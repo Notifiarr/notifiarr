@@ -232,10 +232,10 @@ func (c *QbitConfig) Enabled() bool {
 
 type RtorrentConfig struct {
 	ExtraConfig
-	*xmlrpc.Client `json:"-"    toml:"-"    xml:"-"`
-	URL            string `json:"url"  toml:"url"  xml:"url"`
-	User           string `json:"user" toml:"user" xml:"user"`
-	Pass           string `json:"pass" toml:"pass" xml:"pass"`
+	*xmlrpc.Client `json:"-"        toml:"-"    xml:"-"`
+	URL            string `json:"url"      toml:"url"  xml:"url"`
+	User           string `json:"username" toml:"user" xml:"user"`
+	Pass           string `json:"password" toml:"pass" xml:"pass"`
 }
 
 func (a *Apps) setupRtorrent() error {
@@ -325,9 +325,9 @@ func (c *NZBGetConfig) Enabled() bool {
 
 // XmissionConfig is the Transmission input configuration.
 type XmissionConfig struct {
-	URL  string `json:"url"  toml:"url"  xml:"url"`
-	User string `json:"user" toml:"user" xml:"user"`
-	Pass string `json:"pass" toml:"pass" xml:"pass"`
+	URL  string `json:"url"      toml:"url"  xml:"url"`
+	User string `json:"username" toml:"user" xml:"user"`
+	Pass string `json:"password" toml:"pass" xml:"pass"`
 	ExtraConfig
 	*transmissionrpc.Client `json:"-" toml:"-" xml:"-"`
 }

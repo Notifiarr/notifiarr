@@ -1,26 +1,26 @@
 <script lang="ts">
   import { Badge } from '@sveltestrap/sveltestrap'
   import T, { _ } from './Translate.svelte'
-  import type { App } from './Instance.svelte'
+  import type { InstanceFormValidator } from './instanceFormValidator.svelte'
 
-  type Props = { app: App; deleted?: number; changed: boolean }
-  let { app, deleted = 0, changed }: Props = $props()
+  type Props = { iv: InstanceFormValidator }
+  let { iv }: Props = $props()
 </script>
 
 <h4 class="instance-header">
-  <img src={app.logo} alt="Logo" class="logo" />
-  <T id={app.id + '.title'} />
-  {#if deleted > 0}
+  <img src={iv.app.logo} alt="Logo" class="logo" />
+  <T id={iv.app.id + '.title'} />
+  {#if iv.removed.length > 0}
     <Badge color="warning" class="ms-3">
-      <T id="phrases.DeletedNumber" number={deleted} />
+      <T id="phrases.DeletedNumber" number={iv.removed.length} />
     </Badge>
-  {:else if changed}
+  {:else if iv.formChanged}
     <Badge color="warning" class="ms-3"><T id="phrases.Changed" /></Badge>
   {/if}
 </h4>
 
-{#if $_(app.id + '.description') !== app.id + '.description'}
-  <p><T id={app.id + '.description'} /></p>
+{#if $_(iv.app.id + '.description') !== iv.app.id + '.description'}
+  <p><T id={iv.app.id + '.description'} /></p>
 {/if}
 
 <style>

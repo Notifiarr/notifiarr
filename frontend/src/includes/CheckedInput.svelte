@@ -22,7 +22,6 @@
     index: number
     form: Form
     original: Form
-    feedback: string
     [key: string]: any
   }
   let {
@@ -31,7 +30,6 @@
     index,
     form = $bindable(),
     original = $bindable(),
-    feedback = $bindable(),
     ...rest
   }: Props = $props()
 
@@ -58,7 +56,6 @@
   <Input
     id={app.id + '.' + id}
     bind:value={form[id]}
-    bind:feedback
     original={original?.[id] ?? undefined}
     disabled={app.disabled?.includes(id)}
     description={id === 'url' && form[id]?.toString()?.startsWith('https://')

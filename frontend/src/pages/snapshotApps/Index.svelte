@@ -20,70 +20,31 @@
   import mysqlLogo from '../../assets/logos/mysql.png'
   import nvidiaLogo from '../../assets/logos/nvidia.png'
   import type { MySQLConfig, NvidiaConfig } from '../../api/notifiarrConfig'
-  import { deepCopy, deepEqual } from '../../includes/util'
+  import { deepCopy } from '../../includes/util'
   import Instance, { type Form } from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
-
-  const validate = (id: string, index: number, value: any, reset?: boolean) => {
-    if (reset) {
-      invalid[index] = {}
-      return ''
-    }
-
-    if (!invalid[index]) invalid[index] = {}
-    invalid[index][id] = ''
-
-    if (id.endsWith('.name')) {
-      mysql.forEach((m, i) => {
-        if (i !== index && m?.name === value) {
-          invalid[index][id] = $_('phrases.NameInUseByInstance', {
-            values: { number: i + 1 },
-          })
-          return
-        }
-      })
-      if (value === '') invalid[index][id] = $_('phrases.NameMustNotBeEmpty')
-    }
-
-    if (id.endsWith('.host') && value === '') {
-      invalid[index][id] = $_('phrases.HostMustNotBeEmpty')
-    }
-
-    if (id.endsWith('.username') && value === '') {
-      invalid[index][id] = $_('phrases.UsernameMustNotBeEmpty')
-    }
-
-    //console.log('debug', id, value, invalid[index][id])
-    return invalid[index][id]
-  }
-
-  let mysqlConfig: MySQLConfig = {
-    name: '',
-    host: '',
-    username: '',
-    password: '',
-    timeout: '10s',
-    interval: '5m0s',
-  }
-
-  let mysql = $state(deepCopy($profile.config.snapshot?.mysql ?? []))
-  let nvidia = $state(deepCopy($profile.config.snapshot?.nvidia))
-  let originalMysql = $derived(deepCopy($profile.config.snapshot?.mysql ?? []))
-  let originalNvidia = $derived(deepCopy($profile.config.snapshot?.nvidia))
-  let m = $state<Instances>()
-  let invalid = $state<Record<number, Record<string, string>>>({})
-
-  let formChanged = $derived(
-    !deepEqual(mysql, originalMysql) || !deepEqual(nvidia, originalNvidia),
-  )
+  import { InstanceFormValidator } from '../../includes/instanceFormValidator.svelte'
+  import { nav } from '../../navigation/nav.svelte'
 
   const mysqlApp = {
     name: 'MySQL',
     id: page.id + '.MySQL',
     logo: mysqlLogo,
     hidden: ['deletes'],
-    empty: mysqlConfig,
-    validate,
+    empty: {
+      name: '',
+      host: '',
+      username: '',
+      password: '',
+      timeout: '10s',
+      interval: '5m0s',
+    },
+    customValidator: (id: string, value: any) =>
+      id.endsWith('.username')
+        ? value === ''
+          ? $_('phrases.UsernameMustNotBeEmpty')
+          : ''
+        : undefined,
     merge: (index: number, form: Form) => {
       const c = deepCopy($profile.config)
       c.snapshot!.mysql![index] = form as MySQLConfig
@@ -103,33 +64,38 @@
     },
   }
 
+  let iv = $derived({
+    MySQL: new InstanceFormValidator($profile.config.snapshot?.mysql ?? [], mysqlApp),
+    Nvidia: new InstanceFormValidator(
+      [$profile.config.snapshot?.nvidia ?? {}],
+      nvidiaApp,
+    ),
+  })
+
   async function submit() {
     const c = { ...$profile.config }
-    c.snapshot!.mysql = mysql
-    c.snapshot!.nvidia = nvidia
+    c.snapshot!.mysql = iv.MySQL.instances as MySQLConfig[]
+    c.snapshot!.nvidia = iv.Nvidia.instances[0]! as NvidiaConfig
     await profile.writeConfig(c)
-    m?.clear() // clears the delete counter.
   }
 
-  let removed = $state<number[]>([])
-
-  const allValid = $derived(
-    Object.values(invalid).every(v => Object.values(v).every(v => !v)),
-  )
+  $effect(() => {
+    nav.formChanged = Object.values(iv).some(iv => iv.formChanged)
+  })
 </script>
 
 <Header {page} />
 
 <CardBody class="pt-0 mt-0">
-  <Instances
-    {validate}
-    remove={index => removed.push(index)}
-    bind:instances={mysql}
-    bind:this={m}
-    original={originalMysql}
-    app={mysqlApp} />
-  <InstanceHeader app={nvidiaApp} changed={!deepEqual(nvidia, originalNvidia)} />
-  <Instance bind:form={nvidia!} original={originalNvidia!} app={nvidiaApp} />
+  <Instances iv={iv.MySQL} />
+  <InstanceHeader iv={iv.Nvidia} />
+  <Instance
+    bind:form={iv.Nvidia.instances[0]!}
+    original={iv.Nvidia.original[0]!}
+    app={nvidiaApp} />
 </CardBody>
 
-<Footer {submit} saveDisabled={(!formChanged && removed.length === 0) || !allValid} />
+<Footer
+  {submit}
+  saveDisabled={Object.values(iv).every(iv => !iv.formChanged) ||
+    Object.values(iv).some(iv => iv.invalid)} />

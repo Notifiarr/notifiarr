@@ -413,8 +413,8 @@ export interface QbitConfig extends ExtraConfig, QbitConfig0 {};
  */
 export interface QbitConfig0 {
   url: string;
-  user: string;
-  pass: string;
+  username: string;
+  password: string;
   httppass: string;
   httpuser: string;
 };
@@ -424,8 +424,8 @@ export interface QbitConfig0 {
  */
 export interface RtorrentConfig extends ExtraConfig {
   url: string;
-  user: string;
-  pass: string;
+  username: string;
+  password: string;
 };
 
 /**
@@ -453,8 +453,8 @@ export interface NZBGetConfig extends ExtraConfig, NzbgetConfig {};
  */
 export interface NzbgetConfig {
   url: string;
-  user: string;
-  pass: string;
+  username: string;
+  password: string;
 };
 
 /**
@@ -463,8 +463,8 @@ export interface NzbgetConfig {
  */
 export interface XmissionConfig extends ExtraConfig {
   url: string;
-  user: string;
-  pass: string;
+  username: string;
+  password: string;
 };
 
 /**

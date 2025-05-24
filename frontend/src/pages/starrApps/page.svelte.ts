@@ -43,46 +43,13 @@ export const starrConfig: StarrConfig & ExtraConfig = {
 }
 
 export class Starr {
-  static Validate(
-    id: string,
-    index: number,
-    value: any,
-    instances: (Form | null)[],
-  ): string {
-    const key = id.split('.')[2]
-
-    if (key == 'name') {
-      console.log(id, index, value, instances)
-      let found = ''
-      instances.forEach((m, i) => {
-        if (i !== index && m?.name === value) {
-          found = get(_)('phrases.NameInUseByInstance', { values: { number: i + 1 } })
-          return
-        }
-      })
-      return found ? found : value ? '' : get(_)('phrases.NameMustNotBeEmpty')
-    }
-
-    if (key == 'url') {
-      return value.startsWith('http://') || value.startsWith('https://')
-        ? ''
-        : get(_)('phrases.URLMustBeginWithHttp')
-    }
-
-    if (key == 'apiKey' && value.length < 32) {
-      return get(_)('phrases.APIKeyMustBe32Characters')
-    }
-
-    return ''
-  }
-
-  static get title() {
+  static get title(): Record<string, string> {
     return {
-      Sonarr: get(_)('StarrApps.Sonarr.title'),
-      Radarr: get(_)('StarrApps.Radarr.title'),
-      Readarr: get(_)('StarrApps.Readarr.title'),
-      Lidarr: get(_)('StarrApps.Lidarr.title'),
-      Prowlarr: get(_)('StarrApps.Prowlarr.title'),
+      [Starr.Sonarr.name]: get(_)('StarrApps.Sonarr.title'),
+      [Starr.Radarr.name]: get(_)('StarrApps.Radarr.title'),
+      [Starr.Readarr.name]: get(_)('StarrApps.Readarr.title'),
+      [Starr.Lidarr.name]: get(_)('StarrApps.Lidarr.title'),
+      [Starr.Prowlarr.name]: get(_)('StarrApps.Prowlarr.title'),
     }
   }
 
@@ -150,4 +117,12 @@ export class Starr {
       return c
     },
   }
+
+  static readonly tabs = [
+    Starr.Sonarr.name.toLowerCase(),
+    Starr.Radarr.name.toLowerCase(),
+    Starr.Readarr.name.toLowerCase(),
+    Starr.Lidarr.name.toLowerCase(),
+    Starr.Prowlarr.name.toLowerCase(),
+  ]
 }

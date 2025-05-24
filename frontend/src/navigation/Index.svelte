@@ -11,8 +11,16 @@
 </script>
 
 <script lang="ts">
-  import { Card, Col, Button } from '@sveltestrap/sveltestrap'
-  import { _ } from '../includes/Translate.svelte'
+  import {
+    Card,
+    Col,
+    Button,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+  } from '@sveltestrap/sveltestrap'
+  import T, { _ } from '../includes/Translate.svelte'
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
   import { slide } from 'svelte/transition'
@@ -66,6 +74,21 @@
     {/key}
   </Card>
 </Col>
+
+<!-- This uses global variables to show a modal whenever any (connected)
+     form has changes and you might lose them by navigating away. -->
+<Modal isOpen={nav.showUnsavedAlert !== ''} theme={$theme} color="warning">
+  <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
+  <ModalBody><T id="phrases.LeavePage" /></ModalBody>
+  <ModalFooter>
+    <Button color="primary" onclick={() => (nav.showUnsavedAlert = '')}>
+      <T id="buttons.NoStayHere" />
+    </Button>
+    <Button color="danger" onclick={() => nav.goto(nav.forceEvent, nav.showUnsavedAlert)}>
+      <T id="buttons.YesDeleteMyChanges" />
+    </Button>
+  </ModalFooter>
+</Modal>
 
 <style>
   .sidebar-col {

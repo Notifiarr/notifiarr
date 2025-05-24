@@ -1,4 +1,4 @@
-import { get } from 'svelte/store'
+import { get, writable } from 'svelte/store'
 import { urlbase } from '../api/fetch'
 import type { Component } from 'svelte'
 import Landing from '../Landing.svelte'
@@ -14,8 +14,16 @@ export interface Page extends FaProps {
 }
 
 class Navigator {
+  /** This is the current page component on screen. */
   public ActivePage: Component = $state(Landing)
+  /** This is the current page id on screen. */
   private activePage = $state('')
+  /** This is set to true if any form has changes. */
+  public formChanged = $state(false)
+  /** This is set to the page id if there are unsaved changes. */
+  public showUnsavedAlert = $state('')
+  /** This is used to force a navigation event even if there are unsaved changes. */
+  public forceEvent = { type: 'force', preventDefault: () => {} } as Event
 
   /** Call this in the onMount function of the parent component to set the initial page. */
   public onMount = () => {
@@ -35,6 +43,14 @@ class Navigator {
    */
   public goto = (event: Event | null, pid: string, subPages: string[] = []): void => {
     event?.preventDefault()
+
+    if (this.formChanged && event?.type !== 'force' && pid !== this.activePage) {
+      this.showUnsavedAlert = pid
+      return
+    }
+
+    this.showUnsavedAlert = ''
+    this.formChanged = false
     pid = this.setActivePage(pid)
     closeSidebar()
     const params = new URLSearchParams(window.location.search).toString()

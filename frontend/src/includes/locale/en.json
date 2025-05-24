@@ -46,7 +46,9 @@
     "Close": "Close",
     "SaveChanges": "Save Changes",
     "SaveConfiguration": "Save Configuration",
-    "ResetForm": "Reset Form"
+    "ResetForm": "Reset Form",
+    "NoStayHere": "No! Stay here",
+    "YesDeleteMyChanges": "Yes! Delete my changes"
   },
   "phrases": {
     "ERROR": "ERROR",
@@ -89,7 +91,9 @@
     "HostMustNotBeEmpty": "Host must not be empty.",
     "UsernameMustNotBeEmpty": "Username must not be empty.",
     "NameInUseByInstance": "This name is in use by instance {number}.",
-    "APIKeyMustBe32Characters": "API key must be 32 characters or longer.",
+    "APIKeyMustBeCountCharacters": "API key must be {count} characters or longer.",
+    "TokenMustBeCountCharacters": "Token must be {count} characters or longer.",
+    "LeavePage": "Do you really want to leave this page?",
     "Landing": {
       "SelectASection": "Select a section from the navigation menu to get started.",
       "Welcome": "Welcome, {username}!"
@@ -116,7 +120,8 @@
       "LogFiles": "Log Files",
       "System": "System",
       "TrustProfile": "Trust Profile",
-      "Landing": "Notifiarr Home"
+      "Landing": "Notifiarr Home",
+      "UnsavedChanges": "Unsaved Changes"
     },
     "pageDescription": {
       "Configuration": "Configure your Notifiarr client settings here.",
@@ -681,6 +686,142 @@
       "password": {
         "label": "Password",
         "description": "Password for the Prowlarr instance.",
+        "placeholder": "password"
+      }
+    }
+  },
+  "Downloaders": {
+    "Qbittorrent": {
+      "title": "Qbittorrent",
+      "addInstance": "Add Qbittorrent Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Qbittorrent instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Qbittorrent instance.",
+        "placeholder": "http://qbittorrent.server.tv:8080"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Qbittorrent instance.",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Qbittorrent instance.",
+        "placeholder": "password"
+      }
+    },
+    "Rtorrent": {
+      "title": "Rtorrent",
+      "addInstance": "Add Rtorrent Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Rtorrent instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Rtorrent instance.",
+        "placeholder": "http://rtorrent.server.tv:8080"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Rtorrent instance.",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Rtorrent instance.",
+        "placeholder": "password"
+      }
+    },
+    "Transmission": {
+      "title": "Transmission",
+      "addInstance": "Add Transmission Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Transmission instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Transmission instance.",
+        "placeholder": "http://transmission.server.tv:9091"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Transmission instance.",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Transmission instance.",
+        "placeholder": "password"
+      }
+    },
+    "Deluge": {
+      "title": "Deluge",
+      "addInstance": "Add Deluge Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Deluge instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Deluge instance.",
+        "placeholder": "http://deluge.server.tv:8112"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Deluge instance.",
+        "placeholder": "password"
+      }
+    },
+    "SabNZB": {
+      "title": "SabNZB",
+      "addInstance": "Add SabNZB Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the SabNZB instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the SabNZB instance.",
+        "placeholder": "http://sabnzb.server.tv:8080"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the SabNZB instance.",
+        "placeholder": "sabnzb-api-key"
+      }
+    },
+    "NZBGet": {
+      "title": "NZBGet",
+      "addInstance": "Add NZBGet Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the NZBGet instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the NZBGet instance.",
+        "placeholder": "http://nzbget.server.tv:6789"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the NZBGet instance.",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the NZBGet instance.",
         "placeholder": "password"
       }
     }

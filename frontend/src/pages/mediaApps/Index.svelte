@@ -18,31 +18,11 @@
   import Header from '../../includes/Header.svelte'
   import plexLogo from '../../assets/logos/plex.png'
   import tautulliLogo from '../../assets/logos/tautulli.png'
-  import { deepCopy, deepEqual } from '../../includes/util'
   import Instance, { type Form } from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
-  import type { Config } from '../../api/notifiarrConfig'
-
-  let tautulli = $state($profile.config.tautulli)
-  let plex = $state($profile.config.plex)
-  let originalTautulli = $derived(deepCopy($profile.config.tautulli))
-  let originalPlex = $derived(deepCopy($profile.config.plex))
-  let invalid = $state<Record<number, Record<string, string>>>({})
-  let formChanged = $derived(
-    !deepEqual(plex, originalPlex) || !deepEqual(tautulli, originalTautulli),
-  )
-
-  const validate = (id: string, index: number, value: any) => {
-    if (!invalid[index]) invalid[index] = {}
-
-    if (id.endsWith('.url')) {
-      invalid[index][id] =
-        value.startsWith('http://') || value.startsWith('https://') || value === ''
-          ? ''
-          : $_('phrases.URLMustBeginWithHttp')
-    }
-    return invalid[index][id]
-  }
+  import type { Config, PlexConfig, TautulliConfig } from '../../api/notifiarrConfig'
+  import { InstanceFormValidator } from '../../includes/instanceFormValidator.svelte'
+  import { nav } from '../../navigation/nav.svelte'
 
   const merge = (index: number, form: Form) => {
     return {
@@ -59,7 +39,6 @@
     logo: plexLogo,
     hidden: ['deletes'],
     disabled: ['name'],
-    validate,
     merge,
   }
 
@@ -68,24 +47,45 @@
     id: page.id + '.Tautulli',
     logo: tautulliLogo,
     hidden: ['deletes'],
-    validate,
     merge,
   }
 
-  const allValid = $derived(
-    Object.values(invalid).every(v => Object.values(v).every(v => !v)),
-  )
+  let iv = $derived({
+    Plex: new InstanceFormValidator([$profile.config.plex ?? {}], plexApp),
+    Tautulli: new InstanceFormValidator([$profile.config.tautulli ?? {}], tautulliApp),
+  })
+
+  $effect(() => {
+    nav.formChanged = Object.values(iv).some(iv => iv.formChanged)
+  })
 </script>
 
 <Header {page} />
 
+<!-- We use the zero index because we only support once of each of these apps. -->
 <CardBody class="pt-0 mt-0">
-  <InstanceHeader app={plexApp} changed={!deepEqual(plex, originalPlex)} />
-  <Instance bind:form={plex!} original={originalPlex!} app={plexApp} />
-  <InstanceHeader app={tautulliApp} changed={!deepEqual(tautulli, originalTautulli)} />
-  <Instance bind:form={tautulli!} original={originalTautulli!} app={tautulliApp} />
+  <InstanceHeader iv={iv.Plex} />
+  <Instance
+    reset={() => iv.Plex.resetForm(0)}
+    validate={(id, value) => iv.Plex.validate(id, value, 0)}
+    bind:form={iv.Plex.instances[0]!}
+    original={iv.Plex.original[0]!}
+    app={plexApp} />
+  <InstanceHeader iv={iv.Tautulli} />
+  <Instance
+    reset={() => iv.Tautulli.resetForm(0)}
+    validate={(id, value) => iv.Tautulli.validate(id, value, 0)}
+    bind:form={iv.Tautulli.instances[0]!}
+    original={iv.Tautulli.original[0]!}
+    app={tautulliApp} />
 </CardBody>
 
 <Footer
-  saveDisabled={!formChanged || !allValid}
-  submit={() => profile.writeConfig({ ...$profile.config, tautulli, plex })} />
+  submit={() =>
+    profile.writeConfig({
+      ...$profile.config,
+      plex: iv.Plex.instances[0]! as PlexConfig,
+      tautulli: iv.Tautulli.instances[0]! as TautulliConfig,
+    })}
+  saveDisabled={Object.values(iv).every(iv => !iv.formChanged) ||
+    Object.values(iv).some(iv => iv.invalid)} />
