@@ -46,7 +46,7 @@ require (
 	golift.io/goty v0.0.1
 	golift.io/mulery v0.0.8
 	golift.io/nzbget v0.1.5
-	golift.io/qbit v0.0.0-20240715191156-11930ac2546e
+	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
 	golift.io/rotatorr v0.0.0-20240723172740-cb73b9c4894c
 	golift.io/starr v1.1.0
 	golift.io/version v0.0.2
