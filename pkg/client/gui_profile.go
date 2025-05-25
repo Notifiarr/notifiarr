@@ -17,6 +17,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/private"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/shirou/gopsutil/v4/host"
 	mulery "golift.io/mulery/client"
@@ -47,39 +48,41 @@ type Profile struct {
 	UpstreamType    configfile.AuthType    `json:"upstreamType"`
 	Languages       frontend.Languages     `json:"languages"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
-	LoggedIn    bool                           `json:"loggedIn"`
-	Updated     time.Time                      `json:"updated"`
-	Flags       *configfile.Flags              `json:"flags"`
-	Dynamic     bool                           `json:"dynamic"`
-	Webauth     bool                           `json:"webauth"`
-	Msg         string                         `json:"msg,omitempty"`
-	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
-	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
-	Expvar      mnd.AllData                    `json:"expvar"`
-	HostInfo    *host.InfoStat                 `json:"hostInfo"`
-	Disks       map[string]*snapshot.Partition `json:"disks"`
-	ProxyAllow  bool                           `json:"proxyAllow"`
-	PoolStats   map[string]*mulery.PoolSize    `json:"poolStats"`
-	Started     time.Time                      `json:"started"`
-	Program     string                         `json:"program"`
-	Version     string                         `json:"version"`
-	Revision    string                         `json:"revision"`
-	Branch      string                         `json:"branch"`
-	BuildUser   string                         `json:"buildUser"`
-	BuildDate   string                         `json:"buildDate"`
-	GoVersion   string                         `json:"goVersion"`
-	OS          string                         `json:"os"`
-	Arch        string                         `json:"arch"`
-	Binary      string                         `json:"binary"`
-	Environment map[string]string              `json:"environment"`
-	Docker      bool                           `json:"docker"`
-	UID         int                            `json:"uid"`
-	GID         int                            `json:"gid"`
-	IP          string                         `json:"ip"`
-	Gateway     string                         `json:"gateway"`
-	IfName      string                         `json:"ifName"`
-	Netmask     string                         `json:"netmask"`
-	MD5         string                         `json:"md5"`
+	LoggedIn        bool                           `json:"loggedIn"`
+	Updated         time.Time                      `json:"updated"`
+	Flags           *configfile.Flags              `json:"flags"`
+	Dynamic         bool                           `json:"dynamic"`
+	Webauth         bool                           `json:"webauth"`
+	Msg             string                         `json:"msg,omitempty"`
+	LogFiles        *logs.LogFileInfos             `json:"logFileInfo"`
+	ConfigFiles     *logs.LogFileInfos             `json:"configFileInfo"`
+	Expvar          mnd.AllData                    `json:"expvar"`
+	HostInfo        *host.InfoStat                 `json:"hostInfo"`
+	Disks           map[string]*snapshot.Partition `json:"disks"`
+	ProxyAllow      bool                           `json:"proxyAllow"`
+	PoolStats       map[string]*mulery.PoolSize    `json:"poolStats"`
+	Started         time.Time                      `json:"started"`
+	Program         string                         `json:"program"`
+	Version         string                         `json:"version"`
+	Revision        string                         `json:"revision"`
+	Branch          string                         `json:"branch"`
+	BuildUser       string                         `json:"buildUser"`
+	BuildDate       string                         `json:"buildDate"`
+	GoVersion       string                         `json:"goVersion"`
+	OS              string                         `json:"os"`
+	Arch            string                         `json:"arch"`
+	Binary          string                         `json:"binary"`
+	Environment     map[string]string              `json:"environment"`
+	Docker          bool                           `json:"docker"`
+	UID             int                            `json:"uid"`
+	GID             int                            `json:"gid"`
+	IP              string                         `json:"ip"`
+	Gateway         string                         `json:"gateway"`
+	IfName          string                         `json:"ifName"`
+	Netmask         string                         `json:"netmask"`
+	MD5             string                         `json:"md5"`
+	ActiveTunnel    string                         `json:"activeTunnel"`
+	TunnelPoolStats map[string]*mulery.PoolSize    `json:"tunnelPoolStats"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
@@ -98,6 +101,16 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
 	hostInfo, _ := c.Config.GetHostInfo(req.Context())
+	activeTunnel := ""
+	poolStats := map[string]*mulery.PoolSize{}
+
+	if at := data.Get("activeTunnel"); at != nil {
+		activeTunnel, _ = at.Data.(string)
+	}
+
+	if c.tunnel != nil {
+		poolStats = c.tunnel.PoolStats()
+	}
 
 	if err := json.NewEncoder(resp).Encode(&Profile{
 		Username:        username,
@@ -147,6 +160,8 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		IfName:          ifName,
 		Netmask:         netmask,
 		MD5:             private.MD5(),
+		ActiveTunnel:    activeTunnel,
+		TunnelPoolStats: poolStats,
 	}); err != nil {
 		c.Errorf("Writing HTTP Response: %v", err)
 	}

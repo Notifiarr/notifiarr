@@ -1,7 +1,15 @@
+<!-- Footer for any page that saves configuration.
+  - Shows a save button.
+  - Shows a status message.
+  - Shows a success message.
+  - Shows a form error message.
+  - Shows a form error message.
+  - TIED to profile.svelte.ts.
+-->
 <script lang="ts">
   import { Alert, Button, CardFooter, Col, Row, Spinner } from '@sveltestrap/sveltestrap'
   import { profile } from '../api/profile.svelte'
-  import T, { _ } from './Translate.svelte'
+  import T, { _, time } from './Translate.svelte'
   import { age } from './util'
 
   type Props = {
@@ -11,7 +19,7 @@
     successText?: string
     /** The text to display on the save button. Must be translation key. */
     saveButtonText?: string
-    /** The optionaldescription of the save button. Must be translation key. */
+    /** The optional description of the save button. Must be translation key. */
     saveButtonDescription?: string
     /** Whether the save button is disabled. */
     saveDisabled?: boolean
@@ -28,48 +36,59 @@
     children = undefined,
   }: Props = $props()
 
+  let submitting = $state(false)
+  let successTime = $state(new Date())
+  let submitted = $state(false)
+
   async function onclick(e: Event) {
     e.preventDefault()
+    submitting = true
+    submitted = false
     await submit(e)
+    submitting = false
+    submitted = true
+    successTime = new Date()
+    profile.now = successTime.getTime() // speed up the timer display
   }
+
+  function toggle() {
+    submitted = false
+    if (profile.status) profile.clearStatus()
+  }
+
+  // These are derived values that are used to display the status messages.
+  let color = $derived(
+    profile.formError ? 'danger' : profile.status ? 'warning' : 'success',
+  )
+  let isOpen = $derived(!!(profile.formError || profile.status || submitted))
+  let disabled = $derived(submitting || saveDisabled)
+  const values = $derived({
+    timeDuration: age(profile.now - new Date(successTime ?? new Date()).getTime()),
+  })
+  let msg = $derived(
+    profile.formError || profile.status || (submitted && $_(successText, { values })),
+  )
 </script>
 
 <CardFooter>
   <div class="footer pb-2">
     <Row>
-      <Col style="max-width: fit-content;">
+      <Col style="max-width: fit-content;" class="mt-1">
         <!-- Save Button -->
-        <Button
-          size="lg"
-          color="notifiarr"
-          type="submit"
-          class="mt-1"
-          disabled={profile.status !== '' || saveDisabled}
-          {onclick}>
-          {#if profile.status}
-            <Spinner size="sm" />
-          {/if}
-          {profile.status ? $_('phrases.SavingConfiguration') : $_(saveButtonText)}
+        <Button size="lg" color="notifiarr" type="submit" {disabled} {onclick}>
+          {#if submitting}<Spinner size="sm" />{/if}
+          {submitting ? $_('phrases.SavingConfiguration') : $_(saveButtonText)}
         </Button>
         <!-- Save Button Description -->
         {#if saveButtonDescription}
           <br /><small class="ms-2 text-muted">{$_(saveButtonDescription)}</small>
         {/if}
       </Col>
+
       <!-- Status Message, goes beside button -->
       <Col>
-        <Alert
-          color={profile.error ? 'danger' : profile.success ? 'success' : 'warning'}
-          toggle={profile.status ? undefined : () => profile.clearStatus()}
-          isOpen={!!(profile.error || profile.status || profile.success)}
-          closeClassName="submit-alert-close"
-          class="submit-alert">
-          <!-- These happen in order, and only one will display something at a time.-->
-          {profile.status}
-          {profile.error}
-          {#if profile.success}
-            <T id={successText} age={age(profile.successAge, true)} />
-          {/if}
+        <Alert {color} {toggle} {isOpen} closeClassName="close" class="submit-alert">
+          {msg}
         </Alert>
       </Col>
     </Row>
@@ -81,7 +100,7 @@
   /* The next two are used by the alerts that pop up when you click a save button.
    * This makes the alert match the height of a lg button.
    */
-  .footer :global(.submit-alert-close) {
+  .footer :global(.close) {
     position: absolute !important;
     right: 0;
     top: -5px !important;

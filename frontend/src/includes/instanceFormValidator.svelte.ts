@@ -104,7 +104,7 @@ export class InstanceFormValidator {
     if (!this.feedback[index]) this.feedback[index] = {}
     this.feedback[index][id] = ''
 
-    if (key == 'name' && !id.includes('Plex')) {
+    if (key == 'name') {
       this.instances?.forEach((m, i) => {
         if (i !== index && m?.name === value) {
           this.feedback[index][id] = get(_)('phrases.NameInUseByInstance', {

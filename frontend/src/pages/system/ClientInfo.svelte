@@ -7,7 +7,8 @@
   import { date, time } from '../../includes/Translate.svelte'
   import T from '../../includes/Translate.svelte'
   // make this dynamic?
-  const uptime = $derived(age(Date.now() - new Date($profile.started).getTime()))
+  const started = new Date($profile.started).getTime()
+  const uptime = $derived(age(profile.now - started))
 </script>
 
 <!-- Client Section -->

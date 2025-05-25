@@ -8,20 +8,17 @@ import { urlbase } from './fetch'
 
 class ConfigProfile {
   private profile: Writable<Profile>
-  private now = $state(Date.now())
+  public now = $state(Date.now())
 
-  /** Display a status message to the user after calling writeConfig or trustProfile. */
-  public status = $state('')
   /** Display an error message to the user after calling writeConfig or trustProfile. */
   public error = $state('')
-  /** Display a success message to the user after calling writeConfig or trustProfile. */
-  public success = $state(<Date | null>null)
-  /** Use age to display the age of the success message in milliseconds. */
-  public successAge = $derived(this.now - (this.success?.getTime() ?? 0))
   /** This is the last time the profile configuration was updated. */
-  public updated = $state(0)
-  /** Milliseconds since the last profile configuration update. */
-  public updatedAge = $derived(this.now - this.updated)
+  public updated = $state<Date | null>(new Date())
+
+  /** Display a status message (form feedback) to the user after calling one of the update methods. */
+  public status = $state('')
+  /** Display an error message (form feedback) to the user after calling one of the update methods. */
+  public formError = $state('')
 
   constructor() {
     this.profile = writable<Profile>({} as Profile)
@@ -52,7 +49,8 @@ class ConfigProfile {
   public clearStatus() {
     this.status = ''
     this.error = ''
-    this.success = null
+    this.updated = null
+    this.formError = ''
   }
 
   private async waitForReload() {
@@ -63,7 +61,7 @@ class ConfigProfile {
       this.status = get(_)('phrases.UpdatingBackEnd')
       this.error = await this.fetch()
       await (this.error == ''
-        ? (this.success = new Date())
+        ? (this.updated = new Date())
         : (this.error = get(_)('phrases.FailedToReload', {
             values: { error: this.error },
           })))
@@ -79,21 +77,24 @@ class ConfigProfile {
   public async trustProfile(form: ProfilePost) {
     this.status = get(_)('phrases.SavingConfiguration')
     this.error = ''
-    this.success = null
+    this.updated = null
 
     const { ok, body } = await postUi('profile', JSON.stringify(form), false)
+
     if (!ok) {
-      this.error = body
-      return (this.status = '')
+      this.formError = this.error = body
+      this.status = ''
+    } else {
+      await this.waitForReload()
+      this.status = ''
     }
-    await this.waitForReload()
   }
 
   /** Use writeConfig to update a partial configuration on the backend and reload. */
   public async writeConfig(config: Config) {
     this.status = get(_)('phrases.SavingConfiguration')
     this.error = ''
-    this.success = null
+    this.updated = null
 
     // Merge whatever was provided with the existing config.
     const newConfig = { ...get(this.profile).config, ...config }
@@ -101,8 +102,11 @@ class ConfigProfile {
     const { ok, body } = await postUi('reconfig', JSON.stringify(newConfig), false)
     // If it's an error, set the error message, and exit.
     if (!ok) {
-      this.error = get(_)('config.errors.ConfigUpdateFailed', { values: { error: body } })
-      return (this.status = '')
+      this.status = ''
+      this.formError = this.error = get(_)('config.errors.ConfigUpdateFailed', {
+        values: { error: body },
+      })
+      return
     }
 
     // Update the local store with the new config.
@@ -131,12 +135,28 @@ class ConfigProfile {
     }
   }
 
+  /** Save the tunnel configuration to the backend. */
+  public async saveTunnels(primaryTunnel: string, backupTunnel: string) {
+    this.status = get(_)('phrases.SavingConfiguration')
+    this.error = ''
+
+    const resp = await postUi(
+      'tunnel/save',
+      JSON.stringify({ PrimaryTunnel: primaryTunnel, BackupTunnel: [backupTunnel] }),
+      true,
+      10000,
+    )
+
+    this.status = ''
+    if (!resp.ok) this.formError = resp.body
+  }
+
   public subscribe(run: (value: Profile) => void): Unsubscriber {
     return this.profile.subscribe(run)
   }
 
   private set(value: Profile) {
-    this.updated = Date.now()
+    this.updated = new Date()
     // Update local url base in case it changed.
     // The backend will begin using another url base after the reload.
     urlbase.set(value.config?.urlbase ?? '/')

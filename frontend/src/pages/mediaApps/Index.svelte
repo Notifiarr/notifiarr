@@ -39,6 +39,8 @@
     logo: plexLogo,
     hidden: ['deletes'],
     disabled: ['name'],
+    // Ignore empty values since Plex is optional.
+    customValidator: (id: string, value: any) => (value === '' ? '' : undefined),
     merge,
   }
 
@@ -47,6 +49,7 @@
     id: page.id + '.Tautulli',
     logo: tautulliLogo,
     hidden: ['deletes'],
+    customValidator: (id: string, value: any) => (value === '' ? '' : undefined),
     merge,
   }
 

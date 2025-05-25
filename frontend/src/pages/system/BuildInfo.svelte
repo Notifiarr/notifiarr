@@ -3,7 +3,9 @@
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Header from './Header.svelte'
-  import T from '../../includes/Translate.svelte'
+  import T, { date } from '../../includes/Translate.svelte'
+  import { age } from '../../includes/util'
+  const buildDate = new Date($profile.buildDate).getTime()
 </script>
 
 <!-- Build Section -->
@@ -20,7 +22,7 @@
     </tr>
     <tr>
       <th><T id="system.BuildInformation.BuildDate" /></th>
-      <td>{new Date($profile.buildDate).toLocaleString()}</td>
+      <td>{date($profile.buildDate)} ({age(profile.now - buildDate, false)})</td>
     </tr>
     <tr>
       <th><T id="system.BuildInformation.GoVersion" /></th>

@@ -36,6 +36,26 @@
         "tooltip": "This controls how many delete requests are allowed per hour. A setting of 0 disables the ability to send delete requests. This refers to media deletes, but may include other actions. This is a throttle to prevent hackers from obliterating your content.",
         "countPerHour": "{count} per hour"
       }
+    },
+    "clock": {
+      "short": {
+        "ms": "{milliseconds}ms",
+        "s": "{seconds}s",
+        "m": "{minutes}m",
+        "h": "{hours}h",
+        "d": "{days}d",
+        "w": "{weeks}w"
+      },
+      "ago": "{timeDuration} ago"
+    },
+    "bytes": {
+      "short": {
+        "B": "{bytes} B",
+        "KB": "{bytes} KB",
+        "MB": "{bytes} MB",
+        "GB": "{bytes} GB",
+        "TB": "{bytes} TB"
+      }
     }
   },
   "buttons": {
@@ -55,12 +75,12 @@
     "LoggingIn": "Logging in...",
     "LoggedIn": "Logged in!",
     "Loading": "Loading...",
-    "BackEndUpdated": "Back-end updated {age} ago.",
+    "BackEndUpdated": "Back-end updated {timeDuration} ago.",
     "UpdatingBackEnd": "Updating back-end...",
     "FailedToUpdateBackEnd": "Failed to update back-end: {error}",
     "TryRefreshingThePage": "Try refreshing the page.",
     "ConfigurationSavedReloading": "Configuration saved! Reloading client...",
-    "ConfigurationSaved": "Configuration saved {age} ago!",
+    "ConfigurationSaved": "Configuration saved {timeDuration} ago!",
     "SavingConfiguration": "Saving configuration...",
     "Version": "Version {version}",
     "Every12Hours": "Every 12 hours",
@@ -125,7 +145,7 @@
     },
     "pageDescription": {
       "Configuration": "Configure your Notifiarr client settings here.",
-      "SiteTunnel": "Select primary and secondary tunnel servers.",
+      "SiteTunnel": "This client keeps a persistent websocket connection to notifiarr.com using a <a href='https://github.com/golift/mulery' target='_new'>Mulery tunnel</a>. This tunnel allows the website to make requests to your client without the need for opening a port, or having a static IP. This page allows you to select your primary tunnel and which tunnel you wish to use as backup in case the primary becomes inaccessible.",
       "StarrApps": "Setup Starr integrations.",
       "Downloaders": "Manage download clients.",
       "MediaApps": "Manage media players and related services.",
@@ -335,7 +355,7 @@
       "PasswordOnlyUsed": "Username and Password are only used if Authentication Type is set to Password.",
       "HeaderOnlyUsed": "Auth Header is only used if Authentication Type is <b>not</b> set to Password.",
       "AuthTypeChange": "If Authentication Type changes, log out to complete the process.",
-      "ProfileUpdated": "Profile updated successfully {age} ago!",
+      "ProfileUpdated": "Profile updated successfully {timeDuration} ago!",
       "EnterCurrentPassword": "Enter your current password to make changes.",
       "ProxyAuthDisabled": "Proxy authentication is disabled because your upstream ({upstreamIp}) is not in the allowed upstreams list.",
       "Addit": "Add it.",
@@ -824,6 +844,29 @@
         "description": "Password for the NZBGet instance.",
         "placeholder": "password"
       }
+    }
+  },
+  "SiteTunnel": {
+    "subText": "Click the <span class='text-success'>Ping Tunnels</span> button, and select the tunnel with the fastest response time as your primary. Select another fast tunnel as backup.",
+    "phrases": {
+      "PrimaryTunnel": "Primary Tunnel",
+      "BackupTunnel": "Backup Tunnel",
+      "Ping": "Ping Tunnels",
+      "Pinging": "Pinging ...",
+      "ActiveTunnel": "Active Tunnel: {tunnel}",
+      "TunnelStats": "Tunnel Stats",
+      "Disconnects": "Disconnects",
+      "ConnectionPoolSize": "Connection Pool Size",
+      "Connecting": "Connecting",
+      "Idle": "Idle",
+      "Running": "Running",
+      "LastConnection": "Last Connection",
+      "LastActiveCheck": "Last Active Check",
+      "SocketURLActive": "Socket URL (active)",
+      "SocketURLInactive": "Socket URL (inactive)",
+      "SelectTunnel": "Select a tunnel",
+      "TunnelsSaved": "Tunnels saved {timeDuration} ago!",
+      "TunnelStatsStale": "The data above is always stale. To update it, click the update backend link in the page header."
     }
   }
 }

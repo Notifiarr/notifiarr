@@ -160,3 +160,13 @@ textarea:focus {
 .accordion-body {
   background-color: #cdf0cd42 !important;
 }
+
+input[type='radio']:checked,
+input[type='checkbox']:checked {
+  background-color: #3cd2a5 !important;
+}
+
+input[type='radio'],
+input[type='checkbox'] {
+  border-color: #3cd2a5 !important;
+}

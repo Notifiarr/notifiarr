@@ -65,8 +65,6 @@
         form.username == 'webauth' ||
         form.username == 'noauth' ||
         form.username.includes(':') ||
-        // Cannot click save while the form is submitting.
-        (profile.status != '' && !profile.success) ||
         // Enable the save button.
         false,
     )

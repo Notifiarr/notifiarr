@@ -67,14 +67,16 @@
     <Card color="transparent border-0" theme={$theme}>
       <span class="text-nowrap">
         {#if $profile?.loggedIn}
-          <a href="#reload" onclick={updateBackend}>
+          <a href="#reload" onclick={updateBackend} class="text-decoration-none">
             <Fa i={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
+            {#if notification}
+              {@html notification}
+            {:else if profile.updated}
+              <T
+                id="phrases.BackEndUpdated"
+                timeDuration={age(profile.now - new Date($profile.updated).getTime())} />
+            {/if}
           </a>
-          {#if notification}
-            {@html notification}
-          {:else}
-            <T id="phrases.BackEndUpdated" age={age(profile.updatedAge)} />
-          {/if}
         {/if}
       </span>
     </Card>

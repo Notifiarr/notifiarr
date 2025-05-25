@@ -29,7 +29,7 @@
 
   const magicNumber = 1005
   // windowWidth is used for sidebar collapse state.
-  let windowWidth = $state(magicNumber + 1)
+  let windowWidth = $state(magicNumber - 1)
   const isMobile = $derived(windowWidth <= magicNumber)
   // Use this to limit the sidebar height to the content height.
   let contentHeight = $state(0)

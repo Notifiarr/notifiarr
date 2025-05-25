@@ -33,8 +33,9 @@ export async function postUi(
   uri: string,
   body: BodyInit,
   json: boolean = true,
+  timeout: number = 5000,
 ): Promise<BackendResponse> {
-  return await request('ui/' + uri, 'POST', body, json)
+  return await request('ui/' + uri, 'POST', body, json, timeout)
 }
 
 /**
@@ -97,6 +98,7 @@ async function request(
   method: string = 'GET',
   body: BodyInit | null = null,
   json: boolean = true,
+  timeout: number = 5000,
 ): Promise<BackendResponse> {
   try {
     const headers: Record<string, string> = {}
@@ -105,7 +107,7 @@ async function request(
     if (body) headers['Content-Type'] = 'application/json'
 
     uri = rtrim(get(urlbase), '/') + '/' + ltrim(uri, '/')
-    const response = await fetchWithTimeout(uri, { method, headers, body })
+    const response = await fetchWithTimeout(uri, { method, headers, body }, timeout)
     if (response.status === 403) throw LoggedOut
 
     if (!response.ok)

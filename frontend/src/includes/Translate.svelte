@@ -6,14 +6,18 @@
   export { _ } // pass it through
   export const isReady = derived(locale, $locale => typeof $locale === 'string')
 
+  export function datetime(datetime: string | Date | number): string {
+    return `${date(datetime)} ${time(datetime)}`
+  }
+
   export function date(date: string | Date | number): string {
     if (typeof date !== 'string') return get(d)(date)
     return get(d)(Date.parse(date))
   }
 
-  export function time(date: string | Date | number): string {
-    if (typeof date !== 'string') return get(t)(date)
-    return get(t)(Date.parse(date))
+  export function time(time: string | Date | number): string {
+    if (typeof time !== 'string') return get(t)(time)
+    return get(t)(Date.parse(time), { format: 'long' })
   }
 </script>
 

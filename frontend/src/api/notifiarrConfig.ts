@@ -89,6 +89,8 @@ export interface Profile {
   ifName: string;
   netmask: string;
   md5: string;
+  activeTunnel: string;
+  tunnelPoolStats?: Record<string, null | PoolSize>;
 };
 
 /**

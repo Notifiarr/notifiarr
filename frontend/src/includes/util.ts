@@ -1,4 +1,6 @@
 import { toast } from '@zerodevx/svelte-toast'
+import { get } from 'svelte/store'
+import { _ } from './Translate.svelte'
 
 /** Remove a prefix from a string. */
 export const ltrim = (str: string, prefix: string) =>
@@ -38,22 +40,33 @@ export const failure = (m: string) =>
     },
   })
 
+/** Convert a date into a human readable string of how long ago it was. */
+export function since(date: Date | string): string {
+  const now = new Date().getTime()
+  const then = typeof date === 'string' ? new Date(date).getTime() : date.getTime()
+  return age(now - then, false)
+}
+
 /** age converts a milliseconds counter into human readable: 13h 5m 45s */
 export function age(milliseconds: number, includeSeconds = false): string {
   const seconds = Math.floor(milliseconds / 1000)
   if (!seconds) return '0s'
-  const days = Math.floor(seconds / 86400)
-  const hours = Math.floor((seconds - days * 86400) / 3600)
-  const minutes = Math.floor((seconds - days * 86400 - hours * 3600) / 60)
+  const weeks = Math.floor(seconds / 604800)
+  const days = Math.floor((seconds - weeks * 604800) / 86400)
+  const hours = Math.floor((seconds - weeks * 604800 - days * 86400) / 3600)
+  const minutes = Math.floor(
+    (seconds - weeks * 604800 - days * 86400 - hours * 3600) / 60,
+  )
   const secs =
     !includeSeconds && seconds > 60
       ? 0
-      : Math.floor(seconds - days * 86400 - hours * 3600 - minutes * 60)
+      : Math.floor(seconds - weeks * 604800 - days * 86400 - hours * 3600 - minutes * 60)
   return (
-    (days > 0 ? days + 'd ' : '') +
-    (hours > 0 ? hours + 'h ' : '') +
-    (minutes > 0 ? minutes + 'm ' : '') +
-    (secs > 0 ? secs + 's ' : '')
+    (weeks > 0 ? get(_)('words.clock.short.w', { values: { weeks } }) + ' ' : '') +
+    (days > 0 ? get(_)('words.clock.short.d', { values: { days } }) + ' ' : '') +
+    (hours > 0 ? get(_)('words.clock.short.h', { values: { hours } }) + ' ' : '') +
+    (minutes > 0 ? get(_)('words.clock.short.m', { values: { minutes } }) + ' ' : '') +
+    (seconds > 0 ? get(_)('words.clock.short.s', { values: { seconds } }) + ' ' : '')
   ).trim()
 }
 
@@ -66,6 +79,7 @@ export const iequals = (a: string, b: string) => a.toLowerCase() === b.toLowerCa
 
 /** Format bytes number into a human readable string. */
 export function formatBytes(bytes: number): string {
+  // Translation keys.
   const units = ['B', 'KB', 'MB', 'GB', 'TB']
   let unitIndex = 0
 
@@ -74,7 +88,9 @@ export function formatBytes(bytes: number): string {
     unitIndex++
   }
 
-  return `${bytes.toFixed(2)} ${units[unitIndex]}`
+  return get(_)('words.bytes.short.' + units[unitIndex], {
+    values: { bytes: bytes.toFixed(2) },
+  })
 }
 
 /** Check if two objects are equal. */
