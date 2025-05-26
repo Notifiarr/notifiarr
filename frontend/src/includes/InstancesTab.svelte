@@ -9,31 +9,39 @@
   import { faExclamationTriangle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { Badge, TabPane } from '@sveltestrap/sveltestrap'
   import Instances from './Instances.svelte'
-  import type { InstanceFormValidator } from './instanceFormValidator.svelte'
+  import type { FormListTracker } from './formsTracker.svelte'
+  import Instance from './Instance.svelte'
 
-  type Props = { iv: InstanceFormValidator; tab: string; titles: Record<string, string> }
-  let { iv, tab = $bindable(), titles = $bindable() }: Props = $props()
+  type Props = { flt: FormListTracker; tab: string; titles: Record<string, string> }
+  let { flt, tab = $bindable(), titles = $bindable() }: Props = $props()
 </script>
 
 <TabPane
-  tabId={iv.app.name.toLowerCase()}
-  active={tab === iv.app.name.toLowerCase()}
-  onclick={() => (tab = iv.app.name.toLowerCase())}>
+  tabId={flt.app.name.toLowerCase()}
+  active={tab === flt.app.name.toLowerCase()}
+  onclick={() => (tab = flt.app.name.toLowerCase())}>
   <div class="title" slot="tab">
-    <h5 class="title {iv.invalid ? 'text-danger' : ''}">
-      {titles[iv.app.name]}
-      {#if iv.instances.length > 0}
-        <Badge class="tab-badge" color="success">{iv.instances.length}</Badge>
+    <h5 class="title {flt.invalid ? 'text-danger' : ''}">
+      {titles[flt.app.name]}
+      {#if flt.instances.length > 0}
+        <Badge class="tab-badge" color="success">{flt.instances.length}</Badge>
       {/if}
-      {#if iv.invalid}
+      {#if flt.invalid}
         <Fa i={faExclamationTriangle} c1="red" c2="red" />
-      {:else if iv.formChanged || iv.removed.length > 0}
+      {:else if flt.formChanged || flt.removed.length > 0}
         <Fa i={faExclamationTriangle} c1="orange" c2="orange" />
       {/if}
     </h5>
   </div>
 
-  <Instances {iv} />
+  <Instances {flt} Child={Instance}>
+    {#snippet headerActive(index)}
+      {index + 1}. {flt.original[index]?.name}
+    {/snippet}
+    {#snippet headerCollapsed(index)}
+      {flt.original[index]?.url}
+    {/snippet}
+  </Instances>
 </TabPane>
 
 <style>

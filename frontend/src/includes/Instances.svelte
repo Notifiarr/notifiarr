@@ -11,53 +11,66 @@
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
   import InstanceHeader from './InstanceHeader.svelte'
-  import type { InstanceFormValidator } from './instanceFormValidator.svelte'
+  import type { FormListTracker } from './formsTracker.svelte'
+  import Watcher from '../pages/fileWatcher/Watcher.svelte'
+  import type { Snippet } from 'svelte'
 
-  let { iv }: { iv: InstanceFormValidator } = $props()
+  let {
+    flt,
+    Child = Instance,
+    headerActive = $bindable(),
+    headerCollapsed = $bindable(),
+  }: {
+    flt: FormListTracker
+    Child: typeof Instance | typeof Watcher
+    headerActive: Snippet<[number]>
+    headerCollapsed?: Snippet<[number]>
+  } = $props()
 </script>
 
-<InstanceHeader {iv} />
+<InstanceHeader {flt} />
 
-{#if iv.instances.length > 0}
+{#if flt.instances.length > 0}
   <div class="instances" transition:slide>
     <Accordion class="mb-2">
-      {#each iv.instances as instance, index}
-        {@const changed = !deepEqual(instance, iv.original[index] ?? iv.app.empty)}
+      {#each flt.instances as instance, index}
+        {@const changed = !deepEqual(instance, flt.original[index] ?? flt.app.empty)}
         <div class="accordion-item">
           <AccordionHeader
-            onclick={() => (iv.active = index)}
-            class={iv.active !== index ? 'collapsed d-block' : ''}>
+            onclick={() => (flt.active = index)}
+            class={flt.active !== index ? 'collapsed d-block' : ''}>
             <h5 class="mb-0">
-              {index + 1}. {iv.original[index]?.name}
-              {#if !iv.isValid(index)}
+              {@render headerActive(index)}
+              {#if !flt.isValid(index)}
                 <Badge color="danger"><T id="phrases.Invalid" /></Badge>
-              {:else if index + 1 > iv.original.length}
+              {:else if index + 1 > flt.original.length}
                 <Badge color="info"><T id="phrases.New" /></Badge>
               {:else if changed}
                 <Badge color="warning"><T id="phrases.Changed" /></Badge>
               {/if}
             </h5>
-            {#if iv.active !== index}
+            {#if flt.active !== index}
               <span class="text-muted fs-6 mt-0">
-                {iv.original[index]?.url}{iv.original[index]?.host}
+                {@render headerCollapsed?.(index)}
               </span>
             {/if}
           </AccordionHeader>
 
-          {#key iv.active}
-            <Card class="accordion-collapse {iv.active === index ? 'd-block' : 'd-none'}">
+          {#key flt.active}
+            <Card
+              class="accordion-collapse {flt.active === index ? 'd-block' : 'd-none'}">
               <div class="accordion-body" transition:slide={{ duration: 350, axis: 'y' }}>
-                <Instance
-                  bind:form={iv.instances[index]!}
-                  original={iv.original[index] ?? iv.app.empty}
-                  app={iv.app}
-                  validate={(id, value) => iv.validate(id, value, index)}
+                <Child
+                  bind:form={flt.instances[index]!}
+                  original={flt.original[index] ?? flt.app.empty}
+                  app={flt.app}
+                  validate={(id, value) => flt.validate(id, value, index)}
                   {index} />
                 <Button
                   color="danger"
                   class="float-end"
                   outline
-                  onclick={async () => await iv.delInstance(index)}>
+                  onclick={async () => await flt.delInstance(index)}>
                   {$_('phrases.DeleteInstance')}
                 </Button>
                 <Button
@@ -65,7 +78,7 @@
                   class="float-end me-2"
                   outline
                   disabled={!changed}
-                  onclick={() => iv.resetForm(index)}>
+                  onclick={() => flt.resetForm(index)}>
                   {$_('buttons.ResetForm')}
                 </Button>
                 <div style="clear: both;"></div>
@@ -78,8 +91,8 @@
   </div>
 {/if}
 
-<Button color="success" outline onclick={iv.addInstance}>
-  {$_(iv.app.id + '.addInstance')}
+<Button color="success" outline onclick={flt.addInstance}>
+  {$_(flt.app.id + '.addInstance')}
 </Button>
 
 <style>

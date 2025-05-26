@@ -49,25 +49,29 @@ export function since(date: Date | string): string {
 
 /** age converts a milliseconds counter into human readable: 13h 5m 45s */
 export function age(milliseconds: number, includeSeconds = false): string {
-  const seconds = Math.floor(milliseconds / 1000)
-  if (!seconds) return '0s'
+  const t = get(_) // translate function
+  let seconds = Math.floor(milliseconds / 1000)
+  if (!seconds) return t('words.clock.short.s', { values: { seconds: 0 } })
   const weeks = Math.floor(seconds / 604800)
   const days = Math.floor((seconds - weeks * 604800) / 86400)
   const hours = Math.floor((seconds - weeks * 604800 - days * 86400) / 3600)
   const minutes = Math.floor(
     (seconds - weeks * 604800 - days * 86400 - hours * 3600) / 60,
   )
-  const secs =
+  seconds =
     !includeSeconds && seconds > 60
       ? 0
       : Math.floor(seconds - weeks * 604800 - days * 86400 - hours * 3600 - minutes * 60)
-  return (
-    (weeks > 0 ? get(_)('words.clock.short.w', { values: { weeks } }) + ' ' : '') +
-    (days > 0 ? get(_)('words.clock.short.d', { values: { days } }) + ' ' : '') +
-    (hours > 0 ? get(_)('words.clock.short.h', { values: { hours } }) + ' ' : '') +
-    (minutes > 0 ? get(_)('words.clock.short.m', { values: { minutes } }) + ' ' : '') +
-    (seconds > 0 ? get(_)('words.clock.short.s', { values: { seconds } }) + ' ' : '')
-  ).trim()
+
+  const w = weeks ? t('words.clock.short.w', { values: { weeks } }) + ' ' : ''
+  const d = days ? t('words.clock.short.d', { values: { days } }) + ' ' : ''
+  const h = hours ? t('words.clock.short.h', { values: { hours } }) + ' ' : ''
+  const m = minutes ? t('words.clock.short.m', { values: { minutes } }) + ' ' : ''
+  const s = seconds ? t('words.clock.short.s', { values: { seconds } }) + ' ' : ''
+
+  return t('words.clock.format', {
+    values: { weeks: w, days: d, hours: h, minutes: m, seconds: s, milliseconds: '' },
+  }).trim()
 }
 
 /** Add a delay anywhere in any async function. */

@@ -21,12 +21,13 @@
   import nvidiaLogo from '../../assets/logos/nvidia.png'
   import type { MySQLConfig, NvidiaConfig } from '../../api/notifiarrConfig'
   import { deepCopy } from '../../includes/util'
-  import Instance, { type Form } from '../../includes/Instance.svelte'
+  import Instance, { type App, type Form } from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
-  import { InstanceFormValidator } from '../../includes/instanceFormValidator.svelte'
+  import { FormListTracker } from '../../includes/formsTracker.svelte'
   import { nav } from '../../navigation/nav.svelte'
+  import { validate } from '../../includes/instanceValidator'
 
-  const mysqlApp = {
+  const mysqlApp: App = {
     name: 'MySQL',
     id: page.id + '.MySQL',
     logo: mysqlLogo,
@@ -39,12 +40,11 @@
       timeout: '10s',
       interval: '5m0s',
     },
-    customValidator: (id: string, value: any) =>
-      id.endsWith('.username')
-        ? value === ''
-          ? $_('phrases.UsernameMustNotBeEmpty')
-          : ''
-        : undefined,
+    validator: (id: string, value: any, index: number) => {
+      if (id.endsWith('.username'))
+        return value === '' ? $_('phrases.UsernameMustNotBeEmpty') : ''
+      return validate(id, value, index, $profile.config.snapshot?.mysql ?? [])
+    },
     merge: (index: number, form: Form) => {
       const c = deepCopy($profile.config)
       c.snapshot!.mysql![index] = form as MySQLConfig
@@ -65,11 +65,8 @@
   }
 
   let iv = $derived({
-    MySQL: new InstanceFormValidator($profile.config.snapshot?.mysql ?? [], mysqlApp),
-    Nvidia: new InstanceFormValidator(
-      [$profile.config.snapshot?.nvidia ?? {}],
-      nvidiaApp,
-    ),
+    MySQL: new FormListTracker($profile.config.snapshot?.mysql ?? [], mysqlApp),
+    Nvidia: new FormListTracker([$profile.config.snapshot?.nvidia ?? {}], nvidiaApp),
   })
 
   async function submit() {
@@ -87,8 +84,15 @@
 <Header {page} />
 
 <CardBody class="pt-0 mt-0">
-  <Instances iv={iv.MySQL} />
-  <InstanceHeader iv={iv.Nvidia} />
+  <Instances flt={iv.MySQL} Child={Instance}>
+    {#snippet headerActive(index)}
+      {index + 1}. {iv.MySQL.original[index]?.name}
+    {/snippet}
+    {#snippet headerCollapsed(index)}
+      {iv.MySQL.original[index]?.host}
+    {/snippet}
+  </Instances>
+  <InstanceHeader flt={iv.Nvidia} />
   <Instance
     bind:form={iv.Nvidia.instances[0]!}
     original={iv.Nvidia.original[0]!}

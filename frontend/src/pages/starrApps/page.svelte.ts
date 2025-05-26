@@ -10,7 +10,7 @@ import type {
   LidarrConfig,
   ProwlarrConfig,
 } from '../../api/notifiarrConfig'
-import type { Form } from '../../includes/Instance.svelte'
+import type { App, Form } from '../../includes/Instance.svelte'
 import { profile } from '../../api/profile.svelte'
 import sonarrLogo from '../../assets/logos/sonarr.png'
 import radarrLogo from '../../assets/logos/radarr.png'
@@ -18,6 +18,8 @@ import readarrLogo from '../../assets/logos/readarr.png'
 import lidarrLogo from '../../assets/logos/lidarr.png'
 import prowlarrLogo from '../../assets/logos/prowlarr.png'
 import { faStars } from '@fortawesome/sharp-duotone-regular-svg-icons'
+import { validate } from '../../includes/instanceValidator'
+import { getTracker } from './Index.svelte'
 
 export const page = {
   id: 'StarrApps',
@@ -53,7 +55,15 @@ export class Starr {
     }
   }
 
-  static readonly Sonarr = {
+  static readonly getValidator = (
+    app: 'Sonarr' | 'Radarr' | 'Readarr' | 'Lidarr' | 'Prowlarr',
+  ): ((id: string, value: any, index: number) => string) => {
+    return (id: string, value: any, index: number) => {
+      return validate(id, value, index, getTracker(app).instances)
+    }
+  }
+
+  static readonly Sonarr: App = {
     name: 'Sonarr',
     id: page.id + '.Sonarr',
     logo: sonarrLogo,
@@ -64,9 +74,10 @@ export class Starr {
       c.sonarr[index] = form as SonarrConfig
       return c
     },
+    validator: Starr.getValidator('Sonarr'),
   }
 
-  static readonly Radarr = {
+  static readonly Radarr: App = {
     name: 'Radarr',
     id: page.id + '.Radarr',
     logo: radarrLogo,
@@ -77,9 +88,10 @@ export class Starr {
       c.radarr[index] = form as RadarrConfig
       return c
     },
+    validator: Starr.getValidator('Radarr'),
   }
 
-  static readonly Readarr = {
+  static readonly Readarr: App = {
     name: 'Readarr',
     id: page.id + '.Readarr',
     logo: readarrLogo,
@@ -90,9 +102,10 @@ export class Starr {
       c.readarr[index] = form as ReadarrConfig
       return c
     },
+    validator: Starr.getValidator('Readarr'),
   }
 
-  static readonly Lidarr = {
+  static readonly Lidarr: App = {
     name: 'Lidarr',
     id: page.id + '.Lidarr',
     logo: lidarrLogo,
@@ -103,9 +116,10 @@ export class Starr {
       c.lidarr[index] = form as LidarrConfig
       return c
     },
+    validator: Starr.getValidator('Lidarr'),
   }
 
-  static readonly Prowlarr = {
+  static readonly Prowlarr: App = {
     name: 'Prowlarr',
     id: page.id + '.Prowlarr',
     logo: prowlarrLogo,
@@ -116,6 +130,7 @@ export class Starr {
       c.prowlarr[index] = form as ProwlarrConfig
       return c
     },
+    validator: Starr.getValidator('Prowlarr'),
   }
 
   static readonly tabs = [

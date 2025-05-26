@@ -1,6 +1,17 @@
 <script lang="ts" module>
   import { page } from './page.svelte'
+
   export { page }
+
+  const flt = $derived({
+    Sonarr: new FormListTracker(get(profile).config.sonarr, Starr.Sonarr),
+    Radarr: new FormListTracker(get(profile).config.radarr, Starr.Radarr),
+    Readarr: new FormListTracker(get(profile).config.readarr, Starr.Readarr),
+    Lidarr: new FormListTracker(get(profile).config.lidarr, Starr.Lidarr),
+    Prowlarr: new FormListTracker(get(profile).config.prowlarr, Starr.Prowlarr),
+  })
+
+  export const getTracker = (app: keyof typeof flt) => flt[app]
 </script>
 
 <script lang="ts">
@@ -12,7 +23,6 @@
   import Tab, { getTab } from '../../includes/InstancesTab.svelte'
   import { Starr } from './page.svelte'
   import { nav } from '../../navigation/nav.svelte'
-  import { InstanceFormValidator } from '../../includes/instanceFormValidator.svelte'
   import type {
     LidarrConfig,
     ProwlarrConfig,
@@ -20,35 +30,29 @@
     ReadarrConfig,
     SonarrConfig,
   } from '../../api/notifiarrConfig'
-
-  let iv = $derived({
-    Sonarr: new InstanceFormValidator($profile.config.sonarr, Starr.Sonarr),
-    Radarr: new InstanceFormValidator($profile.config.radarr, Starr.Radarr),
-    Readarr: new InstanceFormValidator($profile.config.readarr, Starr.Readarr),
-    Lidarr: new InstanceFormValidator($profile.config.lidarr, Starr.Lidarr),
-    Prowlarr: new InstanceFormValidator($profile.config.prowlarr, Starr.Prowlarr),
-  })
+  import { FormListTracker } from '../../includes/formsTracker.svelte'
+  import { get } from 'svelte/store'
 
   async function submit() {
     const c = {
       ...$profile.config,
-      sonarr: iv.Sonarr.instances as SonarrConfig[],
-      radarr: iv.Radarr.instances as RadarrConfig[],
-      readarr: iv.Readarr.instances as ReadarrConfig[],
-      lidarr: iv.Lidarr.instances as LidarrConfig[],
-      prowlarr: iv.Prowlarr.instances as ProwlarrConfig[],
+      sonarr: flt.Sonarr.instances as SonarrConfig[],
+      radarr: flt.Radarr.instances as RadarrConfig[],
+      readarr: flt.Readarr.instances as ReadarrConfig[],
+      lidarr: flt.Lidarr.instances as LidarrConfig[],
+      prowlarr: flt.Prowlarr.instances as ProwlarrConfig[],
     }
     await profile.writeConfig(c)
 
     if (profile.error) return
     // clears the delete counters.
-    Object.values(iv).forEach(iv => iv.resetAll())
+    Object.values(flt).forEach(iv => iv.resetAll())
   }
 
   let tab = $state(getTab(Starr.tabs))
 
   $effect(() => {
-    nav.formChanged = Object.values(iv).some(iv => iv.formChanged)
+    nav.formChanged = Object.values(flt).some(iv => iv.formChanged)
   })
 </script>
 
@@ -56,16 +60,16 @@
 
 <CardBody>
   <TabContent on:tab={e => nav.goto(e, page.id, [e.detail.toString()])}>
-    <Tab iv={iv.Sonarr} bind:tab titles={Starr.title} />
-    <Tab iv={iv.Radarr} bind:tab titles={Starr.title} />
-    <Tab iv={iv.Readarr} bind:tab titles={Starr.title} />
-    <Tab iv={iv.Lidarr} bind:tab titles={Starr.title} />
-    <Tab iv={iv.Prowlarr} bind:tab titles={Starr.title} />
+    <Tab flt={flt.Sonarr} bind:tab titles={Starr.title} />
+    <Tab flt={flt.Radarr} bind:tab titles={Starr.title} />
+    <Tab flt={flt.Readarr} bind:tab titles={Starr.title} />
+    <Tab flt={flt.Lidarr} bind:tab titles={Starr.title} />
+    <Tab flt={flt.Prowlarr} bind:tab titles={Starr.title} />
   </TabContent>
 </CardBody>
 
 <Footer
   {submit}
-  saveDisabled={(Object.values(iv).every(iv => !iv.formChanged) &&
-    Object.values(iv).every(iv => iv.removed.length === 0)) ||
-    !Object.values(iv).every(iv => iv.invalid)} />
+  saveDisabled={(Object.values(flt).every(iv => !iv.formChanged) &&
+    Object.values(flt).every(iv => iv.removed.length === 0)) ||
+    !Object.values(flt).every(iv => iv.invalid)} />

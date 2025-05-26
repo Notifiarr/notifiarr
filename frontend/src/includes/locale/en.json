@@ -46,6 +46,7 @@
         "d": "{days}d",
         "w": "{weeks}w"
       },
+      "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}",
       "ago": "{timeDuration} ago"
     },
     "bytes": {
@@ -150,7 +151,7 @@
       "Downloaders": "Manage download clients.",
       "MediaApps": "Manage media players and related services.",
       "SnapshotApps": "Most snapshot configurations are on the Notifiarr.com website. Below you will find Application 'plugin' settings for the snapshot feature.",
-      "FileWatcher": "Watch for file changes and trigger actions.",
+      "FileWatcher": "Watch for file changes and trigger actions! This Notifiarr client can watch (log) files for lines matching a regular expression. This is similar to <code>tail -f file | grep string</code> and allows you to send notifications when, for instance, a log file has a new line written that matches a regular expression.",
       "Endpoints": "Configure relay endpoints, timers and triggers.",
       "Commands": "Set up and execute custom commands and scripts.",
       "Services": "Set up and monitor network devices and services.",
@@ -867,6 +868,61 @@
       "SelectTunnel": "Select a tunnel",
       "TunnelsSaved": "Tunnels saved {timeDuration} ago!",
       "TunnelStatsStale": "The data above is always stale. To update it, click the update backend link in the page header."
+    }
+  },
+  "FileWatcher": {
+    "title": "Watched Files",
+    "description": "You must enable the Log Watcher feature and choose a channel on the Notifiarr website for this to work!",
+    "addInstance": "Add File Watcher",
+    "badges": {
+      "CurrentlyWatching": "Currently Watching",
+      "WatcherStopped": "Watcher Stopped"
+    },
+    "buttons": {
+      "TestRegex": "Test Regex",
+      "StopWatcher": "Stop Watcher",
+      "StartWatcher": "Start Watcher"
+    },
+    "titles": {
+      "RegularExpressionTester": "Regular Expression Tester",
+      "Expression": "Expression",
+      "TestString": "Test String"
+    },
+    "path": {
+      "label": "File Path",
+      "description": "Path to the file to watch. Recommend absolute path names.",
+      "placeholder": "/var/log/nginx/access.log"
+    },
+    "regex": {
+      "label": "Regular Expression",
+      "description": "Regex to match against the file.",
+      "tooltip": "Expressions are automatically wrapped in a wildcard matcher: <code>.*</code>. Use <code>(?i)</code> as a prefix to make regular expressions case insensitive.",
+      "placeholder": "GET.*some/path"
+    },
+    "skip": {
+      "label": "Skip Expressions",
+      "description": "Anything matching this expressio is ignored.",
+      "placeholder": "GET.*some/path"
+    },
+    "poll": {
+      "label": "File Polling",
+      "description": "Poll file for changes.",
+      "tooltip": "File system events do not work on some systems. If nothing is being matched, turn this on to enable the file poller interval."
+    },
+    "pipe": {
+      "label": "FIFO Pipe",
+      "description": "Path is a named FIFO pipe.",
+      "tooltip": "Enable this if the file you're watching is a named FIFO pipe. You probably don't need this."
+    },
+    "mustExist": {
+      "label": "File Must Exist",
+      "description": "Skip watching file if it's missing.",
+      "tooltip": "Enabling this will skip watching the file if it does not exist when the application starts. Watching files that do not exist is still buggy and may not work at all."
+    },
+    "logMatch": {
+      "label": "Log Matches",
+      "description": "Write matched lines to notifiarr log.",
+      "tooltip": "Enabling this will write the matched line to the notifiarr log. This is good for debugging, but may be noisy."
     }
   }
 }

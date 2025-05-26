@@ -18,11 +18,12 @@
   import Header from '../../includes/Header.svelte'
   import plexLogo from '../../assets/logos/plex.png'
   import tautulliLogo from '../../assets/logos/tautulli.png'
-  import Instance, { type Form } from '../../includes/Instance.svelte'
+  import Instance, { type App, type Form } from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
   import type { Config, PlexConfig, TautulliConfig } from '../../api/notifiarrConfig'
-  import { InstanceFormValidator } from '../../includes/instanceFormValidator.svelte'
+  import { FormListTracker } from '../../includes/formsTracker.svelte'
   import { nav } from '../../navigation/nav.svelte'
+  import { validate } from '../../includes/instanceValidator'
 
   const merge = (index: number, form: Form) => {
     return {
@@ -33,29 +34,33 @@
     }
   }
 
-  const plexApp = {
+  const plexApp: App = {
     name: 'Plex',
     id: page.id + '.Plex',
     logo: plexLogo,
     hidden: ['deletes'],
     disabled: ['name'],
-    // Ignore empty values since Plex is optional.
-    customValidator: (id: string, value: any) => (value === '' ? '' : undefined),
     merge,
+    // Ignore empty values since Plex is optional.
+    validator: (id: string, value: any, index: number) => {
+      if (id.endsWith('.name')) return ''
+      if (id.endsWith('.url') && value === '') return ''
+      if (id.endsWith('.token') && value === '') return ''
+      return validate(id, value, index, [$profile.config.plex ?? {}])
+    },
   }
 
-  const tautulliApp = {
+  const tautulliApp: App = {
     name: 'Tautulli',
     id: page.id + '.Tautulli',
     logo: tautulliLogo,
     hidden: ['deletes'],
-    customValidator: (id: string, value: any) => (value === '' ? '' : undefined),
     merge,
   }
 
   let iv = $derived({
-    Plex: new InstanceFormValidator([$profile.config.plex ?? {}], plexApp),
-    Tautulli: new InstanceFormValidator([$profile.config.tautulli ?? {}], tautulliApp),
+    Plex: new FormListTracker([$profile.config.plex ?? {}], plexApp),
+    Tautulli: new FormListTracker([$profile.config.tautulli ?? {}], tautulliApp),
   })
 
   $effect(() => {
@@ -67,14 +72,14 @@
 
 <!-- We use the zero index because we only support once of each of these apps. -->
 <CardBody class="pt-0 mt-0">
-  <InstanceHeader iv={iv.Plex} />
+  <InstanceHeader flt={iv.Plex} />
   <Instance
     reset={() => iv.Plex.resetForm(0)}
     validate={(id, value) => iv.Plex.validate(id, value, 0)}
     bind:form={iv.Plex.instances[0]!}
     original={iv.Plex.original[0]!}
     app={plexApp} />
-  <InstanceHeader iv={iv.Tautulli} />
+  <InstanceHeader flt={iv.Tautulli} />
   <Instance
     reset={() => iv.Tautulli.resetForm(0)}
     validate={(id, value) => iv.Tautulli.validate(id, value, 0)}

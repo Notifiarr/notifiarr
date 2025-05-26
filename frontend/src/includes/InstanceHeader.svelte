@@ -1,26 +1,31 @@
 <script lang="ts">
   import { Badge } from '@sveltestrap/sveltestrap'
   import T, { _ } from './Translate.svelte'
-  import type { InstanceFormValidator } from './instanceFormValidator.svelte'
+  import type { FormListTracker } from './formsTracker.svelte'
+  import Fa from './Fa.svelte'
 
-  type Props = { iv: InstanceFormValidator }
-  let { iv }: Props = $props()
+  type Props = { flt: FormListTracker }
+  let { flt }: Props = $props()
 </script>
 
 <h4 class="instance-header">
-  <img src={iv.app.logo} alt="Logo" class="logo" />
-  <T id={iv.app.id + '.title'} />
-  {#if iv.removed.length > 0}
+  {#if typeof flt.app.logo === 'string'}
+    <img src={flt.app.logo} alt="Logo" class="logo" />
+  {:else}
+    <Fa i={flt.app.logo} {...flt.app.iconProps} class="logo" />
+  {/if}
+  <T id={flt.app.id + '.title'} />
+  {#if flt.removed.length > 0}
     <Badge color="warning" class="ms-3">
-      <T id="phrases.DeletedNumber" number={iv.removed.length} />
+      <T id="phrases.DeletedNumber" number={flt.removed.length} />
     </Badge>
-  {:else if iv.formChanged}
+  {:else if flt.formChanged}
     <Badge color="warning" class="ms-3"><T id="phrases.Changed" /></Badge>
   {/if}
 </h4>
 
-{#if $_(iv.app.id + '.description') !== iv.app.id + '.description'}
-  <p><T id={iv.app.id + '.description'} /></p>
+{#if $_(flt.app.id + '.description') !== flt.app.id + '.description'}
+  <p><T id={flt.app.id + '.description'} /></p>
 {/if}
 
 <style>

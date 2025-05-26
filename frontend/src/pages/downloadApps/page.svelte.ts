@@ -18,7 +18,8 @@ import delugeLogo from '../../assets/logos/deluge.png'
 import sabnzbLogo from '../../assets/logos/sabnzb.png'
 import nzbgetLogo from '../../assets/logos/nzbget.png'
 import { faDownload } from '@fortawesome/sharp-duotone-regular-svg-icons'
-import type { InstanceFormValidator } from '../../includes/instanceFormValidator.svelte'
+import { validate } from '../../includes/instanceValidator'
+import { getTracker } from './Index.svelte'
 
 export const page = {
   id: 'Downloaders',
@@ -50,6 +51,14 @@ export class Downloaders {
       [Downloaders.Deluge.name]: get(_)('Downloaders.Deluge.title'),
       [Downloaders.SabNZB.name]: get(_)('Downloaders.SabNZB.title'),
       [Downloaders.NZBGet.name]: get(_)('Downloaders.NZBGet.title'),
+    }
+  }
+
+  static readonly getValidator = (
+    app: 'Qbittorrent' | 'Rtorrent' | 'Transmission' | 'Deluge' | 'SabNZB' | 'NZBGet',
+  ): ((id: string, value: any, index: number) => string) => {
+    return (id: string, value: any, index: number) => {
+      return validate(id, value, index, getTracker(app).instances)
     }
   }
 

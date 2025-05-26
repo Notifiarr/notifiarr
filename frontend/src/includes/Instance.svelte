@@ -1,11 +1,15 @@
+<!-- This handles all the standard app types. Does not handle non-app things like file watcher and endpoints. -->
 <script lang="ts" module>
+  import type { Props as FaProps } from './Fa.svelte'
   export type App = {
     /** The id of the app. (StarrApps.Sonarr) */
     id: string
     /** The name of the app. (Sonarr) */
     name: string
-    /** The logo of the app. (../../assets/logos/sonarr.png) */
-    logo: string
+    /** The imported logo or FA icon of the app. (../../assets/logos/sonarr.png) */
+    logo: string | IconDefinition
+    /** If you provided an FA icon, you can use this to set the icon props. */
+    iconProps?: Omit<FaProps, 'i'>
     /** The disabled fields of the app. (['apiKey', 'username']) */
     disabled?: string[]
     /** The hidden fields of the app. (['deletes']) */
@@ -19,7 +23,7 @@
      * @param form - The form of the instance.
      * @returns The merged application config.
      */
-    merge: (index: number, form: Form) => Config
+    merge: (index: number, form: any) => Config
     /** The custom validator of the app.
      * This optional function is used to add additional validation to an instance's form elements.
      * Return undefined if the validator does not apply to the validated field.
@@ -28,7 +32,7 @@
      * @param index - The index of the instance.
      * @returns The feedback of the field.
      */
-    customValidator?: (id: string, value: any, index: number) => string | undefined
+    validator?: (id: string, value: any, index: number) => string
   }
 
   // This is a combination of all types supported: starr, downloaders, media, snapshot, etc.
@@ -61,6 +65,7 @@
   import { deepEqual } from './util'
   import type { Config } from '../api/notifiarrConfig'
   import { slide } from 'svelte/transition'
+  import type { IconDefinition } from '@fortawesome/sharp-duotone-light-svg-icons'
 
   type Props = {
     form: Form

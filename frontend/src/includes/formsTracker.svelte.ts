@@ -1,24 +1,24 @@
 import { get } from 'svelte/store'
-import type { App, Form, Forms } from './Instance.svelte'
+import type { App } from './Instance.svelte'
 import { _ } from './Translate.svelte'
 import { deepCopy, deepEqual, delay, success } from './util'
 
 /**
- * InstanceFormValidator is a class that validates the instances in the tabs.
+ * FormListTracker is a class that tracks multiple forms (across accordions generally).
  * it keeps track of the original list of instances, the form-bound list of instances,
  * the removed instances, the invalid instances, and the feedback for the instances.
  * @param instances - The form-bound list of instances in our tabs.
  * @param app - The app we're validating.
  */
-export class InstanceFormValidator {
+export class FormListTracker {
   /** The form-bound list of instances in our tabs. */
-  public instances: Forms
+  public instances: any[]
   /** The original list of instances in our tabs. */
-  public original: Forms
+  public original: any[]
   /** Data about the app we're validating. */
   public app: App
   /** List of removed instances. */
-  public removed: Forms = $state([])
+  public removed: any[] = $state([])
   /** List of invalid instances. */
   private feedback: Record<number, Record<string, string>> = $state({})
   /** If any instance in the list has non-empty feedback the form is invalid. */
@@ -30,7 +30,7 @@ export class InstanceFormValidator {
   /** The active instance tab. */
   public active: number | undefined = $state(0)
 
-  constructor(instances: Forms | undefined, app: App) {
+  constructor(instances: any[] | undefined, app: App) {
     this.instances = $state(deepCopy(instances ?? []))
     this.original = $state(deepCopy(instances ?? []))
     this.app = app
@@ -72,7 +72,7 @@ export class InstanceFormValidator {
   public resetForm = (index: number) => {
     this.instances[index] = deepCopy(this.original[index] ?? this.app.empty)
     Object.keys(this.instances[index] ?? {}).forEach(k => {
-      this.validate(k, this.instances[index]?.[k as keyof Form], index)
+      this.validate(k, this.instances[index]?.[k], index)
     })
   }
 
@@ -80,7 +80,7 @@ export class InstanceFormValidator {
   private validateAll = () => {
     this.instances.forEach((m, i) => {
       Object.keys(m ?? {}).forEach(k => {
-        this.validate(k, m?.[k as keyof Form], i)
+        this.validate(k, m?.[k], i)
       })
     })
   }
@@ -99,44 +99,7 @@ export class InstanceFormValidator {
    * @updates The feedback for the instance.
    */
   public validate = (id: string, value: any, index: number): string => {
-    const key = id.split('.').pop()
-
     if (!this.feedback[index]) this.feedback[index] = {}
-    this.feedback[index][id] = ''
-
-    if (key == 'name') {
-      this.instances?.forEach((m, i) => {
-        if (i !== index && m?.name === value) {
-          this.feedback[index][id] = get(_)('phrases.NameInUseByInstance', {
-            values: { number: i + 1 },
-          })
-          return
-        }
-      })
-      this.feedback[index][id] =
-        this.feedback[index][id] || (value ? '' : get(_)('phrases.NameMustNotBeEmpty'))
-    } else if (key == 'url') {
-      this.feedback[index][id] =
-        value.startsWith('http://') || value.startsWith('https://')
-          ? ''
-          : get(_)('phrases.URLMustBeginWithHttp')
-    } else if (key == 'host' && value === '') {
-      this.feedback[index][id] = get(_)('phrases.HostMustNotBeEmpty')
-    } else if (key == 'apiKey' && value.length < 32) {
-      this.feedback[index][id] = get(_)('phrases.APIKeyMustBeCountCharacters', {
-        values: { count: 32 },
-      })
-    } else if (key == 'token' && value.length < 8) {
-      this.feedback[index][id] = get(_)('phrases.TokenMustBeCountCharacters', {
-        values: { count: 8 },
-      })
-    }
-
-    if (this.app.customValidator) {
-      const feedback = this.app.customValidator(id, value, index)
-      if (feedback !== undefined) this.feedback[index][id] = feedback
-    }
-
-    return this.feedback[index][id]
+    return (this.feedback[index][id] = this.app.validator?.(id, value, index) ?? '')
   }
 }
