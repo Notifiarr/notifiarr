@@ -39,8 +39,6 @@
     value?: any
     /** Optional original value. Used to check for changes.*/
     original?: any
-    /** Optional rows for textarea. */
-    rows?: number
     /** Optional options for select input. */
     options?: Option[] | undefined
     /** Optional validation function. */
@@ -55,6 +53,8 @@
     msg?: Snippet
     /** Optional feedback to display below the input. Use this to reset it or view it. */
     feedback?: string
+    /** Optional inner value for binding. */
+    inner?: any
     /** Optional other attributes to apply to the input. */
     [key: string]: any
   }
@@ -74,6 +74,7 @@
     children,
     post,
     msg,
+    inner = $bindable(),
     feedback = $bindable(),
     ...rest
   }: Props = $props()
@@ -82,7 +83,7 @@
 
   let input = $state<SvelteComponent>()
   let showTooltip = $state(false)
-  let changed = $derived(original !== undefined && !deepEqual(value, original))
+  let changed = $derived(original !== null && !deepEqual(value, original))
   let currType = $derived(type)
   let passIcon = $derived(currType === 'password' ? faEyeSlash : faEye)
   $effect(() => {
@@ -169,6 +170,7 @@
         class="{inputClass} {changed ? 'changed' : ''}"
         type={currType as InputType}
         bind:this={input}
+        bind:inner
         bind:value
         bind:checked={value}
         autocomplete="off"

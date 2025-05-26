@@ -21,9 +21,9 @@
   import nvidiaLogo from '../../assets/logos/nvidia.png'
   import type { MySQLConfig, NvidiaConfig } from '../../api/notifiarrConfig'
   import { deepCopy } from '../../includes/util'
-  import Instance, { type App, type Form } from '../../includes/Instance.svelte'
+  import Instance, { type Form } from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
-  import { FormListTracker } from '../../includes/formsTracker.svelte'
+  import { FormListTracker, type App } from '../../includes/formsTracker.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import { validate } from '../../includes/instanceValidator'
 
@@ -64,42 +64,41 @@
     },
   }
 
-  let iv = $derived({
+  let flt = $derived({
     MySQL: new FormListTracker($profile.config.snapshot?.mysql ?? [], mysqlApp),
     Nvidia: new FormListTracker([$profile.config.snapshot?.nvidia ?? {}], nvidiaApp),
   })
 
   async function submit() {
     const c = { ...$profile.config }
-    c.snapshot!.mysql = iv.MySQL.instances as MySQLConfig[]
-    c.snapshot!.nvidia = iv.Nvidia.instances[0]! as NvidiaConfig
+    c.snapshot!.mysql = flt.MySQL.instances as MySQLConfig[]
+    c.snapshot!.nvidia = flt.Nvidia.instances[0]! as NvidiaConfig
     await profile.writeConfig(c)
   }
 
   $effect(() => {
-    nav.formChanged = Object.values(iv).some(iv => iv.formChanged)
+    nav.formChanged = Object.values(flt).some(iv => iv.formChanged)
   })
 </script>
 
 <Header {page} />
 
 <CardBody class="pt-0 mt-0">
-  <Instances flt={iv.MySQL} Child={Instance}>
+  <Instances flt={flt.MySQL} Child={Instance}>
     {#snippet headerActive(index)}
-      {index + 1}. {iv.MySQL.original[index]?.name}
+      {index + 1}. {flt.MySQL.original[index]?.name}
     {/snippet}
     {#snippet headerCollapsed(index)}
-      {iv.MySQL.original[index]?.host}
+      {flt.MySQL.original[index]?.host}
     {/snippet}
   </Instances>
-  <InstanceHeader flt={iv.Nvidia} />
+  <InstanceHeader flt={flt.Nvidia} />
   <Instance
-    bind:form={iv.Nvidia.instances[0]!}
-    original={iv.Nvidia.original[0]!}
+    bind:form={flt.Nvidia.instances[0]!}
+    original={flt.Nvidia.original[0]!}
     app={nvidiaApp} />
 </CardBody>
 
 <Footer
   {submit}
-  saveDisabled={Object.values(iv).every(iv => !iv.formChanged) ||
-    Object.values(iv).some(iv => iv.invalid)} />
+  saveDisabled={!nav.formChanged && Object.values(flt).some(iv => iv.invalid)} />

@@ -1,68 +1,51 @@
 <script lang="ts" module>
-  import { faEyeEvil, faFileWaveform } from '@fortawesome/sharp-duotone-light-svg-icons'
-  export const page = {
-    id: 'FileWatcher',
-    i: faFileWaveform,
-    d1: 'thistle',
-    d2: 'blue',
-    c1: 'sienna',
-    c2: 'moccasin',
-  }
+  import { FormListTracker } from '../../includes/formsTracker.svelte'
+  import { app, page } from './page.svelte'
+  export { page }
+
+  const flt = $derived(new FormListTracker(get(profile).config.watchFiles, app))
 </script>
 
 <script lang="ts">
-  import { CardBody } from '@sveltestrap/sveltestrap'
-  import { _ } from '../../includes/Translate.svelte'
+  import { Card, CardBody, CardHeader } from '@sveltestrap/sveltestrap'
+  import T, { _ } from '../../includes/Translate.svelte'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import Watcher from './Watcher.svelte'
-  import { profile } from '../../api/profile.svelte'
-  import type { App } from '../../includes/Instance.svelte'
-  import { deepCopy } from '../../includes/util'
-  import type { Config, WatchFile } from '../../api/notifiarrConfig'
-  import { FormListTracker } from '../../includes/formsTracker.svelte'
   import Instances from '../../includes/Instances.svelte'
+  import { nav } from '../../navigation/nav.svelte'
+  import { profile } from '../../api/profile.svelte'
+  import { get } from 'svelte/store'
+  import Input from '../../includes/Input.svelte'
+  import { slide } from 'svelte/transition'
+  import { escapeHtml } from '../../includes/util'
+  import TestRegex from './TestRegex.svelte'
 
-  const app: App = {
-    id: 'FileWatcher',
-    name: 'File Watcher',
-    logo: faEyeEvil,
-    iconProps: { c1: 'wheat', c2: 'firebrick', d2: 'purple' },
-    disabled: [],
-    hidden: [],
-    empty: {
-      path: '',
-      regex: '',
-      skip: '',
-      poll: false,
-      pipe: false,
-      mustExist: false,
-      logMatch: false,
-    } as WatchFile,
-    merge: (index: number, form: WatchFile): Config => {
-      const c = deepCopy($profile.config)
-      if (!c.watchFiles) c.watchFiles = []
-      for (let i = 0; i < c.watchFiles.length; i++) {
-        if (i === index) c.watchFiles[i] = form
-        else c.watchFiles[i] = {} as WatchFile
-      }
-      return c
-    },
-  }
   // Handle form submission
-  function submit(e: Event) {
-    e.preventDefault()
-    // profile.writeConfig(c)
+  const submit = async () => {
+    await profile.writeConfig({ ...$profile.config, watchFiles: flt.instances })
+    if (!profile.error) flt.resetAll() // clears the delete counters.
   }
-  const flt = new FormListTracker($profile.config.watchFiles, app)
+
+  $effect(() => {
+    nav.formChanged = flt.formChanged
+  })
 </script>
 
 <Header {page} />
-<CardBody>
-  <Instances {flt} Child={Watcher}>
+
+<CardBody style="max-width: 100%;">
+  <Instances {flt} Child={Watcher} deleteButton={page.id + '.DeleteWatcher'}>
     {#snippet headerActive(index)}
       {index + 1}. {flt.original[index]?.path}
     {/snippet}
+    {#snippet headerCollapsed(index)}
+      {flt.original[index]?.regex}
+    {/snippet}
   </Instances>
+
+  <!-- Test regular expression -->
+  <TestRegex />
 </CardBody>
-<Footer {submit} />
+
+<Footer {submit} saveDisabled={!flt.formChanged || flt.invalid} />

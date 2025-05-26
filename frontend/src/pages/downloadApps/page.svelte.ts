@@ -74,6 +74,7 @@ export class Downloaders {
       c.qbit[index] = form as QbitConfig
       return c
     },
+    validator: Downloaders.getValidator('Qbittorrent'),
   }
 
   static readonly Rtorrent = {
@@ -88,6 +89,7 @@ export class Downloaders {
       c.rtorrent[index] = form as RtorrentConfig
       return c
     },
+    validator: Downloaders.getValidator('Rtorrent'),
   }
 
   static readonly Xmission = {
@@ -102,6 +104,7 @@ export class Downloaders {
       c.transmission[index] = form as XmissionConfig
       return c
     },
+    validator: Downloaders.getValidator('Transmission'),
   }
 
   static readonly Deluge = {
@@ -116,6 +119,7 @@ export class Downloaders {
       c.deluge[index] = form as DelugeConfig
       return c
     },
+    validator: Downloaders.getValidator('Deluge'),
   }
 
   static readonly SabNZB = {
@@ -130,6 +134,7 @@ export class Downloaders {
       c.sabnzbd[index] = form as SabNZBConfig
       return c
     },
+    validator: Downloaders.getValidator('SabNZB'),
   }
 
   static readonly NZBGet = {
@@ -144,6 +149,7 @@ export class Downloaders {
       c.nzbget[index] = form as NZBGetConfig
       return c
     },
+    validator: Downloaders.getValidator('NZBGet'),
   }
 
   // Keep track of the navigation.

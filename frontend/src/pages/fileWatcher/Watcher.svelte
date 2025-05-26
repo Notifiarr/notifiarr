@@ -1,35 +1,69 @@
-<script lang="ts" module>
-  export type WatchFiles = (WatchFile | null)[]
-</script>
-
 <script lang="ts">
   import Input from '../../includes/Input.svelte'
   import { Col, Row } from '@sveltestrap/sveltestrap'
   import { _ } from '../../includes/Translate.svelte'
   import type { WatchFile } from '../../api/notifiarrConfig'
-  import type { App } from '../../includes/Instance.svelte'
+  import type { ChildProps } from '../../includes/Instances.svelte'
 
-  type Props = {
-    form: WatchFile
-    original: WatchFile
-    app: App
-    index: number
-    validate?: (id: string, value: any) => string
-  }
-
-  let { form = $bindable(), original, app, index, validate }: Props = $props()
+  let {
+    form = $bindable(),
+    original,
+    app,
+    index, // unused but matches our ChildProps interface.
+    validate,
+  }: ChildProps<WatchFile> = $props()
 </script>
 
-<div class="watcher">
-  <!-- Top row, shows name and url or hostname/ip. -->
-  <Row>
-    <!-- Name is required for all integrations except Nvidia. -->
-    <Col lg={6}>
-      <Input
-        id={app.id + '.path'}
-        bind:value={form.path}
-        original={original?.path}
-        {validate} />
-    </Col>
-  </Row>
-</div>
+<Row>
+  <Col lg={12}>
+    <Input
+      id={app.id + '.path'}
+      bind:value={form.path}
+      original={original?.path}
+      {validate} />
+  </Col>
+  <Col lg={12}>
+    <Input
+      type="textarea"
+      id={app.id + '.regex'}
+      bind:value={form.regex}
+      original={original?.regex}
+      {validate} />
+  </Col>
+  <Col lg={12}>
+    <Input
+      type="textarea"
+      id={app.id + '.skip'}
+      bind:value={form.skip}
+      original={original?.skip}
+      {validate} />
+  </Col>
+  <Col sm={6}>
+    <Input
+      id={app.id + '.poll'}
+      bind:value={form.poll}
+      original={original?.poll}
+      {validate} />
+  </Col>
+  <Col sm={6}>
+    <Input
+      id={app.id + '.pipe'}
+      bind:value={form.pipe}
+      original={original?.pipe}
+      {validate} />
+  </Col>
+  <Col sm={6}>
+    <Input
+      id={app.id + '.mustExist'}
+      bind:value={form.mustExist}
+      original={original?.mustExist}
+      {validate} />
+  </Col>
+  <Col sm={6}>
+    <Input
+      id={app.id + '.logMatch'}
+      bind:value={form.logMatch}
+      original={original?.logMatch}
+      {validate} />
+  </Col>
+</Row>

@@ -145,3 +145,12 @@ export const deepCopy = <T>(obj: T): T => {
 
 export const maxLength = (str: string, max: number) =>
   str.length > max ? str.slice(0, max) + ' ....' : str
+
+export const escapeHtml = (unsafe: string) => {
+  return unsafe
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;')
+}

@@ -1,40 +1,5 @@
 <!-- This handles all the standard app types. Does not handle non-app things like file watcher and endpoints. -->
 <script lang="ts" module>
-  import type { Props as FaProps } from './Fa.svelte'
-  export type App = {
-    /** The id of the app. (StarrApps.Sonarr) */
-    id: string
-    /** The name of the app. (Sonarr) */
-    name: string
-    /** The imported logo or FA icon of the app. (../../assets/logos/sonarr.png) */
-    logo: string | IconDefinition
-    /** If you provided an FA icon, you can use this to set the icon props. */
-    iconProps?: Omit<FaProps, 'i'>
-    /** The disabled fields of the app. (['apiKey', 'username']) */
-    disabled?: string[]
-    /** The hidden fields of the app. (['deletes']) */
-    hidden?: string[]
-    /** The empty version of the form of the app. */
-    empty?: any
-    /** The merge function of the app.
-     * This is used when checking (testing) an instance.
-     * The check function calls this to merge the instance with the original config.
-     * @param index - The index of the instance.
-     * @param form - The form of the instance.
-     * @returns The merged application config.
-     */
-    merge: (index: number, form: any) => Config
-    /** The custom validator of the app.
-     * This optional function is used to add additional validation to an instance's form elements.
-     * Return undefined if the validator does not apply to the validated field.
-     * @param id - The id of the field.
-     * @param value - The value of the field.
-     * @param index - The index of the instance.
-     * @returns The feedback of the field.
-     */
-    validator?: (id: string, value: any, index: number) => string
-  }
-
   // This is a combination of all types supported: starr, downloaders, media, snapshot, etc.
   export type Form = {
     name?: string
@@ -66,17 +31,16 @@
   import type { Config } from '../api/notifiarrConfig'
   import { slide } from 'svelte/transition'
   import type { IconDefinition } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import type { ChildProps } from './Instances.svelte'
 
-  type Props = {
-    form: Form
-    original: Form
-    app: App
-    index?: number
-    reset?: () => void
-    validate?: (id: string, value: any) => string
-  }
-
-  let { form = $bindable(), original, app, index = 0, validate, reset }: Props = $props()
+  let {
+    form = $bindable(),
+    original,
+    app,
+    index = 0,
+    validate,
+    reset,
+  }: ChildProps<Form> = $props()
 
   // Convert array to newline-separated string for textarea.
   let busIds = $state(

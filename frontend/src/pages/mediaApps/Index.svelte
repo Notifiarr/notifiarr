@@ -18,10 +18,10 @@
   import Header from '../../includes/Header.svelte'
   import plexLogo from '../../assets/logos/plex.png'
   import tautulliLogo from '../../assets/logos/tautulli.png'
-  import Instance, { type App, type Form } from '../../includes/Instance.svelte'
+  import Instance, { type Form } from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
   import type { Config, PlexConfig, TautulliConfig } from '../../api/notifiarrConfig'
-  import { FormListTracker } from '../../includes/formsTracker.svelte'
+  import { FormListTracker, type App } from '../../includes/formsTracker.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import { validate } from '../../includes/instanceValidator'
 

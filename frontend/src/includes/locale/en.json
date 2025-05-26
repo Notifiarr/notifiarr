@@ -71,6 +71,24 @@
     "NoStayHere": "No! Stay here",
     "YesDeleteMyChanges": "Yes! Delete my changes"
   },
+  "RegexTester": {
+    "RegularExpressionTester": "Regular Expression Tester",
+    "testPattern": {
+      "label": "Test Pattern",
+      "description": "Example string or log line to test the regular expression against.",
+      "placeholder": "[INFO] 2025-05-25 16:20:01 - This is a test log line."
+    },
+    "testRegex": {
+      "label": "Test Expression",
+      "description": "Expression to match against the test pattern.",
+      "placeholder": "GET .*some/path"
+    },
+    "TestResult": "Test Result",
+    "Test": "Test",
+    "Expression": "Expression",
+    "Result": "Result",
+    "NoMatch": "No Match"
+  },
   "phrases": {
     "ERROR": "ERROR",
     "LoggingIn": "Logging in...",
@@ -873,16 +891,13 @@
   "FileWatcher": {
     "title": "Watched Files",
     "description": "You must enable the Log Watcher feature and choose a channel on the Notifiarr website for this to work!",
-    "addInstance": "Add File Watcher",
+    "addInstance": "Watch Another File",
+    "DeleteWatcher": "Delete Watcher",
     "badges": {
       "CurrentlyWatching": "Currently Watching",
       "WatcherStopped": "Watcher Stopped"
     },
-    "buttons": {
-      "TestRegex": "Test Regex",
-      "StopWatcher": "Stop Watcher",
-      "StartWatcher": "Start Watcher"
-    },
+    "buttons": { "StopWatcher": "Stop Watcher", "StartWatcher": "Start Watcher" },
     "titles": {
       "RegularExpressionTester": "Regular Expression Tester",
       "Expression": "Expression",
@@ -891,17 +906,19 @@
     "path": {
       "label": "File Path",
       "description": "Path to the file to watch. Recommend absolute path names.",
-      "placeholder": "/var/log/nginx/access.log"
+      "placeholder": "/var/log/nginx/access.log",
+      "required": "Path is required"
     },
     "regex": {
       "label": "Regular Expression",
       "description": "Regex to match against the file.",
-      "tooltip": "Expressions are automatically wrapped in a wildcard matcher: <code>.*</code>. Use <code>(?i)</code> as a prefix to make regular expressions case insensitive.",
-      "placeholder": "GET.*some/path"
+      "tooltip": "Expressions are automatically wrapped in a wildcard matcher: <code>.*</code> so do not use <code>^</code> or <code>$</code> in your expression. Use <code>(?i)</code> as a prefix to make regular expressions case insensitive.",
+      "placeholder": "GET.*some/path",
+      "required": "Regex is required"
     },
     "skip": {
       "label": "Skip Expressions",
-      "description": "Anything matching this expressio is ignored.",
+      "description": "Anything matching this expression is ignored.",
       "placeholder": "GET.*some/path"
     },
     "poll": {

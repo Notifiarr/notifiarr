@@ -1,3 +1,16 @@
+<script lang="ts" module>
+  import type { App } from './formsTracker.svelte'
+  /** These are the props that are passed to the child component. */
+  export type ChildProps<T> = {
+    form: T
+    original: T
+    app: App
+    validate?: (id: string, value: any) => string
+    index?: number
+    reset?: () => void
+  }
+</script>
+
 <script lang="ts">
   import {
     Accordion,
@@ -6,25 +19,25 @@
     Button,
     Card,
   } from '@sveltestrap/sveltestrap'
-  import Instance from './Instance.svelte'
   import T, { _ } from './Translate.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
   import InstanceHeader from './InstanceHeader.svelte'
   import type { FormListTracker } from './formsTracker.svelte'
-  import Watcher from '../pages/fileWatcher/Watcher.svelte'
-  import type { Snippet } from 'svelte'
+  import type { Component, Snippet } from 'svelte'
 
   let {
     flt,
-    Child = Instance,
+    Child,
     headerActive = $bindable(),
     headerCollapsed = $bindable(),
+    deleteButton = 'phrases.DeleteInstance',
   }: {
     flt: FormListTracker
-    Child: typeof Instance | typeof Watcher
+    Child: Component<ChildProps<any>>
     headerActive: Snippet<[number]>
     headerCollapsed?: Snippet<[number]>
+    deleteButton?: string
   } = $props()
 </script>
 
@@ -50,9 +63,11 @@
               {/if}
             </h5>
             {#if flt.active !== index}
-              <span class="text-muted fs-6 mt-0">
-                {@render headerCollapsed?.(index)}
-              </span>
+              <div style="overflow: clip;">
+                <span class="text-muted fs-6 mt-0 header-collapsed">
+                  {@render headerCollapsed?.(index)}
+                </span>
+              </div>
             {/if}
           </AccordionHeader>
 
@@ -71,7 +86,7 @@
                   class="float-end"
                   outline
                   onclick={async () => await flt.delInstance(index)}>
-                  {$_('phrases.DeleteInstance')}
+                  {$_(deleteButton)}
                 </Button>
                 <Button
                   color="primary"
@@ -101,5 +116,17 @@
     right: 60px;
     border-radius: 12px;
     text-transform: uppercase;
+  }
+
+  /* This allows the sub header to span the entire length of the accordion. */
+  .header-collapsed {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: initial;
+    word-break: break-all;
+    display: -webkit-box;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
   }
 </style>

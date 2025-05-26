@@ -70,6 +70,4 @@
 
 <Footer
   {submit}
-  saveDisabled={(!nav.formChanged &&
-    Object.values(flt).every(iv => iv.removed.length === 0)) ||
-    Object.values(flt).some(iv => iv.invalid)} />
+  saveDisabled={!nav.formChanged && Object.values(flt).some(iv => iv.invalid)} />

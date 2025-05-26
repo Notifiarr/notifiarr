@@ -29,7 +29,7 @@
 {/if}
 
 <style>
-  .logo {
+  .instance-header :global(.logo) {
     height: 36px;
     margin-right: 6px;
     margin-left: -5px;

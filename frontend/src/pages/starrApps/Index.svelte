@@ -68,8 +68,9 @@
   </TabContent>
 </CardBody>
 
+{Object.values(flt).every(iv => !iv.formChanged)}
+{Object.values(flt).every(iv => iv.removed.length === 0)}
+{Object.values(flt).every(iv => iv.invalid)}
 <Footer
   {submit}
-  saveDisabled={(Object.values(flt).every(iv => !iv.formChanged) &&
-    Object.values(flt).every(iv => iv.removed.length === 0)) ||
-    !Object.values(flt).every(iv => iv.invalid)} />
+  saveDisabled={!nav.formChanged && Object.values(flt).some(iv => iv.invalid)} />
