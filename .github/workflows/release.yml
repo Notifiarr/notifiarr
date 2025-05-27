@@ -98,6 +98,8 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
       - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
+        env:
+          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
         id: release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools osslsigncode

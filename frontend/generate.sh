@@ -4,8 +4,9 @@
 # It generates the locales.go file.
 # And builds the frontend using npm.
 
+set -e
 # Install dependencies.
-npm install
+npm ci
 
 # Build the frontend 'dist' directory.
 npm run build
