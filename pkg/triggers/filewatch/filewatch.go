@@ -196,7 +196,10 @@ func (w *WatchFile) setup(logger *logger, ignored ignored) error {
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
 func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
-	c.addWatcher = make(chan *WatchFile, len(tails)+1)
+	c.awMutex.Lock()
+	defer c.awMutex.Unlock()
+
+	c.addWatcher = make(chan *WatchFile, len(tails)+1) // DATA RACE 101
 	c.stopWatcher = make(chan struct{})
 	ticker := time.NewTicker(retryInterval)
 	cases := make([]reflect.SelectCase, len(tails))
@@ -401,7 +404,7 @@ func (c *cmd) stop() {
 	}
 
 	// The following code might wait for all the watchers to die before returning.
-	close(c.addWatcher)
+	close(c.addWatcher) // DATA RACE 101
 	<-c.stopWatcher
 	c.addWatcher = nil
 	c.stopWatcher = nil

@@ -10,7 +10,7 @@ import type { IconDefinition } from '@fortawesome/sharp-duotone-light-svg-icons'
  * @param name - The name of the app. (Sonarr)
  * @param logo - The imported logo or FA icon of the app. (../../assets/logos/sonarr.png)
  */
-export type App = {
+export type App<T> = {
   /** The id of the app. (StarrApps.Sonarr) */
   id: string
   /** The name of the app. (Sonarr) */
@@ -24,7 +24,7 @@ export type App = {
   /** The hidden fields of the app. (['deletes']) */
   hidden?: string[]
   /** The empty version of the form of the app. */
-  empty?: any
+  empty?: T
   /** The merge function of the app.
    * This is used when checking (testing) an instance.
    * The check function calls this to merge the instance with the original config.
@@ -32,7 +32,7 @@ export type App = {
    * @param form - The form of the instance.
    * @returns The merged application config.
    */
-  merge: (index: number, form: any) => Config
+  merge: (index: number, form: T) => Config
   /** The custom validator of the app.
    * This optional function is used to add additional validation to an instance's form elements.
    * Return undefined if the validator does not apply to the validated field.
@@ -51,17 +51,17 @@ export type App = {
  * @param instances - The form-bound list of instances in our tabs.
  * @param app - The app we're validating.
  */
-export class FormListTracker {
+export class FormListTracker<T> {
   /** List of invalid instances. */
   private feedback: Record<number, Record<string, string>> = $state({})
   /** The form-bound list of instances in our tabs. */
-  public instances: any[]
+  public instances: T[]
   /** List of removed instance indexes. Use .length to get the number of removed instances. */
   public removed: number[] = $state([])
   /** The original list of instances in our tabs. */
-  public readonly original: any[]
+  public readonly original: T[]
   /** Data about the app we're validating. */
-  public readonly app: App
+  public readonly app: App<T>
   /** If any instance in the list has non-empty feedback the form is invalid. */
   public readonly invalid: boolean = $derived(
     Object.values(this.feedback).some(v => Object.values(v).some(v => !!v)),
@@ -72,7 +72,7 @@ export class FormListTracker {
   /** The active instance tab. */
   public active: number | undefined = $state(0)
 
-  constructor(instances: any[] | undefined, app: App) {
+  constructor(instances: T[], app: App<T>) {
     this.instances = $state(deepCopy(instances ?? []))
     this.original = $state(deepCopy(instances ?? []))
     this.app = app
@@ -81,7 +81,7 @@ export class FormListTracker {
 
   /** Add a new instance to the list. */
   public addInstance = () => {
-    this.instances.push(this.app.empty)
+    this.instances.push(this.app.empty!)
     this.active = this.instances.length - 1
   }
 
@@ -111,9 +111,9 @@ export class FormListTracker {
 
   /** Reset a single instance to the original values. Call this when reset button is clicked. */
   public resetForm = (index: number) => {
-    this.instances[index] = deepCopy(this.original[index] ?? this.app.empty)
+    this.instances[index] = deepCopy(this.original[index] ?? this.app.empty!)
     Object.keys(this.instances[index] ?? {}).forEach(k => {
-      this.validate(k, this.instances[index]?.[k], index)
+      this.validate(k, this.instances[index]?.[k as keyof T], index)
     })
   }
 
@@ -121,7 +121,7 @@ export class FormListTracker {
   private validateAll = () => {
     this.instances.forEach((m, i) => {
       Object.keys(m ?? {}).forEach(k => {
-        this.validate(k, m?.[k], i)
+        this.validate(k, m?.[k as keyof T], i)
       })
     })
   }

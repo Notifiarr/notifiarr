@@ -110,11 +110,11 @@ export interface Config extends LogConfig, Apps {
   retries: number;
   snapshot?: SnapshotConfig;
   services?: ServicesConfig;
-  service?: (null | Service)[];
+  service?: Service[];
   apt: boolean;
-  watchFiles?: (null | WatchFile)[];
-  endpoints?: (null | Endpoint)[];
-  commands?: (null | Command)[];
+  watchFiles?: WatchFile[];
+  endpoints?: Endpoint[];
+  commands?: Command[];
   version: number;
 };
 
@@ -145,7 +145,7 @@ export interface SnapshotConfig extends Plugins {
  */
 export interface Plugins {
   nvidia?: NvidiaConfig;
-  mysql?: (null | MySQLConfig)[];
+  mysql?: MySQLConfig[];
 };
 
 /**
@@ -253,7 +253,7 @@ export interface CronJob {
    * AtTimes is a list of 'hours, minutes, seconds' to schedule for Daily/Weekly/Monthly frequencies.
    * Also used in Minutely and Hourly schedules, a bit awkwardly.
    */
-  atTimes?: (null | number[])[];
+  atTimes?: number[][];
   /**
    * DaysOfWeek is a list of days to schedule. 0-6. 0 = Sunday.
    */
@@ -314,17 +314,17 @@ export interface Apps {
   urlbase: string;
   maxBody: number;
   serial: boolean;
-  sonarr?: (null | SonarrConfig)[];
-  radarr?: (null | RadarrConfig)[];
-  lidarr?: (null | LidarrConfig)[];
-  readarr?: (null | ReadarrConfig)[];
-  prowlarr?: (null | ProwlarrConfig)[];
-  deluge?: (null | DelugeConfig)[];
-  qbit?: (null | QbitConfig)[];
-  rtorrent?: (null | RtorrentConfig)[];
-  sabnzbd?: (null | SabNZBConfig)[];
-  nzbget?: (null | NZBGetConfig)[];
-  transmission?: (null | XmissionConfig)[];
+  sonarr?: SonarrConfig[];
+  radarr?: RadarrConfig[];
+  lidarr?: LidarrConfig[];
+  readarr?: ReadarrConfig[];
+  prowlarr?: ProwlarrConfig[];
+  deluge?: DelugeConfig[];
+  qbit?: QbitConfig[];
+  rtorrent?: RtorrentConfig[];
+  sabnzbd?: SabNZBConfig[];
+  nzbget?: NZBGetConfig[];
+  transmission?: XmissionConfig[];
   tautulli?: TautulliConfig;
   plex?: PlexConfig;
 };
@@ -511,7 +511,7 @@ export interface ClientInfo {
     stopLogs: boolean;
     tunnelUrl: string;
     tunnels?: string[];
-    mulery?: (null | MuleryServer)[];
+    mulery?: MuleryServer[];
   };
   actions: {
     plex: ClientinfoPlexConfig;
@@ -520,7 +520,7 @@ export interface ClientInfo {
     sync: SyncConfig;
     mdblist: MdbListConfig;
     gaps: GapsConfig;
-    custom?: (null | CronConfig)[];
+    custom?: CronConfig[];
     snapshot: SnapshotConfig;
   };
   integrityCheck: boolean;
@@ -565,11 +565,11 @@ export interface ClientinfoPlexConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.AllAppConfigs>
  */
 export interface AllAppConfigs {
-  lidarr?: (null | AppConfig)[];
-  prowlarr?: (null | AppConfig)[];
-  radarr?: (null | AppConfig)[];
-  readarr?: (null | AppConfig)[];
-  sonarr?: (null | AppConfig)[];
+  lidarr?: AppConfig[];
+  prowlarr?: AppConfig[];
+  radarr?: AppConfig[];
+  readarr?: AppConfig[];
+  sonarr?: AppConfig[];
 };
 
 /**
@@ -703,7 +703,7 @@ export interface Flags {
 export interface LogFileInfos {
   dirs?: string[];
   size: number;
-  list?: (null | LogFileInfo)[];
+  list?: LogFileInfo[];
 };
 
 /**

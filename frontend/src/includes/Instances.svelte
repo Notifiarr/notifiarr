@@ -4,7 +4,7 @@
   export type ChildProps<T> = {
     form: T
     original: T
-    app: App
+    app: App<T>
     validate?: (id: string, value: any) => string
     index?: number
     reset?: () => void
@@ -33,7 +33,7 @@
     headerCollapsed = $bindable(),
     deleteButton = 'phrases.DeleteInstance',
   }: {
-    flt: FormListTracker
+    flt: FormListTracker<any>
     Child: Component<ChildProps<any>>
     headerActive: Snippet<[number]>
     headerCollapsed?: Snippet<[number]>

@@ -1,5 +1,5 @@
 import { get, writable } from 'svelte/store'
-import { delay, ltrim, rtrim, success } from '../includes/util'
+import { delay, failure, ltrim, rtrim, success } from '../includes/util'
 import { _ } from 'svelte-i18n'
 import Cookies from 'js-cookie'
 
@@ -88,7 +88,9 @@ export async function checkReloaded(): Promise<void> {
       if (await checkReload()) return resolve()
     }
 
-    reject(new Error(get(_)('phrases.ReloadCheckTimedOut')))
+    const err = get(_)('phrases.ReloadCheckTimedOut')
+    failure(err)
+    reject(new Error(err))
   })
 }
 

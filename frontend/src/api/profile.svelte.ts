@@ -3,7 +3,7 @@ import { checkReloaded, fetchWithTimeout, getUi } from './fetch'
 import { postUi } from './fetch'
 import type { Config, Profile, ProfilePost } from './notifiarrConfig'
 import { _ } from '../includes/Translate.svelte'
-import { failure, success } from '../includes/util'
+import { delay, failure, success } from '../includes/util'
 import { urlbase } from './fetch'
 
 class ConfigProfile {
@@ -147,8 +147,16 @@ class ConfigProfile {
       10000,
     )
 
+    if (!resp.ok) {
+      this.status = ''
+      this.formError = resp.body
+      return
+    }
+
+    this.status = get(_)('phrases.UpdatingBackEnd')
+    await delay(1000)
+    await this.waitForReload()
     this.status = ''
-    if (!resp.ok) this.formError = resp.body
   }
 
   public subscribe(run: (value: Profile) => void): Unsubscriber {

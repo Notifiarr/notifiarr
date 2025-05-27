@@ -21,13 +21,13 @@
   import nvidiaLogo from '../../assets/logos/nvidia.png'
   import type { MySQLConfig, NvidiaConfig } from '../../api/notifiarrConfig'
   import { deepCopy } from '../../includes/util'
-  import Instance, { type Form } from '../../includes/Instance.svelte'
+  import Instance from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
   import { FormListTracker, type App } from '../../includes/formsTracker.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import { validate } from '../../includes/instanceValidator'
 
-  const mysqlApp: App = {
+  const mysqlApp: App<MySQLConfig> = {
     name: 'MySQL',
     id: page.id + '.MySQL',
     logo: mysqlLogo,
@@ -45,28 +45,31 @@
         return value === '' ? $_('phrases.UsernameMustNotBeEmpty') : ''
       return validate(id, value, index, $profile.config.snapshot?.mysql ?? [])
     },
-    merge: (index: number, form: Form) => {
+    merge: (index: number, form: MySQLConfig) => {
       const c = deepCopy($profile.config)
-      c.snapshot!.mysql![index] = form as MySQLConfig
+      c.snapshot!.mysql![index] = form
       return c
     },
   }
 
-  const nvidiaApp = {
+  const nvidiaApp: App<NvidiaConfig> = {
     name: 'Nvidia',
     id: page.id + '.Nvidia',
     logo: nvidiaLogo,
     hidden: ['deletes'],
-    merge: (index: number, form: Form) => {
+    merge: (index: number, form: NvidiaConfig) => {
       const c = deepCopy($profile.config)
-      c.snapshot!.nvidia = form as NvidiaConfig
+      c.snapshot!.nvidia = form
       return c
     },
   }
 
   let flt = $derived({
     MySQL: new FormListTracker($profile.config.snapshot?.mysql ?? [], mysqlApp),
-    Nvidia: new FormListTracker([$profile.config.snapshot?.nvidia ?? {}], nvidiaApp),
+    Nvidia: new FormListTracker(
+      [$profile.config.snapshot?.nvidia ?? ({} as NvidiaConfig)],
+      nvidiaApp,
+    ),
   })
 
   async function submit() {
@@ -101,4 +104,4 @@
 
 <Footer
   {submit}
-  saveDisabled={!nav.formChanged && Object.values(flt).some(iv => iv.invalid)} />
+  saveDisabled={!nav.formChanged || Object.values(flt).some(iv => iv.invalid)} />

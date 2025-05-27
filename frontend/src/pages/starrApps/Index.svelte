@@ -1,17 +1,6 @@
 <script lang="ts" module>
   import { page } from './page.svelte'
-
   export { page }
-
-  const flt = $derived({
-    Sonarr: new FormListTracker(get(profile).config.sonarr, Starr.Sonarr),
-    Radarr: new FormListTracker(get(profile).config.radarr, Starr.Radarr),
-    Readarr: new FormListTracker(get(profile).config.readarr, Starr.Readarr),
-    Lidarr: new FormListTracker(get(profile).config.lidarr, Starr.Lidarr),
-    Prowlarr: new FormListTracker(get(profile).config.prowlarr, Starr.Prowlarr),
-  })
-
-  export const getTracker = (app: keyof typeof flt) => flt[app]
 </script>
 
 <script lang="ts">
@@ -31,7 +20,14 @@
     SonarrConfig,
   } from '../../api/notifiarrConfig'
   import { FormListTracker } from '../../includes/formsTracker.svelte'
-  import { get } from 'svelte/store'
+
+  const flt = $derived({
+    Sonarr: new FormListTracker($profile.config.sonarr ?? [], Starr.Sonarr),
+    Radarr: new FormListTracker($profile.config.radarr ?? [], Starr.Radarr),
+    Readarr: new FormListTracker($profile.config.readarr ?? [], Starr.Readarr),
+    Lidarr: new FormListTracker($profile.config.lidarr ?? [], Starr.Lidarr),
+    Prowlarr: new FormListTracker($profile.config.prowlarr ?? [], Starr.Prowlarr),
+  })
 
   async function submit() {
     const c = {
@@ -68,9 +64,6 @@
   </TabContent>
 </CardBody>
 
-{Object.values(flt).every(iv => !iv.formChanged)}
-{Object.values(flt).every(iv => iv.removed.length === 0)}
-{Object.values(flt).every(iv => iv.invalid)}
 <Footer
   {submit}
-  saveDisabled={!nav.formChanged && Object.values(flt).some(iv => iv.invalid)} />
+  saveDisabled={!nav.formChanged || Object.values(flt).some(iv => iv.invalid)} />

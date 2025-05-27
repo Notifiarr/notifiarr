@@ -16,7 +16,7 @@
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
-  import { warning } from '../../includes/util'
+  import { delay, failure, warning } from '../../includes/util'
   import { faSplotch } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Fa from '../../includes/Fa.svelte'
   import { nav } from '../../navigation/nav.svelte'
@@ -25,8 +25,8 @@
 
   let pinging = $state(false)
   // Tunnel configuration comes from the website.
-  let primaryTunnel = $state($profile.clientInfo?.user.tunnels?.[0])
-  let backupTunnel = $state($profile.clientInfo?.user.tunnels?.[1])
+  let primaryTunnel = $derived($profile.clientInfo?.user.tunnels?.[0])
+  let backupTunnel = $derived($profile.clientInfo?.user.tunnels?.[1])
   // Track ping button and response.
   let pingOutput: Record<number, string> = $state({})
   let pingError = $state('')

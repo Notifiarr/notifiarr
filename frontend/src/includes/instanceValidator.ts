@@ -1,6 +1,6 @@
 import { get } from 'svelte/store'
 import { _ } from './Translate.svelte'
-import type { Forms } from './Instance.svelte'
+import type { Form } from './Instance.svelte'
 
 /** Standard form validator for an integrated instance (plex, sonarr, etc)
  * @param id - The id of the form field. (anything.here.url)
@@ -13,8 +13,9 @@ export const validate = (
   id: string,
   value: any,
   index: number,
-  instances: Forms,
+  instances: Form[] | Form,
 ): string => {
+  if (!Array.isArray(instances)) instances = [instances]
   const key = id.split('.').pop()
 
   if (key == 'name') {

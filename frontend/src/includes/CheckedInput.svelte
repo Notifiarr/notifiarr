@@ -9,19 +9,20 @@
   } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { faCheckDouble } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { get } from 'svelte/store'
-  import type { App, Form } from './Instance.svelte'
+  import type { Form } from './Instance.svelte'
+  import type { App } from './formsTracker.svelte'
   import Input from './Input.svelte'
   import { delay, maxLength } from './util'
   import { postUi } from '../api/fetch'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
 
-  type Props = {
-    id: keyof Form
-    app: App
+  type Props<T> = {
+    id: keyof T
+    app: App<T>
     index: number
-    form: Form
-    original: Form
+    form: T
+    original: T
     [key: string]: any
   }
   let {
@@ -31,7 +32,7 @@
     form = $bindable(),
     original = $bindable(),
     ...rest
-  }: Props = $props()
+  }: Props<any> = $props()
 
   // Used for instance checking.
   let ok = $state(undefined as boolean | undefined)
@@ -54,10 +55,10 @@
 
 <div class="checked-input">
   <Input
-    id={app.id + '.' + id}
+    id={app.id + '.' + id.toString()}
     bind:value={form[id]}
     original={original?.[id] ?? undefined}
-    disabled={app.disabled?.includes(id)}
+    disabled={app.disabled?.includes(id.toString())}
     description={id === 'url' && form[id]?.toString()?.startsWith('https://')
       ? get(_)('words.instance-options.validSsl.description')
       : rest.description}

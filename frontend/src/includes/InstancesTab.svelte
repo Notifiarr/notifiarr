@@ -12,8 +12,8 @@
   import type { FormListTracker } from './formsTracker.svelte'
   import Instance from './Instance.svelte'
 
-  type Props = { flt: FormListTracker; tab: string; titles: Record<string, string> }
-  let { flt, tab = $bindable(), titles = $bindable() }: Props = $props()
+  type Props<T> = { flt: FormListTracker<T>; tab: string; titles: Record<string, string> }
+  let { flt, tab = $bindable(), titles = $bindable() }: Props<any> = $props()
 </script>
 
 <TabPane

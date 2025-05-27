@@ -18,7 +18,6 @@
     busIDs?: string[]
     disabled?: boolean
   }
-  export type Forms = (Form | null)[]
 </script>
 
 <script lang="ts">
@@ -28,9 +27,7 @@
   import { Col, Row, Button } from '@sveltestrap/sveltestrap'
   import { _ } from './Translate.svelte'
   import { deepEqual } from './util'
-  import type { Config } from '../api/notifiarrConfig'
   import { slide } from 'svelte/transition'
-  import type { IconDefinition } from '@fortawesome/sharp-duotone-light-svg-icons'
   import type { ChildProps } from './Instances.svelte'
 
   let {
@@ -40,7 +37,7 @@
     index = 0,
     validate,
     reset,
-  }: ChildProps<Form> = $props()
+  }: ChildProps<any> = $props()
 
   // Convert array to newline-separated string for textarea.
   let busIds = $state(

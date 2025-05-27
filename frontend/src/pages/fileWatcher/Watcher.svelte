@@ -40,6 +40,7 @@
   </Col>
   <Col sm={6}>
     <Input
+      type="select"
       id={app.id + '.poll'}
       bind:value={form.poll}
       original={original?.poll}
@@ -47,6 +48,7 @@
   </Col>
   <Col sm={6}>
     <Input
+      type="select"
       id={app.id + '.pipe'}
       bind:value={form.pipe}
       original={original?.pipe}
@@ -54,6 +56,7 @@
   </Col>
   <Col sm={6}>
     <Input
+      type="select"
       id={app.id + '.mustExist'}
       bind:value={form.mustExist}
       original={original?.mustExist}
@@ -61,6 +64,7 @@
   </Col>
   <Col sm={6}>
     <Input
+      type="select"
       id={app.id + '.logMatch'}
       bind:value={form.logMatch}
       original={original?.logMatch}

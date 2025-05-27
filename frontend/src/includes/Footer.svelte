@@ -44,6 +44,7 @@
     e.preventDefault()
     submitting = true
     submitted = false
+    profile.error = '' // clear the error message
     await submit(e)
     submitting = false
     submitted = true

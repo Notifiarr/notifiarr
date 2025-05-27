@@ -121,6 +121,8 @@ rsrc.syso: init/windows/application.ico init/windows/manifest.xml
 	go run github.com/akavel/rsrc@latest -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
 
 generate: pkg/bindata/docs/api_docs.go
+	mkdir -p ./frontend/dist
+	echo "Fake frontend build." > ./frontend/dist/fake.txt
 	go generate ./frontend/src/api
 	go generate ./frontend
 pkg/bindata/docs/api_docs.go:

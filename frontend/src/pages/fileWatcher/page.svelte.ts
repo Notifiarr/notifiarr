@@ -46,9 +46,9 @@ const validator = (id: string, value: any): string => {
   return ''
 }
 
-export const app: App = {
+export const app: App<WatchFile> = {
   id: 'FileWatcher',
-  name: 'File Watcher',
+  name: 'FileWatcher',
   logo: faEyeEvil,
   iconProps: { c1: 'purple', c2: 'firebrick', d1: 'thistle', d2: 'violet' },
   disabled: [],

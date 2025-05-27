@@ -19,7 +19,7 @@ import sabnzbLogo from '../../assets/logos/sabnzb.png'
 import nzbgetLogo from '../../assets/logos/nzbget.png'
 import { faDownload } from '@fortawesome/sharp-duotone-regular-svg-icons'
 import { validate } from '../../includes/instanceValidator'
-import { getTracker } from './Index.svelte'
+import type { App } from '../../includes/formsTracker.svelte'
 
 export const page = {
   id: 'Downloaders',
@@ -55,101 +55,101 @@ export class Downloaders {
   }
 
   static readonly getValidator = (
-    app: 'Qbittorrent' | 'Rtorrent' | 'Transmission' | 'Deluge' | 'SabNZB' | 'NZBGet',
+    app: 'qbit' | 'rtorrent' | 'transmission' | 'deluge' | 'sabnzbd' | 'nzbget',
   ): ((id: string, value: any, index: number) => string) => {
     return (id: string, value: any, index: number) => {
-      return validate(id, value, index, getTracker(app).instances)
+      return validate(id, value, index, get(profile).config[app] ?? [])
     }
   }
 
-  static readonly Qbittorrent = {
+  static readonly Qbittorrent: App<QbitConfig> = {
     name: 'Qbittorrent',
     id: page.id + '.Qbittorrent',
     logo: qbitLogo,
     hidden: ['apiKey', 'deletes'],
-    empty: downloadConfig,
-    merge: (index: number, form: Form) => {
+    empty: downloadConfig as QbitConfig,
+    merge: (index: number, form: QbitConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.qbit) c.qbit = []
-      c.qbit[index] = form as QbitConfig
+      c.qbit[index] = form
       return c
     },
-    validator: Downloaders.getValidator('Qbittorrent'),
+    validator: Downloaders.getValidator('qbit'),
   }
 
-  static readonly Rtorrent = {
+  static readonly Rtorrent: App<RtorrentConfig> = {
     name: 'Rtorrent',
     id: page.id + '.Rtorrent',
     logo: rtorrentLogo,
     hidden: ['apiKey', 'deletes'],
-    empty: downloadConfig,
-    merge: (index: number, form: Form) => {
+    empty: downloadConfig as RtorrentConfig,
+    merge: (index: number, form: RtorrentConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.rtorrent) c.rtorrent = []
-      c.rtorrent[index] = form as RtorrentConfig
+      c.rtorrent[index] = form
       return c
     },
-    validator: Downloaders.getValidator('Rtorrent'),
+    validator: Downloaders.getValidator('rtorrent'),
   }
 
-  static readonly Xmission = {
+  static readonly Xmission: App<XmissionConfig> = {
     name: 'Transmission',
     id: page.id + '.Transmission',
     logo: xmissionLogo,
     hidden: ['apiKey', 'deletes'],
-    empty: downloadConfig,
-    merge: (index: number, form: Form) => {
+    empty: downloadConfig as XmissionConfig,
+    merge: (index: number, form: XmissionConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.transmission) c.transmission = []
-      c.transmission[index] = form as XmissionConfig
+      c.transmission[index] = form
       return c
     },
-    validator: Downloaders.getValidator('Transmission'),
+    validator: Downloaders.getValidator('transmission'),
   }
 
-  static readonly Deluge = {
+  static readonly Deluge: App<DelugeConfig> = {
     name: 'Deluge',
     id: page.id + '.Deluge',
     logo: delugeLogo,
     hidden: ['username', 'apiKey', 'deletes'],
-    empty: downloadConfig,
-    merge: (index: number, form: Form) => {
+    empty: downloadConfig as DelugeConfig,
+    merge: (index: number, form: DelugeConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.deluge) c.deluge = []
-      c.deluge[index] = form as DelugeConfig
+      c.deluge[index] = form
       return c
     },
-    validator: Downloaders.getValidator('Deluge'),
+    validator: Downloaders.getValidator('deluge'),
   }
 
-  static readonly SabNZB = {
+  static readonly SabNZB: App<SabNZBConfig> = {
     name: 'SabNZB',
     id: page.id + '.SabNZB',
     logo: sabnzbLogo,
     hidden: ['username', 'password', 'deletes'],
-    empty: downloadConfig,
-    merge: (index: number, form: Form) => {
+    empty: downloadConfig as SabNZBConfig,
+    merge: (index: number, form: SabNZBConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.sabnzbd) c.sabnzbd = []
-      c.sabnzbd[index] = form as SabNZBConfig
+      c.sabnzbd[index] = form
       return c
     },
-    validator: Downloaders.getValidator('SabNZB'),
+    validator: Downloaders.getValidator('sabnzbd'),
   }
 
-  static readonly NZBGet = {
+  static readonly NZBGet: App<NZBGetConfig> = {
     name: 'NZBGet',
     id: page.id + '.NZBGet',
     logo: nzbgetLogo,
     hidden: ['apiKey', 'deletes'],
-    empty: downloadConfig,
-    merge: (index: number, form: Form) => {
+    empty: downloadConfig as NZBGetConfig,
+    merge: (index: number, form: NZBGetConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.nzbget) c.nzbget = []
-      c.nzbget[index] = form as NZBGetConfig
+      c.nzbget[index] = form
       return c
     },
-    validator: Downloaders.getValidator('NZBGet'),
+    validator: Downloaders.getValidator('nzbget'),
   }
 
   // Keep track of the navigation.

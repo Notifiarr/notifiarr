@@ -18,29 +18,23 @@
   import Header from '../../includes/Header.svelte'
   import plexLogo from '../../assets/logos/plex.png'
   import tautulliLogo from '../../assets/logos/tautulli.png'
-  import Instance, { type Form } from '../../includes/Instance.svelte'
+  import Instance from '../../includes/Instance.svelte'
   import InstanceHeader from '../../includes/InstanceHeader.svelte'
   import type { Config, PlexConfig, TautulliConfig } from '../../api/notifiarrConfig'
   import { FormListTracker, type App } from '../../includes/formsTracker.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import { validate } from '../../includes/instanceValidator'
 
-  const merge = (index: number, form: Form) => {
-    return {
-      ...({} as Config),
-      // ugly but it works
-      [plexApp.name.toLowerCase()]: form,
-      [tautulliApp.name.toLowerCase()]: form,
-    }
-  }
-
-  const plexApp: App = {
+  const plexApp: App<PlexConfig> = {
     name: 'Plex',
     id: page.id + '.Plex',
     logo: plexLogo,
     hidden: ['deletes'],
     disabled: ['name'],
-    merge,
+    merge: (index: number, form: PlexConfig) => ({
+      ...({} as Config),
+      plex: form as PlexConfig,
+    }),
     // Ignore empty values since Plex is optional.
     validator: (id: string, value: any, index: number) => {
       if (id.endsWith('.name')) return ''
@@ -50,17 +44,30 @@
     },
   }
 
-  const tautulliApp: App = {
+  const tautulliApp: App<TautulliConfig> = {
     name: 'Tautulli',
     id: page.id + '.Tautulli',
     logo: tautulliLogo,
     hidden: ['deletes'],
-    merge,
+    merge: (index: number, form: TautulliConfig) => ({
+      ...({} as Config),
+      tautulli: form as TautulliConfig,
+    }),
+    // Ignore empty values since Plex is optional.
+    validator: (id: string, value: any, index: number) => {
+      if (id.endsWith('.name')) return ''
+      if (id.endsWith('.url') && value === '') return ''
+      if (id.endsWith('.apiKey') && value === '') return ''
+      return validate(id, value, index, [$profile.config.tautulli ?? {}])
+    },
   }
 
   let iv = $derived({
-    Plex: new FormListTracker([$profile.config.plex ?? {}], plexApp),
-    Tautulli: new FormListTracker([$profile.config.tautulli ?? {}], tautulliApp),
+    Plex: new FormListTracker([$profile.config.plex ?? ({} as PlexConfig)], plexApp),
+    Tautulli: new FormListTracker(
+      [$profile.config.tautulli ?? ({} as TautulliConfig)],
+      tautulliApp,
+    ),
   })
 
   $effect(() => {
@@ -95,5 +102,4 @@
       plex: iv.Plex.instances[0]! as PlexConfig,
       tautulli: iv.Tautulli.instances[0]! as TautulliConfig,
     })}
-  saveDisabled={Object.values(iv).every(iv => !iv.formChanged) ||
-    Object.values(iv).some(iv => iv.invalid)} />
+  saveDisabled={!nav.formChanged || Object.values(iv).some(iv => iv.invalid)} />
