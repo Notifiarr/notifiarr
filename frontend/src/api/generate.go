@@ -6,7 +6,7 @@ package main
 import (
 	"log"
 	"os"
-	"path/filepath"
+	"path"
 	"reflect"
 	"strings"
 	"time"
@@ -18,7 +18,10 @@ import (
 	"golift.io/goty/gotydoc"
 )
 
-const outputFileName = "notifiarrConfig.ts"
+const (
+	outputFileName = "notifiarrConfig.ts"
+	localPrefix    = "github.com/Notifiarr/notifiarr/"
+)
 
 func main() {
 	vendorDir := os.Getenv("VENDOR_DIR")
@@ -61,7 +64,10 @@ func main() {
 	docs.AddMust(vendorDir, vendorPkgs...) // `go mod vendor`
 
 	log.Printf("==> adding %d local packages", len(localPkgs))
-	docs.AddMust(filepath.Join(filepath.Dir(vendorDir), "../../../"), localPkgs...) // `git clone`
+	for _, pkg := range localPkgs {
+		dir := strings.TrimPrefix(pkg, localPrefix)
+		docs.AddPkgMust(path.Join("../../../", dir), pkg) // `git clone`
+	}
 
 	log.Println("==> writing output file")
 	if err := goat.Write(outputFileName, true); err != nil {
@@ -73,7 +79,6 @@ func main() {
 // This splits them out so we can add the vendor docs from the vendor folder,
 // and the local docs from the local git checkout.
 func splitPkgs(pkgs []string) ([]string, []string) {
-	const localPrefix = "github.com/Notifiarr/notifiarr/"
 
 	vendorPkgs := []string{}
 	localPkgs := []string{}
