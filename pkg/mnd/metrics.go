@@ -23,15 +23,15 @@ var (
 )
 
 type AllData struct {
-	LogFiles      map[string]interface{}
-	APIHits       map[string]interface{}
-	HTTPRequests  map[string]interface{}
-	TimerEvents   map[string]map[string]interface{}
-	TimerCounts   map[string]interface{}
-	Website       map[string]interface{}
-	ServiceChecks map[string]map[string]interface{}
-	Apps          map[string]map[string]interface{}
-	FileWatcher   map[string]interface{}
+	LogFiles      map[string]interface{}            `json:"logFiles"`
+	APIHits       map[string]interface{}            `json:"apiHits"`
+	HTTPRequests  map[string]interface{}            `json:"httpRequests"`
+	TimerEvents   map[string]map[string]interface{} `json:"timerEvents"`
+	TimerCounts   map[string]interface{}            `json:"timerCounts"`
+	Website       map[string]interface{}            `json:"website"`
+	ServiceChecks map[string]map[string]interface{} `json:"serviceChecks"`
+	Apps          map[string]map[string]interface{} `json:"apps"`
+	FileWatcher   map[string]interface{}            `json:"fileWatcher"`
 }
 
 func GetAllData() AllData {

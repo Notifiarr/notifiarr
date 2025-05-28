@@ -1,0 +1,172 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  height: 100vh;
+}
+
+/* https://github.com/react-bootstrap/react-bootstrap/issues/6796 */
+.modal {
+  color: var(--bs-body-color);
+}
+
+body {
+  background-image: url(lightbg.svg?inline);
+  background-color: #b9c8f3;
+  background-position: center;
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: background-image 0.4s;
+}
+
+body.dark-mode {
+  transition: background-image 0.4s;
+  background-image: url(darkbg.svg?inline);
+  background-color: #1d3040;
+}
+
+/* https://www.fontshungry.com/beleren-font-family/ */
+@font-face {
+  font-family: notifiarrFont;
+  src: url(fonts/Beleren2016SmallCaps-Bold.ttf?inline);
+}
+
+.title-notifiarr {
+  font-family: notifiarrFont !important;
+  color: #3cd2a5;
+  text-shadow: 1px 1px 1px #828181;
+  vertical-align: bottom;
+}
+
+.border-notifiarr {
+  --bs-border-opacity: 1;
+  border-color: rgba(60, 210, 165, var(--bs-border-opacity)) !important;
+}
+
+.bg-notifiarr {
+  background-color: rgba(60, 210, 165, 1) !important;
+}
+
+.bg-notifiarr-subtle {
+  background-color: rgb(8, 104, 75, 1) !important;
+}
+
+.text-bg-notifiarr {
+  color: #000000 !important;
+  background: radial-gradient(
+    circle,
+    rgba(60, 210, 165, 1) 37%,
+    rgba(94, 230, 216, 1) 100%
+  );
+}
+
+.text-notifiarr {
+  color: #3cd2a5 !important;
+}
+
+.btn-notifiarr {
+  color: #000000 !important;
+  background: radial-gradient(
+    circle,
+    rgba(60, 210, 165, 1) 37%,
+    rgba(94, 230, 216, 1) 100%
+  );
+  border-color: #03535a !important;
+  font-weight: 600;
+}
+
+.btn-notifiarr:hover {
+  background: radial-gradient(circle, rgb(54, 197, 154) 37%, rgb(79, 195, 185) 100%);
+}
+
+.btn-outline-notifiarr {
+  border-color: #3cd2a5 !important;
+}
+
+/* Use h4 as sub header for input groups. */
+h4 {
+  font-size: 1.5rem !important;
+  font-weight: 550 !important;
+  width: 98%;
+  border-bottom: 2px solid rgba(54, 197, 154, 0.4);
+  text-transform: uppercase;
+  text-shadow: 2px 2px 4px rgba(54, 197, 154, 0.5);
+  margin-bottom: 1rem !important;
+  margin-top: 1.5rem !important;
+  vertical-align: bottom;
+  display: inline-block;
+}
+
+/* Make links look notifiarr. */
+
+a {
+  color: #2fa582 !important;
+}
+
+a:hover {
+  color: #3cd2a5 !important;
+}
+
+.dark-mode a {
+  color: #3cd2a5 !important;
+}
+
+.dark-mode a:hover {
+  color: #2fa582 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid #3cd2a5 !important;
+  box-shadow: 0 0 10px #2fa582 !important;
+}
+
+.accordion {
+  --bs-accordion-active-bg: #b0d9c4ab !important;
+  --bs-accordion-active-color: #04482c !important;
+  --bs-accordion-bg: #cdf0cd42 !important;
+  --bs-accordion-border-color: #6cf878 !important;
+  --bs-accordion-active-border-color: #6cf878 !important;
+}
+
+.dark-mode .accordion {
+  --bs-accordion-active-bg: #03331f !important;
+  --bs-accordion-active-color: #9df6c8 !important;
+  --bs-accordion-bg: #212921 !important;
+  --bs-accordion-border-color: #659369 !important;
+  --bs-accordion-active-border-color: #659369 !important;
+}
+
+.dark-mode .accordion-body {
+  background-color: #212921 !important;
+}
+
+.accordion-body {
+  background-color: #cdf0cd42 !important;
+}
+
+input[type='radio']:checked,
+input[type='checkbox']:checked {
+  background-color: #3cd2a5 !important;
+}
+
+input[type='radio'],
+input[type='checkbox'] {
+  border-color: #3cd2a5 !important;
+}

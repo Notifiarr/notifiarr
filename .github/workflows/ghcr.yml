@@ -13,7 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        docker: [ {name: 'scratch', sfx: ''}, {name: 'cuda', sfx: '-cuda'}, {name: 'alpine', sfx: '-alpine'} ]
+        docker:
+          [
+            { name: 'scratch', sfx: '' },
+            { name: 'cuda', sfx: '-cuda' },
+            { name: 'alpine', sfx: '-alpine' },
+          ]
     permissions:
       contents: read
       packages: write
@@ -90,6 +95,8 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          secrets: |
+            FONTAWESOME_PACKAGE_TOKEN=${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
           build-args: |
             BUILD_DATE=${{ env.DATE }}
             COMMIT=${{ env.COMMIT }}

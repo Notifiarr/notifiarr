@@ -37,9 +37,9 @@ echo "############################################"
 echo "############################################"
 
 echo "Build Args: ${BUILD_ARGS}"
-eval "docker buildx build --load --tag current:amd64 --platform linux/amd64 $BUILD_ARGS"
-eval "docker buildx build --load --tag current:arm64 --platform linux/arm64/v8 $BUILD_ARGS"
-eval "docker buildx build --load --tag current:arm --platform linux/arm $BUILD_ARGS"
+eval "docker buildx build --load --tag current:amd64 --secret id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN --platform linux/amd64 $BUILD_ARGS"
+eval "docker buildx build --load --tag current:arm64 --secret id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN --platform linux/arm64/v8 $BUILD_ARGS"
+eval "docker buildx build --load --tag current:arm --secret id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN --platform linux/arm $BUILD_ARGS"
 echo "Done Building."
 
 TAGS="$SOURCE_BRANCH"

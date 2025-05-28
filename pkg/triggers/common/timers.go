@@ -2,13 +2,13 @@ package common
 
 import (
 	"context"
+	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
-	"golift.io/cnfg"
 )
 
 // TrigStop is used to signal a stop/reload.
@@ -49,11 +49,11 @@ func (c *Config) Run(ctx context.Context) {
 	c.printStartupLog()
 }
 
-func (c *Config) GatherTriggerInfo() (map[string]cnfg.Duration, map[string]cnfg.Duration) {
-	var (
-		triggers = make(map[string]cnfg.Duration)
-		timers   = make(map[string]cnfg.Duration)
-	)
+//nolint:nonamedreturns
+func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]fmt.Stringer) {
+	triggers = make(map[string]fmt.Stringer)
+	timers = make(map[string]fmt.Stringer)
+	schedules = make(map[string]fmt.Stringer)
 
 	for _, action := range append(c.list, c.stop) {
 		if action == nil {
@@ -67,26 +67,38 @@ func (c *Config) GatherTriggerInfo() (map[string]cnfg.Duration, map[string]cnfg.
 		if action.t != nil {
 			timers[string(action.Name)] = action.D
 		}
+
+		if action.job != nil {
+			schedules[string(action.Name)] = action.J
+		}
 	}
 
-	return triggers, timers
+	return
 }
 
 func (c *Config) printStartupLog() {
-	triggers, timers := c.GatherTriggerInfo()
-	c.Printf("==> Actions Started: %d Timers and %d Triggers", len(timers), len(triggers))
+	triggers, timers, schedules := c.GatherTriggerInfo()
+	c.Printf("==> Actions Started: %d Timers and %d Triggers and %d Schedules", len(timers), len(triggers), len(schedules))
 
-	for name, dur := range triggers {
+	for name := range triggers {
 		if _, ok := timers[name]; ok {
-			c.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, dur)
+			c.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, timers[name])
+		} else if _, ok := schedules[name]; ok {
+			c.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
 		} else {
 			c.Debugf("==> Enabled Action: %s Trigger only.", name)
 		}
 	}
 
-	for name, dur := range timers {
+	for name := range timers {
 		if _, ok := triggers[name]; !ok {
-			c.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, dur)
+			c.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, timers[name])
+		}
+	}
+
+	for name := range schedules {
+		if _, ok := triggers[name]; !ok {
+			c.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
 		}
 	}
 }
@@ -97,9 +109,12 @@ func (c *Config) printStartupLog() {
 // That means only 1 action can run at a time. If c.Serial is set to true, then
 // some of those actions (especially dashboard) will spawn their own go routines.
 func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []reflect.SelectCase) {
+	c.Scheduler.Start()
+
 	defer func() {
 		c.CapturePanic()
 		c.stopTimerLoop(actions)
+		_ = c.Scheduler.Shutdown()
 	}()
 
 	// This is how you watch a slice of reflect.SelectCase.

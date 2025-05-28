@@ -3,9 +3,9 @@
 # https://github.com/golift/application-builder
 #
 
-FROM golang:1.24.2-alpine AS builder
+FROM golang:1.24.3-alpine AS builder
 
-# Build speed magic! 
+# Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
 COPY main.go go.mod go.sum ./
@@ -14,8 +14,15 @@ COPY main.go go.mod go.sum ./
 RUN go mod download \
     && go run github.com/swaggo/swag/cmd/swag@latest -v
 
+RUN apk add nodejs npm
 COPY pkg pkg
-RUN go generate ./...
+COPY frontend frontend
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN \
+    go generate ./pkg/bindata/docs \
+    mkdir -p ./frontend/dist \
+    echo "Fake frontend build." > ./frontend/dist/index.html \
+    go generate ./frontend/src/api \
+    go generate ./frontend
 
 ARG TARGETARCH
 ARG TARGETOS

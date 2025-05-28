@@ -158,6 +158,11 @@ serial = {{.Serial}}
 ## Setting this to 0 will take the default of 4. Use 1 to disable retrying.
 retries = {{.Retries}}
 
+## The version of the config file. The app uses this to verify the config
+## version the front-end updates is not older than the back-end version.
+version = {{.Version}}
+
+
 ##################
 # Starr Settings #
 ##################
@@ -585,5 +590,75 @@ retries = {{.Retries}}
   log     = {{$item.Log}}
   notify  = {{$item.Notify}}
   timeout = "{{$item.Timeout}}"{{end}}
+{{end}}{{end}}
+
+############################
+# Endpoint URL Passthrough #
+############################
+
+## The Endpoint URL Passthrough feature allows you to configure the client to poll
+## any URL and send the response to the Notifiarr website for notification processing.
+## @name          - Defaults to URL. Name is used in logs and to identify this endpoint remotely.
+## @url           - Required URL to poll. Query is optional here, can be added in query param.
+## @method        - defaults to GET. Can use POST, PUT, etc.
+## @template      - Helps the website identify which template to parse this data into.
+##                  Setting this to "false" will skip sending the response to the website.
+## @body          - For POST and PUT this is the body payload that is sent.
+## @follow        - Follow redirects? Default is false, do not follow 301/302s.
+## @frequency     - 0: no schedule, 1: minutely, 2: hourly, 3: daily, 4: weekly, 5: monthly
+## @interval      - How often to schedule when frequency is 3, 4 or 5.
+## @days_of_week  - List of days. Used when frequency is 4. Allowed values 0-6, 0 = Sunday.
+## @days_of_month - List of days. Used when frequency is 5. Allowed values 1-31 and -31 to -1.
+## @months        - List of months. Currently not used. Allowed values: 1-12, 1 = January.
+## @at_times      - List of tuples [hours,minutes,seconds] to schedule when frequency is 3, 4 or 5.
+##                  Only seconds are used when frequency is 1, only minutes when frequency is 2.
+## @header        - Map of header names to values sent with the http request to the URL.
+## @query         - Map of query names to values appended to the url in the request.
+##
+## Full Example Follows (remove the leading # hashes to use it):
+##
+#[[endpoint]]
+#  name          = "My Example"
+#  url           = "http://example.com"
+#  method        = "GET"
+#  template      = "pihole"
+#  body          = ''
+#  follow        = false
+#  frequency     = 1
+#  interval      = 1
+#  days_of_week  = [0]
+#  days_of_month = [1]
+#  months        = [1]
+#  at_times      = [[0,0,0]]
+#  [endpoint.header]
+#    x-api-key = ["abc123"]
+#  [endpoint.query]
+#    apiKey = ["abc123"]
+
+{{if .Endpoints}}
+## Configured Commands:
+{{- range $item := .Endpoints}}{{if $item}}
+
+[[endpoint]]
+  name          = "{{$item.Name}}"
+  url           = "{{$item.URL}}"
+  method        = "{{$item.Method}}"
+  template      = "{{$item.Template}}"
+  body          = '''{{$item.Body}}'''
+  follow        = {{$item.Follow}}
+  frequency     = {{$item.Frequency}}
+  interval      = {{$item.Interval}}
+  days_of_week  = [{{range $s := $item.DaysOfWeek}}{{$s}},{{end}}]
+  days_of_month = [{{range $s := $item.DaysOfMonth}}{{$s}},{{end}}]
+  months        = [{{range $s := $item.Months}}{{$s}},{{end}}]
+  at_times      = [{{range $s := $item.AtTimes}}[{{range $j := $s}}{{$j}},{{end}}],{{end}}]
+  {{- if $item.Query}}
+  [endpoint.query]
+  {{- range $query, $values := $item.Query}}
+    {{$query}} = [{{range $s := $values}}"{{$s}}",{{end}}]{{end}}{{end}}
+  {{- if $item.Header}}
+  [endpoint.header]
+  {{- range $header, $values := $item.Header}}
+    {{$header}} = [{{range $s := $values}}"{{$s}}",{{end}}]{{end}}{{end}}{{end}}
 {{end}}{{end}}
 `

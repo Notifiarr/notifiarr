@@ -3,9 +3,9 @@
 # https://github.com/golift/application-builder
 #
 
-FROM golang:1.24.2-bullseye AS builder
+FROM golang:1.24.3-bullseye AS builder
 
-# Build speed magic! 
+# Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
 WORKDIR /src
 COPY main.go go.mod go.sum ./
@@ -14,8 +14,18 @@ COPY main.go go.mod go.sum ./
 RUN go mod download \
     && go run github.com/swaggo/swag/cmd/swag@latest -v
 
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash \
+    && apt install -y nodejs
+
 COPY pkg pkg
-RUN go generate ./...
+COPY frontend frontend
+COPY frontend frontend
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN \
+    go generate ./pkg/bindata/docs \
+    mkdir -p ./frontend/dist \
+    echo "Fake frontend build." > ./frontend/dist/index.html \
+    go generate ./frontend/src/api \
+    go generate ./frontend
 
 ARG TARGETARCH
 
@@ -40,7 +50,7 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
     -X \"golift.io/version.Revision=${ITERATION}\" \
     -X \"golift.io/version.Version=${VERSION}\""
 
-FROM nvidia/cuda:12.8.1-base-ubuntu22.04
+FROM nvidia/cuda:12.9.0-base-ubuntu22.04
 
 COPY --from=builder /tmp/notifiarr /
 # Other tools.

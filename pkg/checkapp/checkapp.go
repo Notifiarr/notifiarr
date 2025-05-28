@@ -4,6 +4,7 @@ package checkapp
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"html"
 	"net/http"
@@ -35,7 +36,12 @@ var ErrBadIndex = errors.New("index provided has no configuration data")
 func Test(orig *configfile.Config, writer http.ResponseWriter, req *http.Request) {
 	posted := configfile.Config{}
 
-	if err := mnd.ConfigPostDecoder.Decode(&posted, req.PostForm); err != nil {
+	if req.Header.Get("Content-Type") == "application/json" {
+		if err := json.NewDecoder(req.Body).Decode(&posted); err != nil {
+			http.Error(writer, "Decoding JSON data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+	} else if err := mnd.ConfigPostDecoder.Decode(&posted, req.PostForm); err != nil {
 		http.Error(writer, "Decoding POST data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
 		return
 	}

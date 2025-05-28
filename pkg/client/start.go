@@ -54,6 +54,7 @@ type Client struct {
 	noauth     bool
 	authHeader string
 	reloading  bool
+	newUI      bool
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" and "reloading" as of its creation.
 	sync.RWMutex
@@ -121,6 +122,7 @@ func Start() error {
 }
 
 func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
+	c.newUI = os.Getenv(c.Flags.EnvPrefix+"_NEW_UI") == mnd.True
 	msgs, newPassword, err := c.loadConfiguration(ctx)
 
 	ctx, cancel := context.WithCancel(ctx)

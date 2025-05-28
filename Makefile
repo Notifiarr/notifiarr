@@ -121,13 +121,23 @@ rsrc.syso: init/windows/application.ico init/windows/manifest.xml
 	go run github.com/akavel/rsrc@latest -arch amd64 -ico init/windows/application.ico -manifest init/windows/manifest.xml
 
 generate: pkg/bindata/docs/api_docs.go
+	mkdir -p ./frontend/dist
+	echo "Fake frontend build." > ./frontend/dist/fake.txt
+	go generate ./frontend/src/api
+	go generate ./frontend
 pkg/bindata/docs/api_docs.go:
 	find pkg -name .DS\* -delete
 	go generate ./pkg/bindata/docs
 
+
 ####################
 ##### Binaries #####
 ####################
+
+dev: generate main.go
+	go build -race $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
+	DN_NEW_UI=true $(OUTPUTDIR)/notifiarr
+
 
 notifiarr: generate main.go
 	go build $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
@@ -402,7 +412,7 @@ test: clean generate lint
 	go test -race -covermode=atomic ./...
 
 lint: generate
-	codespell -H -L vender,te -S .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum .
+	codespell -H -L vender,te -S .git,dist,node_modules,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum,package-lock.json .
 	# Checking lint.
 	golangci-lint version
 	GOOS=linux golangci-lint run

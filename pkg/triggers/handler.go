@@ -30,9 +30,10 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 }
 
 type trigger struct {
-	Name string `json:"name"`
-	Dur  string `json:"interval,omitempty"`
-	Path string `json:"apiPath,omitempty"`
+	Kind string       `json:"kind"`
+	Name string       `json:"name"`
+	Dur  fmt.Stringer `json:"interval,omitempty"`
+	Path string       `json:"apiPath,omitempty"`
 }
 
 type timer struct {
@@ -58,20 +59,26 @@ type triggerOutput struct {
 // @Router       /api/triggers [get]
 // @Security     ApiKeyAuth
 func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
-	triggers, timers := a.GatherTriggerInfo()
+	triggers, timers, schedules := a.GatherTriggerInfo()
 	temp := make(map[string]*trigger) // used to dedup.
 
 	for name, dur := range triggers {
-		if dur.Duration == 0 {
-			temp[name] = &trigger{Name: name}
+		if dur.String() == "0" {
+			temp[name] = &trigger{Kind: "trigger", Name: name}
 		} else {
-			temp[name] = &trigger{Name: name, Dur: dur.String()}
+			temp[name] = &trigger{Kind: "trigger", Name: name, Dur: dur}
 		}
 	}
 
 	for name, dur := range timers {
 		if _, ok := temp[name]; !ok {
-			temp[name] = &trigger{Name: name, Dur: dur.String()}
+			temp[name] = &trigger{Kind: "timer", Name: name, Dur: dur}
+		}
+	}
+
+	for name, dur := range schedules {
+		if _, ok := temp[name]; !ok {
+			temp[name] = &trigger{Kind: "schedule", Name: name, Dur: dur}
 		}
 	}
 
@@ -118,7 +125,7 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	return a.runTrigger(input, trigger, content)
 }
 
-func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string) (int, string) { //nolint:cyclop
+func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string) (int, string) { //nolint:cyclop,funlen
 	switch trigger {
 	case "custom":
 		return a.customTimer(input, content)
@@ -126,6 +133,8 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 		return a.clientLogs(content)
 	case "command":
 		return a.command(input, content)
+	case "endpoint":
+		return a.endpoint(input, content)
 	case "cfsync":
 		return a.cfsync(input, content)
 	case "rpsync":
@@ -240,6 +249,28 @@ func (a *Actions) command(input *common.ActionInput, content string) (int, strin
 	cmd.Run(input)
 
 	return http.StatusOK, "Command triggered: " + cmd.Name
+}
+
+// @Description  Trigger a pre-programmed endpoint URL passthrough request.
+// @Summary      Trigger Endpoint
+// @Tags         Triggers
+// @Produce      json
+// @Param        name  path   bool  true  "Name or URL of endpoint being triggered"
+// @Success      200  {object} apps.Respond.apiResponse{message=string} "success"
+// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad or missing name"
+// @Failure      404  {object} string "bad token or api key"
+// @Router       /api/trigger/endpoint/{name} [get]
+// @Security     ApiKeyAuth
+func (a *Actions) endpoint(input *common.ActionInput, content string) (int, string) {
+	a.Endpoints.List().Get(content)
+	endpoint := a.Commands.GetByHash(content)
+	if endpoint == nil {
+		return http.StatusBadRequest, "Endpoint '" + content + "' not found."
+	}
+
+	endpoint.Run(input)
+
+	return http.StatusOK, "Endpoint triggered: " + endpoint.Name
 }
 
 // @Description  Sync custom profiles and formats to Radarr.

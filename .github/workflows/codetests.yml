@@ -15,7 +15,12 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
-        run: go generate ./...
+        run: |
+          # Swagger docs
+          go generate ./pkg/bindata/docs
+          # Fake frontend build.
+          mkdir -p ./frontend/dist
+          echo "Fake frontend build." > ./frontend/dist/index.html
       - name: go-test
         run: |
           go test ./pkg/...
@@ -28,8 +33,7 @@ jobs:
         with:
           check_hidden: true
           ignore_words_list: vender, te
-          skip: .git,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum
-
+          skip: .git,dist,node_modules,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum,package-lock.json
 
   golangci-darwin:
     # description: "Runs golangci-lint on macos against freebsd and macos."
@@ -46,11 +50,16 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
-        run: GOOS=darwin go generate ./...
+        run: |
+          # Swagger docs
+          GOOS=darwin go generate ./pkg/bindata/docs
+          # Fake frontend build.
+          mkdir -p ./frontend/dist
+          echo "Fake frontend build." > ./frontend/dist/index.html
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.0
+          version: v2.1
           args: --build-tags nodbus
 
   golangci-linux:
@@ -68,8 +77,15 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
-        run: GOOS=linux go generate ./...
+        env:
+          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
+        run: |
+          # Swagger docs
+          GOOS=linux go generate ./pkg/bindata/docs
+          # Fake frontend build.
+          mkdir -p ./frontend/dist
+          echo "Fake frontend build." > ./frontend/dist/index.html
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: v2.0
+          version: v2.1

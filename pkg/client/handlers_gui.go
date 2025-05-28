@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -17,6 +18,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/checkapp"
@@ -50,11 +52,13 @@ const (
 	fileSourceLogs = "logs"
 )
 
-// userNameValue is used a context value key.
+// userNameValue is used as a context value key.
 type userNameValue int
 
 //nolint:gochecknoglobals // used as context value key.
 var userNameStr = userNameValue(1)
+
+var ErrConfigVersionMismatch = errors.New("config version mismatch")
 
 func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
@@ -103,14 +107,14 @@ func (c *Client) getUserName(request *http.Request) (string, bool) {
 	return cookieValue["username"], false
 }
 
-func (c *Client) setSession(userName string, response http.ResponseWriter) {
+func (c *Client) setSession(userName string, response http.ResponseWriter, request *http.Request) *http.Request {
 	value := map[string]string{
 		"username": userName,
 	}
 
 	encoded, err := c.cookies.Encode("session", value)
 	if err != nil {
-		return
+		return request
 	}
 
 	http.SetCookie(response, &http.Cookie{
@@ -118,12 +122,13 @@ func (c *Client) setSession(userName string, response http.ResponseWriter) {
 		Value: encoded,
 		Path:  "/",
 	})
+
+	return request.WithContext(context.WithValue(request.Context(), userNameStr, []any{userName, true}))
 }
 
 func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
 	loggedinUsername, _ := c.getUserName(request)
 	providedUsername := request.FormValue("name")
-
 	switch {
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
@@ -134,9 +139,14 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	case len(request.FormValue("password")) < minPasswordLen:
 		c.indexPage(request.Context(), response, request, "Invalid Password Length")
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
-		c.setSession(providedUsername, response)
+		request = c.setSession(providedUsername, response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
-		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+
+		if c.newUI {
+			c.handleProfile(response, request)
+		} else { // support the old interface.
+			http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+		}
 	default: // Start over.
 		c.indexPage(request.Context(), response, request, "Invalid Password")
 	}
@@ -353,82 +363,6 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 	}
 }
 
-func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	var (
-		currPass          = request.PostFormValue("Password")
-		authType          = request.PostFormValue("AuthType")
-		authHeader        = request.PostFormValue("AuthHeader")
-		currUser, dynamic = c.getUserName(request)
-	)
-
-	if !dynamic {
-		// If the auth is currently using a password, check the password.
-		if !c.checkUserPass(currUser, currPass) {
-			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
-			return
-		}
-	}
-
-	// Upstreams is only read on reload, but this is still not thread safe
-	// because two people could click save at the same time.
-	c.Lock()
-	c.Config.Upstreams = strings.Fields(request.PostFormValue("Upstreams"))
-	c.Unlock()
-
-	if authType == "password" {
-		c.handleProfilePostPassword(response, request)
-		return
-	}
-
-	switch err := c.setUserPass(request.Context(), authType, authHeader, ""); {
-	case err != nil:
-		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
-		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
-	case authType == "nopass":
-		c.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
-		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
-		c.reloadAppNow()
-	default:
-		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, authHeader)
-		c.setSession(request.Header.Get(authHeader), response)
-		http.Error(response, "Enabled WebUI proxy authentication. Header: "+authHeader, http.StatusOK)
-		c.reloadAppNow()
-	}
-}
-
-func (c *Client) handleProfilePostPassword(response http.ResponseWriter, request *http.Request) {
-	currPass := request.PostFormValue("Password")
-	currUser, _ := c.getUserName(request)
-
-	username := request.PostFormValue("NewUsername")
-	if username == "" {
-		username = currUser
-	}
-
-	newPassw := request.PostFormValue("NewPassword")
-	if newPassw == "" {
-		newPassw = currPass
-	}
-
-	if len(newPassw) < minPasswordLen {
-		http.Error(response, fmt.Sprintf("New password must be at least %d characters.",
-			minPasswordLen), http.StatusBadRequest)
-		return
-	}
-
-	if err := c.setUserPass(request.Context(), "password", username, newPassw); err != nil {
-		c.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
-		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
-
-		return
-	}
-
-	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, username)
-	c.setSession(username, response)
-	http.Error(response, "Trust Profile saved.", http.StatusOK)
-	c.reloadAppNow()
-}
-
 func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http.Request) {
 	mnd.ConfigPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
 		return reflect.ValueOf(strings.Fields(input))
@@ -615,7 +549,19 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// update config.
-	if err = c.mergeAndValidateNewConfig(config, request); err != nil {
+	if request.Header.Get("Content-Type") == "application/json" {
+		if err = json.NewDecoder(request.Body).Decode(&config); err != nil {
+			c.Errorf("[gui '%s' requested] Decoding POSTed Config: %v", user, err)
+			http.Error(response, "Error decoding POSTed Config: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = c.validateNewConfig(config)
+	} else {
+		err = c.mergeAndValidateNewConfig(config, request)
+	}
+
+	if err != nil {
 		c.Errorf("[gui '%s' requested] Validating POSTed Config: %v", user, err)
 		http.Error(response, err.Error(), http.StatusBadRequest)
 
@@ -624,12 +570,12 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 
 	// Check app integration configs before saving.
 	config.Apps.Logger = c.Logger
-	if err := config.Apps.Setup(); err != nil {
+	if err = config.Apps.Setup(); err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 		return
 	}
 
-	if err := c.saveNewConfig(request.Context(), config); err != nil {
+	if err = c.saveNewConfig(request.Context(), config); err != nil {
 		c.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
@@ -637,15 +583,21 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// reload.
-	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
+	reload := " Not Reloading!"
 
-	c.Lock()
-	c.reloading = true
-	c.Unlock()
+	if mux.Vars(request)["noreload"] != "true" {
+		defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
+
+		c.Lock()
+		c.reloading = true
+		c.Unlock()
+
+		reload = "Reloading in 5 seconds..."
+	}
 
 	// respond.
-	c.Printf("[gui '%s' requested] Updated Configuration.", user)
-	http.Error(response, "Config Saved. Reloading in 5 seconds...", http.StatusOK)
+	c.Printf("[gui '%s' requested] Updated Configuration.%s", user, reload)
+	http.Error(response, "Config Saved."+reload, http.StatusOK)
 }
 
 // saveNewConfig takes a fully built (copy) of config data, and saves it as the config file.
@@ -724,6 +676,11 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 }
 
 func (c *Client) validateNewConfig(config *configfile.Config) error {
+	if config.Version != c.Config.Version {
+		return fmt.Errorf("%w: provided: %d, running: %d",
+			ErrConfigVersionMismatch, config.Version, c.Config.Version)
+	}
+
 	for idx, cmd := range config.Commands {
 		if err := cmd.SetupRegexpArgs(); err != nil {
 			return fmt.Errorf("command %d '%s' failed setup: %w", idx+1, cmd.Name, err)
@@ -793,7 +750,11 @@ func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, re
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 
-	c.renderTemplate(ctx, response, request, "index.html", msg)
+	if c.newUI {
+		frontend.IndexHandler(response, request)
+	} else {
+		c.renderTemplate(ctx, response, request, "index.html", msg)
+	}
 }
 
 func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {

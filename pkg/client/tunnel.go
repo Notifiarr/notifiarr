@@ -278,26 +278,27 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 }
 
 func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
-	body, _ := io.ReadAll(request.Body)
-
-	type tunnelS struct {
-		PrimaryTunnel string
-		BackupTunnel  []string
-	}
-
-	var input tunnelS
-
-	decodedValue, err := url.ParseQuery(string(body))
+	body, err := io.ReadAll(request.Body)
 	if err != nil {
-		c.Errorf("Saving Tunnel: parsing request: %v", err)
+		c.Errorf("Saving Tunnel: reading request: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
-	err = schema.NewDecoder().Decode(&input, decodedValue)
+	var input = struct {
+		PrimaryTunnel string   `json:"PrimaryTunnel"`
+		BackupTunnel  []string `json:"BackupTunnel"`
+	}{}
+
+	if request.Header.Get("Content-Type") != "application/json" {
+		err = c.decodeTunnelConfig(body, &input)
+	} else {
+		err = json.Unmarshal(body, &input)
+	}
+
 	if err != nil {
-		c.Errorf("Saving Tunnel: decoding request: %v", err)
+		c.Errorf("Saving Tunnel: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -326,6 +327,26 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	c.tunnel.Shutdown()
 	c.makeTunnel(tl.ctx, ci) //nolint:contextcheck // these cannot be inherited from the http request.
 	c.tunnel.Start(tl.ctx)   //nolint:contextcheck
-	http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
-		input.PrimaryTunnel, len(input.BackupTunnel)), http.StatusOK)
+
+	if request.Header.Get("Content-Type") != "application/json" {
+		http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
+			input.PrimaryTunnel, len(input.BackupTunnel)), http.StatusOK)
+	} else if err := json.NewEncoder(response).Encode(map[string]any{"success": true, "primary": input.PrimaryTunnel, "backups": input.BackupTunnel}); err != nil {
+		c.Errorf("Saving Tunnel: sending json response: %v", err)
+	}
+}
+
+// Support the old style.
+func (c *Client) decodeTunnelConfig(body []byte, input any) error {
+	decodedValue, err := url.ParseQuery(string(body))
+	if err != nil {
+		return fmt.Errorf("parsing request: %v", err)
+	}
+
+	err = schema.NewDecoder().Decode(&input, decodedValue)
+	if err != nil {
+		return fmt.Errorf("decoding request: %v", err)
+	}
+
+	return nil
 }

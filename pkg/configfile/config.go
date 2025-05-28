@@ -26,6 +26,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/filewatch"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -65,7 +66,9 @@ type Config struct {
 	Service    []*services.Service    `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
 	EnableApt  bool                   `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
 	WatchFiles []*filewatch.WatchFile `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
+	Endpoints  []*epconfig.Endpoint   `json:"endpoints"   toml:"endpoint"      xml:"endpoint"      yaml:"endpoints"`
 	Commands   []*commands.Command    `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
+	Version    uint                   `json:"version"     toml:"version"       xml:"version"       yaml:"version"`
 	*logs.LogConfig
 	*apps.Apps
 	*website.Server `json:"-" toml:"-" xml:"-" yaml:"-"`
@@ -233,8 +236,9 @@ func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 
 	// Ordering.....
 	clientinfo := &clientinfo.Config{
-		Server: c.Server,
-		Apps:   c.Apps,
+		Server:    c.Server,
+		Apps:      c.Apps,
+		Endpoints: c.Endpoints,
 	}
 	triggers := triggers.New(&triggers.Config{
 		Apps:       c.Apps,
@@ -249,6 +253,7 @@ func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 		UnstableCh: c.UnstableCh,
 		Services:   c.Services,
 		Logger:     logger,
+		Endpoints:  c.Endpoints,
 	})
 	clientinfo.CmdList = triggers.Commands.List()
 
@@ -352,7 +357,7 @@ func (c *Config) Write(ctx context.Context, file string, encode bool) (string, e
 
 	var writer io.Writer = newFile
 
-	if encode {
+	if encode && os.Getenv("DN_ENCODE_CONFIG_FILE") != mnd.False {
 		bzWr, err := bzip2.NewWriter(newFile, &bzip2.WriterConfig{Level: 1})
 		if err != nil {
 			return "", fmt.Errorf("encoding config file: %w", err)
@@ -361,6 +366,8 @@ func (c *Config) Write(ctx context.Context, file string, encode bool) (string, e
 		defer bzWr.Close()
 		writer = bzWr
 	}
+
+	c.Version++
 
 	if err := Template.Execute(writer, c); err != nil {
 		return "", fmt.Errorf("writing config file: %w", err)

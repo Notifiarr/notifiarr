@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/shirou/gopsutil/v4/host"
@@ -25,7 +26,8 @@ type Config struct {
 	// Actions *triggers.Actions
 	*apps.Apps
 	*website.Server
-	CmdList []*cmdconfig.Config
+	CmdList   []*cmdconfig.Config
+	Endpoints []*epconfig.Endpoint
 }
 
 // AppInfo contains exported info about this app and its host.
@@ -38,6 +40,8 @@ type AppInfo struct {
 	Config AppInfoConfig `json:"config"`
 	// Commands is the list of available commands.
 	Commands []*cmdconfig.Config `json:"commands"`
+	// Endpoints is the list of available endpoint url passthrough configs.
+	Endpoints []*epconfig.Endpoint `json:"endpoints"`
 	// Host contains host info.
 	Host *host.InfoStat `json:"host"`
 	// HostError has data if hostinfo has an error.
@@ -168,6 +172,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 			Apps:           c.getAppConfigs(ctx, startup),
 		},
 		Commands:  c.CmdList,
+		Endpoints: c.Endpoints,
 		Host:      host,
 		HostError: err.Error(),
 	}
