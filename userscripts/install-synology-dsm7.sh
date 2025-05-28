@@ -47,7 +47,11 @@ fi
 echo "Installing or updating Notifiarr binary..."
 if [ -f /usr/bin/notifiarr ]; then
   echo "Stopping existing Notifiarr service..."
-  pkill -f "/usr/bin/notifiarr" || true
+  if [ -f /usr/local/etc/rc.d/notifiarr.sh ]; then
+    /usr/local/etc/rc.d/notifiarr.sh stop || true
+  else
+    pkill -f "/usr/bin/notifiarr" || true
+  fi
   # Give processes time to terminate
   sleep 2
 fi
@@ -115,6 +119,8 @@ echo "Installing or updating daily auto-update cron job..."
 CRON_SCRIPT="/usr/bin/update-notifiarr.sh"
 CRON_FILE="/etc/cron.d/update-notifiarr"
 
+# Download the update script - this should be a dedicated update script, not the installer
+curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/update-notifiarr-dsm7.sh || \
 curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology-dsm7.sh
 chmod +x "$CRON_SCRIPT"
 # Randomize update time to avoid all users hitting GitHub simultaneously
