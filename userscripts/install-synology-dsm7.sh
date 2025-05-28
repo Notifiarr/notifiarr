@@ -67,8 +67,6 @@ CONFIGFILE=/etc/notifiarr/notifiarr.conf
 if [ ! -f "${CONFIGFILE}" ]; then
   echo "Generating config file ${CONFIGFILE}"
   echo " " > "${CONFIGFILE}"
-  export DN_LOG_FILE="/volume1/@appdata/notifiarr/lognotifiarr/app.log"
-  export DN_HTTP_LOG="/volume1/@appdata/notifiarr/lognotifiarr/http.log"
   /usr/bin/notifiarr --config "${CONFIGFILE}" --write "${CONFIGFILE}.new"
   mv "${CONFIGFILE}.new" "${CONFIGFILE}"
 else
@@ -92,6 +90,11 @@ fi
 echo "Creating or updating DSM boot startup script..."
 cat << 'EOF' > /usr/local/etc/rc.d/notifiarr.sh
 #!/bin/sh
+
+# Set log file paths - these cannot be edited in the config
+export DN_LOG_FILE="/volume1/@appdata/notifiarr/lognotifiarr/app.log"
+export DN_HTTP_LOG="/volume1/@appdata/notifiarr/lognotifiarr/http.log"
+
 case "$1" in
   start)
     echo "Starting Notifiarr..."
