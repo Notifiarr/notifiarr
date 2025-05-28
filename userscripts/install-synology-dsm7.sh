@@ -85,8 +85,9 @@ chmod 0750 /usr/bin/notifiarr /volume1/@appdata/notifiarr/lognotifiarr
 chown -R notifiarr:notifiarr /volume1/@appdata/notifiarr/lognotifiarr /etc/notifiarr
 
 echo "Adding sudoers entry for smartctl..."
-sed -i '/notifiarr/d' /etc/sudoers
-echo 'notifiarr ALL=(root) NOPASSWD:/bin/smartctl *' >> /etc/sudoers
+if ! grep -q "notifiarr ALL=(root) NOPASSWD:/bin/smartctl" /etc/sudoers; then
+  echo 'notifiarr ALL=(root) NOPASSWD:/bin/smartctl *' >> /etc/sudoers
+fi
 
 echo "Creating or updating DSM boot startup script..."
 cat << 'EOF' > /usr/local/etc/rc.d/notifiarr.sh
