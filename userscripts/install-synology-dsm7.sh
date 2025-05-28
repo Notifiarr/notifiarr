@@ -44,6 +44,14 @@ if ! curl -L -o "$PACKAGE" "$PACKAGE_URL"; then
   exit 1
 fi
 
+echo "Installing or updating Notifiarr binary..."
+if [ -f /usr/bin/notifiarr ]; then
+  echo "Stopping existing Notifiarr service..."
+  pkill -f "/usr/bin/notifiarr" || true
+  # Give processes time to terminate
+  sleep 2
+fi
+
 echo "Extracting Notifiarr package..."
 if ! gunzip -c "$PACKAGE" > /usr/bin/notifiarr; then
   echo "Failed to extract Notifiarr package."
@@ -52,12 +60,6 @@ fi
 
 chmod +x /usr/bin/notifiarr
 rm -f "$PACKAGE"
-
-echo "Installing or updating Notifiarr binary..."
-if [ -f /usr/bin/notifiarr ]; then
-  echo "Stopping existing Notifiarr service..."
-  pkill -f "/usr/bin/notifiarr" || true
-fi
 
 echo "Creating or updating config and log directories..."
 mkdir -p /etc/notifiarr /volume1/@appdata/notifiarr/lognotifiarr
