@@ -117,7 +117,10 @@ CRON_FILE="/etc/cron.d/update-notifiarr"
 
 curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology-dsm7.sh
 chmod +x "$CRON_SCRIPT"
-echo "10 3 * * * root /bin/bash $CRON_SCRIPT >> /dev/null 2>&1" > "$CRON_FILE"
+# Randomize update time to avoid all users hitting GitHub simultaneously
+RANDOM_MINUTE=$((RANDOM % 59))
+RANDOM_HOUR=$((RANDOM % 6 + 1))  # Random hour between 1-6 AM
+echo "$RANDOM_MINUTE $RANDOM_HOUR * * * root /bin/bash $CRON_SCRIPT >> /dev/null 2>&1" > "$CRON_FILE"
 
 echo "Running final install verification..."
 fail() { echo "FAILED: $1"; exit 1; }
