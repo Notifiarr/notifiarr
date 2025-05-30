@@ -1,13 +1,15 @@
-version: "2"
+version: '2'
 linters:
   default: all
   disable:
     - exhaustruct # This will never work in this app.
-    - dupl        # Maybe one day we can reduce the duplicate code with generics.
-    - nlreturn    # Not needed because wsl is good enough; better actually.
-    - godot       # Does not work with annotations.
-    - depguard    # Not even sure why this is useful. We have too many deps to care.
+    - dupl # Maybe one day we can reduce the duplicate code with generics.
+    - nlreturn # Not needed because wsl is good enough; better actually.
+    - godot # Does not work with annotations.
+    - depguard # Not even sure why this is useful. We have too many deps to care.
     - funcorder
+    - gochecknoglobals # we use global sparingly, but they are useful.
+    - interfacebloat # I'll do what I want with my own interfaces.
     # fix these.
     - gosec
     - predeclared
@@ -17,13 +19,13 @@ linters:
     - staticcheck
   exclusions:
     presets:
-    - comments
-    - std-error-handling
-    - common-false-positives
-    - legacy
+      - comments
+      - std-error-handling
+      - common-false-positives
+      - legacy
     rules:
       # Exclude some linters from running on auto-generated files.
-      - path: "pkg/bindata/docs/*"
+      - path: 'pkg/bindata/docs/*'
         linters:
           - lll
           - gochecknoinits
