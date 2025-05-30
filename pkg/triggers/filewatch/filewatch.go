@@ -182,7 +182,7 @@ func (w *WatchFile) setup(ignored ignored) error {
 		Pipe:          w.Pipe,
 		CompleteLines: true,
 		Location:      &tail.SeekInfo{Whence: io.SeekEnd},
-		Logger:        &logger{Lagger: mnd.Log},
+		Logger:        &logger{Logger: mnd.Log},
 	})
 	if err != nil {
 		mnd.FileWatcher.Add(w.Path+Errors, 1)

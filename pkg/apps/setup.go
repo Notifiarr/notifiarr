@@ -40,11 +40,11 @@ type AppsConfig struct {
 }
 
 type BaseConfig struct {
-	APIKey  string   `json:"apiKey"                 toml:"api_key"      xml:"api_key"      yaml:"apiKey"`
-	ExKeys  []string `json:"extraKeys"              toml:"extra_keys"   xml:"extra_keys"   yaml:"extraKeys"`
-	URLBase string   `json:"urlbase"                toml:"urlbase"      xml:"urlbase"      yaml:"urlbase"`
-	MaxBody int      `json:"maxBody"                toml:"max_body"     xml:"max_body"     yaml:"maxBody"`
-	Serial  bool     `json:"serial"                 toml:"serial"       xml:"serial"       yaml:"serial"`
+	APIKey  string   `json:"apiKey"    toml:"api_key"    xml:"api_key"    yaml:"apiKey"`
+	ExKeys  []string `json:"extraKeys" toml:"extra_keys" xml:"extra_keys" yaml:"extraKeys"`
+	URLBase string   `json:"urlbase"   toml:"urlbase"    xml:"urlbase"    yaml:"urlbase"`
+	MaxBody int      `json:"maxBody"   toml:"max_body"   xml:"max_body"   yaml:"maxBody"`
+	Serial  bool     `json:"serial"    toml:"serial"     xml:"serial"     yaml:"serial"`
 }
 
 type Apps struct {
@@ -62,7 +62,7 @@ type Apps struct {
 	Transmission []Xmission
 	Tautulli     Tautulli
 	Plex         Plex
-	Router       *mux.Router         `json:"-"                      toml:"-"            xml:"-"            yaml:"-"`
+	Router       *mux.Router
 	keys         map[string]struct{} // for fast key lookup.
 	compress     func(h http.Handler) http.HandlerFunc
 }
@@ -104,8 +104,8 @@ var (
 	ErrRateLimit  = errors.New("rate limit reached")
 )
 
-// Test validates the configuration for each app.
-func Test(config *AppsConfig) error { //nolint:cyclop
+// CheckURLs validates the configuration for each app.
+func CheckURLs(config *AppsConfig) error { //nolint:cyclop,gocognit,funlen
 	for idx, app := range config.Lidarr {
 		if err := checkUrl(app.URL, starr.Lidarr.String(), idx); err != nil {
 			return err
@@ -189,7 +189,7 @@ func Test(config *AppsConfig) error { //nolint:cyclop
 
 // New creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
-func New(config *AppsConfig) (*Apps, error) { //nolint:cyclop
+func New(config *AppsConfig) (*Apps, error) { //nolint:cyclop,funlen
 	var err error
 
 	apps := &Apps{

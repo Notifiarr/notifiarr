@@ -5,7 +5,7 @@ import "github.com/Notifiarr/notifiarr/pkg/mnd"
 /* All this just to give the tail module a custom logger. Its logger interface kinda sucks. */
 
 type logger struct {
-	mnd.Lagger
+	mnd.Logger
 }
 
 const loggerPrefix = "File Watcher:"

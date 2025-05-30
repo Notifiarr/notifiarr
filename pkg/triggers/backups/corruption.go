@@ -314,7 +314,8 @@ func (c *cmd) checkBackupFileCorruption(
 		return nil, err
 	}
 
-	mnd.Log.Debugf("[%s requested] Extracting downloaded %s backup file (%d): %s", input.event, input.name, input.int, fileName)
+	mnd.Log.Debugf("[%s requested] Extracting downloaded %s backup file (%d): %s",
+		input.event, input.name, input.int, fileName)
 
 	_, newFiles, err := xtractr.ExtractZIP(&xtractr.XFile{
 		FilePath:  fileName,

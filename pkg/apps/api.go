@@ -153,7 +153,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 	}
 
 	mnd.APIHits.Add(statusTxt, 1)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", mnd.ContentTypeJSON)
 	w.WriteHeader(stat)
 	counter := datacounter.NewResponseWriterCounter(w)
 	json := json.NewEncoder(counter)

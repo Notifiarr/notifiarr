@@ -5,10 +5,10 @@ import (
 	"log"
 )
 
-var Log Lagger
+var Log Logger
 
 // Logger is an interface for our logs package. We use this to avoid an import cycle.
-type Lagger interface {
+type Logger interface {
 	Print(v ...interface{})
 	Printf(msg string, v ...interface{})
 	Error(v ...interface{})

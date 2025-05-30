@@ -142,7 +142,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		Webauth:         c.webauth,
 		LogFiles:        c.Logger.GetAllLogFilePaths(),
 		ConfigFiles:     logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
-		//Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
+		// Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
 		Expvar:          mnd.GetAllData(),
 		HostInfo:        hostInfo,
 		Started:         version.Started.Round(time.Second),
@@ -235,7 +235,7 @@ func (c *Client) getProfilePostData(request *http.Request) (*ProfilePost, error)
 	post := &ProfilePost{}
 
 	// The New UI uses JSON, the old UI uses form data.
-	if request.Header.Get("Content-Type") != "application/json" {
+	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
 		// If the request is not JSON, we're using the old form data.
 		at, _ := strconv.Atoi(request.PostFormValue("AuthType"))
 		post.AuthType = configfile.AuthType(at)

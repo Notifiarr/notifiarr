@@ -140,7 +140,7 @@ type Service struct {
 	State        CheckState `json:"state"`
 	Since        time.Time  `json:"since"`
 	LastCheck    time.Time  `json:"lastCheck"`
-	log          mnd.Lagger
+	log          mnd.Logger
 	sync.RWMutex `json:"-"`
 	*ServiceConfig
 }

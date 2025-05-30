@@ -45,7 +45,7 @@ type Config struct {
 	AutoUpdate string
 	UnstableCh bool
 	common.Services
-	Logger mnd.Lagger
+	Logger mnd.Logger
 }
 
 // Actions defines all our triggers and timers.

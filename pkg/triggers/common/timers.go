@@ -78,7 +78,8 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]fmt
 
 func (c *Config) printStartupLog() {
 	triggers, timers, schedules := c.GatherTriggerInfo()
-	mnd.Log.Printf("==> Actions Started: %d Timers and %d Triggers and %d Schedules", len(timers), len(triggers), len(schedules))
+	mnd.Log.Printf("==> Actions Started: %d Timers and %d Triggers and %d Schedules",
+		len(timers), len(triggers), len(schedules))
 
 	for name := range triggers {
 		if _, ok := timers[name]; ok {

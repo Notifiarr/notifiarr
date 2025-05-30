@@ -74,7 +74,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return 0, nil, fmt.Errorf("creating http request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", mnd.ContentTypeJSON)
 	req.Header.Set("X-Api-Key", s.Config.Apps.APIKey)
 
 	start := time.Now()

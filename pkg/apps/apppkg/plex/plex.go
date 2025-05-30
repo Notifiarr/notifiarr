@@ -16,6 +16,8 @@ import (
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // Server is the Plex configuration from a config file.
@@ -23,7 +25,7 @@ import (
 type Server struct {
 	mu sync.RWMutex
 	Config
-	Client *http.Client `json:"-"     toml:"-"     xml:"-"`
+	Client *http.Client
 	name   string
 }
 
@@ -88,7 +90,7 @@ func (s *Server) reqPlexURL(
 
 	req.URL.RawQuery = params.Encode()
 	req.Header.Set("X-Plex-Token", s.Config.Token)
-	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Accept", mnd.ContentTypeJSON)
 
 	resp, err := s.Client.Do(req)
 	if err != nil {

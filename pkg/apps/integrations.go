@@ -36,8 +36,9 @@ func (c *PlexConfig) Setup(maxBody int) Plex {
 		c.Timeout.Duration = time.Minute
 	}
 
-	client := &http.Client{}
 	c.URL = strings.TrimRight(c.URL, "/")
+
+	var client *http.Client
 
 	if mnd.Log.DebugEnabled() {
 		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
@@ -82,7 +83,8 @@ func (c *TautulliConfig) Setup(maxBody int) Tautulli {
 	}
 
 	c.URL = strings.TrimRight(c.URL, "/")
-	client := &http.Client{}
+
+	var client *http.Client
 
 	if mnd.Log.DebugEnabled() {
 		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
@@ -194,9 +196,9 @@ func (a *AppsConfig) setupSabNZBd() ([]SabNZB, error) {
 }
 
 func (c *SabNZBConfig) Setup(maxBody, index int) (*SabNZB, error) {
-	client := &http.Client{}
-	c.URL = strings.TrimRight(c.URL, "/")
+	var client *http.Client
 
+	c.URL = strings.TrimRight(c.URL, "/")
 	if err := checkUrl(c.URL, "SABnzbd", index); err != nil {
 		return nil, err
 	}
@@ -450,7 +452,7 @@ func (a *AppsConfig) setupTransmission() ([]Xmission, error) {
 			CustomClient: client,
 		})
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("creating transmissionrpc client: %w", err)
 		}
 
 		output[idx] = Xmission{

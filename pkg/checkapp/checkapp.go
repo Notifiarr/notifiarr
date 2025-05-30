@@ -36,7 +36,7 @@ var ErrBadIndex = errors.New("index provided has no configuration data")
 func Test(orig *configfile.Config, writer http.ResponseWriter, req *http.Request) {
 	posted := configfile.Config{}
 
-	if req.Header.Get("Content-Type") == "application/json" {
+	if req.Header.Get("Content-Type") == mnd.ContentTypeJSON {
 		if err := json.NewDecoder(req.Body).Decode(&posted); err != nil {
 			http.Error(writer, "Decoding JSON data into Go data structure failed: "+err.Error(), http.StatusBadRequest)
 			return

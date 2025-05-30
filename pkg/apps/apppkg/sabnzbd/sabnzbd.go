@@ -25,7 +25,7 @@ type Config struct {
 
 type SabNZB struct {
 	Config
-	*http.Client `json:"-"      toml:"-"       xml:"-"`
+	*http.Client
 }
 
 func New(config Config, client *http.Client) *SabNZB {

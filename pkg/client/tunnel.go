@@ -282,12 +282,13 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		return
 	}
 
-	var input = struct {
+	//nolint:tagliatelle // fix this after old WebUI goes away.
+	input := struct {
 		PrimaryTunnel string   `json:"PrimaryTunnel"`
 		BackupTunnel  []string `json:"BackupTunnel"`
 	}{}
 
-	if request.Header.Get("Content-Type") != "application/json" {
+	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
 		err = c.decodeTunnelConfig(body, &input)
 	} else {
 		err = json.Unmarshal(body, &input)
@@ -324,10 +325,12 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	c.makeTunnel(tl.ctx, ci) //nolint:contextcheck // these cannot be inherited from the http request.
 	c.tunnel.Start(tl.ctx)   //nolint:contextcheck
 
-	if request.Header.Get("Content-Type") != "application/json" {
+	tunnels := map[string]any{"success": true, "primary": input.PrimaryTunnel, "backups": input.BackupTunnel}
+
+	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
 		http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
 			input.PrimaryTunnel, len(input.BackupTunnel)), http.StatusOK)
-	} else if err := json.NewEncoder(response).Encode(map[string]any{"success": true, "primary": input.PrimaryTunnel, "backups": input.BackupTunnel}); err != nil {
+	} else if err := json.NewEncoder(response).Encode(tunnels); err != nil {
 		c.Errorf("Saving Tunnel: sending json response: %v", err)
 	}
 }
@@ -336,12 +339,12 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 func (c *Client) decodeTunnelConfig(body []byte, input any) error {
 	decodedValue, err := url.ParseQuery(string(body))
 	if err != nil {
-		return fmt.Errorf("parsing request: %v", err)
+		return fmt.Errorf("parsing request: %w", err)
 	}
 
 	err = schema.NewDecoder().Decode(&input, decodedValue)
 	if err != nil {
-		return fmt.Errorf("decoding request: %v", err)
+		return fmt.Errorf("decoding request: %w", err)
 	}
 
 	return nil

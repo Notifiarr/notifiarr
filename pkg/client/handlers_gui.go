@@ -550,7 +550,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// update config.
-	if request.Header.Get("Content-Type") == "application/json" {
+	if request.Header.Get("Content-Type") == mnd.ContentTypeJSON {
 		if err = json.NewDecoder(request.Body).Decode(&config); err != nil {
 			c.Errorf("[gui '%s' requested] Decoding POSTed Config: %v, %#v", user, err, config)
 			http.Error(response, "Error decoding POSTed Config: "+err.Error(), http.StatusBadRequest)
@@ -570,7 +570,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// Check app integration configs before saving.
-	if err = apps.Test(&config.AppsConfig); err != nil {
+	if err = apps.CheckURLs(&config.AppsConfig); err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 		return
 	}

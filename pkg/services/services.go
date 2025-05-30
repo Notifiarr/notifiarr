@@ -142,7 +142,6 @@ func (s *Services) loadServiceStates(ctx context.Context) {
 	}
 
 	values, err := website.Site.GetState(ctx, names...)
-
 	if err != nil {
 		mnd.Log.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return

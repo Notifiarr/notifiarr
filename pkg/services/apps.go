@@ -21,7 +21,6 @@ const (
 
 // AddApps turns app configs into service checks if they have a name.
 func (s *Services) AddApps(apps *apps.Apps, mysql []*snapshot.MySQLConfig) {
-
 	svcs := []*Service{}
 	svcs = collectLidarrApps(svcs, apps.Lidarr)
 	svcs = collectProwlarrApps(svcs, apps.Prowlarr)
@@ -35,7 +34,7 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []*snapshot.MySQLConfig) {
 	svcs = collectSabNZBApps(svcs, apps.SabNZB)
 	svcs = collectXmissionApps(svcs, apps.Transmission)
 	svcs = collectTautulliApps(svcs, apps.Tautulli)
-	svcs = collectPlexApps(svcs, apps.Plex)
+	svcs = collectPlexApps(svcs, &apps.Plex)
 	svcs = collectMySQLApps(svcs, mysql)
 	now := time.Now()
 
@@ -413,7 +412,7 @@ func collectTautulliApps(svcs []*Service, app apps.Tautulli) []*Service {
 	return svcs
 }
 
-func collectPlexApps(svcs []*Service, app apps.Plex) []*Service {
+func collectPlexApps(svcs []*Service, app *apps.Plex) []*Service {
 	if !app.Enabled() || app.Interval.Duration < 0 {
 		return svcs
 	}
