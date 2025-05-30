@@ -65,35 +65,28 @@ func (a *Apps) sonarrHandlers() { //nolint:funlen
 	a.HandleAPIpath(starr.Sonarr, "/delete/{episodeFileID:[0-9]+}", sonarrDeleteEpisode, "DELETE")
 }
 
-// SonarrConfig represents the input data for a Sonarr server.
-type SonarrConfig struct {
+type Sonarr struct {
+	StarrApp       `json:"-" toml:"-" xml:"-"`
 	*sonarr.Sonarr `json:"-" toml:"-" xml:"-"`
-	ExtraConfig
-	*starr.Config
-	errorf func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
-func getSonarr(r *http.Request) *SonarrConfig {
-	return r.Context().Value(starr.Sonarr).(*SonarrConfig) //nolint:forcetypeassert
+func getSonarr(r *http.Request) *Sonarr {
+	return r.Context().Value(starr.Sonarr).(*Sonarr) //nolint:forcetypeassert
 }
 
-// Enabled returns true if the Sonarr instance is enabled and usable.
-func (s *SonarrConfig) Enabled() bool {
-	return s != nil && s.Config != nil && s.URL != "" && s.APIKey != "" && s.Timeout.Duration >= 0
-}
+func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
+	output := make([]Sonarr, len(a.Sonarr))
 
-func (a *Apps) setupSonarr() error {
-	for idx, app := range a.Sonarr {
-		if app.Config == nil || app.Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Sonarr config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
-			return fmt.Errorf("%w: URL must begin with http:// or https://: Sonarr config %d", ErrInvalidApp, idx+1)
+	for idx := range a.Sonarr {
+		app := &a.Sonarr[idx]
+		if err := checkUrl(app.URL, starr.Sonarr.String(), idx); err != nil {
+			return nil, err
 		}
 
-		if a.Logger.DebugEnabled() {
+		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  a.Debugf,
+				Debugf:  mnd.Log.Debugf,
 				Caller:  metricMakerCallback(string(starr.Sonarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
@@ -102,16 +95,20 @@ func (a *Apps) setupSonarr() error {
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Sonarr.String(), app.Config.Client.Transport)
 		}
 
-		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
-		app.Sonarr = sonarr.New(app.Config)
+		output[idx] = Sonarr{
+			StarrApp: StarrApp{
+				StarrConfig: a.Sonarr[idx],
+			},
+			Sonarr: sonarr.New(&app.Config),
+		}
 
 		if app.Deletes > 0 {
-			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
+			output[idx].delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
 		}
 	}
 
-	return nil
+	return output, nil
 }
 
 // @Description  Adds a new Series to Sonarr.
@@ -1375,7 +1372,7 @@ func sonarrDeleteEpisode(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["episodeFileID"]
 	episodeFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 
-	if !getSonarr(req).DelOK() {
+	if !getSonarr(req).StarrApp.DelOK() {
 		return http.StatusLocked, ErrRateLimit
 	}
 

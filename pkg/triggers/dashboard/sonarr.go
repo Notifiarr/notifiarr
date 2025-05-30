@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
@@ -19,12 +20,12 @@ func (c *Cmd) getSonarrStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting Sonarr State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting Sonarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getSonarrState(ctx, instance+1, app)
+		state, err := c.getSonarrState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Sonarr Queue from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting Sonarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -33,7 +34,7 @@ func (c *Cmd) getSonarrStates(ctx context.Context) []*State {
 	return states
 }
 
-func (c *Cmd) getSonarrState(ctx context.Context, instance int, app *apps.SonarrConfig) (*State, error) {
+func (c *Cmd) getSonarrState(ctx context.Context, instance int, app *apps.Sonarr) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -80,7 +81,7 @@ func (c *Cmd) getSonarrState(ctx context.Context, instance int, app *apps.Sonarr
 	return state, nil
 }
 
-func (c *Cmd) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
+func (c *Cmd) getSonarrHistory(app *apps.Sonarr) ([]*Sortable, error) {
 	history, err := app.GetHistoryPage(&starr.PageReq{
 		Page:     1,
 		PageSize: showLatest + 5, //nolint:mnd // grab extra in case there's an error.
@@ -123,7 +124,7 @@ func (c *Cmd) getSonarrHistory(app *apps.SonarrConfig) ([]*Sortable, error) {
 	return table, nil
 }
 
-func (c *Cmd) getSonarrStateUpcoming(app *apps.SonarrConfig, next []*Sortable) ([]*Sortable, error) {
+func (c *Cmd) getSonarrStateUpcoming(app *apps.Sonarr, next []*Sortable) ([]*Sortable, error) {
 	sort.Sort(dateSorter(next))
 
 	redo := []*Sortable{}

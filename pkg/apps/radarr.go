@@ -2,7 +2,6 @@ package apps
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -59,35 +58,35 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/delete/{movieFileID:[0-9]+}", radarrDeleteContent, "DELETE")
 }
 
-// RadarrConfig represents the input data for a Radarr server.
-type RadarrConfig struct {
-	ExtraConfig
-	*starr.Config
+type Radarr struct {
+	StarrApp       `json:"-" toml:"-" xml:"-"`
 	*radarr.Radarr `json:"-" toml:"-" xml:"-"`
-	errorf         func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
-func getRadarr(r *http.Request) *RadarrConfig {
-	return r.Context().Value(starr.Radarr).(*RadarrConfig) //nolint:forcetypeassert
+func getRadarr(r *http.Request) *Radarr {
+	return r.Context().Value(starr.Radarr).(*Radarr) //nolint:forcetypeassert
 }
 
-// Enabled returns true if the Radarr instance is enabled and usable.
-func (r *RadarrConfig) Enabled() bool {
-	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration >= 0
-}
+func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
+	output := make([]Radarr, len(a.Radarr))
 
-func (a *Apps) setupRadarr() error {
-	for idx, app := range a.Radarr {
-		if app.Config == nil || app.Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Radarr config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
-			return fmt.Errorf("%w: URL must begin with http:// or https://: Radarr config %d", ErrInvalidApp, idx+1)
+	for idx := range a.Radarr {
+		app := &a.Radarr[idx]
+		if err := checkUrl(app.URL, starr.Radarr.String(), idx); err != nil {
+			return nil, err
 		}
 
-		if a.Logger.DebugEnabled() {
+		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+			MaxBody: a.MaxBody,
+			Debugf:  mnd.Log.Debugf,
+			Caller:  metricMakerCallback(string(starr.Radarr)),
+			Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
+		})
+
+		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  a.Debugf,
+				Debugf:  mnd.Log.Debugf,
 				Caller:  metricMakerCallback(string(starr.Radarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
@@ -96,16 +95,20 @@ func (a *Apps) setupRadarr() error {
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Radarr.String(), app.Config.Client.Transport)
 		}
 
-		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
-		app.Radarr = radarr.New(app.Config)
+		output[idx] = Radarr{
+			Radarr: radarr.New(&app.Config),
+			StarrApp: StarrApp{
+				StarrConfig: a.Radarr[idx],
+			},
+		}
 
 		if app.Deletes > 0 {
-			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
+			output[idx].delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
 		}
 	}
 
-	return nil
+	return output, nil
 }
 
 // @Description  Adds a new Movie to Radarr.

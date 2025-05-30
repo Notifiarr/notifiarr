@@ -1,6 +1,6 @@
 module github.com/Notifiarr/notifiarr
 
-go 1.24.2
+go 1.24.3
 
 require (
 	github.com/BurntSushi/toml v1.5.0
@@ -23,6 +23,7 @@ require (
 	github.com/jackpal/gateway v1.1.1
 	github.com/jaypipes/ghw v0.16.0
 	github.com/jxeng/shortcut v1.0.2
+	github.com/klauspost/compress v1.18.0
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mrobinsn/go-rtorrent v1.8.0
@@ -44,7 +45,7 @@ require (
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/goty v0.0.3-0.20250527011927-18adb9e321f5
-	golift.io/mulery v0.0.9-0.20250527002750-6a5456aab60c
+	golift.io/mulery v0.0.9
 	golift.io/nzbget v0.1.6
 	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
 	golift.io/rotatorr v0.0.0-20240723172740-cb73b9c4894c
@@ -82,7 +83,6 @@ require (
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/kdomanski/iso9660 v0.4.0 // indirect
-	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/lestrrat-go/strftime v1.1.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
 	github.com/mailru/easyjson v0.9.0 // indirect

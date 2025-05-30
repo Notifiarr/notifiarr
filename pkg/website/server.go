@@ -36,13 +36,12 @@ var (
 
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
-	Apps       *apps.Apps
-	Retries    int
-	BaseURL    string
-	Timeout    cnfg.Duration
-	HostID     string
-	BindAddr   string
-	mnd.Logger // log file writer
+	Apps     *apps.Apps
+	Retries  int
+	BaseURL  string
+	Timeout  cnfg.Duration
+	HostID   string
+	BindAddr string
 }
 
 // Server is what you get for providing a Config to New().
@@ -56,7 +55,7 @@ type Server struct {
 	stopSendData chan struct{}
 }
 
-func New(config *Config) *Server {
+func New(config *Config) {
 	config.BaseURL = BaseURL
 
 	if config.Retries < 0 {
@@ -65,16 +64,15 @@ func New(config *Config) *Server {
 		config.Retries = DefaultRetries
 	}
 
-	return &Server{
+	Site = &Server{
 		Config: config,
 		// clientInfo:   &ClientInfo{},
 		client: &httpClient{
 			Retries: config.Retries,
-			Logger:  config.Logger,
 			Client:  &http.Client{},
 		},
 		hostInfo:     nil, // must start nil
-		sendData:     make(chan *Request, mnd.Kilobyte),
+		sendData:     make(chan *Request, mnd.Base10),
 		stopSendData: make(chan struct{}),
 	}
 }
@@ -91,11 +89,10 @@ func (s *Server) Stop() {
 
 	if s.sendData != nil {
 		close(s.sendData)
+		<-s.stopSendData // wait for done signal.
+		s.stopSendData = nil
+		s.sendData = nil
 	}
-
-	<-s.stopSendData // wait for done signal.
-	s.stopSendData = nil
-	s.sendData = nil
 }
 
 // GetData sends data to a notifiarr URL as JSON and returns a response.
@@ -124,12 +121,19 @@ func (s *Server) RawGetData(ctx context.Context, req *Request) (*Response, time.
 }
 
 func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			mnd.Log.Errorf("sendPayload panic: %v\n%#v\n", r, payload)
+			panic(r)
+		}
+	}()
+
 	data, err := json.Marshal(payload)
 	if err == nil {
 		var torn map[string]any
 		if err := json.Unmarshal(data, &torn); err == nil {
 			if torn["host"], err = s.GetHostInfo(ctx); err != nil {
-				s.Config.Errorf("Host Info Unknown: %v", err)
+				mnd.Log.Errorf("Host Info Unknown: %v", err)
 			}
 
 			torn["private"] = private.Info()

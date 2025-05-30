@@ -10,7 +10,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
-	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 // Errors produced by this file.
@@ -44,14 +43,12 @@ type Command struct {
 	lastArg []string
 	mu      sync.RWMutex
 	ch      chan *common.ActionInput
-	log     mnd.Logger
-	website *website.Server
 }
 
 // New configures the library.
 func New(config *common.Config, commands []*Command) *Action {
 	for _, cmd := range commands {
-		cmd.Setup(config.Logger, config.Server)
+		cmd.Setup()
 	}
 
 	return &Action{cmd: &cmd{Config: config, cmdlist: commands}}
@@ -129,7 +126,7 @@ func (c *Command) Stats() Stats {
 func (c *cmd) create() {
 	for _, cmd := range c.cmdlist {
 		if err := cmd.SetupRegexpArgs(); err != nil {
-			c.Errorf("Command Setup Failed: %v", err)
+			mnd.Log.Errorf("Command Setup Failed: %v", err)
 			cmd.disable = true //nolint:wsl
 		}
 
@@ -142,5 +139,5 @@ func (c *cmd) create() {
 		})
 	}
 
-	c.Printf("==> Custom Commands: %d provided", len(c.cmdlist))
+	mnd.Log.Printf("==> Custom Commands: %d provided", len(c.cmdlist))
 }

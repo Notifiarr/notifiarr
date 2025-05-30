@@ -15,22 +15,22 @@ type Website interface {
 //nolint:gochecknoglobals
 var (
 	// Config is setup by the configfile package.
-	config Website
-	locker sync.RWMutex
+	enabled bool
+	locker  sync.RWMutex
 )
 
-func Setup(website Website) {
+func Enable() {
 	locker.Lock()
 	defer locker.Unlock()
 
-	config = website
+	enabled = true
 }
 
-func StopLogs() {
+func Disable() {
 	locker.Lock()
 	defer locker.Unlock()
 
-	config = nil
+	enabled = false
 }
 
 // Match is what we send to the website.
@@ -45,11 +45,11 @@ func Log(msg string) {
 	locker.RLock()
 	defer locker.RUnlock()
 
-	if ci := data.Get("clientInfo"); ci == nil || ci.Data == nil || config == nil {
+	if ci := data.Get("clientInfo"); ci == nil || !enabled {
 		return
 	}
 
-	config.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Payload:    &Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,

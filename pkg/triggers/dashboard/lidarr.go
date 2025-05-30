@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/starr"
 	"golift.io/starr/lidarr"
 )
@@ -19,12 +20,12 @@ func (c *Cmd) getLidarrStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting Lidarr State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting Lidarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getLidarrState(ctx, instance+1, app)
+		state, err := c.getLidarrState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Lidarr Queue from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting Lidarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -33,7 +34,7 @@ func (c *Cmd) getLidarrStates(ctx context.Context) []*State {
 	return states
 }
 
-func (c *Cmd) getLidarrState(ctx context.Context, instance int, app *apps.LidarrConfig) (*State, error) {
+func (c *Cmd) getLidarrState(ctx context.Context, instance int, app *apps.Lidarr) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -88,7 +89,7 @@ func (c *Cmd) getLidarrState(ctx context.Context, instance int, app *apps.Lidarr
 }
 
 // getLidarrHistory is not done.
-func (c *Cmd) getLidarrHistory(ctx context.Context, app *apps.LidarrConfig) ([]*Sortable, error) {
+func (c *Cmd) getLidarrHistory(ctx context.Context, app *apps.Lidarr) ([]*Sortable, error) {
 	history, err := app.GetHistoryPageContext(ctx, &starr.PageReq{
 		Page:     1,
 		PageSize: showLatest + 20, //nolint:mnd // grab extra in case some are tracks and not albums.

@@ -34,16 +34,16 @@ const (
 // may send to this client. Realistically very few clients create
 // more than 4 or 5 connections.
 func (c *Client) poolMax(info *clientinfo.ClientInfo) int {
-	poolmax := len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
-		len(c.Config.Apps.Readarr) + len(c.Config.Apps.Prowlarr) + len(c.Config.Apps.Deluge) +
-		len(c.Config.Apps.Qbit) + len(c.Config.Apps.Rtorrent) + len(c.Config.Apps.SabNZB) +
-		len(c.Config.Apps.NZBGet) + 1
+	poolmax := len(c.apps.Sonarr) + len(c.apps.Radarr) + len(c.apps.Lidarr) +
+		len(c.apps.Readarr) + len(c.apps.Prowlarr) + len(c.apps.Deluge) +
+		len(c.apps.Qbit) + len(c.apps.Rtorrent) + len(c.apps.SabNZB) +
+		len(c.apps.NZBGet) + 1
 
-	if c.Config.Apps.Plex.Enabled() {
+	if c.apps.Plex.Enabled() {
 		poolmax++
 	}
 
-	if c.Config.Apps.Tautulli.Enabled() {
+	if c.apps.Tautulli.Enabled() {
 		poolmax++
 	}
 
@@ -74,7 +74,7 @@ func (c *Client) startTunnel(ctx context.Context) {
 
 func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 	hostname, _ := os.Hostname()
-	if hostInfo, err := c.triggers.CI.GetHostInfo(ctx); err != nil {
+	if hostInfo, err := website.Site.GetHostInfo(ctx); err != nil {
 		hostname = hostInfo.Hostname
 	}
 
@@ -93,11 +93,10 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 		CleanInterval:    time.Second + time.Duration(c.triggers.Rand().Intn(1000))*time.Millisecond,
 		Backoff:          600*time.Millisecond + time.Duration(c.triggers.Rand().Intn(600))*time.Millisecond,
 		SecretKey:        c.Config.APIKey,
-		Handler:          remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
+		Handler:          remWs.Wrap(c.prefixURLbase(c.apps.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
 		RoundRobinConfig: c.roundRobinConfig(info),
 		Logger: &tunnelLogger{
 			ctx:            ctx,
-			Logger:         c.Logger,
 			sendSiteErrors: info.User.DevAllowed,
 		},
 	})
@@ -117,7 +116,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 		Callback: func(_ context.Context, socket string) {
 			defer data.Save("activeTunnel", socket)
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
-			c.Config.SendData(&website.Request{
+			website.Site.SendData(&website.Request{
 				Route:      website.TunnelRoute,
 				Event:      website.EventSignal,
 				Payload:    map[string]interface{}{"socket": socket, "previous": data.Get("activeTunnel")},
@@ -166,17 +165,15 @@ func (c *Client) prefixURLbase(handler http.Handler) http.Handler {
 			return
 		}
 
-		req2 := new(http.Request)
-		*req2 = *req
-		req2.URL = new(url.URL)
-		*req2.URL = *req.URL
-		req2.URL.Path = path.Join(c.Config.URLBase, req.URL.Path)
+		url := &(*req.URL)
+		url.Path = path.Join(c.Config.URLBase, url.Path)
 
-		if req.URL.RawPath != "" {
-			req2.URL.RawPath = path.Join(c.Config.URLBase, req.URL.RawPath)
+		if url.RawPath != "" {
+			url.RawPath = path.Join(c.Config.URLBase, url.RawPath)
 		}
 
-		handler.ServeHTTP(writer, req2)
+		req.URL = url
+		handler.ServeHTTP(writer, req)
 	})
 }
 
@@ -184,29 +181,28 @@ func (c *Client) prefixURLbase(handler http.Handler) http.Handler {
 type tunnelLogger struct {
 	// hide the app context here so we can use it when we restart a tunnel from an http request
 	ctx context.Context //nolint:containedctx
-	mnd.Logger
-	// sendSiteErrors true sends tunnel errors to website as notifications.
+	//	// sendSiteErrors true sends tunnel errors to website as notifications.
 	sendSiteErrors bool
 }
 
 // Debugf prints a message with DEBUG prefixed.
 func (l *tunnelLogger) Debugf(format string, v ...interface{}) {
-	l.Logger.Debugf(format, v...)
+	mnd.Log.Debugf(format, v...)
 }
 
 // Errorf prints a message with ERROR prefixed.
 func (l *tunnelLogger) Errorf(format string, v ...interface{}) {
 	// this is why we dont just pass the interface in as-is.
 	if l.sendSiteErrors {
-		l.Logger.Errorf(format, v...)
+		mnd.Log.Errorf(format, v...)
 	} else {
-		l.Logger.ErrorfNoShare(format, v...)
+		mnd.Log.ErrorfNoShare(format, v...)
 	}
 }
 
 // Printf prints a message with INFO prefixed.
 func (l *tunnelLogger) Printf(format string, v ...interface{}) {
-	l.Logger.Printf(format, v...)
+	mnd.Log.Printf(format, v...)
 }
 
 const pingTimeout = 7 * time.Second
@@ -312,7 +308,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		}
 	}
 
-	c.Config.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.TunnelRoute,
 		Event:      website.EventGUI,
 		Payload:    map[string]any{"sockets": sockets},

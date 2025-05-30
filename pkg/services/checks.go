@@ -34,12 +34,7 @@ type triggerCheck struct {
 	Service *Service
 }
 
-func (s *Service) Validate() error { //nolint:cyclop
-	s.svc.Lock()
-	defer s.svc.Unlock()
-
-	s.svc.State = StateUnknown
-
+func (s *ServiceConfig) Validate() error { //nolint:cyclop
 	if s.Name == "" {
 		return fmt.Errorf("%s: %w", s.Value, ErrNoName)
 	} else if s.Value == "" {
@@ -85,13 +80,24 @@ func (s *Service) Validate() error { //nolint:cyclop
 		s.Interval.Duration = MinimumCheckInterval
 	}
 
+	s.validated = true
+
 	return nil
 }
 
 // CheckOnly runs a service check and returns the result immediately.
 // It is not otherwise stored anywhere.
-func (s *Service) CheckOnly(ctx context.Context) *CheckResult {
-	res := s.checkNow(ctx)
+func (s *ServiceConfig) CheckOnly(ctx context.Context) *CheckResult {
+	if err := s.Validate(); err != nil {
+		return &CheckResult{
+			Output:   &Output{str: err.Error()},
+			State:    StateCritical,
+			Metadata: s.Tags,
+		}
+	}
+
+	service := &Service{ServiceConfig: s, log: mnd.Log}
+	res := service.checkNow(ctx)
 
 	return &CheckResult{
 		Output:   res.output,
@@ -129,24 +135,24 @@ func (s *Service) update(res *result) bool {
 	mnd.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
 	//	mnd.ServiceChecks.Add("Total Checks Run", 1)
 
-	s.svc.Lock()
-	defer s.svc.Unlock()
+	s.Lock()
+	defer s.Unlock()
 
-	if s.svc.LastCheck = time.Now().Round(time.Microsecond); s.svc.Since.IsZero() {
-		s.svc.Since = s.svc.LastCheck
+	if s.LastCheck = time.Now().Round(time.Microsecond); s.Since.IsZero() {
+		s.Since = s.LastCheck
 	}
 
-	s.svc.Output = res.output
+	s.Output = res.output
 
-	if s.svc.State == res.state {
-		s.svc.log.Printf("Service Checked: %s, state: %s for %v, output: %s",
-			s.Name, s.svc.State, time.Since(s.svc.Since).Round(time.Second), s.svc.Output)
+	if s.State == res.state {
+		mnd.Log.Printf("Service Checked: %s, state: %s for %v, output: %s",
+			s.Name, s.State, time.Since(s.Since).Round(time.Second), s.Output)
 		return false
 	}
 
-	s.svc.log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.svc.State, res.state, s.svc.Output)
-	s.svc.Since = s.svc.LastCheck
-	s.svc.State = res.state
+	mnd.Log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.State, res.state, s.Output)
+	s.Since = s.LastCheck
+	s.State = res.state
 
 	return true
 }
@@ -256,7 +262,7 @@ func RemoveSecrets(appURL, message string) string {
 	return message
 }
 
-func (s *Service) checkTCP() *result {
+func (s *ServiceConfig) checkTCP() *result {
 	res := &result{
 		state:  StateUnknown,
 		output: &Output{str: "unknown"},
@@ -280,8 +286,8 @@ func (s *Service) checkTCP() *result {
 }
 
 func (s *Service) Due(now time.Time) bool {
-	s.svc.RLock()
-	defer s.svc.RUnlock()
+	s.RLock()
+	defer s.RUnlock()
 
-	return now.Sub(s.svc.LastCheck) > s.Interval.Duration
+	return now.Sub(s.LastCheck) > s.Interval.Duration
 }

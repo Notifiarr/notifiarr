@@ -32,7 +32,7 @@ type Logger struct {
 	app       *rotatorr.Logger
 	debug     *rotatorr.Logger
 	custom    *rotatorr.Logger // must not be set when web/app/debug are set.
-	LogConfig *LogConfig
+	LogConfig LogConfig
 	mu        sync.RWMutex
 }
 
@@ -78,16 +78,15 @@ type LogConfig struct {
 // New returns a new Logger with debug off and sends everything to stdout.
 func New() *Logger {
 	return &Logger{
-		DebugLog:  log.New(discard, "[DEBUG] ", log.LstdFlags),
-		InfoLog:   log.New(stdout, "[INFO] ", log.LstdFlags),
-		ErrorLog:  log.New(stdout, "[ERROR] ", log.LstdFlags),
-		HTTPLog:   log.New(stdout, "", log.LstdFlags),
-		LogConfig: &LogConfig{},
+		DebugLog: log.New(discard, "[DEBUG] ", log.LstdFlags),
+		InfoLog:  log.New(stdout, "[INFO] ", log.LstdFlags),
+		ErrorLog: log.New(stdout, "[ERROR] ", log.LstdFlags),
+		HTTPLog:  log.New(stdout, "", log.LstdFlags),
 	}
 }
 
 // SetupLogging splits log writers into a file and/or stdout.
-func (l *Logger) SetupLogging(config *LogConfig) {
+func (l *Logger) SetupLogging(config LogConfig) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
@@ -305,6 +304,18 @@ func (l *Logger) GetErrorLog() *log.Logger {
 
 func (l *Logger) GetDebugLog() *log.Logger {
 	return l.DebugLog
+}
+
+func (l *Logger) NoUploads() bool {
+	return l.LogConfig.NoUploads
+}
+
+func (l *Logger) GetLogFiles() map[string]string {
+	return map[string]string{
+		"app":   l.LogConfig.LogFile,
+		"debug": l.LogConfig.DebugLog,
+		"http":  l.LogConfig.HTTPLog,
+	}
 }
 
 func (l *Logger) DebugEnabled() bool {

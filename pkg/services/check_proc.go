@@ -95,14 +95,14 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 
 		// Look for a match for our process.
 		if strings.Contains(procinfo.CmdLine, s.Value) ||
-			(s.svc.proc.checkRE != nil && s.svc.proc.checkRE.FindString(procinfo.CmdLine) != "") {
+			(s.proc.checkRE != nil && s.proc.checkRE.FindString(procinfo.CmdLine) != "") {
 			found = append(found, proc.Pid)
 			ages = append(ages, procinfo.Created)
 
 			// log.Printf("pid: %d, age: %v, cmd: %v",
 			// 	proc.Pid, time.Since(procinfo.Created).Round(time.Second), procinfo.CmdLine)
 
-			if !procinfo.Created.IsZero() && s.svc.proc.restarts && time.Since(procinfo.Created) < s.Interval.Duration {
+			if !procinfo.Created.IsZero() && s.proc.restarts && time.Since(procinfo.Created) < s.Interval.Duration {
 				return &result{
 					state: StateCritical,
 					output: &Output{str: fmt.Sprintf("%s: process restarted since last check, age: %v, pid: %d, proc: %s",
@@ -120,16 +120,16 @@ func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 	min, max, age, pid := s.getProcessStrings(pids, ages)
 
 	switch count := len(pids); {
-	case !s.svc.proc.running && count == 0: // not running!
+	case !s.proc.running && count == 0: // not running!
 		fallthrough
-	case s.svc.proc.countMax != 0 && count > s.svc.proc.countMax: // too many running!
+	case s.proc.countMax != 0 && count > s.proc.countMax: // too many running!
 		fallthrough
-	case count < s.svc.proc.countMin: // not enough running!
+	case count < s.proc.countMin: // not enough running!
 		return &result{
 			state:  StateCritical,
 			output: &Output{str: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid)},
 		}
-	case s.svc.proc.running && count > 0: // running but should not be!
+	case s.proc.running && count > 0: // running but should not be!
 		return &result{
 			state:  StateCritical,
 			output: &Output{str: fmt.Sprintf("%s: found %d processes; expected: 0%s%s", s.Value, count, age, pid)},
@@ -149,12 +149,12 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (string, str
 		max, age, pid string
 	)
 
-	if s.svc.proc.countMin > 0 { // min always exists.
-		min = fmt.Sprintf("min: %d", s.svc.proc.countMin)
+	if s.proc.countMin > 0 { // min always exists.
+		min = fmt.Sprintf("min: %d", s.proc.countMin)
 	}
 
-	if s.svc.proc.countMax > 0 {
-		max = fmt.Sprintf(", max: %d", s.svc.proc.countMax)
+	if s.proc.countMax > 0 {
+		max = fmt.Sprintf(", max: %d", s.proc.countMax)
 	}
 
 	if len(ages) == 1 && !ages[0].IsZero() {

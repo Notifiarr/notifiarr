@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	xmission "github.com/hekmon/transmissionrpc/v3"
 	"golift.io/cnfg"
 )
@@ -19,12 +20,12 @@ func (c *Cmd) getTransmissionStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting Transmission State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting Transmission State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getTransmissionState(ctx, instance+1, app)
+		state, err := c.getTransmissionState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Transmission Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting Transmission Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -34,7 +35,7 @@ func (c *Cmd) getTransmissionStates(ctx context.Context) []*State {
 }
 
 //nolint:cyclop,funlen
-func (c *Cmd) getTransmissionState(ctx context.Context, instance int, app *apps.XmissionConfig) (*State, error) {
+func (c *Cmd) getTransmissionState(ctx context.Context, instance int, app *apps.Xmission) (*State, error) {
 	start := time.Now()
 	xfers, err := app.TorrentGetAll(ctx)
 

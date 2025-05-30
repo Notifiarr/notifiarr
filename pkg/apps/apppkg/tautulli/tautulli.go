@@ -15,22 +15,33 @@ import (
 
 // Config is the Tautulli configuration.
 type Config struct {
-	URL    string       `json:"url"    toml:"url"     xml:"url"`
-	APIKey string       `json:"apiKey" toml:"api_key" xml:"api_key"`
-	Client *http.Client `json:"-"      toml:"-"       xml:"-"`
+	URL    string `json:"url"    toml:"url"     xml:"url"`
+	APIKey string `json:"apiKey" toml:"api_key" xml:"api_key"`
+}
+
+type Tautulli struct {
+	Config
+	*http.Client `json:"-"      toml:"-"       xml:"-"`
+}
+
+func New(config Config, client *http.Client) *Tautulli {
+	return &Tautulli{
+		Config: config,
+		Client: client,
+	}
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func (c *Config) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
+func (t *Tautulli) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
 	err := func() error {
-		req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.URL+"/api/v2", nil)
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, t.URL+"/api/v2", nil)
 		if err != nil {
 			return fmt.Errorf("creating request: %w", err)
 		}
 
 		req.URL.RawQuery = params.Encode()
 
-		resp, err := c.Client.Do(req)
+		resp, err := t.Client.Do(req)
 		if err != nil {
 			return fmt.Errorf("making request: %w", err)
 		}
@@ -48,25 +59,25 @@ func (c *Config) GetURLInto(ctx context.Context, params url.Values, into interfa
 		return nil
 	}()
 	if err != nil {
-		return fmt.Errorf("%s", strings.ReplaceAll(err.Error(), c.APIKey, "<redacted>")) //nolint:err113
+		return fmt.Errorf("%s", strings.ReplaceAll(err.Error(), t.APIKey, "<redacted>")) //nolint:err113
 	}
 
 	return nil
 }
 
 // GetUsers returns the Tautulli users.
-func (c *Config) GetUsers(ctx context.Context) (*Users, error) {
-	if c == nil || c.Client == nil {
+func (t *Tautulli) GetUsers(ctx context.Context) (*Users, error) {
+	if t == nil || t.Client == nil {
 		return &Users{}, nil
 	}
 
 	params := url.Values{}
 	params.Add("cmd", "get_users")
-	params.Add("apikey", c.APIKey)
+	params.Add("apikey", t.APIKey)
 
 	var users Users
 
-	err := c.GetURLInto(ctx, params, &users)
+	err := t.GetURLInto(ctx, params, &users)
 	if err != nil {
 		return nil, err
 	}
@@ -91,14 +102,14 @@ type Info struct {
 }
 
 // GetInfo returns the Tautulli app info.
-func (c *Config) GetInfo(ctx context.Context) (*Info, error) {
-	if c == nil || c.Client == nil {
+func (t *Tautulli) GetInfo(ctx context.Context) (*Info, error) {
+	if t == nil || t.Client == nil {
 		return nil, nil //nolint:nilnil
 	}
 
 	params := url.Values{}
 	params.Add("cmd", "get_tautulli_info")
-	params.Add("apikey", c.APIKey)
+	params.Add("apikey", t.APIKey)
 
 	var output struct {
 		Resp struct {
@@ -107,7 +118,7 @@ func (c *Config) GetInfo(ctx context.Context) (*Info, error) {
 		} `json:"response"`
 	}
 
-	if err := c.GetURLInto(ctx, params, &output); err != nil {
+	if err := t.GetURLInto(ctx, params, &output); err != nil {
 		return nil, err
 	}
 

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/starr"
 	"golift.io/starr/readarr"
 )
@@ -19,12 +20,12 @@ func (c *Cmd) getReadarrStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting Readarr State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting Readarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getReadarrState(ctx, instance+1, app)
+		state, err := c.getReadarrState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Readarr Queue from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting Readarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -33,7 +34,7 @@ func (c *Cmd) getReadarrStates(ctx context.Context) []*State {
 	return states
 }
 
-func (c *Cmd) getReadarrState(ctx context.Context, instance int, app *apps.ReadarrConfig) (*State, error) {
+func (c *Cmd) getReadarrState(ctx context.Context, instance int, app *apps.Readarr) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Name: app.Name}
 	start := time.Now()
 
@@ -88,7 +89,7 @@ func (c *Cmd) getReadarrState(ctx context.Context, instance int, app *apps.Reada
 }
 
 // getReadarrHistory is not done.
-func (c *Cmd) getReadarrHistory(ctx context.Context, app *apps.ReadarrConfig) ([]*Sortable, error) {
+func (c *Cmd) getReadarrHistory(ctx context.Context, app *apps.Readarr) ([]*Sortable, error) {
 	history, err := app.GetHistoryPageContext(ctx, &starr.PageReq{
 		Page:     1,
 		PageSize: showLatest,

@@ -162,7 +162,7 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 		wait sync.WaitGroup
 	)
 
-	c.getPlexVersion(ctx, &wait, c.Apps.Plex, &plx)
+	c.getPlexVersion(ctx, &wait, &c.Apps.Plex, &plx)
 	c.getLidarrVersion(ctx, &wait, c.Apps.Lidarr, lid)
 	c.getProwlarrVersion(ctx, &wait, c.Apps.Prowlarr, prl)
 	c.getRadarrVersion(ctx, &wait, c.Apps.Radarr, rad)
@@ -182,7 +182,7 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 
 func (c *Config) getConTest(app string, name string, instance int, err error) conTest {
 	if err != nil {
-		c.Errorf("Getting %s %d (%s) system status: %v", app, instance, name, err)
+		mnd.Log.Errorf("Getting %s %d (%s) system status: %v", app, instance, name, err)
 		return conTest{Instance: instance, Error: err.Error(), Name: name}
 	}
 
@@ -268,7 +268,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	return nil
 }
 
-func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []*apps.LidarrConfig, lid []*LidarrConTest) {
+func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []apps.Lidarr, lid []*LidarrConTest) {
 	for idx, app := range lidarrs {
 		lid[idx] = &LidarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 
@@ -279,7 +279,7 @@ func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lid
 
 		wait.Add(1)
 
-		go func(idx int, app *apps.LidarrConfig) {
+		go func(idx int, app apps.Lidarr) {
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
@@ -290,7 +290,7 @@ func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lid
 	}
 }
 
-func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []*apps.ProwlarrConfig, prl []*ProwlarrConTest) {
+func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []apps.Prowlarr, prl []*ProwlarrConTest) {
 	for idx, app := range prowlarrs {
 		prl[idx] = &ProwlarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 
@@ -301,7 +301,7 @@ func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, p
 
 		wait.Add(1)
 
-		go func(idx int, app *apps.ProwlarrConfig) {
+		go func(idx int, app apps.Prowlarr) {
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
@@ -312,7 +312,7 @@ func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, p
 	}
 }
 
-func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []*apps.RadarrConfig, rad []*RadarrConTest) {
+func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []apps.Radarr, rad []*RadarrConTest) {
 	for idx, app := range radarrs {
 		rad[idx] = &RadarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 
@@ -323,7 +323,7 @@ func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, rad
 
 		wait.Add(1)
 
-		go func(idx int, app *apps.RadarrConfig) {
+		go func(idx int, app apps.Radarr) {
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
@@ -334,7 +334,7 @@ func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, rad
 	}
 }
 
-func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []*apps.ReadarrConfig, read []*ReadarrConTest) {
+func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []apps.Readarr, read []*ReadarrConTest) {
 	for idx, app := range readarrs {
 		read[idx] = &ReadarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 
@@ -345,7 +345,7 @@ func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, re
 
 		wait.Add(1)
 
-		go func(idx int, app *apps.ReadarrConfig) {
+		go func(idx int, app apps.Readarr) {
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
@@ -356,7 +356,7 @@ func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, re
 	}
 }
 
-func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []*apps.SonarrConfig, son []*SonarrConTest) {
+func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []apps.Sonarr, son []*SonarrConTest) {
 	for idx, app := range sonarrs {
 		son[idx] = &SonarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
 
@@ -367,7 +367,7 @@ func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, son
 
 		wait.Add(1)
 
-		go func(idx int, app *apps.SonarrConfig) {
+		go func(idx int, app apps.Sonarr) {
 			defer wait.Done()
 
 			stat, err := app.GetSystemStatusContext(ctx)
@@ -378,7 +378,7 @@ func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, son
 	}
 }
 
-func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *apps.PlexConfig, plx *[]*PlexConTest) {
+func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *apps.Plex, plx *[]*PlexConTest) {
 	if !plexServer.Enabled() {
 		return
 	}

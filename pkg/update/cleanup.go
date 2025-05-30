@@ -61,6 +61,6 @@ func (u *Command) cleanOldBackups() {
 		}
 
 		err := os.Remove(filepath.Join(dir, file.name))
-		u.Printf("[UPDATE] Deleted old backup file: %s%s (error: %v)", file.name, mnd.DurationAge(file.when), err)
+		mnd.Log.Printf("[UPDATE] Deleted old backup file: %s%s (error: %v)", file.name, mnd.DurationAge(file.when), err)
 	}
 }

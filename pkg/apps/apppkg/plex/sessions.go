@@ -36,7 +36,7 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 		sessions = &Sessions{Name: s.name}
 	)
 
-	body, err := s.getPlexURL(ctx, s.config.URL+"/status/sessions", nil)
+	body, err := s.getPlexURL(ctx, s.Config.URL+"/status/sessions", nil)
 	if err != nil {
 		return sessions, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -56,7 +56,7 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 	params.Add("sessionId", sessionID)
 	params.Add("reason", reason)
 
-	body, err := s.getPlexURL(ctx, s.config.URL+"/status/sessions/terminate", params)
+	body, err := s.getPlexURL(ctx, s.Config.URL+"/status/sessions/terminate", params)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -75,7 +75,7 @@ func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) ([]byte,
 	params.Add("identifier", "com.plexapp.plugins.library")
 	params.Add("key", key)
 
-	body, err := s.getPlexURL(ctx, s.config.URL+"/:/scrobble", params)
+	body, err := s.getPlexURL(ctx, s.Config.URL+"/:/scrobble", params)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -91,7 +91,7 @@ func (s *Server) MarkPlayed(key string) ([]byte, error) {
 // EmptyTrashWithContext deletes (a section's) trash.
 func (s *Server) EmptyTrashWithContext(ctx context.Context, libraryKey string) ([]byte, error) {
 	// Requires PUT with no data.
-	body, err := s.putPlexURL(ctx, s.config.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
+	body, err := s.putPlexURL(ctx, s.Config.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -55,7 +56,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	sonarr := c.getDownloadingItemsSonarr(ctx)
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
-		c.Debugf("[%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
+		mnd.Log.Debugf("[%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
 
 		if c.empty {
@@ -67,11 +68,11 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 		c.empty = false
 	}
 
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.DownloadRoute,
 		Event:      input.Type,
 		LogPayload: true,
-		ErrorsOnly: !c.DebugEnabled(),
+		ErrorsOnly: !mnd.Log.DebugEnabled(),
 		LogMsg: fmt.Sprintf("Downloading Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
 		Payload: &QueuesPaylod{
@@ -103,7 +104,7 @@ func (c *cmd) getDownloadingItemsLidarr(ctx context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*lidarr.Queue)
-		lidarrQueue := c.rangeDownloadingItemsLidarr(ctx, idx, app, queue.Records)
+		lidarrQueue := c.rangeDownloadingItemsLidarr(ctx, idx, &app, queue.Records)
 		items[instance] = listItem{Name: app.Name, Queue: lidarrQueue, Total: queue.TotalRecords}
 	}
 
@@ -113,7 +114,7 @@ func (c *cmd) getDownloadingItemsLidarr(ctx context.Context) itemList {
 func (c *cmd) rangeDownloadingItemsLidarr(
 	ctx context.Context,
 	idx int,
-	app *apps.LidarrConfig,
+	app *apps.Lidarr,
 	records []*lidarr.QueueRecord,
 ) []*lidarrRecord {
 	lidarrQueue := []*lidarrRecord{}
@@ -141,7 +142,7 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			album, err := app.GetAlbumByIDContext(ctx, item.AlbumID)
 			if err != nil {
-				c.Errorf("Getting data for downloading item: %v", err)
+				mnd.Log.Errorf("Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &lidarr.Album{Artist: &lidarr.Artist{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx, album)
@@ -183,7 +184,7 @@ func (c *cmd) getDownloadingItemsRadarr(ctx context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*radarr.Queue)
-		radarrQueue := c.rangeDownloadingItemsRadarr(ctx, idx, app, queue.Records)
+		radarrQueue := c.rangeDownloadingItemsRadarr(ctx, idx, &app, queue.Records)
 		items[instance] = listItem{Name: app.Name, Queue: radarrQueue, Total: queue.TotalRecords}
 	}
 
@@ -193,7 +194,7 @@ func (c *cmd) getDownloadingItemsRadarr(ctx context.Context) itemList {
 func (c *cmd) rangeDownloadingItemsRadarr(
 	ctx context.Context,
 	idx int,
-	app *apps.RadarrConfig,
+	app *apps.Radarr,
 	records []*radarr.QueueRecord,
 ) []*radarrRecord {
 	radarrQueue := []*radarrRecord{}
@@ -221,7 +222,7 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			movie, err := app.GetMovieByIDContext(ctx, item.MovieID)
 			if err != nil {
-				c.Errorf("Getting data for downloading item: %v", err)
+				mnd.Log.Errorf("Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &radarr.Movie{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("radarrMovie", item.MovieID), idx, movie)
@@ -261,7 +262,7 @@ func (c *cmd) getDownloadingItemsReadarr(ctx context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*readarr.Queue)
-		readarrQueue := c.rangeDownloadingItemsReadarr(ctx, idx, app, queue.Records)
+		readarrQueue := c.rangeDownloadingItemsReadarr(ctx, idx, &app, queue.Records)
 		items[instance] = listItem{Name: app.Name, Queue: readarrQueue, Total: queue.TotalRecords}
 	}
 
@@ -271,7 +272,7 @@ func (c *cmd) getDownloadingItemsReadarr(ctx context.Context) itemList {
 func (c *cmd) rangeDownloadingItemsReadarr(
 	ctx context.Context,
 	idx int,
-	app *apps.ReadarrConfig,
+	app *apps.Readarr,
 	records []*readarr.QueueRecord,
 ) []*readarrRecord {
 	readarrQueue := []*readarrRecord{}
@@ -299,7 +300,7 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			book, err := app.GetBookByIDContext(ctx, item.BookID)
 			if err != nil {
-				c.Errorf("Getting data for downloading item: %v", err)
+				mnd.Log.Errorf("Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &readarr.Book{Author: &readarr.Author{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("readarrBook", item.BookID), idx, book)
@@ -341,7 +342,7 @@ func (c *cmd) getDownloadingItemsSonarr(ctx context.Context) itemList {
 		}
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
-		sonarrQueue := c.rangeDownloadingItemsSonarr(ctx, idx, app, queue.Records)
+		sonarrQueue := c.rangeDownloadingItemsSonarr(ctx, idx, &app, queue.Records)
 		items[instance] = listItem{Name: app.Name, Queue: sonarrQueue, Total: queue.TotalRecords}
 	}
 
@@ -351,7 +352,7 @@ func (c *cmd) getDownloadingItemsSonarr(ctx context.Context) itemList {
 func (c *cmd) rangeDownloadingItemsSonarr(
 	ctx context.Context,
 	idx int,
-	app *apps.SonarrConfig,
+	app *apps.Sonarr,
 	records []*sonarr.QueueRecord,
 ) []*sonarrRecord {
 	sonarrQueue := []*sonarrRecord{}
@@ -379,7 +380,7 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			series, err := app.GetSeriesByIDContext(ctx, item.SeriesID)
 			if err != nil {
-				c.Errorf("Getting data for downloading item: %v", err)
+				mnd.Log.Errorf("Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &sonarr.Series{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx, series)

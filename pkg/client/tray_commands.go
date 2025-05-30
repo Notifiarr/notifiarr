@@ -20,7 +20,7 @@ func (c *Client) toggleServer(ctx context.Context) {
 		ui.Toast("Started web server") //nolint:errcheck
 		c.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
 			c.Config.URLBase, c.Config.BindAddr)
-		c.StartWebServer(ctx)
+		go c.RunWebServer()
 
 		return
 	}
@@ -49,7 +49,7 @@ func (c *Client) rotateLogs() {
 func (c *Client) displayConfig() string { //nolint: funlen,cyclop
 	out := "Config File: " + c.Flags.ConfigFile
 	out += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
-	out += fmt.Sprintf("\nUpstreams: %v", c.Config.Allow.Input)
+	out += fmt.Sprintf("\nUpstreams: %v", c.allow.Input)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		out += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, c.Config.URLBase)
@@ -205,8 +205,6 @@ func (c *Client) updatePassword(ctx context.Context) {
 
 	c.Print("[user requested] Updating Web UI password.")
 
-	defer c.StartWebServer(ctx)
-
 	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
 		c.Errorf("Updating Web UI Password: %v", err)
 		_, _ = ui.Error("Updating Web UI Password: " + err.Error())
@@ -215,4 +213,6 @@ func (c *Client) updatePassword(ctx context.Context) {
 	if err = ui.Toast("Web UI password updated. Save config to persist this change."); err != nil {
 		c.Errorf("Creating Toast Notification: %v", err)
 	}
+
+	go c.RunWebServer()
 }

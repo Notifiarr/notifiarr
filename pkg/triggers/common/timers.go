@@ -78,27 +78,27 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]fmt
 
 func (c *Config) printStartupLog() {
 	triggers, timers, schedules := c.GatherTriggerInfo()
-	c.Printf("==> Actions Started: %d Timers and %d Triggers and %d Schedules", len(timers), len(triggers), len(schedules))
+	mnd.Log.Printf("==> Actions Started: %d Timers and %d Triggers and %d Schedules", len(timers), len(triggers), len(schedules))
 
 	for name := range triggers {
 		if _, ok := timers[name]; ok {
-			c.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, timers[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, timers[name])
 		} else if _, ok := schedules[name]; ok {
-			c.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
 		} else {
-			c.Debugf("==> Enabled Action: %s Trigger only.", name)
+			mnd.Log.Debugf("==> Enabled Action: %s Trigger only.", name)
 		}
 	}
 
 	for name := range timers {
 		if _, ok := triggers[name]; !ok {
-			c.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, timers[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, timers[name])
 		}
 	}
 
 	for name := range schedules {
 		if _, ok := triggers[name]; !ok {
-			c.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
 		}
 	}
 }
@@ -112,7 +112,7 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 	c.Scheduler.Start()
 
 	defer func() {
-		c.CapturePanic()
+		mnd.Log.CapturePanic()
 		c.stopTimerLoop(actions)
 		_ = c.Scheduler.Shutdown()
 	}()
@@ -145,12 +145,12 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action *Action) {
 	if input.Type == website.EventUser && action.Name != "" {
 		if err := ui.Toast("%s", string(action.Name)); err != nil {
-			c.Errorf("Displaying toast notification: %v", err)
+			mnd.Log.Errorf("Displaying toast notification: %v", err)
 		}
 	}
 
 	if action.Name != "" && !action.Hide {
-		c.Printf("[%s requested] Event Triggered: %s", input.Type, action.Name)
+		mnd.Log.Printf("[%s requested] Event Triggered: %s", input.Type, action.Name)
 	}
 
 	if action.Fn != nil {
@@ -164,7 +164,7 @@ func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action 
 func (c *Config) stopTimerLoop(actions []*Action) {
 	defer close(c.stop.C) // signal that we're done.
 
-	c.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
+	mnd.Log.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
 	for _, action := range actions {
 		if action.t != nil {

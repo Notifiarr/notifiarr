@@ -16,7 +16,6 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -51,40 +50,38 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
-	HostID     string                 `json:"hostId"      toml:"host_id"       xml:"host_id"       yaml:"hostId"`
-	UIPassword CryptPass              `json:"uiPassword"  toml:"ui_password"   xml:"ui_password"   yaml:"uiPassword"`
-	BindAddr   string                 `json:"bindAddr"    toml:"bind_addr"     xml:"bind_addr"     yaml:"bindAddr"`
-	SSLCrtFile string                 `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
-	SSLKeyFile string                 `json:"sslKeyFile"  toml:"ssl_key_file"  xml:"ssl_key_file"  yaml:"sslKeyFile"`
-	Upstreams  []string               `json:"upstreams"   toml:"upstreams"     xml:"upstreams"     yaml:"upstreams"`
-	AutoUpdate string                 `json:"autoUpdate"  toml:"auto_update"   xml:"auto_update"   yaml:"autoUpdate"`
-	UnstableCh bool                   `json:"unstableCh"  toml:"unstable_ch"   xml:"unstable_ch"   yaml:"unstableCh"`
-	Timeout    cnfg.Duration          `json:"timeout"     toml:"timeout"       xml:"timeout"       yaml:"timeout"`
-	Retries    int                    `json:"retries"     toml:"retries"       xml:"retries"       yaml:"retries"`
-	Snapshot   *snapshot.Config       `json:"snapshot"    toml:"snapshot"      xml:"snapshot"      yaml:"snapshot"`
-	Services   *services.Config       `json:"services"    toml:"services"      xml:"services"      yaml:"services"`
-	Service    []*services.Service    `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
-	EnableApt  bool                   `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
-	WatchFiles []*filewatch.WatchFile `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
-	Endpoints  []*epconfig.Endpoint   `json:"endpoints"   toml:"endpoint"      xml:"endpoint"      yaml:"endpoints"`
-	Commands   []*commands.Command    `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
-	Version    uint                   `json:"version"     toml:"version"       xml:"version"       yaml:"version"`
-	*logs.LogConfig
-	*apps.Apps
-	*website.Server `json:"-" toml:"-" xml:"-" yaml:"-"`
-	Allow           AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
+	HostID     string                    `json:"hostId"      toml:"host_id"       xml:"host_id"       yaml:"hostId"`
+	UIPassword CryptPass                 `json:"uiPassword"  toml:"ui_password"   xml:"ui_password"   yaml:"uiPassword"`
+	BindAddr   string                    `json:"bindAddr"    toml:"bind_addr"     xml:"bind_addr"     yaml:"bindAddr"`
+	SSLCrtFile string                    `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
+	SSLKeyFile string                    `json:"sslKeyFile"  toml:"ssl_key_file"  xml:"ssl_key_file"  yaml:"sslKeyFile"`
+	Upstreams  []string                  `json:"upstreams"   toml:"upstreams"     xml:"upstreams"     yaml:"upstreams"`
+	AutoUpdate string                    `json:"autoUpdate"  toml:"auto_update"   xml:"auto_update"   yaml:"autoUpdate"`
+	UnstableCh bool                      `json:"unstableCh"  toml:"unstable_ch"   xml:"unstable_ch"   yaml:"unstableCh"`
+	Timeout    cnfg.Duration             `json:"timeout"     toml:"timeout"       xml:"timeout"       yaml:"timeout"`
+	Retries    int                       `json:"retries"     toml:"retries"       xml:"retries"       yaml:"retries"`
+	Snapshot   *snapshot.Config          `json:"snapshot"    toml:"snapshot"      xml:"snapshot"      yaml:"snapshot"`
+	Services   *services.Config          `json:"services"    toml:"services"      xml:"services"      yaml:"services"`
+	Service    []*services.ServiceConfig `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
+	EnableApt  bool                      `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
+	WatchFiles []*filewatch.WatchFile    `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
+	Endpoints  []*epconfig.Endpoint      `json:"endpoints"   toml:"endpoint"      xml:"endpoint"      yaml:"endpoints"`
+	Commands   []*commands.Command       `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
+	Version    uint                      `json:"version"     toml:"version"       xml:"version"       yaml:"version"`
+	logs.LogConfig
+	apps.AppsConfig
 }
 
 // NewConfig returns a fresh config with only defaults and a logger ready to go.
-func NewConfig(logger mnd.Logger) *Config {
+func NewConfig() *Config {
 	return &Config{
-		Apps: &apps.Apps{
-			URLBase: "/",
-			Logger:  logger,
+		AppsConfig: apps.AppsConfig{
+			BaseConfig: apps.BaseConfig{
+				URLBase: "/",
+			},
 		},
 		Services: &services.Config{
 			Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
-			Logger:   logger,
 		},
 		BindAddr: mnd.DefaultBindAddr,
 		Snapshot: &snapshot.Config{
@@ -93,7 +90,7 @@ func NewConfig(logger mnd.Logger) *Config {
 				Nvidia: &snapshot.NvidiaConfig{},
 			},
 		},
-		LogConfig: &logs.LogConfig{
+		LogConfig: logs.LogConfig{
 			LogFiles:  mnd.DefaultLogFiles,
 			LogFileMb: mnd.DefaultLogFileMb,
 		},
@@ -108,7 +105,7 @@ func (c *Config) CopyConfig() (*Config, error) {
 
 	buf := bytes.Buffer{}
 	if err := Template.Execute(&buf, c); err != nil {
-		return nil, fmt.Errorf("encoding config into toml for copying (this is a bug!): %w", err)
+		return nil, fmt.Errorf("encoding config into toml for copying (this is a bug!): %w: %#v, %#v", err, c.Endpoints[0], c)
 	}
 
 	dec := toml.NewDecoder(&buf)
@@ -144,7 +141,7 @@ func (c *Config) Get(flag *Flags) (*Config, error) {
 		return nil, fmt.Errorf("environment variables: %w", err)
 	}
 
-	return c.CopyConfig()
+	return c, nil
 }
 
 // ExpandHomedir expands a ~ to a homedir, or returns the original path in case of any error.
@@ -157,52 +154,61 @@ func ExpandHomedir(filePath string) string {
 	return expanded
 }
 
-func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*triggers.Actions, map[string]string, error) {
+type SetupResult struct {
+	Triggers *triggers.Actions
+	Output   map[string]string
+	Services *services.Services
+	Apps     *apps.Apps
+}
+
+func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*SetupResult, error) {
 	output, err := cnfgfile.Parse(c, &cnfgfile.Opts{
 		Name:          mnd.Title,
 		TransformPath: ExpandHomedir,
 		Prefix:        "filepath:",
 	})
 	if err != nil {
-		return nil, nil, fmt.Errorf("filepath variables: %w", err)
+		return nil, fmt.Errorf("filepath variables: %w", err)
 	}
 
+	result := &SetupResult{Output: output}
+
 	if err := c.setupPassword(); err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	c.fixConfig()
 	logger.LogConfig = c.LogConfig // this is sorta hacky.
 
-	if err := c.Services.Setup(c.Service); err != nil {
-		return nil, nil, fmt.Errorf("service checks: %w", err)
+	c.Services.Fix()
+
+	result.Services = services.New(c.Services)
+	if err := result.Services.Add(c.Service); err != nil {
+		return nil, fmt.Errorf("service checks: %w", err)
 	}
 
 	// Make sure each app has a sane timeout.
-	if err = c.Apps.Setup(); err != nil {
-		return nil, nil, fmt.Errorf("setting up app: %w", err)
+	if result.Apps, err = apps.New(&c.AppsConfig); err != nil {
+		return nil, fmt.Errorf("setting up app: %w", err)
 	}
 
 	// Make sure the port is not in use before starting the web server.
 	c.BindAddr, err = CheckPort(c.BindAddr)
-	if flag.Delay > time.Second {
-		err = nil // dont check the port if delay is set.
-	}
 
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
-	c.Server = website.New(&website.Config{
-		Apps:     c.Apps,
-		Logger:   c.Apps.Logger,
+	website.New(&website.Config{
+		Apps:     result.Apps,
 		BaseURL:  website.BaseURL,
 		Timeout:  c.Timeout,
 		Retries:  c.Retries,
 		HostID:   c.HostID,
 		BindAddr: c.BindAddr,
 	})
-	c.Services.SetWebsite(c.Server)
 
-	return c.setup(logger, flag), output, err
+	result.Triggers = c.setup(flag, result.Services, result.Apps)
+
+	return result, err
 }
 
 func (c *Config) fixConfig() {
@@ -216,19 +222,17 @@ func (c *Config) fixConfig() {
 		_ = c.UIPassword.Set(DefaultUsername + ":" + c.APIKey)
 	}
 
-	c.Services.Apps = c.Apps
 	c.Services.Plugins = &c.Snapshot.Plugins
 }
 
-func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
+func (c *Config) setup(flag *Flags, svc *services.Services, apps *apps.Apps) *triggers.Actions {
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
-	c.Allow = MakeIPs(c.Upstreams)
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = mnd.DefaultTimeout
 	}
 
-	if ui.HasGUI() && c.LogConfig != nil {
+	if ui.HasGUI() {
 		// Setting AppName forces log files (even if not configured).
 		// Used for GUI apps that have no console output.
 		c.LogConfig.AppName = mnd.Title
@@ -236,13 +240,11 @@ func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 
 	// Ordering.....
 	clientinfo := &clientinfo.Config{
-		Server:    c.Server,
-		Apps:      c.Apps,
+		Apps:      apps,
 		Endpoints: c.Endpoints,
 	}
 	triggers := triggers.New(&triggers.Config{
-		Apps:       c.Apps,
-		Website:    c.Server,
+		Apps:       apps,
 		Snapshot:   c.Snapshot,
 		WatchFiles: c.WatchFiles,
 		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
@@ -251,8 +253,8 @@ func (c *Config) setup(logger *logs.Logger, flag *Flags) *triggers.Actions {
 		ConfigFile: flag.ConfigFile,
 		AutoUpdate: c.AutoUpdate,
 		UnstableCh: c.UnstableCh,
-		Services:   c.Services,
-		Logger:     logger,
+		Services:   svc,
+		Logger:     mnd.Log,
 		Endpoints:  c.Endpoints,
 	})
 	clientinfo.CmdList = triggers.Commands.List()

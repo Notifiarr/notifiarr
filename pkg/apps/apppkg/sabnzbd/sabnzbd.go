@@ -19,9 +19,20 @@ import (
 var ErrUnknownByteType = errors.New("unknown byte type")
 
 type Config struct {
-	URL    string       `json:"url"    toml:"url"     xml:"url"`
-	APIKey string       `json:"apiKey" toml:"api_key" xml:"api_key"`
-	Client *http.Client `json:"-"      toml:"-"       xml:"-"`
+	URL    string `json:"url"    toml:"url"     xml:"url"`
+	APIKey string `json:"apiKey" toml:"api_key" xml:"api_key"`
+}
+
+type SabNZB struct {
+	Config
+	*http.Client `json:"-"      toml:"-"       xml:"-"`
+}
+
+func New(config Config, client *http.Client) *SabNZB {
+	return &SabNZB{
+		Config: config,
+		Client: client,
+	}
 }
 
 // QueueSlots has the following data structure.
@@ -186,7 +197,7 @@ type Queue struct {
 }
 
 // GetHistory returns the history items in SABnzbd.
-func (s *Config) GetHistory(ctx context.Context) (*History, error) {
+func (s *SabNZB) GetHistory(ctx context.Context) (*History, error) {
 	if s == nil || s.URL == "" {
 		return &History{}, nil
 	}
@@ -210,7 +221,7 @@ func (s *Config) GetHistory(ctx context.Context) (*History, error) {
 }
 
 // GetQueue returns the active queued items in SABnzbd.
-func (s *Config) GetQueue(ctx context.Context) (*Queue, error) {
+func (s *SabNZB) GetQueue(ctx context.Context) (*Queue, error) {
 	if s == nil || s.URL == "" {
 		return &Queue{}, nil
 	}
@@ -233,7 +244,7 @@ func (s *Config) GetQueue(ctx context.Context) (*Queue, error) {
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func (s *Config) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
+func (s *SabNZB) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+"/api", nil)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)

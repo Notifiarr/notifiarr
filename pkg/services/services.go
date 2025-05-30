@@ -17,7 +17,7 @@ import (
 	"golift.io/version"
 )
 
-func (c *Config) Setup(services []*Service) error {
+func (c *Config) Fix() {
 	if c.Parallel > MaximumParallel {
 		c.Parallel = MaximumParallel
 	} else if c.Parallel == 0 {
@@ -29,107 +29,101 @@ func (c *Config) Setup(services []*Service) error {
 	} else if c.Interval.Duration < MinimumSendInterval {
 		c.Interval.Duration = MinimumSendInterval
 	}
-
-	services = append(services, c.collectApps()...)
-
-	return c.setup(services)
 }
 
-func (c *Config) setup(services []*Service) error {
-	c.services = make(map[string]*Service)
-
-	for idx, check := range services {
-		if err := services[idx].Validate(); err != nil {
-			return err
+func (s *Services) Add(services []*ServiceConfig) error {
+	for _, svc := range services {
+		if !svc.validated {
+			if err := svc.Validate(); err != nil {
+				return err
+			}
 		}
 
-		mnd.ServiceChecks.Add(check.Name+"&&Total", 0)
-		mnd.ServiceChecks.Add(check.Name+"&&"+StateUnknown.String(), 0)
-		mnd.ServiceChecks.Add(check.Name+"&&"+StateOK.String(), 0)
-		mnd.ServiceChecks.Add(check.Name+"&&"+StateWarning.String(), 0)
-		mnd.ServiceChecks.Add(check.Name+"&&"+StateCritical.String(), 0)
-
 		// Add this validated service to our service map.
-		c.services[services[idx].Name] = services[idx]
+		s.add(svc)
 	}
 
 	return nil
 }
 
-func (c *Config) SetWebsite(website *website.Server) {
-	c.website = website
+func (s *Services) add(svc *ServiceConfig) {
+	mnd.ServiceChecks.Add(svc.Name+"&&Total", 0)
+	mnd.ServiceChecks.Add(svc.Name+"&&"+StateUnknown.String(), 0)
+	mnd.ServiceChecks.Add(svc.Name+"&&"+StateOK.String(), 0)
+	mnd.ServiceChecks.Add(svc.Name+"&&"+StateWarning.String(), 0)
+	mnd.ServiceChecks.Add(svc.Name+"&&"+StateCritical.String(), 0)
+
+	// Add this validated service to our service map.
+	s.services[svc.Name] = &Service{
+		ServiceConfig: svc,
+	}
 }
 
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
-func (c *Config) Start(ctx context.Context) {
-	if len(c.services) == 0 {
-		c.Printf("==> Service Checker Disabled! No services to check.")
+func (s *Services) Start(ctx context.Context, plexName string) {
+	if len(s.services) == 0 {
+		mnd.Log.Printf("==> Service Checker Disabled! No services to check.")
 		return
 	}
 
-	c.stopLock.Lock()
-	defer c.stopLock.Unlock()
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
 
-	if c.LogFile != "" {
-		c.Logger = logs.CustomLog(c.LogFile, "Services")
+	logger := mnd.Log
+	if s.LogFile != "" {
+		logger = logs.CustomLog(s.LogFile, "Services")
 	}
 
-	for name := range c.services {
-		c.services[name].svc.log = c.Logger
+	for name := range s.services {
+		s.services[name].log = logger
 	}
 
-	c.applyLocalOverrides()
-	c.loadServiceStates(ctx)
-	c.checks = make(chan *Service, DefaultBuffer)
-	c.done = make(chan bool)
-	c.stopChan = make(chan struct{})
-	c.triggerChan = make(chan website.EventType)
-	c.checkChan = make(chan triggerCheck)
-
-	for range c.Parallel {
+	s.applyLocalOverrides(plexName)
+	s.loadServiceStates(ctx)
+	for range s.Parallel {
 		go func() {
-			defer c.CapturePanic()
+			defer mnd.Log.CapturePanic()
 
-			for check := range c.checks {
-				if c.done == nil {
+			for check := range s.checks {
+				if s.done == nil {
 					return
 				} else if check == nil {
-					c.done <- false
+					s.done <- false
 					return
 				}
 
-				c.done <- check.check(ctx)
+				s.done <- check.check(ctx)
 			}
 		}()
 	}
 
-	go c.runServiceChecker()
+	go s.runServiceChecker()
 
 	word := "Started"
-	if c.Disabled {
+	if s.Disabled {
 		word = "Disabled"
 	}
 
-	c.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
-		word, len(c.services), c.Interval, c.Parallel)
+	mnd.Log.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
+		word, len(s.services), s.Interval, s.Parallel)
 }
 
-func (c *Config) applyLocalOverrides() {
-	if !c.Apps.Plex.Enabled() {
-		return
-	}
-
-	name := c.Apps.Plex.Server.Name()
-	if name == "" {
+func (s *Services) applyLocalOverrides(plexName string) {
+	if plexName == "" {
 		return
 	}
 
 	// This is how we shoehorn the plex servr name into the service check.
 	// We do this because we don't have the name when the config file is parsed.
-	for _, svc := range c.services {
+	for _, svc := range s.services {
 		if svc.Name == PlexServerName {
-			svc.Tags = map[string]any{"name": name}
+			if svc.Tags == nil {
+				svc.Tags = map[string]any{}
+			}
+
+			svc.Tags["name"] = plexName
+
 			return
 		}
 	}
@@ -137,9 +131,9 @@ func (c *Config) applyLocalOverrides() {
 
 // loadServiceStates brings service states from the website into the fold.
 // In other words, states are stored in the website's database.
-func (c *Config) loadServiceStates(ctx context.Context) {
+func (s *Services) loadServiceStates(ctx context.Context) {
 	names := []string{}
-	for name := range c.services {
+	for name := range s.services {
 		names = append(names, valuePrefix+name)
 	}
 
@@ -147,29 +141,30 @@ func (c *Config) loadServiceStates(ctx context.Context) {
 		return
 	}
 
-	values, err := c.website.GetState(ctx, names...)
+	values, err := website.Site.GetState(ctx, names...)
+
 	if err != nil {
-		c.ErrorfNoShare("Getting initial service states from website: %v", err)
+		mnd.Log.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return
 	}
 
-	for name := range c.services {
+	for name := range s.services {
 		for siteDataName := range values {
 			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
-				var svc service
+				var svc Service
 				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
-					c.ErrorfNoShare("Service check data for '%s' returned from site is invalid: %v", name, err)
+					mnd.Log.ErrorfNoShare("Service check data for '%s' returned from site is invalid: %v", name, err)
 					break
 				}
 
 				if time.Since(svc.LastCheck) < 2*time.Hour {
-					c.Printf("==> Set service state with website-saved data: %s, %s for %s",
+					mnd.Log.Printf("==> Set service state with website-saved data: %s, %s for %s",
 						name, svc.State, time.Since(svc.Since).Round(time.Second))
 
-					c.services[name].svc.Output = svc.Output
-					c.services[name].svc.State = svc.State
-					c.services[name].svc.Since = svc.Since
-					c.services[name].svc.LastCheck = svc.LastCheck
+					s.services[name].Output = svc.Output
+					s.services[name].State = svc.State
+					s.services[name].Since = svc.Since
+					s.services[name].LastCheck = svc.LastCheck
 				}
 
 				break
@@ -178,112 +173,112 @@ func (c *Config) loadServiceStates(ctx context.Context) {
 	}
 }
 
-func (c *Config) runServiceChecker() { //nolint:cyclop
+func (s *Services) runServiceChecker() { //nolint:cyclop
 	defer func() {
-		defer c.CapturePanic()
-		c.Printf("==> Service Checker Stopped!")
-		c.stopChan <- struct{}{} // signal we're finished.
+		defer mnd.Log.CapturePanic()
+		mnd.Log.Printf("==> Service Checker Stopped!")
+		s.stopChan <- struct{}{} // signal we're finished.
 	}()
 
 	checker := &time.Ticker{C: make(<-chan time.Time)}
 
-	if !c.Disabled {
+	if !s.Disabled {
 		checker = time.NewTicker(time.Second)
 		defer checker.Stop()
 
-		c.runChecks(true, version.Started)
-		c.SendResults(&Results{What: website.EventStart, Svcs: c.GetResults()})
+		s.runChecks(true, version.Started)
+		s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()})
 	}
 
 	for {
 		select {
-		case <-c.stopChan:
-			for range c.Parallel {
-				c.checks <- nil
-				<-c.done
+		case <-s.stopChan:
+			for range s.Parallel {
+				s.checks <- nil
+				<-s.done
 			}
 
 			return
-		case event := <-c.checkChan:
-			c.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
-				event.Service.Name, event.Source, len(c.checks), cap(c.checks))
+		case event := <-s.checkChan:
+			mnd.Log.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
+				event.Service.Name, event.Source, len(s.checks), cap(s.checks))
 
-			if c.runCheck(event.Service, true, time.Now()) {
-				c.SendResults(&Results{What: event.Source, Svcs: c.GetResults()})
+			if s.runCheck(event.Service, true, time.Now()) {
+				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()})
 			}
-		case event := <-c.triggerChan:
-			c.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(c.checks), cap(c.checks))
-			c.runChecks(true, time.Now())
+		case event := <-s.triggerChan:
+			mnd.Log.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(s.checks), cap(s.checks))
+			s.runChecks(true, time.Now())
 
 			if event != "log" {
-				c.SendResults(&Results{What: event, Svcs: c.GetResults()})
+				s.SendResults(&Results{What: event, Svcs: s.GetResults()})
 				continue
 			}
 
-			data, err := json.MarshalIndent(&Results{Svcs: c.GetResults(), Interval: c.Interval.Seconds()}, "", " ")
+			data, err := json.MarshalIndent(&Results{Svcs: s.GetResults(), Interval: s.Interval.Seconds()}, "", " ")
 			if err != nil {
-				c.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
+				mnd.Log.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
 				continue
 			}
 
-			c.Debug("Service Checks Payload (log only):", string(data))
+			mnd.Log.Debug("Service Checks Payload (log only):", string(data))
 		case now := <-checker.C:
-			if c.runChecks(false, now) {
-				c.SendResults(&Results{What: website.EventCron, Svcs: c.GetResults()})
+			if s.runChecks(false, now) {
+				s.SendResults(&Results{What: website.EventCron, Svcs: s.GetResults()})
 			}
 		}
 	}
 }
 
-func (c *Config) Running() bool {
-	c.stopLock.Lock()
-	defer c.stopLock.Unlock()
+func (s *Services) Running() bool {
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
 
-	return c.stopChan != nil
+	return s.stopChan != nil
 }
 
 // Stop sends current states to the website and ends all service checker routines.
-func (c *Config) Stop() {
-	c.stopLock.Lock()
-	defer c.stopLock.Unlock()
+func (s *Services) Stop() {
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
 
-	if c.stopChan == nil {
+	if s.stopChan == nil {
 		return
 	}
 
-	defer close(c.stopChan)
-	c.stopChan <- struct{}{}
-	<-c.stopChan // wait for all go routines to die off.
+	defer close(s.stopChan)
+	s.stopChan <- struct{}{}
+	<-s.stopChan // wait for all go routines to die off.
 
-	close(c.triggerChan)
-	close(c.checkChan)
-	close(c.checks)
-	close(c.done)
+	close(s.triggerChan)
+	close(s.checkChan)
+	close(s.checks)
+	close(s.done)
 
-	c.triggerChan = nil
-	c.checkChan = nil
-	c.checks = nil
-	c.done = nil
-	c.stopChan = nil
+	s.triggerChan = nil
+	s.checkChan = nil
+	s.checks = nil
+	s.done = nil
+	s.stopChan = nil
 }
 
 // SvcCount returns the count of services being monitored.
-func (c *Config) SvcCount() int {
-	return len(c.services)
+func (s *Services) SvcCount() int {
+	return len(s.services)
 }
 
 // APIHandler is passed into the webserver so services can be accessed by the API.
-func (c *Config) APIHandler(req *http.Request) (int, any) {
-	return c.handleTrigger(req, website.EventAPI)
+func (s *Services) APIHandler(req *http.Request) (int, any) {
+	return s.handleTrigger(req, website.EventAPI)
 }
 
-func (c *Config) handleTrigger(req *http.Request, event website.EventType) (int, any) {
+func (s *Services) handleTrigger(req *http.Request, event website.EventType) (int, any) {
 	action := mux.Vars(req)["action"]
-	c.Debugf("[%s requested] Incoming Service Action: %s (%s)", event, action)
+	mnd.Log.Debugf("[%s requested] Incoming Service Action: %s (%s)", event, action)
 
 	switch action {
 	case "list":
-		return c.returnServiceList()
+		return s.returnServiceList()
 	default:
 		return http.StatusBadRequest, "unknown service action: " + action
 	}
@@ -297,6 +292,6 @@ func (c *Config) handleTrigger(req *http.Request, event website.EventType) (int,
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/services/list [get]
 // @Security     ApiKeyAuth
-func (c *Config) returnServiceList() (int, any) {
-	return http.StatusOK, c.GetResults()
+func (s *Services) returnServiceList() (int, any) {
+	return http.StatusOK, s.GetResults()
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/cnfg"
 )
 
@@ -18,12 +19,12 @@ func (c *Cmd) getDelugeStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting Deluge State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting Deluge State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getDelugeState(ctx, instance+1, app)
+		state, err := c.getDelugeState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -33,9 +34,10 @@ func (c *Cmd) getDelugeStates(ctx context.Context) []*State {
 }
 
 //nolint:funlen,cyclop
-func (c *Cmd) getDelugeState(ctx context.Context, instance int, app *apps.DelugeConfig) (*State, error) {
+func (c *Cmd) getDelugeState(ctx context.Context, instance int, app *apps.Deluge) (*State, error) {
 	start := time.Now()
 	xfers, err := app.GetXfersCompatContext(ctx)
+
 	state := &State{
 		Elapsed:  cnfg.Duration{Duration: time.Since(start)},
 		Instance: instance,

@@ -7,6 +7,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -26,7 +27,7 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
-	Plex *apps.PlexConfig
+	Plex *apps.Plex
 	sent map[string]struct{} // Tracks Finished sessions already sent.
 	sync.Mutex
 }
@@ -44,7 +45,7 @@ const (
 )
 
 // New configures the library.
-func New(config *common.Config, plex *apps.PlexConfig) *Action {
+func New(config *common.Config, plex *apps.Plex) *Action {
 	return &Action{
 		cmd: &cmd{
 			Config: config,
@@ -76,8 +77,8 @@ func (c *cmd) run() {
 	if cfg.Interval.Duration > 0 {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = cfg.Interval.Duration + randomTime
-		c.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
-			c.Plex.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
+		mnd.Log.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
+			c.Plex.Server.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
 	}
 
 	c.Add(&common.Action{
@@ -88,8 +89,8 @@ func (c *cmd) run() {
 	})
 
 	if cfg.MoviesPC != 0 || cfg.SeriesPC != 0 || cfg.TrackSess {
-		c.Printf("==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
-			c.Plex.URL, c.Plex.Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
+		mnd.Log.Printf("==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
+			c.Plex.Server.URL, c.Plex.Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
 
 		c.Add(&common.Action{
 			Name: "Checking Plex for completed sessions.",
@@ -107,7 +108,7 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 }
 
 func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
-	sessions := &plex.Sessions{Name: c.Plex.Server.Name()}
+	sessions := &plex.Sessions{Name: c.Plex.Name()}
 	ci := clientinfo.Get()
 	ctx := context.Background()
 
@@ -118,7 +119,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 
 		var err error
 		if sessions, err = c.getSessions(ctx, time.Second); err != nil {
-			c.Errorf("Getting Plex sessions: %v", err)
+			mnd.Log.Errorf("Getting Plex sessions: %v", err)
 		}
 
 		cancel()
@@ -127,7 +128,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second) //nolint:mnd // wait max 5 seconds for system info.
 	defer cancel()
 
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.PlexRoute,
 		Event:      website.EventHook,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Load: hook, Plex: sessions},

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -18,12 +19,12 @@ const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
 // Does not send data to the website.
 func (a *Action) StoreLidarr(event website.EventType, instance int) {
 	if name := TrigLidarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		a.cmd.Errorf("[%s requested] Failed! %s Disabled?", event, name)
+		mnd.Log.Errorf("[%s requested] Failed! %s Disabled?", event, name)
 	}
 }
 
 type lidarrApp struct {
-	app *apps.LidarrConfig
+	app *apps.Lidarr
 	cmd *cmd
 	idx int
 }
@@ -32,7 +33,7 @@ type lidarrApp struct {
 func (app *lidarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		app.cmd.Errorf("[%s requested] Getting Lidarr Queue (instance %d): %v", input.Type, app.idx+1, err)
+		mnd.Log.Errorf("[%s requested] Getting Lidarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -40,7 +41,7 @@ func (app *lidarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 		record.Quality = nil
 	}
 
-	app.cmd.Debugf("[%s requested] Stored Lidarr Queue (%d items), instance %d %s",
+	mnd.Log.Debugf("[%s requested] Stored Lidarr Queue (%d items), instance %d %s",
 		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("lidarr", app.idx, queue)
 }
@@ -69,7 +70,7 @@ func (c *cmd) setupLidarr() bool {
 			c.Add(&common.Action{
 				Hide: true,
 				Name: TrigLidarrQueue.WithInstance(instance),
-				Fn:   (&lidarrApp{app: app, cmd: c, idx: idx}).storeQueue,
+				Fn:   (&lidarrApp{app: &app, cmd: c, idx: idx}).storeQueue,
 				C:    make(chan *common.ActionInput, 1),
 				D:    cnfg.Duration{Duration: dur},
 			})

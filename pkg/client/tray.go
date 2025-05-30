@@ -28,7 +28,7 @@ const timerPrefix = "TimErr"
 var menu = make(map[string]*systray.MenuItem) //nolint:gochecknoglobals
 
 // startTray Run()s readyTray to bring up the web server and the GUI app.
-func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInfo) {
+func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInfo, reload func()) {
 	systray.Run(func() {
 		defer os.Exit(0)
 		defer c.CapturePanic()
@@ -43,7 +43,7 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 		c.setupMenus(clientInfo)     // code that runs on reload, too.
 
 		// This starts the web server, and waits for reload/exit signals.
-		if err := c.Exit(ctx); err != nil {
+		if err := c.Exit(ctx, reload); err != nil {
 			c.Errorf("Server: %v", err)
 			os.Exit(1) // web server problem
 		}
@@ -177,11 +177,11 @@ func (c *Client) configMenu(ctx context.Context) {
 	menu["svcs"].Click(func() {
 		if menu["svcs"].Checked() {
 			menu["svcs"].Uncheck()
-			c.Config.Services.Stop()
+			c.Services.Stop()
 			ui.Toast("Stopped checking services!")
 		} else {
 			menu["svcs"].Check()
-			c.Config.Services.Start(ctx)
+			c.Services.Start(ctx, c.apps.Plex.Name())
 			ui.Toast("Service checks started!")
 		}
 	})
@@ -280,8 +280,8 @@ func (c *Client) notifiarrMenuActions() {
 	menu["syncqp"].Click(func() { c.triggers.CFSync.SyncSonarrRP(website.EventUser) })
 	menu["svcs_prod"].Click(func() {
 		c.Print("[user requested] Checking services and sending results to Notifiarr.")
-		ui.Toast("Running and sending %d Service Checks.", c.Config.Services.SvcCount())
-		c.Config.Services.RunChecks(website.EventUser)
+		ui.Toast("Running and sending %d Service Checks.", c.Services.SvcCount())
+		c.Services.RunChecks(website.EventUser)
 	})
 	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(website.EventUser) })
 	menu["snap_prod"].Click(func() { c.triggers.SnapCron.Send(website.EventUser) })
@@ -331,8 +331,8 @@ func (c *Client) debugMenu() {
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
 	menu["svcs_log"].Click(func() {
 		c.Print("[user requested] Checking services and logging results.")
-		ui.Toast("Running and logging %d Service Checks.", c.Config.Services.SvcCount())
-		c.Config.Services.RunChecks("log")
+		ui.Toast("Running and logging %d Service Checks.", c.Services.SvcCount())
+		c.Services.RunChecks("log")
 	})
 
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()

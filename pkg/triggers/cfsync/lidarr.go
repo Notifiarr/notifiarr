@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -49,22 +50,22 @@ func (a *Action) SyncLidarrInstanceCF(event website.EventType, instance int) err
 func (c *cmd) syncLidarr(ctx context.Context, input *common.ActionInput) {
 	info := clientinfo.Get()
 	if info == nil || len(info.Actions.Sync.LidarrInstances) < 1 {
-		c.Printf("[%s requested] Cannot sync Lidarr profiles and formats. Website provided 0 instances.", input.Type)
+		mnd.Log.Printf("[%s requested] Cannot sync Lidarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Lidarr) < 1 {
-		c.Printf("[%s requested] Cannot sync Lidarr profiles and formats. No Lidarr instances configured.", input.Type)
+		mnd.Log.Printf("[%s requested] Cannot sync Lidarr profiles and formats. No Lidarr instances configured.", input.Type)
 		return
 	}
 
 	for idx, app := range c.Apps.Lidarr {
 		instance := idx + 1
 		if !app.Enabled() || !info.Actions.Sync.LidarrInstances.Has(instance) {
-			c.Printf("[%s requested] Profiles and formats sync skipping Lidarr instance %d. Not in sync list: %v",
+			mnd.Log.Printf("[%s requested] Profiles and formats sync skipping Lidarr instance %d. Not in sync list: %v",
 				input.Type, instance, info.Actions.Sync.LidarrInstances)
 			continue
 		}
 
-		(&lidarrApp{app: app, cmd: c, idx: idx}).syncLidarr(ctx, input)
+		(&lidarrApp{app: &app, cmd: c, idx: idx}).syncLidarr(ctx, input)
 	}
 }
 
@@ -73,7 +74,7 @@ func (c *lidarrApp) syncLidarr(ctx context.Context, input *common.ActionInput) {
 	start := time.Now()
 	payload := c.cmd.getLidarrProfiles(ctx, input.Type, c.idx+1)
 
-	c.cmd.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.CFSyncRoute,
 		Event:      input.Type,
 		Params:     []string{"app=lidarr"},
@@ -81,7 +82,7 @@ func (c *lidarrApp) syncLidarr(ctx context.Context, input *common.ActionInput) {
 		LogMsg:     fmt.Sprintf("Lidarr profiles and formats sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
 		LogPayload: true,
 	})
-	c.cmd.Printf("[%s requested] Synced profiles and formats for Lidarr instance %d (%s/%s)",
+	mnd.Log.Printf("[%s requested] Synced profiles and formats for Lidarr instance %d (%s/%s)",
 		input.Type, c.idx+1, c.app.Name, c.app.URL)
 }
 
@@ -96,28 +97,28 @@ func (c *cmd) getLidarrProfiles(ctx context.Context, event website.EventType, in
 	if err != nil {
 		errStr := fmt.Sprintf("getting quality profiles: %v ", err)
 		payload.Error += errStr
-		c.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
 	payload.CustomFormats, err = app.GetCustomFormatsContext(ctx)
 	if err != nil {
 		errStr := fmt.Sprintf("getting custom formats: %v ", err)
 		payload.Error += errStr
-		c.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
 	payload.QualityDefinitions, err = app.GetQualityDefinitionsContext(ctx)
 	if err != nil {
 		errStr := fmt.Sprintf("getting quality definitions: %v ", err)
 		payload.Error += errStr
-		c.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
 	payload.Naming, err = app.GetNamingContext(ctx)
 	if err != nil {
 		errStr := fmt.Sprintf("getting naming: %v ", err)
 		payload.Error += errStr
-		c.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf("[%s requested] Getting Lidarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
 	}
 
 	return &payload
@@ -138,7 +139,7 @@ func (c *cmd) aggregateTrashLidarr(
 			if app.Enabled() {
 				output = append(output, &LidarrTrashPayload{Instance: instance, Name: app.Name})
 			} else {
-				c.Errorf("[%s requested] Profiles and formats aggregate for disabled Lidarr instance %d (%s)",
+				mnd.Log.Errorf("[%s requested] Profiles and formats aggregate for disabled Lidarr instance %d (%s)",
 					event, instance, app.Name)
 			}
 		}

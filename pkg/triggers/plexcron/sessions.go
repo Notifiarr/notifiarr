@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -17,10 +18,10 @@ import (
 func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 	sessions, err := c.getSessions(ctx, time.Minute)
 	if err != nil {
-		c.Errorf("Getting Plex sessions: %v", err)
+		mnd.Log.Errorf("Getting Plex sessions: %v", err)
 	}
 
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.PlexRoute,
 		Event:      input.Type,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Plex: sessions},

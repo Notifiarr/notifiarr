@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -18,13 +19,13 @@ const TrigSonarrQueue common.TriggerName = "Storing Sonarr instance %d queue."
 // Does not send data to the website.
 func (a *Action) StoreSonarr(event website.EventType, instance int) {
 	if name := TrigSonarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		a.cmd.Errorf("[%s requested] Failed! %s Disabled?", event, name)
+		mnd.Log.Errorf("[%s requested] Failed! %s Disabled?", event, name)
 	}
 }
 
 // sonarrApp allows us to have a trigger/timer per instance.
 type sonarrApp struct {
-	app *apps.SonarrConfig
+	app *apps.Sonarr
 	cmd *cmd
 	idx int
 }
@@ -33,7 +34,7 @@ type sonarrApp struct {
 func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		app.cmd.Errorf("[%s requested] Getting Sonarr Queue (instance %d): %v", input.Type, app.idx+1, err)
+		mnd.Log.Errorf("[%s requested] Getting Sonarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -42,7 +43,7 @@ func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 		record.Language = nil
 	}
 
-	app.cmd.Debugf("[%s requested] Stored Sonarr Queue (%d items), instance %d %s",
+	mnd.Log.Debugf("[%s requested] Stored Sonarr Queue (%d items), instance %d %s",
 		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("sonarr", app.idx, queue)
 }
@@ -71,7 +72,7 @@ func (c *cmd) setupSonarr() bool {
 			c.Add(&common.Action{
 				Hide: true,
 				Name: TrigSonarrQueue.WithInstance(instance),
-				Fn:   (&sonarrApp{app: app, cmd: c, idx: idx}).storeQueue,
+				Fn:   (&sonarrApp{app: &app, cmd: c, idx: idx}).storeQueue,
 				C:    make(chan *common.ActionInput, 1),
 				D:    cnfg.Duration{Duration: dur},
 			})

@@ -10,13 +10,12 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/hekmon/transmissionrpc/v3"
 	"golift.io/deluge"
-	"golift.io/nzbget"
 	"golift.io/qbit"
 	"golift.io/version"
 )
 
-func testQbit(ctx context.Context, config *apps.QbitConfig) (string, int) {
-	qbit, err := qbit.New(ctx, config.Config)
+func testQbit(ctx context.Context, config apps.QbitConfig) (string, int) {
+	qbit, err := qbit.New(ctx, &config.Config)
 	if err != nil {
 		return connecting + err.Error(), http.StatusBadRequest
 	}
@@ -29,10 +28,10 @@ func testQbit(ctx context.Context, config *apps.QbitConfig) (string, int) {
 	return fmt.Sprintf("Connection Successful! %d Transfers", len(xfers)), http.StatusOK
 }
 
-func testRtorrent(_ context.Context, config *apps.RtorrentConfig) (string, int) {
-	config.Setup(0, nil)
+func testRtorrent(_ context.Context, config apps.RtorrentConfig) (string, int) {
+	app := config.Setup(0)
 
-	result, err := config.Client.Call("system.hostname")
+	result, err := app.Call("system.hostname")
 	if err != nil {
 		return "Getting Server Name: " + err.Error(), http.StatusFailedDependency
 	}
@@ -48,10 +47,13 @@ func testRtorrent(_ context.Context, config *apps.RtorrentConfig) (string, int) 
 	return "Getting Server Name: result was not a string?", http.StatusFailedDependency
 }
 
-func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
-	app.Setup(0, nil)
+func testSabNZB(ctx context.Context, app apps.SabNZBConfig) (string, int) {
+	nzb, err := app.Setup(0, 0)
+	if err != nil {
+		return "Setting up SABnzbd: " + err.Error(), http.StatusFailedDependency
+	}
 
-	sab, err := app.GetQueue(ctx)
+	sab, err := nzb.GetQueue(ctx)
 	if err != nil {
 		return "Getting Queue: " + err.Error(), http.StatusFailedDependency
 	}
@@ -59,8 +61,10 @@ func testSabNZB(ctx context.Context, app *apps.SabNZBConfig) (string, int) {
 	return success + sab.Version, http.StatusOK
 }
 
-func testNZBGet(ctx context.Context, config *apps.NZBGetConfig) (string, int) {
-	ver, err := nzbget.New(config.Config).VersionContext(ctx)
+func testNZBGet(ctx context.Context, app apps.NZBGetConfig) (string, int) {
+	nzb := app.Setup(0)
+
+	ver, err := nzb.VersionContext(ctx)
 	if err != nil {
 		return "Getting Version: " + err.Error(), http.StatusFailedDependency
 	}
@@ -68,8 +72,8 @@ func testNZBGet(ctx context.Context, config *apps.NZBGetConfig) (string, int) {
 	return fmt.Sprintf("%s%s", success, ver), http.StatusOK
 }
 
-func testDeluge(ctx context.Context, config *apps.DelugeConfig) (string, int) {
-	deluge, err := deluge.New(ctx, config.Config)
+func testDeluge(ctx context.Context, config apps.DelugeConfig) (string, int) {
+	deluge, err := deluge.New(ctx, &config.Config)
 	if err != nil {
 		return connecting + err.Error(), http.StatusFailedDependency
 	}
@@ -77,7 +81,7 @@ func testDeluge(ctx context.Context, config *apps.DelugeConfig) (string, int) {
 	return fmt.Sprintf("%s%s", success, deluge.Version), http.StatusOK
 }
 
-func testTransmission(ctx context.Context, config *apps.XmissionConfig) (string, int) {
+func testTransmission(ctx context.Context, config apps.XmissionConfig) (string, int) {
 	endpoint, err := url.Parse(config.URL)
 	if err != nil {
 		return "parsing url: " + err.Error(), http.StatusFailedDependency

@@ -26,6 +26,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
@@ -108,7 +109,7 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 				c.Errorf("fsnotify/parsing templates: %v", err)
 			}
 
-			c.StartWebServer(ctx)
+			go c.RunWebServer()
 		}
 	}
 }
@@ -450,26 +451,26 @@ func (c *Client) parseCustomTemplates() error {
 }
 
 type templateData struct {
-	Input       *configfile.Config             `json:"input"`
-	Config      *configfile.Config             `json:"config"`
-	Flags       *configfile.Flags              `json:"flags"`
-	Actions     *triggers.Actions              `json:"actions"`
-	Username    string                         `json:"username"`
-	Dynamic     bool                           `json:"dynamic"`
-	Webauth     bool                           `json:"webauth"`
-	Msg         string                         `json:"msg,omitempty"`
-	Version     map[string]any                 `json:"version"`
-	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
-	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
-	ClientInfo  *clientinfo.ClientInfo         `json:"clientInfo"`
-	Expvar      mnd.AllData                    `json:"expvar"`
-	HostInfo    *host.InfoStat                 `json:"hostInfo"`
-	Disks       map[string]*snapshot.Partition `json:"disks"`
-	Headers     http.Header                    `json:"headers"`
-	ProxyAllow  bool                           `json:"proxyAllow"`
-	UpstreamIP  string                         `json:"upstreamIp"`
-	Tunnel      *mulery.Client                 `json:"tunnel"`
-	PoolStats   map[string]*mulery.PoolSize    `json:"poolStats"`
+	Input       *configfile.Config            `json:"input"`
+	Config      *configfile.Config            `json:"config"`
+	Flags       *configfile.Flags             `json:"flags"`
+	Actions     *triggers.Actions             `json:"actions"`
+	Username    string                        `json:"username"`
+	Dynamic     bool                          `json:"dynamic"`
+	Webauth     bool                          `json:"webauth"`
+	Msg         string                        `json:"msg,omitempty"`
+	Version     map[string]any                `json:"version"`
+	LogFiles    *logs.LogFileInfos            `json:"logFileInfo"`
+	ConfigFiles *logs.LogFileInfos            `json:"configFileInfo"`
+	ClientInfo  *clientinfo.ClientInfo        `json:"clientInfo"`
+	Expvar      mnd.AllData                   `json:"expvar"`
+	HostInfo    *host.InfoStat                `json:"hostInfo"`
+	Disks       map[string]snapshot.Partition `json:"disks"`
+	Headers     http.Header                   `json:"headers"`
+	ProxyAllow  bool                          `json:"proxyAllow"`
+	UpstreamIP  string                        `json:"upstreamIp"`
+	Tunnel      *mulery.Client                `json:"tunnel"`
+	PoolStats   map[string]*mulery.PoolSize   `json:"poolStats"`
 }
 
 func (c *Client) renderTemplate( //nolint:funlen
@@ -486,13 +487,13 @@ func (c *Client) renderTemplate( //nolint:funlen
 
 	binary, _ := os.Executable()
 	userName, dynamic := c.getUserName(req)
-	hostInfo, _ := c.Config.GetHostInfo(ctx)
+	hostInfo, _ := website.Site.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	outboundIP := clientinfo.GetOutboundIP()
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
 
 	err := c.template.ExecuteTemplate(response, templateName, &templateData{
-		ProxyAllow:  c.Config.Allow.Contains(req.RemoteAddr),
+		ProxyAllow:  c.allow.Contains(req.RemoteAddr),
 		UpstreamIP:  strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]"),
 		Actions:     c.triggers,
 		Config:      c.Config,
@@ -753,8 +754,8 @@ func revBytes(output bytes.Buffer) []byte {
 	return data
 }
 
-func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
-	output := make(map[string]*snapshot.Partition)
+func (c *Client) getDisks(ctx context.Context) map[string]snapshot.Partition {
+	output := make(map[string]snapshot.Partition)
 	snapcnfg := &snapshot.Config{
 		Plugins:   snapshot.Plugins{},
 		DiskUsage: true,
@@ -763,18 +764,18 @@ func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 		UseSudo:   c.Config.Snapshot.UseSudo,
 		//		Raid:      c.Config.Snapshot.Raid,
 	}
-	snapshot, _, _ := snapcnfg.GetSnapshot(ctx, c.Debugf)
+	snapshot, _, _ := snapcnfg.GetSnapshot(ctx)
 
 	for k, v := range snapshot.DiskUsage {
-		output[k] = v
+		output[k] = *v
 	}
 
 	for k, v := range snapshot.Quotas {
-		output["Quota: "+k] = v
+		output["Quota: "+k] = *v
 	}
 
 	for k, v := range snapshot.ZFSPool {
-		output[k] = v
+		output[k] = *v
 	}
 
 	return output

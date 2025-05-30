@@ -2,7 +2,6 @@ package apps
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -19,36 +18,28 @@ func (a *Apps) prowlarrHandlers() {
 	a.HandleAPIpath(starr.Prowlarr, "/notification", prowlarrAddNotification, "POST")
 }
 
-// ProwlarrConfig represents the input data for a Prowlarr server.
-type ProwlarrConfig struct {
-	ExtraConfig
-	*starr.Config
-	*prowlarr.Prowlarr `json:"-" toml:"-" xml:"-"`
-	errorf             func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
-}
-
 func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
-	app, _ := r.Context().Value(starr.Prowlarr).(*ProwlarrConfig)
-	return app.Prowlarr
+	return r.Context().Value(starr.Prowlarr).(*prowlarr.Prowlarr) //nolint:forcetypeassert
 }
 
-// Enabled returns true if the Prowlarr instance is enabled and usable.
-func (p *ProwlarrConfig) Enabled() bool {
-	return p != nil && p.Config != nil && p.URL != "" && p.APIKey != "" && p.Timeout.Duration >= 0
+type Prowlarr struct {
+	StarrApp           `json:"-" toml:"-" xml:"-"`
+	*prowlarr.Prowlarr `json:"-" toml:"-" xml:"-"`
 }
 
-func (a *Apps) setupProwlarr() error {
-	for idx, app := range a.Prowlarr {
-		if app.Config == nil || app.Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Prowlarr config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
-			return fmt.Errorf("%w: URL must begin with http:// or https://: Prowlarr config %d", ErrInvalidApp, idx+1)
+func (a *AppsConfig) setupProwlarr() ([]Prowlarr, error) {
+	output := make([]Prowlarr, len(a.Prowlarr))
+
+	for idx := range a.Prowlarr {
+		app := &a.Prowlarr[idx]
+		if err := checkUrl(app.URL, starr.Prowlarr.String(), idx); err != nil {
+			return nil, err
 		}
 
-		if a.Logger.DebugEnabled() {
+		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  a.Debugf,
+				Debugf:  mnd.Log.Debugf,
 				Caller:  metricMakerCallback(string(starr.Prowlarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
@@ -57,12 +48,16 @@ func (a *Apps) setupProwlarr() error {
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Prowlarr.String(), app.Config.Client.Transport)
 		}
 
-		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
-		app.Prowlarr = prowlarr.New(app.Config)
+		output[idx] = Prowlarr{
+			StarrApp: StarrApp{
+				StarrConfig: a.Prowlarr[idx],
+			},
+			Prowlarr: prowlarr.New(&app.Config),
+		}
 	}
 
-	return nil
+	return output, nil
 }
 
 // @Description  Returns Prowlarr Notifications with a name that matches 'notifiar'.

@@ -73,28 +73,28 @@ func testInstance(ctx context.Context, input *Input) (string, int) {
 		return testCommand(ctx, input)
 	// downloaders.go
 	case "nzbget":
-		return checkAndRun(ctx, testNZBGet, input, input.Post.Apps, input.Post.Apps.NZBGet)
+		return checkAndRun(ctx, testNZBGet, input, input.Post.AppsConfig, input.Post.NZBGet)
 	case "deluge":
-		return checkAndRun(ctx, testDeluge, input, input.Post.Apps, input.Post.Apps.Deluge)
+		return checkAndRun(ctx, testDeluge, input, input.Post.AppsConfig, input.Post.Deluge)
 	case "qbit":
-		return checkAndRun(ctx, testQbit, input, input.Post.Apps, input.Post.Apps.Qbit)
+		return checkAndRun(ctx, testQbit, input, input.Post.AppsConfig, input.Post.Qbit)
 	case "rtorrent":
-		return checkAndRun(ctx, testRtorrent, input, input.Post.Apps, input.Post.Apps.Rtorrent)
+		return checkAndRun(ctx, testRtorrent, input, input.Post.AppsConfig, input.Post.Rtorrent)
 	case "transmission":
-		return checkAndRun(ctx, testTransmission, input, input.Post.Apps, input.Post.Apps.Transmission)
+		return checkAndRun(ctx, testTransmission, input, input.Post.AppsConfig, input.Post.Transmission)
 	case "sabnzb":
-		return checkAndRun(ctx, testSabNZB, input, input.Post.Apps, input.Post.Apps.SabNZB)
+		return checkAndRun(ctx, testSabNZB, input, input.Post.AppsConfig, input.Post.SabNZB)
 	// starr.go
 	case "lidarr":
-		return checkAndRun(ctx, testLidarr, input, input.Post.Apps, input.Post.Apps.Lidarr)
+		return checkAndRun(ctx, testLidarr, input, input.Post.AppsConfig, input.Post.Lidarr)
 	case "prowlarr":
-		return checkAndRun(ctx, testProwlarr, input, input.Post.Apps, input.Post.Apps.Prowlarr)
+		return checkAndRun(ctx, testProwlarr, input, input.Post.AppsConfig, input.Post.Prowlarr)
 	case "radarr":
-		return checkAndRun(ctx, testRadarr, input, input.Post.Apps, input.Post.Apps.Radarr)
+		return checkAndRun(ctx, testRadarr, input, input.Post.AppsConfig, input.Post.Radarr)
 	case "readarr":
-		return checkAndRun(ctx, testReadarr, input, input.Post.Apps, input.Post.Apps.Readarr)
+		return checkAndRun(ctx, testReadarr, input, input.Post.AppsConfig, input.Post.Readarr)
 	case "sonarr":
-		return checkAndRun(ctx, testSonarr, input, input.Post.Apps, input.Post.Apps.Sonarr)
+		return checkAndRun(ctx, testSonarr, input, input.Post.AppsConfig, input.Post.Sonarr)
 	// snapshots.go
 	case "mysql":
 		return checkAndRun(ctx, testMySQL, input, input.Post.Snapshot, input.Post.Snapshot.Plugins.MySQL)
@@ -114,7 +114,7 @@ func testInstance(ctx context.Context, input *Input) (string, int) {
 	case "plex":
 		return testPlex(ctx, input.Post.Plex)
 	case "tautulli":
-		return testTautulli(ctx, input.Post.Apps.Tautulli)
+		return testTautulli(ctx, input.Post.Tautulli)
 	default:
 		return "Unknown Check Type Requested! (" + input.Type + ")", http.StatusNotImplemented
 	}

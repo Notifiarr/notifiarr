@@ -8,7 +8,7 @@ import (
 	"reflect"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
@@ -35,7 +35,6 @@ import (
 // Config is the required input data. Everything is mandatory.
 type Config struct {
 	Apps       *apps.Apps
-	Website    *website.Server
 	Snapshot   *snapshot.Config
 	WatchFiles []*filewatch.WatchFile
 	Endpoints  []*epconfig.Endpoint
@@ -46,7 +45,7 @@ type Config struct {
 	AutoUpdate string
 	UnstableCh bool
 	common.Services
-	*logs.Logger
+	Logger mnd.Lagger
 }
 
 // Actions defines all our triggers and timers.
@@ -73,15 +72,13 @@ type Actions struct {
 // New turns a populated Config into a pile of Actions.
 func New(config *Config) *Actions {
 	common := &common.Config{
-		Server:   config.Website,
 		Snapshot: config.Snapshot,
 		Apps:     config.Apps,
-		Logger:   config.Logger,
 		CI:       config.ClientInfo,
 		Services: config.Services,
 	}
 	common.Scheduler, _ = gocron.NewScheduler()
-	plex := plexcron.New(common, config.Apps.Plex)
+	plex := plexcron.New(common, &config.Apps.Plex)
 
 	return &Actions{
 		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
@@ -130,7 +131,7 @@ func (c *Cmd) create() {
 			ci.Actions.Dashboard.Interval.Duration
 		c.Enabled = ci.Actions.Dashboard
 
-		c.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
+		mnd.Log.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
 	}
 
 	c.Add(&common.Action{
@@ -154,7 +155,7 @@ func (c *Cmd) sendDashboardState(ctx context.Context, input *common.ActionInput)
 	)
 
 	data.Save("dashboard", states)
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.DashRoute,
 		Event:      input.Type,
 		LogPayload: true,

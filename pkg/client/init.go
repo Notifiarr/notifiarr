@@ -11,6 +11,7 @@ import (
 	"path"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 	"golift.io/version"
@@ -33,7 +34,7 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 		clientInfo = &clientinfo.ClientInfo{}
 	}
 
-	switch host, err := c.Config.GetHostInfo(ctx); {
+	switch host, err := website.Site.GetHostInfo(ctx); {
 	case err != nil:
 		c.Errorf("=> Unknown Host Info (this is bad): %v", err)
 	case c.Config.HostID == "":
@@ -63,9 +64,9 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 	c.Printf(" => Timeout: %s, Quiet: %v", c.Config.Timeout, c.Config.Quiet)
 
 	if c.Config.UIPassword.Webauth() {
-		c.Printf(" => Trusted Upstream Networks: %v, Auth Proxy Header: %s", c.Config.Allow, c.Config.UIPassword.Header())
+		c.Printf(" => Trusted Upstream Networks: %v, Auth Proxy Header: %s", c.allow, c.Config.UIPassword.Header())
 	} else {
-		c.Printf(" => Trusted Upstream Networks: %v", c.Config.Allow)
+		c.Printf(" => Trusted Upstream Networks: %v", c.allow)
 	}
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
@@ -81,7 +82,7 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 func (c *Client) printVersionChangeInfo(ctx context.Context) {
 	const clientVersion = "clientVersion"
 
-	values, err := c.Config.GetState(ctx, clientVersion)
+	values, err := website.Site.GetState(ctx, clientVersion)
 	if err != nil {
 		c.Errorf("XX> Getting version from database: %v", err)
 	}
@@ -100,7 +101,7 @@ func (c *Client) printVersionChangeInfo(ctx context.Context) {
 		c.Printf("==> Detected application version change! %s => %s", previousVersion, currentVersion)
 	}
 
-	err = c.Config.SetState(ctx, clientVersion, []byte(currentVersion))
+	err = website.Site.SetState(ctx, clientVersion, []byte(currentVersion))
 	if err != nil {
 		c.Errorf("Updating version in database: %v", err)
 	}
@@ -142,18 +143,17 @@ func (c *Client) printLogFileInfo() { //nolint:cyclop
 
 // printPlex is called on startup to print info about configured Plex instance(s).
 func (c *Client) printPlex() {
-	plex := c.Config.Plex
-	if !plex.Enabled() {
+	if !c.apps.Plex.Enabled() {
 		return
 	}
 
-	name := plex.Server.Name()
+	name := c.apps.Plex.Server.Name()
 	if name == "" {
 		name = "<connection error?>"
 	}
 
 	c.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming APIs and webhook) timeout:%v check_interval:%s ",
-		name, plex.URL, plex.Timeout, plex.Interval)
+		name, c.apps.Plex.Server.URL, c.apps.Plex.Timeout, c.apps.Plex.Interval)
 }
 
 // printLidarr is called on startup to print info about each configured server.
@@ -317,7 +317,7 @@ func (c *Client) printSABnzbd() {
 
 // printTautulli is called on startup to print info about configured Tautulli instance(s).
 func (c *Client) printTautulli() {
-	switch taut := c.Config.Apps.Tautulli; {
+	switch taut := c.Config.Tautulli; {
 	case !taut.Enabled():
 		c.Printf(" => Tautulli Config (enables name map): 0 servers")
 	case taut.Name != "":

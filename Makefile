@@ -136,7 +136,7 @@ pkg/bindata/docs/api_docs.go:
 
 dev: generate main.go
 	go build -race $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	DN_NEW_UI=true $(OUTPUTDIR)/notifiarr
+	DN_NEW_UI=true DN_ENCODE_CONFIG_FILE=false $(OUTPUTDIR)/notifiarr
 
 
 notifiarr: generate main.go

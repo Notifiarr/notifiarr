@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/cnfg"
 )
 
@@ -19,12 +20,12 @@ func (c *Cmd) getQbitStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting Qbit State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting Qbit State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getQbitState(ctx, instance+1, app)
+		state, err := c.getQbitState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Qbit Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting Qbit Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -33,7 +34,7 @@ func (c *Cmd) getQbitStates(ctx context.Context) []*State {
 	return states
 }
 
-func (c *Cmd) getQbitState(ctx context.Context, instance int, app *apps.QbitConfig) (*State, error) { //nolint:cyclop
+func (c *Cmd) getQbitState(ctx context.Context, instance int, app *apps.Qbit) (*State, error) { //nolint:cyclop
 	start := time.Now()
 	xfers, err := app.GetXfersContext(ctx)
 

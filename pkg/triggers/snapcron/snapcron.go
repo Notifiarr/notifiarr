@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -85,31 +86,31 @@ func (c *cmd) printLog() {
 	}
 
 	if c.Snapshot.Interval.Duration == 0 {
-		c.Printf("==> System Snapshot Collection Disabled, timeout: %v, configured: %s", c.Snapshot.Timeout, enabled)
+		mnd.Log.Printf("==> System Snapshot Collection Disabled, timeout: %v, configured: %s", c.Snapshot.Timeout, enabled)
 		return
 	}
 
-	c.Printf("==> System Snapshot Collection Started, interval: %v, timeout: %v, enabled: %s",
+	mnd.Log.Printf("==> System Snapshot Collection Started, interval: %v, timeout: %v, enabled: %s",
 		c.Snapshot.Interval, c.Snapshot.Timeout, enabled)
 }
 
 func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
-	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx, c.Debugf)
+	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx)
 	for _, err := range errs {
 		if err != nil {
-			c.ErrorfNoShare("[%s requested] Snapshot: %v", input.Type, err)
+			mnd.Log.ErrorfNoShare("[%s requested] Snapshot: %v", input.Type, err)
 		}
 	}
 
 	// These debug messages are mostly just errors that we expect to have.
 	for _, err := range debug {
 		if err != nil {
-			c.Debugf("Snapshot: %v", err)
+			mnd.Log.Debugf("Snapshot: %v", err)
 		}
 	}
 
 	data.Save("snapshot", snapshot)
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.SnapRoute,
 		Event:      input.Type,
 		LogPayload: true,

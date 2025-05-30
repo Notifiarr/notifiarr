@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -114,9 +115,9 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	content := mux.Vars(req)["content"]
 
 	if content != "" {
-		a.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
+		mnd.Log.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
 	} else {
-		a.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
+		mnd.Log.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
 	}
 
 	_ = req.ParseForm()
@@ -205,11 +206,11 @@ func (a *Actions) customTimer(input *common.ActionInput, content string) (int, s
 // @Security     ApiKeyAuth
 func (a *Actions) clientLogs(content string) (int, string) {
 	if content == "true" || content == "on" || content == "enable" {
-		share.Setup(a.Server)
+		share.Enable()
 		return http.StatusOK, "Client log notifications enabled."
 	}
 
-	share.StopLogs()
+	share.Disable()
 
 	return http.StatusOK, "Client log notifications disabled."
 }
@@ -478,7 +479,7 @@ func (a *Actions) handleConfigReload() (int, string) {
 func (a *Actions) notification(content string) (int, string) {
 	if content != "" {
 		ui.Toast("Notification: %s", content) //nolint:errcheck
-		a.Printf("NOTIFICATION: %s", content)
+		mnd.Log.Printf("NOTIFICATION: %s", content)
 
 		return http.StatusOK, "Local Nntification sent."
 	}
@@ -531,7 +532,7 @@ func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 // @Router       /api/trigger/uploadlog/{file} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string) {
-	if a.LogConfig.NoUploads {
+	if mnd.Log.NoUploads() {
 		return http.StatusFailedDependency, "Uploads Administratively Disabled"
 	}
 

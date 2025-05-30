@@ -18,6 +18,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/private"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/shirou/gopsutil/v4/host"
 	mulery "golift.io/mulery/client"
@@ -27,9 +28,6 @@ import (
 // Profile is the data returned by the profile GET endpoint.
 // Basically everything.
 type Profile struct {
-	// Input       *configfile.Config             `json:"input"`
-	// Actions     *triggers.Actions              `json:"actions"`
-	// Tunnel      *mulery.Client                 `json:"tunnel"`
 	Username        string                 `json:"username"`
 	Config          configfile.Config      `json:"config"`
 	ClientInfo      *clientinfo.ClientInfo `json:"clientInfo"`
@@ -48,47 +46,54 @@ type Profile struct {
 	UpstreamType    configfile.AuthType    `json:"upstreamType"`
 	Languages       frontend.Languages     `json:"languages"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
-	LoggedIn        bool                           `json:"loggedIn"`
-	Updated         time.Time                      `json:"updated"`
-	Flags           *configfile.Flags              `json:"flags"`
-	Dynamic         bool                           `json:"dynamic"`
-	Webauth         bool                           `json:"webauth"`
-	Msg             string                         `json:"msg,omitempty"`
-	LogFiles        *logs.LogFileInfos             `json:"logFileInfo"`
-	ConfigFiles     *logs.LogFileInfos             `json:"configFileInfo"`
-	Expvar          mnd.AllData                    `json:"expvar"`
-	HostInfo        *host.InfoStat                 `json:"hostInfo"`
-	Disks           map[string]*snapshot.Partition `json:"disks"`
-	ProxyAllow      bool                           `json:"proxyAllow"`
-	PoolStats       map[string]*mulery.PoolSize    `json:"poolStats"`
-	Started         time.Time                      `json:"started"`
-	Program         string                         `json:"program"`
-	Version         string                         `json:"version"`
-	Revision        string                         `json:"revision"`
-	Branch          string                         `json:"branch"`
-	BuildUser       string                         `json:"buildUser"`
-	BuildDate       string                         `json:"buildDate"`
-	GoVersion       string                         `json:"goVersion"`
-	OS              string                         `json:"os"`
-	Arch            string                         `json:"arch"`
-	Binary          string                         `json:"binary"`
-	Environment     map[string]string              `json:"environment"`
-	Docker          bool                           `json:"docker"`
-	UID             int                            `json:"uid"`
-	GID             int                            `json:"gid"`
-	IP              string                         `json:"ip"`
-	Gateway         string                         `json:"gateway"`
-	IfName          string                         `json:"ifName"`
-	Netmask         string                         `json:"netmask"`
-	MD5             string                         `json:"md5"`
-	ActiveTunnel    string                         `json:"activeTunnel"`
-	TunnelPoolStats map[string]*mulery.PoolSize    `json:"tunnelPoolStats"`
+	LoggedIn        bool                          `json:"loggedIn"`
+	Updated         time.Time                     `json:"updated"`
+	Flags           *configfile.Flags             `json:"flags"`
+	Dynamic         bool                          `json:"dynamic"`
+	Webauth         bool                          `json:"webauth"`
+	Msg             string                        `json:"msg,omitempty"`
+	LogFiles        *logs.LogFileInfos            `json:"logFileInfo"`
+	ConfigFiles     *logs.LogFileInfos            `json:"configFileInfo"`
+	Expvar          mnd.AllData                   `json:"expvar"`
+	HostInfo        *host.InfoStat                `json:"hostInfo"`
+	Disks           map[string]snapshot.Partition `json:"disks"`
+	ProxyAllow      bool                          `json:"proxyAllow"`
+	PoolStats       map[string]*mulery.PoolSize   `json:"poolStats"`
+	Started         time.Time                     `json:"started"`
+	Program         string                        `json:"program"`
+	Version         string                        `json:"version"`
+	Revision        string                        `json:"revision"`
+	Branch          string                        `json:"branch"`
+	BuildUser       string                        `json:"buildUser"`
+	BuildDate       string                        `json:"buildDate"`
+	GoVersion       string                        `json:"goVersion"`
+	OS              string                        `json:"os"`
+	Arch            string                        `json:"arch"`
+	Binary          string                        `json:"binary"`
+	Environment     map[string]string             `json:"environment"`
+	Docker          bool                          `json:"docker"`
+	UID             int                           `json:"uid"`
+	GID             int                           `json:"gid"`
+	IP              string                        `json:"ip"`
+	Gateway         string                        `json:"gateway"`
+	IfName          string                        `json:"ifName"`
+	Netmask         string                        `json:"netmask"`
+	MD5             string                        `json:"md5"`
+	ActiveTunnel    string                        `json:"activeTunnel"`
+	TunnelPoolStats map[string]*mulery.PoolSize   `json:"tunnelPoolStats"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
 //
 //nolint:funlen
 func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
+	defer func() {
+		if r := recover(); r != nil {
+			c.Errorf("handleProfile panic: %v\n%#v\n", r, c.Config)
+			panic(r)
+		}
+	}()
+
 	clientInfo := clientinfo.Get()
 	if clientInfo == nil {
 		clientInfo = &clientinfo.ClientInfo{}
@@ -100,7 +105,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	outboundIP := clientinfo.GetOutboundIP()
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
-	hostInfo, _ := c.Config.GetHostInfo(req.Context())
+	hostInfo, _ := website.Site.GetHostInfo(req.Context())
 	activeTunnel := ""
 	poolStats := map[string]*mulery.PoolSize{}
 
@@ -126,18 +131,18 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		Headers:         c.getProfileHeaders(req),
 		Fortune:         Fortune(),
 		UpstreamIP:      upstreamIP,
-		UpstreamAllowed: c.Config.Allow.Contains(req.RemoteAddr),
+		UpstreamAllowed: c.allow.Contains(req.RemoteAddr),
 		UpstreamHeader:  c.Config.UIPassword.Header(),
 		UpstreamType:    c.Config.UIPassword.Type(),
 		Updated:         time.Now().UTC(),
 		Languages:       frontend.Translations(),
-		ProxyAllow:      c.Config.Allow.Contains(req.RemoteAddr),
+		ProxyAllow:      c.allow.Contains(req.RemoteAddr),
 		Flags:           c.Flags,
 		Dynamic:         dynamic,
 		Webauth:         c.webauth,
 		LogFiles:        c.Logger.GetAllLogFilePaths(),
 		ConfigFiles:     logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
-		Disks:           c.getDisks(req.Context()),
+		//Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
 		Expvar:          mnd.GetAllData(),
 		HostInfo:        hostInfo,
 		Started:         version.Started.Round(time.Second),

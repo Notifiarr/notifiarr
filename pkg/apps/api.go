@@ -95,10 +95,10 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 		wrote := a.Respond(resp, code, msg)
 
 		if str, _ := json.MarshalIndent(msg, "", " "); len(post) > 0 {
-			a.Debugf("Incoming API: %s %s (%s): %s\nStatus: %d, Reply (%s): %s",
+			mnd.Log.Debugf("Incoming API: %s %s (%s): %s\nStatus: %d, Reply (%s): %s",
 				r.Method, r.URL, mnd.FormatBytes(len(post)), string(post), code, mnd.FormatBytes(wrote), str)
 		} else {
-			a.Debugf("Incoming API: %s %s, Status: %d, Reply (%s): %s", r.Method, r.URL, code, mnd.FormatBytes(wrote), str)
+			mnd.Log.Debugf("Incoming API: %s %s, Status: %d, Reply (%s): %s", r.Method, r.URL, code, mnd.FormatBytes(wrote), str)
 		}
 
 		if appName == "" {
@@ -140,7 +140,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 	}
 
 	if m, ok := msg.(error); ok {
-		a.Errorf("Request failed. Status: %s, Message: %v", statusTxt, m)
+		mnd.Log.Errorf("Request failed. Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
@@ -161,7 +161,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 
 	err := json.Encode(&apiResponse{Status: statusTxt, Msg: msg})
 	if err != nil {
-		a.Errorf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
+		mnd.Log.Errorf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
 
 	return int64(counter.Count())
