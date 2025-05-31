@@ -21,7 +21,7 @@ require (
 	github.com/hekmon/transmissionrpc/v3 v3.0.0
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
 	github.com/jackpal/gateway v1.1.1
-	github.com/jaypipes/ghw v0.16.0
+	github.com/jaypipes/ghw v0.17.0
 	github.com/jxeng/shortcut v1.0.2
 	github.com/klauspost/compress v1.18.0
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
