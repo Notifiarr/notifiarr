@@ -16,7 +16,7 @@
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
-  import { delay, failure, warning } from '../../includes/util'
+  import { warning } from '../../includes/util'
   import { faSplotch } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Fa from '../../includes/Fa.svelte'
   import { nav } from '../../navigation/nav.svelte'

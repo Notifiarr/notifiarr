@@ -1,16 +1,7 @@
 import { get } from 'svelte/store'
 import { _ } from '../../includes/Translate.svelte'
 import { deepCopy } from '../../includes/util'
-import type {
-  SonarrConfig,
-  StarrConfig,
-  ExtraConfig,
-  RadarrConfig,
-  ReadarrConfig,
-  LidarrConfig,
-  ProwlarrConfig,
-} from '../../api/notifiarrConfig'
-import type { App } from '../../includes/formsTracker.svelte'
+import type { StarrConfig } from '../../api/notifiarrConfig'
 import { profile } from '../../api/profile.svelte'
 import sonarrLogo from '../../assets/logos/sonarr.png'
 import radarrLogo from '../../assets/logos/radarr.png'
@@ -18,7 +9,8 @@ import readarrLogo from '../../assets/logos/readarr.png'
 import lidarrLogo from '../../assets/logos/lidarr.png'
 import prowlarrLogo from '../../assets/logos/prowlarr.png'
 import { faStars } from '@fortawesome/sharp-duotone-regular-svg-icons'
-import { validate } from '../../includes/instanceValidator'
+import { validate as validator } from '../../includes/instanceValidator'
+import type { App } from '../../includes/formsTracker.svelte'
 
 export const page = {
   id: 'StarrApps',
@@ -29,7 +21,7 @@ export const page = {
   d2: 'darkgoldenrod',
 }
 
-export const starrConfig: StarrConfig & ExtraConfig = {
+export const starrConfig: StarrConfig = {
   name: '',
   timeout: '10s',
   interval: '5m0s',
@@ -44,6 +36,8 @@ export const starrConfig: StarrConfig & ExtraConfig = {
 }
 
 export class Starr {
+  static readonly tabs = ['sonarr', 'radarr', 'readarr', 'lidarr', 'prowlarr']
+
   static get title(): Record<string, string> {
     return {
       Sonarr: get(_)('StarrApps.Sonarr.title'),
@@ -54,83 +48,73 @@ export class Starr {
     }
   }
 
-  static readonly getValidator = (
-    app: 'sonarr' | 'radarr' | 'readarr' | 'lidarr' | 'prowlarr',
-  ): ((id: string, value: any, index: number) => string) => {
-    return (id: string, value: any, index: number) => {
-      return validate(id, value, index, get(profile).config[app] ?? [])
-    }
-  }
-
-  static readonly Sonarr: App<SonarrConfig> = {
+  static readonly Sonarr: App<StarrConfig> = {
     name: 'Sonarr',
     id: page.id + '.Sonarr',
     logo: sonarrLogo,
     empty: starrConfig,
-    merge: (index: number, form: SonarrConfig) => {
+    merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.sonarr) c.sonarr = []
       c.sonarr[index] = form
       return c
     },
-    validator: Starr.getValidator('sonarr'),
+    validator,
   }
 
-  static readonly Radarr: App<RadarrConfig> = {
+  static readonly Radarr: App<StarrConfig> = {
     name: 'Radarr',
     id: page.id + '.Radarr',
     logo: radarrLogo,
     empty: starrConfig,
-    merge: (index: number, form: RadarrConfig) => {
+    merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.radarr) c.radarr = []
       c.radarr[index] = form
       return c
     },
-    validator: Starr.getValidator('radarr'),
+    validator,
   }
 
-  static readonly Readarr: App<ReadarrConfig> = {
+  static readonly Readarr: App<StarrConfig> = {
     name: 'Readarr',
     id: page.id + '.Readarr',
     logo: readarrLogo,
     empty: starrConfig,
-    merge: (index: number, form: ReadarrConfig) => {
+    merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.readarr) c.readarr = []
       c.readarr[index] = form
       return c
     },
-    validator: Starr.getValidator('readarr'),
+    validator,
   }
 
-  static readonly Lidarr: App<LidarrConfig> = {
+  static readonly Lidarr: App<StarrConfig> = {
     name: 'Lidarr',
     id: page.id + '.Lidarr',
     logo: lidarrLogo,
     empty: starrConfig,
-    merge: (index: number, form: LidarrConfig) => {
+    merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.lidarr) c.lidarr = []
       c.lidarr[index] = form
       return c
     },
-    validator: Starr.getValidator('lidarr'),
+    validator,
   }
 
-  static readonly Prowlarr: App<ProwlarrConfig> = {
+  static readonly Prowlarr: App<StarrConfig> = {
     name: 'Prowlarr',
     id: page.id + '.Prowlarr',
     logo: prowlarrLogo,
     empty: starrConfig,
-    merge: (index: number, form: ProwlarrConfig) => {
+    merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)
       if (!c.prowlarr) c.prowlarr = []
       c.prowlarr[index] = form
       return c
     },
-    validator: Starr.getValidator('prowlarr'),
+    validator,
   }
-
-  static readonly tabs = ['Sonarr', 'Radarr', 'Readarr', 'Lidarr', 'Prowlarr']
 }

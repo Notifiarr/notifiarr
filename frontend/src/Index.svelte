@@ -36,7 +36,7 @@
   <link rel="icon" type="image/svg+xml" href={logo} />
 </svelte:head>
 
-<SvelteToast />
+<SvelteToast options={{ duration: 9999, pausable: true, intro: { y: '-6rem' } }} />
 
 <main>
   <Container fluid class="mb-2">

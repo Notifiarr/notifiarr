@@ -21,7 +21,7 @@ require (
 	github.com/hekmon/transmissionrpc/v3 v3.0.0
 	github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa
 	github.com/jackpal/gateway v1.1.1
-	github.com/jaypipes/ghw v0.16.0
+	github.com/jaypipes/ghw v0.17.0
 	github.com/jxeng/shortcut v1.0.2
 	github.com/klauspost/compress v1.18.0
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
@@ -44,7 +44,7 @@ require (
 	golift.io/cnfgfile v0.0.0-20240713024420-a5436d84eb48
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
-	golift.io/goty v0.0.3-0.20250527011927-18adb9e321f5
+	golift.io/goty v0.0.3
 	golift.io/mulery v0.0.9
 	golift.io/nzbget v0.1.6
 	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
@@ -105,7 +105,7 @@ require (
 	github.com/ulikunitz/xz v0.5.12 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go4.org v0.0.0-20230225012048-214862532bf5 // indirect
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6 // indirect
+	golang.org/x/exp v0.0.0-20250531010427-b6e5de432a8b // indirect
 	golang.org/x/net v0.40.0 // indirect
 	golang.org/x/sync v0.14.0 // indirect
 	golang.org/x/tools v0.33.0 // indirect

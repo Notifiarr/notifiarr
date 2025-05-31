@@ -56,9 +56,9 @@ export class Downloaders {
 
   static readonly getValidator = (
     app: 'qbit' | 'rtorrent' | 'transmission' | 'deluge' | 'sabnzbd' | 'nzbget',
-  ): ((id: string, value: any, index: number) => string) => {
-    return (id: string, value: any, index: number) => {
-      return validate(id, value, index, get(profile).config[app] ?? [])
+  ): ((id: string, value: any, index: number, instances: Form[]) => string) => {
+    return (id: string, value: any, index: number, instances: Form[]) => {
+      return validate(id, value, index, instances)
     }
   }
 

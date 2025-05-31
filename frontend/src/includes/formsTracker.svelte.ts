@@ -41,7 +41,7 @@ export type App<T> = {
    * @param index - The index of the instance.
    * @returns The feedback of the field.
    */
-  validator?: (id: string, value: any, index: number) => string
+  validator?: (id: string, value: any, index: number, instances: T[]) => string
 }
 
 /**
@@ -113,7 +113,7 @@ export class FormListTracker<T> {
   public resetForm = (index: number) => {
     this.instances[index] = deepCopy(this.original[index] ?? this.app.empty!)
     Object.keys(this.instances[index] ?? {}).forEach(k => {
-      this.validate(k, this.instances[index]?.[k as keyof T], index)
+      this.validate(k, this.instances[index]?.[k as keyof T], index, this.instances)
     })
   }
 
@@ -121,7 +121,7 @@ export class FormListTracker<T> {
   private validateAll = () => {
     this.instances.forEach((m, i) => {
       Object.keys(m ?? {}).forEach(k => {
-        this.validate(k, m?.[k as keyof T], i)
+        this.validate(k, m?.[k as keyof T], i, this.instances)
       })
     })
   }
@@ -137,10 +137,12 @@ export class FormListTracker<T> {
    * @param id - The id of the form field. (anything.here.url)
    * @param value - The value of the form field. (http://localhost:8080)
    * @param index - The index of the current instance the instances list. (0)
+   * @param instances - The list of instances currently in the form. (all instances)
    * @updates The feedback for the instance.
    */
-  public validate = (id: string, value: any, index: number): string => {
+  public validate = (id: string, value: any, index: number, instances: T[]): string => {
     if (!this.feedback[index]) this.feedback[index] = {}
-    return (this.feedback[index][id] = this.app.validator?.(id, value, index) ?? '')
+    return (this.feedback[index][id] =
+      this.app.validator?.(id, value, index, instances) ?? '')
   }
 }

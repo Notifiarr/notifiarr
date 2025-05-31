@@ -13,7 +13,7 @@
       {#each Object.entries($profile.tunnelPoolStats) as [socket, stats]}
         <tr>
           <th>
-            {#if stats?.Active}
+            {#if stats?.active}
               <T id="SiteTunnel.phrases.SocketURLActive" />
             {:else}
               <T id="SiteTunnel.phrases.SocketURLInactive" />
@@ -23,31 +23,31 @@
         </tr>
         <tr>
           <th><T id="SiteTunnel.phrases.Disconnects" /></th>
-          <td>{stats?.Disconnects}</td>
+          <td>{stats?.disconnects}</td>
         </tr>
         <tr>
           <th><T id="SiteTunnel.phrases.ConnectionPoolSize" /></th>
-          <td>{stats?.Total}</td>
+          <td>{stats?.total}</td>
         </tr>
         <tr>
-          <th><T id="SiteTunnel.phrases.Connecting" /></th><td>{stats?.Connecting}</td>
+          <th><T id="SiteTunnel.phrases.Connecting" /></th><td>{stats?.connecting}</td>
         </tr>
-        <tr> <th><T id="SiteTunnel.phrases.Idle" /></th><td>{stats?.Idle}</td> </tr>
+        <tr> <th><T id="SiteTunnel.phrases.Idle" /></th><td>{stats?.idle}</td> </tr>
         <tr>
-          <th><T id="SiteTunnel.phrases.Running" /></th><td>{stats?.Running}</td>
+          <th><T id="SiteTunnel.phrases.Running" /></th><td>{stats?.running}</td>
         </tr>
         <tr>
           <th><T id="SiteTunnel.phrases.LastConnection" /></th>
           <td>
-            {datetime(stats!.LastConn)},
-            <T id="words.clock.ago" timeDuration={since(stats!.LastConn)} />
+            {datetime(stats?.lastConn ?? new Date())},
+            <T id="words.clock.ago" timeDuration={since(stats?.lastConn ?? new Date())} />
           </td>
         </tr>
         <tr>
           <th><T id="SiteTunnel.phrases.LastActiveCheck" /></th>
           <td>
-            {datetime(stats!.LastTry)},
-            <T id="words.clock.ago" timeDuration={since(stats!.LastTry)} />
+            {datetime(stats?.lastTry ?? new Date())},
+            <T id="words.clock.ago" timeDuration={since(stats?.lastTry ?? new Date())} />
           </td>
         </tr>
       {/each}

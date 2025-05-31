@@ -31,11 +31,6 @@ export enum AuthType {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
  */
 export interface Profile {
-  /**
-   * Input       *configfile.Config             `json:"input"`
-   * Actions     *triggers.Actions              `json:"actions"`
-   * Tunnel      *mulery.Client                 `json:"tunnel"`
-   */
   username: string;
   config: Config;
   clientInfo?: ClientInfo;
@@ -66,7 +61,7 @@ export interface Profile {
   configFileInfo?: LogFileInfos;
   expvar: AllData;
   hostInfo?: InfoStat;
-  disks?: Record<string, null | Partition>;
+  disks?: Record<string, Partition>;
   proxyAllow: boolean;
   poolStats?: Record<string, null | PoolSize>;
   started: Date;
@@ -97,7 +92,7 @@ export interface Profile {
  * Config represents the data in our config file.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.Config>
  */
-export interface Config extends LogConfig, Apps {
+export interface Config extends LogConfig, AppsConfig {
   hostId: string;
   uiPassword: string;
   bindAddr: string;
@@ -110,7 +105,7 @@ export interface Config extends LogConfig, Apps {
   retries: number;
   snapshot?: SnapshotConfig;
   services?: ServicesConfig;
-  service?: Service[];
+  service?: ServiceConfig[];
   apt: boolean;
   watchFiles?: WatchFile[];
   endpoints?: Endpoint[];
@@ -186,10 +181,10 @@ export interface ServicesConfig {
 };
 
 /**
- * Service is a thing we check and report results for.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Service>
+ * ServiceConfig is a thing we check and report results for.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.ServiceConfig>
  */
-export interface Service {
+export interface ServiceConfig {
   name: string;
   type: string;
   value: string;
@@ -306,19 +301,14 @@ export interface LogConfig {
 
 /**
  * Apps is the input configuration to relay requests to Starr apps.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.Apps>
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.AppsConfig>
  */
-export interface Apps {
-  apiKey: string;
-  extraKeys?: string[];
-  urlbase: string;
-  maxBody: number;
-  serial: boolean;
-  sonarr?: SonarrConfig[];
-  radarr?: RadarrConfig[];
-  lidarr?: LidarrConfig[];
-  readarr?: ReadarrConfig[];
-  prowlarr?: ProwlarrConfig[];
+export interface AppsConfig extends BaseConfig {
+  sonarr?: StarrConfig[];
+  radarr?: StarrConfig[];
+  lidarr?: StarrConfig[];
+  readarr?: StarrConfig[];
+  prowlarr?: StarrConfig[];
   deluge?: DelugeConfig[];
   qbit?: QbitConfig[];
   rtorrent?: RtorrentConfig[];
@@ -326,14 +316,40 @@ export interface Apps {
   nzbget?: NZBGetConfig[];
   transmission?: XmissionConfig[];
   tautulli?: TautulliConfig;
-  plex?: PlexConfig;
+  plex: PlexConfig;
 };
 
 /**
- * SonarrConfig represents the input data for a Sonarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.SonarrConfig>
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.BaseConfig>
  */
-export interface SonarrConfig extends ExtraConfig, StarrConfig {};
+export interface BaseConfig {
+  apiKey: string;
+  extraKeys?: string[];
+  urlbase: string;
+  maxBody: number;
+  serial: boolean;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.StarrConfig>
+ */
+export interface StarrConfig extends StarrConfig0, ExtraConfig {};
+
+/**
+ * Config is the data needed to poll Radarr or Sonarr or Lidarr or Readarr.
+ * At a minimum, provide a URL and API Key.
+ * HTTPUser and HTTPPass are used for Basic HTTP auth, if enabled (not common).
+ * Username and Password are for non-API paths with native authentication enabled.
+ * @see golang: <golift.io/starr.Config>
+ */
+export interface StarrConfig0 {
+  apiKey: string;
+  url: string;
+  httpPass: string;
+  httpUser: string;
+  username: string;
+  password: string;
+};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ExtraConfig>
@@ -345,46 +361,6 @@ export interface ExtraConfig {
   validSsl: boolean;
   deletes: number;
 };
-
-/**
- * Config is the data needed to poll Radarr or Sonarr or Lidarr or Readarr.
- * At a minimum, provide a URL and API Key.
- * HTTPUser and HTTPPass are used for Basic HTTP auth, if enabled (not common).
- * Username and Password are for non-API paths with native authentication enabled.
- * @see golang: <golift.io/starr.Config>
- */
-export interface StarrConfig {
-  apiKey: string;
-  url: string;
-  httpPass: string;
-  httpUser: string;
-  username: string;
-  password: string;
-};
-
-/**
- * RadarrConfig represents the input data for a Radarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.RadarrConfig>
- */
-export interface RadarrConfig extends ExtraConfig, StarrConfig {};
-
-/**
- * LidarrConfig represents the input data for a Lidarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.LidarrConfig>
- */
-export interface LidarrConfig extends ExtraConfig, StarrConfig {};
-
-/**
- * ReadarrConfig represents the input data for a Readarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ReadarrConfig>
- */
-export interface ReadarrConfig extends ExtraConfig, StarrConfig {};
-
-/**
- * ProwlarrConfig represents the input data for a Prowlarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ProwlarrConfig>
- */
-export interface ProwlarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.DelugeConfig>
@@ -693,7 +669,6 @@ export interface Flags {
   envPrefix: string;
   headers?: string[];
   staticDif: string;
-  delay: number;
 };
 
 /**
@@ -776,14 +751,14 @@ export interface Partition {
  * @see golang: <golift.io/mulery/client.PoolSize>
  */
 export interface PoolSize {
-  Disconnects: number;
-  Connecting: number;
-  Idle: number;
-  Running: number;
-  Total: number;
-  LastConn: Date;
-  LastTry: Date;
-  Active: boolean;
+  disconnects: number;
+  connecting: number;
+  idle: number;
+  running: number;
+  total: number;
+  lastConn: Date;
+  lastTry: Date;
+  active: boolean;
 };
 
 /**

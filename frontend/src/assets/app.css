@@ -10,6 +10,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --toastContainerTop: 5rem;
+  --toastContainerRight: auto;
+  --toastContainerBottom: auto;
+  --toastContainerLeft: calc(50vw - 15rem);
+  --toastWidth: 30rem;
 }
 
 html,
@@ -169,4 +174,34 @@ input[type='checkbox']:checked {
 input[type='radio'],
 input[type='checkbox'] {
   border-color: #3cd2a5 !important;
+}
+
+/* Toast styles. Used in includes/util.ts */
+.toast-wrapman {
+  display: flex;
+  align-items: center;
+  --toastColor: 'black';
+  --toastBorderRadius: 12px;
+  --toastBorder: 2px solid darkslategrey;
+}
+
+.success-toast {
+  --toastBackground: #32e1b2f5;
+  --toastBarBackground: #2b9eb0f5;
+}
+
+.warning-toast {
+  --toastBackground: #ffa60bf5;
+  --toastBarBackground: #8f4e04f5;
+}
+
+.failure-toast {
+  --toastColor: 'white' !important;
+  color: white !important;
+  --toastBackground: #972c05f5;
+  --toastBarBackground: #e6622efe;
+}
+
+.dark-mode .toast-wrapman {
+  --toastBorder: 2px solid silver;
 }

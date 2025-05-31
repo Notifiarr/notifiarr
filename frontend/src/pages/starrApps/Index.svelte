@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import { page } from './page.svelte'
+  import { Starr, page } from './page.svelte'
   export { page }
 </script>
 
@@ -10,15 +10,8 @@
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import Tab, { getTab } from '../../includes/InstancesTab.svelte'
-  import { Starr } from './page.svelte'
   import { nav } from '../../navigation/nav.svelte'
-  import type {
-    LidarrConfig,
-    ProwlarrConfig,
-    RadarrConfig,
-    ReadarrConfig,
-    SonarrConfig,
-  } from '../../api/notifiarrConfig'
+  import type { StarrConfig } from '../../api/notifiarrConfig'
   import { FormListTracker } from '../../includes/formsTracker.svelte'
 
   const flt = $derived({
@@ -32,11 +25,11 @@
   async function submit() {
     const c = {
       ...$profile.config,
-      sonarr: flt.Sonarr.instances as SonarrConfig[],
-      radarr: flt.Radarr.instances as RadarrConfig[],
-      readarr: flt.Readarr.instances as ReadarrConfig[],
-      lidarr: flt.Lidarr.instances as LidarrConfig[],
-      prowlarr: flt.Prowlarr.instances as ProwlarrConfig[],
+      sonarr: flt.Sonarr.instances as StarrConfig[],
+      radarr: flt.Radarr.instances as StarrConfig[],
+      readarr: flt.Readarr.instances as StarrConfig[],
+      lidarr: flt.Lidarr.instances as StarrConfig[],
+      prowlarr: flt.Prowlarr.instances as StarrConfig[],
     }
     await profile.writeConfig(c)
 

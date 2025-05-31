@@ -40,10 +40,10 @@
       timeout: '10s',
       interval: '5m0s',
     },
-    validator: (id: string, value: any, index: number) => {
+    validator: (id: string, value: any, index: number, instances: MySQLConfig[]) => {
       if (id.endsWith('.username'))
         return value === '' ? $_('phrases.UsernameMustNotBeEmpty') : ''
-      return validate(id, value, index, $profile.config.snapshot?.mysql ?? [])
+      return validate(id, value, index, instances)
     },
     merge: (index: number, form: MySQLConfig) => {
       const c = deepCopy($profile.config)

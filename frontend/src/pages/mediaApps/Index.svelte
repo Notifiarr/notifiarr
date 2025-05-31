@@ -82,14 +82,14 @@
   <InstanceHeader flt={iv.Plex} />
   <Instance
     reset={() => iv.Plex.resetForm(0)}
-    validate={(id, value) => iv.Plex.validate(id, value, 0)}
+    validate={(id, value) => iv.Plex.validate(id, value, 0, iv.Plex.instances)}
     bind:form={iv.Plex.instances[0]!}
     original={iv.Plex.original[0]!}
     app={plexApp} />
   <InstanceHeader flt={iv.Tautulli} />
   <Instance
     reset={() => iv.Tautulli.resetForm(0)}
-    validate={(id, value) => iv.Tautulli.validate(id, value, 0)}
+    validate={(id, value) => iv.Tautulli.validate(id, value, 0, iv.Tautulli.instances)}
     bind:form={iv.Tautulli.instances[0]!}
     original={iv.Tautulli.original[0]!}
     app={tautulliApp} />
