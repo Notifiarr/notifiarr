@@ -32,10 +32,9 @@ const (
 
 // Command is the input data to perform an in-place update.
 type Command struct {
-	URL        string   // file to download.
-	Path       string   // file to be updated.
-	Args       []string // optional, but non-nil will crash.
-	mnd.Logger          // debug logs.
+	URL  string   // file to download.
+	Path string   // file to be updated.
+	Args []string // optional, but non-nil will crash.
 }
 
 // Errors. Don't trigger these.
@@ -89,7 +88,7 @@ func NowWithContext(ctx context.Context, update *Command) (string, error) {
 		return backupFile, err
 	}
 
-	update.Printf("[UPDATE] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
+	mnd.Log.Printf("[UPDATE] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
 
 	if err := exec.Command(update.Path, update.Args...).Start(); err != nil { //nolint:gosec
 		return backupFile, fmt.Errorf("executing restart command: %w", err)
@@ -120,13 +119,13 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 
 	backupFile := strings.TrimSuffix(u.Path, dotExe)
 	backupFile += ".backup." + time.Now().Format(backupTimeFormat) + suff
-	u.Debugf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
+	mnd.Log.Debugf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
 
 	if err := os.Rename(u.Path, backupFile); err != nil {
 		return backupFile, fmt.Errorf("renaming original file: %w", err)
 	}
 
-	u.Debugf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
+	mnd.Log.Debugf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
 
 	u.cleanOldBackups()
 
@@ -144,7 +143,7 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 	}
 	defer tempFile.Close()
 
-	u.Debugf("[UPDATE] Primed Temp File: %s", tempFile.Name())
+	mnd.Log.Debugf("[UPDATE] Primed Temp File: %s", tempFile.Name())
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.URL, nil)
 	if err != nil {
@@ -227,7 +226,7 @@ func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error
 		}
 	}
 
-	u.Errorf("[UPDATE] exe file not found in zip file")
+	mnd.Log.Errorf("[UPDATE] exe file not found in zip file")
 
 	return nil
 }

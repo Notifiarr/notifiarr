@@ -79,9 +79,10 @@ func main() {
 // This splits them out so we can add the vendor docs from the vendor folder,
 // and the local docs from the local git checkout.
 func splitPkgs(pkgs []string) ([]string, []string) {
-
-	vendorPkgs := []string{}
-	localPkgs := []string{}
+	var (
+		vendorPkgs []string
+		localPkgs  []string
+	)
 
 	for _, pkg := range pkgs {
 		if strings.HasPrefix(pkg, localPrefix) {

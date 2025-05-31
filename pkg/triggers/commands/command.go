@@ -29,7 +29,7 @@ const (
 )
 
 // Setup must run in the creation routine.
-func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
+func (c *Command) Setup() {
 	if c.Name == "" {
 		if args := shlex.Split(c.Command); len(args) > 0 {
 			c.Name = args[0]
@@ -42,8 +42,6 @@ func (c *Command) Setup(logger mnd.Logger, website *website.Server) {
 		c.Hash = hex.EncodeToString(hash.Sum(nil))
 	}
 
-	c.log = logger
-	c.website = website
 	c.Args = len(c.args)
 
 	if c.Timeout.Duration == 0 {
@@ -108,7 +106,7 @@ func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string
 
 	// Send the notification before the lock.
 	if c.Notify {
-		c.website.SendData(&website.Request{
+		website.Site.SendData(&website.Request{
 			Route: website.CommandRoute,
 			Event: input.Type,
 			Payload: map[string]string{
@@ -149,14 +147,14 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, elapse
 		c.output = "error: " + eStr + ", output: " + oStr
 
 		if c.Log && oStr != "" {
-			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v, Output:\n%s",
+			mnd.Log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v, Output:\n%s",
 				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err, oStr)
 		} else {
-			c.log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v",
+			mnd.Log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v",
 				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err)
 		}
 	} else if c.Log && oStr != "" {
-		c.log.Printf("[%s requested] Custom Command '%s%s' Output (elapsed: %s):\n%s",
+		mnd.Log.Printf("[%s requested] Custom Command '%s%s' Output (elapsed: %s):\n%s",
 			input.Type, c.Name, extra, elapsed.Round(time.Millisecond), oStr)
 	}
 }

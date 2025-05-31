@@ -9,10 +9,10 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 )
 
-func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
-	app.Setup(0, nil)
+func testPlex(ctx context.Context, app apps.PlexConfig) (string, int) {
+	server := app.Setup(0)
 
-	info, err := app.GetInfo(ctx)
+	info, err := server.GetInfo(ctx)
 	if err != nil {
 		return "Getting Info: " + err.Error(), http.StatusFailedDependency
 	}
@@ -20,8 +20,8 @@ func testPlex(ctx context.Context, app *apps.PlexConfig) (string, int) {
 	return "Plex OK! Version: " + info.Version, http.StatusOK
 }
 
-func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
-	app.Setup(0, nil)
+func testTautulli(ctx context.Context, app apps.TautulliConfig) (string, int) {
+	tautulli := app.Setup(0)
 
 	if app.APIKey == "" {
 		return "Tautulli API Key is not set", http.StatusFailedDependency
@@ -31,7 +31,7 @@ func testTautulli(ctx context.Context, app *apps.TautulliConfig) (string, int) {
 		return "Tautulli URL is not set, must begin with http(s)://", http.StatusFailedDependency
 	}
 
-	users, err := app.GetUsers(ctx)
+	users, err := tautulli.GetUsers(ctx)
 	if err != nil {
 		return "Getting Users: " + err.Error(), http.StatusFailedDependency
 	}

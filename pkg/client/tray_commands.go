@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -18,29 +19,29 @@ import (
 func (c *Client) toggleServer(ctx context.Context) {
 	if !menu["stat"].Checked() {
 		ui.Toast("Started web server") //nolint:errcheck
-		c.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
+		logs.Log.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
 			c.Config.URLBase, c.Config.BindAddr)
-		c.StartWebServer(ctx)
+		go c.RunWebServer()
 
 		return
 	}
 
 	ui.Toast("Paused web server") //nolint:errcheck
-	c.Print("[user requested] Pausing Web Server")
+	logs.Log.Printf("[user requested] Pausing Web Server")
 
 	if err := c.StopWebServer(ctx); err != nil {
-		c.Errorf("Unable to Pause Server: %v", err)
+		logs.Log.Errorf("Unable to Pause Server: %v", err)
 	}
 }
 
 func (c *Client) rotateLogs() {
-	c.Print("[user requested] Rotating Log Files!")
+	logs.Log.Printf("[user requested] Rotating Log Files!")
 	ui.Toast("Rotating log files") //nolint:errcheck
 
-	for _, err := range c.Logger.Rotate() {
+	for _, err := range logs.Log.Rotate() {
 		if err != nil {
 			ui.Toast("Error rotating log files: %v", err) //nolint:errcheck
-			c.Errorf("Rotating Log Files: %v", err)
+			logs.Log.Errorf("Rotating Log Files: %v", err)
 		}
 	}
 }
@@ -49,7 +50,7 @@ func (c *Client) rotateLogs() {
 func (c *Client) displayConfig() string { //nolint: funlen,cyclop
 	out := "Config File: " + c.Flags.ConfigFile
 	out += fmt.Sprintf("\nTimeout: %v", c.Config.Timeout)
-	out += fmt.Sprintf("\nUpstreams: %v", c.Config.Allow.Input)
+	out += fmt.Sprintf("\nUpstreams: %v", c.allow.Input)
 
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		out += fmt.Sprintf("\nHTTPS: https://%s%s", c.Config.BindAddr, c.Config.URLBase)
@@ -118,10 +119,10 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 		return
 	}
 
-	c.Print("[user requested] Writing Config File:", val)
+	logs.Log.Print("[user requested] Writing Config File:", val)
 
 	if _, err := c.Config.Write(ctx, val, false); err != nil {
-		c.Errorf("Writing Config File: %v", err)
+		logs.Log.Errorf("Writing Config File: %v", err)
 		_, _ = ui.Error("Writing Config File: " + err.Error())
 
 		return
@@ -131,14 +132,14 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 }
 
 func (c *Client) menuPanic() {
-	defer c.CapturePanic()
+	defer logs.Log.CapturePanic()
 
 	yes, err := ui.Question("You really want to panic?", true)
 	if !yes || err != nil {
 		return
 	}
 
-	defer c.Printf("User Requested Application Panic, good bye.")
+	defer logs.Log.Printf("User Requested Application Panic, good bye.")
 	panic("user requested panic")
 }
 
@@ -151,7 +152,7 @@ func (c *Client) openGUI() {
 	// This always has a colon, or the app will not start.
 	port := strings.Split(c.Config.BindAddr, ":")[1]
 	if err := ui.OpenURL(uri + ":" + port + c.Config.URLBase); err != nil {
-		c.Errorf("Opening URL: %v", err)
+		logs.Log.Errorf("Opening URL: %v", err)
 	}
 }
 
@@ -162,10 +163,10 @@ func (c *Client) autoStart() {
 
 		if file, err := ui.DeleteStartupLink(); err != nil {
 			ui.Toast("Failed disabling autostart: %s", err.Error())
-			c.Errorf("[user requested] Disabling auto start: %v", err)
+			logs.Log.Errorf("[user requested] Disabling auto start: %v", err)
 		} else {
 			ui.Toast("Removed auto start file: %s", file)
-			c.Printf("[user requested] Removed auto start file: %s", file)
+			logs.Log.Printf("[user requested] Removed auto start file: %s", file)
 		}
 
 		return
@@ -175,44 +176,44 @@ func (c *Client) autoStart() {
 
 	if loaded, file, err := ui.CreateStartupLink(); err != nil {
 		ui.Toast("Failed enabling autostart: %s", err.Error())
-		c.Errorf("[user requested] Enabling auto start: %v", err)
+		logs.Log.Errorf("[user requested] Enabling auto start: %v", err)
 	} else if mnd.IsDarwin && !loaded {
 		ui.Toast("Created auto start file: %s - Exiting so launchctl can restart the app.", file)
-		c.Printf("[user requested] Created auto start file: %s (exiting)", file)
+		logs.Log.Printf("[user requested] Created auto start file: %s (exiting)", file)
 		c.sigkil <- &update.Signal{Text: "launchctl restart"}
 	} else {
 		ui.Toast("Created auto start file: %s", file)
-		c.Printf("[user requested] Created auto start file: %s", file)
+		logs.Log.Printf("[user requested] Created auto start file: %s", file)
 	}
 }
 
 func (c *Client) updatePassword(ctx context.Context) {
 	pass, _, err := ui.Entry("Enter new Web UI admin password (must be 9+ characters):", "")
 	if err != nil {
-		c.Errorf("err: %v", err)
+		logs.Log.Errorf("err: %v", err)
 		return
 	}
 
 	if err := c.StopWebServer(ctx); err != nil {
-		c.Errorf("Stopping web server: %v", err)
+		logs.Log.Errorf("Stopping web server: %v", err)
 
 		if err = ui.Toast("Stopping web server failed, password not updated."); err != nil {
-			c.Errorf("Creating Toast Notification: %v", err)
+			logs.Log.Errorf("Creating Toast Notification: %v", err)
 		}
 
 		return
 	}
 
-	c.Print("[user requested] Updating Web UI password.")
-
-	defer c.StartWebServer(ctx)
+	logs.Log.Printf("[user requested] Updating Web UI password.")
 
 	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
-		c.Errorf("Updating Web UI Password: %v", err)
+		logs.Log.Errorf("Updating Web UI Password: %v", err)
 		_, _ = ui.Error("Updating Web UI Password: " + err.Error())
 	}
 
 	if err = ui.Toast("Web UI password updated. Save config to persist this change."); err != nil {
-		c.Errorf("Creating Toast Notification: %v", err)
+		logs.Log.Errorf("Creating Toast Notification: %v", err)
 	}
+
+	go c.RunWebServer()
 }

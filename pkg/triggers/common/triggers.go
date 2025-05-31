@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -28,18 +27,16 @@ var ErrNoChannel = errors.New("no channel to send request")
 // Config is the input data shared by most triggers.
 // Everything is mandatory.
 type Config struct {
-	CI              *clientinfo.Config
-	*website.Server // send trigger responses to website.
-	Snapshot        *snapshot.Config
-	Apps            *apps.Apps
-	Scheduler       gocron.Scheduler
-	*logs.Logger
-	stop     *Action        // Triggered by calling Stop()
-	list     []*Action      // List of action triggers
-	Services                // for running service checks.
-	reloadCh chan os.Signal // so triggers can reload the app.
-	stopCh   chan os.Signal // so triggers can stop the app.
-	rand     *rand.Rand
+	CI        *clientinfo.Config
+	Snapshot  *snapshot.Config
+	Apps      *apps.Apps
+	Scheduler gocron.Scheduler
+	stop      *Action        // Triggered by calling Stop()
+	list      []*Action      // List of action triggers
+	Services                 // for running service checks.
+	reloadCh  chan os.Signal // so triggers can reload the app.
+	stopCh    chan os.Signal // so triggers can stop the app.
+	rand      *rand.Rand
 }
 
 type Create interface {

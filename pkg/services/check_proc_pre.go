@@ -23,22 +23,22 @@ var (
  * The service Lock is acquired before running any of this code.
  */
 
-func (s *Service) checkProcValues() error {
+func (s *ServiceConfig) checkProcValues() error {
 	if s.Value == "" {
 		return ErrNoProcVal
 	} else if err := s.fillExpect(); err != nil {
 		return err
 	} else if err = s.fillExpectRegex(); err != nil {
 		return err
-	} else if (s.svc.proc.countMin != 0 || s.svc.proc.countMax != 0) && s.svc.proc.running {
+	} else if (s.proc.countMin != 0 || s.proc.countMax != 0) && s.proc.running {
 		return ErrCountZero
 	}
 
 	return nil
 }
 
-func (s *Service) fillExpect() error {
-	s.svc.proc = &procExpect{}
+func (s *ServiceConfig) fillExpect() error {
+	s.proc = &procExpect{}
 
 	splitStr := strings.Split(s.Expect, ",")
 	for _, str := range splitStr {
@@ -48,13 +48,13 @@ func (s *Service) fillExpect() error {
 				return err
 			}
 		case strings.EqualFold(str, "restart"):
-			s.svc.proc.restarts = true
+			s.proc.restarts = true
 
 			if mnd.IsFreeBSD {
 				return ErrBSDRestart
 			}
 		case strings.EqualFold(str, "running"):
-			s.svc.proc.running = true
+			s.proc.running = true
 		case str == "":
 			continue
 		default:
@@ -66,12 +66,12 @@ func (s *Service) fillExpect() error {
 }
 
 // check Value for regex and attempt to compile it for later use.
-func (s *Service) fillExpectRegex() error {
+func (s *ServiceConfig) fillExpectRegex() error {
 	// Denote a regex by providing a string with slahes at each end.
 	if s.Value[0] == '/' && len(s.Value) > 2 && s.Value[len(s.Value)-1] == '/' {
 		var err error
 
-		s.svc.proc.checkRE, err = regexp.Compile(s.Value[1 : len(s.Value)-1]) // strip slashes.
+		s.proc.checkRE, err = regexp.Compile(s.Value[1 : len(s.Value)-1]) // strip slashes.
 		if err != nil {
 			return fmt.Errorf("invalid regex %s: %w", s.Value[1:len(s.Value)-1], err)
 		}
@@ -80,18 +80,18 @@ func (s *Service) fillExpectRegex() error {
 	return nil
 }
 
-func (s *Service) fillExpectCounts(str string) error {
+func (s *ServiceConfig) fillExpectCounts(str string) error {
 	var err error
 
 	countSplit := strings.Split(str, ":")
 	if len(countSplit) > 1 {
-		if s.svc.proc.countMin, err = strconv.Atoi(countSplit[1]); err != nil {
+		if s.proc.countMin, err = strconv.Atoi(countSplit[1]); err != nil {
 			return fmt.Errorf("invalid minimum count: %s: %w", countSplit[1], err)
 		}
 	}
 
 	if len(countSplit) > 2 { //nolint:mnd
-		if s.svc.proc.countMax, err = strconv.Atoi(countSplit[2]); err != nil {
+		if s.proc.countMax, err = strconv.Atoi(countSplit[2]); err != nil {
 			return fmt.Errorf("invalid maximum count: %s: %w", countSplit[2], err)
 		}
 	}

@@ -18,6 +18,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/private"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/shirou/gopsutil/v4/host"
 	mulery "golift.io/mulery/client"
@@ -27,9 +28,6 @@ import (
 // Profile is the data returned by the profile GET endpoint.
 // Basically everything.
 type Profile struct {
-	// Input       *configfile.Config             `json:"input"`
-	// Actions     *triggers.Actions              `json:"actions"`
-	// Tunnel      *mulery.Client                 `json:"tunnel"`
 	Username        string                 `json:"username"`
 	Config          configfile.Config      `json:"config"`
 	ClientInfo      *clientinfo.ClientInfo `json:"clientInfo"`
@@ -48,41 +46,41 @@ type Profile struct {
 	UpstreamType    configfile.AuthType    `json:"upstreamType"`
 	Languages       frontend.Languages     `json:"languages"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
-	LoggedIn        bool                           `json:"loggedIn"`
-	Updated         time.Time                      `json:"updated"`
-	Flags           *configfile.Flags              `json:"flags"`
-	Dynamic         bool                           `json:"dynamic"`
-	Webauth         bool                           `json:"webauth"`
-	Msg             string                         `json:"msg,omitempty"`
-	LogFiles        *logs.LogFileInfos             `json:"logFileInfo"`
-	ConfigFiles     *logs.LogFileInfos             `json:"configFileInfo"`
-	Expvar          mnd.AllData                    `json:"expvar"`
-	HostInfo        *host.InfoStat                 `json:"hostInfo"`
-	Disks           map[string]*snapshot.Partition `json:"disks"`
-	ProxyAllow      bool                           `json:"proxyAllow"`
-	PoolStats       map[string]*mulery.PoolSize    `json:"poolStats"`
-	Started         time.Time                      `json:"started"`
-	Program         string                         `json:"program"`
-	Version         string                         `json:"version"`
-	Revision        string                         `json:"revision"`
-	Branch          string                         `json:"branch"`
-	BuildUser       string                         `json:"buildUser"`
-	BuildDate       string                         `json:"buildDate"`
-	GoVersion       string                         `json:"goVersion"`
-	OS              string                         `json:"os"`
-	Arch            string                         `json:"arch"`
-	Binary          string                         `json:"binary"`
-	Environment     map[string]string              `json:"environment"`
-	Docker          bool                           `json:"docker"`
-	UID             int                            `json:"uid"`
-	GID             int                            `json:"gid"`
-	IP              string                         `json:"ip"`
-	Gateway         string                         `json:"gateway"`
-	IfName          string                         `json:"ifName"`
-	Netmask         string                         `json:"netmask"`
-	MD5             string                         `json:"md5"`
-	ActiveTunnel    string                         `json:"activeTunnel"`
-	TunnelPoolStats map[string]*mulery.PoolSize    `json:"tunnelPoolStats"`
+	LoggedIn        bool                          `json:"loggedIn"`
+	Updated         time.Time                     `json:"updated"`
+	Flags           *configfile.Flags             `json:"flags"`
+	Dynamic         bool                          `json:"dynamic"`
+	Webauth         bool                          `json:"webauth"`
+	Msg             string                        `json:"msg,omitempty"`
+	LogFiles        *logs.LogFileInfos            `json:"logFileInfo"`
+	ConfigFiles     *logs.LogFileInfos            `json:"configFileInfo"`
+	Expvar          mnd.AllData                   `json:"expvar"`
+	HostInfo        *host.InfoStat                `json:"hostInfo"`
+	Disks           map[string]snapshot.Partition `json:"disks"`
+	ProxyAllow      bool                          `json:"proxyAllow"`
+	PoolStats       map[string]*mulery.PoolSize   `json:"poolStats"`
+	Started         time.Time                     `json:"started"`
+	Program         string                        `json:"program"`
+	Version         string                        `json:"version"`
+	Revision        string                        `json:"revision"`
+	Branch          string                        `json:"branch"`
+	BuildUser       string                        `json:"buildUser"`
+	BuildDate       string                        `json:"buildDate"`
+	GoVersion       string                        `json:"goVersion"`
+	OS              string                        `json:"os"`
+	Arch            string                        `json:"arch"`
+	Binary          string                        `json:"binary"`
+	Environment     map[string]string             `json:"environment"`
+	Docker          bool                          `json:"docker"`
+	UID             int                           `json:"uid"`
+	GID             int                           `json:"gid"`
+	IP              string                        `json:"ip"`
+	Gateway         string                        `json:"gateway"`
+	IfName          string                        `json:"ifName"`
+	Netmask         string                        `json:"netmask"`
+	MD5             string                        `json:"md5"`
+	ActiveTunnel    string                        `json:"activeTunnel"`
+	TunnelPoolStats map[string]*mulery.PoolSize   `json:"tunnelPoolStats"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
@@ -100,7 +98,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	outboundIP := clientinfo.GetOutboundIP()
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
-	hostInfo, _ := c.Config.GetHostInfo(req.Context())
+	hostInfo, _ := website.Site.GetHostInfo(req.Context())
 	activeTunnel := ""
 	poolStats := map[string]*mulery.PoolSize{}
 
@@ -126,18 +124,18 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		Headers:         c.getProfileHeaders(req),
 		Fortune:         Fortune(),
 		UpstreamIP:      upstreamIP,
-		UpstreamAllowed: c.Config.Allow.Contains(req.RemoteAddr),
+		UpstreamAllowed: c.allow.Contains(req.RemoteAddr),
 		UpstreamHeader:  c.Config.UIPassword.Header(),
 		UpstreamType:    c.Config.UIPassword.Type(),
 		Updated:         time.Now().UTC(),
 		Languages:       frontend.Translations(),
-		ProxyAllow:      c.Config.Allow.Contains(req.RemoteAddr),
+		ProxyAllow:      c.allow.Contains(req.RemoteAddr),
 		Flags:           c.Flags,
 		Dynamic:         dynamic,
 		Webauth:         c.webauth,
-		LogFiles:        c.Logger.GetAllLogFilePaths(),
+		LogFiles:        logs.Log.GetAllLogFilePaths(),
 		ConfigFiles:     logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
-		Disks:           c.getDisks(req.Context()),
+		// Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
 		Expvar:          mnd.GetAllData(),
 		HostInfo:        hostInfo,
 		Started:         version.Started.Round(time.Second),
@@ -163,14 +161,14 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		ActiveTunnel:    activeTunnel,
 		TunnelPoolStats: poolStats,
 	}); err != nil {
-		c.Errorf("Writing HTTP Response: %v", err)
+		logs.Log.Errorf("Writing HTTP Response: %v", err)
 	}
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
 	post, err := c.getProfilePostData(request)
 	if err != nil {
-		c.Errorf("%v", err)
+		logs.Log.Errorf("%v", err)
 		http.Error(response, "Invalid Request", http.StatusBadRequest)
 		return
 	}
@@ -179,7 +177,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	if !dynamic {
 		// If the auth is currently using a password, check the password.
 		if !c.checkUserPass(currUser, post.Password) {
-			c.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
+			logs.Log.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return
 		}
@@ -202,14 +200,14 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 
 	switch err := c.setUserPass(request.Context(), post.AuthType, post.Header, ""); {
 	case err != nil:
-		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
+		logs.Log.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 	case post.AuthType == configfile.AuthNone:
-		c.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
+		logs.Log.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
 		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
 		c.reloadAppNow()
 	default:
-		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
+		logs.Log.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
 		c.setSession(post.Username, response, request)
 		http.Error(response, "Enabled WebUI proxy authentication. Header: "+post.Header, http.StatusOK)
 		c.reloadAppNow()
@@ -230,7 +228,7 @@ func (c *Client) getProfilePostData(request *http.Request) (*ProfilePost, error)
 	post := &ProfilePost{}
 
 	// The New UI uses JSON, the old UI uses form data.
-	if request.Header.Get("Content-Type") != "application/json" {
+	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
 		// If the request is not JSON, we're using the old form data.
 		at, _ := strconv.Atoi(request.PostFormValue("AuthType"))
 		post.AuthType = configfile.AuthType(at)
@@ -265,20 +263,20 @@ func (c *Client) handleProfilePostPassword(
 	currUser, _ := c.getUserName(request)
 
 	if len(newPassw) < minPasswordLen {
-		c.Errorf("[gui '%s' requested] New password must be at least %d characters.", currUser, minPasswordLen)
+		logs.Log.Errorf("[gui '%s' requested] New password must be at least %d characters.", currUser, minPasswordLen)
 		http.Error(response, fmt.Sprintf("New password must be at least %d characters.",
 			minPasswordLen), http.StatusBadRequest)
 		return
 	}
 
 	if err := c.setUserPass(request.Context(), configfile.AuthPassword, newUser, newPassw); err != nil {
-		c.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
+		logs.Log.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
 		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
-	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, newUser)
+	logs.Log.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, newUser)
 	c.setSession(newUser, response, request)
 	http.Error(response, "Trust Profile saved.", http.StatusOK)
 	c.reloadAppNow()

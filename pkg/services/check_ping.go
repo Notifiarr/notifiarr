@@ -30,7 +30,7 @@ type pingExpect struct {
 	icmp     bool
 }
 
-func (s *Service) checkPingValues(icmp bool) error {
+func (s *ServiceConfig) checkPingValues(icmp bool) error {
 	if s.Value == "" {
 		return ErrNoPingVal
 	}
@@ -40,16 +40,16 @@ func (s *Service) checkPingValues(icmp bool) error {
 			" and min is the minimum packets that must be returned: %w", err)
 	}
 
-	if s.svc.ping.count == 0 || s.svc.ping.min > s.svc.ping.count || s.svc.ping.interval <= 0 {
+	if s.ping.count == 0 || s.ping.min > s.ping.count || s.ping.interval <= 0 {
 		return fmt.Errorf("%w, ensure minimum(%d) is less than or equal to count(%d) and interval(%d) > 0",
-			ErrPingExpect, s.svc.ping.min, s.svc.ping.count, s.svc.ping.interval)
+			ErrPingExpect, s.ping.min, s.ping.count, s.ping.interval)
 	}
 
 	return nil
 }
 
-func (s *Service) fillPingExpect(icmp bool) error {
-	s.svc.ping = &pingExpect{
+func (s *ServiceConfig) fillPingExpect(icmp bool) error {
+	s.ping = &pingExpect{
 		icmp: icmp,
 	}
 
@@ -59,22 +59,22 @@ func (s *Service) fillPingExpect(icmp bool) error {
 	}
 
 	var err error
-	if s.svc.ping.count, err = strconv.Atoi(splitStr[0]); err != nil {
+	if s.ping.count, err = strconv.Atoi(splitStr[0]); err != nil {
 		return fmt.Errorf("invalid packet send count: %s: %w", splitStr[0], err)
 	}
 
-	if s.svc.ping.min, err = strconv.Atoi(splitStr[1]); err != nil {
+	if s.ping.min, err = strconv.Atoi(splitStr[1]); err != nil {
 		return fmt.Errorf("invalid minimum packet receive count: %s: %w", splitStr[1], err)
 	}
 
-	if s.svc.ping.interval, err = strconv.Atoi(splitStr[2]); err != nil {
+	if s.ping.interval, err = strconv.Atoi(splitStr[2]); err != nil {
 		return fmt.Errorf("invalid packet send interval: %s: %w", splitStr[2], err)
 	}
 
 	return nil
 }
 
-func (s *Service) checkPING() *result {
+func (s *ServiceConfig) checkPING() *result {
 	pinger, err := ping.NewPinger(s.Value)
 	if err != nil {
 		return &result{
@@ -83,10 +83,10 @@ func (s *Service) checkPING() *result {
 		}
 	}
 
-	pinger.SetPrivileged(s.svc.ping.icmp)
+	pinger.SetPrivileged(s.ping.icmp)
 	pinger.Timeout = s.Timeout.Duration
-	pinger.Count = s.svc.ping.count
-	pinger.Interval = time.Duration(s.svc.ping.interval) * time.Millisecond
+	pinger.Count = s.ping.count
+	pinger.Interval = time.Duration(s.ping.interval) * time.Millisecond
 
 	if err = pinger.Run(); err != nil { // blocks.
 		return &result{
@@ -97,12 +97,12 @@ func (s *Service) checkPING() *result {
 
 	stats := pinger.Statistics()
 	state := StateOK
-	msg := fmt.Sprintf("rcvd(%d) >= min(%d)", stats.PacketsRecv, s.svc.ping.min)
+	msg := fmt.Sprintf("rcvd(%d) >= min(%d)", stats.PacketsRecv, s.ping.min)
 
 	// Check if we received our minimum packet count responses.
-	if stats.PacketsRecv < s.svc.ping.min {
+	if stats.PacketsRecv < s.ping.min {
 		state = StateCritical
-		msg = fmt.Sprintf("rcvd(%d) < min(%d)", stats.PacketsRecv, s.svc.ping.min)
+		msg = fmt.Sprintf("rcvd(%d) < min(%d)", stats.PacketsRecv, s.ping.min)
 	}
 
 	return &result{

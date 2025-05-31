@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/starr/radarr"
 )
 
@@ -18,12 +19,12 @@ func (c *Cmd) getRadarrStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting Radarr State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting Radarr State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getRadarrState(ctx, instance+1, app)
+		state, err := c.getRadarrState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting Radarr Queue from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting Radarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -32,7 +33,7 @@ func (c *Cmd) getRadarrStates(ctx context.Context) []*State {
 	return states
 }
 
-func (c *Cmd) getRadarrState(ctx context.Context, instance int, r *apps.RadarrConfig) (*State, error) {
+func (c *Cmd) getRadarrState(ctx context.Context, instance int, r *apps.Radarr) (*State, error) {
 	state := &State{Instance: instance, Next: []*Sortable{}, Latest: []*Sortable{}, Name: r.Name}
 	start := time.Now()
 

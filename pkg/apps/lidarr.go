@@ -3,7 +3,6 @@ package apps
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -56,35 +55,30 @@ func (a *Apps) lidarrHandlers() {
 	a.HandleAPIpath(starr.Lidarr, "/queue/{queueID}", lidarrDeleteQueue, "DELETE")
 }
 
-// LidarrConfig represents the input data for a Lidarr server.
-type LidarrConfig struct {
-	ExtraConfig
-	*starr.Config
+// Lidarr represents the input data for a Lidarr server.
+type Lidarr struct {
+	StarrApp       `json:"-" toml:"-" xml:"-"`
 	*lidarr.Lidarr `json:"-" toml:"-" xml:"-"`
-	errorf         func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
-func getLidarr(r *http.Request) *LidarrConfig {
-	return r.Context().Value(starr.Lidarr).(*LidarrConfig) //nolint:forcetypeassert
+func getLidarr(r *http.Request) *Lidarr {
+	return r.Context().Value(starr.Lidarr).(*Lidarr) //nolint:forcetypeassert
 }
 
-// Enabled returns true if the Lidarr instance is enabled and usable.
-func (l *LidarrConfig) Enabled() bool {
-	return l != nil && l.Config != nil && l.URL != "" && l.APIKey != "" && l.Timeout.Duration >= 0
-}
+func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
+	output := make([]Lidarr, len(a.Lidarr))
 
-func (a *Apps) setupLidarr() error {
-	for idx, app := range a.Lidarr {
-		if app.Config == nil || app.Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Lidarr config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
-			return fmt.Errorf("%w: URL must begin with http:// or https://: Lidarr config %d", ErrInvalidApp, idx+1)
+	for idx := range a.Lidarr {
+		app := &a.Lidarr[idx]
+
+		if err := checkUrl(app.URL, starr.Lidarr.String(), idx); err != nil {
+			return nil, err
 		}
 
-		if a.Logger.DebugEnabled() {
+		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  a.Debugf,
+				Debugf:  mnd.Log.Debugf,
 				Caller:  metricMakerCallback(string(starr.Lidarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
@@ -93,16 +87,20 @@ func (a *Apps) setupLidarr() error {
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Lidarr.String(), nil)
 		}
 
-		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
-		app.Lidarr = lidarr.New(app.Config)
+		output[idx] = Lidarr{
+			StarrApp: StarrApp{
+				StarrConfig: a.Lidarr[idx],
+			},
+			Lidarr: lidarr.New(&app.Config),
+		}
 
 		if app.Deletes > 0 {
-			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
+			output[idx].delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
 		}
 	}
 
-	return nil
+	return output, nil
 }
 
 // @Description  Adds a new Album to Lidarr.

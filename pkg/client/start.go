@@ -19,11 +19,13 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/cooldown"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -37,7 +39,7 @@ import (
 
 // Client stores all the running data.
 type Client struct {
-	*logs.Logger
+	apps       *apps.Apps
 	plexTimer  *cooldown.Timer
 	Flags      *configfile.Flags
 	Config     *configfile.Config
@@ -47,6 +49,7 @@ type Client struct {
 	sighup     chan os.Signal
 	reload     chan customReload
 	triggers   *triggers.Actions
+	Services   *services.Services
 	cookies    *securecookie.SecureCookie
 	template   *template.Template
 	tunnel     *mulery.Client
@@ -55,6 +58,8 @@ type Client struct {
 	authHeader string
 	reloading  bool
 	newUI      bool
+	allow      configfile.AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
+
 	// this locks anything that may be updated while running.
 	// at least "UIPassword" and "reloading" as of its creation.
 	sync.RWMutex
@@ -73,15 +78,14 @@ var (
 
 // newDefaults returns a new Client pointer with default settings.
 func newDefaults() *Client {
-	logger := logs.New() // This persists throughout the app.
+	mnd.Log = logs.Log
 
 	return &Client{
 		sigkil:    make(chan os.Signal, 1),
 		sighup:    make(chan os.Signal, 1),
 		reload:    make(chan customReload, 1),
-		Logger:    logger,
 		plexTimer: cooldown.NewTimer(false, time.Hour),
-		Config:    configfile.NewConfig(logger),
+		Config:    configfile.NewConfig(),
 		Flags: &configfile.Flags{
 			FlagSet:    flag.NewFlagSet(mnd.DefaultName, flag.ExitOnError),
 			ConfigFile: os.Getenv(mnd.DefaultEnvPrefix + "_CONFIG_FILE"),
@@ -142,7 +146,7 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 		return c.resetAdminPassword(ctx)
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
 		for _, msg := range msgs {
-			c.Printf("==> %s", msg)
+			logs.Log.Printf("==> %s", msg)
 		}
 
 		ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
@@ -161,14 +165,14 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 }
 
 func (c *Client) start(ctx context.Context, msgs []string, newPassword string) error {
-	c.Logger.SetupLogging(c.Config.LogConfig)
-	c.Printf(" %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
+	logs.Log.SetupLogging(c.Config.LogConfig)
+	logs.Log.Printf(" %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
 		mnd.TodaysEmoji(), mnd.Title, version.Version, version.Revision,
 		os.Getpid(), os.Getuid(), os.Getgid(),
 		version.Started.Format("Mon, Jan 2, 2006 @ 3:04:05 PM MST -0700"))
 
 	for _, msg := range msgs {
-		c.Printf("==> %s", msg)
+		logs.Log.Printf("==> %s", msg)
 	}
 
 	if c.Flags.Updated {
@@ -184,15 +188,15 @@ func (c *Client) start(ctx context.Context, msgs []string, newPassword string) e
 		c.makeNewConfigFile(ctx, newPassword)
 	}
 
-	clientInfo := c.configureServices(ctx)
+	clientInfo, reload := c.configureServices(ctx)
 
 	if ui.HasGUI() {
 		// This starts the web server and calls os.Exit() when done.
-		c.startTray(ctx, clientInfo)
+		c.startTray(ctx, clientInfo, reload)
 		return nil
 	}
 
-	return c.Exit(ctx)
+	return c.Exit(ctx, reload)
 }
 
 func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
@@ -200,7 +204,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	defer cancel()
 
 	c.Config.APIKey, _, _ = ui.Entry("Enter 'All' API Key from notifiarr.com", "api-key-from-notifiarr.com")
-	if c.Config.ValidAPIKey() != nil {
+	if website.Site.ValidAPIKey() != nil {
 		c.Config.APIKey = "api-key-from-notifiarr.com"
 	} else {
 		c.Input.APIKey = c.Config.APIKey
@@ -209,12 +213,12 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	// write new config file to temporary path.
 	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig")
 	if _, err := c.Config.Write(ctx, destFile, true); err != nil { // write our config file template.
-		c.Errorf("writing new (temporary) config file: %v", err)
+		logs.Log.Errorf("writing new (temporary) config file: %v", err)
 	}
 
 	// move new config file to existing config file.
 	if err := os.Rename(destFile, c.Flags.ConfigFile); err != nil {
-		c.Errorf("renaming temporary config file: %v", err)
+		logs.Log.Errorf("renaming temporary config file: %v", err)
 	}
 
 	go func() {
@@ -231,7 +235,6 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	var (
 		msg, newPassword string
 		err              error
-		moreMsgs         map[string]string
 	)
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
@@ -248,15 +251,12 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	}
 
 	// Parse the config file and environment variables.
-	if c.Input, err = c.Config.Get(c.Flags); err != nil {
-		return output, newPassword, fmt.Errorf("getting config: %w", err)
+	result, err := c.getConfig()
+	if err != nil {
+		return output, newPassword, err
 	}
 
-	if c.triggers, moreMsgs, err = c.Config.Setup(c.Flags, c.Logger); err != nil {
-		return output, newPassword, fmt.Errorf("setting config: %w", err)
-	}
-
-	for file, path := range moreMsgs {
+	for file, path := range result.Output {
 		output = append(output, fmt.Sprintf("Extra Config File: %s => %s", file, path))
 	}
 
@@ -268,10 +268,11 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 	clientInfo, err := c.triggers.CI.SaveClientInfo(ctx, true)
 	if err != nil || clientInfo == nil {
 		if errors.Is(err, website.ErrInvalidAPIKey) {
-			c.ErrorfNoShare("==> Problem validating API key: %v", err)
-			c.ErrorfNoShare("==> NOTICE! No Further requests will be sent to the website until you reload with a valid API Key!")
+			logs.Log.ErrorfNoShare("==> Problem validating API key: %v", err)
+			logs.Log.ErrorfNoShare(
+				"==> NOTICE! No Further requests will be sent to the website until you reload with a valid API Key!")
 		} else {
-			c.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
+			logs.Log.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
 		}
 
 		return nil
@@ -287,23 +288,32 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 }
 
 // configureServices is called on startup and on reload, so be careful what goes in here.
-func (c *Client) configureServices(ctx context.Context) *clientinfo.ClientInfo {
-	c.Config.Start(ctx)
-
+func (c *Client) configureServices(ctx context.Context) (*clientinfo.ClientInfo, func()) {
+	// Cancelling this context should stop most of the things.
+	// It's just a backup, because they all have Stop methods.
+	ctx, reload := context.WithCancel(ctx)
+	// Website starts a routine that's require to send requests to notifiarr.com. Start it early.
+	website.Site.Start(ctx)
+	// Load the site config (this connects to Tautulli and notifiarr.com)
 	clientInfo := c.loadSiteConfig(ctx)
 	if clientInfo != nil && !clientInfo.User.StopLogs {
-		share.Setup(c.Config)
+		share.Enable()
 	}
-
+	// Get the Plex server name.
 	c.configureServicesPlex(ctx)
+	// Start the service checks, which needs the Plex server name.
+	c.Services.Start(ctx, c.apps.Plex.Name())
+	// Validate the snapshot configuration settings (data from website clientinfo).
 	c.Config.Snapshot.Validate()
+	// Print the startup configuration info.
 	c.PrintStartupInfo(ctx, clientInfo)
+	// Start the triggers/actions routines.
 	c.triggers.Start(ctx, c.sighup, c.sigkil)
-	c.Config.Services.Start(ctx)
 
-	return clientInfo
+	return clientInfo, reload
 }
 
+// configureServicesPlex is called on startup to set the Plex server name.
 func (c *Client) configureServicesPlex(ctx context.Context) {
 	if !c.Config.Plex.Enabled() {
 		return
@@ -312,8 +322,8 @@ func (c *Client) configureServicesPlex(ctx context.Context) {
 	ctx, cancel := context.WithTimeout(ctx, c.Config.Plex.Timeout.Duration)
 	defer cancel()
 
-	if _, err := c.Config.Plex.GetInfo(ctx); err != nil {
-		c.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
+	if _, err := c.apps.Plex.GetInfo(ctx); err != nil {
+		logs.Log.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
 	}
 }
 
@@ -322,32 +332,37 @@ func (c *Client) triggerConfigReload(event website.EventType, source string) {
 }
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
-func (c *Client) Exit(ctx context.Context) error {
+func (c *Client) Exit(ctx context.Context, reload func()) error {
 	defer func() {
-		defer c.CapturePanic()
-		c.Print(" ❌ Good bye! Exiting" + mnd.DurationAge(version.Started))
+		defer logs.Log.CapturePanic()
+		logs.Log.Print(" ❌ Good bye! Exiting" + mnd.DurationAge(version.Started))
 	}()
 
-	go func() {
-		time.Sleep(c.Flags.Delay)
-		c.StartWebServer(ctx)
-	}()
+	// Start external webserver.
+	c.SetupWebServer()
+	// Start the Notifiarr.com origin websocket tunnel (internal webserver).
+	// This uses the Routes created in the StartWebServer function.
+	c.startTunnel(ctx)
+	go c.RunWebServer()
 
 	signal.Notify(c.sigkil, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 	signal.Notify(c.sighup, syscall.SIGHUP)
 
+	var err error
 	// For non-GUI systems, this is where the main go routine stops (and waits).
 	for {
 		select {
 		case data := <-c.reload:
-			if err := c.reloadConfiguration(ctx, data.event, data.msg); err != nil {
+			reload()
+			if err, reload = c.reloadConfiguration(ctx, data.event, data.msg); err != nil {
 				return err
 			}
 		case sigc := <-c.sigkil:
-			c.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
+			logs.Log.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
 			return c.stop(ctx, website.EventSignal)
 		case sigc := <-c.sighup:
-			err := c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
+			reload()
+			err, reload = c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
 			if err != nil {
 				return err
 			}
@@ -355,74 +370,99 @@ func (c *Client) Exit(ctx context.Context) error {
 	}
 }
 
+// getConfig is the piece shared between loadConfiguration and reloadConfiguration.
+func (c *Client) getConfig() (*configfile.SetupResult, error) {
+	var err error
+	if c.Input, err = c.Config.Get(c.Flags); err != nil {
+		return nil, fmt.Errorf("getting config: %w", err)
+	}
+
+	result, err := c.Config.Setup(c.Flags)
+	if err != nil {
+		return nil, fmt.Errorf("setting config: %w", err)
+	}
+
+	c.triggers = result.Triggers
+	c.Services = result.Services
+	c.apps = result.Apps
+	c.allow = configfile.MakeIPs(c.Config.Upstreams)
+
+	return result, nil
+}
+
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
-func (c *Client) reloadConfiguration(ctx context.Context, event website.EventType, source string) error {
-	c.Printf("==> Reloading Configuration (%s): %s", event, source)
+func (c *Client) reloadConfiguration(ctx context.Context, event website.EventType, source string) (error, func()) {
+	logs.Log.Printf("==> Reloading Configuration (%s): %s", event, source)
 
 	err := c.stop(ctx, event)
 	if err != nil {
-		return fmt.Errorf("stopping web server: %w", err)
+		return fmt.Errorf("stopping web server: %w", err), nil
 	}
 
 	// start over.
-	c.Config = configfile.NewConfig(c.Logger)
-	if c.Input, err = c.Config.Get(c.Flags); err != nil {
-		return fmt.Errorf("getting config: %w", err)
+	c.Config = configfile.NewConfig()
+
+	result, err := c.getConfig()
+	if err != nil {
+		return err, nil
 	}
 
-	var output map[string]string
-
-	if c.triggers, output, err = c.Config.Setup(c.Flags, c.Logger); err != nil {
-		return fmt.Errorf("setting config: %w", err)
+	if errs := logs.Log.Close(); len(errs) > 0 {
+		return fmt.Errorf("closing logger: %w", errs[0]), nil
 	}
 
-	if errs := c.Logger.Close(); len(errs) > 0 {
-		return fmt.Errorf("closing logger: %w", errs[0])
-	}
+	defer func() {
+		c.SetupWebServer()
+		c.startTunnel(ctx)
+		go c.RunWebServer()
+	}()
 
-	defer c.StartWebServer(ctx)
-
-	c.Logger.SetupLogging(c.Config.LogConfig)
-	clientInfo := c.configureServices(ctx)
+	logs.Log.SetupLogging(c.Config.LogConfig)
+	clientInfo, reload := c.configureServices(ctx)
 	c.setupMenus(clientInfo)
+	uptime := mnd.DurationAge(version.Started)
 
 	if c.Flags.ConfigFile == "" {
-		c.Printf(" 🌀 %s v%s-%s Configuration Reloaded! No config file.",
-			c.Flags.Name(), version.Version, version.Revision)
+		logs.Log.Printf(" 🌀 %s v%s-%s Configuration Reloaded! No config file, Uptime: %s",
+			c.Flags.Name(), version.Version, version.Revision, uptime)
 
 		if err = ui.Toast("Configuration Reloaded! No config file."); err != nil {
-			c.Errorf("Creating Toast Notification: %v", err)
+			logs.Log.Errorf("Creating Toast Notification: %v", err)
 		}
 	} else {
-		c.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s",
-			c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile)
+		logs.Log.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s, Uptime: %s",
+			c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile, uptime)
 
 		if err = ui.Toast("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
-			c.Errorf("Creating Toast Notification: %v", err)
+			logs.Log.Errorf("Creating Toast Notification: %v", err)
 		}
 	}
 
-	for path, file := range output {
-		c.Printf(" => Extra Config File: %s => %s", file, path)
+	for path, file := range result.Output {
+		logs.Log.Printf(" => Extra Config File: %s => %s", file, path)
 	}
 
 	// This doesn't need to lock because web server is not running.
 	c.reloading = false // We're done.
 
-	return nil
+	return nil, reload
 }
 
 // stop is called from at least two different exit points and on reload.
 func (c *Client) stop(ctx context.Context, event website.EventType) error {
 	defer func() {
-		defer c.CapturePanic()
+		defer logs.Log.CapturePanic()
 		c.triggers.Stop(event)
-		c.Config.Services.Stop()
-		c.Config.Stop()
-		c.Print("==> All systems powered down!")
+		c.Services.Stop()
+		website.Site.Stop()
+		logs.Log.Printf("==> All systems powered down!")
 	}()
+
+	if c.tunnel != nil {
+		c.tunnel.Shutdown()
+	}
 
 	return c.StopWebServer(ctx)
 }

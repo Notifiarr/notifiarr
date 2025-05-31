@@ -23,19 +23,19 @@ var upgrader = websocket.Upgrader{
 
 // Websockets cannot use our apachelog package, so we have to produce our own log line for those reqs.
 func (c *Client) socketLog(code int, r *http.Request) {
-	_, _ = c.Logger.HTTPLog.Writer().Write([]byte(fmt.Sprintf(`%s - - [%s] "%s %s %s" %d 0 "%s" "%s"`+"\n",
+	_, _ = logs.Log.HTTPLog.Writer().Write([]byte(fmt.Sprintf(`%s - - [%s] "%s %s %s" %d 0 "%s" "%s"`+"\n",
 		r.Header.Get("X-Forwarded-For"), time.Now().Format("02/Jan/2006:15:04:05 -0700"),
 		r.Method, r.RequestURI, r.Proto, code, r.Header.Get("Referer"), r.Header.Get("User-Agent"))))
 }
 
 func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Request) {
-	defer c.CapturePanic()
+	defer logs.Log.CapturePanic()
 
 	var fileInfos *logs.LogFileInfos
 
 	switch src := mux.Vars(request)["source"]; src {
 	case fileSourceLogs:
-		fileInfos = c.Logger.GetAllLogFilePaths()
+		fileInfos = logs.Log.GetAllLogFilePaths()
 	default:
 		http.Error(response, "invalid source: "+src, http.StatusBadRequest)
 		c.socketLog(http.StatusBadRequest, request)
@@ -66,7 +66,7 @@ func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Re
 
 		socket, err := upgrader.Upgrade(response, request, nil)
 		if err != nil {
-			c.Errorf("[gui requested] Creating Websocket: %v", err)
+			logs.Log.Errorf("[gui requested] Creating Websocket: %v", err)
 			c.socketLog(http.StatusInternalServerError, request)
 
 			return
@@ -91,7 +91,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 	)
 
 	defer func() {
-		c.CapturePanic()
+		logs.Log.CapturePanic()
 		fileTail.Stop() //nolint:errcheck
 		pingTicker.Stop()
 		socket.Close()
@@ -101,7 +101,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 		select {
 		case line := <-fileTail.Lines:
 			if line == nil {
-				c.Debugf("file lines return empty, dropping websocket (did the file rotate?)")
+				logs.Log.Debugf("file lines return empty, dropping websocket (did the file rotate?)")
 				return
 			}
 
@@ -116,7 +116,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 					lastError = lineErr
 					text = lineErr
 				} else {
-					c.Debugf("closing websocket due to errors: %v", lineErr)
+					logs.Log.Debugf("closing websocket due to errors: %v", lineErr)
 					return // two errors.
 				}
 			} else {
@@ -126,14 +126,14 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))
 
 			if err := socket.WriteMessage(websocket.TextMessage, []byte(text)); err != nil {
-				c.Debugf("websocket closed, write error: %v", err)
+				logs.Log.Debugf("websocket closed, write error: %v", err)
 				return // dead sock
 			}
 		case <-pingTicker.C:
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))
 
 			if err := socket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				c.Debugf("websocket closed, ping error: %v", err)
+				logs.Log.Debugf("websocket closed, ping error: %v", err)
 				return
 			}
 		}
@@ -142,7 +142,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 
 func (c *Client) webSocketReader(socket *websocket.Conn) {
 	defer func() {
-		c.CapturePanic()
+		logs.Log.CapturePanic()
 		socket.Close()
 	}()
 

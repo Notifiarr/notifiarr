@@ -7,7 +7,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/services"
 )
 
-func testTCP(ctx context.Context, svc *services.Service) (string, int) {
+func testTCP(ctx context.Context, svc *services.ServiceConfig) (string, int) {
 	if err := svc.Validate(); err != nil {
 		return validation + err.Error(), http.StatusBadRequest
 	}
@@ -20,7 +20,7 @@ func testTCP(ctx context.Context, svc *services.Service) (string, int) {
 	return "TCP Port is OPEN and reachable: " + res.Output.String(), http.StatusOK
 }
 
-func testHTTP(ctx context.Context, svc *services.Service) (string, int) {
+func testHTTP(ctx context.Context, svc *services.ServiceConfig) (string, int) {
 	if err := svc.Validate(); err != nil {
 		return validation + err.Error(), http.StatusBadRequest
 	}
@@ -34,7 +34,7 @@ func testHTTP(ctx context.Context, svc *services.Service) (string, int) {
 	return "HTTP Response Code Acceptable! " + res.Output.String(), http.StatusOK
 }
 
-func testProcess(ctx context.Context, svc *services.Service) (string, int) {
+func testProcess(ctx context.Context, svc *services.ServiceConfig) (string, int) {
 	if err := svc.Validate(); err != nil {
 		return validation + err.Error(), http.StatusBadRequest
 	}
@@ -47,7 +47,7 @@ func testProcess(ctx context.Context, svc *services.Service) (string, int) {
 	return "Process Tested OK: " + res.Output.String(), http.StatusOK
 }
 
-func testPing(ctx context.Context, svc *services.Service) (string, int) {
+func testPing(ctx context.Context, svc *services.ServiceConfig) (string, int) {
 	if err := svc.Validate(); err != nil {
 		return validation + err.Error(), http.StatusBadRequest
 	}

@@ -14,37 +14,45 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // Server is the Plex configuration from a config file.
 // Without a URL or Token, nothing works and this package is unused.
 type Server struct {
-	config Config
+	mu sync.RWMutex
+	Config
+	Client *http.Client
 	name   string
 }
 
 type Config struct {
-	URL    string       `json:"url"   toml:"url"   xml:"url"`
-	Token  string       `json:"token" toml:"token" xml:"token"`
-	Client *http.Client `json:"-"     toml:"-"     xml:"-"`
+	URL   string `json:"url"   toml:"url"   xml:"url"`
+	Token string `json:"token" toml:"token" xml:"token"`
 }
 
 // New turns a config into a server.
-func New(config *Config) *Server {
-	if config.Client == nil {
-		config.Client = &http.Client{
+func New(config *Config, client *http.Client) *Server {
+	if client == nil {
+		client = &http.Client{
 			Timeout: time.Minute,
 		}
 	}
 
 	return &Server{
-		config: *config,
+		Config: *config,
+		Client: client,
 	}
 }
 
 // Name returns the server name.
 func (s *Server) Name() string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	return s.name
 }
 
@@ -71,7 +79,7 @@ func (s *Server) reqPlexURL(
 	params url.Values,
 	sendData io.Reader,
 ) ([]byte, error) {
-	if s.config.URL == "" || s.config.Token == "" {
+	if s.Config.URL == "" || s.Config.Token == "" {
 		return nil, ErrNoURLToken
 	}
 
@@ -81,10 +89,10 @@ func (s *Server) reqPlexURL(
 	}
 
 	req.URL.RawQuery = params.Encode()
-	req.Header.Set("X-Plex-Token", s.config.Token)
-	req.Header.Set("Accept", "application/json")
+	req.Header.Set("X-Plex-Token", s.Config.Token)
+	req.Header.Set("Accept", mnd.ContentTypeJSON)
 
-	resp, err := s.config.Client.Do(req)
+	resp, err := s.Client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("making http request: %w", err)
 	}

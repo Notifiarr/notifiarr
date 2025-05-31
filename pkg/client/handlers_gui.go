@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/frontend"
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/checkapp"
@@ -82,7 +83,7 @@ func (c *Client) getUserName(request *http.Request) (string, bool) {
 		return username, found
 	}
 
-	if c.Config.Allow.Contains(request.RemoteAddr) && c.webauth {
+	if c.allow.Contains(request.RemoteAddr) && c.webauth {
 		// If the upstream is allowed and gave us a username header, use it.
 		if userName := request.Header.Get(c.authHeader); userName != "" {
 			return userName, true
@@ -176,7 +177,7 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 		return
 	}
 
-	fileInfos := c.Logger.GetAllLogFilePaths()
+	fileInfos := logs.Log.GetAllLogFilePaths()
 	id := mux.Vars(req)["id"]
 
 	for _, fileInfo := range fileInfos.List {
@@ -188,13 +189,13 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 
 		if err := os.Remove(fileInfo.Path); err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
-			c.Errorf("[gui '%s' requested] Deleting file: %v", user, err)
+			logs.Log.Errorf("[gui '%s' requested] Deleting file: %v", user, err)
 		}
 
-		c.Printf("[gui '%s' requested] Deleted file: %s", user, fileInfo.Path)
+		logs.Log.Printf("[gui '%s' requested] Deleted file: %s", user, fileInfo.Path)
 
 		if _, err := response.Write([]byte("ok")); err != nil {
-			c.Errorf("Writing HTTP Response: %v", err)
+			logs.Log.Errorf("Writing HTTP Response: %v", err)
 		}
 
 		return
@@ -209,7 +210,7 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 	}
 
 	id := mux.Vars(req)["id"]
-	for _, fileInfo := range c.Logger.GetAllLogFilePaths().List {
+	for _, fileInfo := range logs.Log.GetAllLogFilePaths().List {
 		if fileInfo.ID != id {
 			continue
 		}
@@ -220,7 +221,7 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 		}
 
 		user, _ := c.getUserName(req)
-		c.Printf("[gui '%s' requested] Uploaded file: %s", user, fileInfo.Path)
+		logs.Log.Printf("[gui '%s' requested] Uploaded file: %s", user, fileInfo.Path)
 
 		return
 	}
@@ -229,7 +230,7 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 // getFileDownloadHandler downloads log files to the browser.
 func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.Request) {
 	id := mux.Vars(req)["id"]
-	for _, fileInfo := range c.Logger.GetAllLogFilePaths().List {
+	for _, fileInfo := range logs.Log.GetAllLogFilePaths().List {
 		if fileInfo.ID != id {
 			continue
 		}
@@ -252,12 +253,12 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 		response.Header().Set("Content-Type", "application/zip")
 
 		if _, err := io.Copy(newZippedFile, fileOpen); err != nil {
-			c.Errorf("Sending Zipped File %s: %v", fileInfo.Path, err)
+			logs.Log.Errorf("Sending Zipped File %s: %v", fileInfo.Path, err)
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 
 		user, _ := c.getUserName(req)
-		c.Printf("[gui '%s' requested] Downloaded file: %s", user, fileInfo.Path)
+		logs.Log.Printf("[gui '%s' requested] Downloaded file: %s", user, fileInfo.Path)
 
 		return
 	}
@@ -300,12 +301,12 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":
-		c.Config.Services.Stop()
-		c.Printf("[gui '%s' requested] Service Checks Stopped", user)
+		c.Services.Stop()
+		logs.Log.Printf("[gui '%s' requested] Service Checks Stopped", user)
 		http.Error(response, "Service Checks Stopped", http.StatusOK)
 	case "start":
-		c.Config.Services.Start(req.Context())
-		c.Printf("[gui '%s' requested] Service Checks Started", user)
+		c.Services.Start(req.Context(), c.apps.Plex.Name())
+		logs.Log.Printf("[gui '%s' requested] Service Checks Started", user)
 		http.Error(response, "Service Checks Started", http.StatusOK)
 	default:
 		http.Error(response, "invalid action: "+action, http.StatusBadRequest)
@@ -314,13 +315,13 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 
 func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Request) {
 	svc := mux.Vars(req)["service"]
-	if err := c.Config.Services.RunCheck(website.EventAPI, svc); err != nil {
+	if err := c.Services.RunCheck(website.EventAPI, svc); err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	user, _ := c.getUserName(req)
-	c.Printf("[gui '%s' requested] Check Service: %s", user, svc)
+	logs.Log.Printf("[gui '%s' requested] Check Service: %s", user, svc)
 	http.Error(response, "Service Check Initiated", http.StatusOK)
 }
 
@@ -330,7 +331,7 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 
 	switch mux.Vars(req)["source"] {
 	case fileSourceLogs:
-		fileInfos = c.Logger.GetAllLogFilePaths()
+		fileInfos = logs.Log.GetAllLogFilePaths()
 	default:
 		http.Error(response, "invalid source", http.StatusBadRequest)
 		return
@@ -351,12 +352,12 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 
 		lines, err := getLinesFromFile(fileInfo.Path, mux.Vars(req)["sort"], count, skip)
 		if err != nil {
-			c.Errorf("Handling Log File Request: %v", err)
+			logs.Log.Errorf("Handling Log File Request: %v", err)
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		} else if fileInfo.Size == 0 {
 			http.Error(response, "the file is empty", http.StatusInternalServerError)
 		} else if _, err = response.Write(lines); err != nil {
-			c.Errorf("Writing HTTP Response: %v", err)
+			logs.Log.Errorf("Writing HTTP Response: %v", err)
 		}
 
 		return
@@ -404,7 +405,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	case runtime.GOOS == mnd.Windows:
 		partitions, err := disk.PartitionsWithContext(request.Context(), false)
 		if err != nil {
-			c.Errorf("Getting disk partitions: %v", err)
+			logs.Log.Errorf("Getting disk partitions: %v", err)
 		}
 		// this runs anyway.
 		for _, partition := range partitions {
@@ -415,7 +416,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	}
 
 	if err := json.NewEncoder(response).Encode(&output); err != nil {
-		c.Errorf("Encoding file browser directory: %v", err)
+		logs.Log.Errorf("Encoding file browser directory: %v", err)
 	}
 }
 
@@ -458,7 +459,7 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 	} else if _, err = ps.WriteTo(response); err != nil {
 		user, _ := c.getUserName(request)
-		c.Errorf("[gui '%s' requested] Writing HTTP Response: %v", user, err)
+		logs.Log.Errorf("[gui '%s' requested] Writing HTTP Response: %v", user, err)
 	}
 }
 
@@ -510,7 +511,7 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 		http.Error(response, "Stop Failed: "+err.Error(), http.StatusInternalServerError)
 
 		user, _ := c.getUserName(request)
-		c.Errorf("[gui '%s' requested] Stopping File Watcher: %v", user, err)
+		logs.Log.Errorf("[gui '%s' requested] Stopping File Watcher: %v", user, err)
 
 		return
 	}
@@ -541,7 +542,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	// copy running config,
 	config, err := c.Config.CopyConfig()
 	if err != nil {
-		c.Errorf("[gui '%s' requested] Copying Config (GUI request): %v", user, err)
+		logs.Log.Errorf("[gui '%s' requested] Copying Config (GUI request): %v", user, err)
 		http.Error(response, "Error copying internal configuration (this is a bug): "+
 			err.Error(), http.StatusInternalServerError)
 
@@ -549,9 +550,9 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// update config.
-	if request.Header.Get("Content-Type") == "application/json" {
+	if request.Header.Get("Content-Type") == mnd.ContentTypeJSON {
 		if err = json.NewDecoder(request.Body).Decode(&config); err != nil {
-			c.Errorf("[gui '%s' requested] Decoding POSTed Config: %v", user, err)
+			logs.Log.Errorf("[gui '%s' requested] Decoding POSTed Config: %v, %#v", user, err, config)
 			http.Error(response, "Error decoding POSTed Config: "+err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -562,21 +563,20 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	if err != nil {
-		c.Errorf("[gui '%s' requested] Validating POSTed Config: %v", user, err)
+		logs.Log.Errorf("[gui '%s' requested] Validating POSTed Config: %v", user, err)
 		http.Error(response, err.Error(), http.StatusBadRequest)
 
 		return
 	}
 
 	// Check app integration configs before saving.
-	config.Apps.Logger = c.Logger
-	if err = config.Apps.Setup(); err != nil {
+	if err = apps.CheckURLs(&config.AppsConfig); err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 		return
 	}
 
 	if err = c.saveNewConfig(request.Context(), config); err != nil {
-		c.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
+		logs.Log.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
 		return
@@ -596,7 +596,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// respond.
-	c.Printf("[gui '%s' requested] Updated Configuration.%s", user, reload)
+	logs.Log.Printf("[gui '%s' requested] Updated Configuration.%s", user, reload)
 	http.Error(response, "Config Saved."+reload, http.StatusOK)
 }
 
@@ -637,26 +637,19 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		config.Snapshot = &snapshot.Config{}
 	}
 
-	if config.Apps != nil {
-		config.Apps.Lidarr = nil
-		config.Apps.Prowlarr = nil
-		config.Apps.Radarr = nil
-		config.Apps.Readarr = nil
-		config.Apps.Sonarr = nil
-		config.Apps.Qbit = nil
-		config.Apps.Rtorrent = nil
-		config.Apps.Deluge = nil
-		config.Apps.SabNZB = nil
-		config.Apps.NZBGet = nil
-		config.Apps.Tautulli = nil
-		config.Apps.Transmission = nil
-		config.Apps.Qbit = nil
-		config.Apps.Plex = nil
-	}
-
+	config.AppsConfig.Lidarr = nil
+	config.AppsConfig.Prowlarr = nil
+	config.AppsConfig.Radarr = nil
+	config.AppsConfig.Readarr = nil
+	config.AppsConfig.Sonarr = nil
+	config.AppsConfig.Qbit = nil
+	config.AppsConfig.Rtorrent = nil
+	config.AppsConfig.Deluge = nil
+	config.AppsConfig.SabNZB = nil
+	config.AppsConfig.NZBGet = nil
+	config.AppsConfig.Transmission = nil
 	config.SSLCrtFile = ""
 	config.SSLKeyFile = ""
-	config.Plex = nil
 	config.WatchFiles = nil
 	config.Commands = nil
 	config.Service = nil

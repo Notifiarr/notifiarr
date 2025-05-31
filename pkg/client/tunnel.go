@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -34,16 +35,16 @@ const (
 // may send to this client. Realistically very few clients create
 // more than 4 or 5 connections.
 func (c *Client) poolMax(info *clientinfo.ClientInfo) int {
-	poolmax := len(c.Config.Apps.Sonarr) + len(c.Config.Apps.Radarr) + len(c.Config.Apps.Lidarr) +
-		len(c.Config.Apps.Readarr) + len(c.Config.Apps.Prowlarr) + len(c.Config.Apps.Deluge) +
-		len(c.Config.Apps.Qbit) + len(c.Config.Apps.Rtorrent) + len(c.Config.Apps.SabNZB) +
-		len(c.Config.Apps.NZBGet) + 1
+	poolmax := len(c.apps.Sonarr) + len(c.apps.Radarr) + len(c.apps.Lidarr) +
+		len(c.apps.Readarr) + len(c.apps.Prowlarr) + len(c.apps.Deluge) +
+		len(c.apps.Qbit) + len(c.apps.Rtorrent) + len(c.apps.SabNZB) +
+		len(c.apps.NZBGet) + 1
 
-	if c.Config.Apps.Plex.Enabled() {
+	if c.apps.Plex.Enabled() {
 		poolmax++
 	}
 
-	if c.Config.Apps.Tautulli.Enabled() {
+	if c.apps.Tautulli.Enabled() {
 		poolmax++
 	}
 
@@ -60,21 +61,21 @@ func (c *Client) startTunnel(ctx context.Context) {
 	// If clientinfo is nil, then we probably have a bad API key.
 	info := clientinfo.Get()
 	if info == nil {
-		c.Errorf("Skipping tunnel creation because there is no client info.")
+		logs.Log.Errorf("Skipping tunnel creation because there is no client info.")
 		return
 	}
 
 	c.makeTunnel(ctx, info)
-	c.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
+	logs.Log.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
 		len(c.tunnel.Targets), c.tunnel.PoolMaxSize, c.tunnel.CleanInterval,
 		c.tunnel.Backoff, info.User.TunnelURL, c.tunnel.GetID())
-	c.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
+	logs.Log.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
 	c.tunnel.Start(ctx)
 }
 
 func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 	hostname, _ := os.Hostname()
-	if hostInfo, err := c.triggers.CI.GetHostInfo(ctx); err != nil {
+	if hostInfo, err := website.Site.GetHostInfo(ctx); err != nil {
 		hostname = hostInfo.Hostname
 	}
 
@@ -93,11 +94,10 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 		CleanInterval:    time.Second + time.Duration(c.triggers.Rand().Intn(1000))*time.Millisecond,
 		Backoff:          600*time.Millisecond + time.Duration(c.triggers.Rand().Intn(600))*time.Millisecond,
 		SecretKey:        c.Config.APIKey,
-		Handler:          remWs.Wrap(c.prefixURLbase(c.Config.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
+		Handler:          remWs.Wrap(c.prefixURLbase(c.apps.Router), logs.Log.HTTPLog.Writer()).ServeHTTP,
 		RoundRobinConfig: c.roundRobinConfig(info),
 		Logger: &tunnelLogger{
 			ctx:            ctx,
-			Logger:         c.Logger,
 			sendSiteErrors: info.User.DevAllowed,
 		},
 	})
@@ -117,7 +117,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 		Callback: func(_ context.Context, socket string) {
 			defer data.Save("activeTunnel", socket)
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
-			c.Config.SendData(&website.Request{
+			website.Site.SendData(&website.Request{
 				Route:      website.TunnelRoute,
 				Event:      website.EventSignal,
 				Payload:    map[string]interface{}{"socket": socket, "previous": data.Get("activeTunnel")},
@@ -166,17 +166,15 @@ func (c *Client) prefixURLbase(handler http.Handler) http.Handler {
 			return
 		}
 
-		req2 := new(http.Request)
-		*req2 = *req
-		req2.URL = new(url.URL)
-		*req2.URL = *req.URL
-		req2.URL.Path = path.Join(c.Config.URLBase, req.URL.Path)
+		url := &(*req.URL)
+		url.Path = path.Join(c.Config.URLBase, url.Path)
 
-		if req.URL.RawPath != "" {
-			req2.URL.RawPath = path.Join(c.Config.URLBase, req.URL.RawPath)
+		if url.RawPath != "" {
+			url.RawPath = path.Join(c.Config.URLBase, url.RawPath)
 		}
 
-		handler.ServeHTTP(writer, req2)
+		req.URL = url
+		handler.ServeHTTP(writer, req)
 	})
 }
 
@@ -184,29 +182,28 @@ func (c *Client) prefixURLbase(handler http.Handler) http.Handler {
 type tunnelLogger struct {
 	// hide the app context here so we can use it when we restart a tunnel from an http request
 	ctx context.Context //nolint:containedctx
-	mnd.Logger
-	// sendSiteErrors true sends tunnel errors to website as notifications.
+	//	// sendSiteErrors true sends tunnel errors to website as notifications.
 	sendSiteErrors bool
 }
 
 // Debugf prints a message with DEBUG prefixed.
 func (l *tunnelLogger) Debugf(format string, v ...interface{}) {
-	l.Logger.Debugf(format, v...)
+	mnd.Log.Debugf(format, v...)
 }
 
 // Errorf prints a message with ERROR prefixed.
 func (l *tunnelLogger) Errorf(format string, v ...interface{}) {
 	// this is why we dont just pass the interface in as-is.
 	if l.sendSiteErrors {
-		l.Logger.Errorf(format, v...)
+		mnd.Log.Errorf(format, v...)
 	} else {
-		l.Logger.ErrorfNoShare(format, v...)
+		mnd.Log.ErrorfNoShare(format, v...)
 	}
 }
 
 // Printf prints a message with INFO prefixed.
 func (l *tunnelLogger) Printf(format string, v ...interface{}) {
-	l.Logger.Printf(format, v...)
+	mnd.Log.Printf(format, v...)
 }
 
 const pingTimeout = 7 * time.Second
@@ -247,7 +244,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 	wait.Wait()
 
 	if err := json.NewEncoder(response).Encode(list); err != nil {
-		c.Errorf("Pinging Tunnel: encoding json: %v", err)
+		logs.Log.Errorf("Pinging Tunnel: encoding json: %v", err)
 	}
 }
 
@@ -258,7 +255,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
 		strings.Replace(socket, "wss://", "https://", 1), nil)
 	if err != nil {
-		c.Errorf("Pinging Tunnel: creating request: %v", err)
+		logs.Log.Errorf("Pinging Tunnel: creating request: %v", err)
 		return
 	}
 
@@ -266,7 +263,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		c.Errorf("Pinging Tunnel: making request: %v", err)
+		logs.Log.Errorf("Pinging Tunnel: making request: %v", err)
 		inCh <- map[int]string{idx: "error"}
 
 		return
@@ -280,25 +277,26 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
-		c.Errorf("Saving Tunnel: reading request: %v", err)
+		logs.Log.Errorf("Saving Tunnel: reading request: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
-	var input = struct {
+	//nolint:tagliatelle // fix this after old WebUI goes away.
+	input := struct {
 		PrimaryTunnel string   `json:"PrimaryTunnel"`
 		BackupTunnel  []string `json:"BackupTunnel"`
 	}{}
 
-	if request.Header.Get("Content-Type") != "application/json" {
+	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
 		err = c.decodeTunnelConfig(body, &input)
 	} else {
 		err = json.Unmarshal(body, &input)
 	}
 
 	if err != nil {
-		c.Errorf("Saving Tunnel: %v", err)
+		logs.Log.Errorf("Saving Tunnel: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -312,7 +310,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		}
 	}
 
-	c.Config.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.TunnelRoute,
 		Event:      website.EventGUI,
 		Payload:    map[string]any{"sockets": sockets},
@@ -328,11 +326,13 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	c.makeTunnel(tl.ctx, ci) //nolint:contextcheck // these cannot be inherited from the http request.
 	c.tunnel.Start(tl.ctx)   //nolint:contextcheck
 
-	if request.Header.Get("Content-Type") != "application/json" {
+	tunnels := map[string]any{"success": true, "primary": input.PrimaryTunnel, "backups": input.BackupTunnel}
+
+	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
 		http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
 			input.PrimaryTunnel, len(input.BackupTunnel)), http.StatusOK)
-	} else if err := json.NewEncoder(response).Encode(map[string]any{"success": true, "primary": input.PrimaryTunnel, "backups": input.BackupTunnel}); err != nil {
-		c.Errorf("Saving Tunnel: sending json response: %v", err)
+	} else if err := json.NewEncoder(response).Encode(tunnels); err != nil {
+		logs.Log.Errorf("Saving Tunnel: sending json response: %v", err)
 	}
 }
 
@@ -340,12 +340,12 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 func (c *Client) decodeTunnelConfig(body []byte, input any) error {
 	decodedValue, err := url.ParseQuery(string(body))
 	if err != nil {
-		return fmt.Errorf("parsing request: %v", err)
+		return fmt.Errorf("parsing request: %w", err)
 	}
 
 	err = schema.NewDecoder().Decode(&input, decodedValue)
 	if err != nil {
-		return fmt.Errorf("decoding request: %v", err)
+		return fmt.Errorf("decoding request: %w", err)
 	}
 
 	return nil

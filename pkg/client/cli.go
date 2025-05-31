@@ -49,7 +49,7 @@ func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error 
 		return fmt.Errorf("writing config: %w", err)
 	}
 
-	c.Print("Wrote Config File:", f)
+	logs.Log.Print("Wrote Config File:", f)
 
 	return nil
 }
@@ -63,8 +63,8 @@ func (c *Client) resetAdminPassword(ctx context.Context) error {
 		return fmt.Errorf("setting password failed: %w", err)
 	}
 
-	c.Printf("New '%s' user password: %s", configfile.DefaultUsername, password)
-	c.Printf("Writing Config File: %s", c.Flags.ConfigFile)
+	logs.Log.Printf("New '%s' user password: %s", configfile.DefaultUsername, password)
+	logs.Log.Printf("Writing Config File: %s", c.Flags.ConfigFile)
 
 	return c.saveNewConfig(ctx, c.Config)
 }
@@ -212,7 +212,7 @@ func (c *Client) handleAptHook(ctx context.Context) error { //nolint:cyclop
 		} //nolint:wsl
 	}
 
-	resp, _, err := c.Config.RawGetData(ctx, &website.Request{
+	resp, _, err := website.Site.RawGetData(ctx, &website.Request{
 		Route:   website.PkgRoute,
 		Event:   "apt",
 		Payload: output,

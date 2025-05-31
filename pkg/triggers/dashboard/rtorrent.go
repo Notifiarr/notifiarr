@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/mrobinsn/go-rtorrent/rtorrent"
 )
 
@@ -20,12 +21,12 @@ func (c *Cmd) getRtorrentStates() []*State {
 			continue
 		}
 
-		c.Debugf("Getting rTorrent State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting rTorrent State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getRtorrentState(instance+1, app)
+		state, err := c.getRtorrentState(instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting rTorrent Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting rTorrent Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -34,7 +35,7 @@ func (c *Cmd) getRtorrentStates() []*State {
 	return states
 }
 
-func (c *Cmd) getRtorrentState(instance int, rTorrent *apps.RtorrentConfig) (*State, error) { //nolint:cyclop
+func (c *Cmd) getRtorrentState(instance int, rTorrent *apps.Rtorrent) (*State, error) { //nolint:cyclop
 	state := &State{Instance: instance, Name: rTorrent.Name}
 	start := time.Now()
 
@@ -101,7 +102,7 @@ type rTorrentData struct {
 	Torrents  []*RtorrentTorrent
 }
 
-func getRtorrentData(rTorrent *apps.RtorrentConfig) (*rTorrentData, error) {
+func getRtorrentData(rTorrent *apps.Rtorrent) (*rTorrentData, error) {
 	var (
 		err    error
 		output = &rTorrentData{}
@@ -137,7 +138,7 @@ type RtorrentTorrent struct {
 	Finished  time.Time
 }
 
-func rTorrentTorrents(rTorrent *apps.RtorrentConfig) ([]*RtorrentTorrent, error) {
+func rTorrentTorrents(rTorrent *apps.Rtorrent) ([]*RtorrentTorrent, error) {
 	args := []interface{}{
 		"",
 		string(rtorrent.ViewMain),
@@ -187,7 +188,7 @@ func rTorrentTorrents(rTorrent *apps.RtorrentConfig) ([]*RtorrentTorrent, error)
 }
 
 // rTorrentDownTotal returns the total downloaded metric reported by this RTorrent instance (bytes).
-func rTorrentDownTotal(rTorrent *apps.RtorrentConfig) (int, error) {
+func rTorrentDownTotal(rTorrent *apps.Rtorrent) (int, error) {
 	result, err := rTorrent.Call("throttle.global_down.total")
 	if err != nil {
 		return 0, fmt.Errorf("%w: throttle.global_down.total XMLRPC call failed", err)
@@ -205,7 +206,7 @@ func rTorrentDownTotal(rTorrent *apps.RtorrentConfig) (int, error) {
 }
 
 // rTorrentUpTotal returns the total uploaded metric reported by this RTorrent instance (bytes).
-func rTorrentUpTotal(rTorrent *apps.RtorrentConfig) (int, error) {
+func rTorrentUpTotal(rTorrent *apps.Rtorrent) (int, error) {
 	result, err := rTorrent.Call("throttle.global_up.total")
 	if err != nil {
 		return 0, fmt.Errorf("%w: throttle.global_up.total XMLRPC call failed", err)

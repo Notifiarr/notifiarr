@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -44,7 +45,7 @@ func (c *cmd) create() {
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = ci.Actions.Gaps.Interval.Duration + randomTime
-		c.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
+		mnd.Log.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
 	}
 
 	c.Add(&common.Action{
@@ -63,7 +64,7 @@ func (a *Action) Send(event website.EventType) {
 func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 	info := clientinfo.Get()
 	if info == nil || len(info.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
-		c.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
+		mnd.Log.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
 			input.Type, len(c.Apps.Radarr))
 		return
 	}
@@ -82,12 +83,12 @@ func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 
 		movies, err := app.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
 		if err != nil {
-			c.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v",
+			mnd.Log.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v",
 				input.Type, instance, app.URL, err)
 			continue
 		}
 
-		c.SendData(&website.Request{
+		website.Site.SendData(&website.Request{
 			Route:      website.GapsRoute,
 			Event:      input.Type,
 			LogPayload: true,

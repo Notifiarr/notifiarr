@@ -89,7 +89,7 @@ var (
 // Run fires in a go routine. Wait a minute or two then tell the website we're up.
 // If app reloads in first checkWait duration, this throws an error. That's ok.
 func (c *cmd) create() {
-	defer c.CapturePanic()
+	defer mnd.Log.CapturePanic()
 
 	var dur time.Duration
 
@@ -118,7 +118,7 @@ func (c *cmd) create() {
 		pfx = "Unstable"
 	}
 
-	c.Printf("==> Client auto-updater started. %s channel check interval: %s",
+	mnd.Log.Printf("==> Client auto-updater started. %s channel check interval: %s",
 		pfx, durafmt.Parse(dur).LimitFirstN(3)) //nolint:mnd
 
 	c.Add(&common.Action{
@@ -140,31 +140,30 @@ func (c *cmd) checkAndUpdate(ctx context.Context, action *common.ActionInput) {
 
 	//nolint:wsl
 	if c.UnstableCh {
-		c.Debugf("[cron requested] Checking Unstable website for Update.")
+		mnd.Log.Debugf("[cron requested] Checking Unstable website for Update.")
 		data, err = update.CheckUnstable(ctx, mnd.DefaultName, version.Revision)
 	} else {
-		c.Debugf("[cron requested] Checking GitHub for Update.")
+		mnd.Log.Debugf("[cron requested] Checking GitHub for Update.")
 		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
 	}
 
 	if err != nil {
-		c.Errorf("Auto-Update Failed checking for update: %v", err)
+		mnd.Log.Errorf("Auto-Update Failed checking for update: %v", err)
 	} else if !data.Outdate {
-		c.Debugf("Auto-Update Success, up to date.")
+		mnd.Log.Debugf("Auto-Update Success, up to date.")
 	} else if err = c.updateNow(ctx, data, action.Type); err != nil {
-		c.Errorf("Auto-Update Failed applying update: %v", err)
+		mnd.Log.Errorf("Auto-Update Failed applying update: %v", err)
 	}
 }
 
 func (c *cmd) updateNow(ctx context.Context, u *update.Update, msg website.EventType) error {
-	c.Printf("[UPDATE] Downloading and installing update! %s-%s => %s: %s",
+	mnd.Log.Printf("[UPDATE] Downloading and installing update! %s-%s => %s: %s",
 		version.Version, version.Revision, u.Current, u.CurrURL)
 
 	cmd := &update.Command{
-		URL:    u.CurrURL,
-		Logger: c.Logger,
-		Args:   []string{"--restart", "--config", c.ConfigFile},
-		Path:   os.Args[0],
+		URL:  u.CurrURL,
+		Args: []string{"--restart", "--config", c.ConfigFile},
+		Path: os.Args[0],
 	}
 
 	if path, err := os.Executable(); err == nil {
@@ -180,7 +179,7 @@ func (c *cmd) updateNow(ctx context.Context, u *update.Update, msg website.Event
 		return fmt.Errorf("installing update: %w", err)
 	}
 
-	c.Printf("Update installed to %s restarting! Backup: %s", cmd.Path, backupFile)
+	mnd.Log.Printf("Update installed to %s restarting! Backup: %s", cmd.Path, backupFile)
 	// And exit, so we can restart.
 	c.StopApp("upgrade request: " + string(msg))
 

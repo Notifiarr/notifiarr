@@ -79,7 +79,7 @@ func (a *Action) Create() {
 	}
 
 	if len(a.urls) > 0 {
-		a.conf.Printf("==> Endpoint URL Passthrough Enabled: %d URL(s)", len(a.urls))
+		mnd.Log.Printf("==> Endpoint URL Passthrough Enabled: %d URL(s)", len(a.urls))
 	}
 }
 
@@ -120,7 +120,7 @@ func (s *Schedule) Run(input *common.ActionInput) {
 func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 	header, code, body, err := s.getURLBody(ctx)
 	if err != nil {
-		s.conf.Errorf("Endpoint URL '%s' failed: %v", s.Name, err)
+		mnd.Log.Errorf("Endpoint URL '%s' failed: %v", s.Name, err)
 		return
 	}
 
@@ -128,7 +128,7 @@ func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 		return // template is false, do not send anything to website.
 	}
 
-	s.conf.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.EndpointRoute,
 		Event:      input.Type,
 		LogPayload: true,

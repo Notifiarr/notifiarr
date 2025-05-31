@@ -14,6 +14,7 @@ import (
 	"github.com/CAFxX/httpcompression"
 	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -31,44 +32,44 @@ func (c *Client) httpHandlers() {
 	defer func() {
 		if c.newUI {
 			// SPA gets all the requests so it can handle its own page router.
-			c.Config.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
-			c.Config.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
-			c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
+			c.apps.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
+			c.apps.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
+			c.apps.Router.PathPrefix("/").Handler(gzip(c.notFound))
 		}
 		// 404 (or redirect to base path) everything else
-		c.Config.Router.PathPrefix("/").Handler(gzip(c.notFound))
+		c.apps.Router.PathPrefix("/").Handler(gzip(c.notFound))
 	}()
 
 	base := path.Join("/", c.Config.URLBase)
 	frontend.URLBase = base
 
-	c.Config.Router.Handle("/favicon.ico", gzip(c.favIcon)).Methods("GET")
-	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")
-	c.Config.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginHandler)).Methods("POST")
+	c.apps.Router.Handle("/favicon.ico", gzip(c.favIcon)).Methods("GET")
+	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")
+	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginHandler)).Methods("POST")
 
 	// Handle the same URLs as above on the different base URL too.
 	if !strings.EqualFold(base, "/") {
-		c.Config.Router.Handle(path.Join(base, "favicon.ico"), gzip(c.favIcon)).Methods("GET")
-		c.Config.Router.Handle(base, gzip(c.slash)).Methods("GET")
-		c.Config.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
+		c.apps.Router.Handle(path.Join(base, "favicon.ico"), gzip(c.favIcon)).Methods("GET")
+		c.apps.Router.Handle(base, gzip(c.slash)).Methods("GET")
+		c.apps.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
 	}
 
 	if c.Config.UIPassword == "" {
 		return
 	}
 
-	c.Config.Router.PathPrefix(path.Join(base, "/assets/")).
+	c.apps.Router.PathPrefix(path.Join(base, "/assets/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), gzip(frontend.IndexHandler)))
-	c.Config.Router.PathPrefix(path.Join(base, "/files/")).
+	c.apps.Router.PathPrefix(path.Join(base, "/files/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
-	c.Config.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")
+	c.apps.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")
 	c.httpGuiHandlers(base, compress)
 }
 
 //nolint:funlen // oh well.
 func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler) http.Handler) {
 	// gui is used for authorized paths. All these paths have a prefix of /ui.
-	gui := c.Config.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
+	gui := c.apps.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
 	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
 	gui.Use(compress)
 	gui.Handle("/debug/vars", expvar.Handler()).Methods("GET")
@@ -113,35 +114,35 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 
 // httpAPIHandlers initializes API routes.
 func (c *Client) httpAPIHandlers() {
-	c.Config.HandleAPIpath("", "info", c.triggers.CI.InfoHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version", c.triggers.CI.VersionHandler, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.triggers.CI.VersionHandlerInstance, "GET", "HEAD")
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
-	c.Config.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
-	c.Config.HandleAPIpath("", "services/{action}", c.Config.Services.APIHandler, "GET")
-	c.Config.HandleAPIpath("", "triggers", c.triggers.HandleGetTriggers, "GET")
-	c.Config.HandleAPIpath("", "ping", c.handleInstancePing, "GET")
-	c.Config.HandleAPIpath("", "ping/{app:[a-z,]+}", c.handleInstancePing, "GET")
-	c.Config.HandleAPIpath("", "ping/{app:[a-z]+}/{instance:[0-9]+}", c.handleInstancePing, "GET")
+	c.apps.HandleAPIpath("", "info", c.triggers.CI.InfoHandler, "GET", "HEAD")
+	c.apps.HandleAPIpath("", "version", c.triggers.CI.VersionHandler, "GET", "HEAD")
+	c.apps.HandleAPIpath("", "version/{app}/{instance:[0-9]+}", c.triggers.CI.VersionHandlerInstance, "GET", "HEAD")
+	c.apps.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}", c.triggers.APIHandler, "GET", "POST")
+	c.apps.HandleAPIpath("", "trigger/{trigger:[0-9a-z-]+}/{content}", c.triggers.APIHandler, "GET", "POST")
+	c.apps.HandleAPIpath("", "services/{action}", c.Services.APIHandler, "GET")
+	c.apps.HandleAPIpath("", "triggers", c.triggers.HandleGetTriggers, "GET")
+	c.apps.HandleAPIpath("", "ping", c.handleInstancePing, "GET")
+	c.apps.HandleAPIpath("", "ping/{app:[a-z,]+}", c.handleInstancePing, "GET")
+	c.apps.HandleAPIpath("", "ping/{app:[a-z]+}/{instance:[0-9]+}", c.handleInstancePing, "GET")
 
 	// Aggregate handlers. Non-app specific.
-	c.Config.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
+	c.apps.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
 
 	if c.Config.Plex.Enabled() {
-		c.Config.HandleAPIpath(starr.Plex, "sessions", c.Config.Plex.HandleSessions, "GET")
-		c.Config.HandleAPIpath(starr.Plex, "directory", c.Config.Plex.HandleDirectory, "GET")
-		c.Config.HandleAPIpath(starr.Plex, "emptytrash/{key}", c.Config.Plex.HandleEmptyTrash, "GET")
-		c.Config.HandleAPIpath(starr.Plex, "markwatched/{key}", c.Config.Plex.HandleMarkWatched, "GET")
-		c.Config.HandleAPIpath(starr.Plex, "kill", c.Config.Plex.HandleKillSession, "GET").
+		c.apps.HandleAPIpath(starr.Plex, "sessions", c.apps.Plex.HandleSessions, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "directory", c.apps.Plex.HandleDirectory, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "emptytrash/{key}", c.apps.Plex.HandleEmptyTrash, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "markwatched/{key}", c.apps.Plex.HandleMarkWatched, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "kill", c.apps.Plex.HandleKillSession, "GET").
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:.*}")
 
-		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.Apps.APIKey)
-		c.Config.Router.HandleFunc("/plex", c.PlexHandler).Methods("POST").Queries("token", tokens)
-		c.Config.Router.HandleFunc("/", c.PlexHandler).Methods("POST").Queries("token", tokens)
+		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.AppsConfig.APIKey)
+		c.apps.Router.HandleFunc("/plex", c.PlexHandler).Methods("POST").Queries("token", tokens)
+		c.apps.Router.HandleFunc("/", c.PlexHandler).Methods("POST").Queries("token", tokens)
 
 		if c.Config.URLBase != "/" {
 			// Allow plex to use the base url too.
-			c.Config.Router.HandleFunc(path.Join(c.Config.URLBase, "plex"), c.PlexHandler).
+			c.apps.Router.HandleFunc(path.Join(c.Config.URLBase, "plex"), c.PlexHandler).
 				Methods("POST").Queries("token", tokens)
 		}
 	}
@@ -158,7 +159,7 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 	response.WriteHeader(http.StatusNotFound)
 
 	if err := c.template.ExecuteTemplate(response, "404.html", nil); err != nil {
-		c.Logger.Errorf("Sending HTTP Reply: %v", err)
+		logs.Log.Errorf("Sending HTTP Reply: %v", err)
 	}
 }
 
@@ -185,7 +186,7 @@ func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varn
 // stripSecrets runs first to save a redacted URI in a special request header.
 // The logger uses this special value to save a redacted URI in the log file.
 func (c *Client) stripSecrets(next http.Handler) http.Handler {
-	secrets := []string{c.Config.Apps.APIKey}
+	secrets := []string{c.Config.AppsConfig.APIKey}
 	secrets = append(secrets, c.Config.ExKeys...)
 	// gather configured/known secrets.
 	if c.Config.Plex.Enabled() {
@@ -240,7 +241,7 @@ func (c *Client) countRequest(next http.Handler) http.Handler {
 // under specific circumstances.
 func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-		if xff := r.Header.Get("X-Forwarded-For"); xff == "" || !c.Config.Allow.Contains(r.RemoteAddr) {
+		if xff := r.Header.Get("X-Forwarded-For"); xff == "" || !c.allow.Contains(r.RemoteAddr) {
 			if end := strings.LastIndex(r.RemoteAddr, ":"); end != -1 {
 				r.Header.Set("X-Forwarded-For", strings.Trim(r.RemoteAddr[:end], "[]"))
 			} else if ra := strings.Trim(r.RemoteAddr, "[]"); ra != "" {
@@ -308,24 +309,24 @@ func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) { //no
 	for _, app := range apps {
 		switch app {
 		case starr.Lidarr.Lower():
-			for idx := range c.Config.Apps.Lidarr {
-				c.pingInstance(req.Context(), c.Config.Apps.Lidarr[idx], app, idx, instance, output)
+			for idx := range c.apps.Lidarr {
+				c.pingInstance(req.Context(), c.apps.Lidarr[idx], app, idx, instance, output)
 			}
 		case starr.Radarr.Lower():
-			for idx := range c.Config.Apps.Radarr {
-				c.pingInstance(req.Context(), c.Config.Apps.Radarr[idx], app, idx, instance, output)
+			for idx := range c.apps.Radarr {
+				c.pingInstance(req.Context(), c.apps.Radarr[idx], app, idx, instance, output)
 			}
 		case starr.Readarr.Lower():
-			for idx := range c.Config.Apps.Readarr {
-				c.pingInstance(req.Context(), c.Config.Apps.Readarr[idx], app, idx, instance, output)
+			for idx := range c.apps.Readarr {
+				c.pingInstance(req.Context(), c.apps.Readarr[idx], app, idx, instance, output)
 			}
 		case starr.Sonarr.Lower():
-			for idx := range c.Config.Apps.Sonarr {
-				c.pingInstance(req.Context(), c.Config.Apps.Sonarr[idx], app, idx, instance, output)
+			for idx := range c.apps.Sonarr {
+				c.pingInstance(req.Context(), c.apps.Sonarr[idx], app, idx, instance, output)
 			}
 		case starr.Prowlarr.Lower():
-			for idx := range c.Config.Apps.Prowlarr {
-				c.pingInstance(req.Context(), c.Config.Apps.Prowlarr[idx], app, idx, instance, output)
+			for idx := range c.apps.Prowlarr {
+				c.pingInstance(req.Context(), c.apps.Prowlarr[idx], app, idx, instance, output)
 			}
 		}
 	}
@@ -333,14 +334,9 @@ func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) { //no
 	return http.StatusOK, output
 }
 
-type instancePinger interface {
-	PingContext(ctx context.Context) error
-	Enabled() bool
-}
-
 func (c *Client) pingInstance(
 	ctx context.Context,
-	pinger instancePinger,
+	pinger mnd.InstancePinger,
 	app string,
 	idx, instance int,
 	output map[string]map[int]bool,

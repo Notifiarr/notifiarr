@@ -25,7 +25,6 @@ import (
 type Config struct {
 	// Actions *triggers.Actions
 	*apps.Apps
-	*website.Server
 	CmdList   []*cmdconfig.Config
 	Endpoints []*epconfig.Endpoint
 }
@@ -123,12 +122,12 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 		numTautulli = 1
 	}
 
-	host, err := c.GetHostInfo(ctx)
+	host, err := website.Site.GetHostInfo(ctx)
 	if err == nil {
 		err = errors.New("") //nolint:err113
 	}
 
-	split := strings.Split(c.Config.BindAddr, ":")
+	split := strings.Split(website.Site.Config.BindAddr, ":")
 
 	port := split[0]
 	if len(split) > 1 {
@@ -167,8 +166,8 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 			"sonarr":       len(c.Apps.Sonarr),
 		},
 		Config: AppInfoConfig{
-			WebsiteTimeout: c.Server.Config.Timeout.String(),
-			Retries:        c.Server.Config.Retries,
+			WebsiteTimeout: website.Site.Config.Timeout.String(),
+			Retries:        website.Site.Config.Retries,
 			Apps:           c.getAppConfigs(ctx, startup),
 		},
 		Commands:  c.CmdList,
@@ -209,7 +208,7 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 
 	if !startup {
 		if u, err := c.tautulliUsers(ctx); err != nil {
-			c.Error("Getting Tautulli Users:", err)
+			mnd.Log.Errorf("Getting Tautulli Users:", err)
 		} else {
 			apps.Tautulli = &AppInfoTautulli{Users: u.MapIDName()}
 		}

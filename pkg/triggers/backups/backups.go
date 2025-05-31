@@ -164,7 +164,7 @@ func (c *cmd) sendLidarrBackups(ctx context.Context, input *common.ActionInput) 
 				event: input.Type,
 				name:  starr.Lidarr,
 				int:   idx + 1,
-				app:   app,
+				app:   app.Lidarr,
 				cName: app.Name,
 				skip:  !app.Enabled(),
 			})
@@ -180,7 +180,7 @@ func (c *cmd) sendProwlarrBackups(ctx context.Context, input *common.ActionInput
 				event: input.Type,
 				name:  starr.Prowlarr,
 				int:   idx + 1,
-				app:   app,
+				app:   app.Prowlarr,
 				cName: app.Name,
 				skip:  !app.Enabled(),
 			})
@@ -196,7 +196,7 @@ func (c *cmd) sendRadarrBackups(ctx context.Context, input *common.ActionInput) 
 				event: input.Type,
 				name:  starr.Radarr,
 				int:   idx + 1,
-				app:   app,
+				app:   app.Radarr,
 				cName: app.Name,
 				skip:  !app.Enabled(),
 			})
@@ -212,7 +212,7 @@ func (c *cmd) sendReadarrBackups(ctx context.Context, input *common.ActionInput)
 				event: input.Type,
 				name:  starr.Readarr,
 				int:   idx + 1,
-				app:   app,
+				app:   app.Readarr,
 				cName: app.Name,
 				skip:  !app.Enabled(),
 			})
@@ -229,7 +229,7 @@ func (c *cmd) sendSonarrBackups(ctx context.Context, input *common.ActionInput) 
 				name:  starr.Sonarr,
 				cName: app.Name,
 				int:   idx + 1,
-				app:   app,
+				app:   app.Sonarr,
 				skip:  !app.Enabled(),
 			})
 		}
@@ -243,10 +243,10 @@ func (c *cmd) sendBackups(ctx context.Context, input *genericInstance) {
 
 	fileList, err := input.app.GetBackupFilesContext(ctx)
 	if err != nil {
-		c.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
+		mnd.Log.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
 		return
 	} else if len(fileList) == 0 {
-		c.Printf("[%s requested] %s has no backup files (%d)", input.event, input.name, input.int)
+		mnd.Log.Printf("[%s requested] %s has no backup files (%d)", input.event, input.name, input.int)
 		return
 	}
 
@@ -257,7 +257,7 @@ func (c *cmd) sendBackups(ctx context.Context, input *genericInstance) {
 		Files: fileList,
 	}
 
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.BackupRoute,
 		Event:      input.event,
 		LogPayload: true,

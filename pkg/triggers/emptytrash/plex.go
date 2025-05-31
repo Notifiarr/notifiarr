@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -53,7 +54,7 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 
 	for _, key := range input.Args {
 		if _, err := c.Apps.Plex.EmptyTrashWithContext(ctx, key); err != nil {
-			c.ErrorfNoShare("[%s requested] Emptying Plex trash for library '%s' failed: %v", input.Type, key, err)
+			mnd.Log.ErrorfNoShare("[%s requested] Emptying Plex trash for library '%s' failed: %v", input.Type, key, err)
 
 			status[key] = err.Error()
 			errors++
@@ -63,7 +64,7 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 	}
 
 	if len(status) > 0 {
-		c.SendData(&website.Request{
+		website.Site.SendData(&website.Request{
 			Route:      website.PlexRoute,
 			Event:      input.Type,
 			Params:     []string{"emptylibrary=true"},
@@ -72,6 +73,6 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 			LogPayload: true,
 		})
 	} else {
-		c.Printf("[%s requested] Emptied %d Plex library trashes with %d errors.", input.Type, len(status), errors)
+		mnd.Log.Printf("[%s requested] Emptied %d Plex library trashes with %d errors.", input.Type, len(status), errors)
 	}
 }

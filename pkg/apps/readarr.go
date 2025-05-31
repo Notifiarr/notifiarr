@@ -41,35 +41,28 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(starr.Readarr, "/queue/{queueID}", readarrDeleteQueue, "DELETE")
 }
 
-// ReadarrConfig represents the input data for a Readarr server.
-type ReadarrConfig struct {
-	ExtraConfig
-	*starr.Config
+func getReadarr(r *http.Request) *Readarr {
+	return r.Context().Value(starr.Readarr).(*Readarr) //nolint:forcetypeassert
+}
+
+type Readarr struct {
+	StarrApp         `json:"-" toml:"-" xml:"-"`
 	*readarr.Readarr `json:"-" toml:"-" xml:"-"`
-	errorf           func(string, ...interface{}) `json:"-" toml:"-" xml:"-"`
 }
 
-func getReadarr(r *http.Request) *ReadarrConfig {
-	return r.Context().Value(starr.Readarr).(*ReadarrConfig) //nolint:forcetypeassert
-}
+func (a *AppsConfig) setupReadarr() ([]Readarr, error) {
+	output := make([]Readarr, len(a.Readarr))
 
-// Enabled returns true if the Readarr instance is enabled and usable.
-func (r *ReadarrConfig) Enabled() bool {
-	return r != nil && r.Config != nil && r.URL != "" && r.APIKey != "" && r.Timeout.Duration >= 0
-}
-
-func (a *Apps) setupReadarr() error {
-	for idx, app := range a.Readarr {
-		if app.Config == nil || app.Config.URL == "" {
-			return fmt.Errorf("%w: missing url: Readarr config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
-			return fmt.Errorf("%w: URL must begin with http:// or https://: Readarr config %d", ErrInvalidApp, idx+1)
+	for idx := range a.Readarr {
+		app := &a.Readarr[idx]
+		if err := checkUrl(app.URL, starr.Readarr.String(), idx); err != nil {
+			return nil, err
 		}
 
-		if a.Logger.DebugEnabled() {
+		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  a.Debugf,
+				Debugf:  mnd.Log.Debugf,
 				Caller:  metricMakerCallback(string(starr.Readarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
@@ -78,16 +71,20 @@ func (a *Apps) setupReadarr() error {
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), app.Config.Client.Transport)
 		}
 
-		app.errorf = a.Errorf
 		app.URL = strings.TrimRight(app.URL, "/")
-		app.Readarr = readarr.New(app.Config)
+		output[idx] = Readarr{
+			StarrApp: StarrApp{
+				StarrConfig: a.Readarr[idx],
+			},
+			Readarr: readarr.New(&app.Config),
+		}
 
 		if app.Deletes > 0 {
-			app.delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
+			output[idx].delLimit = rate.NewLimiter(rate.Every(1*time.Hour/time.Duration(app.Deletes)), app.Deletes)
 		}
 	}
 
-	return nil
+	return output, nil
 }
 
 // @Description  Adds a new Book to Readarr.

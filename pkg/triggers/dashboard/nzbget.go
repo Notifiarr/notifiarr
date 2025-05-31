@@ -20,12 +20,12 @@ func (c *Cmd) getNZBGetStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting NZBGet State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting NZBGet State: %d:%s", instance+1, app.URL)
 
-		state, err := c.getNZBGetState(ctx, instance+1, app)
+		state, err := c.getNZBGetState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting NZBGet Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting NZBGet Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)
@@ -34,7 +34,7 @@ func (c *Cmd) getNZBGetStates(ctx context.Context) []*State {
 	return states
 }
 
-func (c *Cmd) getNZBGetState(ctx context.Context, instance int, n *apps.NZBGetConfig) (*State, error) {
+func (c *Cmd) getNZBGetState(ctx context.Context, instance int, n *apps.NZBGet) (*State, error) {
 	state := &State{Instance: instance, Name: n.Name}
 	start := time.Now()
 
@@ -90,7 +90,7 @@ func (c *Cmd) getNZBGetState(ctx context.Context, instance int, n *apps.NZBGetCo
 func getNzbData(
 	ctx context.Context,
 	instance int,
-	nzb *apps.NZBGetConfig,
+	nzb *apps.NZBGet,
 ) ([]*nzbget.Group, *nzbget.Status, []*nzbget.History, error) {
 	queue, err := nzb.ListGroupsContext(ctx)
 	if err != nil {

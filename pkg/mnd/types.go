@@ -1,6 +1,11 @@
 package mnd
 
-import "log"
+import (
+	"context"
+)
+
+// The logger is created here to avoid an import cycle between website and logs.
+var Log Logger
 
 // Logger is an interface for our logs package. We use this to avoid an import cycle.
 type Logger interface {
@@ -11,7 +16,17 @@ type Logger interface {
 	ErrorfNoShare(msg string, v ...interface{})
 	Debug(v ...interface{})
 	Debugf(msg string, v ...interface{})
-	GetInfoLog() *log.Logger
 	DebugEnabled() bool
 	CapturePanic()
+}
+
+// InstancePinger is an interface for pinging a server instance.
+// Used between apps and client.
+type InstancePinger interface {
+	PingContext(ctx context.Context) error
+	Enabled
+}
+
+type Enabled interface {
+	Enabled() bool
 }

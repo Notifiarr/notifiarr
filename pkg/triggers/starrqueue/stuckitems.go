@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -29,11 +30,11 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	sonarr := c.getFinishedItemsSonarr(ctx)
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
-		c.Debugf("[%s requested] No stuck items found.", input.Type)
+		mnd.Log.Debugf("[%s requested] No stuck items found.", input.Type)
 		return
 	}
 
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.StuckRoute,
 		Event:      input.Type,
 		LogPayload: true,
@@ -81,7 +82,7 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
-		c.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
@@ -121,7 +122,7 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
-		c.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
@@ -161,7 +162,7 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
-		c.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
@@ -201,7 +202,7 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
-		c.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 

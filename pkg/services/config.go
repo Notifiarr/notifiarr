@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -36,16 +35,21 @@ var (
 	ErrBadTCP = errors.New("tcp checks must have an ip:port or host:port combo; the :port is required")
 )
 
+type Services struct {
+	*data
+}
+
 // Config for this Services plugin comes from a config file.
 type Config struct {
-	Interval    cnfg.Duration     `json:"interval" toml:"interval" xml:"interval"`
-	Parallel    uint              `json:"parallel" toml:"parallel" xml:"parallel"`
-	Disabled    bool              `json:"disabled" toml:"disabled" xml:"disabled"`
-	LogFile     string            `json:"logFile"  toml:"log_file" xml:"log_file"`
-	Apps        *apps.Apps        `json:"-"        toml:"-"`
-	website     *website.Server   `json:"-"        toml:"-"`
-	Plugins     *snapshot.Plugins `json:"-"        toml:"-"` // pass this in so we can service-check mysql
-	mnd.Logger  `json:"-"`        // log file writer
+	Interval cnfg.Duration     `json:"interval" toml:"interval" xml:"interval"`
+	Parallel uint              `json:"parallel" toml:"parallel" xml:"parallel"`
+	Disabled bool              `json:"disabled" toml:"disabled" xml:"disabled"`
+	LogFile  string            `json:"logFile"  toml:"log_file" xml:"log_file"`
+	Plugins  *snapshot.Plugins `json:"-"        toml:"-"` // pass this in so we can service-check mysql
+}
+
+type data struct {
+	*Config
 	services    map[string]*Service
 	checks      chan *Service
 	done        chan bool
@@ -66,6 +70,20 @@ const (
 	CheckICMP CheckType = "icmp"
 	CheckPROC CheckType = "process"
 )
+
+func New(servicesConfig *Config) *Services {
+	return &Services{
+		&data{
+			Config:      servicesConfig,
+			services:    make(map[string]*Service),
+			checks:      make(chan *Service, DefaultBuffer),
+			done:        make(chan bool),
+			stopChan:    make(chan struct{}),
+			triggerChan: make(chan website.EventType),
+			checkChan:   make(chan triggerCheck),
+		},
+	}
+}
 
 // CheckState represents the current state of a service check.
 type CheckState uint
@@ -101,8 +119,8 @@ type CheckResult struct {
 	IntervalDur time.Duration  `json:"-"`
 }
 
-// Service is a thing we check and report results for.
-type Service struct {
+// ServiceConfig is a thing we check and report results for.
+type ServiceConfig struct {
 	Name     string         `json:"name"     toml:"name"     xml:"name"`     // Radarr
 	Type     CheckType      `json:"type"     toml:"type"     xml:"type"`     // http
 	Value    string         `json:"value"    toml:"check"    xml:"check"`    // http://some.url
@@ -110,19 +128,21 @@ type Service struct {
 	Timeout  cnfg.Duration  `json:"timeout"  toml:"timeout"  xml:"timeout"`  // 10s
 	Interval cnfg.Duration  `json:"interval" toml:"interval" xml:"interval"` // 1m
 	Tags     map[string]any `json:"tags"     toml:"tags"     xml:"tags"`     // copied to Metadata.
-	validSSL bool           // can be set for https checks.
-	svc      service
+	// Derived in Validate(). Do not change them after that.
+	validSSL  bool        // can be set for https checks
+	proc      *procExpect // only used for process checks.
+	ping      *pingExpect // only used for icmp/udp ping checks.
+	validated bool        // set to true after Validate() is called.
 }
 
-type service struct {
+type Service struct {
 	Output       *Output    `json:"output"`
 	State        CheckState `json:"state"`
 	Since        time.Time  `json:"since"`
 	LastCheck    time.Time  `json:"lastCheck"`
 	log          mnd.Logger
-	proc         *procExpect // only used for process checks.
-	ping         *pingExpect // only used for icmp/udp ping checks.
 	sync.RWMutex `json:"-"`
+	*ServiceConfig
 }
 
 type Output struct {

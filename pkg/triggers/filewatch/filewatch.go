@@ -143,8 +143,8 @@ func (c *cmd) run() {
 	validTails := []*WatchFile{{Path: "/add watcher channel/"}, {Path: "/retry ticker/"}}
 
 	for _, item := range c.files {
-		if err := item.setup(&logger{Logger: c.Config.Logger}, c.ignored); err != nil {
-			c.Errorf("Unable to watch file: %v", err)
+		if err := item.setup(c.ignored); err != nil {
+			mnd.Log.Errorf("Unable to watch file: %v", err)
 			continue
 		}
 
@@ -159,7 +159,7 @@ func (c *cmd) run() {
 	c.tailFiles(cases, validTails, ticker)
 }
 
-func (w *WatchFile) setup(logger *logger, ignored ignored) error {
+func (w *WatchFile) setup(ignored ignored) error {
 	var err error
 
 	w.retries = maxRetries // so it will not get "restarted" unless it passes validation.
@@ -182,7 +182,7 @@ func (w *WatchFile) setup(logger *logger, ignored ignored) error {
 		Pipe:          w.Pipe,
 		CompleteLines: true,
 		Location:      &tail.SeekInfo{Whence: io.SeekEnd},
-		Logger:        logger,
+		Logger:        &logger{Logger: mnd.Log},
 	})
 	if err != nil {
 		mnd.FileWatcher.Add(w.Path+Errors, 1)
@@ -216,7 +216,7 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 
 		cases[idx] = reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)}
 
-		c.Printf("==> Watching: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
+		mnd.Log.Printf("==> Watching: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
 			item.Path, item.Regexp, item.Skip, item.Poll, item.Pipe, item.MustExist, item.LogMatch)
 
 		if mnd.FileWatcher.Get(item.Path+Matched) == nil {
@@ -230,9 +230,9 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 
 func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *time.Ticker) {
 	defer func() {
-		defer c.CapturePanic()
+		defer mnd.Log.CapturePanic()
 		ticker.Stop()
-		c.Printf("==> All file watchers stopped.")
+		mnd.Log.Printf("==> All file watchers stopped.")
 		close(c.stopWatcher) // signal we're done.
 	}()
 
@@ -254,7 +254,7 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 		case idx == 1:
 			died = c.fileWatcherTicker(died)
 		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
-			c.Errorf("Got non-addressable file watcher data from %s", item.Path)
+			mnd.Log.Errorf("Got non-addressable file watcher data from %s", item.Path)
 			mnd.FileWatcher.Add(item.Path+Errors, 1)
 		case idx == 0:
 			item, _ = data.Elem().Addr().Interface().(*WatchFile)
@@ -275,13 +275,13 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 // If that does not return an error, it means Stop was already called.
 func (c *cmd) killWatcher(item *WatchFile) bool {
 	if err := item.deactivate(); err != nil {
-		c.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
+		mnd.Log.Errorf("No longer watching file (channel closed): %s: %v", item.Path, err)
 		mnd.FileWatcher.Add(item.Path+Errors, 1)
 
 		return true
 	}
 
-	c.Printf("==> No longer watching file (channel closed): %s", item.Path)
+	mnd.Log.Printf("==> No longer watching file (channel closed): %s", item.Path)
 
 	return false
 }
@@ -304,10 +304,10 @@ func (c *cmd) fileWatcherTicker(died bool) bool {
 		mnd.FileWatcher.Add(item.Path+" Retries", 1)
 
 		// move this back to debug.
-		c.Printf("Restarting File Watcher (retries: %d/%d): %s", item.retries, maxRetries, item.Path)
+		mnd.Log.Printf("Restarting File Watcher (retries: %d/%d): %s", item.retries, maxRetries, item.Path)
 
 		if err := c.addFileWatcher(item); err != nil {
-			c.Errorf("Restarting File Watcher (retries: %d/%d): %s: %v", item.retries, maxRetries, item.Path, err)
+			mnd.Log.Errorf("Restarting File Watcher (retries: %d/%d): %s: %v", item.retries, maxRetries, item.Path, err)
 			mnd.FileWatcher.Add(item.Path+Errors, 1)
 
 			stilldead = true
@@ -349,7 +349,7 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		return // rate limited.
 	}
 
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
 		LogPayload: tail.LogMatch,
@@ -370,12 +370,12 @@ func (c *cmd) addFileWatcher(file *WatchFile) error {
 		return common.ErrNoChannel
 	}
 
-	err := file.setup(&logger{Logger: c.Config.Logger}, c.ignored)
+	err := file.setup(c.ignored)
 	if err != nil {
 		return err
 	}
 
-	c.Printf("Watching File: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
+	mnd.Log.Printf("Watching File: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
 		file.Path, file.Regexp, file.Skip, file.Poll, file.Pipe, file.MustExist, file.LogMatch)
 
 	c.addWatcher <- file
@@ -399,7 +399,7 @@ func (c *cmd) stop() {
 
 	for _, tail := range c.files {
 		if err := tail.Stop(); err != nil {
-			c.Errorf("Stopping File Watcher: %s: %v", tail.Path, err)
+			mnd.Log.Errorf("Stopping File Watcher: %s: %v", tail.Path, err)
 		}
 	}
 

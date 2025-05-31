@@ -17,13 +17,16 @@ import (
 	"golift.io/version"
 )
 
+// Site can be used to call the website APIs.
+var Site *Server
+
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
 	Retries int
-	mnd.Logger
 	*http.Client
 }
 
+// ValidAPIKey checks if the API key is valid.
 func (s *Server) ValidAPIKey() error {
 	if len(s.Config.Apps.APIKey) != APIKeyLength {
 		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
@@ -71,7 +74,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return 0, nil, fmt.Errorf("creating http request: %w", err)
 	}
 
-	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Content-Type", mnd.ContentTypeJSON)
 	req.Header.Set("X-Api-Key", s.Config.Apps.APIKey)
 
 	start := time.Now()
@@ -82,7 +85,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 
-	if !s.Config.DebugEnabled() { // no debug, just return the body.
+	if !mnd.Log.DebugEnabled() { // no debug, just return the body.
 		return resp.StatusCode, resp.Body, nil
 	}
 
@@ -140,7 +143,7 @@ func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 
 	reader := resp.Body
 
-	if s.Config.DebugEnabled() {
+	if mnd.Log.DebugEnabled() {
 		reader = s.debugLogResponseBody(start, resp, url, []byte(msg), true)
 	}
 
@@ -207,7 +210,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
-				h.ErrorfNoShare("Unexpected cookie [%v/%v] returned from website: %s", i+1, len(resp.Cookies()), c.String())
+				mnd.Log.ErrorfNoShare("Unexpected cookie [%v/%v] returned from website: %s", i+1, len(resp.Cookies()), c.String())
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError &&
@@ -238,7 +241,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 		case retry == h.Retries:
 			return resp, fmt.Errorf("[%d/%d] website req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			h.ErrorfNoShare("[%d/%d] website req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
+			mnd.Log.ErrorfNoShare("[%d/%d] website req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
@@ -264,11 +267,11 @@ func (s *Server) debughttplog(resp *http.Response, url string, start time.Time, 
 
 	if data == "" {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.Config.Apps.MaxBody))
-		s.Config.Debugf("Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
+		mnd.Log.Debugf("Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
 			url, time.Since(start).Round(time.Microsecond), mnd.FormatBytes(bodySize), status, headers, truncatedBody)
 	} else {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.Config.Apps.MaxBody))
-		s.Config.Debugf("Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
+		mnd.Log.Debugf("Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
 			mnd.FormatBytes(len(data)), url, time.Since(start).Round(time.Microsecond),
 			data, mnd.FormatBytes(bodySize), status, headers, truncatedBody)
 	}
@@ -300,8 +303,8 @@ func readBodyForLog(body io.Reader, max int64) (string, int64) {
 
 func (s *Server) watchSendDataChan(ctx context.Context) {
 	defer func() {
-		defer s.Config.CapturePanic()
-		s.Config.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
+		defer mnd.Log.CapturePanic()
+		mnd.Log.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
 	}()
 
 	for data := range s.sendData {
@@ -309,13 +312,13 @@ func (s *Server) watchSendDataChan(ctx context.Context) {
 		case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 			continue
 		case errors.Is(err, ErrNon200):
-			s.Config.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+			mnd.Log.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
 				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 		case err != nil:
-			s.Config.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+			mnd.Log.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
 				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 		case !data.ErrorsOnly:
-			s.Config.Printf("[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
+			mnd.Log.Printf("[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
 				data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
 		default:
 		}

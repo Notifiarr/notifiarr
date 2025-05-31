@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -44,16 +46,12 @@ func (c *cmd) create() {
 
 // Log uploads a specific log file to Notifiarr.com.
 func (a *Action) Log(event website.EventType, file string) error {
-	switch file {
-	case "app":
-		return a.Upload(event, a.cmd.Logger.LogConfig.LogFile)
-	case "debug":
-		return a.Upload(event, a.cmd.Logger.LogConfig.DebugLog)
-	case "http":
-		return a.Upload(event, a.cmd.Logger.LogConfig.HTTPLog)
-	default:
+	filePath := logs.Log.GetLogFiles()[file]
+	if filePath == "" {
 		return ErrInvalidFile
 	}
+
+	return a.Upload(event, filePath)
 }
 
 // Upload a file or files to Notifiarr.com.
@@ -80,11 +78,11 @@ func (c *cmd) uploadFile(_ context.Context, event website.EventType, fileName st
 	// Add a file to the request
 	file, err := os.Open(fileName)
 	if err != nil {
-		c.Errorf("[%s requested] Opening file '%s' for Upload failed: %v", event, fileName, err)
+		mnd.Log.Errorf("[%s requested] Opening file '%s' for Upload failed: %v", event, fileName, err)
 		return
 	}
 
-	c.SendData(&website.Request{
+	website.Site.SendData(&website.Request{
 		Route:  website.UploadRoute,
 		Event:  event,
 		LogMsg: "Upload file " + fileName,

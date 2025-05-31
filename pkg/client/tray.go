@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
@@ -28,10 +29,10 @@ const timerPrefix = "TimErr"
 var menu = make(map[string]*systray.MenuItem) //nolint:gochecknoglobals
 
 // startTray Run()s readyTray to bring up the web server and the GUI app.
-func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInfo) {
+func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInfo, reload func()) {
 	systray.Run(func() {
 		defer os.Exit(0)
-		defer c.CapturePanic()
+		defer logs.Log.CapturePanic()
 
 		b, _ := bindata.Files.ReadFile(ui.SystrayIcon)
 		systray.SetTemplateIcon(b, b)
@@ -43,14 +44,14 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 		c.setupMenus(clientInfo)     // code that runs on reload, too.
 
 		// This starts the web server, and waits for reload/exit signals.
-		if err := c.Exit(ctx); err != nil {
-			c.Errorf("Server: %v", err)
+		if err := c.Exit(ctx, reload); err != nil {
+			logs.Log.Errorf("Server: %v", err)
 			os.Exit(1) // web server problem
 		}
 	}, func() {
 		// This code only fires from menu->quit.
 		if err := c.stop(ctx, website.EventUser); err != nil {
-			c.Errorf("Server: %v", err)
+			logs.Log.Errorf("Server: %v", err)
 			os.Exit(1) // web server problem
 		}
 		// because systray wants to control the exit code? no..
@@ -60,7 +61,7 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 
 func (c *Client) showMenu(menu systray.IMenu) {
 	if err := menu.ShowMenu(); err != nil {
-		c.Errorf("Menu Failed: %v", err)
+		logs.Log.Errorf("Menu Failed: %v", err)
 	}
 }
 
@@ -143,7 +144,7 @@ func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInf
 	menu["sub"].Click(func() { ui.OpenURL("https://github.com/sponsors/Notifiarr") })
 	menu["exit"] = systray.AddMenuItem("Quit", "exit "+c.Flags.Name())
 	menu["exit"].Click(func() {
-		c.Printf("Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
+		logs.Log.Printf("Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
 		systray.Quit() // this kills the app
 	})
 }
@@ -160,7 +161,7 @@ func (c *Client) configMenu(ctx context.Context) {
 	menu["edit"] = conf.AddSubMenuItem("Edit", "edit configuration")
 	menu["edit"].Click(func() {
 		ui.OpenFile(c.Flags.ConfigFile)
-		c.Print("user requested] Editing Config File:", c.Flags.ConfigFile)
+		logs.Log.Print("user requested] Editing Config File:", c.Flags.ConfigFile)
 	})
 
 	menu["pass"] = conf.AddSubMenuItem("Password", "create or update the Web UI admin password")
@@ -177,11 +178,11 @@ func (c *Client) configMenu(ctx context.Context) {
 	menu["svcs"].Click(func() {
 		if menu["svcs"].Checked() {
 			menu["svcs"].Uncheck()
-			c.Config.Services.Stop()
+			c.Services.Stop()
 			ui.Toast("Stopped checking services!")
 		} else {
 			menu["svcs"].Check()
-			c.Config.Services.Start(ctx)
+			c.Services.Start(ctx, c.apps.Plex.Name())
 			ui.Toast("Service checks started!")
 		}
 	})
@@ -216,34 +217,34 @@ func (c *Client) linksMenu() {
 }
 
 func (c *Client) logsMenu() {
-	logs := systray.AddMenuItem("Logs", "log file info")
-	menu["logs"] = logs
+	logsMenu := systray.AddMenuItem("Logs", "log file info")
+	menu["logs"] = logsMenu
 
-	menu["logs_view"] = logs.AddSubMenuItem("View", "view the application log")
+	menu["logs_view"] = logsMenu.AddSubMenuItem("View", "view the application log")
 	menu["logs_view"].Click(func() {
 		ui.OpenLog(c.Config.LogFile)
-		c.Print("[user requested] Viewing App Log File:", c.Config.LogFile)
+		logs.Log.Print("[user requested] Viewing App Log File:", c.Config.LogFile)
 	})
 
-	menu["logs_http"] = logs.AddSubMenuItem("HTTP", "view the HTTP log")
+	menu["logs_http"] = logsMenu.AddSubMenuItem("HTTP", "view the HTTP log")
 	menu["logs_http"].Click(func() {
 		ui.OpenLog(c.Config.HTTPLog)
-		c.Print("[user requested] Viewing HTTP Log File:", c.Config.HTTPLog)
+		logs.Log.Print("[user requested] Viewing HTTP Log File:", c.Config.HTTPLog)
 	})
 
-	menu["debug_logs2"] = logs.AddSubMenuItem("Debug", "view the Debug log")
+	menu["debug_logs2"] = logsMenu.AddSubMenuItem("Debug", "view the Debug log")
 	menu["debug_logs2"].Click(func() {
 		ui.OpenLog(c.Config.LogConfig.DebugLog)
-		c.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
+		logs.Log.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
 	})
 
-	menu["logs_svcs"] = logs.AddSubMenuItem("Services", "view the Services log")
+	menu["logs_svcs"] = logsMenu.AddSubMenuItem("Services", "view the Services log")
 	menu["logs_svcs"].Click(func() {
 		ui.OpenLog(c.Config.Services.LogFile)
-		c.Print("[user requested] Viewing Services Log File:", c.Config.Services.LogFile)
+		logs.Log.Print("[user requested] Viewing Services Log File:", c.Config.Services.LogFile)
 	})
 
-	menu["logs_rotate"] = logs.AddSubMenuItem("Rotate", "rotate both log files")
+	menu["logs_rotate"] = logsMenu.AddSubMenuItem("Rotate", "rotate both log files")
 	menu["logs_rotate"].Click(c.rotateLogs)
 }
 
@@ -279,9 +280,9 @@ func (c *Client) notifiarrMenuActions() {
 	menu["synccf"].Click(func() { c.triggers.CFSync.SyncRadarrCF(website.EventUser) })
 	menu["syncqp"].Click(func() { c.triggers.CFSync.SyncSonarrRP(website.EventUser) })
 	menu["svcs_prod"].Click(func() {
-		c.Print("[user requested] Checking services and sending results to Notifiarr.")
-		ui.Toast("Running and sending %d Service Checks.", c.Config.Services.SvcCount())
-		c.Config.Services.RunChecks(website.EventUser)
+		logs.Log.Printf("[user requested] Checking services and sending results to Notifiarr.")
+		ui.Toast("Running and sending %d Service Checks.", c.Services.SvcCount())
+		c.Services.RunChecks(website.EventUser)
 	})
 	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(website.EventUser) })
 	menu["snap_prod"].Click(func() { c.triggers.SnapCron.Send(website.EventUser) })
@@ -325,14 +326,14 @@ func (c *Client) debugMenu() {
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["debug_logs"].Click(func() {
 		ui.OpenLog(c.Config.LogConfig.DebugLog)
-		c.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
+		logs.Log.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
 	})
 
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
 	menu["svcs_log"].Click(func() {
-		c.Print("[user requested] Checking services and logging results.")
-		ui.Toast("Running and logging %d Service Checks.", c.Config.Services.SvcCount())
-		c.Config.Services.RunChecks("log")
+		logs.Log.Print("[user requested] Checking services and logging results.")
+		ui.Toast("Running and logging %d Service Checks.", c.Services.SvcCount())
+		c.Services.RunChecks("log")
 	})
 
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
@@ -341,7 +342,7 @@ func (c *Client) debugMenu() {
 }
 
 func (c *Client) buildDynamicTimerMenus() {
-	defer c.CapturePanic()
+	defer logs.Log.CapturePanic()
 
 	c.closeDynamicTimerMenus()
 

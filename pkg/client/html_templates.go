@@ -26,6 +26,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/fsnotify/fsnotify"
 	"github.com/hako/durafmt"
@@ -82,12 +83,12 @@ func (c *Client) loadAssetsTemplates(ctx context.Context) error {
 }
 
 func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher) {
-	defer c.CapturePanic()
+	defer logs.Log.CapturePanic()
 
 	for {
 		select {
 		case err := <-fsn.Errors:
-			c.Errorf("fsnotify: %v", err)
+			logs.Log.Errorf("fsnotify: %v", err)
 		case event, ok := <-fsn.Events:
 			if !ok {
 				return
@@ -98,17 +99,17 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 				continue
 			}
 
-			c.Debugf("Got event: %s on %s, reloading HTML templates!", event.Op, event.Name)
+			logs.Log.Debugf("Got event: %s on %s, reloading HTML templates!", event.Op, event.Name)
 
 			if err := c.StopWebServer(ctx); err != nil {
 				panic("Stopping web server: " + err.Error())
 			}
 
 			if err := c.ParseGUITemplates(); err != nil {
-				c.Errorf("fsnotify/parsing templates: %v", err)
+				logs.Log.Errorf("fsnotify/parsing templates: %v", err)
 			}
 
-			c.StartWebServer(ctx)
+			go c.RunWebServer()
 		}
 	}
 }
@@ -407,7 +408,7 @@ func (c *Client) ParseGUITemplates() error {
 func (c *Client) parseCustomTemplates() error {
 	templatePath := filepath.Join(c.Flags.Assets, "templates")
 
-	c.Printf("==> Parsing and watching HTML templates @ %s", templatePath)
+	logs.Log.Printf("==> Parsing and watching HTML templates @ %s", templatePath)
 
 	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error { //nolint:wrapcheck
 		if err != nil {
@@ -438,7 +439,7 @@ func (c *Client) parseCustomTemplates() error {
 		// Convert windows paths to unix paths for template names.
 		trim := strings.TrimSuffix(strings.TrimPrefix(strings.ReplaceAll(
 			strings.TrimPrefix(path, templatePath), `\`, "/"), "/"), ".gz")
-		c.Debugf("Parsed Template File '%s' to %s", path, trim)
+		logs.Log.Debugf("Parsed Template File '%s' to %s", path, trim)
 
 		c.template, err = c.template.New(trim).Parse(string(data))
 		if err != nil {
@@ -450,26 +451,26 @@ func (c *Client) parseCustomTemplates() error {
 }
 
 type templateData struct {
-	Input       *configfile.Config             `json:"input"`
-	Config      *configfile.Config             `json:"config"`
-	Flags       *configfile.Flags              `json:"flags"`
-	Actions     *triggers.Actions              `json:"actions"`
-	Username    string                         `json:"username"`
-	Dynamic     bool                           `json:"dynamic"`
-	Webauth     bool                           `json:"webauth"`
-	Msg         string                         `json:"msg,omitempty"`
-	Version     map[string]any                 `json:"version"`
-	LogFiles    *logs.LogFileInfos             `json:"logFileInfo"`
-	ConfigFiles *logs.LogFileInfos             `json:"configFileInfo"`
-	ClientInfo  *clientinfo.ClientInfo         `json:"clientInfo"`
-	Expvar      mnd.AllData                    `json:"expvar"`
-	HostInfo    *host.InfoStat                 `json:"hostInfo"`
-	Disks       map[string]*snapshot.Partition `json:"disks"`
-	Headers     http.Header                    `json:"headers"`
-	ProxyAllow  bool                           `json:"proxyAllow"`
-	UpstreamIP  string                         `json:"upstreamIp"`
-	Tunnel      *mulery.Client                 `json:"tunnel"`
-	PoolStats   map[string]*mulery.PoolSize    `json:"poolStats"`
+	Input       *configfile.Config            `json:"input"`
+	Config      *configfile.Config            `json:"config"`
+	Flags       *configfile.Flags             `json:"flags"`
+	Actions     *triggers.Actions             `json:"actions"`
+	Username    string                        `json:"username"`
+	Dynamic     bool                          `json:"dynamic"`
+	Webauth     bool                          `json:"webauth"`
+	Msg         string                        `json:"msg,omitempty"`
+	Version     map[string]any                `json:"version"`
+	LogFiles    *logs.LogFileInfos            `json:"logFileInfo"`
+	ConfigFiles *logs.LogFileInfos            `json:"configFileInfo"`
+	ClientInfo  *clientinfo.ClientInfo        `json:"clientInfo"`
+	Expvar      mnd.AllData                   `json:"expvar"`
+	HostInfo    *host.InfoStat                `json:"hostInfo"`
+	Disks       map[string]snapshot.Partition `json:"disks"`
+	Headers     http.Header                   `json:"headers"`
+	ProxyAllow  bool                          `json:"proxyAllow"`
+	UpstreamIP  string                        `json:"upstreamIp"`
+	Tunnel      *mulery.Client                `json:"tunnel"`
+	PoolStats   map[string]*mulery.PoolSize   `json:"poolStats"`
 }
 
 func (c *Client) renderTemplate( //nolint:funlen
@@ -486,13 +487,13 @@ func (c *Client) renderTemplate( //nolint:funlen
 
 	binary, _ := os.Executable()
 	userName, dynamic := c.getUserName(req)
-	hostInfo, _ := c.Config.GetHostInfo(ctx)
+	hostInfo, _ := website.Site.GetHostInfo(ctx)
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	outboundIP := clientinfo.GetOutboundIP()
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
 
 	err := c.template.ExecuteTemplate(response, templateName, &templateData{
-		ProxyAllow:  c.Config.Allow.Contains(req.RemoteAddr),
+		ProxyAllow:  c.allow.Contains(req.RemoteAddr),
 		UpstreamIP:  strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]"),
 		Actions:     c.triggers,
 		Config:      c.Config,
@@ -502,7 +503,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 		Dynamic:     dynamic,
 		Webauth:     c.webauth,
 		Msg:         msg,
-		LogFiles:    c.Logger.GetAllLogFilePaths(),
+		LogFiles:    logs.Log.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(ctx),
@@ -534,7 +535,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 		HostInfo: hostInfo,
 	})
 	if err != nil {
-		c.Errorf("Sending HTTP Response: %v", err)
+		logs.Log.Errorf("Sending HTTP Response: %v", err)
 	}
 }
 
@@ -753,8 +754,8 @@ func revBytes(output bytes.Buffer) []byte {
 	return data
 }
 
-func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
-	output := make(map[string]*snapshot.Partition)
+func (c *Client) getDisks(ctx context.Context) map[string]snapshot.Partition {
+	output := make(map[string]snapshot.Partition)
 	snapcnfg := &snapshot.Config{
 		Plugins:   snapshot.Plugins{},
 		DiskUsage: true,
@@ -763,18 +764,18 @@ func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 		UseSudo:   c.Config.Snapshot.UseSudo,
 		//		Raid:      c.Config.Snapshot.Raid,
 	}
-	snapshot, _, _ := snapcnfg.GetSnapshot(ctx, c.Debugf)
+	snapshot, _, _ := snapcnfg.GetSnapshot(ctx)
 
 	for k, v := range snapshot.DiskUsage {
-		output[k] = v
+		output[k] = *v
 	}
 
 	for k, v := range snapshot.Quotas {
-		output["Quota: "+k] = v
+		output["Quota: "+k] = *v
 	}
 
 	for k, v := range snapshot.ZFSPool {
-		output[k] = v
+		output[k] = *v
 	}
 
 	return output

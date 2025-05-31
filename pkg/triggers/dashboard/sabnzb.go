@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 func (c *Cmd) getSabNZBStates(ctx context.Context) []*State {
@@ -18,12 +19,12 @@ func (c *Cmd) getSabNZBStates(ctx context.Context) []*State {
 			continue
 		}
 
-		c.Debugf("Getting SabNZB State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf("Getting SabNZB State: %d:%s", instance+1, app.SabNZB.URL)
 
-		state, err := c.getSabNZBState(ctx, instance+1, app)
+		state, err := c.getSabNZBState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			c.Errorf("Getting SabNZB Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf("Getting SabNZB Data from %d:%s: %v", instance+1, app.SabNZB.URL, err)
 		}
 
 		states = append(states, state)
@@ -32,7 +33,7 @@ func (c *Cmd) getSabNZBStates(ctx context.Context) []*State {
 	return states
 }
 
-func (c *Cmd) getSabNZBState(ctx context.Context, instance int, s *apps.SabNZBConfig) (*State, error) {
+func (c *Cmd) getSabNZBState(ctx context.Context, instance int, s *apps.SabNZB) (*State, error) {
 	state := &State{Instance: instance, Name: s.Name}
 	start := time.Now()
 	queue, err := s.GetQueue(ctx)
