@@ -87,13 +87,6 @@ type Profile struct {
 //
 //nolint:funlen
 func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
-	defer func() {
-		if r := recover(); r != nil {
-			c.Errorf("handleProfile panic: %v\n%#v\n", r, c.Config)
-			panic(r)
-		}
-	}()
-
 	clientInfo := clientinfo.Get()
 	if clientInfo == nil {
 		clientInfo = &clientinfo.ClientInfo{}
@@ -140,7 +133,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		Flags:           c.Flags,
 		Dynamic:         dynamic,
 		Webauth:         c.webauth,
-		LogFiles:        c.Logger.GetAllLogFilePaths(),
+		LogFiles:        logs.Log.GetAllLogFilePaths(),
 		ConfigFiles:     logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
 		// Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
 		Expvar:          mnd.GetAllData(),
@@ -168,14 +161,14 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		ActiveTunnel:    activeTunnel,
 		TunnelPoolStats: poolStats,
 	}); err != nil {
-		c.Errorf("Writing HTTP Response: %v", err)
+		logs.Log.Errorf("Writing HTTP Response: %v", err)
 	}
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
 	post, err := c.getProfilePostData(request)
 	if err != nil {
-		c.Errorf("%v", err)
+		logs.Log.Errorf("%v", err)
 		http.Error(response, "Invalid Request", http.StatusBadRequest)
 		return
 	}
@@ -184,7 +177,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	if !dynamic {
 		// If the auth is currently using a password, check the password.
 		if !c.checkUserPass(currUser, post.Password) {
-			c.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
+			logs.Log.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return
 		}
@@ -207,14 +200,14 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 
 	switch err := c.setUserPass(request.Context(), post.AuthType, post.Header, ""); {
 	case err != nil:
-		c.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
+		logs.Log.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 	case post.AuthType == configfile.AuthNone:
-		c.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
+		logs.Log.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
 		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
 		c.reloadAppNow()
 	default:
-		c.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
+		logs.Log.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
 		c.setSession(post.Username, response, request)
 		http.Error(response, "Enabled WebUI proxy authentication. Header: "+post.Header, http.StatusOK)
 		c.reloadAppNow()
@@ -270,20 +263,20 @@ func (c *Client) handleProfilePostPassword(
 	currUser, _ := c.getUserName(request)
 
 	if len(newPassw) < minPasswordLen {
-		c.Errorf("[gui '%s' requested] New password must be at least %d characters.", currUser, minPasswordLen)
+		logs.Log.Errorf("[gui '%s' requested] New password must be at least %d characters.", currUser, minPasswordLen)
 		http.Error(response, fmt.Sprintf("New password must be at least %d characters.",
 			minPasswordLen), http.StatusBadRequest)
 		return
 	}
 
 	if err := c.setUserPass(request.Context(), configfile.AuthPassword, newUser, newPassw); err != nil {
-		c.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
+		logs.Log.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
 		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
-	c.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, newUser)
+	logs.Log.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, newUser)
 	c.setSession(newUser, response, request)
 	http.Error(response, "Trust Profile saved.", http.StatusOK)
 	c.reloadAppNow()

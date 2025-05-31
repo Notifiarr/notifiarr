@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -60,15 +61,15 @@ func (c *Client) startTunnel(ctx context.Context) {
 	// If clientinfo is nil, then we probably have a bad API key.
 	info := clientinfo.Get()
 	if info == nil {
-		c.Errorf("Skipping tunnel creation because there is no client info.")
+		logs.Log.Errorf("Skipping tunnel creation because there is no client info.")
 		return
 	}
 
 	c.makeTunnel(ctx, info)
-	c.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
+	logs.Log.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
 		len(c.tunnel.Targets), c.tunnel.PoolMaxSize, c.tunnel.CleanInterval,
 		c.tunnel.Backoff, info.User.TunnelURL, c.tunnel.GetID())
-	c.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
+	logs.Log.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
 	c.tunnel.Start(ctx)
 }
 
@@ -93,7 +94,7 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 		CleanInterval:    time.Second + time.Duration(c.triggers.Rand().Intn(1000))*time.Millisecond,
 		Backoff:          600*time.Millisecond + time.Duration(c.triggers.Rand().Intn(600))*time.Millisecond,
 		SecretKey:        c.Config.APIKey,
-		Handler:          remWs.Wrap(c.prefixURLbase(c.apps.Router), c.Logger.HTTPLog.Writer()).ServeHTTP,
+		Handler:          remWs.Wrap(c.prefixURLbase(c.apps.Router), logs.Log.HTTPLog.Writer()).ServeHTTP,
 		RoundRobinConfig: c.roundRobinConfig(info),
 		Logger: &tunnelLogger{
 			ctx:            ctx,
@@ -243,7 +244,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 	wait.Wait()
 
 	if err := json.NewEncoder(response).Encode(list); err != nil {
-		c.Errorf("Pinging Tunnel: encoding json: %v", err)
+		logs.Log.Errorf("Pinging Tunnel: encoding json: %v", err)
 	}
 }
 
@@ -254,7 +255,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
 		strings.Replace(socket, "wss://", "https://", 1), nil)
 	if err != nil {
-		c.Errorf("Pinging Tunnel: creating request: %v", err)
+		logs.Log.Errorf("Pinging Tunnel: creating request: %v", err)
 		return
 	}
 
@@ -262,7 +263,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		c.Errorf("Pinging Tunnel: making request: %v", err)
+		logs.Log.Errorf("Pinging Tunnel: making request: %v", err)
 		inCh <- map[int]string{idx: "error"}
 
 		return
@@ -276,7 +277,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
-		c.Errorf("Saving Tunnel: reading request: %v", err)
+		logs.Log.Errorf("Saving Tunnel: reading request: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -295,7 +296,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	}
 
 	if err != nil {
-		c.Errorf("Saving Tunnel: %v", err)
+		logs.Log.Errorf("Saving Tunnel: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -331,7 +332,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
 			input.PrimaryTunnel, len(input.BackupTunnel)), http.StatusOK)
 	} else if err := json.NewEncoder(response).Encode(tunnels); err != nil {
-		c.Errorf("Saving Tunnel: sending json response: %v", err)
+		logs.Log.Errorf("Saving Tunnel: sending json response: %v", err)
 	}
 }
 

@@ -8,7 +8,6 @@ import (
 	"reflect"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
@@ -45,7 +44,6 @@ type Config struct {
 	AutoUpdate string
 	UnstableCh bool
 	common.Services
-	Logger mnd.Logger
 }
 
 // Actions defines all our triggers and timers.

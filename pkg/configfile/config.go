@@ -161,7 +161,7 @@ type SetupResult struct {
 	Apps     *apps.Apps
 }
 
-func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*SetupResult, error) {
+func (c *Config) Setup(flag *Flags) (*SetupResult, error) {
 	output, err := cnfgfile.Parse(c, &cnfgfile.Opts{
 		Name:          mnd.Title,
 		TransformPath: ExpandHomedir,
@@ -178,8 +178,6 @@ func (c *Config) Setup(flag *Flags, logger *logs.Logger) (*SetupResult, error) {
 	}
 
 	c.fixConfig()
-	logger.LogConfig = c.LogConfig // this is sorta hacky.
-
 	c.Services.Fix()
 
 	result.Services = services.New(c.Services)
@@ -254,7 +252,6 @@ func (c *Config) setup(flag *Flags, svc *services.Services, apps *apps.Apps) *tr
 		AutoUpdate: c.AutoUpdate,
 		UnstableCh: c.UnstableCh,
 		Services:   svc,
-		Logger:     mnd.Log,
 		Endpoints:  c.Endpoints,
 	})
 	clientinfo.CmdList = triggers.Commands.List()

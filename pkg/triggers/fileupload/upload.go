@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -45,7 +46,7 @@ func (c *cmd) create() {
 
 // Log uploads a specific log file to Notifiarr.com.
 func (a *Action) Log(event website.EventType, file string) error {
-	filePath := mnd.Log.GetLogFiles()[file]
+	filePath := logs.Log.GetLogFiles()[file]
 	if filePath == "" {
 		return ErrInvalidFile
 	}

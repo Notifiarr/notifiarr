@@ -12,7 +12,6 @@ type Website interface {
 	SendData(data *website.Request)
 }
 
-//nolint:gochecknoglobals
 var (
 	// Config is setup by the configfile package.
 	enabled bool

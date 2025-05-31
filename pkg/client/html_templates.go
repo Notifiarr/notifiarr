@@ -83,12 +83,12 @@ func (c *Client) loadAssetsTemplates(ctx context.Context) error {
 }
 
 func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher) {
-	defer c.CapturePanic()
+	defer logs.Log.CapturePanic()
 
 	for {
 		select {
 		case err := <-fsn.Errors:
-			c.Errorf("fsnotify: %v", err)
+			logs.Log.Errorf("fsnotify: %v", err)
 		case event, ok := <-fsn.Events:
 			if !ok {
 				return
@@ -99,14 +99,14 @@ func (c *Client) watchAssetsTemplates(ctx context.Context, fsn *fsnotify.Watcher
 				continue
 			}
 
-			c.Debugf("Got event: %s on %s, reloading HTML templates!", event.Op, event.Name)
+			logs.Log.Debugf("Got event: %s on %s, reloading HTML templates!", event.Op, event.Name)
 
 			if err := c.StopWebServer(ctx); err != nil {
 				panic("Stopping web server: " + err.Error())
 			}
 
 			if err := c.ParseGUITemplates(); err != nil {
-				c.Errorf("fsnotify/parsing templates: %v", err)
+				logs.Log.Errorf("fsnotify/parsing templates: %v", err)
 			}
 
 			go c.RunWebServer()
@@ -408,7 +408,7 @@ func (c *Client) ParseGUITemplates() error {
 func (c *Client) parseCustomTemplates() error {
 	templatePath := filepath.Join(c.Flags.Assets, "templates")
 
-	c.Printf("==> Parsing and watching HTML templates @ %s", templatePath)
+	logs.Log.Printf("==> Parsing and watching HTML templates @ %s", templatePath)
 
 	return filepath.Walk(templatePath, func(path string, info os.FileInfo, err error) error { //nolint:wrapcheck
 		if err != nil {
@@ -439,7 +439,7 @@ func (c *Client) parseCustomTemplates() error {
 		// Convert windows paths to unix paths for template names.
 		trim := strings.TrimSuffix(strings.TrimPrefix(strings.ReplaceAll(
 			strings.TrimPrefix(path, templatePath), `\`, "/"), "/"), ".gz")
-		c.Debugf("Parsed Template File '%s' to %s", path, trim)
+		logs.Log.Debugf("Parsed Template File '%s' to %s", path, trim)
 
 		c.template, err = c.template.New(trim).Parse(string(data))
 		if err != nil {
@@ -503,7 +503,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 		Dynamic:     dynamic,
 		Webauth:     c.webauth,
 		Msg:         msg,
-		LogFiles:    c.Logger.GetAllLogFilePaths(),
+		LogFiles:    logs.Log.GetAllLogFilePaths(),
 		ConfigFiles: logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
 		ClientInfo:  clientInfo,
 		Disks:       c.getDisks(ctx),
@@ -535,7 +535,7 @@ func (c *Client) renderTemplate( //nolint:funlen
 		HostInfo: hostInfo,
 	})
 	if err != nil {
-		c.Errorf("Sending HTTP Response: %v", err)
+		logs.Log.Errorf("Sending HTTP Response: %v", err)
 	}
 }
 

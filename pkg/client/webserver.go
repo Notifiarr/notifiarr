@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	apachelog "github.com/lestrrat-go/apache-logformat/v2"
@@ -34,7 +35,7 @@ func (c *Client) SetupWebServer() {
 
 	// Make a multiplexer because websockets can't use apache log.
 	smx := http.NewServeMux()
-	smx.Handle("/", c.stripSecrets(apache.Wrap(c.apps.Router, c.Logger.HTTPLog.Writer())))
+	smx.Handle("/", c.stripSecrets(apache.Wrap(c.apps.Router, logs.Log.HTTPLog.Writer())))
 	smx.Handle(path.Join(c.apps.URLBase, "ui", "ws"), c.apps.Router) // websockets cannot go through the apache logger.
 
 	// Create a server.
@@ -45,7 +46,7 @@ func (c *Client) SetupWebServer() {
 		WriteTimeout:      c.Config.Timeout.Duration,
 		ReadTimeout:       c.Config.Timeout.Duration,
 		ReadHeaderTimeout: c.Config.Timeout.Duration,
-		ErrorLog:          c.Logger.ErrorLog,
+		ErrorLog:          logs.Log.ErrorLog,
 	}
 
 	// Initialize all the application API paths.
@@ -55,7 +56,7 @@ func (c *Client) SetupWebServer() {
 
 // RunWebServer starts the http or https listener.
 func (c *Client) RunWebServer() {
-	defer c.CapturePanic()
+	defer logs.Log.CapturePanic()
 
 	var err error
 
@@ -72,7 +73,7 @@ func (c *Client) RunWebServer() {
 	}
 
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		c.Errorf("Web Server Failed: %v (shutting down)", err)
+		logs.Log.Errorf("Web Server Failed: %v (shutting down)", err)
 		c.sigkil <- os.Kill // stop the app.
 	}
 }
@@ -86,7 +87,7 @@ func (c *Client) StopWebServer(ctx context.Context) error {
 		return nil
 	}
 
-	c.Print("==> Stopping Web Server!")
+	logs.Log.Printf("==> Stopping Web Server!")
 
 	ctx, cancel := context.WithTimeout(ctx, c.Config.Timeout.Duration)
 	defer cancel()

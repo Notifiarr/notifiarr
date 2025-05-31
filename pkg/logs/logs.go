@@ -22,6 +22,8 @@ import (
 	"golift.io/version"
 )
 
+var Log = New()
+
 // Logger provides some methods with baked in assumptions.
 type Logger struct {
 	ErrorLog  *log.Logger // Shares a Writer with InfoLog.

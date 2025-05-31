@@ -121,13 +121,6 @@ func (s *Server) RawGetData(ctx context.Context, req *Request) (*Response, time.
 }
 
 func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
-	defer func() {
-		if r := recover(); r != nil {
-			mnd.Log.Errorf("sendPayload panic: %v\n%#v\n", r, payload)
-			panic(r)
-		}
-	}()
-
 	data, err := json.Marshal(payload)
 	if err == nil {
 		var torn map[string]any

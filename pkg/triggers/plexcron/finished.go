@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -20,10 +20,10 @@ import (
 func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) {
 	sessions, err := c.getSessions(ctx, time.Second)
 	if err != nil {
-		mnd.Log.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.Server.URL, err)
+		logs.Log.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.Server.URL, err)
 		return
 	} else if len(sessions.Sessions) == 0 {
-		mnd.Log.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.Server.URL)
+		logs.Log.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.Server.URL)
 		return
 	}
 
@@ -42,11 +42,11 @@ func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) 
 		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
 		if strings.HasPrefix(msg, statusSending) || strings.HasPrefix(msg, statusError) {
-			mnd.Log.Printf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
+			logs.Log.Printf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
 				c.Plex.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
 				session.Type, session.Title, session.Player.State, pct, msg)
 		} else {
-			mnd.Log.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
+			logs.Log.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
 				c.Plex.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
 				session.Type, session.Title, session.Player.State, pct, msg)
 		}
@@ -94,7 +94,7 @@ func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string
 		},
 		LogMsg:     "Plex Completed Sessions",
 		LogPayload: true,
-		ErrorsOnly: !mnd.Log.DebugEnabled(),
+		ErrorsOnly: !logs.Log.DebugEnabled(),
 	})
 
 	c.sent[session.Session.ID+session.SessionKey] = struct{}{}

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -532,7 +533,7 @@ func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 // @Router       /api/trigger/uploadlog/{file} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string) {
-	if mnd.Log.NoUploads() {
+	if logs.Log.NoUploads() {
 		return http.StatusFailedDependency, "Uploads Administratively Disabled"
 	}
 

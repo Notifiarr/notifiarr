@@ -2,9 +2,9 @@ package mnd
 
 import (
 	"context"
-	"log"
 )
 
+// The logger is created here to avoid an import cycle between website and logs.
 var Log Logger
 
 // Logger is an interface for our logs package. We use this to avoid an import cycle.
@@ -16,9 +16,6 @@ type Logger interface {
 	ErrorfNoShare(msg string, v ...interface{})
 	Debug(v ...interface{})
 	Debugf(msg string, v ...interface{})
-	NoUploads() bool
-	GetInfoLog() *log.Logger
-	GetLogFiles() map[string]string
 	DebugEnabled() bool
 	CapturePanic()
 }

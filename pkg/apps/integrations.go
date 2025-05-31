@@ -124,10 +124,8 @@ func (a *AppsConfig) setupDeluge() ([]Deluge, error) {
 
 	for idx := range a.Deluge {
 		app := &a.Deluge[idx]
-		if app.URL == "" {
-			return nil, fmt.Errorf("%w: missing url: Deluge config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
-			return nil, fmt.Errorf("%w: URL must begin with http:// or https://: Deluge config %d", ErrInvalidApp, idx+1)
+		if err := checkUrl(app.URL, "Deluge", idx); err != nil {
+			return nil, err
 		}
 
 		deluge, err := app.setup(a.MaxBody)
@@ -241,10 +239,8 @@ func (a *AppsConfig) setupQbit() ([]Qbit, error) {
 
 	for idx := range a.Qbit {
 		app := &a.Qbit[idx]
-		if app.URL == "" {
-			return nil, fmt.Errorf("%w: missing url: Qbit config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.Config.URL, "http://") && !strings.HasPrefix(app.Config.URL, "https://") {
-			return nil, fmt.Errorf("%w: URL must begin with http:// or https://: Qbit config %d", ErrInvalidApp, idx+1)
+		if err := checkUrl(app.URL, "qBittorrent", idx); err != nil {
+			return nil, err
 		}
 
 		qbit, err := app.Setup(a.MaxBody)
@@ -304,10 +300,8 @@ func (a *AppsConfig) setupRtorrent() ([]Rtorrent, error) {
 
 	for idx := range a.Rtorrent {
 		app := &a.Rtorrent[idx]
-		if app.URL == "" {
-			return nil, fmt.Errorf("%w: missing url: rTorrent config %d", ErrInvalidApp, idx+1)
-		} else if !strings.HasPrefix(app.URL, "http://") && !strings.HasPrefix(app.URL, "https://") {
-			return nil, fmt.Errorf("%w: URL must begin with http:// or https://: rTorrent config %d", ErrInvalidApp, idx+1)
+		if err := checkUrl(app.URL, "rTorrent", idx); err != nil {
+			return nil, err
 		}
 
 		output[idx] = Rtorrent{
