@@ -3,7 +3,7 @@
 # https://github.com/golift/application-builder
 #
 
-FROM golang:1.24.3-bullseye AS builder
+FROM golang:1.24.3-bookworm AS builder
 
 # Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
@@ -22,12 +22,11 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash  \
 COPY pkg pkg
 COPY frontend frontend
 COPY frontend frontend
-RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN \
-    go generate ./pkg/bindata/docs \
-    mkdir -p ./frontend/dist \
-    echo "Fake frontend build." > ./frontend/dist/index.html \
-    go generate ./frontend/src/api \
-    go generate ./frontend
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN go generate ./pkg/bindata/docs \
+    && mkdir -p ./frontend/dist \
+    && echo "Fake frontend build." > ./frontend/dist/index.html \
+    && go generate ./frontend/src/api \
+    && go generate ./frontend
 
 ARG TARGETARCH
 
