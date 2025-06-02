@@ -428,8 +428,15 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 		return
 	}
 
-	uri := "ajax/" + mux.Vars(request)["path"] + ".html"
+	if request.Header.Get("Accept") == mnd.ContentTypeJSON {
+		if err := json.NewEncoder(response).Encode(cmd.Stats()); err != nil {
+			logs.Log.Errorf("Encoding command stats: %v", err)
+		}
 
+		return
+	}
+
+	uri := "ajax/" + mux.Vars(request)["path"] + ".html"
 	if err := c.template.ExecuteTemplate(response, uri, cmd); err != nil {
 		http.Error(response, "template error: "+err.Error(), http.StatusOK)
 	}
@@ -633,10 +640,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 		return fmt.Errorf("parsing form data failed: %w", err)
 	}
 
-	if config.Snapshot == nil {
-		config.Snapshot = &snapshot.Config{}
-	}
-
+	config.Snapshot = snapshot.Config{}
 	config.AppsConfig.Lidarr = nil
 	config.AppsConfig.Prowlarr = nil
 	config.AppsConfig.Radarr = nil
@@ -654,7 +658,7 @@ func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *h
 	config.Commands = nil
 	config.Service = nil
 	config.Snapshot.Plugins.MySQL = nil
-	config.Snapshot.Plugins.Nvidia = nil
+	config.Snapshot.Plugins.Nvidia = snapshot.NvidiaConfig{}
 
 	// for k, v := range request.PostForm {
 	// 	c.Errorf("Config Post: %s = %+v", k, v)
@@ -707,10 +711,6 @@ func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 	index := 0
 
 	for _, svc := range config.Service {
-		if svc == nil {
-			continue
-		}
-
 		config.Service[index] = svc
 		index++
 
@@ -723,11 +723,6 @@ func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 		}
 
 		serviceNames[svc.Name] = struct{}{}
-	}
-
-	// Clean up to avoid leaking memory.
-	for j := index; j < len(config.Service); j++ {
-		config.Service[j] = nil
 	}
 
 	config.Service = config.Service[:index]

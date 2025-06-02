@@ -8,6 +8,7 @@ import (
 	"errors"
 	"html"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -28,6 +29,7 @@ type Input struct {
 	Real  *configfile.Config
 	Post  *configfile.Config
 	Type  string
+	Args  url.Values
 	Index int
 }
 
@@ -60,6 +62,7 @@ func Test(orig *configfile.Config, writer http.ResponseWriter, req *http.Request
 		Real:  orig,
 		Post:  &posted,
 		Type:  mux.Vars(req)["type"],
+		Args:  req.URL.Query(),
 		Index: index,
 	})
 	http.Error(writer, html.EscapeString(reply), code)
@@ -76,13 +79,13 @@ func testInstance(ctx context.Context, input *Input) (string, int) {
 		return checkAndRun(ctx, testNZBGet, input, input.Post.AppsConfig, input.Post.NZBGet)
 	case "deluge":
 		return checkAndRun(ctx, testDeluge, input, input.Post.AppsConfig, input.Post.Deluge)
-	case "qbit":
+	case "qbit", "qbittorrent":
 		return checkAndRun(ctx, testQbit, input, input.Post.AppsConfig, input.Post.Qbit)
 	case "rtorrent":
 		return checkAndRun(ctx, testRtorrent, input, input.Post.AppsConfig, input.Post.Rtorrent)
 	case "transmission":
 		return checkAndRun(ctx, testTransmission, input, input.Post.AppsConfig, input.Post.Transmission)
-	case "sabnzb":
+	case "sabnzb", "sabnzbd":
 		return checkAndRun(ctx, testSabNZB, input, input.Post.AppsConfig, input.Post.SabNZB)
 	// starr.go
 	case "lidarr":
@@ -97,10 +100,10 @@ func testInstance(ctx context.Context, input *Input) (string, int) {
 		return checkAndRun(ctx, testSonarr, input, input.Post.AppsConfig, input.Post.Sonarr)
 	// snapshots.go
 	case "mysql":
-		return checkAndRun(ctx, testMySQL, input, input.Post.Snapshot, input.Post.Snapshot.Plugins.MySQL)
+		return checkAndRun(ctx, testMySQL, input, input.Post.Snapshot, input.Post.Snapshot.MySQL)
 	case "nvidia":
 		return checkAndRun(ctx, testNvidia, input, input.Post.Snapshot,
-			[]*snapshot.NvidiaConfig{input.Post.Snapshot.Plugins.Nvidia}) // ad-hoc slice, index is already 0.
+			[]snapshot.NvidiaConfig{input.Post.Snapshot.Nvidia}) // ad-hoc slice, index is already 0.
 	// services.go
 	case "tcp":
 		return checkAndRun(ctx, testTCP, input, input.Post.Service, input.Post.Service)

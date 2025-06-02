@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
+	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -89,8 +90,12 @@ func NewSchedule(endpoint *epconfig.Endpoint, conf *common.Config) *Schedule {
 		Endpoint: endpoint,
 		ch:       make(chan *common.ActionInput, 1),
 		client: &http.Client{
-			Timeout:       globalTimeout,
-			Transport:     apps.NewMetricsRoundTripper("endpoints", nil),
+			Timeout: globalTimeout,
+			Transport: apps.NewMetricsRoundTripper("endpoints", &http.Transport{
+				TLSClientConfig: &tls.Config{
+					InsecureSkipVerify: !endpoint.ValidSSL,
+				},
+			}),
 			CheckRedirect: endpoint.CheckRedirect(),
 		},
 	}

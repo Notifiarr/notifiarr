@@ -31,7 +31,7 @@ func (c *Config) Fix() {
 	}
 }
 
-func (s *Services) Add(services []*ServiceConfig) error {
+func (s *Services) Add(services []ServiceConfig) error {
 	for _, svc := range services {
 		if !svc.validated {
 			if err := svc.Validate(); err != nil {
@@ -40,7 +40,7 @@ func (s *Services) Add(services []*ServiceConfig) error {
 		}
 
 		// Add this validated service to our service map.
-		s.add(svc)
+		s.add(&svc)
 	}
 
 	return nil

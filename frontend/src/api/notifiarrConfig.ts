@@ -26,6 +26,20 @@ export enum AuthType {
 };
 
 /**
+ * Frequency sets the base "how-often" a CronJob is executed.
+ * See the Frequency constants.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler.Frequency>
+ */
+export enum Frequency {
+  DeadCron = 0,
+  Minutely = 1,
+  Hourly   = 2,
+  Daily    = 3,
+  Weekly   = 4,
+  Monthly  = 5,
+};
+
+/**
  * Profile is the data returned by the profile GET endpoint.
  * Basically everything.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
@@ -65,6 +79,7 @@ export interface Profile {
   proxyAllow: boolean;
   poolStats?: Record<string, null | PoolSize>;
   started: Date;
+  cmdList?: CmdconfigConfig[];
   program: string;
   version: string;
   revision: string;
@@ -103,8 +118,8 @@ export interface Config extends LogConfig, AppsConfig {
   unstableCh: boolean;
   timeout: string;
   retries: number;
-  snapshot?: SnapshotConfig;
-  services?: ServicesConfig;
+  snapshot: SnapshotConfig;
+  services: ServicesConfig;
   service?: ServiceConfig[];
   apt: boolean;
   watchFiles?: WatchFile[];
@@ -139,7 +154,7 @@ export interface SnapshotConfig extends Plugins {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Plugins>
  */
 export interface Plugins {
-  nvidia?: NvidiaConfig;
+  nvidia: NvidiaConfig;
   mysql?: MySQLConfig[];
 };
 
@@ -222,6 +237,7 @@ export interface Endpoint extends CronJob {
   method: string;
   body: string;
   follow: boolean;
+  validSsl: boolean;
 };
 
 /**
@@ -239,7 +255,7 @@ export interface CronJob {
   /**
    * Frequency to configure the job. Pass 0 disable the cron.
    */
-  frequency: number;
+  frequency: Frequency;
   /**
    * Interval for Daily, Weekly and Monthly Frequencies. 1 = every day/week/month, 2 = every other, and so on.
    */
@@ -276,10 +292,16 @@ export interface Command extends CmdconfigConfig {};
 export interface CmdconfigConfig {
   name: string;
   hash: string;
+  command?: string;
   shell: boolean;
   log: boolean;
   notify: boolean;
+  timeout: string;
+  /**
+   * Args and ArgValues are not config items. They are calculated on startup.
+   */
   args: number;
+  argValues?: string[];
 };
 
 /**
@@ -772,6 +794,20 @@ export interface ProfilePost {
   header: string;
   newPass: string;
   upstreams: string;
+};
+
+/**
+ * Stats for a command's invocations.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/commands.Stats>
+ */
+export interface Stats {
+  runs: number;
+  fails: number;
+  output: string;
+  last: string;
+  lastCmd: string;
+  lastTime: Date;
+  lastArgs?: string[];
 };
 
 // Packages parsed:

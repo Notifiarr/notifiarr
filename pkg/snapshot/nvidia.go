@@ -47,8 +47,8 @@ func (n *NvidiaConfig) HasID(busID string) bool {
 }
 
 // GetNvidia requires nvidia-smi executable and Nvidia drivers.
-func (s *Snapshot) GetNvidia(ctx context.Context, config *NvidiaConfig) error {
-	if config == nil || config.Disabled {
+func (s *Snapshot) GetNvidia(ctx context.Context, config NvidiaConfig) error {
+	if config.Disabled {
 		return nil
 	}
 
@@ -82,7 +82,7 @@ func (s *Snapshot) GetNvidia(ctx context.Context, config *NvidiaConfig) error {
 	scanner := bufio.NewScanner(&stdout)
 	scanner.Split(bufio.ScanLines)
 
-	defer s.scanNvidiaSMIOutput(scanner, config)
+	defer s.scanNvidiaSMIOutput(scanner, &config)
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("%v: %w: %s", cmd.Args, err, stderr.String())

@@ -17,6 +17,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/private"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -60,6 +61,7 @@ type Profile struct {
 	ProxyAllow      bool                          `json:"proxyAllow"`
 	PoolStats       map[string]*mulery.PoolSize   `json:"poolStats"`
 	Started         time.Time                     `json:"started"`
+	CmdList         []*cmdconfig.Config           `json:"cmdList"`
 	Program         string                        `json:"program"`
 	Version         string                        `json:"version"`
 	Revision        string                        `json:"revision"`
@@ -139,6 +141,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		Expvar:          mnd.GetAllData(),
 		HostInfo:        hostInfo,
 		Started:         version.Started.Round(time.Second),
+		CmdList:         c.triggers.Commands.List(),
 		Program:         c.Flags.Name(),
 		Version:         version.Version,
 		Revision:        version.Revision,

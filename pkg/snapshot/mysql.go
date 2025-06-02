@@ -63,7 +63,7 @@ func (n NullString) MarshalJSON() ([]byte, error) {
 }
 
 // GetMySQL grabs the process list from a bunch of servers.
-func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit int) []error {
+func (s *Snapshot) GetMySQL(ctx context.Context, servers []MySQLConfig, limit int) []error {
 	s.MySQL = make(map[string]*MySQLServerData)
 
 	var errs []error
@@ -73,7 +73,7 @@ func (s *Snapshot) GetMySQL(ctx context.Context, servers []*MySQLConfig, limit i
 			continue
 		}
 
-		procs, status, err := getMySQL(ctx, server)
+		procs, status, err := getMySQL(ctx, &server)
 		if err != nil {
 			errs = append(errs, err)
 		}

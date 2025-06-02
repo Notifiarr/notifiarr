@@ -41,6 +41,7 @@ type Command struct {
 	output  string // last output logged
 	lastRun time.Time
 	lastArg []string
+	lastCmd string
 	mu      sync.RWMutex
 	ch      chan *common.ActionInput
 }
@@ -99,6 +100,8 @@ type Stats struct {
 	Fails      int              `json:"fails"`
 	LastOutput string           `json:"output"`
 	LastRun    string           `json:"last"`
+	LastCmd    string           `json:"lastCmd"`
+	LastTime   time.Time        `json:"lastTime"`
 	LastArgs   []string         `json:"lastArgs"`
 }
 
@@ -119,17 +122,14 @@ func (c *Command) Stats() Stats {
 		Fails:      c.fails,
 		LastOutput: c.output,
 		LastRun:    last,
+		LastTime:   c.lastRun,
 		LastArgs:   c.lastArg,
+		LastCmd:    c.lastCmd,
 	}
 }
 
 func (c *cmd) create() {
 	for _, cmd := range c.cmdlist {
-		if err := cmd.SetupRegexpArgs(); err != nil {
-			mnd.Log.Errorf("Command Setup Failed: %v", err)
-			cmd.disable = true //nolint:wsl
-		}
-
 		cmd.ch = make(chan *common.ActionInput, 1)
 
 		c.Add(&common.Action{

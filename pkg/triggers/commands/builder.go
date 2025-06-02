@@ -29,21 +29,21 @@ type cmdBuilder struct {
 }
 
 // getCmd returns the exec.Cmd for the provided arguments.
-func (c *cmdBuilder) getCmd(ctx context.Context) (*exec.Cmd, error) {
+func (c *cmdBuilder) getCmd(ctx context.Context) ([]string, *exec.Cmd, error) {
 	if len(c.expectedArgs) != len(c.providedArgs) {
-		return nil, fmt.Errorf("%w: expected: %d, provided: %d", ErrArgCount, len(c.expectedArgs), len(c.providedArgs))
+		return nil, nil, fmt.Errorf("%w: expected: %d, provided: %d", ErrArgCount, len(c.expectedArgs), len(c.providedArgs))
 	}
 
 	builtArgs, err := c.getArgs()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var cmd *exec.Cmd
 	//nolint:gosec
 	switch len(builtArgs) {
 	case 0:
-		return nil, ErrNoCmd
+		return nil, nil, ErrNoCmd
 	case 1:
 		cmd = exec.CommandContext(ctx, builtArgs[0])
 	default:
@@ -53,7 +53,7 @@ func (c *cmdBuilder) getCmd(ctx context.Context) (*exec.Cmd, error) {
 	// This call hides the cmd window on Windows.
 	// snapshot.SysCallSettings(cmd)
 
-	return cmd, nil
+	return builtArgs, cmd, nil
 }
 
 func (c *cmdBuilder) getArgs() ([]string, error) {

@@ -13,6 +13,8 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/client"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler"
 	"golift.io/cnfg"
 	"golift.io/goty"
 	"golift.io/goty/gotydoc"
@@ -54,8 +56,16 @@ func main() {
 		{Name: "header", Value: configfile.AuthHeader},
 		{Name: "noauth", Value: configfile.AuthNone},
 	})
+	goat.Enums([]goty.Enum{
+		{Name: "DeadCron", Value: scheduler.DeadCron},
+		{Name: "Minutely", Value: scheduler.Minutely},
+		{Name: "Hourly", Value: scheduler.Hourly},
+		{Name: "Daily", Value: scheduler.Daily},
+		{Name: "Weekly", Value: scheduler.Weekly},
+		{Name: "Monthly", Value: scheduler.Monthly},
+	})
 	log.Println("==> parsing config structs")
-	goat.Parse(client.Profile{}, client.ProfilePost{})
+	goat.Parse(client.Profile{}, client.ProfilePost{}, commands.Stats{})
 
 	log.Println("==> splitting packages")
 	vendorPkgs, localPkgs := splitPkgs(goat.Pkgs())
@@ -87,7 +97,7 @@ func splitPkgs(pkgs []string) ([]string, []string) {
 	for _, pkg := range pkgs {
 		if strings.HasPrefix(pkg, localPrefix) {
 			localPkgs = append(localPkgs, pkg)
-		} else {
+		} else if strings.Contains(pkg, ".") {
 			vendorPkgs = append(vendorPkgs, pkg)
 		}
 	}
