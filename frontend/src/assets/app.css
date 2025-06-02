@@ -86,17 +86,19 @@ body.dark-mode {
 
 .btn-notifiarr {
   color: #000000 !important;
-  background: radial-gradient(
-    circle,
-    rgba(60, 210, 165, 1) 37%,
-    rgba(94, 230, 216, 1) 100%
-  );
+  background: radial-gradient(circle, rgba(60, 210, 165) 37%, rgba(94, 230, 216) 100%);
   border-color: #03535a !important;
   font-weight: 600;
 }
 
 .btn-notifiarr:hover {
   background: radial-gradient(circle, rgb(54, 197, 154) 37%, rgb(79, 195, 185) 100%);
+}
+
+.btn-notifiarr:focus {
+  background: radial-gradient(circle, rgb(95, 248, 202) 37%, rgb(123, 249, 236) 100%);
+  border-color: #10c4c4f6 !important;
+  border-width: 5px !important;
 }
 
 .btn-outline-notifiarr {

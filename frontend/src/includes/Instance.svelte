@@ -39,26 +39,22 @@
     reset,
   }: ChildProps<any> = $props()
 
-  // Convert array to newline-separated string for textarea.
-  let busIds = $state(
-    typeof form.busIDs === 'undefined' ? undefined : form.busIDs?.join('\n'),
-  )
+  /** Array converted to newline-separated string for textarea. */
+  let busIds: string = $state(form.busIDs?.join('\n') ?? '')
+  /** Rows for textarea based on count of newlines. */
+  const rows = $derived(busIds.split('\n').length < 10 ? busIds.split('\n').length : 1)
+  // Update form variables if they existed prior to this effect.
+  $effect(() => {
+    // form.smiPath and form.busIDs only exist on Nvidia.
+    if (typeof form.smiPath !== 'undefined') form.busIDs = busIds.split(/\s+/)
+  })
 
-  const rows = $derived(
-    busIds ? (busIds.split('\n').length < 10 ? busIds?.split('\n').length : 1) : 1,
-  )
-
-  /** hasToken is a shorthand variable to set Col sizes for username and password inputs. */
+  /** Shorthand variable to set Col sizes for username and password inputs. */
   const hasToken = $derived(
     (typeof form.token === 'string' || typeof form.apiKey === 'string') &&
       !app.hidden?.includes('token') &&
       !app.hidden?.includes('apiKey'),
   )
-
-  $effect(() => {
-    // Only update form variables if they existed prior to this effect.
-    if (typeof form.disabled !== 'undefined') form.busIDs = busIds?.split(/\s+/)
-  })
 </script>
 
 <div class="instance">
@@ -80,9 +76,9 @@
         <CheckedInput
           id="url"
           bind:original
+          bind:form
           disabled={app.disabled?.includes('url')}
           {app}
-          {form}
           {index}
           {validate} />
       </Col>
@@ -94,9 +90,9 @@
         <CheckedInput
           id="host"
           bind:original
+          bind:form
           disabled={app.disabled?.includes('host')}
           {app}
-          {form}
           {index}
           {validate} />
       </Col>
@@ -226,9 +222,9 @@
         <CheckedInput
           id="smiPath"
           bind:original
+          bind:form
           disabled={app.disabled?.includes('smiPath')}
           {app}
-          {form}
           {index}
           {validate} />
       </Col>
@@ -238,7 +234,7 @@
           type="textarea"
           {rows}
           bind:value={busIds}
-          original={original?.busIDs?.join('\n')}
+          original={original?.busIDs?.join('\n') ?? ''}
           disabled={app.disabled?.includes('busIds')}
           {validate} />
       </Col>

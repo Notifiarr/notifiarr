@@ -49,7 +49,6 @@ class ConfigProfile {
   public clearStatus() {
     this.status = ''
     this.error = ''
-    this.updated = null
     this.formError = ''
   }
 

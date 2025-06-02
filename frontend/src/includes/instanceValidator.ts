@@ -13,9 +13,8 @@ export const validate = (
   id: string,
   value: any,
   index: number,
-  instances: Form[] | Form,
+  instances: Form[],
 ): string => {
-  if (!Array.isArray(instances)) instances = [instances]
   const key = id.split('.').pop()
 
   if (key == 'name') {

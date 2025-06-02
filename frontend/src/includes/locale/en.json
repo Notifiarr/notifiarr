@@ -69,7 +69,13 @@
     "SaveConfiguration": "Save Configuration",
     "ResetForm": "Reset Form",
     "NoStayHere": "No! Stay here",
-    "YesDeleteMyChanges": "Yes! Delete my changes"
+    "YesDeleteMyChanges": "Yes! Delete my changes",
+    "Execute": "Execute",
+    "HideMenu": "Hide Menu",
+    "ShowMenu": "Show Menu",
+    "ShowOutput": "Show Output",
+    "HideOutput": "Hide Output",
+    "RefreshOutput": "Refresh Output"
   },
   "RegexTester": {
     "RegularExpressionTester": "Regular Expression Tester",
@@ -105,8 +111,6 @@
     "Every12Hours": "Every 12 hours",
     "Every6Hours": "Every 6 hours",
     "Every3Hours": "Every 3 hours",
-    "HideMenu": "Hide Menu",
-    "ShowMenu": "Show Menu",
     "Reloading": "Reloading...",
     "FailedToReload": "Failed to reload: {error}",
     "ConfirmReload": "Confirm Reload",
@@ -940,6 +944,46 @@
       "label": "Log Matches",
       "description": "Write matched lines to notifiarr log.",
       "tooltip": "Enabling this will write the matched line to the notifiarr log. This is good for debugging, but may be noisy."
+    }
+  },
+  "Commands": {
+    "title": "Command List",
+    "addInstance": "Create Command",
+    "DeleteCommand": "Delete Command",
+    "notes": "If you modify a command you must save the configuration before you can run it from the Web UI.",
+    "Executions": "Executions: {count}",
+    "Failures": "Failures: {count}",
+    "LastExecution": "Last Execution",
+    "neverExecuted": "never executed",
+    "enterCommandArguments": "Enter Command Arguments",
+    "commandRequiresArguments": "This command requires {count, plural, one {one argument. Enter it below.} other {# arguments. Enter them below.}}",
+    "noOutput": "No output yet. Try executing the command then click refresh.",
+    "refreshed": "refreshed {timeDuration} ago",
+    "regexMismatch": "Argument does not match regular expression.",
+    "name": {
+      "label": "Name",
+      "description": "Name of the command. Shows up in the log and in notifications.",
+      "placeholder": "custom name for notifications"
+    },
+    "command": {
+      "label": "Command",
+      "description": "Command to run.",
+      "placeholder": "echo 'Hello, world!'",
+      "tooltip": "This is the command that will execute when triggered.<br />Click the double-check icon to run the command right now. After it finishes, click refresh and show output to see the results.<br /><br />Check the box to wrap the command in a shell. On Windows, this will run the command with <code>cmd.exe</code> and on other operating systems, it will run the command with <code>/bin/bash</code>. This is useful for commands that require shell features like pipes and redirects. Custom positional arguments may be defined with this format: <code>({regex})</code> - that is a regular expression wrapped in curly braces and parentheses, ie. <code>({[a-z]})</code>. These arguments may be filled in by the person running the command; either in this Web UI or on your chat server. If a command has an argument, it is required; if it has multiple arguments, they're all required.<br /><br /> <h5>Examples</h5>Command using two arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />The above command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>.<br /> This command can be used to curl websites from within the scratch Docker container: <code>/notifiarr --curl ({https?://[^ ;]+})</code>"
+    },
+    "notify": {
+      "label": "Notify",
+      "description": "Send notification after command is executed.",
+      "tooltip": "Receive a notification containing the command output."
+    },
+    "log": {
+      "label": "Log Output",
+      "description": "Log command output.",
+      "tooltip": "Log the command output to this client's application log."
+    },
+    "timeout": {
+      "label": "Maximum Run Duration",
+      "description": "How long the command may run before termination."
     }
   }
 }

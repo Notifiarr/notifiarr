@@ -63,9 +63,9 @@
   }
 
   let iv = $derived({
-    Plex: new FormListTracker([$profile.config.plex ?? ({} as PlexConfig)], plexApp),
+    Plex: new FormListTracker([$profile.config.plex ?? plexApp.empty], plexApp),
     Tautulli: new FormListTracker(
-      [$profile.config.tautulli ?? ({} as TautulliConfig)],
+      [$profile.config.tautulli ?? tautulliApp.empty!],
       tautulliApp,
     ),
   })
@@ -81,17 +81,19 @@
 <CardBody class="pt-0 mt-0">
   <InstanceHeader flt={iv.Plex} />
   <Instance
+    index={0}
     reset={() => iv.Plex.resetForm(0)}
-    validate={(id, value) => iv.Plex.validate(id, value, 0, iv.Plex.instances)}
-    bind:form={iv.Plex.instances[0]!}
-    original={iv.Plex.original[0]!}
+    validate={(id, value) => iv.Plex.validate(id, value, 0)}
+    bind:form={iv.Plex.instances[0]}
+    original={iv.Plex.original[0]}
     app={plexApp} />
   <InstanceHeader flt={iv.Tautulli} />
   <Instance
+    index={0}
     reset={() => iv.Tautulli.resetForm(0)}
-    validate={(id, value) => iv.Tautulli.validate(id, value, 0, iv.Tautulli.instances)}
-    bind:form={iv.Tautulli.instances[0]!}
-    original={iv.Tautulli.original[0]!}
+    validate={(id, value) => iv.Tautulli.validate(id, value, 0)}
+    bind:form={iv.Tautulli.instances[0]}
+    original={iv.Tautulli.original[0]}
     app={tautulliApp} />
 </CardBody>
 
@@ -99,7 +101,7 @@
   submit={() =>
     profile.writeConfig({
       ...$profile.config,
-      plex: iv.Plex.instances[0]! as PlexConfig,
-      tautulli: iv.Tautulli.instances[0]! as TautulliConfig,
+      plex: iv.Plex.instances[0],
+      tautulli: iv.Tautulli.instances[0],
     })}
   saveDisabled={!nav.formChanged || Object.values(iv).some(iv => iv.invalid)} />

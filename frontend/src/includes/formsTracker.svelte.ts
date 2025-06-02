@@ -113,7 +113,7 @@ export class FormListTracker<T> {
   public resetForm = (index: number) => {
     this.instances[index] = deepCopy(this.original[index] ?? this.app.empty!)
     Object.keys(this.instances[index] ?? {}).forEach(k => {
-      this.validate(k, this.instances[index]?.[k as keyof T], index, this.instances)
+      this.validate(k, this.instances[index]?.[k as keyof T], index)
     })
   }
 
@@ -121,7 +121,7 @@ export class FormListTracker<T> {
   private validateAll = () => {
     this.instances.forEach((m, i) => {
       Object.keys(m ?? {}).forEach(k => {
-        this.validate(k, m?.[k as keyof T], i, this.instances)
+        this.validate(k, m?.[k as keyof T], i)
       })
     })
   }
@@ -140,9 +140,9 @@ export class FormListTracker<T> {
    * @param instances - The list of instances currently in the form. (all instances)
    * @updates The feedback for the instance.
    */
-  public validate = (id: string, value: any, index: number, instances: T[]): string => {
+  public validate = (id: string, value: any, index: number): string => {
     if (!this.feedback[index]) this.feedback[index] = {}
     return (this.feedback[index][id] =
-      this.app.validator?.(id, value, index, instances) ?? '')
+      this.app.validator?.(id, value, index, this.instances) ?? '')
   }
 }
