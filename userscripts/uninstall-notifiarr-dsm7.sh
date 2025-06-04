@@ -18,8 +18,7 @@ ls -la /usr/bin/notifiarr 2>/dev/null || echo "File not found"
 rm -f /usr/bin/notifiarr
 
 echo "Checking for /usr/bin/update-notifiarr.sh:"
-ls -la /usr/bin/update-notifiarr.sh 2>/dev/null || echo "File not found"
-rm -f /usr/bin/update-notifiarr.sh
+[ -f "/usr/bin/update-notifiarr.sh" ]  || echo "File not found:  /usr/bin/update-notifiarr.sh"
 
 echo "Checking for /etc/notifiarr:"
 ls -la /etc/notifiarr 2>/dev/null || echo "Directory not found"
