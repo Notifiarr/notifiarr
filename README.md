@@ -66,40 +66,24 @@ DSM 6 systems can install Notifiarr by downloading and extracting the appropriat
 
 ## Synology DSM 7+
 
-This install script for DSM 7+ does the following:
+- The install script for DSM 7+ at `userscripts/install-synology-dsm7.sh` installs notifiarr as a system service and sets up a daily auto-update cron job. 
+- Upon completion, you must manually edit `/etc/notifiarr/notifiarr.conf`
+- When finished, restart the notifarr service with `/usr/local/etc/rc.d/notifiarr.sh restart`
 
-- Installs `zstd` via Entware (`opkg`)
-- Detects architecture (`x86_64`, `arm64`, `armhf`)
-- Downloads and installs the latest Notifiarr release
-- Sets up persistent boot startup using `/usr/local/etc/rc.d`
-- Adds a daily update cron job
-- Writes logs to `/volume1/data/notifiarr.log`
-- Adds a weekly log rotation with 4 compressed backups
-
-### Prerequisites
-
-- Entware must be installed ([instructions](https://github.com/Entware/Entware/wiki/Install-on-Synology-NAS))
-- SSH/terminal access with root privileges
 
 ### Install command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/install-notifiarr-dsm7.sh | sudo bash
+curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology-dsm7.sh | sudo bash && vi /etc/notifiarr/notifiarr.conf
 ```
-
-### Paths
-
-- Config: `/etc/notifiarr/notifiarr.conf`
-- Logs: `/volume1/data/notifiarr.log`
 
 ### Manage service:
 
 ```bash
 /usr/local/etc/rc.d/notifiarr.sh start
 /usr/local/etc/rc.d/notifiarr.sh stop
+/usr/local/etc/rc.d/notifiarr.sh restart
 ```
-
-The installer also sets up cron jobs for daily updates and weekly log rotation automatically.
 
 ### macOS Install
 

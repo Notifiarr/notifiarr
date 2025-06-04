@@ -108,6 +108,12 @@ case "$1" in
     echo "Stopping Notifiarr..."
     pkill -f "/usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf"
     ;;
+  restart)
+    echo "Restarting Notifiarr..."
+    $0 stop
+    sleep 10
+    $0 start
+    ;;
 esac
 exit 0
 EOF
@@ -146,5 +152,4 @@ grep -q update-notifiarr "$CRON_FILE" && echo "OK: Cron job is installed" || fai
 
 echo "Installation or update complete. Notifiarr is running, persistent, and auto-updating."
 echo "Please edit /etc/notifiarr/notifiarr.conf and then restart the service with:"
-echo "/usr/local/etc/rc.d/notifiarr.sh stop"
-echo "/usr/local/etc/rc.d/notifiarr.sh start"
+echo "/usr/local/etc/rc.d/notifiarr.sh restart"
