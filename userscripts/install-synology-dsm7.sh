@@ -66,7 +66,7 @@ chmod +x /usr/bin/notifiarr
 rm -f "$PACKAGE"
 
 echo "Creating or updating config and log directories..."
-mkdir -p /etc/notifiarr /volume1/@appdata/notifiarr/lognotifiarr
+mkdir -p /etc/notifiarr /usr/bin/notifiarr
 CONFIGFILE=/etc/notifiarr/notifiarr.conf
 if [ ! -f "${CONFIGFILE}" ]; then
   echo "Generating config file ${CONFIGFILE}"
@@ -82,9 +82,9 @@ if ! id notifiarr >/dev/null 2>&1; then
   synouser --add notifiarr "" Notifiarr 0 "" 0
 fi
 
-echo "Setting permissions/ownership on: /usr/bin/notifiarr /volume1/@appdata/notifiarr/lognotifiarr"
-chmod 0750 /usr/bin/notifiarr /volume1/@appdata/notifiarr/lognotifiarr
-chown -R notifiarr:notifiarr /volume1/@appdata/notifiarr/lognotifiarr /etc/notifiarr
+echo "Setting permissions/ownership on: /usr/bin/notifiarr"
+chmod 0750 /usr/bin/notifiarr
+chown -R notifiarr:notifiarr /usr/bin/notifiarr /etc/notifiarr
 
 echo "Adding sudoers entry for smartctl..."
 if ! grep -q "notifiarr ALL=(root) NOPASSWD:/bin/smartctl" /etc/sudoers; then
@@ -96,8 +96,8 @@ cat << 'EOF' > /usr/local/etc/rc.d/notifiarr.sh
 #!/bin/sh
 
 # Set log file paths - these cannot be edited in the config
-export DN_LOG_FILE="/volume1/@appdata/notifiarr/lognotifiarr/app.log"
-export DN_HTTP_LOG="/volume1/@appdata/notifiarr/lognotifiarr/http.log"
+export DN_LOG_FILE="/usr/bin/notifiarr/app.log"
+export DN_HTTP_LOG="/usr/bin/notifiarr/http.log"
 
 case "$1" in
   start)
