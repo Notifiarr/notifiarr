@@ -14,7 +14,7 @@ echo "Stopping Notifiarr..."
 
 echo "Removing Notifiarr files..."
 echo "Checking for /usr/bin/notifiarr:"
-ls -la /usr/bin/notifiarr 2>/dev/null || echo "File not found"
+[ -f /usr/bin/notifiarr ] && ls -la /usr/bin/notifiarr || echo "File not found"
 rm -f /usr/bin/notifiarr
 
 echo "Checking for /usr/bin/update-notifiarr.sh:"
