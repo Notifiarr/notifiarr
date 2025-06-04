@@ -32,9 +32,7 @@ echo "Checking for /etc/cron.d/update-notifiarr:"
 [ -f /etc/cron.d/update-notifiarr ] && ls -la /etc/cron.d/update-notifiarr || echo "File not found"
 rm -f /etc/cron.d/update-notifiarr
 
-echo "Checking for /volume1/@appdata/notifiarr/lognotifiarr:"
-[ -d /volume1/@appdata/notifiarr/lognotifiarr ] && ls -la /volume1/@appdata/notifiarr/lognotifiarr || echo "Directory not found"
-rm -rf /volume1/@appdata/notifiarr/lognotifiarr
+# Removed redundant check/removal of lognotifiarr since parent directory removal handles it
 
 echo "Checking for /volume1/@appdata/notifiarr:"
 [ -d /volume1/@appdata/notifiarr ] && ls -la /volume1/@appdata/notifiarr || echo "Directory not found"
