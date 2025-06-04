@@ -21,23 +21,23 @@ echo "Checking for /usr/bin/update-notifiarr.sh:"
 [ -f "/usr/bin/update-notifiarr.sh" ]  || echo "File not found:  /usr/bin/update-notifiarr.sh"
 
 echo "Checking for /etc/notifiarr:"
-ls -la /etc/notifiarr 2>/dev/null || echo "Directory not found"
+[ -d /etc/notifiarr ] && ls -la /etc/notifiarr || echo "Directory not found"
 rm -rf /etc/notifiarr
 
 echo "Checking for /usr/local/etc/rc.d/notifiarr.sh:"
-ls -la /usr/local/etc/rc.d/notifiarr.sh 2>/dev/null || echo "File not found"
+[ -f /usr/local/etc/rc.d/notifiarr.sh ] && ls -la /usr/local/etc/rc.d/notifiarr.sh || echo "File not found"
 rm -f /usr/local/etc/rc.d/notifiarr.sh
 
 echo "Checking for /etc/cron.d/update-notifiarr:"
-ls -la /etc/cron.d/update-notifiarr 2>/dev/null || echo "File not found"
+[ -f /etc/cron.d/update-notifiarr ] && ls -la /etc/cron.d/update-notifiarr || echo "File not found"
 rm -f /etc/cron.d/update-notifiarr
 
 echo "Checking for /volume1/@appdata/notifiarr/lognotifiarr:"
-ls -la /volume1/@appdata/notifiarr/lognotifiarr 2>/dev/null || echo "Directory not found"
+[ -d /volume1/@appdata/notifiarr/lognotifiarr ] && ls -la /volume1/@appdata/notifiarr/lognotifiarr || echo "Directory not found"
 rm -rf /volume1/@appdata/notifiarr/lognotifiarr
 
 echo "Checking for /volume1/@appdata/notifiarr:"
-ls -la /volume1/@appdata/notifiarr 2>/dev/null || echo "Directory not found"
+[ -d /volume1/@appdata/notifiarr ] && ls -la /volume1/@appdata/notifiarr || echo "Directory not found"
 rm -rf /volume1/@appdata/notifiarr
 
 echo "Removing Notifiarr user and sudoers entry..."
