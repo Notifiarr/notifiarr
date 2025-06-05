@@ -22,7 +22,16 @@ echo "Checking for /usr/bin/update-notifiarr.sh:"
 
 echo "Checking for /etc/notifiarr:"
 [ -d /etc/notifiarr ] && ls -la /etc/notifiarr || echo "Directory not found"
-rm -rf /etc/notifiarr
+if [ -d /etc/notifiarr ]; then
+    read -p "Keep Notifiarr config files? [Y/n] " -r
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        echo "Removing all files except notifiarr.conf..."
+        find /etc/notifiarr -mindepth 1 ! -name 'notifiarr.conf' -delete
+        echo "Preserved notifiarr.conf, removed other files"
+    else
+        echo "Preserving all config files"
+    fi
+fi
 
 echo "Checking for /usr/local/etc/rc.d/notifiarr.sh:"
 [ -f /usr/local/etc/rc.d/notifiarr.sh ] && ls -la /usr/local/etc/rc.d/notifiarr.sh || echo "File not found"
