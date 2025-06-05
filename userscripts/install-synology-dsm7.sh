@@ -29,12 +29,22 @@ esac
 
 echo "Fetching latest Notifiarr release metadata..."
 RELEASE_JSON=$(curl -sSL https://api.github.com/repos/Notifiarr/notifiarr/releases/latest)
-PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -o "https://[^\"]*notifiarr\.${ARCH_NAME//./\\.}\.linux\.gz" | head -n 1)
+
+# Try multiple patterns to find package URL
+PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -o "https://[^\"]*notifiarr[-_\.]${ARCH_NAME//./\\.}\.linux\.gz" | head -n 1)
+if [ -z "$PACKAGE_URL" ]; then
+  # Fallback to simpler pattern
+  PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -o "https://[^\"]*${ARCH_NAME//./\\.}\.linux\.gz" | head -n 1)
+fi
+
 CHECKSUM_URL=$(echo "$RELEASE_JSON" | grep -o "https://[^\"]*checksums\.txt" | head -n 1)
 PACKAGE=$(basename "$PACKAGE_URL")
 
 if [ -z "$PACKAGE_URL" ] || [ -z "$CHECKSUM_URL" ]; then
   echo "Failed to find valid release package or checksums for $ARCH_NAME"
+  echo "GitHub API Response:"
+  echo "$RELEASE_JSON" | jq -r '.assets[] | "\(.name): \(.browser_download_url)"' 2>/dev/null || echo "$RELEASE_JSON"
+  echo "You may need to manually download the package for your architecture."
   exit 1
 fi
 
