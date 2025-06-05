@@ -3,6 +3,37 @@
 
 set -e
 
+# Handle command line arguments
+MANUAL_PACKAGE=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --manual|-m)
+      MANUAL_PACKAGE="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown argument: $1"
+      exit 1
+      ;;
+  esac
+done
+
+if [ -n "$MANUAL_PACKAGE" ]; then
+  if [ ! -f "$MANUAL_PACKAGE" ]; then
+    echo "Manual package file not found: $MANUAL_PACKAGE"
+    exit 1
+  fi
+  PACKAGE=$(basename "$MANUAL_PACKAGE")
+  TEMP_BINARY="/tmp/notifiarr.new"
+  echo "Using manually provided package: $MANUAL_PACKAGE"
+  if ! gunzip -c "$MANUAL_PACKAGE" > "$TEMP_BINARY"; then
+    echo "Failed to extract manual package."
+    exit 1
+  fi
+  # Skip to binary verification
+  goto_verify_binary
+fi
+
 # Check for root privileges
 if [ "$EUID" -ne 0 ]; then
   echo "This script must be run as root or with sudo."
@@ -38,18 +69,21 @@ echo "Debug - Available assets:"
 echo "$ASSETS"
 
 # Find package URL - try multiple patterns
-PACKAGE_URL=$(echo "$ASSETS" | grep -iE "notifiarr[-_\.]?${ARCH_NAME//./\\.}\.linux\.gz" | cut -d: -f2 | head -n 1)
+PACKAGE_URL=$(echo "$ASSETS" | grep -iE "notifiarr\.${ARCH_NAME//./\\.}\.linux\.gz" | cut -d: -f2 | head -n 1)
 [ -z "$PACKAGE_URL" ] && PACKAGE_URL=$(echo "$ASSETS" | grep -iE "${ARCH_NAME//./\\.}\.linux\.gz" | cut -d: -f2 | head -n 1)
 
-# Find checksums
-CHECKSUM_URL=$(echo "$ASSETS" | grep -i "checksums\.txt" | cut -d: -f2 | head -n 1)
+# Find checksums - try both sha512sums.txt and checksums.txt
+CHECKSUM_URL=$(echo "$ASSETS" | grep -i "sha512sums\.txt" | cut -d: -f2 | head -n 1)
+[ -z "$CHECKSUM_URL" ] && CHECKSUM_URL=$(echo "$ASSETS" | grep -i "checksums\.txt" | cut -d: -f2 | head -n 1)
+
 PACKAGE=$(basename "$PACKAGE_URL")
 
 if [ -z "$PACKAGE_URL" ] || [ -z "$CHECKSUM_URL" ]; then
   echo "Failed to find valid release package or checksums for $ARCH_NAME"
   echo "Available assets:"
   echo "$ASSETS" | sed 's/:/: /'
-  echo "Please check https://github.com/Notifiarr/notifiarr/releases for correct package"
+  echo -e "\nYou can manually download the correct package and run:"
+  echo "sudo ./install-synology-dsm7.sh --manual /path/to/package.gz"
   exit 1
 fi
 
