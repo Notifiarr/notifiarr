@@ -30,10 +30,11 @@ esac
 echo "Fetching latest Notifiarr release metadata..."
 RELEASE_JSON=$(curl -sSL https://api.github.com/repos/Notifiarr/notifiarr/releases/latest)
 PACKAGE_URL=$(echo "$RELEASE_JSON" | grep -o "https://[^\"]*notifiarr\.${ARCH_NAME//./\\.}\.linux\.gz" | head -n 1)
+CHECKSUM_URL=$(echo "$RELEASE_JSON" | grep -o "https://[^\"]*checksums\.txt" | head -n 1)
 PACKAGE=$(basename "$PACKAGE_URL")
 
-if [ -z "$PACKAGE_URL" ]; then
-  echo "Failed to find a valid release package for $ARCH_NAME"
+if [ -z "$PACKAGE_URL" ] || [ -z "$CHECKSUM_URL" ]; then
+  echo "Failed to find valid release package or checksums for $ARCH_NAME"
   exit 1
 fi
 
@@ -44,8 +45,30 @@ if ! curl -L -o "$PACKAGE" "$PACKAGE_URL"; then
   exit 1
 fi
 
-echo "Installing or updating Notifiarr binary..."
+echo "Downloading checksums..."
+if ! curl -L -o checksums.txt "$CHECKSUM_URL"; then
+  echo "Failed to download checksums file."
+  exit 1
+fi
+
+echo "Verifying package checksum..."
+EXPECTED_SUM=$(grep "$PACKAGE" checksums.txt | awk '{print $1}')
+ACTUAL_SUM=$(sha256sum "$PACKAGE" | awk '{print $1}')
+
+if [ "$EXPECTED_SUM" != "$ACTUAL_SUM" ]; then
+  echo "Checksum verification failed!"
+  echo "Expected: $EXPECTED_SUM"
+  echo "Actual:   $ACTUAL_SUM"
+  rm -f "$PACKAGE" checksums.txt
+  exit 1
+fi
+rm -f checksums.txt
+
+echo "Checking current installation..."
 if [ -f /usr/bin/notifiarr ]; then
+  CURRENT_VERSION=$(/usr/bin/notifiarr --version 2>/dev/null | awk '{print $3}' || echo "unknown")
+  echo "Existing Notifiarr version detected: ${CURRENT_VERSION:-unknown}"
+  
   echo "Stopping existing Notifiarr service..."
   if [ -f /usr/local/etc/rc.d/notifiarr.sh ]; then
     /usr/local/etc/rc.d/notifiarr.sh stop || true
@@ -53,15 +76,33 @@ if [ -f /usr/bin/notifiarr ]; then
     pkill -f "/usr/bin/notifiarr" || true
   fi
   # Give processes time to terminate
-  sleep 2
+  sleep 10
+  
+  # Backup existing config if it exists
+  if [ -f /etc/notifiarr/notifiarr.conf ]; then
+    echo "Backing up existing config..."
+    cp -a /etc/notifiarr/notifiarr.conf /etc/notifiarr/notifiarr.conf.bak
+  fi
 fi
 
 echo "Extracting Notifiarr package..."
-if ! gunzip -c "$PACKAGE" > /usr/bin/notifiarr; then
+TEMP_BINARY="/tmp/notifiarr.new"
+if ! gunzip -c "$PACKAGE" > "$TEMP_BINARY"; then
   echo "Failed to extract Notifiarr package."
   exit 1
 fi
 
+# Verify new binary works
+echo "Verifying new binary..."
+chmod +x "$TEMP_BINARY"
+if ! "$TEMP_BINARY" --version >/dev/null 2>&1; then
+  echo "ERROR: New binary verification failed!"
+  rm -f "$TEMP_BINARY"
+  exit 1
+fi
+
+# Replace existing binary
+mv "$TEMP_BINARY" /usr/bin/notifiarr
 chmod +x /usr/bin/notifiarr
 rm -f "$PACKAGE"
 
@@ -73,6 +114,9 @@ if [ ! -f "${CONFIGFILE}" ]; then
   echo " " > "${CONFIGFILE}"
   /usr/bin/notifiarr --config "${CONFIGFILE}" --write "${CONFIGFILE}.new"
   mv "${CONFIGFILE}.new" "${CONFIGFILE}"
+elif [ -f "${CONFIGFILE}.bak" ]; then
+  echo "Restoring config from backup..."
+  mv "${CONFIGFILE}.bak" "${CONFIGFILE}"
 else
   echo "Config file already exists. Skipping generation."
 fi
@@ -96,43 +140,74 @@ cat << 'EOF' > /usr/local/etc/rc.d/notifiarr.sh
 #!/bin/sh
 
 # Set log file paths - these cannot be edited in the config
-export DN_LOG_FILE="/usr/bin/notifiarr/app.log"
-export DN_HTTP_LOG="/usr/bin/notifiarr/http.log"
+export DN_LOG_FILE="/etc/notifiarr/app.log"
+export DN_HTTP_LOG="/etc/notifiarr/http.log"
+
+get_latest_version() {
+  curl -sSL https://api.github.com/repos/Notifiarr/notifiarr/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/'
+}
+
+update_notifiarr() {
+  echo "Checking for updates..."
+  LATEST=$(get_latest_version)
+  CURRENT=$(/usr/bin/notifiarr --version | awk '{print $3}')
+  
+  if [ "$LATEST" != "$CURRENT" ]; then
+    echo "Updating from $CURRENT to $LATEST..."
+    ARCH=$(uname -m)
+    case "$ARCH" in
+      x86_64 | amd64) ARCH_NAME="amd64" ;;
+      aarch64 | arm64) ARCH_NAME="arm64" ;;
+      armv7* | armv6* | armhf) ARCH_NAME="arm" ;;
+      *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+    esac
+    
+    PACKAGE_URL="https://github.com/Notifiarr/notifiarr/releases/download/$LATEST/notifiarr.$ARCH_NAME.linux.gz"
+    cd /tmp
+    if curl -L -o notifiarr.gz "$PACKAGE_URL"; then
+      gunzip -c notifiarr.gz > /usr/bin/notifiarr
+      chmod +x /usr/bin/notifiarr
+      rm -f notifiarr.gz
+      echo "Update complete. Restarting service..."
+      $0 restart
+    else
+      echo "Failed to download update package"
+    fi
+  else
+    echo "Already running latest version: $CURRENT"
+  fi
+}
 
 case "$1" in
-  start)
-    echo "Starting Notifiarr..."
-    /usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf &
-    ;;
-  stop)
-    echo "Stopping Notifiarr..."
-    pkill -f "/usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf"
-    ;;
-  restart)
-    echo "Restarting Notifiarr..."
-    $0 stop
-    sleep 10
-    $0 start
-    ;;
+start)
+  echo "Starting Notifiarr..."
+  /usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf &
+  ;;
+stop)
+  echo "Stopping Notifiarr..."
+  pkill -f "/usr/bin/notifiarr -c /etc/notifiarr/notifiarr.conf"
+  ;;
+restart)
+  echo "Restarting Notifiarr..."
+  $0 stop
+  sleep 10
+  $0 start
+  ;;
+update)
+  # Random delay up to 5 hours (18000 seconds) to spread load
+  sleep $((RANDOM % 18000))
+  update_notifiarr
+  ;;
+force-update)
+  # Update immediately without random delay
+  update_notifiarr
+  ;;
 esac
 exit 0
 EOF
 
 chmod +x /usr/local/etc/rc.d/notifiarr.sh
 /usr/local/etc/rc.d/notifiarr.sh start
-
-echo "Installing or updating daily auto-update cron job..."
-CRON_SCRIPT="/usr/bin/update-notifiarr.sh"
-CRON_FILE="/etc/cron.d/update-notifiarr"
-
-# Download the update script - this should be a dedicated update script, not the installer
-curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/update-notifiarr-dsm7.sh || \
-curl -sSLo "$CRON_SCRIPT" https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology-dsm7.sh
-chmod +x "$CRON_SCRIPT"
-# Randomize update time to avoid all users hitting GitHub simultaneously
-RANDOM_MINUTE=$((RANDOM % 59))
-RANDOM_HOUR=$((RANDOM % 6 + 1))  # Random hour between 1-6 AM
-echo "$RANDOM_MINUTE $RANDOM_HOUR * * * root /bin/bash $CRON_SCRIPT >> /dev/null 2>&1" > "$CRON_FILE"
 
 echo "Running final install verification..."
 fail() { echo "FAILED: $1"; exit 1; }
@@ -148,8 +223,16 @@ fi
 
 checkfile "$CONFIGFILE"
 check /usr/local/etc/rc.d/notifiarr.sh
-grep -q update-notifiarr "$CRON_FILE" && echo "OK: Cron job is installed" || fail "Cron job not found"
 
-echo "Installation or update complete. Notifiarr is running, persistent, and auto-updating."
+read -p "Would you like to enable automatic updates? [Y/n] " -r
+if [[ $REPLY =~ ^[Yy]$ ]] || [[ -z $REPLY ]]; then
+  echo "Adding daily update cron job..."
+  (crontab -l 2>/dev/null; echo "0 1 * * * /usr/local/etc/rc.d/notifiarr.sh update") | crontab -
+  echo "OK: Automatic updates enabled (runs daily at 1am)"
+else
+  echo "Automatic updates disabled"
+fi
+
+echo "Installation or update complete. Notifiarr is running and persistent."
 echo "Please edit /etc/notifiarr/notifiarr.conf and then restart the service with:"
 echo "/usr/local/etc/rc.d/notifiarr.sh restart"

@@ -77,6 +77,11 @@ DSM 6 systems can install Notifiarr by downloading and extracting the appropriat
 curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology-dsm7.sh | sudo bash && vi /etc/notifiarr/notifiarr.conf
 ```
 
+### Force Update:
+```bash
+/usr/local/etc/rc.d/notifiarr.sh force-update
+```
+
 ### Manage service:
 
 ```bash
