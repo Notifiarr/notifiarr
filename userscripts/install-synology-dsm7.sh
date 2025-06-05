@@ -69,12 +69,14 @@ echo "Debug - Available assets:"
 echo "$ASSETS"
 
 # Find package URL - try multiple patterns
-PACKAGE_URL=$(echo "$ASSETS" | grep -iE "notifiarr\.${ARCH_NAME//./\\.}\.linux\.gz" | cut -d: -f2 | head -n 1)
-[ -z "$PACKAGE_URL" ] && PACKAGE_URL=$(echo "$ASSETS" | grep -iE "${ARCH_NAME//./\\.}\.linux\.gz" | cut -d: -f2 | head -n 1)
+# Extract the full URL without splitting at the first colon
+PACKAGE_URL=$(echo "$ASSETS" | grep -iE "notifiarr\.${ARCH_NAME//./\\.}\.linux\.gz" | sed 's/^[^:]*://' | head -n 1)
+[ -z "$PACKAGE_URL" ] && PACKAGE_URL=$(echo "$ASSETS" | grep -iE "${ARCH_NAME//./\\.}\.linux\.gz" | sed 's/^[^:]*://' | head -n 1)
 
 # Find checksums - try both sha512sums.txt and checksums.txt
-CHECKSUM_URL=$(echo "$ASSETS" | grep -i "sha512sums\.txt" | cut -d: -f2 | head -n 1)
-[ -z "$CHECKSUM_URL" ] && CHECKSUM_URL=$(echo "$ASSETS" | grep -i "checksums\.txt" | cut -d: -f2 | head -n 1)
+# Extract the full URL for checksums file
+CHECKSUM_URL=$(echo "$ASSETS" | grep -i "sha512sums\.txt" | sed 's/^[^:]*://' | head -n 1)
+[ -z "$CHECKSUM_URL" ] && CHECKSUM_URL=$(echo "$ASSETS" | grep -i "checksums\.txt" | sed 's/^[^:]*://' | head -n 1)
 
 PACKAGE=$(basename "$PACKAGE_URL")
 
@@ -102,7 +104,8 @@ fi
 
 echo "Verifying package checksum..."
 EXPECTED_SUM=$(grep "$PACKAGE" checksums.txt | awk '{print $1}')
-ACTUAL_SUM=$(sha256sum "$PACKAGE" | awk '{print $1}')
+# Use sha512sum instead of sha256sum to match the checksum file format
+ACTUAL_SUM=$(sha512sum "$PACKAGE" | awk '{print $1}')
 
 if [ "$EXPECTED_SUM" != "$ACTUAL_SUM" ]; then
   echo "Checksum verification failed!"
@@ -144,10 +147,32 @@ fi
 # Verify new binary works
 echo "Verifying new binary..."
 chmod +x "$TEMP_BINARY"
-if ! "$TEMP_BINARY" --version >/dev/null 2>&1; then
+
+# Add debugging information
+echo "Binary file type:"
+file "$TEMP_BINARY"
+echo "Binary permissions:"
+ls -la "$TEMP_BINARY"
+
+# Capture and display the actual error
+echo "Testing binary execution:"
+if ! "$TEMP_BINARY" --version 2>binary_error.log; then
   echo "ERROR: New binary verification failed!"
-  rm -f "$TEMP_BINARY"
-  exit 1
+  echo "Error details:"
+  cat binary_error.log
+  rm -f "$TEMP_BINARY" binary_error.log
+  
+  # Add fallback option to skip verification
+  echo "Would you like to continue with installation anyway? (y/N)"
+  read -r SKIP_VERIFY
+  if [[ "$SKIP_VERIFY" =~ ^[Yy]$ ]]; then
+    echo "Continuing installation despite verification failure..."
+  else
+    exit 1
+  fi
+else
+  rm -f binary_error.log
+  echo "Binary verification successful!"
 fi
 
 # Replace existing binary
