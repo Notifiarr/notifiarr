@@ -144,16 +144,6 @@ if ! gunzip -c "$PACKAGE" > "$TEMP_BINARY"; then
   exit 1
 fi
 
-# Verify new binary works
-echo "Verifying new binary..."
-chmod +x "$TEMP_BINARY"
-
-# Add debugging information
-echo "Binary file type:"
-file "$TEMP_BINARY"
-echo "Binary permissions:"
-ls -la "$TEMP_BINARY"
-
 # Capture and display the actual error
 echo "Testing binary execution:"
 if ! "$TEMP_BINARY" --version 2>binary_error.log; then
