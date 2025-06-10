@@ -70,8 +70,8 @@ type Sonarr struct {
 	*sonarr.Sonarr `json:"-" toml:"-" xml:"-"`
 }
 
-func getSonarr(r *http.Request) *Sonarr {
-	return r.Context().Value(starr.Sonarr).(*Sonarr) //nolint:forcetypeassert
+func getSonarr(r *http.Request) Sonarr {
+	return r.Context().Value(starr.Sonarr).(Sonarr) //nolint:forcetypeassert
 }
 
 func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {

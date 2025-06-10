@@ -43,13 +43,13 @@ func main() {
 	// Parse the weekday enums and then parse the config struct.
 	log.Println("==> parsing enums")
 	goat.Enums([]goty.Enum{
-		{Name: "Sunday", Value: time.Sunday},
-		{Name: "Monday", Value: time.Monday},
-		{Name: "Tuesday", Value: time.Tuesday},
-		{Name: "Wednesday", Value: time.Wednesday},
-		{Name: "Thursday", Value: time.Thursday},
-		{Name: "Friday", Value: time.Friday},
-		{Name: "Saturday", Value: time.Saturday},
+		{Name: "Sunday", Value: scheduler.Sunday},
+		{Name: "Monday", Value: scheduler.Monday},
+		{Name: "Tuesday", Value: scheduler.Tuesday},
+		{Name: "Wednesday", Value: scheduler.Wednesday},
+		{Name: "Thursday", Value: scheduler.Thursday},
+		{Name: "Friday", Value: scheduler.Friday},
+		{Name: "Saturday", Value: scheduler.Saturday},
 	})
 	goat.Enums([]goty.Enum{
 		{Name: "password", Value: configfile.AuthPassword},

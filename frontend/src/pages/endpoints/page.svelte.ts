@@ -4,7 +4,8 @@ import { get } from 'svelte/store'
 import { _ } from '../../includes/Translate.svelte'
 import { profile } from '../../api/profile.svelte'
 import { deepCopy } from '../../includes/util'
-import { faWebhook } from '@fortawesome/sharp-duotone-solid-svg-icons'
+import { faLinkSimple, faWebhook } from '@fortawesome/sharp-duotone-solid-svg-icons'
+import { validator as cronValidator } from './CronScheduler.svelte'
 
 export const page = {
   id: 'Endpoints',
@@ -18,7 +19,7 @@ export const page = {
 const empty: Endpoint = {
   name: '',
   url: '',
-  method: 'POST',
+  method: 'GET',
   body: '',
   template: '',
   follow: false,
@@ -37,21 +38,40 @@ const merge = (index: number, form: Endpoint): Config => {
   return c
 }
 
-const validator = (id: string, value: any): string => {
+const validator = (
+  id: string,
+  value: any,
+  index: number,
+  instances: Endpoint[],
+): string => {
   id = id.split('.').pop() ?? id
-  if (id === 'path') {
-    if (!value) return get(_)('FileWatcher.path.required')
-  } else if (id === 'regex') {
-    if (!value) return get(_)('FileWatcher.regex.required')
+
+  if (id == 'name') {
+    let found = ''
+    instances?.forEach((m, i) => {
+      if (i !== index && m?.name === value) {
+        found = get(_)('phrases.NameInUseByInstance', { values: { number: i + 1 } })
+        return
+      }
+    })
+    if (found) return found
+    return value ? '' : get(_)('phrases.NameMustNotBeEmpty')
+  } else if (id == 'url') {
+    return value.match(/^http:\/\/../) || value.match(/^https:\/\/../)
+      ? ''
+      : get(_)('phrases.URLMustBeginWithHttp')
+  } else if (id === 'template') {
+    return value ? '' : get(_)('Endpoints.template.required')
   }
-  return ''
+
+  return cronValidator(id, value)
 }
 
 export const app: App<Endpoint> = {
   name: 'Endpoints',
   id: 'Endpoints',
-  logo: faWebhook,
-  iconProps: { c1: 'cyan', c2: 'violet', d1: 'violet', d2: 'cyan' },
+  logo: faLinkSimple,
+  iconProps: { c1: 'orange', c2: 'violet' },
   disabled: [],
   hidden: [],
   empty,

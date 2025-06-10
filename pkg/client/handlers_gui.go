@@ -546,17 +546,12 @@ func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Req
 // handleConfigPost handles the reconfig endpoint.
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
 	user, _ := c.getUserName(request)
-	// copy running config,
-	config, err := c.Config.CopyConfig()
-	if err != nil {
-		logs.Log.Errorf("[gui '%s' requested] Copying Config (GUI request): %v", user, err)
-		http.Error(response, "Error copying internal configuration (this is a bug): "+
-			err.Error(), http.StatusInternalServerError)
-
-		return
-	}
 
 	// update config.
+	config := &configfile.Config{}
+
+	var err error
+
 	if request.Header.Get("Content-Type") == mnd.ContentTypeJSON {
 		if err = json.NewDecoder(request.Body).Decode(&config); err != nil {
 			logs.Log.Errorf("[gui '%s' requested] Decoding POSTed Config: %v, %#v", user, err, config)

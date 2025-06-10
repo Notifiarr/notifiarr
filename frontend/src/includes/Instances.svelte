@@ -25,7 +25,7 @@
   import { deepEqual } from './util'
   import InstanceHeader from './InstanceHeader.svelte'
   import type { FormListTracker } from './formsTracker.svelte'
-  import type { Component, Snippet } from 'svelte'
+  import type { Component, Snippet, SvelteComponent } from 'svelte'
 
   let {
     flt,
@@ -40,6 +40,10 @@
     headerCollapsed?: Snippet<[number]>
     deleteButton?: string
   } = $props()
+
+  // The child component is binded to this variable.
+  // This is used to call the reset() function of the child component (if it exists).
+  let children: SvelteComponent<ChildProps<any>>[] = $state([])
 </script>
 
 <InstanceHeader {flt} />
@@ -77,6 +81,7 @@
               class="accordion-collapse {flt.active === index ? 'd-block' : 'd-none'}">
               <div class="accordion-body" transition:slide={{ duration: 350, axis: 'y' }}>
                 <Child
+                  bind:this={children[index]}
                   bind:form={flt.instances[index]}
                   original={flt.original?.[index] ?? flt.app.empty}
                   app={flt.app}
@@ -95,7 +100,7 @@
                   class="float-end me-2"
                   outline
                   disabled={!changed}
-                  onclick={() => flt.resetForm(index)}>
+                  onclick={() => (flt.resetForm(index), children[index]?.reset?.())}>
                   {$_('buttons.ResetForm')}
                 </Button>
                 <div style="clear: both;"></div>

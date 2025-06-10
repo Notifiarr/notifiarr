@@ -207,3 +207,33 @@ input[type='checkbox'] {
 .dark-mode .toast-wrapman {
   --toastBorder: 2px solid silver;
 }
+
+/* Svelte Select styles. */
+.svelte-select {
+  --background: var(--bs-body-bg);
+  --border-radius: var(--bs-border-radius);
+  --border: var(--bs-border-width) solid var(--bs-border-color);
+  --clear-icon-color: var(--bs-danger);
+  --multi-item-active-outline: var(--bs-border-width) solid var(--bs-border-color);
+  --multi-item-outline: var(--bs-border-width) solid var(--bs-border-color);
+  --multi-item-bg: var(--bs-secondary-bg);
+  --multi-item-border-radius: var(--bs-border-radius);
+  --multi-item-clear-icon-color: var(--bs-warning);
+  --multi-item-color: var(--bs-secondary-color);
+  --item-hover-bg: var(--bs-body-bg);
+  --item-hover-color: var(--bs-body-color);
+  --item-color: var(--bs-secondary-color);
+  --list-background: var(--bs-secondary-bg);
+  --list-border: var(--bs-border-width) solid var(--bs-border-color);
+  --list-border-radius: var(--bs-border-radius);
+  --border-focused: 3px solid #3cd2a5;
+  --border-hover: var(--bs-border-width) solid var(--bs-border-color);
+  --list-shadow: 0 0 5px #2fa582;
+}
+
+/* Disable the default focus styles because they appear in the wrong place. */
+.svelte-select input:focus,
+.svelte-select input:active {
+  outline: 0 !important;
+  box-shadow: 0 0 0 0 !important;
+}

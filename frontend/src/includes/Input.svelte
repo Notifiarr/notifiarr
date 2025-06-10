@@ -1,9 +1,9 @@
 <!-- David Newhall II, May 2025, Notifiarr, LLC. -->
 <script lang="ts">
   import {
+    Badge,
     Button,
     Card,
-    FormFeedback,
     FormGroup,
     Input,
     InputGroup,
@@ -17,7 +17,7 @@
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { _ } from './Translate.svelte'
-  import { type SvelteComponent, type Snippet, onMount } from 'svelte'
+  import { type SvelteComponent, type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
@@ -39,6 +39,8 @@
     value?: any
     /** Optional original value. Used to check for changes.*/
     original?: any
+    /** Optional badge to display on the input header. */
+    badge?: string
     /** Optional options for select input. */
     options?: Option[] | undefined
     /** Optional validation function. */
@@ -72,6 +74,7 @@
     validate,
     pre,
     children,
+    badge = '',
     post,
     msg,
     inner = $bindable(),
@@ -136,7 +139,8 @@
     ]
   }
 
-  onMount(() => {
+  $effect(() => {
+    // Automatically validate the input when the value changes.
     feedback = validate ? validate(id, value) : ''
   })
 
@@ -147,7 +151,12 @@
 
 <div class="input">
   <FormGroup>
-    <Label for={id}>{@html label}</Label>
+    <Label for={id}>
+      {@html label}
+      {#if badge}
+        <Badge color="secondary" style="margin-left: 0.5rem;">{badge}</Badge>
+      {/if}
+    </Label>
     <InputGroup class="has-validation">
       {#if tooltip != id + '.tooltip'}
         <Button color="secondary" onclick={toggleTooltip} outline style="width:44px;">
@@ -166,7 +175,6 @@
       {@render pre?.()}
       <Input
         {id}
-        oninput={() => (feedback = validate ? validate(id, value) : '')}
         class="{inputClass} {changed ? 'changed' : ''}"
         type={currType as InputType}
         bind:this={input}
@@ -237,6 +245,11 @@
 <style>
   .input {
     margin-bottom: 1rem;
+  }
+
+  /** Allows textarea to be resized vertically on mobile. */
+  .input :global(textarea) {
+    resize: vertical;
   }
 
   .input :global(label) {

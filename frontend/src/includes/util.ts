@@ -137,3 +137,12 @@ export const escapeHtml = (unsafe: string) => {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;')
 }
+
+/** Count the number of key-value pairs in a map. */
+export const mapLength = (map: Record<string, string[] | null>): number => {
+  let count = 0
+  for (const key in map) {
+    count += map[key]?.length ?? 0
+  }
+  return count
+}

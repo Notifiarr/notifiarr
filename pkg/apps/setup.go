@@ -277,7 +277,7 @@ func (a *Apps) InitHandlers() {
 }
 
 // DelOK returns true if the delete limit isn't reached.
-func (e *StarrApp) DelOK() bool {
+func (e StarrApp) DelOK() bool {
 	return e.Deletes > 0 && e.delLimit.Allow()
 }
 

@@ -63,8 +63,8 @@ type Radarr struct {
 	*radarr.Radarr `json:"-" toml:"-" xml:"-"`
 }
 
-func getRadarr(r *http.Request) *Radarr {
-	return r.Context().Value(starr.Radarr).(*Radarr) //nolint:forcetypeassert
+func getRadarr(r *http.Request) Radarr {
+	return r.Context().Value(starr.Radarr).(Radarr) //nolint:forcetypeassert
 }
 
 func (a *AppsConfig) setupRadarr() ([]Radarr, error) {

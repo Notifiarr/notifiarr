@@ -27,7 +27,8 @@
   }
 </script>
 
-<Header {page}><b class="text-warning">This page is not done. TODO: a lot.</b></Header>
+<Header {page} />
+
 <CardBody>
   <Instances {flt} Child={Endpoint} deleteButton={page.id + '.DeleteEndpoint'}>
     {#snippet headerActive(index)}
@@ -38,4 +39,5 @@
     {/snippet}
   </Instances>
 </CardBody>
+
 <Footer {submit} saveDisabled={!flt.formChanged || flt.invalid} />

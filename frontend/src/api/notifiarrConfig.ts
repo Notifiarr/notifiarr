@@ -3,8 +3,9 @@
  */
 
 /**
- * The day of the week.
- * @see golang: <time.Weekday>
+ * A Weekday specifies a day of the week (Sunday = 0, ...).
+ * Copied from stdlib to avoid the String method.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler.Weekday>
  */
 export enum Weekday {
   Sunday    = 0,

@@ -35,6 +35,7 @@
     "bootstrap": "^5.3.6",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.4.0",
-    "svelte-i18n": "^4.0.1"
+    "svelte-i18n": "^4.0.1",
+    "svelte-select": "^5.8.3"
   }
 }

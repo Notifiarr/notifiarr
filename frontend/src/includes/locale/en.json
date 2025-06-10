@@ -38,6 +38,15 @@
       }
     },
     "clock": {
+      "days": {
+        "Sunday": "Sunday",
+        "Monday": "Monday",
+        "Tuesday": "Tuesday",
+        "Wednesday": "Wednesday",
+        "Thursday": "Thursday",
+        "Friday": "Friday",
+        "Saturday": "Saturday"
+      },
       "short": {
         "ms": "{milliseconds}ms",
         "s": "{seconds}s",
@@ -174,7 +183,7 @@
       "MediaApps": "Manage media players and related services.",
       "SnapshotApps": "Most snapshot configurations are on the Notifiarr.com website. Below you will find Application 'plugin' settings for the snapshot feature.",
       "FileWatcher": "Watch for file changes and trigger actions! This Notifiarr client can watch (log) files for lines matching a regular expression. This is similar to <code>tail -f file | grep string</code> and allows you to send notifications when, for instance, a log file has a new line written that matches a regular expression.",
-      "Endpoints": "Configure relay endpoints, timers and triggers.",
+      "Endpoints": "Configure relay endpoint URLs and their schedules.",
       "Commands": "Set up and execute custom commands and scripts.",
       "Services": "Set up and monitor network devices and services.",
       "Triggers": "View and execute configured triggers.",
@@ -984,6 +993,82 @@
     "timeout": {
       "label": "Maximum Run Duration",
       "description": "How long the command may run before termination."
+    }
+  },
+  "scheduler": {
+    "title": "Schedule",
+    "daysOfWeek": "Days of week",
+    "daysOfMonth": "Days of month",
+    "frequency": "Frequency",
+    "selectAFrequency": "Select a frequency to create a schedule.",
+    "AddATime": "Add a time",
+    "empty": "If you want to run every day, select the Daily Frequency.",
+    "required": {
+      "daysOfWeek": "Must select at least one day of the week.",
+      "daysOfMonth": "Must select at least one day of the month.",
+      "atTimes": "Must select at least one time to run the schedule."
+    },
+    "badge": {
+      "header": "{count, plural, one {1 header} other {# headers}}",
+      "query": "{count, plural, one {1 query} other {# queries}}",
+      "body": "{count, plural, one {1 character} other {# characters}}"
+    },
+    "ops": {
+      "noSchedule": "No Schedule",
+      "minutely": "Minutely",
+      "hourly": "Hourly",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "times": {
+      "noneSelected": "(none selected)",
+      "noDaysSelected": "(no days selected)",
+      "everyMinute": "{count, plural, one {One time} other {# times}} every minute at seconds {times}",
+      "everyHour": "{count, plural, one {One time} other {# times}} every hour at minute:seconds {times}",
+      "everyDay": "{count, plural, one {One time} other {# times}} every day at times {times}",
+      "everyWeek": "{count, plural, one {One time} other {# times}} every week on {daysOfWeek} at times {times}",
+      "everyMonth": "{count, plural, one {One time} other {# times}} every month on days {daysOfMonth} at times {times}"
+    }
+  },
+  "Endpoints": {
+    "title": "Relay URLs",
+    "addInstance": "Add Relay URL",
+    "DeleteEndpoint": "Delete URL",
+    "name": {
+      "label": "Name",
+      "description": "Name of the relay URL.",
+      "placeholder": "custom name for notifications"
+    },
+    "template": {
+      "label": "Payload Template",
+      "description": "Parse payload into this template.",
+      "placeholder": "pihole",
+      "tooltip": "The template is used by the website to figure out how to turn the payload into a chat notification. Find a list of available templates or create your own on <a href='https://notifiarr.com/' target='_blank'>the website</a> @ <code>Integrations: Endpoints</code>.",
+      "required": "A template is required. Enter 'test' if you are not sure what to enter."
+    },
+    "method": { "label": "Method", "description": "HTTP Request" },
+    "url": {
+      "label": "Relay URL",
+      "description": "URL for remote service that gets relayed to the website.",
+      "placeholder": "https://pihole.myhome.lan/api/stats"
+    },
+    "header": {
+      "label": "HTTP Headers",
+      "description": "HTTP Request Headers, 1 per line.",
+      "placeholder": "Content-Type: application/json",
+      "tooltip": "The HTTP request headers are sent to the URL as is. The format must be <code>key: value</code> per line. The space and colon are required. Invalid values are ignored and extra spaces are trimmed."
+    },
+    "query": {
+      "label": "Query Parameters",
+      "description": "Query parameters to add to the URL, 1 per line.",
+      "placeholder": "apiKey=1234567890",
+      "tooltip": "The query parameters are appended to the URL. The format must be <code>key=value</code> per line. Invalid values are ignored and extra spaces are trimmed. Do not include the <code>?</code> character or ampersand (<code>&</code>) at the beginning of a line. Keys and values are automatically URL encoded."
+    },
+    "body": {
+      "label": "Request Body",
+      "description": "The body sent to the URL for POST, PUT and PATCH requests.",
+      "placeholder": "{\"message\": \"Hello, world!\"}"
     }
   }
 }

@@ -61,8 +61,8 @@ type Lidarr struct {
 	*lidarr.Lidarr `json:"-" toml:"-" xml:"-"`
 }
 
-func getLidarr(r *http.Request) *Lidarr {
-	return r.Context().Value(starr.Lidarr).(*Lidarr) //nolint:forcetypeassert
+func getLidarr(r *http.Request) Lidarr {
+	return r.Context().Value(starr.Lidarr).(Lidarr) //nolint:forcetypeassert
 }
 
 func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
