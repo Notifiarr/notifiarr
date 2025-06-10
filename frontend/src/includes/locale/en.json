@@ -922,6 +922,7 @@
       "placeholder": "/var/log/nginx/access.log",
       "required": "Path is required"
     },
+    "disabled": { "label": "Active", "description": "Disable this watcher." },
     "regex": {
       "label": "Regular Expression",
       "description": "Regex to match against the file.",

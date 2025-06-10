@@ -16,11 +16,19 @@
 
 <div class="watcher">
   <Row>
-    <Col lg={12}>
+    <Col md={9}>
       <Input
         id={app.id + '.path'}
         bind:value={form.path}
         original={original?.path}
+        {validate} />
+    </Col>
+    <Col md={3}>
+      <Input
+        type="select"
+        id={app.id + '.disabled'}
+        bind:value={form.disabled}
+        original={original?.disabled}
         {validate} />
     </Col>
     <Col lg={12}>

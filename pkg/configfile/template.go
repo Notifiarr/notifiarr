@@ -544,6 +544,7 @@ version = {{.Version}}
 #  pipe  = false
 #  must_exist = false
 #  log_match  = true
+#  disabled   = false
 {{if .WatchFiles}}
 ## Configured Watch Files:
 {{- range $item := .WatchFiles}}{{if $item}}
@@ -555,7 +556,8 @@ version = {{.Version}}
   poll  = true{{end}}{{if $item.Pipe}}
   pipe  = true{{end}}{{if $item.MustExist}}
   must_exist = true{{end}}{{if $item.LogMatch}}
-  log_match = true{{end}}{{end}}
+  log_match = true{{end}}{{if $item.Disabled}}
+  disabled = true{{end}}{{end}}
 {{end}}{{end}}
 
 

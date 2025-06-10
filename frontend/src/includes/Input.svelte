@@ -202,10 +202,14 @@
           {/each}
         {:else if typeof value === 'boolean' && type === 'select'}
           <!-- Create a boolean select-option list. -->
-          <option value={false} selected={value === false}>
+          <option
+            value={id.endsWith('disabled') ? true : false}
+            selected={value === id.endsWith('disabled') ? true : false}>
             {$_('words.select-option.Disabled')}
           </option>
-          <option value={true} selected={value === true}>
+          <option
+            value={id.endsWith('disabled') ? false : true}
+            selected={value === id.endsWith('disabled') ? false : true}>
             {$_('words.select-option.Enabled')}
           </option>
         {/if}

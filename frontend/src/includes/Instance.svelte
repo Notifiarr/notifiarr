@@ -206,15 +206,7 @@
           bind:value={form.disabled}
           original={original?.disabled}
           disabled={app.disabled?.includes('disabled')}
-          {validate}>
-          <!-- These are backward on purpose.-->
-          <option value={false} selected={form.disabled === false}>
-            {$_('words.select-option.Enabled')}
-          </option>
-          <option value={true} selected={form.disabled === true}>
-            {$_('words.select-option.Disabled')}
-          </option>
-        </Input>
+          {validate} />
       </Col>
     {/if}
     {#if typeof form.smiPath === 'string'}

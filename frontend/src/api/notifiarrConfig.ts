@@ -222,6 +222,7 @@ export interface WatchFile {
   pipe: boolean;
   mustExist: boolean;
   logMatch: boolean;
+  disabled: boolean;
 };
 
 /**
