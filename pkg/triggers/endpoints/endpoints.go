@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -65,6 +66,14 @@ func (a *Action) Create() {
 
 		if endpoint.Name == "" {
 			endpoint.Name = endpoint.URL
+		}
+
+		if endpoint.Header == nil {
+			endpoint.Header = make(http.Header)
+		}
+
+		if endpoint.Query == nil {
+			endpoint.Query = make(url.Values)
 		}
 
 		schedule := NewSchedule(endpoint, a.conf)

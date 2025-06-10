@@ -109,6 +109,7 @@
     "LoggingIn": "Logging in...",
     "LoggedIn": "Logged in!",
     "Loading": "Loading...",
+    "UpdateBackend": "Update Backend",
     "BackEndUpdated": "Back-end updated {timeDuration} ago.",
     "UpdatingBackEnd": "Updating back-end...",
     "FailedToUpdateBackEnd": "Failed to update back-end: {error}",
@@ -1070,6 +1071,50 @@
       "label": "Request Body",
       "description": "The body sent to the URL for POST, PUT and PATCH requests.",
       "placeholder": "{\"message\": \"Hello, world!\"}"
+    }
+  },
+  "metrics": {
+    "CountersReset": "The counters on this page reset when the application exits.",
+    "ApplicationUptime": "Application Uptime: &nbsp;<b>{timeDuration}</b>",
+    "logFiles": {
+      "title": "Log Files",
+      "description": "Log file counters.",
+      "empty": "No log files found."
+    },
+    "apiHits": {
+      "title": "API Requests",
+      "description": "Incoming API request counters.",
+      "empty": "No API requests yet."
+    },
+    "httpRequests": {
+      "title": "HTTP Requests",
+      "description": "Incoming HTTP request statistics. This includes websocket tunnel requests.",
+      "empty": "No HTTP requests yet."
+    },
+    "website": {
+      "title": "Website Requests",
+      "description": "Requests to Notifiarr.com.",
+      "empty": "No website requests yet."
+    },
+    "fileWatcher": {
+      "title": "File Watcher",
+      "description": "File watcher statistics.",
+      "empty": "No file watchers configured."
+    },
+    "apps": {
+      "title": "Application Requests",
+      "description": "Application request statistics. These counters do not include service checks.",
+      "empty": "No application requests yet."
+    },
+    "timerEvents": {
+      "title": "Triggered Events",
+      "description": "Triggers and timers executed.",
+      "empty": "No triggered events yet."
+    },
+    "serviceChecks": {
+      "title": "Service Checks",
+      "description": "Service check counters.",
+      "empty": "No service checks configured."
     }
   }
 }

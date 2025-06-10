@@ -201,7 +201,9 @@
             </option>
           {/each}
         {:else if typeof value === 'boolean' && type === 'select'}
-          <!-- Create a boolean select-option list. -->
+          <!-- Create a boolean select-option list: Enabled/Disabled
+           If the name of the input ends with 'disabled', then the values are inverted.
+           -->
           <option
             value={id.endsWith('disabled') ? true : false}
             selected={value === id.endsWith('disabled') ? true : false}>

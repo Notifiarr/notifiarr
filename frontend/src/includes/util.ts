@@ -76,7 +76,7 @@ export function formatBytes(bytes: number): string {
   }
 
   return get(_)('words.bytes.short.' + units[unitIndex], {
-    values: { bytes: bytes.toFixed(2) },
+    values: { bytes: bytes.toFixed(unitIndex === 0 ? 0 : 1) },
   })
 }
 
@@ -138,11 +138,12 @@ export const escapeHtml = (unsafe: string) => {
     .replaceAll("'", '&#039;')
 }
 
-/** Count the number of key-value pairs in a map. */
-export const mapLength = (map: Record<string, string[] | null>): number => {
+/** Count the items nested in an object, or the number of keys in an object. */
+export const mapLength = (map: Record<string, any | null> | undefined): number => {
+  if (!map) return 0
   let count = 0
   for (const key in map) {
-    count += map[key]?.length ?? 0
+    count += (map[key]?.length ?? Object.keys(map[key] ?? {}).length) || 1
   }
   return count
 }
