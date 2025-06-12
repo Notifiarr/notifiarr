@@ -74,13 +74,8 @@ const (
 func New(servicesConfig *Config) *Services {
 	return &Services{
 		&data{
-			Config:      servicesConfig,
-			services:    make(map[string]*Service),
-			checks:      make(chan *Service, DefaultBuffer),
-			done:        make(chan bool),
-			stopChan:    make(chan struct{}),
-			triggerChan: make(chan website.EventType),
-			checkChan:   make(chan triggerCheck),
+			Config:   servicesConfig,
+			services: make(map[string]*Service),
 		},
 	}
 }

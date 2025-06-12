@@ -38,9 +38,7 @@
       { id: 'apiHits', data: $profile.expvar.apiHits },
       { id: 'httpRequests', data: $profile.expvar.httpRequests },
       { id: 'website', data: $profile.expvar.website },
-      // { id: 'apps', data: $profile.expvar.apps },
       { id: 'fileWatcher', data: $profile.expvar.fileWatcher },
-      // { id: 'serviceChecks', data: xv.serviceChecks },
     ].sort((a, b) => mapLength(b.data) - mapLength(a.data)),
   )
 </script>

@@ -81,6 +81,9 @@ export interface Profile {
   poolStats?: Record<string, null | PoolSize>;
   started: Date;
   cmdList?: CmdconfigConfig[];
+  checkResults?: CheckResult[];
+  checkRunning: boolean;
+  checkDisabled: boolean;
   program: string;
   version: string;
   revision: string;
@@ -240,6 +243,7 @@ export interface Endpoint extends CronJob {
   body: string;
   follow: boolean;
   validSsl: boolean;
+  timeout: string;
 };
 
 /**
@@ -784,6 +788,26 @@ export interface PoolSize {
   lastTry: Date;
   active: boolean;
 };
+
+/**
+ * CheckResult represents the status of a service.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.CheckResult>
+ */
+export interface CheckResult {
+  name: string;
+  state: number;
+  output?: Output;
+  type: string;
+  time: Date;
+  since: Date;
+  interval: number;
+  metadata?: Record<string, null | any>;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Output>
+ */
+export interface Output {};
 
 /**
  * ProfilePost is the data sent to the profile POST endpoint when updating the trust profile.

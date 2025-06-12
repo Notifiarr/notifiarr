@@ -20,7 +20,7 @@ const (
 )
 
 // AddApps turns app configs into service checks if they have a name.
-func (s *Services) AddApps(apps *apps.Apps, mysql []*snapshot.MySQLConfig) {
+func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	svcs := []*Service{}
 	svcs = collectLidarrApps(svcs, apps.Lidarr)
 	svcs = collectProwlarrApps(svcs, apps.Prowlarr)
@@ -437,7 +437,7 @@ func collectPlexApps(svcs []*Service, app *apps.Plex) []*Service {
 	return svcs
 }
 
-func collectMySQLApps(svcs []*Service, mysql []*snapshot.MySQLConfig) []*Service { //nolint:cyclop
+func collectMySQLApps(svcs []*Service, mysql []snapshot.MySQLConfig) []*Service { //nolint:cyclop
 	if mysql == nil {
 		return svcs
 	}

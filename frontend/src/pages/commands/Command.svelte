@@ -108,20 +108,11 @@
     </Col>
     <Col sm={6}>
       <Input
-        type="select"
+        type="timeout"
         id={app.id + '.timeout'}
         bind:value={form.timeout}
         original={original?.timeout}
-        options={[
-          { value: '0s', name: $_('words.select-option.NoTimeout') },
-          { value: '5s', name: '5 ' + $_('words.select-option.seconds') },
-          { value: '10s', name: '10 ' + $_('words.select-option.seconds') },
-          { value: '15s', name: '15 ' + $_('words.select-option.seconds') },
-          { value: '30s', name: '30 ' + $_('words.select-option.seconds') },
-          { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
-          { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
-          { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
-        ]}
+        noDisable
         {validate} />
     </Col>
   </Row>

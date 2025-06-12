@@ -57,6 +57,8 @@
     feedback?: string
     /** Optional inner value for binding. */
     inner?: any
+    /** When type is "timeout" this controls if -1 / disabled is an option. */
+    noDisable?: boolean
     /** Optional other attributes to apply to the input. */
     [key: string]: any
   }
@@ -79,6 +81,7 @@
     msg,
     inner = $bindable(),
     feedback = $bindable(),
+    noDisable = false,
     ...rest
   }: Props = $props()
 
@@ -127,7 +130,6 @@
   if (type === 'timeout') {
     currType = 'select'
     options = [
-      { value: '-1s', name: $_('words.select-option.InstanceDisabled') },
       { value: '0s', name: $_('words.select-option.NoTimeout') },
       { value: '5s', name: '5 ' + $_('words.select-option.seconds') },
       { value: '10s', name: '10 ' + $_('words.select-option.seconds') },
@@ -137,6 +139,8 @@
       { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
       { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
     ]
+    if (!noDisable)
+      options.unshift({ value: '-1s', name: $_('words.select-option.InstanceDisabled') })
   }
 
   $effect(() => {

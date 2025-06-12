@@ -68,7 +68,7 @@
 
 <div class="endpoint">
   <Row>
-    <Col md={6}>
+    <Col md={12}>
       <Input
         id={app.id + '.name'}
         bind:value={form.name}
@@ -91,6 +91,15 @@
           </Button>
         {/snippet}
       </Input>
+    </Col>
+    <Col md={6}>
+      <Input
+        type="timeout"
+        id={app.id + '.timeout'}
+        bind:value={form.timeout}
+        original={original?.timeout}
+        noDisable
+        {validate} />
     </Col>
     <Col md={2}>
       <Input

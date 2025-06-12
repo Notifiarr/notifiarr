@@ -8,23 +8,17 @@ import (
 	"bytes"
 	"compress/gzip"
 	"context"
-	"crypto/tls"
 	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
-	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
-
-// globalTimeout is the max duration an endpoint url http request may elapse.
-const globalTimeout = 5 * time.Minute
 
 // Action contains the exported methods for this package.
 type Action struct {
@@ -98,15 +92,7 @@ func NewSchedule(endpoint *epconfig.Endpoint, conf *common.Config) *Schedule {
 		conf:     conf,
 		Endpoint: endpoint,
 		ch:       make(chan *common.ActionInput, 1),
-		client: &http.Client{
-			Timeout: globalTimeout,
-			Transport: apps.NewMetricsRoundTripper("endpoints", &http.Transport{
-				TLSClientConfig: &tls.Config{
-					InsecureSkipVerify: !endpoint.ValidSSL,
-				},
-			}),
-			CheckRedirect: endpoint.CheckRedirect(),
-		},
+		client:   endpoint.GetClient(),
 	}
 }
 
@@ -163,9 +149,7 @@ func (s *Schedule) getURLBody(ctx context.Context) (http.Header, int, string, er
 		return nil, 0, "", fmt.Errorf("creating request: %w", err)
 	}
 
-	for header, value := range s.Header {
-		req.Header[header] = value
-	}
+	s.SetHeaders(req)
 
 	resp, err := s.client.Do(req)
 	if err != nil {

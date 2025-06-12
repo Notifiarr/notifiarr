@@ -199,13 +199,13 @@
               <!-- hours -->
               {@render timeInput(
                 0,
-                23,
+                24,
                 [Frequency.Minutely, Frequency.Hourly].includes(cron.frequency),
               )}
               <!-- minutes -->
-              {@render timeInput(1, 59, cron.frequency === Frequency.Minutely)}
+              {@render timeInput(1, 60, cron.frequency === Frequency.Minutely)}
               <!-- seconds -->
-              {@render timeInput(2, 59, false)}
+              {@render timeInput(2, 60, false)}
               <!-- Add button -->
               <Button class="addButton" color="secondary" outline onclick={addNewTime}>
                 <Fa
@@ -299,10 +299,17 @@
   .cron-scheduler :global(.input-group),
   .cron-scheduler :global(.tp) {
     display: inline-table !important;
-    width: auto !important;
+    width: auto;
     margin: 0 !important;
     height: 100% !important;
     max-height: 110px !important;
+  }
+
+  .cron-scheduler :global(.tp) {
+    width: 34px !important;
+    padding: 0 !important;
+    text-indent: 6px !important;
+    background: none !important;
   }
 
   /** remove the shadow that looks weird on this box.*/

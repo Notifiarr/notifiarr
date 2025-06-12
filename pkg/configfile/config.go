@@ -187,6 +187,9 @@ func (c *Config) Setup(flag *Flags) (*SetupResult, error) {
 		return nil, fmt.Errorf("setting up app: %w", err)
 	}
 
+	// Add apps to the service checks.
+	result.Services.AddApps(result.Apps, c.Snapshot.MySQL)
+
 	// Make sure the port is not in use before starting the web server.
 	c.BindAddr, err = CheckPort(c.BindAddr)
 

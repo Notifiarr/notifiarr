@@ -29,6 +29,10 @@ body {
   color: var(--bs-body-color);
 }
 
+.popover-header {
+  color: var(--bs-body-color) !important;
+}
+
 body {
   background-image: url(lightbg.svg?inline);
   background-color: #b9c8f3;

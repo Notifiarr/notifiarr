@@ -603,6 +603,7 @@ version = {{.Version}}
 ## @name          - Defaults to URL. Name is used in logs and to identify this endpoint remotely.
 ## @url           - Required URL to poll. Query is optional here, can be added in query param.
 ## @method        - defaults to GET. Can use POST, PUT, etc.
+## @timeout       - How long to wait for the http request to complete. Default is no timeout.
 ## @template      - Helps the website identify which template to parse this data into.
 ##                  Setting this to "false" will skip sending the response to the website.
 ## @body          - For POST and PUT this is the body payload that is sent.
@@ -623,6 +624,7 @@ version = {{.Version}}
 #  name          = "My Example"
 #  url           = "http://example.com"
 #  method        = "GET"
+#  timeout       = "0s"
 #  template      = "pihole"
 #  body          = ''
 #  follow        = false
@@ -645,6 +647,7 @@ version = {{.Version}}
   name          = "{{$item.Name}}"
   url           = "{{$item.URL}}"
   method        = "{{$item.Method}}"
+  timeout       = "{{$item.Timeout}}"
   template      = "{{$item.Template}}"
   body          = '''{{$item.Body}}'''
   follow        = {{$item.Follow}}

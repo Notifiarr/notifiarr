@@ -70,6 +70,12 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
+	s.checks = make(chan *Service, DefaultBuffer)
+	s.done = make(chan bool)
+	s.stopChan = make(chan struct{})
+	s.triggerChan = make(chan website.EventType)
+	s.checkChan = make(chan triggerCheck)
+
 	logger := mnd.Log
 	if s.LogFile != "" {
 		logger = logs.CustomLog(s.LogFile, "Services")
@@ -259,6 +265,7 @@ func (s *Services) Stop() {
 	s.checks = nil
 	s.done = nil
 	s.stopChan = nil
+
 }
 
 // SvcCount returns the count of services being monitored.

@@ -1,6 +1,7 @@
 {
   "words": {
     "select-option": {
+      "Off": "Off",
       "Enabled": "Enabled",
       "Disabled": "Disabled",
       "minute": "minute",
@@ -300,7 +301,7 @@
       "timeout": { "label": "Timeout", "description": "Timeout for snapshot operations." }
     },
     "services": {
-      "enabled": {
+      "disabled": {
         "label": "Service Checks",
         "description": "Enable or disable service checks.",
         "tooltip": "Disable or enable monitoring all network and service checks right here."
@@ -1049,6 +1050,10 @@
       "tooltip": "The template is used by the website to figure out how to turn the payload into a chat notification. Find a list of available templates or create your own on <a href='https://notifiarr.com/' target='_blank'>the website</a> @ <code>Integrations: Endpoints</code>.",
       "required": "A template is required. Enter 'test' if you are not sure what to enter."
     },
+    "timeout": {
+      "label": "Request Timeout",
+      "description": "How long to wait for the HTTP request to complete."
+    },
     "method": { "label": "Method", "description": "HTTP Request" },
     "url": {
       "label": "Relay URL",
@@ -1115,6 +1120,47 @@
       "title": "Service Checks",
       "description": "Service check counters.",
       "empty": "No service checks configured."
+    }
+  },
+  "monitoring": {
+    "ConfigureServices": "Configure the service checks displayed on the Services page.",
+    "ChecksDisabled": "Service Checks: Disabled",
+    "ChecksStopped": "Service Checks: Stopped",
+    "EnableOnConfig": "Enable service checks on the Configuration page.",
+    "StartChecks": "Start Service Checks",
+    "StopChecks": "Stop Service Checks",
+    "stopFailed": "Failed to stop service checks.",
+    "startFailed": "Failed to start service checks.",
+    "recheckFailed": "Failed to recheck service.",
+    "checkInitiated": "Service check initiated.",
+    "nextRefresh": "Next refresh in {timeDuration}.",
+    "refreshInterval": "Refresh Interval",
+    "cardsView": "Cards View",
+    "classicView": "Classic View",
+    "hideAllOutputs": "Hide All Outputs",
+    "showAllOutputs": "Show All Outputs",
+    "check": {
+      "name": "Service Name",
+      "state": { "short": "State", "title": "Service Check Counters" },
+      "typeExpect": "Type/Expect",
+      "last": {
+        "short": "Last",
+        "title": "Last Check: {timeDuration} ago",
+        "tooltip": "How long ago this service was checked.",
+        "description": "Service last checked at"
+      },
+      "since": {
+        "short": "Since",
+        "title": "Time in state: {timeDuration}",
+        "tooltip": "How long the service has been in this state.",
+        "description": "Service has been in this state since"
+      },
+      "interval": {
+        "short": "Interval",
+        "title": "Check Interval",
+        "tooltip": "How often this service is checked."
+      },
+      "output": "Last Check Output"
     }
   }
 }

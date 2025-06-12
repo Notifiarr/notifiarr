@@ -74,6 +74,9 @@ func testInstance(ctx context.Context, input *Input) (string, int) {
 	// commands.go
 	case "commands":
 		return testCommand(ctx, input)
+		// endpoints.go
+	case "endpoints":
+		return testEndpoint(ctx, input)
 	// downloaders.go
 	case "nzbget":
 		return checkAndRun(ctx, testNZBGet, input, input.Post.AppsConfig, input.Post.NZBGet)

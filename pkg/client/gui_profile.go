@@ -16,6 +16,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/private"
+	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
@@ -62,6 +63,9 @@ type Profile struct {
 	PoolStats       map[string]*mulery.PoolSize   `json:"poolStats"`
 	Started         time.Time                     `json:"started"`
 	CmdList         []*cmdconfig.Config           `json:"cmdList"`
+	CheckResults    []*services.CheckResult       `json:"checkResults"`
+	CheckRunning    bool                          `json:"checkRunning"`
+	CheckDisabled   bool                          `json:"checkDisabled"`
 	Program         string                        `json:"program"`
 	Version         string                        `json:"version"`
 	Revision        string                        `json:"revision"`
@@ -137,6 +141,9 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		Webauth:         c.webauth,
 		LogFiles:        logs.Log.GetAllLogFilePaths(),
 		ConfigFiles:     logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
+		CheckResults:    c.Services.GetResults(),
+		CheckRunning:    c.Services.Running(),
+		CheckDisabled:   c.Services.Disabled,
 		// Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
 		Expvar:          mnd.GetAllData(),
 		HostInfo:        hostInfo,

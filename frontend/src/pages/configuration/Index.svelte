@@ -172,7 +172,7 @@
   <Row>
     <Col md={4}>
       <Input
-        id="config.services.enabled"
+        id="config.services.disabled"
         type="select"
         bind:value={c.services!.disabled}
         original={$profile.config.services?.disabled} />
