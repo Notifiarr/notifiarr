@@ -20,8 +20,8 @@
     },
     "instance-options": {
       "interval": {
-        "label": "Service Check Interval",
-        "description": "How often to service-check the instance."
+        "label": "Health Check Interval",
+        "description": "How often to check the instance's reachability."
       },
       "timeout": {
         "label": "Request Timeout",
@@ -187,7 +187,7 @@
       "FileWatcher": "Watch for file changes and trigger actions! This Notifiarr client can watch (log) files for lines matching a regular expression. This is similar to <code>tail -f file | grep string</code> and allows you to send notifications when, for instance, a log file has a new line written that matches a regular expression.",
       "Endpoints": "Configure relay endpoint URLs and their schedules.",
       "Commands": "Set up and execute custom commands and scripts.",
-      "Services": "Set up and monitor network devices and services.",
+      "Services": "The Notifiarr client application is capable of monitoring services via HTTP checks, TCP port checks or process running (and not running) checks. <b>The client service checks work with the Notifiarr.com Network Integration.</b>",
       "Triggers": "View and execute configured triggers.",
       "Integrations": "View action statistics and for all integrations.",
       "Monitoring": "View service and network health.",
@@ -962,7 +962,7 @@
     "title": "Command List",
     "addInstance": "Create Command",
     "DeleteCommand": "Delete Command",
-    "notes": "If you modify a command you must save the configuration before you can run it from the Web UI.",
+    "notes": "Commands are executed by the client (the backend). They can be triggered from this interface or from a chat server. If you modify a command you must save the configuration before you can run it from the Web UI.",
     "Executions": "Executions: {count}",
     "Failures": "Failures: {count}",
     "LastExecution": "Last Execution",
@@ -1011,11 +1011,6 @@
       "daysOfMonth": "Must select at least one day of the month.",
       "atTimes": "Must select at least one time to run the schedule."
     },
-    "badge": {
-      "header": "{count, plural, one {1 header} other {# headers}}",
-      "query": "{count, plural, one {1 query} other {# queries}}",
-      "body": "{count, plural, one {1 character} other {# characters}}"
-    },
     "ops": {
       "noSchedule": "No Schedule",
       "minutely": "Minutely",
@@ -1038,6 +1033,11 @@
     "title": "Relay URLs",
     "addInstance": "Add Relay URL",
     "DeleteEndpoint": "Delete URL",
+    "badge": {
+      "header": "{count, plural, one {1 header} other {# headers}}",
+      "query": "{count, plural, one {1 query} other {# queries}}",
+      "body": "{count, plural, one {1 character} other {# characters}}"
+    },
     "name": {
       "label": "Name",
       "description": "Name of the relay URL.",
@@ -1115,11 +1115,6 @@
       "title": "Triggered Events",
       "description": "Triggers and timers executed.",
       "empty": "No triggered events yet."
-    },
-    "serviceChecks": {
-      "title": "Service Checks",
-      "description": "Service check counters.",
-      "empty": "No service checks configured."
     }
   },
   "monitoring": {
@@ -1161,6 +1156,123 @@
         "tooltip": "How often this service is checked."
       },
       "output": "Last Check Output"
+    }
+  },
+  "ServiceChecks": {
+    "title": "Health Checks",
+    "DeleteCheck": "Delete Health Check",
+    "addInstance": "Create Health Check",
+    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead.",
+    "configLink": "Disable and Enable service health checks in whole on the Configuration page.",
+    "monitoringLink": "View running service health information on the Monitoring page.",
+    "processListLink": "View the running process list here.",
+    "timeout": {
+      "label": "Check Timeout",
+      "description": "How long to wait for the service check to complete."
+    },
+    "interval": {
+      "label": "Check Interval",
+      "description": "How often to check the service."
+    },
+    "name": {
+      "label": "Check Name",
+      "description": "Unique name for the service being monitored.",
+      "placeholder": "custom name for notifications",
+      "tooltip": "The name of the service being monitored. This is used to identify the service in notifications. Each service must have a unique name."
+    },
+    "type": {
+      "label": "Check Type",
+      "description": "The type of check to perform.",
+      "tooltip": "The Process check type allows you to monitor that a process is running. The HTTP URL check type allows you to monitor a URL for reachability. The TCP Port check type allows you to monitor a TCP port's connectivity. Both Ping check types allow monitoring an IP or host for reachability.",
+      "options": {
+        "process": "Process Check",
+        "http": "HTTP URL Check",
+        "tcp": "TCP Port Reachability",
+        "ping": "UDP Ping Check",
+        "icmp": "ICMP Ping Check"
+      }
+    },
+    "url": {
+      "label": "URL",
+      "description": "URL of the service being monitored.",
+      "placeholder": "https://my.site"
+    },
+    "http": {
+      "headers": {
+        "label": "HTTP Headers",
+        "description": "HTTP request headers, 1 per line.",
+        "placeholder": "Content-Type: application/json"
+      },
+      "codes": {
+        "label": "Acceptable Response Codes",
+        "description": "Any code here is considered acceptable. If the service responds with another code a notification is generated.",
+        "required": "At least one expected response code is required."
+      }
+    },
+    "tcp": {
+      "value": {
+        "label": "Host and Port",
+        "description": "Enter host:port or host:ip to check connectivity.",
+        "placeholder": "127.0.0.1:22",
+        "tooltip": "An IP address is generally recommended. If you also want to test DNS, use a hostname. The format is <code>host:port</code>. There should be no spaces or extra characters.",
+        "required": "A host and port separated with a colon are required."
+      }
+    },
+    "ping": {
+      "value": {
+        "label": "Host or IP",
+        "description": "Enter host or ip to check reachability.",
+        "placeholder": "127.0.0.1",
+        "tooltip": "An IP address is generally recommended. If you also want to test DNS, use a hostname. The format is <code>host</code> or <code>10.11.12.13</code>. There should be no spaces or extra characters. To allow UDP checks to work on Linux, you must enable them with this command: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. To allow ICMP checks in Linux, you must give the notifiarr binary capabilities with this command: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Easiest way to make both work in Docker is to enable privileged mode, but you may set capabailities too.",
+        "required": "A host or IP address is required."
+      },
+      "count": {
+        "label": "Count",
+        "description": "Number of packets to send.",
+        "placeholder": "10",
+        "required": "A count of packets greater than zero is required."
+      },
+      "minimum": {
+        "label": "Minimum",
+        "description": "Minimum number of packets that must be received.",
+        "placeholder": "10",
+        "required": "A minimum number of packets greater than zero is required."
+      },
+      "interval": {
+        "label": "Interval",
+        "description": "Interval in milliseconds between packets.",
+        "placeholder": "100"
+      }
+    },
+    "process": {
+      "value": {
+        "label": "Process Match",
+        "description": "The name of the process to check.",
+        "placeholder": "notifiarr",
+        "tooltip": "The name of the process to check. This is the name of the process as it appears in the process list. A wildcard string match is used on both ends of the value provided, so the more specific your arguments the better the match will be.",
+        "required": "A process name is required."
+      },
+      "running": {
+        "label": "Running",
+        "description": "Send an alert if the process is running.",
+        "tooltip": "Selecting this will trigger an unhealthy alert if the process is found running. Select this option if you need a notification when the process starts."
+      },
+      "restarts": {
+        "label": "Restarts",
+        "description": "Send an alert if the process has restarted.",
+        "tooltip": "Selecting this will trigger an unhealthy alert if the process is found to have restarted. Select this option if you need a notification when the PID changes."
+      },
+      "minimum": {
+        "label": "Minimum",
+        "description": "Minimum number of running processes that must match the value.",
+        "required": "A minimum number of processes greater than zero is required.",
+        "tooltip": "If you enter 2, then you will receive a notification if there are fewer than 2 processes running. Use this to be alerted if there are too few processes running."
+      },
+      "maximum": {
+        "label": "Maximum",
+        "description": "Maximum number of running processes that may match the value.",
+        "tooltip": "If you enter 2, then you will receive a notification if there are more than 2 processes running. Use this to be alerted if there are too many processes running."
+      }
     }
   }
 }

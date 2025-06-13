@@ -25,6 +25,7 @@ const empty: Endpoint = {
   follow: false,
   frequency: 0,
   interval: 0,
+  timeout: '0s',
   validSsl: true,
 }
 

@@ -107,7 +107,7 @@
     feedback = {}
   }
 
-  /** Sort the days every time the form changes.*/
+  /** Sort the days every time the form changes. */
   const sortDays = () => {
     // Sort the values displayed in text.
     cron.daysOfWeek = cron.daysOfWeek?.sort((a, b) => a - b)
@@ -162,7 +162,7 @@
 <div class="cron-scheduler mb-2">
   <Row>
     <Col>
-      <Label class="fw-bolder"><T id="scheduler.title" /></Label>
+      <Label><T id="scheduler.title" /></Label>
       <FormGroup floating label={$_('scheduler.frequency')} spacing="mb-1">
         <Input
           type="select"
@@ -293,6 +293,10 @@
   /* Make the stuff match other pages. */
   .cron-scheduler {
     font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+
+  .cron-scheduler :global(label) {
+    font-weight: 550;
   }
 
   /** Make the timepicker look correct. (smash the inputs together) */

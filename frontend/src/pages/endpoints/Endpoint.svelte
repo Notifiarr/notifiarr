@@ -31,10 +31,19 @@
   )
 
   // These are the form-binded values
-  // svelte-ignore state_referenced_locally
-  let query = $state<string>(originalQuery)
-  // svelte-ignore state_referenced_locally
-  let header = $state<string>(originalHeader)
+  let query = $state<string>(
+    Object.entries(form.query ?? {})
+      .filter(([_, value]) => value !== null)
+      .map(([key, value]) => value?.map(v => `${key}=${v}`).join('\n') ?? '')
+      .join('\n'),
+  )
+
+  let header = $state<string>(
+    Object.entries(form.header ?? {})
+      .filter(([_, value]) => value !== null)
+      .map(([key, value]) => value?.map(v => `${key}: ${v}`).join('\n') ?? '')
+      .join('\n'),
+  )
 
   let cronScheduler: CronScheduler | undefined = $state(undefined)
 
@@ -123,7 +132,7 @@
         id={app.id + '.body'}
         bind:value={form.body}
         original={original?.body}
-        badge={$_('scheduler.badge.body', { values: { count: form.body?.length ?? 0 } })}
+        badge={$_(app.id + '.badge.body', { values: { count: form.body?.length ?? 0 } })}
         {validate} />
     </Col>
     <Col lg={12}>
@@ -133,7 +142,7 @@
         id={app.id + '.query'}
         bind:value={query}
         original={originalQuery}
-        badge={$_('scheduler.badge.query', {
+        badge={$_(app.id + '.badge.query', {
           values: { count: mapLength(form.query ?? {}) },
         })}
         validate={(id, value) => {
@@ -148,7 +157,7 @@
         id={app.id + '.header'}
         bind:value={header}
         original={originalHeader}
-        badge={$_('scheduler.badge.header', {
+        badge={$_(app.id + '.badge.header', {
           values: { count: mapLength(form.header ?? {}) },
         })}
         validate={(id, value) => {

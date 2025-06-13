@@ -2,6 +2,7 @@ package checkapp
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/Notifiarr/notifiarr/pkg/services"
@@ -21,6 +22,7 @@ func testTCP(ctx context.Context, svc services.ServiceConfig) (string, int) {
 }
 
 func testHTTP(ctx context.Context, svc services.ServiceConfig) (string, int) {
+	log.Println("testHTTP", svc)
 	if err := svc.Validate(); err != nil {
 		return validation + err.Error(), http.StatusBadRequest
 	}

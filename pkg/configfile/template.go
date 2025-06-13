@@ -623,6 +623,7 @@ version = {{.Version}}
 #[[endpoint]]
 #  name          = "My Example"
 #  url           = "http://example.com"
+#  valid_ssl     = true
 #  method        = "GET"
 #  timeout       = "0s"
 #  template      = "pihole"
@@ -646,6 +647,7 @@ version = {{.Version}}
 [[endpoint]]
   name          = "{{$item.Name}}"
   url           = "{{$item.URL}}"
+  valid_ssl     = {{$item.ValidSSL}}
   method        = "{{$item.Method}}"
   timeout       = "{{$item.Timeout}}"
   template      = "{{$item.Template}}"
