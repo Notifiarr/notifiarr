@@ -13,6 +13,6 @@ type Config struct {
 	Notify  bool          `json:"notify"            toml:"notify"  xml:"notify"  yaml:"notify"`
 	Timeout cnfg.Duration `json:"timeout"           toml:"timeout" xml:"timeout" yaml:"timeout"`
 	// Args and ArgValues are not config items. They are calculated on startup.
-	Args      int      `json:"args" toml:"-" xml:"-" yaml:"-"`
+	Args      int      `json:"args"      toml:"-" xml:"-" yaml:"-"`
 	ArgValues []string `json:"argValues" toml:"-" xml:"-" yaml:"-"`
 }

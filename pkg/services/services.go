@@ -265,7 +265,6 @@ func (s *Services) Stop() {
 	s.checks = nil
 	s.done = nil
 	s.stopChan = nil
-
 }
 
 // SvcCount returns the count of services being monitored.

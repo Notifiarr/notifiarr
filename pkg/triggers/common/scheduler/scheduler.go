@@ -193,7 +193,7 @@ func (c *CronJob) daysOfTheMonths() gocron.DaysOfTheMonth {
 
 func (c *CronJob) daysOfTheWeek() func() []time.Weekday {
 	return func() []time.Weekday {
-		days := make([]time.Weekday, 7)
+		days := make([]time.Weekday, len(c.DaysOfWeek))
 		for _, d := range c.DaysOfWeek {
 			days[d] = time.Weekday(d)
 		}
