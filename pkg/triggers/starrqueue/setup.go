@@ -66,6 +66,7 @@ func (a *Action) Create() {
 
 	if lidarr || radarr || readarr || sonarr {
 		a.cmd.Add(&common.Action{
+			Key:  "TrigStuckItems",
 			Name: TrigStuckItems,
 			Fn:   a.cmd.sendStuckQueues,
 			C:    make(chan *common.ActionInput, 1),
@@ -75,6 +76,7 @@ func (a *Action) Create() {
 		// Only enable this timer if the user is a patron.
 		if ci := clientinfo.Get(); ci != nil && ci.IsPatron() {
 			a.cmd.Add(&common.Action{
+				Key:  "TrigDownloadingItems",
 				Hide: true,
 				Name: TrigDownloadingItems,
 				Fn:   a.cmd.sendDownloadingQueues,

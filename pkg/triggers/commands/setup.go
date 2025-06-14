@@ -2,7 +2,6 @@ package commands
 
 import (
 	"errors"
-	"fmt"
 	"regexp"
 	"sync"
 	"time"
@@ -133,7 +132,8 @@ func (c *cmd) create() {
 		cmd.ch = make(chan *common.ActionInput, 1)
 
 		c.Add(&common.Action{
-			Name: common.TriggerName(fmt.Sprintf("Running Custom Command '%s'", cmd.Name)),
+			Key:  "TrigCustomCommand",
+			Name: common.TriggerName(cmd.Name),
 			Fn:   cmd.run,
 			C:    cmd.ch,
 		})

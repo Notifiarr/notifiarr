@@ -56,7 +56,7 @@
         <div class="accordion-item">
           <AccordionHeader
             onclick={() => (flt.active = index)}
-            class={flt.active !== index ? 'collapsed d-block' : ''}>
+            class="pb-2 {flt.active !== index ? 'collapsed d-block' : ''}">
             <h5 class="mb-0">
               {@render headerActive(index)}
               {#if !flt.isValid(index)}
@@ -69,7 +69,7 @@
             </h5>
             {#if flt.active !== index}
               <div style="overflow: clip;">
-                <span class="text-muted fs-6 mt-0 header-collapsed">
+                <span class="text-muted fs-6 mb-0 header-collapsed">
                   {@render headerCollapsed?.(index)}
                 </span>
               </div>

@@ -137,6 +137,7 @@ func (c *cmd) create() {
 
 	mnd.Log.Printf("==> Started Notifiarr Website Up-Checker, interval: %s", durafmt.Parse(upCheckDur))
 	c.Add(&common.Action{
+		Key:  "TrigUpCheck",
 		Name: TrigUpCheck,
 		Fn:   c.PollUpCheck,
 		D:    cnfg.Duration{Duration: upCheckDur},
@@ -159,6 +160,7 @@ func (c *cmd) create() {
 		c.list = append(c.list, timer)
 
 		c.Add(&common.Action{
+			Key:  "TrigCustomCronTimer",
 			Name: common.TriggerName(fmt.Sprintf("Running Custom Cron Timer '%s'", custom.Name)),
 			Fn:   timer.run,
 			C:    timer.ch,
@@ -176,6 +178,7 @@ func (c *cmd) startWebsitePoller() {
 
 	mnd.Log.Printf("==> Started Notifiarr Website Poller, interval: %s", durafmt.Parse(pollDur))
 	c.Add(&common.Action{
+		Key:  "TrigPollSite",
 		Name: TrigPollSite,
 		Fn:   c.PollForReload,
 		D:    cnfg.Duration{Duration: pollDur + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},

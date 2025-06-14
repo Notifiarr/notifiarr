@@ -48,6 +48,7 @@ func (c *cmd) create() {
 	}
 
 	c.Add(&common.Action{
+		Key:  "TrigMDBListSync",
 		Name: TrigMDBListSync,
 		Fn:   c.sendMDBList,
 		C:    make(chan *common.ActionInput, 1),

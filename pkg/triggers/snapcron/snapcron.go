@@ -50,6 +50,7 @@ func (c *cmd) create() {
 
 	c.printLog()
 	c.Add(&common.Action{
+		Key:  "TrigSnapshot",
 		Name: TrigSnapshot,
 		Fn:   c.sendSnapshot,
 		C:    make(chan *common.ActionInput, 1),

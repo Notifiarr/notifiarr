@@ -32,6 +32,7 @@ func (a *Action) Create() {
 
 func (c *cmd) create() {
 	c.Add(&common.Action{
+		Key:  "TrigPlexEmptyTrash",
 		Name: TrigPlexEmptyTrash,
 		Fn:   c.emptyPlexTrash,
 		C:    make(chan *common.ActionInput, 1),

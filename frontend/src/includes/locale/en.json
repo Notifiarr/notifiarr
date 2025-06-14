@@ -167,7 +167,7 @@
       "Endpoints": "Endpoints",
       "Commands": "Commands",
       "Services": "Services",
-      "Triggers": "Triggers",
+      "Actions": "Actions",
       "Integrations": "Integrations",
       "Monitoring": "Monitoring",
       "Metrics": "Metrics",
@@ -188,7 +188,7 @@
       "Endpoints": "Configure relay endpoint URLs and their schedules.",
       "Commands": "Set up and execute custom commands and scripts.",
       "Services": "The Notifiarr client application is capable of monitoring services via HTTP checks, TCP port checks or process running (and not running) checks. <b>The client service checks work with the Notifiarr.com Network Integration.</b>",
-      "Triggers": "View and execute configured triggers.",
+      "Actions": "Find internal Notifiarr client actions here. These are executed by timers, schedules, and events from the website or a chat server. While usually reserved for troubleshooting, you may trigger them manually in this interface.",
       "Integrations": "View action statistics and for all integrations.",
       "Monitoring": "View service and network health.",
       "Metrics": "View metric totals for client configurations.",
@@ -1112,16 +1112,16 @@
       "empty": "No application requests yet."
     },
     "timerEvents": {
-      "title": "Triggered Events",
-      "description": "Triggers and timers executed.",
-      "empty": "No triggered events yet."
+      "title": "Triggered Actions",
+      "description": "Triggers, timers and schedules executed.",
+      "empty": "No triggered actions yet."
     }
   },
   "monitoring": {
-    "ConfigureServices": "Configure the service checks displayed on the Services page.",
+    "ConfigureServices": "Configure the service checks displayed on the <goto-page page='services'>Services</goto-page> page.",
     "ChecksDisabled": "Service Checks: Disabled",
     "ChecksStopped": "Service Checks: Stopped",
-    "EnableOnConfig": "Enable service checks on the Configuration page.",
+    "EnableOnConfig": "Enable service checks on the <goto-page page='configuration'>Configuration</goto-page> page.",
     "StartChecks": "Start Service Checks",
     "StopChecks": "Stop Service Checks",
     "stopFailed": "Failed to stop service checks.",
@@ -1163,8 +1163,8 @@
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
     "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead.",
-    "configLink": "Disable and Enable service health checks in whole on the Configuration page.",
-    "monitoringLink": "View running service health information on the Monitoring page.",
+    "configLink": "Disable and Enable service health checks in whole on the <goto-page page='configuration'>Configuration</goto-page> page.",
+    "monitoringLink": "View running service health information on the <goto-page page='monitoring'>Monitoring</goto-page> page.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",
@@ -1273,6 +1273,62 @@
         "description": "Maximum number of running processes that may match the value.",
         "tooltip": "If you enter 2, then you will receive a notification if there are more than 2 processes running. Use this to be alerted if there are too many processes running."
       }
+    }
+  },
+  "Actions": {
+    "titles": {
+      "Triggers": "Triggers",
+      "Timers": "Timers",
+      "Schedules": "Schedules",
+      "SiteCrons": "Website Timers",
+      "Counter": "Counter",
+      "Interval": "Interval",
+      "Schedule": "Schedule"
+    },
+    "descriptions": {
+      "Triggers": "These actions have no timer and no schedule.",
+      "Timers": "These actions have a timer.",
+      "Schedules": "These actions have a schedule.",
+      "SiteCrons": "These actions are created by the website to offload timer tracking."
+    },
+    "key": {
+      "TrigPlexEmptyTrash": "Empty Plex trash",
+      "TrigUploadFile": "Log file uploaded to website",
+      "TrigPlexSessions": "Collect Plex sessions",
+      "TrigPlexSessionsCheck": "Check for finished Plex sessions",
+      "TrigDashboard": "Dashboard update",
+      "TrigMDBListSync": "MDB list sync",
+      "TrigCollectionGaps": "Collection gaps",
+      "TrigCFSyncLidarr": "Lidarr profile and format sync",
+      "TrigCFSyncRadarr": "Radarr profile and format sync",
+      "TrigRPSyncSonarr": "Sonarr profile and format sync",
+      "TrigStop": "Client reloads",
+      "TrigSnapshot": "Snapshot collection",
+      "TrigProwlarrCorrupt": "Prowlarr database corruption",
+      "TrigLidarrCorrupt": "Lidarr database corruption",
+      "TrigRadarrCorrupt": "Radarr database corruption",
+      "TrigReadarrCorrupt": "Readarr database corruption",
+      "TrigSonarrCorrupt": "Sonarr database corruption",
+      "TrigProwlarrBackup": "Prowlarr database backups",
+      "TrigLidarrBackup": "Lidarr database backups",
+      "TrigRadarrBackup": "Radarr database backups",
+      "TrigReadarrBackup": "Readarr database backups",
+      "TrigSonarrBackup": "Sonarr database backups",
+      "TrigUpCheck": "Client to website up-check",
+      "TrigEndpointURL": "Endpoint URL relayed to website: {name}",
+      "TrigCustomCommand": "Custom command: {name}",
+      "TrigAutoUpdate": "Auto-update update check",
+      "TrigCFSyncLidarrInt": "Lidarr custom format sync per instance",
+      "TrigCFSyncRadarrInt": "Radarr custom format sync per instance",
+      "TrigRPSyncSonarrInt": "Sonarr custom format sync per instance",
+      "TrigCustomCronTimer": "Website timer: {name}",
+      "TrigDownloadingItems": "Downloading / finished items",
+      "TrigLidarrQueue": "Lidarr queue cacher",
+      "TrigRadarrQueue": "Radarr queue cacher",
+      "TrigReadarrQueue": "Readarr queue cacher",
+      "TrigSonarrQueue": "Sonarr queue cacher",
+      "TrigStuckItems": "Stuck items check",
+      "TrigPollSite": "Site poller"
     }
   }
 }

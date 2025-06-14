@@ -241,3 +241,13 @@ input[type='checkbox'] {
   outline: 0 !important;
   box-shadow: 0 0 0 0 !important;
 }
+
+tr:last-child td:last-child,
+tr:last-child th:last-child {
+  border-bottom-right-radius: 7px !important;
+}
+
+tr:last-child td:first-child,
+tr:last-child th:first-child {
+  border-bottom-left-radius: 7px !important;
+}

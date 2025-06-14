@@ -63,6 +63,10 @@ export interface Profile {
   upstreamHeader: string;
   upstreamType: AuthType;
   languages?: Record<string, null | Record<string, LocalizedLanguage>>;
+  triggers?: Record<string, TriggerInfo>;
+  timers?: Record<string, TriggerInfo>;
+  schedules?: Record<string, TriggerInfo>;
+  siteCrons?: Timer[];
   /**
    * LoggedIn is only used by the front end. Backend does not set or use it.
    */
@@ -678,6 +682,22 @@ export interface LocalizedLanguage {
 };
 
 /**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/common.TriggerInfo>
+ */
+export interface TriggerInfo {
+  name: string;
+  key: string;
+  dur: string;
+  runs: string;
+};
+
+/**
+ * Timer is used to trigger actions.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/crontimer.Timer>
+ */
+export interface Timer extends CronConfig {};
+
+/**
  * Flags are our CLI input flags.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.Flags>
  */
@@ -850,13 +870,15 @@ export interface Stats {
 //  11. github.com/Notifiarr/notifiarr/pkg/snapshot
 //  12. github.com/Notifiarr/notifiarr/pkg/triggers/commands
 //  13. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
-//  14. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
-//  15. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
-//  16. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
-//  17. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
-//  18. github.com/shirou/gopsutil/v4/host
-//  19. golift.io/deluge
-//  20. golift.io/mulery/client
-//  21. golift.io/nzbget
-//  22. golift.io/qbit
-//  23. golift.io/starr
+//  14. github.com/Notifiarr/notifiarr/pkg/triggers/common
+//  15. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
+//  16. github.com/Notifiarr/notifiarr/pkg/triggers/crontimer
+//  17. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
+//  18. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
+//  19. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
+//  20. github.com/shirou/gopsutil/v4/host
+//  21. golift.io/deluge
+//  22. golift.io/mulery/client
+//  23. golift.io/nzbget
+//  24. golift.io/qbit
+//  25. golift.io/starr

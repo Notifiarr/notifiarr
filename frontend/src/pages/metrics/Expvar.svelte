@@ -14,7 +14,7 @@
   </tr>
 {/snippet}
 
-<Card class="mt-2" color="secondary-subtle">
+<Card class="mt-3" color="secondary-subtle">
   <CardHeader>
     {#if title}
       {title}

@@ -118,7 +118,7 @@
       </DropdownMenu>
     </Dropdown>
     <Popover target="cards-button" placement="left" trigger="hover" {theme}>
-      <T id={`monitoring.${showCards ? 'cardsView' : 'classicView'}`} />
+      <T id={`monitoring.${showCards ? 'classicView' : 'cardsView'}`} />
     </Popover>
     <Button color="info" outline onclick={toggleCards} id="cards-button">
       <Fa i={icon} c1="blue" d1="slateblue" scale="1.5" />

@@ -32,10 +32,10 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 }
 
 type trigger struct {
-	Kind string       `json:"kind"`
-	Name string       `json:"name"`
-	Dur  fmt.Stringer `json:"interval,omitempty"`
-	Path string       `json:"apiPath,omitempty"`
+	Kind string `json:"kind"`
+	Name string `json:"name"`
+	Dur  string `json:"interval,omitempty"`
+	Path string `json:"apiPath,omitempty"`
 }
 
 type timer struct {
@@ -64,23 +64,23 @@ func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
 	triggers, timers, schedules := a.GatherTriggerInfo()
 	temp := make(map[string]*trigger) // used to dedup.
 
-	for name, dur := range triggers {
-		if dur.String() == "0" {
+	for name, info := range triggers {
+		if info.Dur == "0s" {
 			temp[name] = &trigger{Kind: "trigger", Name: name}
 		} else {
-			temp[name] = &trigger{Kind: "trigger", Name: name, Dur: dur}
+			temp[name] = &trigger{Kind: "trigger", Name: name, Dur: info.Dur}
 		}
 	}
 
-	for name, dur := range timers {
+	for name, info := range timers {
 		if _, ok := temp[name]; !ok {
-			temp[name] = &trigger{Kind: "timer", Name: name, Dur: dur}
+			temp[name] = &trigger{Kind: "timer", Name: name, Dur: info.Dur}
 		}
 	}
 
-	for name, dur := range schedules {
+	for name, info := range schedules {
 		if _, ok := temp[name]; !ok {
-			temp[name] = &trigger{Kind: "schedule", Name: name, Dur: dur}
+			temp[name] = &trigger{Kind: "schedule", Name: name, Dur: info.Dur}
 		}
 	}
 
@@ -129,43 +129,63 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 
 func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string) (int, string) { //nolint:cyclop,funlen
 	switch trigger {
-	case "custom":
+	case "custom", "TrigCustomCronTimer":
 		return a.customTimer(input, content)
 	case "clientlogs":
 		return a.clientLogs(content)
-	case "command":
+	case "command", "TrigCustomCommand":
 		return a.command(input, content)
-	case "endpoint":
+	case "endpoint", "TrigEndpointURL":
 		return a.endpoint(input, content)
-	case "cfsync":
+	case "cfsync", "TrigCFSyncRadarr":
 		return a.cfsync(input, content)
-	case "rpsync":
+	case "rpsync", "TrigRPSyncSonarr":
 		return a.rpsync(input, content)
 	case "services":
 		return a.services(input)
-	case "sessions":
+	case "sessions", "TrigPlexSessions":
 		return a.sessions(input)
-	case "stuckitems":
+	case "stuckitems", "TrigStuckItems":
 		return a.stuckitems(input)
-	case "dashboard":
+	case "dashboard", "TrigDashboard":
 		return a.dashboard(input)
-	case "snapshot":
+	case "snapshot", "TrigSnapshot":
 		return a.snapshot(input)
-	case "gaps":
+	case "gaps", "TrigCollectionGaps":
 		return a.gaps(input)
 	case "corrupt":
 		return a.corrupt(input, content)
+	case "TrigProwlarrCorrupt":
+		return a.corrupt(input, starr.Prowlarr.String())
+	case "TrigLidarrCorrupt":
+		return a.corrupt(input, starr.Lidarr.String())
+	case "TrigRadarrCorrupt":
+		return a.corrupt(input, starr.Radarr.String())
+	case "TrigReadarrCorrupt":
+		return a.corrupt(input, starr.Readarr.String())
+	case "TrigSonarrCorrupt":
+		return a.corrupt(input, starr.Sonarr.String())
 	case "backup":
 		return a.backup(input, content)
-	case "reload":
+	case "TrigLidarrBackup":
+		return a.backup(input, starr.Lidarr.String())
+	case "TrigRadarrBackup":
+		return a.backup(input, starr.Radarr.String())
+	case "TrigReadarrBackup":
+		return a.backup(input, starr.Readarr.String())
+	case "TrigSonarrBackup":
+		return a.backup(input, starr.Sonarr.String())
+	case "TrigProwlarrBackup":
+		return a.backup(input, starr.Prowlarr.String())
+	case "reload", "TrigStop":
 		return a.handleConfigReload()
 	case "notification":
 		return a.notification(content)
-	case "emptyplextrash":
+	case "emptyplextrash", "TrigPlexEmptyTrash":
 		return a.emptyplextrash(input, content)
-	case "mdblist":
+	case "mdblist", "TrigMDBListSync":
 		return a.mdblist(input)
-	case "uploadlog":
+	case "uploadlog", "TrigUploadFile":
 		return a.uploadlog(input, content)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"

@@ -135,6 +135,7 @@ func (c *Cmd) create() {
 	}
 
 	c.Add(&common.Action{
+		Key:  "TrigDashboard",
 		Name: TrigDashboard,
 		Fn:   c.sendDashboardState,
 		C:    make(chan *common.ActionInput, 1),

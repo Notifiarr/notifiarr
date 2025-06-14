@@ -19,6 +19,8 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/crontimer"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -30,23 +32,27 @@ import (
 // Profile is the data returned by the profile GET endpoint.
 // Basically everything.
 type Profile struct {
-	Username        string                 `json:"username"`
-	Config          configfile.Config      `json:"config"`
-	ClientInfo      *clientinfo.ClientInfo `json:"clientInfo"`
-	IsWindows       bool                   `json:"isWindows"`
-	IsLinux         bool                   `json:"isLinux"`
-	IsDarwin        bool                   `json:"isDarwin"`
-	IsDocker        bool                   `json:"isDocker"`
-	IsUnstable      bool                   `json:"isUnstable"`
-	IsFreeBSD       bool                   `json:"isFreeBsd"`
-	IsSynology      bool                   `json:"isSynology"`
-	Headers         http.Header            `json:"headers"`
-	Fortune         string                 `json:"fortune"`
-	UpstreamIP      string                 `json:"upstreamIp"`
-	UpstreamAllowed bool                   `json:"upstreamAllowed"`
-	UpstreamHeader  string                 `json:"upstreamHeader"`
-	UpstreamType    configfile.AuthType    `json:"upstreamType"`
-	Languages       frontend.Languages     `json:"languages"`
+	Username        string                        `json:"username"`
+	Config          configfile.Config             `json:"config"`
+	ClientInfo      *clientinfo.ClientInfo        `json:"clientInfo"`
+	IsWindows       bool                          `json:"isWindows"`
+	IsLinux         bool                          `json:"isLinux"`
+	IsDarwin        bool                          `json:"isDarwin"`
+	IsDocker        bool                          `json:"isDocker"`
+	IsUnstable      bool                          `json:"isUnstable"`
+	IsFreeBSD       bool                          `json:"isFreeBsd"`
+	IsSynology      bool                          `json:"isSynology"`
+	Headers         http.Header                   `json:"headers"`
+	Fortune         string                        `json:"fortune"`
+	UpstreamIP      string                        `json:"upstreamIp"`
+	UpstreamAllowed bool                          `json:"upstreamAllowed"`
+	UpstreamHeader  string                        `json:"upstreamHeader"`
+	UpstreamType    configfile.AuthType           `json:"upstreamType"`
+	Languages       frontend.Languages            `json:"languages"`
+	Triggers        map[string]common.TriggerInfo `json:"triggers"`
+	Timers          map[string]common.TriggerInfo `json:"timers"`
+	Schedules       map[string]common.TriggerInfo `json:"schedules"`
+	SiteCrons       []*crontimer.Timer            `json:"siteCrons"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
 	LoggedIn        bool                          `json:"loggedIn"`
 	Updated         time.Time                     `json:"updated"`
@@ -107,6 +113,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	hostInfo, _ := website.Site.GetHostInfo(req.Context())
 	activeTunnel := ""
 	poolStats := map[string]*mulery.PoolSize{}
+	triggers, timers, schedules := c.triggers.GatherTriggerInfo()
 
 	if at := data.Get("activeTunnel"); at != nil {
 		activeTunnel, _ = at.Data.(string)
@@ -117,6 +124,9 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := json.NewEncoder(resp).Encode(&Profile{
+		Triggers:        triggers,
+		Timers:          timers,
+		Schedules:       schedules,
 		Username:        username,
 		Config:          *c.Config,
 		ClientInfo:      clientInfo,
@@ -144,6 +154,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		CheckResults:    c.Services.GetResults(),
 		CheckRunning:    c.Services.Running(),
 		CheckDisabled:   c.Services.Disabled,
+		SiteCrons:       c.triggers.CronTimer.List(),
 		// Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
 		Expvar:          mnd.GetAllData(),
 		HostInfo:        hostInfo,

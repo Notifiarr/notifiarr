@@ -75,7 +75,8 @@ func (a *Action) Create() {
 
 		// Schedule this cron job.
 		a.conf.Add(&common.Action{
-			Name: common.TriggerName(fmt.Sprintf("Polling endpoint URL '%s'", endpoint.Name)),
+			Key:  "TrigEndpointURL",
+			Name: common.TriggerName(endpoint.Name),
 			Fn:   schedule.run,
 			C:    schedule.ch,
 			J:    &endpoint.CronJob,

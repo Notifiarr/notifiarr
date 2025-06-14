@@ -8,7 +8,7 @@
   const { id, data }: Props = $props()
 </script>
 
-<Card class="mt-2" color="secondary" outline>
+<Card class="mt-3" color="secondary" outline>
   <CardHeader>
     <h5><T id={`metrics.${id}.title`} /></h5>
     <small class="text-muted"><T id={`metrics.${id}.description`} /></small>

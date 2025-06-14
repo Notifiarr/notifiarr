@@ -33,7 +33,7 @@
     {@const icon = showOutput[id] ? faArrowUpFromBracket : faArrowDownToBracket}
 
     <Col md="6" lg="6" xl="4" xxl="3">
-      <Card color={chk.colors[result.state]} outline class="mt-2">
+      <Card color={chk.colors[result.state]} outline class="mt-3">
         <CardHeader>
           <h5 class="d-inline-block">{result.name}</h5>
           <Popover

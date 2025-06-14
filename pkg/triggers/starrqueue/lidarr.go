@@ -68,6 +68,7 @@ func (c *cmd) setupLidarr() bool {
 			enabled = true
 
 			c.Add(&common.Action{
+				Key:  "TrigLidarrQueue",
 				Hide: true,
 				Name: TrigLidarrQueue.WithInstance(instance),
 				Fn:   (&lidarrApp{app: &app, cmd: c, idx: idx}).storeQueue,

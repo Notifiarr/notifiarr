@@ -14,13 +14,20 @@
   import type { ServiceConfig } from '../../api/notifiarrConfig'
   import { get } from 'svelte/store'
   import type { App } from '../../includes/formsTracker.svelte'
-  import { faStaffSnake } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import { faMicrochip, faStaffSnake } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import {
+    faGlobePointer,
+    faHexagonNodesBolt,
+    faPingPongPaddleBall,
+  } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import { type IconDefinition } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import Instances from '../../includes/Instances.svelte'
   import Check from './Check.svelte'
   import { validator as httpValidator } from './HTTP.svelte'
   import { validator as processValidator } from './Process.svelte'
   import { validator as pingValidator } from './Ping.svelte'
   import { validator as tcpValidator } from './TCP.svelte'
+  import Fa from '../../includes/Fa.svelte'
 
   const submit = async () => {
     await profile.writeConfig({ ...$profile.config, service: flt.instances })
@@ -70,6 +77,15 @@
   $effect(() => {
     nav.formChanged = flt.formChanged
   })
+
+  // Shown next to the check name in each accordion header.
+  const icons: Record<string, IconDefinition> = {
+    http: faGlobePointer,
+    process: faMicrochip,
+    ping: faPingPongPaddleBall,
+    icmp: faPingPongPaddleBall,
+    tcp: faHexagonNodesBolt,
+  }
 </script>
 
 <Header {page} />
@@ -77,12 +93,29 @@
 <CardBody>
   <Instances {flt} Child={Check} deleteButton={app.id + '.DeleteCheck'}>
     {#snippet headerActive(index)}
+      <Fa
+        flip={flt.original?.[index]?.type === 'icmp' ? 'horizontal' : undefined}
+        i={icons[flt.original?.[index]?.type]}
+        c1="#0E6655"
+        c2="#0B5345"
+        d1="#9FE2BF"
+        d2="#40E0D0"
+        scale="1.8"
+        class="header-icon" />
       {index + 1}. {flt.original?.[index]?.name}
     {/snippet}
     {#snippet headerCollapsed(index)}
-      {flt.original?.[index]?.type}: {flt.original?.[index]?.value.split('|')[0]}
+      {$_('ServiceChecks.type.options.' + flt.original?.[index]?.type)}:
+      {flt.original?.[index]?.value.split('|')[0]}
     {/snippet}
   </Instances>
 </CardBody>
 
 <Footer {submit} saveDisabled={!flt.formChanged || flt.invalid} />
+
+<style>
+  :global(.header-icon) {
+    margin-right: 8px;
+    margin-bottom: 4px;
+  }
+</style>

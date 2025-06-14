@@ -70,14 +70,17 @@ func (c *cmd) create() {
 	// These aggregate triggers have no timers. Used to sync "all the things" at once.
 	c.Add(&common.Action{
 		Name: TrigCFSyncRadarr,
+		Key:  "TrigCFSyncRadarr",
 		Fn:   c.syncRadarr,
 		C:    make(chan *common.ActionInput, 1),
 	}, &common.Action{
 		Name: TrigRPSyncSonarr,
+		Key:  "TrigRPSyncSonarr",
 		Fn:   c.syncSonarr,
 		C:    make(chan *common.ActionInput, 1),
 	}, &common.Action{
 		Name: TrigCFSyncLidarr,
+		Key:  "TrigCFSyncLidarr",
 		Fn:   c.syncLidarr,
 		C:    make(chan *common.ActionInput, 1),
 	})
@@ -108,6 +111,7 @@ func (c *cmd) setupLidarr(info *clientinfo.ClientInfo) {
 		}
 
 		c.Add(&common.Action{
+			Key:  "TrigCFSyncLidarrInt",
 			Hide: true,
 			D:    dur,
 			Name: TrigCFSyncLidarrInt.WithInstance(instance),
@@ -142,6 +146,7 @@ func (c *cmd) setupRadarr(info *clientinfo.ClientInfo) {
 		}
 
 		c.Add(&common.Action{
+			Key:  "TrigCFSyncRadarrInt",
 			Hide: true,
 			D:    dur,
 			Name: TrigCFSyncRadarrInt.WithInstance(instance),
@@ -176,6 +181,7 @@ func (c *cmd) setupSonarr(info *clientinfo.ClientInfo) {
 		}
 
 		c.Add(&common.Action{
+			Key:  "TrigCFSyncSonarrInt",
 			Hide: true,
 			D:    dur,
 			Name: TrigRPSyncSonarrInt.WithInstance(instance),

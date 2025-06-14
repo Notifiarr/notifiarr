@@ -77,7 +77,7 @@
 
   // Clear the url validation if the page unmounts.
   onMount(() => () => {
-    validate?.(app.id + '.http.url', 'https://this.is.valid')
+    validate?.(app.id + '.url', 'https://this.is.valid')
     validate?.(app.id + '.http.codes', [200])
   })
 </script>

@@ -123,6 +123,7 @@ func (c *cmd) create() {
 
 	c.Add(&common.Action{
 		Name: TrigAutoUpdate,
+		Key:  "TrigAutoUpdate",
 		Fn:   c.checkAndUpdate,
 		D:    cnfg.Duration{Duration: dur},
 	})
