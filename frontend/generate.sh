@@ -6,7 +6,7 @@
 
 set -e
 # Install dependencies.
-npm ci
+npm install
 
 # Build the frontend 'dist' directory.
 npm run build

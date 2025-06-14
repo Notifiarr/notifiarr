@@ -11,7 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
 
-func testMySQL(ctx context.Context, config *snapshot.MySQLConfig) (string, int) {
+func testMySQL(ctx context.Context, config snapshot.MySQLConfig) (string, int) {
 	snaptest := &snapshot.Snapshot{}
 
 	if config.Host == "" {
@@ -22,7 +22,7 @@ func testMySQL(ctx context.Context, config *snapshot.MySQLConfig) (string, int) 
 		return "Username is required", http.StatusBadRequest
 	}
 
-	errs := snaptest.GetMySQL(ctx, []*snapshot.MySQLConfig{config}, 1)
+	errs := snaptest.GetMySQL(ctx, []snapshot.MySQLConfig{config}, 1)
 	if len(errs) > 0 {
 		msg := fmt.Sprintf("%d errors encountered: ", len(errs))
 		for _, err := range errs {
@@ -36,10 +36,8 @@ func testMySQL(ctx context.Context, config *snapshot.MySQLConfig) (string, int) 
 		strconv.Itoa(len(snaptest.MySQL[config.Host].Processes)), http.StatusOK
 }
 
-func testNvidia(ctx context.Context, config *snapshot.NvidiaConfig) (string, int) {
-	if config == nil {
-		return ErrBadIndex.Error(), http.StatusBadRequest
-	} else if config.SMIPath != "" {
+func testNvidia(ctx context.Context, config snapshot.NvidiaConfig) (string, int) {
+	if config.SMIPath != "" {
 		if _, err := os.Stat(config.SMIPath); err != nil {
 			return fmt.Sprintf("nvidia-smi not found at provided path '%s': %v", config.SMIPath, err), http.StatusNotAcceptable
 		}

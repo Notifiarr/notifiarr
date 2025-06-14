@@ -57,8 +57,8 @@ type Config struct {
 
 // Plugins is optional configuration for "plugins".
 type Plugins struct {
-	Nvidia *NvidiaConfig  `json:"nvidia" toml:"nvidia" xml:"nvidia"`
-	MySQL  []*MySQLConfig `json:"mysql"  toml:"mysql"  xml:"mysql"`
+	Nvidia NvidiaConfig  `json:"nvidia" toml:"nvidia" xml:"nvidia"`
+	MySQL  []MySQLConfig `json:"mysql"  toml:"mysql"  xml:"mysql"`
 }
 
 // Errors this package generates.

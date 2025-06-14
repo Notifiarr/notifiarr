@@ -4,7 +4,7 @@
   import type { FormListTracker } from './formsTracker.svelte'
   import Fa from './Fa.svelte'
 
-  type Props = { flt: FormListTracker }
+  type Props = { flt: FormListTracker<any> }
   let { flt }: Props = $props()
 </script>
 

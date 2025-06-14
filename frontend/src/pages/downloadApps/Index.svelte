@@ -1,10 +1,10 @@
 <script lang="ts" module>
   import { Downloaders as App, page } from './page.svelte'
-  import { FormListTracker } from '../../includes/formsTracker.svelte'
   export { page }
 </script>
 
 <script lang="ts">
+  import { FormListTracker } from '../../includes/formsTracker.svelte'
   import { profile } from '../../api/profile.svelte'
   import { _ } from '../../includes/Translate.svelte'
   import { CardBody, TabContent } from '@sveltestrap/sveltestrap'

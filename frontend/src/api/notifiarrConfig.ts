@@ -3,8 +3,9 @@
  */
 
 /**
- * The day of the week.
- * @see golang: <time.Weekday>
+ * A Weekday specifies a day of the week (Sunday = 0, ...).
+ * Copied from stdlib to avoid the String method.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler.Weekday>
  */
 export enum Weekday {
   Sunday    = 0,
@@ -26,16 +27,25 @@ export enum AuthType {
 };
 
 /**
+ * Frequency sets the base "how-often" a CronJob is executed.
+ * See the Frequency constants.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler.Frequency>
+ */
+export enum Frequency {
+  DeadCron = 0,
+  Minutely = 1,
+  Hourly   = 2,
+  Daily    = 3,
+  Weekly   = 4,
+  Monthly  = 5,
+};
+
+/**
  * Profile is the data returned by the profile GET endpoint.
  * Basically everything.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
  */
 export interface Profile {
-  /**
-   * Input       *configfile.Config             `json:"input"`
-   * Actions     *triggers.Actions              `json:"actions"`
-   * Tunnel      *mulery.Client                 `json:"tunnel"`
-   */
   username: string;
   config: Config;
   clientInfo?: ClientInfo;
@@ -66,10 +76,14 @@ export interface Profile {
   configFileInfo?: LogFileInfos;
   expvar: AllData;
   hostInfo?: InfoStat;
-  disks?: Record<string, null | Partition>;
+  disks?: Record<string, Partition>;
   proxyAllow: boolean;
   poolStats?: Record<string, null | PoolSize>;
   started: Date;
+  cmdList?: CmdconfigConfig[];
+  checkResults?: CheckResult[];
+  checkRunning: boolean;
+  checkDisabled: boolean;
   program: string;
   version: string;
   revision: string;
@@ -97,7 +111,7 @@ export interface Profile {
  * Config represents the data in our config file.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/configfile.Config>
  */
-export interface Config extends LogConfig, Apps {
+export interface Config extends LogConfig, AppsConfig {
   hostId: string;
   uiPassword: string;
   bindAddr: string;
@@ -108,9 +122,9 @@ export interface Config extends LogConfig, Apps {
   unstableCh: boolean;
   timeout: string;
   retries: number;
-  snapshot?: SnapshotConfig;
-  services?: ServicesConfig;
-  service?: Service[];
+  snapshot: SnapshotConfig;
+  services: ServicesConfig;
+  service?: ServiceConfig[];
   apt: boolean;
   watchFiles?: WatchFile[];
   endpoints?: Endpoint[];
@@ -144,7 +158,7 @@ export interface SnapshotConfig extends Plugins {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Plugins>
  */
 export interface Plugins {
-  nvidia?: NvidiaConfig;
+  nvidia: NvidiaConfig;
   mysql?: MySQLConfig[];
 };
 
@@ -186,10 +200,10 @@ export interface ServicesConfig {
 };
 
 /**
- * Service is a thing we check and report results for.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Service>
+ * ServiceConfig is a thing we check and report results for.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.ServiceConfig>
  */
-export interface Service {
+export interface ServiceConfig {
   name: string;
   type: string;
   value: string;
@@ -211,6 +225,7 @@ export interface WatchFile {
   pipe: boolean;
   mustExist: boolean;
   logMatch: boolean;
+  disabled: boolean;
 };
 
 /**
@@ -227,6 +242,8 @@ export interface Endpoint extends CronJob {
   method: string;
   body: string;
   follow: boolean;
+  validSsl: boolean;
+  timeout: string;
 };
 
 /**
@@ -244,7 +261,7 @@ export interface CronJob {
   /**
    * Frequency to configure the job. Pass 0 disable the cron.
    */
-  frequency: number;
+  frequency: Frequency;
   /**
    * Interval for Daily, Weekly and Monthly Frequencies. 1 = every day/week/month, 2 = every other, and so on.
    */
@@ -281,10 +298,16 @@ export interface Command extends CmdconfigConfig {};
 export interface CmdconfigConfig {
   name: string;
   hash: string;
+  command?: string;
   shell: boolean;
   log: boolean;
   notify: boolean;
+  timeout: string;
+  /**
+   * Args and ArgValues are not config items. They are calculated on startup.
+   */
   args: number;
+  argValues?: string[];
 };
 
 /**
@@ -306,19 +329,14 @@ export interface LogConfig {
 
 /**
  * Apps is the input configuration to relay requests to Starr apps.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.Apps>
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.AppsConfig>
  */
-export interface Apps {
-  apiKey: string;
-  extraKeys?: string[];
-  urlbase: string;
-  maxBody: number;
-  serial: boolean;
-  sonarr?: SonarrConfig[];
-  radarr?: RadarrConfig[];
-  lidarr?: LidarrConfig[];
-  readarr?: ReadarrConfig[];
-  prowlarr?: ProwlarrConfig[];
+export interface AppsConfig extends BaseConfig {
+  sonarr?: StarrConfig[];
+  radarr?: StarrConfig[];
+  lidarr?: StarrConfig[];
+  readarr?: StarrConfig[];
+  prowlarr?: StarrConfig[];
   deluge?: DelugeConfig[];
   qbit?: QbitConfig[];
   rtorrent?: RtorrentConfig[];
@@ -326,14 +344,40 @@ export interface Apps {
   nzbget?: NZBGetConfig[];
   transmission?: XmissionConfig[];
   tautulli?: TautulliConfig;
-  plex?: PlexConfig;
+  plex: PlexConfig;
 };
 
 /**
- * SonarrConfig represents the input data for a Sonarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.SonarrConfig>
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.BaseConfig>
  */
-export interface SonarrConfig extends ExtraConfig, StarrConfig {};
+export interface BaseConfig {
+  apiKey: string;
+  extraKeys?: string[];
+  urlbase: string;
+  maxBody: number;
+  serial: boolean;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.StarrConfig>
+ */
+export interface StarrConfig extends StarrConfig0, ExtraConfig {};
+
+/**
+ * Config is the data needed to poll Radarr or Sonarr or Lidarr or Readarr.
+ * At a minimum, provide a URL and API Key.
+ * HTTPUser and HTTPPass are used for Basic HTTP auth, if enabled (not common).
+ * Username and Password are for non-API paths with native authentication enabled.
+ * @see golang: <golift.io/starr.Config>
+ */
+export interface StarrConfig0 {
+  apiKey: string;
+  url: string;
+  httpPass: string;
+  httpUser: string;
+  username: string;
+  password: string;
+};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ExtraConfig>
@@ -345,46 +389,6 @@ export interface ExtraConfig {
   validSsl: boolean;
   deletes: number;
 };
-
-/**
- * Config is the data needed to poll Radarr or Sonarr or Lidarr or Readarr.
- * At a minimum, provide a URL and API Key.
- * HTTPUser and HTTPPass are used for Basic HTTP auth, if enabled (not common).
- * Username and Password are for non-API paths with native authentication enabled.
- * @see golang: <golift.io/starr.Config>
- */
-export interface StarrConfig {
-  apiKey: string;
-  url: string;
-  httpPass: string;
-  httpUser: string;
-  username: string;
-  password: string;
-};
-
-/**
- * RadarrConfig represents the input data for a Radarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.RadarrConfig>
- */
-export interface RadarrConfig extends ExtraConfig, StarrConfig {};
-
-/**
- * LidarrConfig represents the input data for a Lidarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.LidarrConfig>
- */
-export interface LidarrConfig extends ExtraConfig, StarrConfig {};
-
-/**
- * ReadarrConfig represents the input data for a Readarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ReadarrConfig>
- */
-export interface ReadarrConfig extends ExtraConfig, StarrConfig {};
-
-/**
- * ProwlarrConfig represents the input data for a Prowlarr server.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ProwlarrConfig>
- */
-export interface ProwlarrConfig extends ExtraConfig, StarrConfig {};
 
 /**
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.DelugeConfig>
@@ -693,7 +697,6 @@ export interface Flags {
   envPrefix: string;
   headers?: string[];
   staticDif: string;
-  delay: number;
 };
 
 /**
@@ -776,15 +779,35 @@ export interface Partition {
  * @see golang: <golift.io/mulery/client.PoolSize>
  */
 export interface PoolSize {
-  Disconnects: number;
-  Connecting: number;
-  Idle: number;
-  Running: number;
-  Total: number;
-  LastConn: Date;
-  LastTry: Date;
-  Active: boolean;
+  disconnects: number;
+  connecting: number;
+  idle: number;
+  running: number;
+  total: number;
+  lastConn: Date;
+  lastTry: Date;
+  active: boolean;
 };
+
+/**
+ * CheckResult represents the status of a service.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.CheckResult>
+ */
+export interface CheckResult {
+  name: string;
+  state: number;
+  output?: Output;
+  type: string;
+  time: Date;
+  since: Date;
+  interval: number;
+  metadata?: Record<string, null | any>;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Output>
+ */
+export interface Output {};
 
 /**
  * ProfilePost is the data sent to the profile POST endpoint when updating the trust profile.
@@ -797,6 +820,20 @@ export interface ProfilePost {
   header: string;
   newPass: string;
   upstreams: string;
+};
+
+/**
+ * Stats for a command's invocations.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/commands.Stats>
+ */
+export interface Stats {
+  runs: number;
+  fails: number;
+  output: string;
+  last: string;
+  lastCmd: string;
+  lastTime: Date;
+  lastArgs?: string[];
 };
 
 // Packages parsed:

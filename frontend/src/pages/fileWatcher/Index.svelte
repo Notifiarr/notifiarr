@@ -5,7 +5,7 @@
 </script>
 
 <script lang="ts">
-  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { CardBody, Col, Row } from '@sveltestrap/sveltestrap'
   import { _ } from '../../includes/Translate.svelte'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
@@ -13,7 +13,7 @@
   import Instances from '../../includes/Instances.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import { profile } from '../../api/profile.svelte'
-  import TestRegex from './TestRegex.svelte'
+  import TestRegex from '../../includes/TestRegex.svelte'
 
   const flt = $derived(new FormListTracker($profile.config.watchFiles ?? [], app))
 
@@ -33,15 +33,14 @@
 <CardBody style="max-width: 100%;">
   <Instances {flt} Child={Watcher} deleteButton={page.id + '.DeleteWatcher'}>
     {#snippet headerActive(index)}
-      {index + 1}. {flt.original[index]?.path}
+      {index + 1}. {flt.original?.[index]?.path}
     {/snippet}
     {#snippet headerCollapsed(index)}
-      {flt.original[index]?.regex}
+      {flt.original?.[index]?.regex}
     {/snippet}
   </Instances>
-
   <!-- Test regular expression -->
-  <TestRegex />
+  <Row><Col><TestRegex /></Col></Row>
 </CardBody>
 
 <Footer {submit} saveDisabled={!flt.formChanged || flt.invalid} />

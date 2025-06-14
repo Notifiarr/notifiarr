@@ -41,8 +41,8 @@ func (a *Apps) readarrHandlers() {
 	a.HandleAPIpath(starr.Readarr, "/queue/{queueID}", readarrDeleteQueue, "DELETE")
 }
 
-func getReadarr(r *http.Request) *Readarr {
-	return r.Context().Value(starr.Readarr).(*Readarr) //nolint:forcetypeassert
+func getReadarr(r *http.Request) Readarr {
+	return r.Context().Value(starr.Readarr).(Readarr) //nolint:forcetypeassert
 }
 
 type Readarr struct {

@@ -25,6 +25,20 @@ const (
 // AtTimes is a list of times in: hours, minutes, seconds.
 type AtTimes [][3]uint
 
+// A Weekday specifies a day of the week (Sunday = 0, ...).
+// Copied from stdlib to avoid the String method.
+type Weekday int
+
+const (
+	Sunday Weekday = iota
+	Monday
+	Tuesday
+	Wednesday
+	Thursday
+	Friday
+	Saturday
+)
+
 // CronJob defines when a job should run.
 // When Frequency is set to:
 // 0 `DeadCron` disables the schedule.
@@ -42,7 +56,7 @@ type CronJob struct {
 	// Also used in Minutely and Hourly schedules, a bit awkwardly.
 	AtTimes AtTimes `json:"atTimes" toml:"at_times" xml:"at_times" yaml:"atTimes"`
 	// DaysOfWeek is a list of days to schedule. 0-6. 0 = Sunday.
-	DaysOfWeek []time.Weekday `json:"daysOfWeek" toml:"days_of_week" xml:"days_of_week" yaml:"daysOfWeek"`
+	DaysOfWeek []Weekday `json:"daysOfWeek" toml:"days_of_week" xml:"days_of_week" yaml:"daysOfWeek"`
 	// DaysOfMonth is a list of days to schedule. 1 to 31 or -31 to -1 to count backward.
 	DaysOfMonth []int `json:"daysOfMonth" toml:"days_of_month" xml:"days_of_month" yaml:"daysOfMonth"`
 	// Months to schedule. 1 to 12. 1 = January.
@@ -99,8 +113,8 @@ func (c *CronJob) fix() { //nolint:cyclop
 	}
 
 	for idx, d := range c.DaysOfWeek {
-		if d > time.Saturday || d < time.Sunday {
-			c.DaysOfWeek[idx] = time.Sunday
+		if d > Saturday || d < Sunday {
+			c.DaysOfWeek[idx] = Sunday
 		}
 	}
 
@@ -178,7 +192,14 @@ func (c *CronJob) daysOfTheMonths() gocron.DaysOfTheMonth {
 }
 
 func (c *CronJob) daysOfTheWeek() func() []time.Weekday {
-	return func() []time.Weekday { return c.DaysOfWeek }
+	return func() []time.Weekday {
+		days := make([]time.Weekday, len(c.DaysOfWeek))
+		for _, d := range c.DaysOfWeek {
+			days[d] = time.Weekday(d)
+		}
+
+		return days
+	}
 }
 
 func (c *CronJob) New(cron gocron.Scheduler, cmd func()) gocron.Job { //nolint:ireturn,nolintlint // it's what we have.

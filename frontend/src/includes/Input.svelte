@@ -1,9 +1,9 @@
 <!-- David Newhall II, May 2025, Notifiarr, LLC. -->
 <script lang="ts">
   import {
+    Badge,
     Button,
     Card,
-    FormFeedback,
     FormGroup,
     Input,
     InputGroup,
@@ -17,7 +17,7 @@
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { _ } from './Translate.svelte'
-  import { type SvelteComponent, type Snippet, onMount } from 'svelte'
+  import { type SvelteComponent, type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
@@ -39,6 +39,8 @@
     value?: any
     /** Optional original value. Used to check for changes.*/
     original?: any
+    /** Optional badge to display on the input header. */
+    badge?: string
     /** Optional options for select input. */
     options?: Option[] | undefined
     /** Optional validation function. */
@@ -55,6 +57,8 @@
     feedback?: string
     /** Optional inner value for binding. */
     inner?: any
+    /** When type is "timeout" this controls if -1 / disabled is an option. */
+    noDisable?: boolean
     /** Optional other attributes to apply to the input. */
     [key: string]: any
   }
@@ -72,16 +76,17 @@
     validate,
     pre,
     children,
+    badge = '',
     post,
     msg,
     inner = $bindable(),
     feedback = $bindable(),
+    noDisable = false,
     ...rest
   }: Props = $props()
 
   type Option = { value: string | number | boolean; name: string; disabled?: boolean }
 
-  let input = $state<SvelteComponent>()
   let showTooltip = $state(false)
   let changed = $derived(original !== null && !deepEqual(value, original))
   let currType = $derived(type)
@@ -124,8 +129,11 @@
   if (type === 'timeout') {
     currType = 'select'
     options = [
-      { value: '-1s', name: $_('words.select-option.InstanceDisabled') },
       { value: '0s', name: $_('words.select-option.NoTimeout') },
+      { value: '1s', name: '1 ' + $_('words.select-option.seconds') },
+      { value: '2s', name: '2 ' + $_('words.select-option.seconds') },
+      { value: '3s', name: '3 ' + $_('words.select-option.seconds') },
+      { value: '4s', name: '4 ' + $_('words.select-option.seconds') },
       { value: '5s', name: '5 ' + $_('words.select-option.seconds') },
       { value: '10s', name: '10 ' + $_('words.select-option.seconds') },
       { value: '15s', name: '15 ' + $_('words.select-option.seconds') },
@@ -133,10 +141,20 @@
       { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
       { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
       { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
+      { value: '4m0s', name: '4 ' + $_('words.select-option.minutes') },
+      { value: '5m0s', name: '5 ' + $_('words.select-option.minutes') },
+      { value: '6m0s', name: '6 ' + $_('words.select-option.minutes') },
+      { value: '7m0s', name: '7 ' + $_('words.select-option.minutes') },
+      { value: '8m0s', name: '8 ' + $_('words.select-option.minutes') },
+      { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
+      { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
     ]
+    if (!noDisable)
+      options.unshift({ value: '-1s', name: $_('words.select-option.InstanceDisabled') })
   }
 
-  onMount(() => {
+  $effect(() => {
+    // Automatically validate the input when the value changes.
     feedback = validate ? validate(id, value) : ''
   })
 
@@ -147,10 +165,15 @@
 
 <div class="input">
   <FormGroup>
-    <Label for={id}>{@html label}</Label>
+    <Label for={id}>
+      {@html label}
+      {#if badge}
+        <Badge color="secondary" style="margin-left: 0.5rem;">{badge}</Badge>
+      {/if}
+    </Label>
     <InputGroup class="has-validation">
       {#if tooltip != id + '.tooltip'}
-        <Button color="secondary" onclick={toggleTooltip} outline>
+        <Button color="secondary" onclick={toggleTooltip} outline style="width:44px;">
           {#if showTooltip}
             <Fa
               i={faArrowUpFromBracket}
@@ -166,10 +189,8 @@
       {@render pre?.()}
       <Input
         {id}
-        oninput={() => (feedback = validate ? validate(id, value) : '')}
         class="{inputClass} {changed ? 'changed' : ''}"
         type={currType as InputType}
-        bind:this={input}
         bind:inner
         bind:value
         bind:checked={value}
@@ -193,11 +214,17 @@
             </option>
           {/each}
         {:else if typeof value === 'boolean' && type === 'select'}
-          <!-- Create a boolean select-option list. -->
-          <option value={false} selected={value === false}>
+          <!-- Create a boolean select-option list: Enabled/Disabled
+           If the name of the input ends with 'disabled', then the values are inverted.
+           -->
+          <option
+            value={id.endsWith('disabled') ? true : false}
+            selected={value === id.endsWith('disabled') ? true : false}>
             {$_('words.select-option.Disabled')}
           </option>
-          <option value={true} selected={value === true}>
+          <option
+            value={id.endsWith('disabled') ? false : true}
+            selected={value === id.endsWith('disabled') ? false : true}>
             {$_('words.select-option.Enabled')}
           </option>
         {/if}
@@ -205,7 +232,7 @@
 
       <!-- Include a password visibility toggler. -->
       {#if type === 'password'}
-        <Button type="button" outline onclick={togglePassword}>
+        <Button type="button" outline onclick={togglePassword} style="width:44px;">
           <Fa
             i={passIcon}
             c1="royalblue"
@@ -237,6 +264,11 @@
 <style>
   .input {
     margin-bottom: 1rem;
+  }
+
+  /** Allows textarea to be resized vertically on mobile. */
+  .input :global(textarea) {
+    resize: vertical;
   }
 
   .input :global(label) {

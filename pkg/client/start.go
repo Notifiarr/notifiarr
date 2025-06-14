@@ -280,8 +280,8 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 
 	// Snapshot is a bit complicated because config-file data (plugins) merges with site-data (snapshot config).
 	clientInfo.Actions.Snapshot.Plugins = c.Config.Snapshot.Plugins
-	c.Config.Snapshot = &clientInfo.Actions.Snapshot
-	c.triggers.Snapshot = c.Config.Snapshot
+	c.Config.Snapshot = clientInfo.Actions.Snapshot
+	c.triggers.Snapshot = &c.Config.Snapshot
 	c.Config.Services.Plugins = &c.Config.Snapshot.Plugins
 
 	return clientInfo

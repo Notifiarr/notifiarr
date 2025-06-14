@@ -22,6 +22,7 @@ import (
 var (
 	ErrInvalidRegexp = errors.New("invalid regexp")
 	ErrIgnoredLog    = errors.New("the requested path is internally ignored")
+	ErrDisabled      = errors.New("the requested watch path is administratively disabled")
 )
 
 const (
@@ -58,6 +59,7 @@ type WatchFile struct {
 	Pipe      bool   `json:"pipe"      toml:"pipe"       xml:"pipe"       yaml:"pipe"`
 	MustExist bool   `json:"mustExist" toml:"must_exist" xml:"must_exist" yaml:"mustExist"`
 	LogMatch  bool   `json:"logMatch"  toml:"log_match"  xml:"log_match"  yaml:"logMatch"`
+	Disabled  bool   `json:"disabled"  toml:"disabled"   xml:"disabled"   yaml:"disabled"`
 	re        *regexp.Regexp
 	skip      *regexp.Regexp
 	tail      *tail.Tail
@@ -172,6 +174,8 @@ func (w *WatchFile) setup(ignored ignored) error {
 		return fmt.Errorf("%w: regexp skip compile failed, ignored: %s", ErrInvalidRegexp, w.Path)
 	} else if ignored.isIgnored(w.Path) {
 		return fmt.Errorf("%w: %s", ErrIgnoredLog, w.Path)
+	} else if w.Disabled {
+		return fmt.Errorf("%w: %s", ErrDisabled, w.Path)
 	}
 
 	w.tail, err = tail.TailFile(w.Path, tail.Config{

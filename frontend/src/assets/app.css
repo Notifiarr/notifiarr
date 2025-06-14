@@ -10,6 +10,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --toastContainerTop: 5rem;
+  --toastContainerRight: auto;
+  --toastContainerBottom: auto;
+  --toastContainerLeft: calc(50vw - 15rem);
+  --toastWidth: 30rem;
 }
 
 html,
@@ -22,6 +27,10 @@ body {
 /* https://github.com/react-bootstrap/react-bootstrap/issues/6796 */
 .modal {
   color: var(--bs-body-color);
+}
+
+.popover-header {
+  color: var(--bs-body-color) !important;
 }
 
 body {
@@ -81,17 +90,19 @@ body.dark-mode {
 
 .btn-notifiarr {
   color: #000000 !important;
-  background: radial-gradient(
-    circle,
-    rgba(60, 210, 165, 1) 37%,
-    rgba(94, 230, 216, 1) 100%
-  );
+  background: radial-gradient(circle, rgba(60, 210, 165) 37%, rgba(94, 230, 216) 100%);
   border-color: #03535a !important;
   font-weight: 600;
 }
 
 .btn-notifiarr:hover {
   background: radial-gradient(circle, rgb(54, 197, 154) 37%, rgb(79, 195, 185) 100%);
+}
+
+.btn-notifiarr:focus {
+  background: radial-gradient(circle, rgb(95, 248, 202) 37%, rgb(123, 249, 236) 100%);
+  border-color: #10c4c4f6 !important;
+  border-width: 5px !important;
 }
 
 .btn-outline-notifiarr {
@@ -169,4 +180,64 @@ input[type='checkbox']:checked {
 input[type='radio'],
 input[type='checkbox'] {
   border-color: #3cd2a5 !important;
+}
+
+/* Toast styles. Used in includes/util.ts */
+.toast-wrapman {
+  display: flex;
+  align-items: center;
+  --toastColor: 'black';
+  --toastBorderRadius: 12px;
+  --toastBorder: 2px solid darkslategrey;
+}
+
+.success-toast {
+  --toastBackground: #32e1b2f5;
+  --toastBarBackground: #2b9eb0f5;
+}
+
+.warning-toast {
+  --toastBackground: #ffa60bf5;
+  --toastBarBackground: #8f4e04f5;
+}
+
+.failure-toast {
+  --toastColor: 'white' !important;
+  color: white !important;
+  --toastBackground: #972c05f5;
+  --toastBarBackground: #e6622efe;
+}
+
+.dark-mode .toast-wrapman {
+  --toastBorder: 2px solid silver;
+}
+
+/* Svelte Select styles. */
+.svelte-select {
+  --background: var(--bs-body-bg);
+  --border-radius: var(--bs-border-radius);
+  --border: var(--bs-border-width) solid var(--bs-border-color);
+  --clear-icon-color: var(--bs-danger);
+  --multi-item-active-outline: var(--bs-border-width) solid var(--bs-border-color);
+  --multi-item-outline: var(--bs-border-width) solid var(--bs-border-color);
+  --multi-item-bg: var(--bs-secondary-bg);
+  --multi-item-border-radius: var(--bs-border-radius);
+  --multi-item-clear-icon-color: var(--bs-warning);
+  --multi-item-color: var(--bs-secondary-color);
+  --item-hover-bg: var(--bs-body-bg);
+  --item-hover-color: var(--bs-body-color);
+  --item-color: var(--bs-secondary-color);
+  --list-background: var(--bs-secondary-bg);
+  --list-border: var(--bs-border-width) solid var(--bs-border-color);
+  --list-border-radius: var(--bs-border-radius);
+  --border-focused: 3px solid #3cd2a5;
+  --border-hover: var(--bs-border-width) solid var(--bs-border-color);
+  --list-shadow: 0 0 5px #2fa582;
+}
+
+/* Disable the default focus styles because they appear in the wrong place. */
+.svelte-select input:focus,
+.svelte-select input:active {
+  outline: 0 !important;
+  box-shadow: 0 0 0 0 !important;
 }

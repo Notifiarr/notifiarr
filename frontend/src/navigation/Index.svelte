@@ -48,7 +48,11 @@
     <div transition:slide style="overflow: visible">
       <Card color="warning" theme={$theme} class="toggle-card mb-2 p-0" outline>
         <Button size="sm" class="toggle-button my-0" onclick={toggleSidebar}>
-          {sidebarOpen ? `✕ ${$_('phrases.HideMenu')}` : `☰ ${$_('phrases.ShowMenu')}`}
+          {#if sidebarOpen}
+            <T id="buttons.HideMenu" />
+          {:else}
+            <T id="buttons.ShowMenu" />
+          {/if}
         </Button>
       </Card>
     </div>

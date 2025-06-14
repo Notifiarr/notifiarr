@@ -8,7 +8,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
 	"regexp"
 	"strings"
 	"time"
@@ -42,7 +41,17 @@ func (c *Command) Setup() {
 		c.Hash = hex.EncodeToString(hash.Sum(nil))
 	}
 
+	if err := c.SetupRegexpArgs(); err != nil {
+		mnd.Log.Errorf("Command Setup Failed: %v", err)
+		c.disable = true //nolint:wsl
+	}
+
 	c.Args = len(c.args)
+
+	c.ArgValues = make([]string, c.Args)
+	for idx := range c.args {
+		c.ArgValues[idx] = c.args[idx].String()
+	}
 
 	if c.Timeout.Duration == 0 {
 		c.Timeout.Duration = defaultTimeout
@@ -174,22 +183,17 @@ func (c *Command) exec(ctx context.Context, input *common.ActionInput) (*bytes.B
 		shell:        c.Shell,
 	}
 
-	cmd, err := builder.getCmd(ctx)
+	args, cmd, err := builder.getCmd(ctx)
 	if err != nil {
 		return nil, 0, err
 	}
 
 	var out bytes.Buffer
-
-	if cmd.Stdout != nil {
-		cmd.Stdout = io.MultiWriter(&out, cmd.Stdout)
-	}
-
-	if cmd.Stderr != nil {
-		cmd.Stderr = io.MultiWriter(&out, cmd.Stderr)
-	}
-
+	cmd.Stdout = &out
+	cmd.Stderr = &out
+	c.lastCmd = strings.Join(args, " ")
 	start := time.Now()
+
 	if err := cmd.Run(); err != nil {
 		return &out, time.Since(start), fmt.Errorf(`running cmd %s: %w`, cmd.Args, err)
 	}

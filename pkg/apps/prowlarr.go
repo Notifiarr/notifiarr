@@ -18,8 +18,8 @@ func (a *Apps) prowlarrHandlers() {
 	a.HandleAPIpath(starr.Prowlarr, "/notification", prowlarrAddNotification, "POST")
 }
 
-func getProwlarr(r *http.Request) *prowlarr.Prowlarr {
-	return r.Context().Value(starr.Prowlarr).(*prowlarr.Prowlarr) //nolint:forcetypeassert
+func getProwlarr(r *http.Request) Prowlarr {
+	return r.Context().Value(starr.Prowlarr).(Prowlarr) //nolint:forcetypeassert
 }
 
 type Prowlarr struct {

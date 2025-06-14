@@ -16,13 +16,12 @@
   import Input from '../../includes/Input.svelte'
   import { _ } from '../../includes/Translate.svelte'
   import Footer from '../../includes/Footer.svelte'
-  import { onMount } from 'svelte'
   import Header from '../../includes/Header.svelte'
 
   // Local state that syncs with profile store.
-  const c = $state({ ...$profile.config })
+  const c = $derived({ ...$profile.config })
   // Convert array to newline-separated string for textarea
-  let extraKeys = $state($profile.config.extraKeys?.join('\n') ?? '')
+  let extraKeys = $derived($profile.config.extraKeys?.join('\n') ?? '')
   const rows = $derived(
     extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length,
   )
@@ -31,9 +30,6 @@
     c.extraKeys = extraKeys.split(/\s+/).filter(key => key.trim() !== '')
     profile.writeConfig(c)
   }
-
-  // Clear the status messages when the component unmounts.
-  onMount(() => () => profile.clearStatus())
 </script>
 
 <Header {page} badge={$_('phrases.Version', { values: { version: c.version } })} />
@@ -176,7 +172,7 @@
   <Row>
     <Col md={4}>
       <Input
-        id="config.services.enabled"
+        id="config.services.disabled"
         type="select"
         bind:value={c.services!.disabled}
         original={$profile.config.services?.disabled} />

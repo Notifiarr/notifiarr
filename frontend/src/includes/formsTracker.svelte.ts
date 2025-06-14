@@ -41,7 +41,7 @@ export type App<T> = {
    * @param index - The index of the instance.
    * @returns The feedback of the field.
    */
-  validator?: (id: string, value: any, index: number) => string
+  validator?: (id: string, value: any, index: number, instances: T[]) => string
 }
 
 /**
@@ -112,16 +112,13 @@ export class FormListTracker<T> {
   /** Reset a single instance to the original values. Call this when reset button is clicked. */
   public resetForm = (index: number) => {
     this.instances[index] = deepCopy(this.original[index] ?? this.app.empty!)
-    Object.keys(this.instances[index] ?? {}).forEach(k => {
-      this.validate(k, this.instances[index]?.[k as keyof T], index)
-    })
   }
 
   /** Validate all instances. Call this after a form has been submitted to re-validate any backend changes. */
   private validateAll = () => {
     this.instances.forEach((m, i) => {
       Object.keys(m ?? {}).forEach(k => {
-        this.validate(k, m?.[k as keyof T], i)
+        this.validate(this.app.id + '.' + k, m?.[k as keyof T], i)
       })
     })
   }
@@ -141,6 +138,8 @@ export class FormListTracker<T> {
    */
   public validate = (id: string, value: any, index: number): string => {
     if (!this.feedback[index]) this.feedback[index] = {}
-    return (this.feedback[index][id] = this.app.validator?.(id, value, index) ?? '')
+    this.feedback[index][id] =
+      this.app.validator?.(id, value, index, this.instances) ?? ''
+    return this.feedback[index][id]
   }
 }

@@ -50,24 +50,24 @@ const (
 
 // Config represents the data in our config file.
 type Config struct {
-	HostID     string                    `json:"hostId"      toml:"host_id"       xml:"host_id"       yaml:"hostId"`
-	UIPassword CryptPass                 `json:"uiPassword"  toml:"ui_password"   xml:"ui_password"   yaml:"uiPassword"`
-	BindAddr   string                    `json:"bindAddr"    toml:"bind_addr"     xml:"bind_addr"     yaml:"bindAddr"`
-	SSLCrtFile string                    `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
-	SSLKeyFile string                    `json:"sslKeyFile"  toml:"ssl_key_file"  xml:"ssl_key_file"  yaml:"sslKeyFile"`
-	Upstreams  []string                  `json:"upstreams"   toml:"upstreams"     xml:"upstreams"     yaml:"upstreams"`
-	AutoUpdate string                    `json:"autoUpdate"  toml:"auto_update"   xml:"auto_update"   yaml:"autoUpdate"`
-	UnstableCh bool                      `json:"unstableCh"  toml:"unstable_ch"   xml:"unstable_ch"   yaml:"unstableCh"`
-	Timeout    cnfg.Duration             `json:"timeout"     toml:"timeout"       xml:"timeout"       yaml:"timeout"`
-	Retries    int                       `json:"retries"     toml:"retries"       xml:"retries"       yaml:"retries"`
-	Snapshot   *snapshot.Config          `json:"snapshot"    toml:"snapshot"      xml:"snapshot"      yaml:"snapshot"`
-	Services   *services.Config          `json:"services"    toml:"services"      xml:"services"      yaml:"services"`
-	Service    []*services.ServiceConfig `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
-	EnableApt  bool                      `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
-	WatchFiles []*filewatch.WatchFile    `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
-	Endpoints  []*epconfig.Endpoint      `json:"endpoints"   toml:"endpoint"      xml:"endpoint"      yaml:"endpoints"`
-	Commands   []*commands.Command       `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
-	Version    uint                      `json:"version"     toml:"version"       xml:"version"       yaml:"version"`
+	HostID     string                   `json:"hostId"      toml:"host_id"       xml:"host_id"       yaml:"hostId"`
+	UIPassword CryptPass                `json:"uiPassword"  toml:"ui_password"   xml:"ui_password"   yaml:"uiPassword"`
+	BindAddr   string                   `json:"bindAddr"    toml:"bind_addr"     xml:"bind_addr"     yaml:"bindAddr"`
+	SSLCrtFile string                   `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
+	SSLKeyFile string                   `json:"sslKeyFile"  toml:"ssl_key_file"  xml:"ssl_key_file"  yaml:"sslKeyFile"`
+	Upstreams  []string                 `json:"upstreams"   toml:"upstreams"     xml:"upstreams"     yaml:"upstreams"`
+	AutoUpdate string                   `json:"autoUpdate"  toml:"auto_update"   xml:"auto_update"   yaml:"autoUpdate"`
+	UnstableCh bool                     `json:"unstableCh"  toml:"unstable_ch"   xml:"unstable_ch"   yaml:"unstableCh"`
+	Timeout    cnfg.Duration            `json:"timeout"     toml:"timeout"       xml:"timeout"       yaml:"timeout"`
+	Retries    int                      `json:"retries"     toml:"retries"       xml:"retries"       yaml:"retries"`
+	Snapshot   snapshot.Config          `json:"snapshot"    toml:"snapshot"      xml:"snapshot"      yaml:"snapshot"`
+	Services   services.Config          `json:"services"    toml:"services"      xml:"services"      yaml:"services"`
+	Service    []services.ServiceConfig `json:"service"     toml:"service"       xml:"service"       yaml:"service"`
+	EnableApt  bool                     `json:"apt"         toml:"apt"           xml:"apt"           yaml:"apt"`
+	WatchFiles []*filewatch.WatchFile   `json:"watchFiles"  toml:"watch_file"    xml:"watch_file"    yaml:"watchFiles"`
+	Endpoints  []*epconfig.Endpoint     `json:"endpoints"   toml:"endpoint"      xml:"endpoint"      yaml:"endpoints"`
+	Commands   []*commands.Command      `json:"commands"    toml:"command"       xml:"command"       yaml:"commands"`
+	Version    uint                     `json:"version"     toml:"version"       xml:"version"       yaml:"version"`
 	logs.LogConfig
 	apps.AppsConfig
 }
@@ -80,15 +80,12 @@ func NewConfig() *Config {
 				URLBase: "/",
 			},
 		},
-		Services: &services.Config{
+		Services: services.Config{
 			Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
 		},
 		BindAddr: mnd.DefaultBindAddr,
-		Snapshot: &snapshot.Config{
+		Snapshot: snapshot.Config{
 			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
-			Plugins: snapshot.Plugins{
-				Nvidia: &snapshot.NvidiaConfig{},
-			},
 		},
 		LogConfig: logs.LogConfig{
 			LogFiles:  mnd.DefaultLogFiles,
@@ -180,7 +177,7 @@ func (c *Config) Setup(flag *Flags) (*SetupResult, error) {
 	c.fixConfig()
 	c.Services.Fix()
 
-	result.Services = services.New(c.Services)
+	result.Services = services.New(&c.Services)
 	if err := result.Services.Add(c.Service); err != nil {
 		return nil, fmt.Errorf("service checks: %w", err)
 	}
@@ -189,6 +186,9 @@ func (c *Config) Setup(flag *Flags) (*SetupResult, error) {
 	if result.Apps, err = apps.New(&c.AppsConfig); err != nil {
 		return nil, fmt.Errorf("setting up app: %w", err)
 	}
+
+	// Add apps to the service checks.
+	result.Services.AddApps(result.Apps, c.Snapshot.MySQL)
 
 	// Make sure the port is not in use before starting the web server.
 	c.BindAddr, err = CheckPort(c.BindAddr)
@@ -243,7 +243,7 @@ func (c *Config) setup(flag *Flags, svc *services.Services, apps *apps.Apps) *tr
 	}
 	triggers := triggers.New(&triggers.Config{
 		Apps:       apps,
-		Snapshot:   c.Snapshot,
+		Snapshot:   &c.Snapshot,
 		WatchFiles: c.WatchFiles,
 		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
 		Commands:   c.Commands,

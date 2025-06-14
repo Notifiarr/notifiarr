@@ -5,46 +5,29 @@ import { _ } from './Translate.svelte'
 /** Remove a prefix from a string. */
 export const ltrim = (str: string, prefix: string) =>
   str.slice(str.startsWith(prefix) ? prefix.length : 0)
-
 /** Remove a suffix from a string. */
 export const rtrim = (str: string, suffix: string) =>
   str.endsWith(suffix) ? str.slice(0, str.length - suffix.length) : str
 
 /** Show a success toast. */
-export const success = (m: string) =>
-  toast.push(m, {
-    theme: {
-      '--toastBackground': 'green',
-      '--toastColor': 'white',
-      '--toastBarBackground': 'olive',
-    },
-  })
-
+export const success = (m: string) => {
+  const e = ['🎉', '🌟', '⭐️', '🏆', '🎯', '☑️', '🎊', '🎈', '🎁', '🏅', '👍', '👏']
+  const r = Math.floor(Math.random() * e.length)
+  toast.push(e[r] + ' &nbsp;' + m, { classes: ['toast-wrapman', 'success-toast'] })
+}
+// Classes for these are in assets/app.css.
 /** Show a warning toast. */
 export const warning = (m: string) =>
-  toast.push(m, {
-    theme: {
-      '--toastBackground': 'orange',
-      '--toastColor': 'white',
-      '--toastBarBackground': 'black',
-    },
-  })
-
+  toast.push('⚠️ &nbsp;' + m, { classes: ['toast-wrapman', 'warning-toast'] })
 /** Show a failure toast. */
 export const failure = (m: string) =>
-  toast.push(m, {
-    theme: {
-      '--toastBackground': 'red',
-      '--toastColor': 'white',
-      '--toastBarBackground': 'royalblue',
-    },
-  })
+  toast.push('⚠️ &nbsp;' + m, { classes: ['toast-wrapman', 'failure-toast'] })
 
 /** Convert a date into a human readable string of how long ago it was. */
 export function since(date: Date | string): string {
   const now = new Date().getTime()
   const then = typeof date === 'string' ? new Date(date).getTime() : date.getTime()
-  return age(now - then, false)
+  return age(now - then, true)
 }
 
 /** age converts a milliseconds counter into human readable: 13h 5m 45s */
@@ -93,7 +76,7 @@ export function formatBytes(bytes: number): string {
   }
 
   return get(_)('words.bytes.short.' + units[unitIndex], {
-    values: { bytes: bytes.toFixed(2) },
+    values: { bytes: bytes.toFixed(unitIndex === 0 ? 0 : 1) },
   })
 }
 
@@ -123,7 +106,7 @@ export const deepEqual = (obj1: any, obj2: any): boolean => {
   return true
 }
 
-/** Deep copy an object. */
+/** Deep copy an object. Works fine on our reasonably simple app config. */
 export const deepCopy = <T>(obj: T): T => {
   if (typeof obj !== 'object' || obj === null) {
     return obj
@@ -153,4 +136,14 @@ export const escapeHtml = (unsafe: string) => {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;')
+}
+
+/** Count the items nested in an object, or the number of keys in an object. */
+export const mapLength = (map: Record<string, any | null> | undefined): number => {
+  if (!map) return 0
+  let count = 0
+  for (const key in map) {
+    count += (map[key]?.length ?? Object.keys(map[key] ?? {}).length) || 1
+  }
+  return count
 }

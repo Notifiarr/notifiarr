@@ -40,14 +40,14 @@
       timeout: '10s',
       interval: '5m0s',
     },
-    validator: (id: string, value: any, index: number) => {
+    validator: (id: string, value: any, index: number, instances: MySQLConfig[]) => {
       if (id.endsWith('.username'))
         return value === '' ? $_('phrases.UsernameMustNotBeEmpty') : ''
-      return validate(id, value, index, $profile.config.snapshot?.mysql ?? [])
+      return validate(id, value, index, instances)
     },
     merge: (index: number, form: MySQLConfig) => {
       const c = deepCopy($profile.config)
-      c.snapshot!.mysql![index] = form
+      c.snapshot.mysql![index] = form
       return c
     },
   }
@@ -57,25 +57,27 @@
     id: page.id + '.Nvidia',
     logo: nvidiaLogo,
     hidden: ['deletes'],
+    empty: { busIDs: [''], smiPath: '', disabled: false },
     merge: (index: number, form: NvidiaConfig) => {
       const c = deepCopy($profile.config)
-      c.snapshot!.nvidia = form
+      c.snapshot.nvidia = form
       return c
     },
   }
 
+  if (!$profile.config.snapshot.nvidia.busIDs) {
+    $profile.config.snapshot.nvidia.busIDs = ['']
+  }
+
   let flt = $derived({
-    MySQL: new FormListTracker($profile.config.snapshot?.mysql ?? [], mysqlApp),
-    Nvidia: new FormListTracker(
-      [$profile.config.snapshot?.nvidia ?? ({} as NvidiaConfig)],
-      nvidiaApp,
-    ),
+    MySQL: new FormListTracker($profile.config.snapshot.mysql ?? [], mysqlApp),
+    Nvidia: new FormListTracker([$profile.config.snapshot.nvidia], nvidiaApp),
   })
 
   async function submit() {
     const c = { ...$profile.config }
-    c.snapshot!.mysql = flt.MySQL.instances as MySQLConfig[]
-    c.snapshot!.nvidia = flt.Nvidia.instances[0]! as NvidiaConfig
+    c.snapshot.mysql = flt.MySQL.instances as MySQLConfig[]
+    c.snapshot.nvidia = flt.Nvidia.instances[0]
     await profile.writeConfig(c)
   }
 
@@ -89,16 +91,17 @@
 <CardBody class="pt-0 mt-0">
   <Instances flt={flt.MySQL} Child={Instance}>
     {#snippet headerActive(index)}
-      {index + 1}. {flt.MySQL.original[index]?.name}
+      {index + 1}. {flt.MySQL.original?.[index]?.name}
     {/snippet}
     {#snippet headerCollapsed(index)}
-      {flt.MySQL.original[index]?.host}
+      {flt.MySQL.original?.[index]?.host}
     {/snippet}
   </Instances>
   <InstanceHeader flt={flt.Nvidia} />
   <Instance
-    bind:form={flt.Nvidia.instances[0]!}
-    original={flt.Nvidia.original[0]!}
+    index={0}
+    bind:form={flt.Nvidia.instances[0]}
+    original={flt.Nvidia.original[0]}
     app={nvidiaApp} />
 </CardBody>
 

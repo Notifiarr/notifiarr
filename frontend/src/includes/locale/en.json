@@ -1,6 +1,7 @@
 {
   "words": {
     "select-option": {
+      "Off": "Off",
       "Enabled": "Enabled",
       "Disabled": "Disabled",
       "minute": "minute",
@@ -19,8 +20,8 @@
     },
     "instance-options": {
       "interval": {
-        "label": "Service Check Interval",
-        "description": "How often to service-check the instance."
+        "label": "Health Check Interval",
+        "description": "How often to check the instance's reachability."
       },
       "timeout": {
         "label": "Request Timeout",
@@ -38,6 +39,15 @@
       }
     },
     "clock": {
+      "days": {
+        "Sunday": "Sunday",
+        "Monday": "Monday",
+        "Tuesday": "Tuesday",
+        "Wednesday": "Wednesday",
+        "Thursday": "Thursday",
+        "Friday": "Friday",
+        "Saturday": "Saturday"
+      },
       "short": {
         "ms": "{milliseconds}ms",
         "s": "{seconds}s",
@@ -69,7 +79,13 @@
     "SaveConfiguration": "Save Configuration",
     "ResetForm": "Reset Form",
     "NoStayHere": "No! Stay here",
-    "YesDeleteMyChanges": "Yes! Delete my changes"
+    "YesDeleteMyChanges": "Yes! Delete my changes",
+    "Execute": "Execute",
+    "HideMenu": "Hide Menu",
+    "ShowMenu": "Show Menu",
+    "ShowOutput": "Show Output",
+    "HideOutput": "Hide Output",
+    "RefreshOutput": "Refresh Output"
   },
   "RegexTester": {
     "RegularExpressionTester": "Regular Expression Tester",
@@ -94,6 +110,7 @@
     "LoggingIn": "Logging in...",
     "LoggedIn": "Logged in!",
     "Loading": "Loading...",
+    "UpdateBackend": "Update Backend",
     "BackEndUpdated": "Back-end updated {timeDuration} ago.",
     "UpdatingBackEnd": "Updating back-end...",
     "FailedToUpdateBackEnd": "Failed to update back-end: {error}",
@@ -105,8 +122,6 @@
     "Every12Hours": "Every 12 hours",
     "Every6Hours": "Every 6 hours",
     "Every3Hours": "Every 3 hours",
-    "HideMenu": "Hide Menu",
-    "ShowMenu": "Show Menu",
     "Reloading": "Reloading...",
     "FailedToReload": "Failed to reload: {error}",
     "ConfirmReload": "Confirm Reload",
@@ -170,9 +185,9 @@
       "MediaApps": "Manage media players and related services.",
       "SnapshotApps": "Most snapshot configurations are on the Notifiarr.com website. Below you will find Application 'plugin' settings for the snapshot feature.",
       "FileWatcher": "Watch for file changes and trigger actions! This Notifiarr client can watch (log) files for lines matching a regular expression. This is similar to <code>tail -f file | grep string</code> and allows you to send notifications when, for instance, a log file has a new line written that matches a regular expression.",
-      "Endpoints": "Configure relay endpoints, timers and triggers.",
+      "Endpoints": "Configure relay endpoint URLs and their schedules.",
       "Commands": "Set up and execute custom commands and scripts.",
-      "Services": "Set up and monitor network devices and services.",
+      "Services": "The Notifiarr client application is capable of monitoring services via HTTP checks, TCP port checks or process running (and not running) checks. <b>The client service checks work with the Notifiarr.com Network Integration.</b>",
       "Triggers": "View and execute configured triggers.",
       "Integrations": "View action statistics and for all integrations.",
       "Monitoring": "View service and network health.",
@@ -286,7 +301,7 @@
       "timeout": { "label": "Timeout", "description": "Timeout for snapshot operations." }
     },
     "services": {
-      "enabled": {
+      "disabled": {
         "label": "Service Checks",
         "description": "Enable or disable service checks.",
         "tooltip": "Disable or enable monitoring all network and service checks right here."
@@ -909,6 +924,7 @@
       "placeholder": "/var/log/nginx/access.log",
       "required": "Path is required"
     },
+    "disabled": { "label": "Active", "description": "Disable this watcher." },
     "regex": {
       "label": "Regular Expression",
       "description": "Regex to match against the file.",
@@ -940,6 +956,323 @@
       "label": "Log Matches",
       "description": "Write matched lines to notifiarr log.",
       "tooltip": "Enabling this will write the matched line to the notifiarr log. This is good for debugging, but may be noisy."
+    }
+  },
+  "Commands": {
+    "title": "Command List",
+    "addInstance": "Create Command",
+    "DeleteCommand": "Delete Command",
+    "notes": "Commands are executed by the client (the backend). They can be triggered from this interface or from a chat server. If you modify a command you must save the configuration before you can run it from the Web UI.",
+    "Executions": "Executions: {count}",
+    "Failures": "Failures: {count}",
+    "LastExecution": "Last Execution",
+    "neverExecuted": "never executed",
+    "enterCommandArguments": "Enter Command Arguments",
+    "commandRequiresArguments": "This command requires {count, plural, one {one argument. Enter it below.} other {# arguments. Enter them below.}}",
+    "noOutput": "No output yet. Try executing the command then click refresh.",
+    "refreshed": "refreshed {timeDuration} ago",
+    "regexMismatch": "Argument does not match regular expression.",
+    "name": {
+      "label": "Name",
+      "description": "Name of the command. Shows up in the log and in notifications.",
+      "placeholder": "custom name for notifications"
+    },
+    "command": {
+      "label": "Command",
+      "description": "Command to run.",
+      "placeholder": "echo 'Hello, world!'",
+      "tooltip": "This is the command that will execute when triggered.<br />Click the double-check icon to run the command right now. After it finishes, click refresh and show output to see the results.<br /><br />Check the box to wrap the command in a shell. On Windows, this will run the command with <code>cmd.exe</code> and on other operating systems, it will run the command with <code>/bin/bash</code>. This is useful for commands that require shell features like pipes and redirects. Custom positional arguments may be defined with this format: <code>({regex})</code> - that is a regular expression wrapped in curly braces and parentheses, ie. <code>({[a-z]})</code>. These arguments may be filled in by the person running the command; either in this Web UI or on your chat server. If a command has an argument, it is required; if it has multiple arguments, they're all required.<br /><br /> <h5>Examples</h5>Command using two arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />The above command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>.<br /> This command can be used to curl websites from within the scratch Docker container: <code>/notifiarr --curl ({https?://[^ ;]+})</code>"
+    },
+    "notify": {
+      "label": "Notify",
+      "description": "Send notification after command is executed.",
+      "tooltip": "Receive a notification containing the command output."
+    },
+    "log": {
+      "label": "Log Output",
+      "description": "Log command output.",
+      "tooltip": "Log the command output to this client's application log."
+    },
+    "timeout": {
+      "label": "Maximum Run Duration",
+      "description": "How long the command may run before termination."
+    }
+  },
+  "scheduler": {
+    "title": "Schedule",
+    "daysOfWeek": "Days of week",
+    "daysOfMonth": "Days of month",
+    "frequency": "Frequency",
+    "selectAFrequency": "Select a frequency to create a schedule.",
+    "AddATime": "Add a time",
+    "empty": "If you want to run every day, select the Daily Frequency.",
+    "required": {
+      "daysOfWeek": "Must select at least one day of the week.",
+      "daysOfMonth": "Must select at least one day of the month.",
+      "atTimes": "Must select at least one time to run the schedule."
+    },
+    "ops": {
+      "noSchedule": "No Schedule",
+      "minutely": "Minutely",
+      "hourly": "Hourly",
+      "daily": "Daily",
+      "weekly": "Weekly",
+      "monthly": "Monthly"
+    },
+    "times": {
+      "noneSelected": "(none selected)",
+      "noDaysSelected": "(no days selected)",
+      "everyMinute": "{count, plural, one {One time} other {# times}} every minute at seconds {times}",
+      "everyHour": "{count, plural, one {One time} other {# times}} every hour at minute:seconds {times}",
+      "everyDay": "{count, plural, one {One time} other {# times}} every day at times {times}",
+      "everyWeek": "{count, plural, one {One time} other {# times}} every week on {daysOfWeek} at times {times}",
+      "everyMonth": "{count, plural, one {One time} other {# times}} every month on days {daysOfMonth} at times {times}"
+    }
+  },
+  "Endpoints": {
+    "title": "Relay URLs",
+    "addInstance": "Add Relay URL",
+    "DeleteEndpoint": "Delete URL",
+    "badge": {
+      "header": "{count, plural, one {1 header} other {# headers}}",
+      "query": "{count, plural, one {1 query} other {# queries}}",
+      "body": "{count, plural, one {1 character} other {# characters}}"
+    },
+    "name": {
+      "label": "Name",
+      "description": "Name of the relay URL.",
+      "placeholder": "custom name for notifications"
+    },
+    "template": {
+      "label": "Payload Template",
+      "description": "Parse payload into this template.",
+      "placeholder": "pihole",
+      "tooltip": "The template is used by the website to figure out how to turn the payload into a chat notification. Find a list of available templates or create your own on <a href='https://notifiarr.com/' target='_blank'>the website</a> @ <code>Integrations: Endpoints</code>.",
+      "required": "A template is required. Enter 'test' if you are not sure what to enter."
+    },
+    "timeout": {
+      "label": "Request Timeout",
+      "description": "How long to wait for the HTTP request to complete."
+    },
+    "method": { "label": "Method", "description": "HTTP Request" },
+    "url": {
+      "label": "Relay URL",
+      "description": "URL for remote service that gets relayed to the website.",
+      "placeholder": "https://pihole.myhome.lan/api/stats"
+    },
+    "header": {
+      "label": "HTTP Headers",
+      "description": "HTTP Request Headers, 1 per line.",
+      "placeholder": "Content-Type: application/json",
+      "tooltip": "The HTTP request headers are sent to the URL as is. The format must be <code>key: value</code> per line. The space and colon are required. Invalid values are ignored and extra spaces are trimmed."
+    },
+    "query": {
+      "label": "Query Parameters",
+      "description": "Query parameters to add to the URL, 1 per line.",
+      "placeholder": "apiKey=1234567890",
+      "tooltip": "The query parameters are appended to the URL. The format must be <code>key=value</code> per line. Invalid values are ignored and extra spaces are trimmed. Do not include the <code>?</code> character or ampersand (<code>&</code>) at the beginning of a line. Keys and values are automatically URL encoded."
+    },
+    "body": {
+      "label": "Request Body",
+      "description": "The body sent to the URL for POST, PUT and PATCH requests.",
+      "placeholder": "{\"message\": \"Hello, world!\"}"
+    }
+  },
+  "metrics": {
+    "CountersReset": "The counters on this page reset when the application exits.",
+    "ApplicationUptime": "Application Uptime: &nbsp;<b>{timeDuration}</b>",
+    "logFiles": {
+      "title": "Log Files",
+      "description": "Log file counters.",
+      "empty": "No log files found."
+    },
+    "apiHits": {
+      "title": "API Requests",
+      "description": "Incoming API request counters.",
+      "empty": "No API requests yet."
+    },
+    "httpRequests": {
+      "title": "HTTP Requests",
+      "description": "Incoming HTTP request statistics. This includes websocket tunnel requests.",
+      "empty": "No HTTP requests yet."
+    },
+    "website": {
+      "title": "Website Requests",
+      "description": "Requests to Notifiarr.com.",
+      "empty": "No website requests yet."
+    },
+    "fileWatcher": {
+      "title": "File Watcher",
+      "description": "File watcher statistics.",
+      "empty": "No file watchers configured."
+    },
+    "apps": {
+      "title": "Application Requests",
+      "description": "Application request statistics. These counters do not include service checks.",
+      "empty": "No application requests yet."
+    },
+    "timerEvents": {
+      "title": "Triggered Events",
+      "description": "Triggers and timers executed.",
+      "empty": "No triggered events yet."
+    }
+  },
+  "monitoring": {
+    "ConfigureServices": "Configure the service checks displayed on the Services page.",
+    "ChecksDisabled": "Service Checks: Disabled",
+    "ChecksStopped": "Service Checks: Stopped",
+    "EnableOnConfig": "Enable service checks on the Configuration page.",
+    "StartChecks": "Start Service Checks",
+    "StopChecks": "Stop Service Checks",
+    "stopFailed": "Failed to stop service checks.",
+    "startFailed": "Failed to start service checks.",
+    "recheckFailed": "Failed to recheck service.",
+    "checkInitiated": "Service check initiated.",
+    "nextRefresh": "Next refresh in {timeDuration}.",
+    "refreshInterval": "Refresh Interval",
+    "cardsView": "Cards View",
+    "classicView": "Classic View",
+    "hideAllOutputs": "Hide All Outputs",
+    "showAllOutputs": "Show All Outputs",
+    "check": {
+      "name": "Service Name",
+      "state": { "short": "State", "title": "Service Check Counters" },
+      "typeExpect": "Type/Expect",
+      "last": {
+        "short": "Last",
+        "title": "Last Check: {timeDuration} ago",
+        "tooltip": "How long ago this service was checked.",
+        "description": "Service last checked at"
+      },
+      "since": {
+        "short": "Since",
+        "title": "Time in state: {timeDuration}",
+        "tooltip": "How long the service has been in this state.",
+        "description": "Service has been in this state since"
+      },
+      "interval": {
+        "short": "Interval",
+        "title": "Check Interval",
+        "tooltip": "How often this service is checked."
+      },
+      "output": "Last Check Output"
+    }
+  },
+  "ServiceChecks": {
+    "title": "Health Checks",
+    "DeleteCheck": "Delete Health Check",
+    "addInstance": "Create Health Check",
+    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead.",
+    "configLink": "Disable and Enable service health checks in whole on the Configuration page.",
+    "monitoringLink": "View running service health information on the Monitoring page.",
+    "processListLink": "View the running process list here.",
+    "timeout": {
+      "label": "Check Timeout",
+      "description": "How long to wait for the service check to complete."
+    },
+    "interval": {
+      "label": "Check Interval",
+      "description": "How often to check the service."
+    },
+    "name": {
+      "label": "Check Name",
+      "description": "Unique name for the service being monitored.",
+      "placeholder": "custom name for notifications",
+      "tooltip": "The name of the service being monitored. This is used to identify the service in notifications. Each service must have a unique name."
+    },
+    "type": {
+      "label": "Check Type",
+      "description": "The type of check to perform.",
+      "tooltip": "The Process check type allows you to monitor that a process is running. The HTTP URL check type allows you to monitor a URL for reachability. The TCP Port check type allows you to monitor a TCP port's connectivity. Both Ping check types allow monitoring an IP or host for reachability.",
+      "options": {
+        "process": "Process Check",
+        "http": "HTTP URL Check",
+        "tcp": "TCP Port Reachability",
+        "ping": "UDP Ping Check",
+        "icmp": "ICMP Ping Check"
+      }
+    },
+    "url": {
+      "label": "URL",
+      "description": "URL of the service being monitored.",
+      "placeholder": "https://my.site"
+    },
+    "http": {
+      "headers": {
+        "label": "HTTP Headers",
+        "description": "HTTP request headers, 1 per line.",
+        "placeholder": "Content-Type: application/json"
+      },
+      "codes": {
+        "label": "Acceptable Response Codes",
+        "description": "Any code here is considered acceptable. If the service responds with another code a notification is generated.",
+        "required": "At least one expected response code is required."
+      }
+    },
+    "tcp": {
+      "value": {
+        "label": "Host and Port",
+        "description": "Enter host:port or host:ip to check connectivity.",
+        "placeholder": "127.0.0.1:22",
+        "tooltip": "An IP address is generally recommended. If you also want to test DNS, use a hostname. The format is <code>host:port</code>. There should be no spaces or extra characters.",
+        "required": "A host and port separated with a colon are required."
+      }
+    },
+    "ping": {
+      "value": {
+        "label": "Host or IP",
+        "description": "Enter host or ip to check reachability.",
+        "placeholder": "127.0.0.1",
+        "tooltip": "An IP address is generally recommended. If you also want to test DNS, use a hostname. The format is <code>host</code> or <code>10.11.12.13</code>. There should be no spaces or extra characters. To allow UDP checks to work on Linux, you must enable them with this command: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. To allow ICMP checks in Linux, you must give the notifiarr binary capabilities with this command: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Easiest way to make both work in Docker is to enable privileged mode, but you may set capabailities too.",
+        "required": "A host or IP address is required."
+      },
+      "count": {
+        "label": "Count",
+        "description": "Number of packets to send.",
+        "placeholder": "10",
+        "required": "A count of packets greater than zero is required."
+      },
+      "minimum": {
+        "label": "Minimum",
+        "description": "Minimum number of packets that must be received.",
+        "placeholder": "10",
+        "required": "A minimum number of packets greater than zero is required."
+      },
+      "interval": {
+        "label": "Interval",
+        "description": "Interval in milliseconds between packets.",
+        "placeholder": "100"
+      }
+    },
+    "process": {
+      "value": {
+        "label": "Process Match",
+        "description": "The name of the process to check.",
+        "placeholder": "notifiarr",
+        "tooltip": "The name of the process to check. This is the name of the process as it appears in the process list. A wildcard string match is used on both ends of the value provided, so the more specific your arguments the better the match will be.",
+        "required": "A process name is required."
+      },
+      "running": {
+        "label": "Running",
+        "description": "Send an alert if the process is running.",
+        "tooltip": "Selecting this will trigger an unhealthy alert if the process is found running. Select this option if you need a notification when the process starts."
+      },
+      "restarts": {
+        "label": "Restarts",
+        "description": "Send an alert if the process has restarted.",
+        "tooltip": "Selecting this will trigger an unhealthy alert if the process is found to have restarted. Select this option if you need a notification when the PID changes."
+      },
+      "minimum": {
+        "label": "Minimum",
+        "description": "Minimum number of running processes that must match the value.",
+        "required": "A minimum number of processes greater than zero is required.",
+        "tooltip": "If you enter 2, then you will receive a notification if there are fewer than 2 processes running. Use this to be alerted if there are too few processes running."
+      },
+      "maximum": {
+        "label": "Maximum",
+        "description": "Maximum number of running processes that may match the value.",
+        "tooltip": "If you enter 2, then you will receive a notification if there are more than 2 processes running. Use this to be alerted if there are too many processes running."
+      }
     }
   }
 }

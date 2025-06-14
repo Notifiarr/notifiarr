@@ -6,8 +6,9 @@
     original: T
     app: App<T>
     validate?: (id: string, value: any) => string
-    index?: number
+    index: number
     reset?: () => void
+    active?: boolean
   }
 </script>
 
@@ -24,7 +25,7 @@
   import { deepEqual } from './util'
   import InstanceHeader from './InstanceHeader.svelte'
   import type { FormListTracker } from './formsTracker.svelte'
-  import type { Component, Snippet } from 'svelte'
+  import type { Component, Snippet, SvelteComponent } from 'svelte'
 
   let {
     flt,
@@ -39,6 +40,10 @@
     headerCollapsed?: Snippet<[number]>
     deleteButton?: string
   } = $props()
+
+  // The child component is binded to this variable.
+  // This is used to call the reset() function of the child component (if it exists).
+  let children: SvelteComponent<ChildProps<any>>[] = $state([])
 </script>
 
 <InstanceHeader {flt} />
@@ -47,7 +52,7 @@
   <div class="instances" transition:slide>
     <Accordion class="mb-2">
       {#each flt.instances as instance, index}
-        {@const changed = !deepEqual(instance, flt.original[index] ?? flt.app.empty)}
+        {@const changed = !deepEqual(instance, flt.original?.[index] ?? flt.app.empty)}
         <div class="accordion-item">
           <AccordionHeader
             onclick={() => (flt.active = index)}
@@ -56,7 +61,7 @@
               {@render headerActive(index)}
               {#if !flt.isValid(index)}
                 <Badge color="danger"><T id="phrases.Invalid" /></Badge>
-              {:else if index + 1 > flt.original.length}
+              {:else if index + 1 > (flt.original?.length ?? 0)}
                 <Badge color="info"><T id="phrases.New" /></Badge>
               {:else if changed}
                 <Badge color="warning"><T id="phrases.Changed" /></Badge>
@@ -76,11 +81,13 @@
               class="accordion-collapse {flt.active === index ? 'd-block' : 'd-none'}">
               <div class="accordion-body" transition:slide={{ duration: 350, axis: 'y' }}>
                 <Child
-                  bind:form={flt.instances[index]!}
-                  original={flt.original[index] ?? flt.app.empty}
+                  bind:this={children[index]}
+                  bind:form={flt.instances[index]}
+                  original={flt.original?.[index] ?? flt.app.empty}
                   app={flt.app}
                   validate={(id, value) => flt.validate(id, value, index)}
-                  {index} />
+                  {index}
+                  active={flt.active === index} />
                 <Button
                   color="danger"
                   class="float-end"
@@ -93,7 +100,7 @@
                   class="float-end me-2"
                   outline
                   disabled={!changed}
-                  onclick={() => flt.resetForm(index)}>
+                  onclick={() => (flt.resetForm(index), children[index]?.reset?.())}>
                   {$_('buttons.ResetForm')}
                 </Button>
                 <div style="clear: both;"></div>

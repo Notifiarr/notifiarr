@@ -25,7 +25,15 @@ class ConfigProfile {
     setInterval(() => (this.now = Date.now()), 1234)
   }
 
-  /** Use refresh to refresh the existing profile data. */
+  private set = (value: Profile) => {
+    this.updated = new Date()
+    // Update local url base in case it changed.
+    // The backend will begin using another url base after the reload.
+    urlbase.set(value.config?.urlbase ?? '/')
+    this.profile.set(value)
+  }
+
+  /** Use refresh to refresh the existing profile data from the backend. */
   public async refresh() {
     const { ok, body } = await getUi('profile')
     if (!ok) throw new Error(body)
@@ -49,7 +57,6 @@ class ConfigProfile {
   public clearStatus() {
     this.status = ''
     this.error = ''
-    this.updated = null
     this.formError = ''
   }
 
@@ -161,14 +168,6 @@ class ConfigProfile {
 
   public subscribe(run: (value: Profile) => void): Unsubscriber {
     return this.profile.subscribe(run)
-  }
-
-  private set(value: Profile) {
-    this.updated = new Date()
-    // Update local url base in case it changed.
-    // The backend will begin using another url base after the reload.
-    urlbase.set(value.config?.urlbase ?? '/')
-    this.profile.set(value)
   }
 }
 

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { Card, CardBody, CardHeader, Table } from '@sveltestrap/sveltestrap'
-  import T, { _ } from '../../includes/Translate.svelte'
-  import Input from '../../includes/Input.svelte'
+  import T, { _ } from './Translate.svelte'
+  import Input from './Input.svelte'
   import { slide } from 'svelte/transition'
-  import { escapeHtml } from '../../includes/util'
+  import { escapeHtml } from './util'
 
   const testRegex = (): string => {
     try {

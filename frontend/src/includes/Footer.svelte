@@ -9,8 +9,9 @@
 <script lang="ts">
   import { Alert, Button, CardFooter, Col, Row, Spinner } from '@sveltestrap/sveltestrap'
   import { profile } from '../api/profile.svelte'
-  import T, { _, time } from './Translate.svelte'
+  import { _ } from './Translate.svelte'
   import { age } from './util'
+  import { onMount } from 'svelte'
 
   type Props = {
     /** The save button runs this function when clicked. */
@@ -44,7 +45,7 @@
     e.preventDefault()
     submitting = true
     submitted = false
-    profile.error = '' // clear the error message
+    profile.clearStatus()
     await submit(e)
     submitting = false
     submitted = true
@@ -52,23 +53,34 @@
     profile.now = successTime.getTime() // speed up the timer display
   }
 
-  function toggle() {
+  const toggle = () => {
     submitted = false
-    if (profile.status) profile.clearStatus()
+    profile.clearStatus()
   }
 
   // These are derived values that are used to display the status messages.
   let color = $derived(
-    profile.formError ? 'danger' : profile.status ? 'warning' : 'success',
+    profile.formError || profile.error
+      ? 'danger'
+      : profile.status
+        ? 'warning'
+        : 'success',
   )
-  let isOpen = $derived(!!(profile.formError || profile.status || submitted))
   let disabled = $derived(submitting || saveDisabled)
   const values = $derived({
     timeDuration: age(profile.now - new Date(successTime ?? new Date()).getTime()),
   })
   let msg = $derived(
-    profile.formError || profile.status || (submitted && $_(successText, { values })),
+    profile.formError ||
+      profile.error ||
+      profile.status ||
+      (submitted && $_(successText, { values })),
   )
+  let isOpen = $derived(!!msg)
+
+  // Clear the status messages when the component unmounts.
+  // This happens on page change.
+  onMount(() => () => toggle())
 </script>
 
 <CardFooter>

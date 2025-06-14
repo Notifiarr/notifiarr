@@ -24,6 +24,7 @@ const empty: WatchFile = {
   pipe: false,
   mustExist: false,
   logMatch: false,
+  disabled: false,
 }
 
 const merge = (index: number, form: WatchFile): Config => {

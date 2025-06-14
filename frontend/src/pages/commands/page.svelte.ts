@@ -1,12 +1,12 @@
 import type { App } from '../../includes/formsTracker.svelte'
-import type { Config } from '../../api/notifiarrConfig'
+import type { Config, MySQLConfig } from '../../api/notifiarrConfig'
 import { get } from 'svelte/store'
 import { _ } from '../../includes/Translate.svelte'
 import { profile } from '../../api/profile.svelte'
 import type { Command } from '../../api/notifiarrConfig'
 import { deepCopy } from '../../includes/util'
-import { faTerminal } from '@fortawesome/sharp-duotone-solid-svg-icons'
-import { faCommand } from '@fortawesome/sharp-duotone-regular-svg-icons'
+import { faTerminal, faCommand } from '@fortawesome/sharp-duotone-solid-svg-icons'
+import { validate } from '../../includes/instanceValidator'
 
 export const page = {
   id: 'Commands',
@@ -24,6 +24,8 @@ const empty: Command = {
   log: false,
   notify: false,
   args: 0,
+  timeout: '10s',
+  command: '',
 }
 
 const merge = (index: number, form: Command): Config => {
@@ -36,21 +38,21 @@ const merge = (index: number, form: Command): Config => {
   return c
 }
 
-const validator = (id: string, value: any): string => {
-  id = id.split('.').pop() ?? id
-  if (id === 'path') {
-    if (!value) return get(_)('FileWatcher.path.required')
-  } else if (id === 'regex') {
-    if (!value) return get(_)('FileWatcher.regex.required')
-  }
-  return ''
+const validator = (
+  id: string,
+  value: any,
+  index: number,
+  instances: Command[],
+): string => {
+  if (id.endsWith('command') && !value) return get(_)('Commands.command.required')
+  return validate(id, value, index, instances)
 }
 
 export const app: App<Command> = {
   name: 'Commands',
   id: 'Commands',
   logo: faCommand,
-  iconProps: { c1: 'cyan', c2: 'violet', d1: 'violet', d2: 'cyan' },
+  iconProps: { c1: 'darksalmon', d1: 'salmon', d2: 'tomato' },
   disabled: [],
   hidden: [],
   empty,

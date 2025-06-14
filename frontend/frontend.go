@@ -91,6 +91,9 @@ func IndexHandler(resp http.ResponseWriter, req *http.Request) {
 		req.URL.Path = path
 	}
 
+	// The frontend uses this cookie to know what path to send API requests to.
+	http.SetCookie(resp, &http.Cookie{Name: "urlbase", Value: URLBase})
+
 	response := &responseWriter{ResponseWriter: resp, Asset: asset}
 	handler.ServeHTTP(response, req)
 
@@ -98,8 +101,6 @@ func IndexHandler(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// The frontend uses this cookie to know what path to send API requests to.
-	http.SetCookie(resp, &http.Cookie{Name: "urlbase", Value: URLBase})
 	resp.Header().Set("Content-Type", "text/html")
 	http.ServeFileFS(resp, req, root, "index.html")
 }
