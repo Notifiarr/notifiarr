@@ -60,6 +60,36 @@ service notifiarr start
 
 On FreeBSD, Notifiarr runs as `user:group` of `notifiarr:notifiarr`.
 
+## Synology DSM 6 (legacy)
+
+DSM 6 systems can install Notifiarr by downloading and extracting the appropriate `.tar.gz` binary from the [Releases](https://github.com/Notifiarr/notifiarr/releases/latest) page. You must set up a manual init script to make it persistent on reboot.
+
+## Synology DSM 7+
+
+- The install script for DSM 7+ at `userscripts/install-synology-dsm7.sh` installs notifiarr as a system service and sets up a daily auto-update cron job. 
+- Upon completion, you must manually edit `/etc/notifiarr/notifiarr.conf`
+- When finished, restart the notifarr service with `/usr/local/etc/rc.d/notifiarr.sh restart`
+
+
+### Install command:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Notifiarr/notifiarr/main/userscripts/install-synology-dsm7.sh | sudo bash && vi /etc/notifiarr/notifiarr.conf
+```
+
+### Force Update:
+```bash
+/usr/local/etc/rc.d/notifiarr.sh force-update
+```
+
+### Manage service:
+
+```bash
+/usr/local/etc/rc.d/notifiarr.sh start
+/usr/local/etc/rc.d/notifiarr.sh stop
+/usr/local/etc/rc.d/notifiarr.sh restart
+```
+
 ### macOS Install
 
 #### Homebrew
