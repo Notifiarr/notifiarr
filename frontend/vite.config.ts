@@ -4,6 +4,12 @@ import { svelte } from '@sveltejs/vite-plugin-svelte'
 // https://vite.dev/config/
 export default defineConfig({
   base: './',
-  build: { sourcemap: true },
-  plugins: [svelte()],
+  plugins: [
+    svelte({
+      dynamicCompileOptions: ({ filename }) => {
+        // Enable custom element compilation for files that end with element.svelte.
+        return { customElement: filename.endsWith('element.svelte') }
+      },
+    }),
+  ],
 })
