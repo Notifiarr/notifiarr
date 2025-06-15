@@ -353,6 +353,7 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		return // rate limited.
 	}
 
+	mnd.Log.Printf("==> Temp DEBUG: Sending file watcher match: %s", tail.Path)
 	website.Site.SendData(&website.Request{
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
@@ -360,6 +361,7 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		LogMsg:     fmt.Sprintf("Watched-File Line Match: %s: %s", tail.Path, match.Line),
 		Payload:    match,
 	})
+	mnd.Log.Printf("==> Temp DEBUG: Sent file watcher match: %s", tail.Path)
 }
 
 func (a *Action) AddFileWatcher(file *WatchFile) error {
@@ -398,8 +400,12 @@ func (w *WatchFile) Stop() error {
 }
 
 func (c *cmd) stop() {
+	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (Lock-before)")
+
 	c.awMutex.Lock()
 	defer c.awMutex.Unlock()
+
+	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (Lock-after)")
 
 	for _, tail := range c.files {
 		if err := tail.Stop(); err != nil {
@@ -407,18 +413,27 @@ func (c *cmd) stop() {
 		}
 	}
 
+	mnd.Log.Printf("==> Temp DEBUG: File watchers stopped")
+
 	// The following code might wait for all the watchers to die before returning.
 	close(c.addWatcher) // DATA RACE 101
 	<-c.stopWatcher
 	c.addWatcher = nil
 	c.stopWatcher = nil
+
+	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop finished")
+
 }
 
 // this runs when a channel dies from the main go routine loop.
 func (w *WatchFile) deactivate() error {
 	defer func() {
+		mnd.Log.Printf("==> Temp DEBUG: File watcher deactivate (Lock-before): %s", w.Path)
+
 		w.mu.Lock()
 		defer w.mu.Unlock()
+
+		mnd.Log.Printf("==> Temp DEBUG: File watcher deactivate (Lock-after): %s", w.Path)
 
 		w.tail = nil
 	}()
@@ -428,20 +443,32 @@ func (w *WatchFile) deactivate() error {
 
 // Active returns true if the tail channel is still open.
 func (w *WatchFile) Active() bool {
+	mnd.Log.Printf("==> Temp DEBUG: File watcher Active (RLock-before): %s", w.Path)
+
 	w.mu.RLock()
 	defer w.mu.RUnlock()
+
+	mnd.Log.Printf("==> Temp DEBUG: File watcher Active (RLock-after): %s", w.Path)
 
 	return w.tail != nil
 }
 
 // stop stops a file watcher.
 func (w *WatchFile) stop() error {
+	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (RLock-before): %s", w.Path)
+
 	w.mu.RLock()
 	defer w.mu.RUnlock()
+
+	// XXX: this is a debug log, remove it.
+	mnd.Log.Printf("==> Temp DEBUG: Stopping file watcher (RLock-after): %s", w.Path)
 
 	if err := w.tail.Stop(); err != nil {
 		return fmt.Errorf("stop failed: %w", err)
 	}
+
+	// XXX: this is a debug log, remove it.
+	mnd.Log.Printf("==> Temp DEBUG: Stopped file watcher: %s", w.Path)
 
 	return nil
 }
