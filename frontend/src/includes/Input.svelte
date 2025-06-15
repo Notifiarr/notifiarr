@@ -17,7 +17,7 @@
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { _ } from './Translate.svelte'
-  import { type SvelteComponent, type Snippet } from 'svelte'
+  import { type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
@@ -53,8 +53,6 @@
     children?: Snippet
     /** Optional message to display below the input. */
     msg?: Snippet
-    /** Optional feedback to display below the input. Use this to reset it or view it. */
-    feedback?: string
     /** Optional inner value for binding. */
     inner?: any
     /** When type is "timeout" this controls if -1 / disabled is an option. */
@@ -80,7 +78,6 @@
     post,
     msg,
     inner = $bindable(),
-    feedback = $bindable(),
     noDisable = false,
     ...rest
   }: Props = $props()
@@ -91,8 +88,15 @@
   let changed = $derived(original !== null && !deepEqual(value, original))
   let currType = $derived(type)
   let passIcon = $derived(currType === 'password' ? faEyeSlash : faEye)
+  let feedback = $state('')
+  const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
+
   $effect(() => {
     placeholder = placeholder == id + '.placeholder' ? '' : placeholder
+  })
+
+  $effect(() => {
+    feedback = validate?.(id, value) ?? ''
   })
 
   function toggleTooltip(e: Event | undefined = undefined) {
@@ -152,15 +156,6 @@
     if (!noDisable)
       options.unshift({ value: '-1s', name: $_('words.select-option.InstanceDisabled') })
   }
-
-  $effect(() => {
-    // Automatically validate the input when the value changes.
-    feedback = validate ? validate(id, value) : ''
-  })
-
-  if (!validate) validate = () => ''
-
-  const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
 </script>
 
 <div class="input">

@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -34,7 +34,7 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 		defer os.Exit(0)
 		defer logs.Log.CapturePanic()
 
-		b, _ := bindata.Files.ReadFile(ui.SystrayIcon)
+		b, _ := frontend.Embedded.ReadFile(ui.SystrayIcon)
 		systray.SetTemplateIcon(b, b)
 		systray.SetTooltip(mnd.PrintVersionInfo(c.Flags.Name()))
 		// systray.SetOnClick(c.showMenu) // buggy

@@ -29,7 +29,6 @@ type Flags struct {
 	ExtraConf     []string `json:"extraConf"`
 	EnvPrefix     string   `json:"envPrefix"`
 	Headers       []string `json:"headers"`
-	Assets        string   `json:"staticDif"`
 }
 
 // ParseArgs stores the cli flag data into the Flags pointer.
@@ -49,7 +48,6 @@ func (f *Flags) ParseArgs(args []string) {
 	f.BoolVar(&f.PSlist, "ps", false, "Print the system process list; useful for 'process' service checks.")
 	f.BoolVar(&f.Reset, "reset", false, "Reset the admin password and write it to the config file.")
 	f.StringVarP(&f.Write, "write", "w", "", "Write new config file to provided path. Use - to overwrite '--config' file.")
-	f.StringVarP(&f.Assets, "assets", "a", "", "Provide path to custom web assets: static files and templates")
 	f.BoolVar(&f.AptHook, "apthook", false, "Process a payload from a dpkg Pre-Install-Pkgs hook.")
 
 	if runtime.GOOS == mnd.Windows {

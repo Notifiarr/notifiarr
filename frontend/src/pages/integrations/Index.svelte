@@ -17,9 +17,11 @@
 </script>
 
 <Header {page} />
+
 <CardBody>
   <p>TODO</p>
 </CardBody>
+
 <CardFooter>
   <small class="text-muted">Integration statistics</small>
 </CardFooter>

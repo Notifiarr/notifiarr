@@ -2,7 +2,6 @@ package common
 
 import (
 	"context"
-	"fmt"
 	"reflect"
 	"time"
 
@@ -21,7 +20,7 @@ func (c *Config) Run(ctx context.Context) {
 		panic("notifiarr timers cannot run more than once")
 	}
 
-	c.stop = &Action{Name: TrigStop, C: make(chan *ActionInput)}
+	c.stop = &Action{Name: TrigStop, Key: "TrigStop", C: make(chan *ActionInput)}
 
 	var (
 		cases   = []reflect.SelectCase{}
@@ -49,31 +48,74 @@ func (c *Config) Run(ctx context.Context) {
 	c.printStartupLog()
 }
 
-//nolint:nonamedreturns
-func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]fmt.Stringer) {
-	triggers = make(map[string]fmt.Stringer)
-	timers = make(map[string]fmt.Stringer)
-	schedules = make(map[string]fmt.Stringer)
+type TriggerInfo struct {
+	Name string `json:"name"`
+	Key  string `json:"key"`
+	Dur  string `json:"dur"`
+	Runs string `json:"runs"`
+}
+
+//nolint:nonamedreturns,cyclop
+func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]TriggerInfo) {
+	triggers = make(map[string]TriggerInfo)
+	timers = make(map[string]TriggerInfo)
+	schedules = make(map[string]TriggerInfo)
 
 	for _, action := range append(c.list, c.stop) {
 		if action == nil {
 			continue
 		}
 
-		if action.C != nil {
-			triggers[string(action.Name)] = action.D
+		if action.C != nil && action.t == nil && action.job == nil {
+			runs := mnd.TimerCounts.Get(string(action.Name))
+
+			count := ""
+			if runs != nil {
+				count = runs.String()
+			}
+
+			triggers[string(action.Name)] = TriggerInfo{
+				Name: string(action.Name),
+				Key:  action.Key,
+				Dur:  action.D.String(),
+				Runs: count,
+			}
 		}
 
 		if action.t != nil {
-			timers[string(action.Name)] = action.D
+			runs := mnd.TimerCounts.Get(string(action.Name))
+
+			count := ""
+			if runs != nil {
+				count = runs.String()
+			}
+
+			timers[string(action.Name)] = TriggerInfo{
+				Name: string(action.Name),
+				Key:  action.Key,
+				Dur:  action.D.String(),
+				Runs: count,
+			}
 		}
 
 		if action.job != nil {
-			schedules[string(action.Name)] = action.J
+			runs := mnd.TimerCounts.Get(string(action.Name))
+
+			count := ""
+			if runs != nil {
+				count = runs.String()
+			}
+
+			schedules[string(action.Name)] = TriggerInfo{
+				Name: string(action.Name),
+				Key:  action.Key,
+				Dur:  action.J.String(),
+				Runs: count,
+			}
 		}
 	}
 
-	return
+	return triggers, timers, schedules
 }
 
 func (c *Config) printStartupLog() {
@@ -83,9 +125,9 @@ func (c *Config) printStartupLog() {
 
 	for name := range triggers {
 		if _, ok := timers[name]; ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, timers[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, timers[name].Dur)
 		} else if _, ok := schedules[name]; ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name].Dur)
 		} else {
 			mnd.Log.Debugf("==> Enabled Action: %s Trigger only.", name)
 		}
@@ -93,13 +135,13 @@ func (c *Config) printStartupLog() {
 
 	for name := range timers {
 		if _, ok := triggers[name]; !ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, timers[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, timers[name].Dur)
 		}
 	}
 
 	for name := range schedules {
 		if _, ok := triggers[name]; !ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name])
+			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name].Dur)
 		}
 	}
 }
@@ -151,7 +193,7 @@ func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action 
 	}
 
 	if action.Name != "" && !action.Hide {
-		mnd.Log.Printf("[%s requested] Event Triggered: %s", input.Type, action.Name)
+		mnd.Log.Printf("[%s requested] Event Triggered: %s", input.Type, action)
 	}
 
 	if action.Fn != nil {

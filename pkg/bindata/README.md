@@ -1,1 +1,1 @@
-- **Do not put anything except Go HTML template files in the templates/ directory.**
+Folder for extra embedded files.

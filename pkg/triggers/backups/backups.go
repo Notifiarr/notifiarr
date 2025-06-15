@@ -44,6 +44,7 @@ func (a *Action) Backup(input *common.ActionInput, app starr.App) error {
 func (c *cmd) makeBackupTriggersLidarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigLidarrBackup,
+		Key:  "TrigLidarrBackup",
 		Fn:   c.sendLidarrBackups,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -67,6 +68,7 @@ func (c *cmd) makeBackupTriggersLidarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeBackupTriggersRadarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigRadarrBackup,
+		Key:  "TrigRadarrBackup",
 		Fn:   c.sendRadarrBackups,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -90,6 +92,7 @@ func (c *cmd) makeBackupTriggersRadarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeBackupTriggersReadarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigReadarrBackup,
+		Key:  "TrigReadarrBackup",
 		Fn:   c.sendReadarrBackups,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -113,6 +116,7 @@ func (c *cmd) makeBackupTriggersReadarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeBackupTriggersSonarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigSonarrBackup,
+		Key:  "TrigSonarrBackup",
 		Fn:   c.sendSonarrBackups,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -136,6 +140,7 @@ func (c *cmd) makeBackupTriggersSonarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeBackupTriggersProwlarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigProwlarrBackup,
+		Key:  "TrigProwlarrBackup",
 		Fn:   c.sendProwlarrBackups,
 		C:    make(chan *common.ActionInput, 1),
 	}

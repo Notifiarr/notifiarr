@@ -57,7 +57,6 @@ type Client struct {
 	noauth     bool
 	authHeader string
 	reloading  bool
-	newUI      bool
 	allow      configfile.AllowedIPs `json:"-" toml:"-" xml:"-" yaml:"-"`
 
 	// this locks anything that may be updated while running.
@@ -126,7 +125,6 @@ func Start() error {
 }
 
 func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
-	c.newUI = os.Getenv(c.Flags.EnvPrefix+"_NEW_UI") == mnd.True
 	msgs, newPassword, err := c.loadConfiguration(ctx)
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -177,10 +175,6 @@ func (c *Client) start(ctx context.Context, msgs []string, newPassword string) e
 
 	if c.Flags.Updated {
 		go ui.Toast("%s updated to v%s-%s", mnd.Title, version.Version, version.Revision) //nolint:errcheck
-	}
-
-	if err := c.loadAssetsTemplates(ctx); err != nil {
-		return err
 	}
 
 	if newPassword != "" {

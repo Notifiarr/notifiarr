@@ -70,6 +70,7 @@ func (c *cmd) setupRadarr() bool {
 			enabled = true
 
 			c.Add(&common.Action{
+				Key:  "TrigRadarrQueue",
 				Hide: true,
 				Name: TrigRadarrQueue.WithInstance(instance),
 				Fn:   (&radarrApp{app: &app, cmd: c, idx: idx}).storeQueue,

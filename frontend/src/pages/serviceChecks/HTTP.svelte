@@ -53,7 +53,7 @@
 
   let codeFeedback = $state<string | undefined>(undefined)
 
-  const updateValue = (id: string, value: any) => {
+  const updateValue = (id: string, value: any): string => {
     form.value = [
       httpCheck.url.trim(),
       httpCheck.headers
@@ -67,18 +67,22 @@
     return id ? (validate?.(id, value) ?? '') : ''
   }
 
-  const updateExpect = () => {
-    form.expect =
-      (httpCheck.codes?.join?.(',') ?? '') + (httpCheck.validSsl ? ',SSL' : '')
-    codeFeedback = validate?.(app.id + '.http.codes', httpCheck.codes)
+  const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
+    console.log('updateExpect', codes, validSsl)
+    form.expect = (codes?.join?.(',') ?? '') + (validSsl ? ',SSL' : '')
+    codeFeedback = validate?.(app.id + '.http.codes', codes)
   }
 
   const merge = (index: number) => app.merge(index, form)
 
   // Clear the url validation if the page unmounts.
   onMount(() => () => {
-    validate?.(app.id + '.http.url', 'https://this.is.valid')
+    validate?.(app.id + '.url', 'https://this.is.valid')
     validate?.(app.id + '.http.codes', [200])
+  })
+
+  $effect(() => {
+    updateExpect(httpCheck.codes, httpCheck.validSsl)
   })
 </script>
 
@@ -89,7 +93,7 @@
     {index}
     bind:form={httpCheck}
     original={originalHttp}
-    validate={(id: string, value: any) => (updateExpect(), updateValue(id, value))} />
+    validate={updateValue} />
 </Col>
 
 <Col lg={6}>
@@ -99,19 +103,16 @@
     id={app.id + '.http.headers'}
     bind:value={httpCheck.headers}
     original={originalHttp.headers}
+    validate={updateValue}
     badge={$_('Endpoints.badge.header', {
       values: { count: httpCheck.headers.split('\n').filter(h => h.trim()).length ?? 0 },
-    })}
-    validate={updateValue} />
+    })} />
 </Col>
 
 <Col md={12}>
   <div class="http-group mb-3">
     <div class="http-check"><Label><T id={app.id + '.http.codes.label'} /></Label></div>
     <Select
-      on:change={updateExpect}
-      on:clear={updateExpect}
-      on:input={updateExpect}
       class="form-control {httpCheck.codes?.length &&
       deepEqual(httpCheck.codes, originalHttp.codes)
         ? ''

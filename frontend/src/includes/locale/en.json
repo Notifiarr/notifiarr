@@ -133,7 +133,7 @@
     "ShutdownSuccess": "Shutdown successful! Client stopped.",
     "FailedToShutdown": "Failed to shutdown: {error} - Try reloading the page.",
     "LoginHelp": "Login Help",
-    "LoginHelpBody": "If you've forgotten your password, please see the <a href='https://notifiarr.wiki/pages/client/gui/#forgotten-passwords' target='_new'>forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key.",
+    "LoginHelpBody": "If you've forgotten your password, please see the <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_new\">forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key.",
     "Changed": "Changed",
     "New": "New",
     "Invalid": "Invalid",
@@ -167,7 +167,7 @@
       "Endpoints": "Endpoints",
       "Commands": "Commands",
       "Services": "Services",
-      "Triggers": "Triggers",
+      "Actions": "Actions",
       "Integrations": "Integrations",
       "Monitoring": "Monitoring",
       "Metrics": "Metrics",
@@ -179,7 +179,7 @@
     },
     "pageDescription": {
       "Configuration": "Configure your Notifiarr client settings here.",
-      "SiteTunnel": "This client keeps a persistent websocket connection to notifiarr.com using a <a href='https://github.com/golift/mulery' target='_new'>Mulery tunnel</a>. This tunnel allows the website to make requests to your client without the need for opening a port, or having a static IP. This page allows you to select your primary tunnel and which tunnel you wish to use as backup in case the primary becomes inaccessible.",
+      "SiteTunnel": "This client keeps a persistent websocket connection to notifiarr.com using a <a href=\"https://github.com/golift/mulery\" target=\"_new\">Mulery tunnel</a>. This tunnel allows the website to make requests to your client without the need for opening a port, or having a static IP. This page allows you to select your primary tunnel and which tunnel you wish to use as backup in case the primary becomes inaccessible.",
       "StarrApps": "Setup Starr integrations.",
       "Downloaders": "Manage download clients.",
       "MediaApps": "Manage media players and related services.",
@@ -188,7 +188,7 @@
       "Endpoints": "Configure relay endpoint URLs and their schedules.",
       "Commands": "Set up and execute custom commands and scripts.",
       "Services": "The Notifiarr client application is capable of monitoring services via HTTP checks, TCP port checks or process running (and not running) checks. <b>The client service checks work with the Notifiarr.com Network Integration.</b>",
-      "Triggers": "View and execute configured triggers.",
+      "Actions": "Find internal Notifiarr client actions here. These are executed by timers, schedules, and events from the website or a chat server. While usually reserved for troubleshooting, you may trigger them manually in this interface.",
       "Integrations": "View action statistics and for all integrations.",
       "Monitoring": "View service and network health.",
       "Metrics": "View metric totals for client configurations.",
@@ -334,7 +334,13 @@
       "path": { "label": "File Path", "description": "Path to the file to watch." }
     },
     "endpoint": { "name": { "label": "Name", "description": "Name of the endpoint." } },
-    "command": { "name": { "label": "Name", "description": "Name of the command." } },
+    "command": {
+      "name": {
+        "label": "Name",
+        "description": "Name of the command.",
+        "required": "A command is required."
+      }
+    },
     "service": { "name": { "label": "Name", "description": "Name of the service." } },
     "urlbase": {
       "label": "URL Base",
@@ -360,7 +366,7 @@
     "apt": {
       "label": "APT Hook",
       "description": "The Notifiarr Debian (and Ubuntu) packages include an APT integration.",
-      "tooltip": "The Notifiarr Debian (and Ubuntu) packages include an APT integration. This integration invokes every time an <b class='text-warning'>apt</b> command is executed. To enable it, set this field to Enabled, and then <b>enable the Package Manager integration on Notifiarr.com.</b> This feature does not require the client to be running; it only requires the client deb package to be installed. This does not work on RHEL or non-Debian Linux."
+      "tooltip": "The Notifiarr Debian (and Ubuntu) packages include an APT integration. This integration invokes every time an <b class=\"text-warning\">apt</b> command is executed. To enable it, set this field to Enabled, and then <b>enable the Package Manager integration on Notifiarr.com.</b> This feature does not require the client to be running; it only requires the client deb package to be installed. This does not work on RHEL or non-Debian Linux."
     },
     "timeout": {
       "label": "Timeout",
@@ -393,7 +399,7 @@
       "EnterCurrentPassword": "Enter your current password to make changes.",
       "ProxyAuthDisabled": "Proxy authentication is disabled because your upstream ({upstreamIp}) is not in the allowed upstreams list.",
       "Addit": "Add it.",
-      "SeeWikiForAuthProxyHelp": "See <a href='https://notifiarr.wiki/pages/client/reverseProxy/' target='_new'>the wiki</a> for instructions setting up an authentication proxy.",
+      "SeeWikiForAuthProxyHelp": "See <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">the wiki</a> for instructions setting up an authentication proxy.",
       "ShowMeMore": "Show me more.",
       "ShowMeLess": "Show me less."
     },
@@ -407,7 +413,7 @@
       },
       "option_desc": {
         "password": " This is the default authentication type. Select the Password option to log into this application with a configured username and password. Only 1 username and password is supported. When selecting this option, you must fill in the username and new password fields. If this is the current authentication type you must also fill in the current password field to make changes.",
-        "header": "Select this option to log into this application using an HTTP header that contains a username. This is commonly known as proxy authentication. We have <a href='https://notifiarr.wiki/pages/client/reverseProxy/' target='_new'>a wiki page</a> that provides instructions to configure Nginx for this feature. When selecting this option, you must also select a header for the auth proxy. If no headers are displayed, then no valid headers were provided by the upstream proxy.",
+        "header": "Select this option to log into this application using an HTTP header that contains a username. This is commonly known as proxy authentication. We have <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">a wiki page</a> that provides instructions to configure Nginx for this feature. When selecting this option, you must also select a header for the auth proxy. If no headers are displayed, then no valid headers were provided by the upstream proxy.",
         "noauth": "This configuration is not recommended. The No Password authentication type allows any request from any configured <code>upstream IP</code>. It also works with an auth proxy to set the username. If no username is in the provided header, then it defaults to admin."
       }
     },
@@ -415,7 +421,7 @@
       "label": "Upstreams",
       "description": "Trusted proxy IP or CIDR networks. Separate networks with spaces.",
       "placeholder": "127.0.0.1 ::1",
-      "tooltip": "If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you should add that proxy's IP here. You can also specify full networks. This controls which IP is written to the web server log file, requester or <span class='text-warning'>X-Forwarded-For</span> header. Required when using a request header for authentication, or when authentication is disabled."
+      "tooltip": "If Notifiarr client is behind a reverse proxy (swag, nginx, etc), then you should add that proxy's IP here. You can also specify full networks. This controls which IP is written to the web server log file, requester or <span class=\"text-warning\">X-Forwarded-For</span> header. Required when using a request header for authentication, or when authentication is disabled."
     },
     "header": {
       "label": "Auth Header",
@@ -503,7 +509,7 @@
   "MediaApps": {
     "Plex": {
       "title": "Plex",
-      "description": "The Plex integration is comprehensive, and many of the settings are configured on the <a href='https://notifiarr.com/' target='_new'>Notifiarr.com website</a>.",
+      "description": "The Plex integration is comprehensive, and many of the settings are configured on the <a href=\"https://notifiarr.com/\" target=\"_new\">Notifiarr.com website</a>.",
       "name": {
         "label": "Server Name",
         "description": "Name of the Plex server.",
@@ -518,7 +524,7 @@
         "label": "Token",
         "description": "Token for the Plex server.",
         "placeholder": "pl3x-to_Ken",
-        "tooltip": "You may find directions for locating your Plex token at <a href='https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/' target='_new'>this Plex Article</a>."
+        "tooltip": "You may find directions for locating your Plex token at <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_new\">this Plex Article</a>."
       }
     },
     "Tautulli": {
@@ -881,7 +887,7 @@
     }
   },
   "SiteTunnel": {
-    "subText": "Click the <span class='text-success'>Ping Tunnels</span> button, and select the tunnel with the fastest response time as your primary. Select another fast tunnel as backup.",
+    "subText": "Click the <span class=\"text-success\">Ping Tunnels</span> button, and select the tunnel with the fastest response time as your primary. Select another fast tunnel as backup.",
     "phrases": {
       "PrimaryTunnel": "Primary Tunnel",
       "BackupTunnel": "Backup Tunnel",
@@ -1047,7 +1053,7 @@
       "label": "Payload Template",
       "description": "Parse payload into this template.",
       "placeholder": "pihole",
-      "tooltip": "The template is used by the website to figure out how to turn the payload into a chat notification. Find a list of available templates or create your own on <a href='https://notifiarr.com/' target='_blank'>the website</a> @ <code>Integrations: Endpoints</code>.",
+      "tooltip": "The template is used by the website to figure out how to turn the payload into a chat notification. Find a list of available templates or create your own on <a href=\"https://notifiarr.com/\" target=\"_new\">the website</a> @ <code>Integrations: Endpoints</code>.",
       "required": "A template is required. Enter 'test' if you are not sure what to enter."
     },
     "timeout": {
@@ -1112,16 +1118,16 @@
       "empty": "No application requests yet."
     },
     "timerEvents": {
-      "title": "Triggered Events",
-      "description": "Triggers and timers executed.",
-      "empty": "No triggered events yet."
+      "title": "Triggered Actions",
+      "description": "Triggers, timers and schedules executed.",
+      "empty": "No triggered actions yet."
     }
   },
   "monitoring": {
-    "ConfigureServices": "Configure the service checks displayed on the Services page.",
+    "ConfigureServices": "Configure the service checks displayed on the <goto-page page=\"services\">Services page</goto-page>.",
     "ChecksDisabled": "Service Checks: Disabled",
     "ChecksStopped": "Service Checks: Stopped",
-    "EnableOnConfig": "Enable service checks on the Configuration page.",
+    "EnableOnConfig": "Enable service checks on the <goto-page page=\"configuration\">Configuration</goto-page> page.",
     "StartChecks": "Start Service Checks",
     "StopChecks": "Stop Service Checks",
     "stopFailed": "Failed to stop service checks.",
@@ -1162,9 +1168,7 @@
     "title": "Health Checks",
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
-    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead.",
-    "configLink": "Disable and Enable service health checks in whole on the Configuration page.",
-    "monitoringLink": "View running service health information on the Monitoring page.",
+    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <goto-page page=\"configuration\">Configuration</goto-page> page. View running service health information on the <goto-page page=\"monitoring\">Monitoring</goto-page> page.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",
@@ -1273,6 +1277,160 @@
         "description": "Maximum number of running processes that may match the value.",
         "tooltip": "If you enter 2, then you will receive a notification if there are more than 2 processes running. Use this to be alerted if there are too many processes running."
       }
+    }
+  },
+  "Actions": {
+    "titles": {
+      "Triggers": "Triggers",
+      "Timers": "Timers",
+      "Schedules": "Schedules",
+      "SiteCrons": "Website Timers",
+      "Counter": "Counter",
+      "Interval": "Interval",
+      "Schedule": "Schedule"
+    },
+    "descriptions": {
+      "Triggers": "These actions have no timer and no schedule.",
+      "Timers": "These actions have a timer.",
+      "Schedules": "These actions have a schedule.",
+      "SiteCrons": "These actions are created by the website to offload timer tracking."
+    },
+    "triggers": {
+      "TrigPlexEmptyTrash": { "label": "Empty Plex trash" },
+      "TrigUploadFile": {
+        "label": "Log file uploaded to website",
+        "button": "Upload Log Now",
+        "success": "Log file uploaded to website.",
+        "options": {
+          "choose": "Choose a file to upload.",
+          "app": "Application log file.",
+          "debug": "Debug log file.",
+          "http": "HTTP log file."
+        }
+      },
+      "TrigPlexSessions": {
+        "label": "Collect Plex sessions",
+        "button": "Collect sessions now",
+        "success": "Plex sessions collected."
+      },
+      "TrigPlexSessionsCheck": { "label": "Check for finished Plex sessions" },
+      "TrigDashboard": {
+        "label": "Dashboard update",
+        "button": "Update dashboard",
+        "success": "Dashboard update started."
+      },
+      "TrigMDBListSync": {
+        "label": "MDB list sync",
+        "button": "Sync MDB list",
+        "success": "MDB list sync initiated."
+      },
+      "TrigCollectionGaps": {
+        "label": "Collection gaps",
+        "button": "Check collection gaps",
+        "success": "Collection gaps check initiated."
+      },
+      "TrigCFSyncLidarr": {
+        "label": "Lidarr profile and format sync",
+        "button": "Sync all Lidarr instances",
+        "success": "Lidarr profile and format sync initiated."
+      },
+      "TrigCFSyncRadarr": {
+        "label": "Radarr profile and format sync",
+        "button": "Sync all Radarr instances",
+        "success": "Radarr profile and format sync initiated."
+      },
+      "TrigRPSyncSonarr": {
+        "label": "Sonarr profile and format sync",
+        "button": "Sync all Sonarr instances",
+        "success": "Sonarr profile and format sync initiated."
+      },
+      "TrigStop": { "label": "Client reloads", "button": "Reload client" },
+      "TrigSnapshot": {
+        "label": "Snapshot collection",
+        "button": "Update snapshot",
+        "success": "Snapshot collection started."
+      },
+      "TrigProwlarrCorrupt": {
+        "label": "Prowlarr database corruption",
+        "button": "Check Prowlarr",
+        "success": "Prowlarr database corruption check initiated."
+      },
+      "TrigLidarrCorrupt": {
+        "label": "Lidarr database corruption",
+        "button": "Check Lidarr",
+        "success": "Lidarr database corruption check initiated."
+      },
+      "TrigRadarrCorrupt": {
+        "label": "Radarr database corruption",
+        "button": "Check Radarr",
+        "success": "Radarr database corruption check initiated."
+      },
+      "TrigReadarrCorrupt": {
+        "label": "Readarr database corruption",
+        "button": "Check Readarr",
+        "success": "Readarr database corruption check initiated."
+      },
+      "TrigSonarrCorrupt": {
+        "label": "Sonarr database corruption",
+        "button": "Check Sonarr",
+        "success": "Sonarr database corruption check initiated."
+      },
+      "TrigProwlarrBackup": {
+        "label": "Prowlarr database backups",
+        "button": "Check Prowlarr",
+        "success": "Prowlarr database backups check initiated."
+      },
+      "TrigLidarrBackup": {
+        "label": "Lidarr database backups",
+        "button": "Check Lidarr",
+        "success": "Lidarr database backups check initiated."
+      },
+      "TrigRadarrBackup": {
+        "label": "Radarr database backups",
+        "button": "Check Radarr",
+        "success": "Radarr database backups check initiated."
+      },
+      "TrigReadarrBackup": {
+        "label": "Readarr database backups",
+        "button": "Check Readarr",
+        "success": "Readarr database backups check initiated."
+      },
+      "TrigSonarrBackup": {
+        "label": "Sonarr database backups",
+        "button": "Check Sonarr",
+        "success": "Sonarr database backups check initiated."
+      },
+      "TrigUpCheck": { "label": "Client to website up-check" },
+      "TrigEndpointURL": {
+        "label": "Endpoint URL relayed to website: {name}",
+        "button": "Run Endpoint",
+        "success": "Endpoint URL relayed initiated."
+      },
+      "TrigCustomCommand": {
+        "label": "Custom command: {name}",
+        "button": "Run Command",
+        "success": "Custom command initiated."
+      },
+      "TrigAutoUpdate": { "label": "Auto-update update check" },
+      "TrigCFSyncLidarrInt": { "label": "Lidarr custom format sync per instance" },
+      "TrigCFSyncRadarrInt": { "label": "Radarr custom format sync per instance" },
+      "TrigRPSyncSonarrInt": { "label": "Sonarr custom format sync per instance" },
+      "TrigCustomCronTimer": {
+        "label": "Website timer: {name}",
+        "button": "Run Timer Now",
+        "success": "Website timer initiated."
+      },
+      "TrigDownloadingItems": { "label": "Downloading / finished items" },
+      "TrigLidarrQueue": { "label": "Lidarr queue cacher" },
+      "TrigRadarrQueue": { "label": "Radarr queue cacher" },
+      "TrigReadarrQueue": { "label": "Readarr queue cacher" },
+      "TrigSonarrQueue": { "label": "Sonarr queue cacher" },
+      "TrigStuckItems": {
+        "label": "Stuck items check",
+        "button": "Check for stuck items",
+        "success": "Stuck items check initiated."
+      },
+      "TrigPollSite": { "label": "Site poller" }
     }
   }
 }

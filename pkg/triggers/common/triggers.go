@@ -96,6 +96,7 @@ type TriggerName string
 // Action defines a trigger/timer that can be executed.
 type Action struct {
 	Name TriggerName
+	Key  string                              // used for display in the UI.
 	D    cnfg.Duration                       // how often the timer fires, sets ticker.
 	J    *scheduler.CronJob                  // If provided, D is ignored.
 	Fn   func(context.Context, *ActionInput) // most actions use this for triggers.
@@ -171,5 +172,17 @@ func (c *Config) Rand() *rand.Rand {
 
 // WithInstance returns a trigger name with an instance ID.
 func (name TriggerName) WithInstance(instance int) TriggerName {
-	return TriggerName(fmt.Sprint(name, instance))
+	return TriggerName(fmt.Sprintf(string(name), instance))
+}
+
+func (a *Action) String() string {
+	if a.J != nil {
+		return fmt.Sprintf("%s: %s (Schedule)", a.Key, a.Name)
+	}
+
+	if a.t != nil {
+		return fmt.Sprintf("%s: %s (Timer)", a.Key, a.Name)
+	}
+
+	return fmt.Sprintf("%s: %s (Trigger)", a.Key, a.Name)
 }

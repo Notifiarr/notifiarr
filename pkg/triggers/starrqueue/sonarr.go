@@ -70,6 +70,7 @@ func (c *cmd) setupSonarr() bool {
 
 		if dur != 0 {
 			c.Add(&common.Action{
+				Key:  "TrigSonarrQueue",
 				Hide: true,
 				Name: TrigSonarrQueue.WithInstance(instance),
 				Fn:   (&sonarrApp{app: &app, cmd: c, idx: idx}).storeQueue,

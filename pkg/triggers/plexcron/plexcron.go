@@ -82,6 +82,7 @@ func (c *cmd) run() {
 	}
 
 	c.Add(&common.Action{
+		Key:  "TrigPlexSessions",
 		Name: TrigPlexSessions,
 		Fn:   c.sendPlexSessions,
 		C:    make(chan *common.ActionInput, 1),
@@ -93,6 +94,7 @@ func (c *cmd) run() {
 			c.Plex.Server.URL, c.Plex.Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
 
 		c.Add(&common.Action{
+			Key:  "TrigPlexSessionsCheck",
 			Name: "Checking Plex for completed sessions.",
 			Hide: true, // do not log this one.
 			Fn:   c.checkForFinishedItems,

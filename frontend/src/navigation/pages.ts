@@ -8,7 +8,7 @@ import FileWatcher, { page as FileWatcherPage } from '../pages/fileWatcher/Index
 import Endpoints, { page as EndpointsPage } from '../pages/endpoints/Index.svelte'
 import Commands, { page as CommandsPage } from '../pages/commands/Index.svelte'
 import ServiceChecks, { page as ServicesP } from '../pages/serviceChecks/Index.svelte'
-import Triggers, { page as TriggersP } from '../pages/triggers/Index.svelte'
+import Actions, { page as ActionsP } from '../pages/actions/Index.svelte'
 import Integrations, { page as IntegrationsP } from '../pages/integrations/Index.svelte'
 import Monitoring, { page as MonitoringP } from '../pages/monitoring/Index.svelte'
 import Metrics, { page as MetricsP } from '../pages/metrics/Index.svelte'
@@ -36,7 +36,7 @@ export const settings: Page[] = [
 ]
 // Insights header in navigation menu.
 export const insights: Page[] = [
-  { component: Triggers, ...TriggersP },
+  { component: Actions, ...ActionsP },
   { component: Integrations, ...IntegrationsP },
   { component: Monitoring, ...MonitoringP },
   { component: Metrics, ...MetricsP },

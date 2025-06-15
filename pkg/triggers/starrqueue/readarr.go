@@ -71,6 +71,7 @@ func (c *cmd) setupReadarr() bool {
 		}
 
 		c.Add(&common.Action{
+			Key:  "TrigReadarrQueue",
 			Hide: true,
 			Name: TrigReadarrQueue.WithInstance(instance),
 			Fn:   (&readarrApp{app: &app, cmd: c, idx: idx}).storeQueue,

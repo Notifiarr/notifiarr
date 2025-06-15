@@ -38,6 +38,7 @@ func (a *Action) Create() {
 
 func (c *cmd) create() {
 	c.Add(&common.Action{
+		Key:  "TrigUploadFile",
 		Name: TrigUploadFile,
 		Fn:   c.uploadFiles,
 		C:    make(chan *common.ActionInput, 1),

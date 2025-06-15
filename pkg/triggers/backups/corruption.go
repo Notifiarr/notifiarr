@@ -51,6 +51,7 @@ func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
 func (c *cmd) makeCorruptionTriggersLidarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigLidarrCorrupt,
+		Key:  "TrigLidarrCorrupt",
 		Fn:   c.sendLidarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -75,6 +76,7 @@ func (c *cmd) makeCorruptionTriggersLidarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeCorruptionTriggersProwlarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigProwlarrCorrupt,
+		Key:  "TrigProwlarrCorrupt",
 		Fn:   c.sendProwlarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -99,6 +101,7 @@ func (c *cmd) makeCorruptionTriggersProwlarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeCorruptionTriggersRadarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigRadarrCorrupt,
+		Key:  "TrigRadarrCorrupt",
 		Fn:   c.sendRadarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -123,6 +126,7 @@ func (c *cmd) makeCorruptionTriggersRadarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeCorruptionTriggersReadarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigReadarrCorrupt,
+		Key:  "TrigReadarrCorrupt",
 		Fn:   c.sendReadarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
 	}
@@ -147,6 +151,7 @@ func (c *cmd) makeCorruptionTriggersReadarr(info *clientinfo.ClientInfo) {
 func (c *cmd) makeCorruptionTriggersSonarr(info *clientinfo.ClientInfo) {
 	action := &common.Action{
 		Name: TrigSonarrCorrupt,
+		Key:  "TrigSonarrCorrupt",
 		Fn:   c.sendSonarrCorruption,
 		C:    make(chan *common.ActionInput, 1),
 	}

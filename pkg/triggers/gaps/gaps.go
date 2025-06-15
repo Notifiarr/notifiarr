@@ -49,6 +49,7 @@ func (c *cmd) create() {
 	}
 
 	c.Add(&common.Action{
+		Key:  "TrigCollectionGaps",
 		Name: TrigCollectionGaps,
 		Fn:   c.sendGaps,
 		C:    make(chan *common.ActionInput, 1),

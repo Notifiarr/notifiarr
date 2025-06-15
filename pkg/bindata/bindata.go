@@ -4,16 +4,12 @@ package bindata
 import (
 	"bytes"
 	"compress/gzip"
-	"embed"
+	_ "embed"
 	"io"
 )
 
 //nolint:gochecknoglobals
 var (
-	//go:embed files
-	Files embed.FS
-	//go:embed templates
-	Templates embed.FS
 	//go:embed other/io.golift.notifiarr.plist
 	Plist string
 	//go:embed other/fortunes.txt.gz

@@ -136,7 +136,7 @@ pkg/bindata/docs/api_docs.go:
 
 dev: generate main.go
 	go build -race $(BUILD_FLAGS) -o $(OUTPUTDIR)/notifiarr -ldflags "-w -s $(VERSION_LDFLAGS) $(EXTRA_LDFLAGS) "
-	DN_NEW_UI=true DN_ENCODE_CONFIG_FILE=false $(OUTPUTDIR)/notifiarr
+	DN_ENCODE_CONFIG_FILE=false $(OUTPUTDIR)/notifiarr
 
 
 notifiarr: generate main.go
@@ -306,7 +306,7 @@ package_build_linux_rpm: generate readme man linux notifiarr.conf.example
 	cp ./*.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* frontend/public/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/rpm" ] || cp -r init/linux/rpm/* $@
@@ -320,7 +320,7 @@ package_build_linux_deb: generate readme man linux notifiarr.conf.example
 	cp ./*.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* frontend/public/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/lib/systemd/system
 	cp init/systemd/notifiarr.service $@/lib/systemd/system/
 	[ ! -d "init/linux/deb" ] || cp -r init/linux/deb/* $@
@@ -334,7 +334,7 @@ package_build_linux_zst: generate readme man linux notifiarr.conf.example
 	cp ./*.1.gz $@/usr/share/man/man1
 	cp notifiarr.conf.example $@/etc/notifiarr/
 	cp notifiarr.conf.example $@/etc/notifiarr/notifiarr.conf
-	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* frontend/public/notifiarr.png $@/usr/share/doc/notifiarr/
 	mkdir -p $@/usr/lib/systemd/system $@/usr/lib/sysusers.d
 	chmod 775 $@/var/log/notifiarr $@/usr/share/doc/notifiarr $@/etc/notifiarr
 	cp init/systemd/notifiarr.service $@/usr/lib/systemd/system/

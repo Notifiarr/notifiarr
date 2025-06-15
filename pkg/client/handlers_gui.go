@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -20,21 +19,18 @@ import (
 
 	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/checkapp"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
-	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"github.com/shirou/gopsutil/v4/disk"
 	"github.com/swaggo/swag"
-	"github.com/vearutop/statigz"
 	"golift.io/cnfgfile"
 	"golift.io/version"
 )
@@ -134,22 +130,19 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method == http.MethodGet: // dont handle login without POST
-		c.indexPage(request.Context(), response, request, "")
+		c.indexPage(request.Context(), response, request)
 	case c.webauth:
-		c.indexPage(request.Context(), response, request, "Logins Disabled")
+		c.indexPage(request.Context(), response, request)
 	case len(request.FormValue("password")) < minPasswordLen:
-		c.indexPage(request.Context(), response, request, "Invalid Password Length")
+		c.indexPage(request.Context(), response, request)
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
 		request = c.setSession(providedUsername, response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
 
-		if c.newUI {
-			c.handleProfile(response, request)
-		} else { // support the old interface.
-			http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
-		}
+		c.handleProfile(response, request)
+
 	default: // Start over.
-		c.indexPage(request.Context(), response, request, "Invalid Password")
+		c.indexPage(request.Context(), response, request)
 	}
 }
 
@@ -428,17 +421,8 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 		return
 	}
 
-	if request.Header.Get("Accept") == mnd.ContentTypeJSON {
-		if err := json.NewEncoder(response).Encode(cmd.Stats()); err != nil {
-			logs.Log.Errorf("Encoding command stats: %v", err)
-		}
-
-		return
-	}
-
-	uri := "ajax/" + mux.Vars(request)["path"] + ".html"
-	if err := c.template.ExecuteTemplate(response, uri, cmd); err != nil {
-		http.Error(response, "template error: "+err.Error(), http.StatusOK)
+	if err := json.NewEncoder(response).Encode(cmd.Stats()); err != nil {
+		logs.Log.Errorf("Encoding command stats: %v", err)
 	}
 }
 
@@ -550,21 +534,13 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	// update config.
 	config := &configfile.Config{}
 
-	var err error
-
-	if request.Header.Get("Content-Type") == mnd.ContentTypeJSON {
-		if err = json.NewDecoder(request.Body).Decode(&config); err != nil {
-			logs.Log.Errorf("[gui '%s' requested] Decoding POSTed Config: %v, %#v", user, err, config)
-			http.Error(response, "Error decoding POSTed Config: "+err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		err = c.validateNewConfig(config)
-	} else {
-		err = c.mergeAndValidateNewConfig(config, request)
+	if err := json.NewDecoder(request.Body).Decode(&config); err != nil {
+		logs.Log.Errorf("[gui '%s' requested] Decoding POSTed Config: %v, %#v", user, err, config)
+		http.Error(response, "Error decoding POSTed Config: "+err.Error(), http.StatusBadRequest)
+		return
 	}
 
-	if err != nil {
+	if err := c.validateNewConfig(config); err != nil {
 		logs.Log.Errorf("[gui '%s' requested] Validating POSTed Config: %v", user, err)
 		http.Error(response, err.Error(), http.StatusBadRequest)
 
@@ -572,12 +548,12 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// Check app integration configs before saving.
-	if err = apps.CheckURLs(&config.AppsConfig); err != nil {
+	if err := apps.CheckURLs(&config.AppsConfig); err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 		return
 	}
 
-	if err = c.saveNewConfig(request.Context(), config); err != nil {
+	if err := c.saveNewConfig(request.Context(), config); err != nil {
 		logs.Log.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
@@ -623,48 +599,6 @@ func (c *Client) saveNewConfig(ctx context.Context, config *configfile.Config) e
 	}
 
 	return nil
-}
-
-func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *http.Request) error {
-	// This turns text fields into a []string (extra keys and upstreams use this).
-	mnd.ConfigPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
-		return reflect.ValueOf(strings.Fields(input))
-	})
-
-	if err := request.ParseForm(); err != nil {
-		return fmt.Errorf("parsing form data failed: %w", err)
-	}
-
-	config.Snapshot = snapshot.Config{}
-	config.AppsConfig.Lidarr = nil
-	config.AppsConfig.Prowlarr = nil
-	config.AppsConfig.Radarr = nil
-	config.AppsConfig.Readarr = nil
-	config.AppsConfig.Sonarr = nil
-	config.AppsConfig.Qbit = nil
-	config.AppsConfig.Rtorrent = nil
-	config.AppsConfig.Deluge = nil
-	config.AppsConfig.SabNZB = nil
-	config.AppsConfig.NZBGet = nil
-	config.AppsConfig.Transmission = nil
-	config.SSLCrtFile = ""
-	config.SSLKeyFile = ""
-	config.WatchFiles = nil
-	config.Commands = nil
-	config.Service = nil
-	config.Snapshot.Plugins.MySQL = nil
-	config.Snapshot.Plugins.Nvidia = snapshot.NvidiaConfig{}
-
-	// for k, v := range request.PostForm {
-	// 	c.Errorf("Config Post: %s = %+v", k, v)
-	// }
-
-	// Decode the POST'd data directly into the mostly-empty config struct.
-	if err := mnd.ConfigPostDecoder.Decode(config, request.PostForm); err != nil {
-		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
-	}
-
-	return c.validateNewConfig(config)
 }
 
 func (c *Client) validateNewConfig(config *configfile.Config) error {
@@ -725,7 +659,7 @@ func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 	return nil
 }
 
-func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, request *http.Request, msg string) {
+func (c *Client) indexPage(_ context.Context, response http.ResponseWriter, request *http.Request) {
 	response.Header().Add("Content-Type", "text/html")
 
 	user, _ := c.getUserName(request)
@@ -733,20 +667,7 @@ func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, re
 		response.WriteHeader(http.StatusUnauthorized)
 	}
 
-	if c.newUI {
-		frontend.IndexHandler(response, request)
-	} else {
-		c.renderTemplate(ctx, response, request, "index.html", msg)
-	}
-}
-
-func (c *Client) getTemplatePageHandler(response http.ResponseWriter, req *http.Request) {
-	page := mux.Vars(req)["template"] + ".html"
-	if c.template.Lookup(page) == nil {
-		page = filepath.Join(mux.Vars(req)["template"], "index.html")
-	}
-
-	c.renderTemplate(req.Context(), response, req, page, "")
+	frontend.IndexHandler(response, request)
 }
 
 func (c *Client) handlerSwaggerDoc(response http.ResponseWriter, request *http.Request) {
@@ -774,23 +695,5 @@ func (c *Client) handlerSwaggerDoc(response http.ResponseWriter, request *http.R
 }
 
 func (c *Client) handleSwaggerIndex(response http.ResponseWriter, request *http.Request) {
-	c.renderTemplate(request.Context(), response, request, "swagger/index.html", "")
-}
-
-func (c *Client) handleStaticAssets(resp http.ResponseWriter, req *http.Request) {
-	if req.URL.Path == "/files/css/custom.css" {
-		if cssFile := c.haveCustomFile("custom.css"); cssFile != "" {
-			// custom css file exists on disk, use http.FileServer to serve the dir it's in.
-			http.StripPrefix("/files/css", http.FileServer(http.Dir(filepath.Dir(cssFile)))).ServeHTTP(resp, req)
-			return
-		}
-	}
-
-	internalServer := statigz.FileServer(bindata.Files)
-	if c.Flags.Assets == "" {
-		internalServer.ServeHTTP(resp, req)
-	} else {
-		statigz.FileServer(os.DirFS(c.Flags.Assets).(fs.ReadDirFS), //nolint:forcetypeassert // This is OK!
-			statigz.OnNotFound(internalServer.ServeHTTP)).ServeHTTP(resp, req)
-	}
+	// c.renderTemplate(request.Context(), response, request, "swagger/index.html", "")
 }
