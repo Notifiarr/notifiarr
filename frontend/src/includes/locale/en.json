@@ -968,7 +968,7 @@
     "title": "Command List",
     "addInstance": "Create Command",
     "DeleteCommand": "Delete Command",
-    "notes": "Commands are executed by the client (the backend). They can be triggered from this interface or from a chat server. If you modify a command you must save the configuration before you can run it from the Web UI.",
+    "description": "Commands are executed by the client (the backend). They can be triggered from this interface or from a chat server. If you modify a command you must save the configuration before you can run it from the Web UI.",
     "Executions": "Executions: {count}",
     "Failures": "Failures: {count}",
     "LastExecution": "Last Execution",
@@ -1124,10 +1124,10 @@
     }
   },
   "monitoring": {
-    "ConfigureServices": "Configure the service checks displayed on the <goto-page page=\"services\">Services page</goto-page>.",
+    "ConfigureServices": "Configure the service checks displayed on the <go-to page=\"services\">Services page</go-to>.",
     "ChecksDisabled": "Service Checks: Disabled",
     "ChecksStopped": "Service Checks: Stopped",
-    "EnableOnConfig": "Enable service checks on the <goto-page page=\"configuration\">Configuration</goto-page> page.",
+    "EnableOnConfig": "Enable service checks on the <go-to page=\"configuration\">Configuration</go-to> page.",
     "StartChecks": "Start Service Checks",
     "StopChecks": "Stop Service Checks",
     "stopFailed": "Failed to stop service checks.",
@@ -1168,7 +1168,7 @@
     "title": "Health Checks",
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
-    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <goto-page page=\"configuration\">Configuration</goto-page> page. View running service health information on the <goto-page page=\"monitoring\">Monitoring</goto-page> page.",
+    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",

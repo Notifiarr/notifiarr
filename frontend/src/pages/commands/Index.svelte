@@ -5,7 +5,7 @@
 
 <script lang="ts">
   import { profile } from '../../api/profile.svelte'
-  import T, { _ } from '../../includes/Translate.svelte'
+  import { _ } from '../../includes/Translate.svelte'
   import { CardBody, Col, Row } from '@sveltestrap/sveltestrap'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
@@ -30,7 +30,6 @@
 <Header {page} />
 
 <CardBody>
-  <T id="Commands.notes" />
   <Instances {flt} Child={Command} deleteButton={page.id + '.DeleteCommand'}>
     {#snippet headerActive(index)}
       {index + 1}. {flt.original?.[index]?.name}

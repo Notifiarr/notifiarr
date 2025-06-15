@@ -34,12 +34,6 @@
         <td>{$profile.flags.extraConf.join(', ')}</td>
       </tr>
     {/if}
-    {#if $profile.flags?.staticDif}
-      <tr>
-        <th><T id="system.StartupParams.CustomAssets" /></th>
-        <td>{$profile.flags.staticDif}</td>
-      </tr>
-    {/if}
     <tr>
       <th><T id="system.StartupParams.UserID" /></th>
       <td>{$profile.uid}</td>
