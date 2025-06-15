@@ -25,7 +25,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
-	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -131,11 +130,11 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method == http.MethodGet: // dont handle login without POST
-		c.indexPage(request.Context(), response, request, "")
+		c.indexPage(request.Context(), response, request)
 	case c.webauth:
-		c.indexPage(request.Context(), response, request, "Logins Disabled")
+		c.indexPage(request.Context(), response, request)
 	case len(request.FormValue("password")) < minPasswordLen:
-		c.indexPage(request.Context(), response, request, "Invalid Password Length")
+		c.indexPage(request.Context(), response, request)
 	case c.checkUserPass(providedUsername, request.FormValue("password")):
 		request = c.setSession(providedUsername, response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
@@ -143,7 +142,7 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		c.handleProfile(response, request)
 
 	default: // Start over.
-		c.indexPage(request.Context(), response, request, "Invalid Password")
+		c.indexPage(request.Context(), response, request)
 	}
 }
 
@@ -425,7 +424,6 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 	if err := json.NewEncoder(response).Encode(cmd.Stats()); err != nil {
 		logs.Log.Errorf("Encoding command stats: %v", err)
 	}
-
 }
 
 // handleRunCommand only handles commands with arguments.
@@ -603,48 +601,6 @@ func (c *Client) saveNewConfig(ctx context.Context, config *configfile.Config) e
 	return nil
 }
 
-func (c *Client) mergeAndValidateNewConfig(config *configfile.Config, request *http.Request) error {
-	// This turns text fields into a []string (extra keys and upstreams use this).
-	mnd.ConfigPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
-		return reflect.ValueOf(strings.Fields(input))
-	})
-
-	if err := request.ParseForm(); err != nil {
-		return fmt.Errorf("parsing form data failed: %w", err)
-	}
-
-	config.Snapshot = snapshot.Config{}
-	config.AppsConfig.Lidarr = nil
-	config.AppsConfig.Prowlarr = nil
-	config.AppsConfig.Radarr = nil
-	config.AppsConfig.Readarr = nil
-	config.AppsConfig.Sonarr = nil
-	config.AppsConfig.Qbit = nil
-	config.AppsConfig.Rtorrent = nil
-	config.AppsConfig.Deluge = nil
-	config.AppsConfig.SabNZB = nil
-	config.AppsConfig.NZBGet = nil
-	config.AppsConfig.Transmission = nil
-	config.SSLCrtFile = ""
-	config.SSLKeyFile = ""
-	config.WatchFiles = nil
-	config.Commands = nil
-	config.Service = nil
-	config.Snapshot.Plugins.MySQL = nil
-	config.Snapshot.Plugins.Nvidia = snapshot.NvidiaConfig{}
-
-	// for k, v := range request.PostForm {
-	// 	c.Errorf("Config Post: %s = %+v", k, v)
-	// }
-
-	// Decode the POST'd data directly into the mostly-empty config struct.
-	if err := mnd.ConfigPostDecoder.Decode(config, request.PostForm); err != nil {
-		return fmt.Errorf("decoding POST data into Go data structure failed: %w", err)
-	}
-
-	return c.validateNewConfig(config)
-}
-
 func (c *Client) validateNewConfig(config *configfile.Config) error {
 	if config.Version != c.Config.Version {
 		return fmt.Errorf("%w: provided: %d, running: %d",
@@ -703,7 +659,7 @@ func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 	return nil
 }
 
-func (c *Client) indexPage(ctx context.Context, response http.ResponseWriter, request *http.Request, msg string) {
+func (c *Client) indexPage(_ context.Context, response http.ResponseWriter, request *http.Request) {
 	response.Header().Add("Content-Type", "text/html")
 
 	user, _ := c.getUserName(request)

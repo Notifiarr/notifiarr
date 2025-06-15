@@ -57,7 +57,6 @@ func (c *Client) httpHandlers() {
 	c.httpGuiHandlers(base, compress)
 }
 
-//nolint:funlen // oh well.
 func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler) http.Handler) {
 	// gui is used for authorized paths. All these paths have a prefix of /ui.
 	gui := c.apps.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
@@ -160,7 +159,7 @@ func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	c.indexPage(request.Context(), response, request, "")
+	c.indexPage(request.Context(), response, request)
 }
 
 // stripSecrets runs first to save a redacted URI in a special request header.

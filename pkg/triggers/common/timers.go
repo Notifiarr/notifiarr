@@ -55,7 +55,7 @@ type TriggerInfo struct {
 	Runs string `json:"runs"`
 }
 
-//nolint:nonamedreturns
+//nolint:nonamedreturns,cyclop
 func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]TriggerInfo) {
 	triggers = make(map[string]TriggerInfo)
 	timers = make(map[string]TriggerInfo)
@@ -115,7 +115,7 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]Tri
 		}
 	}
 
-	return
+	return triggers, timers, schedules
 }
 
 func (c *Config) printStartupLog() {

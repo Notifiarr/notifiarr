@@ -716,7 +716,6 @@ export interface Flags {
   extraConf?: string[];
   envPrefix: string;
   headers?: string[];
-  staticDif: string;
 };
 
 /**
