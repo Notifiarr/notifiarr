@@ -8,7 +8,6 @@ require (
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
 	github.com/energye/systray v1.0.2
-	github.com/fsnotify/fsnotify v1.9.0
 	github.com/gen2brain/beeep v0.0.0-20240516210008-9c006672e7f4
 	github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d
 	github.com/go-co-op/gocron/v2 v2.16.2
@@ -33,7 +32,6 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/swag v1.16.4
-	github.com/vearutop/statigz v1.5.0
 	golang.org/x/crypto v0.38.0
 	golang.org/x/mod v0.24.0
 	golang.org/x/sys v0.33.0
@@ -66,6 +64,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/ebitengine/purego v0.8.4 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect

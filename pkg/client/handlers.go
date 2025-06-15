@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bytes"
 	"context"
 	"expvar"
 	"fmt"
@@ -9,11 +8,9 @@ import (
 	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/CAFxX/httpcompression"
 	"github.com/Notifiarr/notifiarr/frontend"
-	"github.com/Notifiarr/notifiarr/pkg/bindata"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
@@ -30,12 +27,10 @@ func (c *Client) httpHandlers() {
 	}
 
 	defer func() {
-		if c.newUI {
-			// SPA gets all the requests so it can handle its own page router.
-			c.apps.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
-			c.apps.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
-			c.apps.Router.PathPrefix("/").Handler(gzip(c.notFound))
-		}
+		// SPA gets all the requests so it can handle its own page router.
+		c.apps.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
+		c.apps.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
+		c.apps.Router.PathPrefix("/").Handler(gzip(c.notFound))
 		// 404 (or redirect to base path) everything else
 		c.apps.Router.PathPrefix("/").Handler(gzip(c.notFound))
 	}()
@@ -43,13 +38,11 @@ func (c *Client) httpHandlers() {
 	base := path.Join("/", c.Config.URLBase)
 	frontend.URLBase = base
 
-	c.apps.Router.Handle("/favicon.ico", gzip(c.favIcon)).Methods("GET")
 	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")
 	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginHandler)).Methods("POST")
 
 	// Handle the same URLs as above on the different base URL too.
 	if !strings.EqualFold(base, "/") {
-		c.apps.Router.Handle(path.Join(base, "favicon.ico"), gzip(c.favIcon)).Methods("GET")
 		c.apps.Router.Handle(base, gzip(c.slash)).Methods("GET")
 		c.apps.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
 	}
@@ -60,8 +53,6 @@ func (c *Client) httpHandlers() {
 
 	c.apps.Router.PathPrefix(path.Join(base, "/assets/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), gzip(frontend.IndexHandler)))
-	c.apps.Router.PathPrefix(path.Join(base, "/files/")).
-		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), http.HandlerFunc(c.handleStaticAssets))).Methods("GET")
 	c.apps.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")
 	c.httpGuiHandlers(base, compress)
 }
@@ -93,7 +84,6 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/services/{action:stop|start}", c.handleServicesStopStart).Methods("GET")
 	gui.HandleFunc("/shutdown", c.handleShutdown).Methods("GET")
 	gui.HandleFunc("/profile", c.handleProfile).Methods("GET")
-	gui.HandleFunc("/template/{template}", c.getTemplatePageHandler).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}/{content}", c.triggers.Handler).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}", c.triggers.Handler).Methods("GET")
 	gui.HandleFunc("/tunnel/ping", c.pingTunnels).Methods("GET")
@@ -171,16 +161,6 @@ func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
 	}
 
 	c.indexPage(request.Context(), response, request, "")
-}
-
-func (c *Client) favIcon(w http.ResponseWriter, r *http.Request) { //nolint:varnamelen
-	ico, err := bindata.Files.ReadFile("files/images/favicon.ico")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	http.ServeContent(w, r, r.URL.Path, time.Now(), bytes.NewReader(ico))
 }
 
 // stripSecrets runs first to save a redacted URI in a special request header.

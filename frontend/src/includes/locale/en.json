@@ -338,7 +338,7 @@
       "name": {
         "label": "Name",
         "description": "Name of the command.",
-        "required": "Command is required."
+        "required": "A command is required."
       }
     },
     "service": { "name": { "label": "Name", "description": "Name of the service." } },

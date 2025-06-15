@@ -5,13 +5,13 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/Notifiarr/notifiarr/pkg/bindata"
+	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 //nolint:gochecknoglobals
 var (
-	asset = bindata.Files.ReadFile
+	asset = frontend.Embedded.ReadFile
 	// pngPathCache caches the path to the application icon.
 	// Do not use this variable directly. Call GetPNG()
 	pngPathCache = ""
@@ -21,7 +21,7 @@ var (
 )
 
 // ToastIcon is the icon in the menu bar.
-const ToastIcon = "files/images/logo/notifiarr.png"
+const ToastIcon = "notifiarr.png"
 
 // GetPNG purposely returns an empty string when there is no verified file.
 // This is used to give the toast notification an icon.

@@ -24,12 +24,12 @@ var (
 	handler http.Handler
 	root    fs.FS
 	//go:embed dist
-	embedded embed.FS
+	Embedded embed.FS
 )
 
 //nolint:gochecknoinits
 func init() {
-	root, _ = fs.Sub(embedded, "dist")
+	root, _ = fs.Sub(Embedded, "dist")
 	handler = http.FileServerFS(root)
 }
 

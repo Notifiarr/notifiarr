@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
 	"strings"
 	"time"
 
@@ -247,27 +246,6 @@ type ProfilePost struct {
 
 func (c *Client) getProfilePostData(request *http.Request) (*ProfilePost, error) {
 	post := &ProfilePost{}
-
-	// The New UI uses JSON, the old UI uses form data.
-	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
-		// If the request is not JSON, we're using the old form data.
-		at, _ := strconv.Atoi(request.PostFormValue("AuthType"))
-		post.AuthType = configfile.AuthType(at)
-		post.Password = request.PostFormValue("Password")
-		post.Header = request.PostFormValue("AuthHeader")
-		post.Username = request.PostFormValue("NewUsername")
-		post.NewPass = request.PostFormValue("NewPassword")
-		post.Upstreams = request.PostFormValue("Upstreams")
-		switch request.PostFormValue("AuthType") {
-		case "password":
-			post.AuthType = configfile.AuthPassword
-		case "nopass":
-			post.AuthType = configfile.AuthNone
-		case "header":
-			post.AuthType = configfile.AuthHeader
-		}
-		return post, nil
-	}
 
 	if err := json.NewDecoder(request.Body).Decode(&post); err != nil {
 		return nil, fmt.Errorf("decoding request json: %w", err)
