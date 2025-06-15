@@ -284,8 +284,7 @@ func (a *Actions) command(input *common.ActionInput, content string) (int, strin
 // @Router       /api/trigger/endpoint/{name} [get]
 // @Security     ApiKeyAuth
 func (a *Actions) endpoint(input *common.ActionInput, content string) (int, string) {
-	a.Endpoints.List().Get(content)
-	endpoint := a.Commands.GetByHash(content)
+	endpoint := a.Endpoints.List().Get(content)
 	if endpoint == nil {
 		return http.StatusBadRequest, "Endpoint '" + content + "' not found."
 	}

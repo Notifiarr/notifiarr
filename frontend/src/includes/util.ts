@@ -9,6 +9,12 @@ export const ltrim = (str: string, prefix: string) =>
 export const rtrim = (str: string, suffix: string) =>
   str.endsWith(suffix) ? str.slice(0, str.length - suffix.length) : str
 
+/** Show a success toast if the translation key exists. */
+export const successIf = (key: string) => {
+  const t = get(_)(key)
+  if (t != key) success(t)
+}
+
 /** Show a success toast. */
 export const success = (m: string) => {
   const e = ['🎉', '🌟', '⭐️', '🏆', '🎯', '☑️', '🎊', '🎈', '🎁', '🏅', '👍', '👏']

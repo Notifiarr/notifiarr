@@ -1289,44 +1289,142 @@
       "Schedules": "These actions have a schedule.",
       "SiteCrons": "These actions are created by the website to offload timer tracking."
     },
-    "key": {
-      "TrigPlexEmptyTrash": "Empty Plex trash",
-      "TrigUploadFile": "Log file uploaded to website",
-      "TrigPlexSessions": "Collect Plex sessions",
-      "TrigPlexSessionsCheck": "Check for finished Plex sessions",
-      "TrigDashboard": "Dashboard update",
-      "TrigMDBListSync": "MDB list sync",
-      "TrigCollectionGaps": "Collection gaps",
-      "TrigCFSyncLidarr": "Lidarr profile and format sync",
-      "TrigCFSyncRadarr": "Radarr profile and format sync",
-      "TrigRPSyncSonarr": "Sonarr profile and format sync",
-      "TrigStop": "Client reloads",
-      "TrigSnapshot": "Snapshot collection",
-      "TrigProwlarrCorrupt": "Prowlarr database corruption",
-      "TrigLidarrCorrupt": "Lidarr database corruption",
-      "TrigRadarrCorrupt": "Radarr database corruption",
-      "TrigReadarrCorrupt": "Readarr database corruption",
-      "TrigSonarrCorrupt": "Sonarr database corruption",
-      "TrigProwlarrBackup": "Prowlarr database backups",
-      "TrigLidarrBackup": "Lidarr database backups",
-      "TrigRadarrBackup": "Radarr database backups",
-      "TrigReadarrBackup": "Readarr database backups",
-      "TrigSonarrBackup": "Sonarr database backups",
-      "TrigUpCheck": "Client to website up-check",
-      "TrigEndpointURL": "Endpoint URL relayed to website: {name}",
-      "TrigCustomCommand": "Custom command: {name}",
-      "TrigAutoUpdate": "Auto-update update check",
-      "TrigCFSyncLidarrInt": "Lidarr custom format sync per instance",
-      "TrigCFSyncRadarrInt": "Radarr custom format sync per instance",
-      "TrigRPSyncSonarrInt": "Sonarr custom format sync per instance",
-      "TrigCustomCronTimer": "Website timer: {name}",
-      "TrigDownloadingItems": "Downloading / finished items",
-      "TrigLidarrQueue": "Lidarr queue cacher",
-      "TrigRadarrQueue": "Radarr queue cacher",
-      "TrigReadarrQueue": "Readarr queue cacher",
-      "TrigSonarrQueue": "Sonarr queue cacher",
-      "TrigStuckItems": "Stuck items check",
-      "TrigPollSite": "Site poller"
+    "triggers": {
+      "TrigPlexEmptyTrash": { "label": "Empty Plex trash" },
+      "TrigUploadFile": {
+        "label": "Log file uploaded to website",
+        "button": "Upload Log Now",
+        "success": "Log file uploaded to website.",
+        "options": {
+          "choose": "Choose a file to upload.",
+          "app": "Application log file.",
+          "debug": "Debug log file.",
+          "http": "HTTP log file."
+        }
+      },
+      "TrigPlexSessions": {
+        "label": "Collect Plex sessions",
+        "button": "Collect sessions now",
+        "success": "Plex sessions collected."
+      },
+      "TrigPlexSessionsCheck": { "label": "Check for finished Plex sessions" },
+      "TrigDashboard": {
+        "label": "Dashboard update",
+        "button": "Update dashboard",
+        "success": "Dashboard update started."
+      },
+      "TrigMDBListSync": {
+        "label": "MDB list sync",
+        "button": "Sync MDB list",
+        "success": "MDB list sync initiated."
+      },
+      "TrigCollectionGaps": {
+        "label": "Collection gaps",
+        "button": "Check collection gaps",
+        "success": "Collection gaps check initiated."
+      },
+      "TrigCFSyncLidarr": {
+        "label": "Lidarr profile and format sync",
+        "button": "Sync all Lidarr instances",
+        "success": "Lidarr profile and format sync initiated."
+      },
+      "TrigCFSyncRadarr": {
+        "label": "Radarr profile and format sync",
+        "button": "Sync all Radarr instances",
+        "success": "Radarr profile and format sync initiated."
+      },
+      "TrigRPSyncSonarr": {
+        "label": "Sonarr profile and format sync",
+        "button": "Sync all Sonarr instances",
+        "success": "Sonarr profile and format sync initiated."
+      },
+      "TrigStop": { "label": "Client reloads", "button": "Reload client" },
+      "TrigSnapshot": {
+        "label": "Snapshot collection",
+        "button": "Update snapshot",
+        "success": "Snapshot collection started."
+      },
+      "TrigProwlarrCorrupt": {
+        "label": "Prowlarr database corruption",
+        "button": "Check Prowlarr",
+        "success": "Prowlarr database corruption check initiated."
+      },
+      "TrigLidarrCorrupt": {
+        "label": "Lidarr database corruption",
+        "button": "Check Lidarr",
+        "success": "Lidarr database corruption check initiated."
+      },
+      "TrigRadarrCorrupt": {
+        "label": "Radarr database corruption",
+        "button": "Check Radarr",
+        "success": "Radarr database corruption check initiated."
+      },
+      "TrigReadarrCorrupt": {
+        "label": "Readarr database corruption",
+        "button": "Check Readarr",
+        "success": "Readarr database corruption check initiated."
+      },
+      "TrigSonarrCorrupt": {
+        "label": "Sonarr database corruption",
+        "button": "Check Sonarr",
+        "success": "Sonarr database corruption check initiated."
+      },
+      "TrigProwlarrBackup": {
+        "label": "Prowlarr database backups",
+        "button": "Check Prowlarr",
+        "success": "Prowlarr database backups check initiated."
+      },
+      "TrigLidarrBackup": {
+        "label": "Lidarr database backups",
+        "button": "Check Lidarr",
+        "success": "Lidarr database backups check initiated."
+      },
+      "TrigRadarrBackup": {
+        "label": "Radarr database backups",
+        "button": "Check Radarr",
+        "success": "Radarr database backups check initiated."
+      },
+      "TrigReadarrBackup": {
+        "label": "Readarr database backups",
+        "button": "Check Readarr",
+        "success": "Readarr database backups check initiated."
+      },
+      "TrigSonarrBackup": {
+        "label": "Sonarr database backups",
+        "button": "Check Sonarr",
+        "success": "Sonarr database backups check initiated."
+      },
+      "TrigUpCheck": { "label": "Client to website up-check" },
+      "TrigEndpointURL": {
+        "label": "Endpoint URL relayed to website: {name}",
+        "button": "Run Endpoint",
+        "success": "Endpoint URL relayed initiated."
+      },
+      "TrigCustomCommand": {
+        "label": "Custom command: {name}",
+        "button": "Run Command",
+        "success": "Custom command initiated."
+      },
+      "TrigAutoUpdate": { "label": "Auto-update update check" },
+      "TrigCFSyncLidarrInt": { "label": "Lidarr custom format sync per instance" },
+      "TrigCFSyncRadarrInt": { "label": "Radarr custom format sync per instance" },
+      "TrigRPSyncSonarrInt": { "label": "Sonarr custom format sync per instance" },
+      "TrigCustomCronTimer": {
+        "label": "Website timer: {name}",
+        "button": "Run Timer Now",
+        "success": "Website timer initiated."
+      },
+      "TrigDownloadingItems": { "label": "Downloading / finished items" },
+      "TrigLidarrQueue": { "label": "Lidarr queue cacher" },
+      "TrigRadarrQueue": { "label": "Radarr queue cacher" },
+      "TrigReadarrQueue": { "label": "Readarr queue cacher" },
+      "TrigSonarrQueue": { "label": "Sonarr queue cacher" },
+      "TrigStuckItems": {
+        "label": "Stuck items check",
+        "button": "Check for stuck items",
+        "success": "Stuck items check initiated."
+      },
+      "TrigPollSite": { "label": "Site poller" }
     }
   }
 }
