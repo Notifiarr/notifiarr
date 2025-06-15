@@ -103,15 +103,12 @@ async function request(
   timeout: number = 5000,
 ): Promise<BackendResponse> {
   try {
-    const headers: Record<string, string> = {}
-    if (json) headers['Accept'] = 'application/json'
-    else headers['Accept'] = 'text/plain'
+    const headers: HeadersInit = { Accept: json ? 'application/json' : 'text/plain' }
     if (body) headers['Content-Type'] = 'application/json'
 
     uri = rtrim(get(urlbase), '/') + '/' + ltrim(uri, '/')
     const response = await fetchWithTimeout(uri, { method, headers, body }, timeout)
     if (response.status === 403) throw LoggedOut
-
     if (!response.ok)
       throw new Error(
         `${method} ${uri} failed: ${response.status} ${response.statusText}: ${await response.text()}`,
@@ -132,20 +129,18 @@ export async function fetchWithTimeout(
 ): Promise<Response> {
   const controller = new AbortController()
   const id = setTimeout(() => controller.abort(), timeout)
+  options.mode = 'same-origin'
+  options.signal = controller.signal
+  options.redirect = 'manual'
 
   try {
-    const response = await fetch(url, {
-      ...options,
-      mode: 'same-origin',
-      signal: controller.signal,
-      redirect: 'manual',
-    })
+    const response = await fetch(url, options)
+    console.log('fetchWithTimeout2', response)
     clearTimeout(id)
     return response
   } catch (error) {
     clearTimeout(id)
     if (error instanceof DOMException && error.name === 'AbortError') throw TimedOut
-
     throw error
   }
 }

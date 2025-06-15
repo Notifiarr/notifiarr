@@ -3,7 +3,7 @@ package configfile
 import "strings"
 
 //nolint:gochecknoglobals
-var words = strings.Fields(` 
+var words = strings.Fields(`
 aaron
 able
 about
@@ -78,7 +78,6 @@ annex
 annie
 anti
 apart
-apnic
 apple
 apply
 apps
@@ -353,7 +352,6 @@ catch
 cats
 cause
 cave
-cdna
 cedar
 cell
 cells
@@ -419,7 +417,6 @@ cloth
 cloud
 club
 clubs
-cnet
 coach
 coal
 coast
@@ -554,7 +551,6 @@ diana
 diane
 diary
 dice
-dicke
 died
 diego
 dies
@@ -572,7 +568,6 @@ disk
 disks
 dist
 dive
-divx
 dock
 docs
 dodge
@@ -755,7 +750,6 @@ filed
 files
 fill
 film
-filme
 films
 final
 find
@@ -815,8 +809,6 @@ fort
 forth
 forty
 forum
-foto
-fotos
 foul
 found
 four
@@ -1296,7 +1288,6 @@ luis
 luke
 lunch
 lung
-lycos
 lying
 lynn
 lyric
@@ -1436,7 +1427,6 @@ much
 multi
 music
 must
-muze
 myers
 mysql
 myth
@@ -1572,9 +1562,7 @@ path
 paths
 patio
 paul
-paxil
 pays
-pdas
 peace
 peak
 pearl
@@ -1715,7 +1703,6 @@ randy
 range
 rank
 ranks
-rape
 rapid
 rare
 rate
@@ -1750,7 +1737,6 @@ reset
 rest
 retro
 rhode
-rica
 rice
 rich
 rick
@@ -1812,7 +1798,6 @@ ryan
 safe
 safer
 sage
-sagem
 said
 sail
 saint
@@ -2164,8 +2149,6 @@ time
 timer
 times
 tiny
-tion
-tions
 tips
 tire
 tired
@@ -2215,7 +2198,6 @@ tree
 trees
 trek
 trend
-treo
 trial
 tribe
 trick
@@ -2243,9 +2225,7 @@ tunes
 turbo
 turn
 turns
-tvcom
 twice
-twiki
 twin
 twins
 twist
@@ -2311,7 +2291,6 @@ volvo
 vote
 voted
 votes
-vsnet
 wage
 wages
 wagon
@@ -2437,11 +2416,9 @@ your
 yours
 youth
 yukon
-zdnet
 zero
 zinc
 zone
 zones
 zoom
-zope
 `)

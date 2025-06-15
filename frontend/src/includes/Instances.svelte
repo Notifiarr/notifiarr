@@ -92,7 +92,7 @@
                   color="danger"
                   class="float-end"
                   outline
-                  onclick={async () => await flt.delInstance(index)}>
+                  onclick={() => flt.delInstance(index)}>
                   {$_(deleteButton)}
                 </Button>
                 <Button

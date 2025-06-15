@@ -146,7 +146,7 @@
               i={ok ? faCircleCheck : faCircleXmark}
               c1={ok ? 'green' : 'firebrick'}
               c2="white"
-              d2="black" /> &nbsp; {@html maxLength(body, 150)}
+              d2="black" /> &nbsp; {@html maxLength(body, 200)}
           </Alert>
         </div>
       {/if}

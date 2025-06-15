@@ -334,7 +334,13 @@
       "path": { "label": "File Path", "description": "Path to the file to watch." }
     },
     "endpoint": { "name": { "label": "Name", "description": "Name of the endpoint." } },
-    "command": { "name": { "label": "Name", "description": "Name of the command." } },
+    "command": {
+      "name": {
+        "label": "Name",
+        "description": "Name of the command.",
+        "required": "Command is required."
+      }
+    },
     "service": { "name": { "label": "Name", "description": "Name of the service." } },
     "urlbase": {
       "label": "URL Base",

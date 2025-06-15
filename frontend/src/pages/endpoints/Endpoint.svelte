@@ -145,10 +145,8 @@
         badge={$_(app.id + '.badge.query', {
           values: { count: mapLength(form.query ?? {}) },
         })}
-        validate={(id, value) => {
-          form.query = updateMap(query, '=')
-          return validate?.(id, value) ?? ''
-        }} />
+        oninput={() => (form.query = updateMap(query, '='))}
+        {validate} />
     </Col>
     <Col lg={12}>
       <Input
@@ -160,10 +158,8 @@
         badge={$_(app.id + '.badge.header', {
           values: { count: mapLength(form.header ?? {}) },
         })}
-        validate={(id, value) => {
-          form.header = updateMap(header, ': ')
-          return validate?.(id, value) ?? ''
-        }} />
+        oninput={() => (form.header = updateMap(header, ': '))}
+        {validate} />
     </Col>
 
     <Col md={12}>
