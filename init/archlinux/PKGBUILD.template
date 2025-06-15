@@ -34,7 +34,7 @@ build() {
   mv examples/MANUAL.gz "${appname}.1.gz"
 }
 
-package() {  
+package() {
   # Binary.
   install -D -m 755 "${pkgname}-${pkgver}.${CARCH}" "${pkgdir}/usr/bin/${appname}"
 
@@ -49,7 +49,7 @@ package() {
 
   # License, documentation, logo icon, manual.
   install -D -m 644 LICENSE "${pkgdir}/usr/share/licenses/${appname}/LICENSE"
-  install -D -m 644 ./*.html examples/* pkg/bindata/files/images/logo/${appname}.png "${pkgdir}/usr/share/doc/${appname}/"
+  install -D -m 644 ./*.html examples/* frontend/public/${appname}.png "${pkgdir}/usr/share/doc/${appname}/"
   install -D -m 644 "${appname}.1.gz" "${pkgdir}/usr/share/man/man1/${appname}.1.gz"
 
   # X11 Desktop File.

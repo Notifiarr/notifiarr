@@ -388,7 +388,7 @@ package_build_freebsd: generate readme man freebsd notifiarr.conf.example
 	cp ./*.1.gz $@/usr/local/share/man/man1
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/
 	cp notifiarr.conf.example $@/usr/local/etc/notifiarr/notifiarr.conf
-	cp LICENSE ./*.html examples/*?.?* pkg/bindata/files/images/logo/notifiarr.png $@/usr/local/share/doc/notifiarr/
+	cp LICENSE ./*.html examples/*?.?* frontend/public/notifiarr.png $@/usr/local/share/doc/notifiarr/
 	mkdir -p $@/usr/local/etc/rc.d
 	cp init/bsd/freebsd.rc.d $@/usr/local/etc/rc.d/notifiarr
 	chmod +x $@/usr/local/etc/rc.d/notifiarr
