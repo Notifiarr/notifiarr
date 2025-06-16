@@ -104,6 +104,14 @@ func (l *Logger) SetupLogging(config LogConfig) {
 	l.openLogFile()
 	l.openHTTPLog()
 	l.openDebugLog()
+
+	if config.Debug {
+		l.InfoLog.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	}
+
+	l.ErrorLog.SetFlags(l.InfoLog.Flags())
+	l.HTTPLog.SetFlags(l.InfoLog.Flags())
+	l.DebugLog.SetFlags(l.InfoLog.Flags())
 }
 
 // Rotate rotates the log files. If called on a custom log, only rotates that log file.
