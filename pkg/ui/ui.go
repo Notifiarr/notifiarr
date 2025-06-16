@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -11,7 +12,6 @@ import (
 
 //nolint:gochecknoglobals
 var (
-	asset = frontend.Embedded.ReadFile
 	// pngPathCache caches the path to the application icon.
 	// Do not use this variable directly. Call GetPNG()
 	pngPathCache = ""
@@ -50,7 +50,12 @@ func GetPNG() string {
 		folder = filepath.Dir(folder)
 	}
 
-	data, err := asset(ToastIcon)
+	file, err := frontend.Root.Open(ToastIcon)
+	if err != nil {
+		return ""
+	}
+
+	data, err := io.ReadAll(file)
 	if err != nil {
 		return ""
 	}

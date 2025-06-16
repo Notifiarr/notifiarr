@@ -5,7 +5,7 @@
     form: T
     original: T
     app: App<T>
-    validate?: (id: string, value: any) => string
+    validate?: (id: string, value: any) => string | undefined
     index: number
     reset?: () => void
     active?: boolean

@@ -422,7 +422,6 @@ func (c *cmd) stop() {
 	c.stopWatcher = nil
 
 	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop finished")
-
 }
 
 // this runs when a channel dies from the main go routine loop.

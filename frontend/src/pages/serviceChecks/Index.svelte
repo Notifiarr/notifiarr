@@ -45,8 +45,7 @@
           return
         }
       })
-      if (found) return found
-      return val ? '' : get(_)('phrases.NameMustNotBeEmpty')
+      return val ? found : get(_)('phrases.NameMustNotBeEmpty')
     } else if (c?.[idx]?.type === 'http') {
       return httpValidator(id, val)
     } else if (c?.[idx]?.type === 'process') {

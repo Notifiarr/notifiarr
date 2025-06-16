@@ -22,15 +22,15 @@ var URLBase = "/"
 //nolint:gochecknoglobals
 var (
 	handler http.Handler
-	root    fs.FS
+	Root    fs.FS
 	//go:embed dist
-	Embedded embed.FS
+	embedded embed.FS
 )
 
 //nolint:gochecknoinits
 func init() {
-	root, _ = fs.Sub(Embedded, "dist")
-	handler = http.FileServerFS(root)
+	Root, _ = fs.Sub(embedded, "dist")
+	handler = http.FileServerFS(Root)
 }
 
 type responseWriter struct {
@@ -102,7 +102,7 @@ func IndexHandler(resp http.ResponseWriter, req *http.Request) {
 	}
 
 	resp.Header().Set("Content-Type", "text/html")
-	http.ServeFileFS(resp, req, root, "index.html")
+	http.ServeFileFS(resp, req, Root, "index.html")
 }
 
 func (w *responseWriter) WriteHeader(status int) {

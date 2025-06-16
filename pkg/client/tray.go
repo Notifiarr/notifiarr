@@ -6,6 +6,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 
@@ -34,8 +35,9 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 		defer os.Exit(0)
 		defer logs.Log.CapturePanic()
 
-		b, _ := frontend.Embedded.ReadFile(ui.SystrayIcon)
-		systray.SetTemplateIcon(b, b)
+		b, _ := frontend.Root.Open(ui.SystrayIcon)
+		file, _ := io.ReadAll(b)
+		systray.SetTemplateIcon(file, file)
 		systray.SetTooltip(mnd.PrintVersionInfo(c.Flags.Name()))
 		// systray.SetOnClick(c.showMenu) // buggy
 		systray.SetOnRClick(c.showMenu)
