@@ -44,7 +44,7 @@
     /** Optional options for select input. */
     options?: Option[] | undefined
     /** Optional validation function. */
-    validate?: (id: string, value: any) => string
+    validate?: (id: string, value: any) => string | undefined
     /** Optional input-box prefix attachment. */
     pre?: Snippet
     /** Optional input-box suffix attachment. */

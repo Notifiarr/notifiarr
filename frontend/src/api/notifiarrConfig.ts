@@ -80,7 +80,7 @@ export interface Profile {
   configFileInfo?: LogFileInfos;
   expvar: AllData;
   hostInfo?: InfoStat;
-  disks?: Record<string, Partition>;
+  disks?: Record<string, null | Partition>;
   proxyAllow: boolean;
   poolStats?: Record<string, null | PoolSize>;
   started: Date;

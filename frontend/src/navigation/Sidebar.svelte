@@ -65,6 +65,8 @@
     align-items: center;
     border-radius: 8px;
     transition: all 0.2s ease;
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
 
   /* Make all the sidebar selectors look really nice. */

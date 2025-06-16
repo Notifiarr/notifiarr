@@ -16,8 +16,8 @@ import (
 )
 
 const (
-	TrigRPSyncSonarr    common.TriggerName = "Starting Sonarr profile and format sync."
-	TrigRPSyncSonarrInt common.TriggerName = "Starting Sonarr %d profile and format sync."
+	TrigCFSyncSonarr    common.TriggerName = "Starting Sonarr profile and format sync."
+	TrigCFSyncSonarrInt common.TriggerName = "Starting Sonarr %d profile and format sync."
 )
 
 // SonarrTrashPayload is the payload sent and received
@@ -35,12 +35,12 @@ type SonarrTrashPayload struct {
 
 // SyncSonarrRP initializes a release profile sync with sonarr.
 func (a *Action) SyncSonarrRP(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigRPSyncSonarr)
+	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCFSyncSonarr)
 }
 
 // SyncSonarrInstanceRP initializes a release profile sync with a specific sonarr instance.
 func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) error {
-	if name := TrigRPSyncSonarrInt.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
+	if name := TrigCFSyncSonarrInt.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
 		return fmt.Errorf("%w: Sonarr instance: %d", common.ErrInvalidApp, instance)
 	}
 

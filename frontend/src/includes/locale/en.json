@@ -192,7 +192,7 @@
       "Integrations": "View action statistics and for all integrations.",
       "Monitoring": "View service and network health.",
       "Metrics": "View metric totals for client configurations.",
-      "LogFiles": "View and manage client log files.",
+      "LogFiles": "View, follow, download and upload client log files.",
       "System": "View system and client information and.",
       "TrustProfile": "Configure how you log into this Notifiarr client application.",
       "Landing": "This is the greatest place on Earth!"
@@ -1339,7 +1339,7 @@
         "button": "Sync all Radarr instances",
         "success": "Radarr profile and format sync initiated."
       },
-      "TrigRPSyncSonarr": {
+      "TrigCFSyncSonarr": {
         "label": "Sonarr profile and format sync",
         "button": "Sync all Sonarr instances",
         "success": "Sonarr profile and format sync initiated."
@@ -1414,7 +1414,7 @@
       "TrigAutoUpdate": { "label": "Auto-update update check" },
       "TrigCFSyncLidarrInt": { "label": "Lidarr custom format sync per instance" },
       "TrigCFSyncRadarrInt": { "label": "Radarr custom format sync per instance" },
-      "TrigRPSyncSonarrInt": { "label": "Sonarr custom format sync per instance" },
+      "TrigCFSyncSonarrInt": { "label": "Sonarr custom format sync per instance" },
       "TrigCustomCronTimer": {
         "label": "Website timer: {name}",
         "button": "Run Timer Now",

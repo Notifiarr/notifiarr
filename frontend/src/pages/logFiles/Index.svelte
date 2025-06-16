@@ -11,15 +11,13 @@
 </script>
 
 <script lang="ts">
-  import { CardBody, CardFooter } from '@sveltestrap/sveltestrap'
+  import { CardBody } from '@sveltestrap/sveltestrap'
   import { _ } from '../../includes/Translate.svelte'
   import Header from '../../includes/Header.svelte'
 </script>
 
 <Header {page} />
+
 <CardBody>
   <p>TODO</p>
 </CardBody>
-<CardFooter>
-  <small class="text-muted">Log file management</small>
-</CardFooter>

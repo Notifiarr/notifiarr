@@ -23,7 +23,7 @@
           disabled={nav.active(page.id)}
           onclick={e => nav.goto(e, page.id)}>
           <span class="nav-icon">
-            <Fa {...page} scale="1.7x" />
+            <Fa {...page} scale="1.4x" />
           </span>
           <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
         </NavLink>
