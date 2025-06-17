@@ -101,7 +101,7 @@ func IndexHandler(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	resp.Header().Set("Content-Type", "text/html")
+	resp.Header().Set("Content-Type", "text/html; charset=utf-8")
 	http.ServeFileFS(resp, req, Root, "index.html")
 }
 

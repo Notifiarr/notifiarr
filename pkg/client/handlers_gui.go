@@ -660,7 +660,7 @@ func (c *Client) validateNewServiceConfig(config *configfile.Config) error {
 }
 
 func (c *Client) indexPage(_ context.Context, response http.ResponseWriter, request *http.Request) {
-	response.Header().Add("Content-Type", "text/html")
+	response.Header().Add("Content-Type", "text/html; charset=utf-8")
 
 	user, _ := c.getUserName(request)
 	if request.Method != http.MethodGet || (user == "" && c.webauth) {

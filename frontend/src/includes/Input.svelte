@@ -168,7 +168,12 @@
     </Label>
     <InputGroup class="has-validation">
       {#if tooltip != id + '.tooltip'}
-        <Button color="secondary" onclick={toggleTooltip} outline style="width:44px;">
+        <Button
+          color="secondary"
+          onclick={toggleTooltip}
+          outline
+          style="width:44px;"
+          title="Show more information">
           {#if showTooltip}
             <Fa
               i={faArrowUpFromBracket}
@@ -227,7 +232,12 @@
 
       <!-- Include a password visibility toggler. -->
       {#if type === 'password'}
-        <Button type="button" outline onclick={togglePassword} style="width:44px;">
+        <Button
+          type="button"
+          outline
+          onclick={togglePassword}
+          style="width:44px;"
+          title="Toggle password visibility">
           <Fa
             i={passIcon}
             c1="royalblue"

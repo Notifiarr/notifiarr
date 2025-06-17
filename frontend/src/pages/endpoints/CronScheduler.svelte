@@ -32,7 +32,7 @@
   type Props = {
     cron: CronJob
     original: CronJob
-    validate?: (id: string, value: any) => string
+    validate?: (id: string, value: any) => string | undefined
   }
   let { cron = $bindable(), original, validate }: Props = $props()
 

@@ -95,6 +95,7 @@
             color="secondary"
             outline
             style="width:44px;"
+            title="Follow redirects"
             class={form.follow === original.follow ? '' : 'changed'}>
             <Box type="checkbox" id={app.id + '.follow'} bind:checked={form.follow} />
           </Button>

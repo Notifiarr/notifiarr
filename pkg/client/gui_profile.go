@@ -122,6 +122,8 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		poolStats = c.tunnel.PoolStats()
 	}
 
+	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
+
 	if err := json.NewEncoder(resp).Encode(&Profile{
 		Triggers:        triggers,
 		Timers:          timers,

@@ -132,8 +132,8 @@
     white-space: initial;
     word-break: break-all;
     display: -webkit-box;
-    line-clamp: 1;
-    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
   }
 </style>

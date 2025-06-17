@@ -251,3 +251,9 @@ tr:last-child td:first-child,
 tr:last-child th:first-child {
   border-bottom-left-radius: 7px !important;
 }
+
+/* Make select options look good on Windows. */
+option {
+  color: var(--bs-body-color) !important;
+  background-color: var(--bs-body-bg) !important;
+}

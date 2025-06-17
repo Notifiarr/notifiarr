@@ -17,7 +17,7 @@
   const onclick = () => (shutdown = async () => await getUi('shutdown', false))
 </script>
 
-<a href="#shutdown" onclick={e => (e.preventDefault(), (isOpen = true))}>
+<a href="#shutdown" onclick={e => (e.preventDefault(), (isOpen = true))} title="shutdown">
   <Fa i={faPowerOff} c1="salmon" c2="maroon" d1="firebrick" d2="red" class="me-2" />
 </a>
 
