@@ -82,9 +82,11 @@ export async function checkReloaded(): Promise<void> {
   }
 
   return new Promise(async (resolve, reject) => {
-    await delay(600) // initial delay
-    for (let i = 0; i < 20; i++) {
-      await delay(300) // delay between checks
+    await delay(800) // initial delay (this + the first delay)
+    // This waits up to about 40 seconds, and makes 50 attempts.
+    for (let i = 0; i < 50; i++) {
+      // delay between checks
+      await delay(i < 5 ? 250 : i < 12 ? 400 : i < 18 ? 500 : i < 25 ? 600 : 1000)
       if (await checkReload()) return resolve()
     }
 
