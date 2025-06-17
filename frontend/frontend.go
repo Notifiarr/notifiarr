@@ -23,14 +23,18 @@ var URLBase = "/"
 var (
 	handler http.Handler
 	Root    fs.FS
+	Locale  fs.FS
 	//go:embed dist
 	embedded embed.FS
+	//go:embed src/includes/locale/*.json
+	locale embed.FS
 )
 
 //nolint:gochecknoinits
 func init() {
 	Root, _ = fs.Sub(embedded, "dist")
 	handler = http.FileServerFS(Root)
+	Locale, _ = fs.Sub(locale, "src/includes/locale")
 }
 
 type responseWriter struct {

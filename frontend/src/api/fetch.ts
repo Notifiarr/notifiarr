@@ -2,6 +2,7 @@ import { get, writable } from 'svelte/store'
 import { delay, failure, ltrim, rtrim, success } from '../includes/util'
 import { _ } from 'svelte-i18n'
 import Cookies from 'js-cookie'
+import { locale } from '../includes/locale/index.svelte'
 
 export const LoggedOut = new Error('logged out')
 export const TimedOut = new Error('request timed out')
@@ -105,7 +106,10 @@ async function request(
   timeout: number = 5000,
 ): Promise<BackendResponse> {
   try {
-    const headers: HeadersInit = { Accept: json ? 'application/json' : 'text/plain' }
+    const headers: HeadersInit = {
+      Accept: json ? 'application/json' : 'text/plain',
+      'Accept-Language': locale.current,
+    }
     if (body) headers['Content-Type'] = 'application/json'
 
     uri = rtrim(get(urlbase), '/') + '/' + ltrim(uri, '/')
@@ -137,7 +141,6 @@ export async function fetchWithTimeout(
 
   try {
     const response = await fetch(url, options)
-    console.log('fetchWithTimeout2', response)
     clearTimeout(id)
     return response
   } catch (error) {
