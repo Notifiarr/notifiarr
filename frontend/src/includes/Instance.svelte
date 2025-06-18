@@ -108,7 +108,7 @@
           {validate} />
       </Col>
     {/if}
-    <!-- Plex uses a token, and not an api key. It's one of the other in the form (or neither) in a few cases. -->
+    <!-- Plex uses a token, and not an api key. It's one or the other in the form (or neither in a few cases). -->
     {#if typeof form.token === 'string' && !app.hidden?.includes('token')}
       <Col lg={12} xl={4}>
         <Input
@@ -153,7 +153,9 @@
     {#if typeof form.timeout === 'string'}
       <Col md={!app.hidden?.includes('deletes') ? 4 : 6}>
         <Input
-          id="words.instance-options.timeout"
+          id={app.id + '.timeout'}
+          description={$_('words.instance-options.timeout.description')}
+          label={$_('words.instance-options.timeout.label')}
           type="timeout"
           bind:value={form.timeout}
           original={original?.timeout}
@@ -164,7 +166,9 @@
     {#if typeof form.interval === 'string'}
       <Col md={!app.hidden?.includes('deletes') ? 4 : 6}>
         <Input
-          id="words.instance-options.interval"
+          id={app.id + '.interval'}
+          description={$_('words.instance-options.interval.description')}
+          label={$_('words.instance-options.interval.label')}
           type="interval"
           bind:value={form.interval}
           original={original?.interval}
@@ -177,7 +181,10 @@
     {#if !app.hidden?.includes('deletes')}
       <Col md={4}>
         <Input
-          id="words.instance-options.deletes"
+          id={app.id + '.deletes'}
+          description={$_('words.instance-options.deletes.description')}
+          tooltip={$_('words.instance-options.deletes.tooltip')}
+          label={$_('words.instance-options.deletes.label')}
           type="select"
           bind:value={form.deletes}
           original={original?.deletes}

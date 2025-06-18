@@ -188,9 +188,8 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	post, err := c.getProfilePostData(request)
-	if err != nil {
-		logs.Log.Errorf("%v", err)
+	post := &ProfilePost{}
+	if err := json.NewDecoder(request.Body).Decode(post); err != nil {
 		http.Error(response, "Invalid Request", http.StatusBadRequest)
 		return
 	}
@@ -244,16 +243,6 @@ type ProfilePost struct {
 	Header    string              `json:"header"`
 	NewPass   string              `json:"newPass"`
 	Upstreams string              `json:"upstreams"`
-}
-
-func (c *Client) getProfilePostData(request *http.Request) (*ProfilePost, error) {
-	post := &ProfilePost{}
-
-	if err := json.NewDecoder(request.Body).Decode(&post); err != nil {
-		return nil, fmt.Errorf("decoding request json: %w", err)
-	}
-
-	return post, nil
 }
 
 func (c *Client) handleProfilePostPassword(

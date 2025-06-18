@@ -68,7 +68,6 @@
   }
 
   const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
-    console.log('updateExpect', codes, validSsl)
     form.expect = (codes?.join?.(',') ?? '') + (validSsl ? ',SSL' : '')
     codeFeedback = validate?.(app.id + '.http.codes', codes)
   }
