@@ -42,8 +42,8 @@
 
 <svelte:window bind:innerWidth={windowWidth} on:popstate={e => nav.popstate(e)} />
 
-<div class="menu-toggle-wrapper">
-  {#if isMobile}
+{#if isMobile}
+  <div class="menu-toggle-wrapper">
     <!-- Mobile Menu Toggle Button -->
     <div transition:slide style="overflow: visible">
       <Card color="warning" theme={$theme} class="toggle-card mb-2 p-0" outline>
@@ -56,8 +56,8 @@
         </Button>
       </Card>
     </div>
-  {/if}
-</div>
+  </div>
+{/if}
 
 {#if sidebarOpen || !isMobile}
   {@const flex = isMobile ? 'flex-col' : ''}
@@ -77,32 +77,33 @@
       </div>
     {/key}
   </Card>
-</Col>
 
-<!-- This uses global variables to show a modal whenever any (connected)
+  <!-- This uses global variables to show a modal whenever any (connected)
      form has changes and you might lose them by navigating away. -->
-<Modal
-  isOpen={nav.showUnsavedAlert !== ''}
-  theme={$theme}
-  color="warning"
-  style="z-index: 9999;">
-  <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
-  <ModalBody><T id="phrases.LeavePage" /></ModalBody>
-  <ModalFooter>
-    <Button color="primary" onclick={() => (nav.showUnsavedAlert = '')}>
-      <T id="buttons.NoStayHere" />
-    </Button>
-    <Button color="danger" onclick={() => nav.goto(nav.forceEvent, nav.showUnsavedAlert)}>
-      <T id="buttons.YesDeleteMyChanges" />
-    </Button>
-  </ModalFooter>
-</Modal>
+  <Modal
+    isOpen={nav.showUnsavedAlert !== ''}
+    theme={$theme}
+    color="warning"
+    style="z-index: 9999;">
+    <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
+    <ModalBody><T id="phrases.LeavePage" /></ModalBody>
+    <ModalFooter>
+      <Button color="primary" onclick={() => (nav.showUnsavedAlert = '')}>
+        <T id="buttons.NoStayHere" />
+      </Button>
+      <Button
+        color="danger"
+        onclick={() => nav.goto(nav.forceEvent, nav.showUnsavedAlert)}>
+        <T id="buttons.YesDeleteMyChanges" />
+      </Button>
+    </ModalFooter>
+  </Modal>
+</Col>
 
 <style>
   .sidebar-col {
     min-width: 230px;
     max-width: fit-content;
-    margin-right: 0px;
   }
 
   /* Mobile styles for menu toggler. */

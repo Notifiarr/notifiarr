@@ -1432,5 +1432,25 @@
       },
       "TrigPollSite": { "label": "Site poller" }
     }
+  },
+  "LogFiles": {
+    "titles": {
+      "Name": "File Name",
+      "Age": "Age",
+      "Bytes": "Bytes",
+      "InUse": "In Use",
+      "Mode": "Mode",
+      "Owner": "Owner",
+      "Path": "Path",
+      "Date": "Date",
+      "FileList": "File List",
+      "Details": "Details",
+      "FileContent": "File Content"
+    },
+    "button": { "download": "Download", "upload": "Upload", "delete": "Delete" },
+    "Error": "Error loading log file: {error}",
+    "NoFileSelected": "No file selected.",
+    "SelectFile": "Select a file to see what's in it!",
+    "FilesInDirs": "{files} files in {dirs} dirs"
   }
 }

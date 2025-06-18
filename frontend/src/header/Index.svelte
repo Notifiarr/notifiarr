@@ -43,24 +43,25 @@
   import Shutdown from './Shutdown.svelte'
 </script>
 
-<!-- Top of the page. Logo and reload / shutdown buttons. -->
-<Navbar theme={$theme} class="mb-0 pb-0">
-  {#if $profile.loggedIn}
-    <span style="position: absolute; right: 0;" class="fs-3">
-      <!-- Reload Confirmation Link + Modal -->
-      <Reload />
-      <!-- Shutdown Confirmation Link + Modal -->
-      <Shutdown />
-    </span>
-  {/if}
-  <NavbarBrand href={$urlbase} onclick={e => nav.goto(e, '')} class="mb-0 pb-0">
-    <h1 class="m-0 lh-1" style="font-size: 40px;">
-      <img src={logo} height="45" alt="Logo" />
-      <span class="title-notifiarr">Notifiarr Client</span>
-    </h1>
-  </NavbarBrand>
-</Navbar>
-
+<Row>
+  <!-- Top of the page. Logo and reload / shutdown buttons. -->
+  <Navbar theme={$theme} class="mb-0 pb-0">
+    {#if $profile.loggedIn}
+      <span style="position: absolute; right: 0;" class="fs-3">
+        <!-- Reload Confirmation Link + Modal -->
+        <Reload />
+        <!-- Shutdown Confirmation Link + Modal -->
+        <Shutdown />
+      </span>
+    {/if}
+    <NavbarBrand href={$urlbase} onclick={e => nav.goto(e, '')} class="mb-0 pb-0">
+      <h1 class="m-0 lh-1" style="font-size: 40px;">
+        <img src={logo} height="45" alt="Logo" />
+        <span class="title-notifiarr">Notifiarr Client</span>
+      </h1>
+    </NavbarBrand>
+  </Navbar>
+</Row>
 <!-- Notification Center-->
 <Row class="mt-0 mb-1 lh-1">
   <Col class="fs-6 fs-lighter ms-3 fst-italic">

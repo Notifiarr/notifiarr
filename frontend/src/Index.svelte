@@ -41,7 +41,6 @@
 <main>
   <Container fluid class="mb-2">
     <MainHeader />
-
     <Row>
       <!-- Wait for translations to load. -->
       {#if !$isReady}
