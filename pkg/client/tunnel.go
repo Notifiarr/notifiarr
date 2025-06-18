@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -18,7 +17,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
-	"github.com/gorilla/schema"
 	apachelog "github.com/lestrrat-go/apache-logformat/v2"
 	mulery "golift.io/mulery/client"
 )
@@ -325,19 +323,4 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	if err := json.NewEncoder(response).Encode(tunnels); err != nil {
 		logs.Log.Errorf("Saving Tunnel: sending json response: %v", err)
 	}
-}
-
-// Support the old style.
-func (c *Client) decodeTunnelConfig(body []byte, input any) error {
-	decodedValue, err := url.ParseQuery(string(body))
-	if err != nil {
-		return fmt.Errorf("parsing request: %w", err)
-	}
-
-	err = schema.NewDecoder().Decode(&input, decodedValue)
-	if err != nil {
-		return fmt.Errorf("decoding request: %w", err)
-	}
-
-	return nil
 }

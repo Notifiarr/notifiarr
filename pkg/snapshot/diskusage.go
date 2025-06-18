@@ -12,7 +12,7 @@ import (
 	"github.com/shirou/gopsutil/v4/disk"
 )
 
-func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error { //nolint:cyclop
+func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error {
 	if !run {
 		return nil
 	}
@@ -143,8 +143,10 @@ func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 
 // Does not work on windows at all. Linux and Solaris only.
 func GetZFSPoolData(ctx context.Context, pools []string) (map[string]*Partition, error) {
+	output := make(map[string]*Partition)
+
 	if len(pools) == 0 {
-		return nil, nil
+		return output, nil
 	}
 
 	// # zpool list -pH
@@ -156,8 +158,6 @@ func GetZFSPoolData(ctx context.Context, pools []string) (map[string]*Partition,
 	if err != nil {
 		return nil, err
 	}
-
-	output := make(map[string]*Partition)
 
 	go func() {
 		for stdout.Scan() {
