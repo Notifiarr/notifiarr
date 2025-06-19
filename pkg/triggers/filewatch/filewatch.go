@@ -463,13 +463,13 @@ func (w *WatchFile) Active() bool {
 
 // stop stops a file watcher.
 func (w *WatchFile) stop() error {
-	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (RLock-before): %s", w.Path)
+	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (Lock-before): %s", w.Path)
 
-	w.mu.RLock()
-	defer w.mu.RUnlock()
+	w.mu.Lock()
+	defer w.mu.Unlock()
 
 	// XXX: this is a debug log, remove it.
-	mnd.Log.Printf("==> Temp DEBUG: Stopping file watcher (RLock-after): %s", w.Path)
+	mnd.Log.Printf("==> Temp DEBUG: Stopping file watcher (Lock-after): %s", w.Path)
 
 	if err := w.tail.Stop(); err != nil {
 		return fmt.Errorf("stop failed: %w", err)
