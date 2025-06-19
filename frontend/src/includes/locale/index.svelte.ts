@@ -1,6 +1,7 @@
 import { init, register, locale as lang, getLocaleFromNavigator } from 'svelte-i18n'
 import { failure } from '../util'
 import { nav } from '../../navigation/nav.svelte'
+import { get } from 'svelte/store'
 
 /*
 https://phrase.com/blog/posts/a-step-by-step-guide-to-svelte-localization-with-svelte-i18n-v3/
@@ -31,24 +32,27 @@ export const Flags: Record<string, string> = {
 
 class Locale {
   // We support English primarily, so make that the default and fallback.
-  private fallbackLocale = 'en'
+  private readonly fallbackLocale = 'en'
+  // The current locale, so we can export a readonly version.
+  private curr = $state(this.fallbackLocale)
   /** Use this to get the current UI locale (translated language). */
-  public current: string = $state(this.fallbackLocale)
+  public readonly current = $derived(this.curr)
 
   constructor() {
     // We only support language codes, not country codes. Maybe one day.
-    const initialLocale = getLocaleFromNavigator()?.split('-')[0] || this.fallbackLocale
-    this.init(initialLocale, this.fallbackLocale)
+    const init = nav.getQuery('lang') || getLocaleFromNavigator() || this.fallbackLocale
+    this.init(init?.split('-')[0], this.fallbackLocale)
   }
 
   /** Use this to change the UI locale (translated language). */
-  public set = async (newLocale: string | null) => {
+  public readonly set = async (newLocale: string | null) => {
     if (!newLocale) return
 
     try {
+      newLocale = newLocale.split('-')[0]
       await register(newLocale, async () => await import(`../locale/${newLocale}.json`))
       await lang.set(newLocale)
-      await nav.setQuery('lang', (this.current = newLocale))
+      await nav.setQuery('lang', (this.curr = newLocale))
     } catch (e) {
       this.error(`Error registering selected locale ${newLocale}: ${e}`)
     }
@@ -57,13 +61,16 @@ class Locale {
   private init = async (initial: string, fallback: string) => {
     try {
       await register(initial, async () => await import(`../locale/${initial}.json`))
+      await register(fallback, async () => await import(`../locale/${fallback}.json`))
       await init({ fallbackLocale: fallback, initialLocale: initial })
+      this.curr = initial
     } catch (e) {
       this.error(`Error registering browser locale ${initial}: ${e}`)
       // Load default locale.
       try {
         await register(fallback, async () => await import(`../locale/${fallback}.json`))
         await init({ fallbackLocale: fallback, initialLocale: fallback })
+        this.curr = fallback
       } catch (e) {
         this.error(`Error registering default locale ${fallback}: ${e}`)
       }

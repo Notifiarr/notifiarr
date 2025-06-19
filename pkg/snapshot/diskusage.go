@@ -2,7 +2,9 @@ package snapshot
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os/exec"
 	"runtime"
 	"slices"
 	"strconv"
@@ -38,7 +40,7 @@ func GetDisksUsage(ctx context.Context, allDrives bool) (map[string]*Partition, 
 	for idx := range partitions {
 		usage, err := disk.UsageWithContext(ctx, partitions[idx].Mountpoint)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[idx].Mountpoint, err))
+			// errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[idx].Mountpoint, err))
 			continue
 		}
 
@@ -82,6 +84,10 @@ func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
 
 	cmd, stdout, waitg, err := readyCommand(ctx, false, "quota", "--no-wrap", "--show-mntpoint", "--human-readable")
 	if err != nil {
+		if errors.Is(err, exec.ErrNotFound) {
+			return nil
+		}
+
 		return err
 	}
 

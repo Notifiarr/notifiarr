@@ -21,14 +21,9 @@
   import Navigation from './navigation/Index.svelte'
   import { SvelteToast } from '@zerodevx/svelte-toast'
   import { isReady, _ } from './includes/Translate.svelte'
-  import { locale } from './includes/locale/index.svelte'
-  import { onMount } from 'svelte'
   import { theme } from './includes/theme.svelte'
   import MainHeader from './header/Index.svelte'
   import Login from './Login.svelte'
-  import { nav } from './navigation/nav.svelte'
-
-  onMount(() => locale.set(nav.getQuery('lang')))
 </script>
 
 <svelte:head>
@@ -36,7 +31,7 @@
   <link rel="icon" type="image/svg+xml" href={logo} />
 </svelte:head>
 
-<SvelteToast options={{ duration: 9999, pausable: true, intro: { y: '-6rem' } }} />
+<SvelteToast options={{ duration: 7777, pausable: true, intro: { y: '-6rem' } }} />
 
 <main>
   <Container fluid class="mb-2">
