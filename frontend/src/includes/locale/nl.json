@@ -1,1 +1,198 @@
-{}
+{
+    "words": {
+        "select-option": {
+            "Daily": "Dagelijks",
+            "Enabled": "Ingeschakeld",
+            "Disabled": "Uitgeschakeld",
+            "minute": "minuut",
+            "minutes": "minuten",
+            "hour": "uur",
+            "hours": "uren",
+            "custom": "aangepast",
+            "Off": "Uit",
+            "second": "seconde",
+            "seconds": "seconde",
+            "megabytes": "megabytes",
+            "bytes": "bytes",
+            "InstanceDisabled": "Instantie uitgeschakeld",
+            "NoTimeout": "Geen time-out",
+            "ChecksDisabled": "Controles uitgeschakeld"
+        },
+        "clock": {
+            "days": {
+                "Thursday": "Donderdag",
+                "Sunday": "Zondag",
+                "Monday": "Maandag",
+                "Tuesday": "Dinsdag",
+                "Wednesday": "Woensdag",
+                "Friday": "Vrijdag",
+                "Saturday": "Zaterdag"
+            },
+            "short": {
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
+                "m": "{minutes}m",
+                "h": "{hours}h",
+                "d": "{days}d",
+                "w": "{weeks}w"
+            },
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}",
+            "ago": "{timeDuration} geleden"
+        },
+        "bytes": {
+            "short": {
+                "TB": "{bytes} TB",
+                "B": "{bytes} B",
+                "KB": "{bytes} KB",
+                "MB": "{bytes} MB",
+                "GB": "{bytes} GB"
+            }
+        },
+        "instance-options": {
+            "interval": {
+                "label": "Gezondheidscontrole-interval",
+                "description": "Hoe vaak de bereikbaarheid van het exemplaar moet worden gecontroleerd."
+            },
+            "timeout": {
+                "label": "Verzoek-time-out",
+                "description": "Hoe lang moet er worden gewacht op een reactie van het exemplaar?"
+            },
+            "validSsl": {
+                "label": "SSL-certificaat valideren",
+                "description": "Als u het vakje aanvinkt, weet u zeker dat het exemplaar een geldig SSL-certificaat gebruikt."
+            },
+            "deletes": {
+                "label": "Inhoud verwijderen",
+                "description": "Hiermee wordt het aantal verwijderverzoeken beperkt dat per uur naar dit exemplaar kan worden verzonden.",
+                "tooltip": "Hiermee bepaalt u hoeveel verwijderverzoeken er per uur zijn toegestaan. Met een instelling van 0 kunt u geen verwijderverzoeken versturen. Dit geldt voor het verwijderen van media, maar kan ook andere acties omvatten. Dit is een beperking om te voorkomen dat hackers uw content vernietigen.",
+                "countPerHour": "{count} per uur"
+            }
+        }
+    },
+    "phrases": {
+        "BackEndUpdated": "Back-end {timeDuration} geleden bijgewerkt.",
+        "ReloadSuccess": "Herladen succesvol! Client is herladen.",
+        "LoginHelpBody": "Bent u uw wachtwoord vergeten? Raadpleeg dan de wikipagina <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_new\">vergeten wachtwoorden</a>. Als dit uw eerste keer is dat u inlogt, kunt u uw wachtwoord vinden in het logbestand van de client. Als u de client een API-sleutel hebt gegeven voordat u deze voor het eerst startte, is uw wachtwoord de API-sleutel.",
+        "FailedToUpdateBackEnd": "Back-end updaten mislukt: {error}",
+        "TryRefreshingThePage": "Probeer de pagina te vernieuwen.",
+        "ConfigurationSavedReloading": "Configuratie opgeslagen! Client wordt opnieuw geladen...",
+        "ConfigurationSaved": "Configuratie {timeDuration} geleden opgeslagen!",
+        "SavingConfiguration": "Configuratie opslaan...",
+        "Landing": {
+            "SelectASection": "Selecteer een sectie uit het navigatiemenu om te beginnen.",
+            "Welcome": "Welkom, {username}!"
+        },
+        "Every6Hours": "Elke 6 uur",
+        "Every12Hours": "Elke 12 uur",
+        "Every3Hours": "Elke 3 uur",
+        "ERROR": "FOUT",
+        "LoggingIn": "Inloggen...",
+        "LoggedIn": "Ingelogd!",
+        "Loading": "Bezig met laden...",
+        "UpdateBackend": "Backend bijwerken",
+        "UpdatingBackEnd": "Back-end bijwerken...",
+        "Version": "Versie {version}",
+        "Reloading": "Opnieuw laden...",
+        "FailedToReload": "Opnieuw laden mislukt: {error}",
+        "ConfirmReload": "Bevestig herladen",
+        "ConfirmReloadBody": "Weet u zeker dat u de client opnieuw wilt laden?",
+        "ReloadCheckTimedOut": "Server herlaadcontrole is na 20 pogingen verlopen",
+        "ConfirmShutdown": "Bevestig afsluiten",
+        "ConfirmShutdownBody": "Weet u zeker dat u de client wilt afsluiten? U moet hem opnieuw opstarten vanaf de host waarop hij draait.",
+        "ShutdownSuccess": "Afsluiten gelukt! Client gestopt.",
+        "FailedToShutdown": "Afsluiten mislukt: {error} - Probeer de pagina opnieuw te laden.",
+        "LoginHelp": "Inloghulp",
+        "Changed": "Gewijzigd",
+        "New": "Nieuw",
+        "Invalid": "Ongeldig",
+        "DeleteInstance": "Instantie verwijderen",
+        "DeletedNumber": "Verwijderd {number}",
+        "ItsGone": "Weg! Vergeet niet op te slaan.",
+        "URLMustBeginWithHttp": "URL moet beginnen met http:// of https://",
+        "NameMustNotBeEmpty": "Naam mag niet leeg zijn.",
+        "HostMustNotBeEmpty": "Host mag niet leeg zijn.",
+        "UsernameMustNotBeEmpty": "Gebruikersnaam mag niet leeg zijn.",
+        "NameInUseByInstance": "Deze naam wordt gebruikt door instantie {number}.",
+        "APIKeyMustBeCountCharacters": "De API-sleutel moet minimaal {count} tekens lang zijn.",
+        "TokenMustBeCountCharacters": "Het token moet minimaal {count} tekens lang zijn.",
+        "LeavePage": "Wilt u deze pagina echt verlaten?"
+    },
+    "navigation": {
+        "pageDescription": {
+            "SnapshotApps": "De meeste snapshot configuraties vindt u op de website Notifiarr.com. Hieronder vindt u de plug-in instellingen voor de snapshotfunctie.",
+            "FileWatcher": "Let op bestandswijzigingen en activeer acties! Deze Notifiarr-client kan (log)bestanden controleren op regels die overeenkomen met een reguliere expressie. Dit is vergelijkbaar met <code>tail -f file | grep string</code> en stelt u in staat om meldingen te versturen wanneer er bijvoorbeeld een nieuwe regel in een logbestand is geschreven die overeenkomt met een reguliere expressie.",
+            "Metrics": "Bekijk metrische totalen voor client configuraties.",
+            "SiteTunnel": "Deze client onderhoud een permanente websocket verbinding met notifiarr.com via een <a href=\"https://github.com/golift/mulery\" target=\"_new\">Mulery-tunnel</a>. Deze tunnel stelt de website in staat om verzoeken naar uw client te sturen zonder dat er een poort hoeft te worden geopend of een statisch IP-adres hoeft te worden gebruikt. Op deze pagina kunt u uw primaire tunnel selecteren en welke tunnel u als back-up wilt gebruiken voor het geval de primaire tunnel ontoegankelijk wordt.",
+            "Commands": "Aangepaste opdrachten en scripts instellen en uitvoeren.",
+            "Services": "De Notifiarr-clienttoepassing kan services bewaken via HTTP-controles, TCP-poortcontroles of controles op processen die wel of niet worden uitgevoerd. <b>De clientservice controles werken met de Notifiarr.com-netwerkintegratie.</b>",
+            "Configuration": "Configureer hier uw Notifiarr-clientinstellingen.",
+            "StarrApps": "Stel Starr-integraties in.",
+            "Downloaders": "Beheer downloadclients.",
+            "MediaApps": "Beheer mediaspelers en gerelateerde services.",
+            "Endpoints": "Configureer relay-eindpunt-URL's en hun schema's.",
+            "Integrations": "Bekijk actie statistieken voor alle integraties.",
+            "Monitoring": "Bekijk de service- en netwerkstatus.",
+            "LogFiles": "Client logbestanden bekijken en beheren.",
+            "Actions": "Hier vindt u interne Notifiarr-clientacties. Deze worden uitgevoerd door timers, schema's en gebeurtenissen van de website of een chatserver. Hoewel ze normaal gesproken alleen voor probleemoplossing worden gebruikt, kunt u ze in deze interface handmatig activeren."
+        },
+        "titles": {
+            "LogFiles": "Logbestanden",
+            "UnsavedChanges": "Niet-opgeslagen wijzigingen",
+            "System": "Systeem",
+            "Landing": "Notifiarr Home",
+            "TrustProfile": "Vertrouwens profiel",
+            "Settings": "Instellingen",
+            "Insights": "Inzichten",
+            "Configuration": "Configuratie",
+            "FileWatcher": "Bestandsbewaker",
+            "Endpoints": "Eindpunten",
+            "Commands": "Opdrachten",
+            "SiteTunnel": "Site Tunnel",
+            "StarrApps": "Starr Apps",
+            "Downloaders": "Download Apps",
+            "MediaApps": "Media Apps",
+            "SnapshotApps": "Snapshot Apps",
+            "Integrations": "Integraties",
+            "Monitoring": "Monitoring",
+            "Metrics": "Metrieken",
+            "Services": "Diensten",
+            "Actions": "Acties"
+        }
+    },
+    "RegexTester": {
+        "testPattern": {
+            "description": "Voorbeeldstring of logregel om de reguliere expressie mee te testen.",
+            "placeholder": "[INFO] 2025-05-25 16:20:01 - Dit is een testlogregel.",
+            "label": "Testpatroon"
+        },
+        "testRegex": {
+            "label": "Testexpressie",
+            "description": "Expressie die overeenkomt met het testpatroon.",
+            "placeholder": "GET .*some/pad"
+        },
+        "TestResult": "Testresultaat",
+        "Test": "Test",
+        "Expression": "Uitdrukking",
+        "Result": "Resultaat",
+        "NoMatch": "Geen match",
+        "RegularExpressionTester": "Tester voor reguliere expressies"
+    },
+    "buttons": {
+        "ShowMenu": "Menu weergeven",
+        "Login": "Inloggen",
+        "Confirm": "Bevestigen",
+        "Cancel": "Annuleren",
+        "Save": "Opslaan",
+        "Close": "Sluiten",
+        "SaveChanges": "Wijzigingen opslaan",
+        "SaveConfiguration": "Configuratie opslaan",
+        "ResetForm": "Formulier resetten",
+        "Execute": "Uitvoeren",
+        "HideMenu": "Menu verbergen",
+        "ShowOutput": "Uitvoer weergeven",
+        "HideOutput": "Uitvoer verbergen",
+        "RefreshOutput": "Uitvoer vernieuwen",
+        "NoStayHere": "Nee! Blijf hier",
+        "YesDeleteMyChanges": "Ja! Verwijder mijn wijzigingen"
+    }
+}
