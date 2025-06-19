@@ -69,8 +69,7 @@ class Locale {
       // Load default locale.
       try {
         await register(fallback, async () => await import(`../locale/${fallback}.json`))
-        await init({ fallbackLocale: fallback, initialLocale: fallback })
-        this.curr = fallback
+        await init({ fallbackLocale: fallback, initialLocale: (this.curr = fallback) })
       } catch (e) {
         this.error(`Error registering default locale ${fallback}: ${e}`)
       }

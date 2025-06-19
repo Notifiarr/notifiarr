@@ -20,6 +20,7 @@
     if (line.includes('requested]')) return 'primary-subtle'
     // Services checks.
     if (line.includes('Critical')) return 'warning-subtle'
+    if (line.includes('DEBUG')) return 'primary-subtle'
     // Catches any error. Might be too many.
     if (line.toLowerCase().includes('error')) return 'danger-subtle'
     // Startup and info lines.
@@ -38,7 +39,6 @@
   {#if resp.ok}
     {@const list = resp.body.trimEnd().split('\n')}
     {@const lineNumberWidth = Math.floor(Math.log10(list.length)) + 1 + 'ch'}
-    {lineNumberWidth}
     <div class="log-file-content" style="--line-number-width: {lineNumberWidth}">
       <ListGroup flush numbered class="ps-0 text-nowrap ms-0">
         {#each sort ? list : list.reverse() as line}
