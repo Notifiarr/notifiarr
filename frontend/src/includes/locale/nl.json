@@ -194,5 +194,144 @@
         "RefreshOutput": "Uitvoer vernieuwen",
         "NoStayHere": "Nee! Blijf hier",
         "YesDeleteMyChanges": "Ja! Verwijder mijn wijzigingen"
+    },
+    "profile": {
+        "phrase": {
+            "ShowMoreDesc": "Er worden momenteel drie authenticatietypen ondersteund. Auth Proxy en geen wachtwoord zijn alleen beschikbaar als de huidige aanvraag afkomstig is van een geldig, geconfigureerd upstream IP-adres.",
+            "ProxyAuthDisabled": "Proxy-authenticatie is uitgeschakeld omdat uw upstream ({upstreamIp}) niet in de lijst met toegestane upstreams staat.",
+            "Addit": "Voeg toe.",
+            "PasswordOnlyUsed": "Gebruikersnaam en wachtwoord worden alleen gebruikt als het authenticatietype is ingesteld op Wachtwoord.",
+            "HeaderOnlyUsed": "Auth-header wordt alleen gebruikt als het authenticatietype <b>niet</b> is ingesteld op wachtwoord.",
+            "AuthTypeChange": "Als het authenticatie type verandert, meldt u zich af om het proces te voltooien.",
+            "ProfileUpdated": "Profiel succesvol bijgewerkt {timeDuration} geleden!",
+            "EnterCurrentPassword": "Voer uw huidige wachtwoord in om wijzigingen aan te brengen.",
+            "SeeWikiForAuthProxyHelp": "Zie <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">de wiki</a> voor instructies over het instellen van een authenticatie proxy.",
+            "ShowMeMore": "Laat meer zien.",
+            "ShowMeLess": "Laat minder zien."
+        },
+        "authType": {
+            "options": {
+                "noauth": "Geen wachtwoord (gevaar)",
+                "password": "Wachtwoord: Lokale gebruikersnaam",
+                "header": "Auth-proxy: koptekst"
+            },
+            "option_desc": {
+                "header": "Selecteer deze optie om in te loggen bij deze applicatie met een HTTP-header die een gebruikersnaam bevat. Dit staat algemeen bekend als proxy-authenticatie. We hebben <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">een wikipagina</a> met instructies voor het configureren van Nginx voor deze functie. Wanneer u deze optie selecteert, moet u ook een header voor de auth-proxy selecteren. Als er geen headers worden weergegeven, zijn er geen geldige headers door de upstream-proxy verstrekt.",
+                "password": " Dit is het standaard authenticatie type. Selecteer de optie 'Wachtwoord' om in te loggen bij deze applicatie met een geconfigureerde gebruikersnaam en wachtwoord. Er wordt slechts één gebruikersnaam en wachtwoord ondersteund. Wanneer u deze optie selecteert, moet u de velden voor de gebruikersnaam en het nieuwe wachtwoord invullen. Als dit het huidige authenticatietype is, moet u ook het veld voor het huidige wachtwoord invullen om wijzigingen aan te brengen.",
+                "noauth": "Deze configuratie wordt niet aanbevolen. Het authenticatietype 'Geen wachtwoord' staat alle verzoeken toe van elk geconfigureerd <code>upstream IP</code>. Het werkt ook met een authenticatie proxy om de gebruikersnaam in te stellen. Als er geen gebruikersnaam in de opgegeven header staat, wordt standaard admin gebruikt."
+            },
+            "label": "Authenticatie type",
+            "description": "Selecteer hoe u zich wilt authenticeren bij de client"
+        },
+        "upstreams": {
+            "placeholder": "127.0.0.1 ::1",
+            "tooltip": "Als de Notifiarr-client zich achter een reverse proxy (swag, nginx, enz.) bevindt, moet u hier het IP-adres van die proxy toevoegen. U kunt ook volledige netwerken opgeven. Dit bepaalt welk IP-adres wordt weggeschreven naar het logbestand van de webserver, de aanvrager of de <span class=\"text-warning\">X-Forwarded-For</span>-header. Vereist wanneer een aanvraag header wordt gebruikt voor authenticatie, of wanneer authenticatie is uitgeschakeld.",
+            "label": "Upstreams",
+            "description": "Vertrouwde proxy-IP- of CIDR-netwerken. Scheid netwerken met spaties."
+        },
+        "header": {
+            "tooltip": "Hier worden headers weergegeven die door de client of upstream worden aangeleverd en die mogelijk worden gebruikt voor proxy-authenticatie. Deze selectie wordt gebruikt als Authenticatietype is ingesteld op Header of Geen wachtwoord. Kies de header die uw gebruikersnaam weergeeft. Bij Geen wachtwoord wordt de header gebruikt om de gebruikersnaam in te stellen, maar is dit niet verplicht.",
+            "description": "Selecteer de header met uw gebruikersnaam",
+            "label": "Auth-header"
+        },
+        "username": {
+            "label": "Gebruikersnaam",
+            "description": "Uw gebruikersnaam voor inloggen",
+            "placeholder": "Standaard: admin"
+        },
+        "title": {
+            "Authentication": "Authenticatie",
+            "Authorization": "Autorisatie"
+        },
+        "password": {
+            "label": "Huidig wachtwoord",
+            "description": "Uw inlogwachtwoord",
+            "placeholder": "Voer uw huidige wachtwoord in"
+        },
+        "newPass": {
+            "label": "Nieuw wachtwoord",
+            "description": "Uw nieuwe inlogwachtwoord",
+            "placeholder": "Minimaal 9 tekens"
+        }
+    },
+    "config": {
+        "unstableCh": {
+            "description": "Als u het kanaal voor onstabiele updates inschakelt, controleert de toepassing de onstabiele website op automatische updates in plaats van GitHub.",
+            "label": "Onstabiel kanaal",
+            "tooltip": "Alleen beschikbaar voor gebruikers met ontwikkelaar stoegang."
+        },
+        "autoUpdate": {
+            "description": "Dit is hoe vaak de applicatie controleert op updates. Zodra er een gevonden is, wordt deze automatisch geïnstalleerd.",
+            "tooltip": "Dit werkt alleen op Windows."
+        }
+    },
+    "system": {
+        "UserInformation": {
+            "YoureSoGifted": "Je bent zo getalenteerd, en we houden van je! 💜",
+            "DateFormat": "Datumnotatie",
+            "title": "Gebruikersinformatie",
+            "Patron": "Patron",
+            "Subscriber": "Abonnee",
+            "AbsoluteBadAss": "Absoluut stoer",
+            "YesYesYouAre": "Ja, ja dat ben je! 💚",
+            "HellaAwesome": "Hoi geweldenaar"
+        },
+        "ClientInformation": {
+            "Uptime": "Uptime",
+            "Started": "Gestart",
+            "title": "Client informatie",
+            "Application": "Toepassingen",
+            "Version": "Versie"
+        },
+        "StorageData": {
+            "title": "Opslag gegevens",
+            "Total": "Totaal",
+            "Used": "Gebruikt",
+            "Free": "Vrij",
+            "FS": "FS",
+            "ro": "ro"
+        },
+        "NetworkInformation": {
+            "Netmask": "Netmask",
+            "title": "Netwerk informatie",
+            "IPAddress": "IP-adres",
+            "Gateway": "Gateway",
+            "Interface": "Interface"
+        },
+        "BuildInformation": {
+            "title": "Build informatie",
+            "Branch": "Branch",
+            "BuildUser": "Build gebruiker",
+            "BuildDate": "Build datum",
+            "GoVersion": "Go-versie",
+            "Integrity": "Integriteit"
+        },
+        "OperatingSystem": {
+            "title": "Besturingssysteem",
+            "Hostname": "Hostnaam",
+            "UniqueID": "Unieke ID",
+            "Platform": "Platform",
+            "KernelVersion": "Kernel versie",
+            "VirtualizationSystem": "Virtualisatie systeem"
+        },
+        "StartupParams": {
+            "title": "Opstart parameters",
+            "BinaryPath": "Binair pad",
+            "ConfigFile": "Configuratie bestand",
+            "EnvironmentPrefix": "Omgevings prefix",
+            "ExtraConfigFiles": "Extra configuratie bestanden",
+            "CustomAssets": "Aangepaste assets",
+            "UserID": "Gebruikers-ID",
+            "GroupID": "Groeps-ID",
+            "IPAddress": "IP-adres"
+        },
+        "EnvironmentVariables": {
+            "title": "Omgevingsvariabelen"
+        }
+    },
+    "MediaApps": {
+        "Plex": {
+            "title": "Plex"
+        }
     }
 }
