@@ -885,7 +885,7 @@
         "AddATime": "Voeg een tijd toe",
         "times": {
             "everyMonth": "",
-            "everyHour": "{aantal, meervoud, één {One Time} andere {# times}} elk uur op minuut:seconden {times}",
+            "everyHour": "",
             "everyDay": "",
             "everyMinute": "",
             "everyWeek": "",
@@ -1209,9 +1209,9 @@
             "tooltip": ""
         },
         "badge": {
-            "header": "{aantal, meervoud, één {1 header} andere {# headers}}",
-            "body": "{aantal, meervoud, één {1 teken} andere {# tekens}}",
-            "query": "{aantal, meervoud, één {1 query} andere {# queries}}"
+            "header": "",
+            "body": "",
+            "query": ""
         },
         "addInstance": "Relay-URL toevoegen",
         "DeleteEndpoint": "URL verwijderen",
