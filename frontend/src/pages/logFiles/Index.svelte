@@ -24,7 +24,6 @@
   import Fa from '../../includes/Fa.svelte'
   import { faListTimeline } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Content from './Content.svelte'
-  import theme from '../../includes/theme.svelte'
 
   let activeFile: LogFileInfo | null = $state(null)
 

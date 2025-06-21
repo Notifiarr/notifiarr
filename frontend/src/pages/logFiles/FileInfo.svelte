@@ -20,7 +20,7 @@
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import Fa from '../../includes/Fa.svelte'
-  import { getUi } from '../../api/fetch'
+  import { getUi, urlbase } from '../../api/fetch'
   import { success, warning } from '../../includes/util'
   import { slide } from 'svelte/transition'
   import { theme } from '../../includes/theme.svelte'
@@ -39,10 +39,6 @@
     } else {
       warning($_('LogFiles.deleteError', { values: { error: resp.body } }))
     }
-  }
-
-  const downloadFile = async () => {
-    window.location.href = 'downloadFile/logs/' + file.id
   }
 
   const uploadFile = async () => {
@@ -71,11 +67,12 @@
 <div class="mt-2 d-inline-block">
   <ButtonGroup>
     <Button
+      href="{$urlbase}ui/downloadFile/logs/{file.id}"
+      download="{file.name}.zip"
       color="primary"
       size="sm"
       title={$_('LogFiles.button.download')}
-      outline
-      onclick={downloadFile}>
+      outline>
       <Fa i={faCloudDownload} scale={1.5} />&nbsp; <T id="LogFiles.button.download" />
     </Button>
     <Button
