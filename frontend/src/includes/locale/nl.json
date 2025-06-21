@@ -133,7 +133,10 @@
             "Integrations": "Bekijk actie statistieken voor alle integraties.",
             "Monitoring": "Bekijk de service- en netwerkstatus.",
             "LogFiles": "Client logbestanden bekijken en beheren.",
-            "Actions": "Hier vindt u interne Notifiarr-clientacties. Deze worden uitgevoerd door timers, schema's en gebeurtenissen van de website of een chatserver. Hoewel ze normaal gesproken alleen voor probleemoplossing worden gebruikt, kunt u ze in deze interface handmatig activeren."
+            "Actions": "Hier vindt u interne Notifiarr-clientacties. Deze worden uitgevoerd door timers, schema's en gebeurtenissen van de website of een chatserver. Hoewel ze normaal gesproken alleen voor probleemoplossing worden gebruikt, kunt u ze in deze interface handmatig activeren.",
+            "TrustProfile": "Configureer hoe u zich aanmeldt bij deze Notifiarr-clienttoepassing.",
+            "System": "",
+            "Landing": ""
         },
         "titles": {
             "LogFiles": "Logbestanden",
@@ -194,5 +197,1305 @@
         "RefreshOutput": "Uitvoer vernieuwen",
         "NoStayHere": "Nee! Blijf hier",
         "YesDeleteMyChanges": "Ja! Verwijder mijn wijzigingen"
+    },
+    "profile": {
+        "phrase": {
+            "ShowMoreDesc": "Er worden momenteel drie authenticatietypen ondersteund. Auth Proxy en geen wachtwoord zijn alleen beschikbaar als de huidige aanvraag afkomstig is van een geldig, geconfigureerd upstream IP-adres.",
+            "ProxyAuthDisabled": "Proxy-authenticatie is uitgeschakeld omdat uw upstream ({upstreamIp}) niet in de lijst met toegestane upstreams staat.",
+            "Addit": "Voeg toe.",
+            "PasswordOnlyUsed": "Gebruikersnaam en wachtwoord worden alleen gebruikt als het authenticatietype is ingesteld op Wachtwoord.",
+            "HeaderOnlyUsed": "Auth-header wordt alleen gebruikt als het authenticatietype <b>niet</b> is ingesteld op wachtwoord.",
+            "AuthTypeChange": "Als het authenticatie type verandert, meldt u zich af om het proces te voltooien.",
+            "ProfileUpdated": "Profiel succesvol bijgewerkt {timeDuration} geleden!",
+            "EnterCurrentPassword": "Voer uw huidige wachtwoord in om wijzigingen aan te brengen.",
+            "SeeWikiForAuthProxyHelp": "Zie <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">de wiki</a> voor instructies over het instellen van een authenticatie proxy.",
+            "ShowMeMore": "Laat meer zien.",
+            "ShowMeLess": "Laat minder zien."
+        },
+        "authType": {
+            "options": {
+                "noauth": "Geen wachtwoord (gevaar)",
+                "password": "Wachtwoord: Lokale gebruikersnaam",
+                "header": "Auth-proxy: koptekst"
+            },
+            "option_desc": {
+                "header": "Selecteer deze optie om in te loggen bij deze applicatie met een HTTP-header die een gebruikersnaam bevat. Dit staat algemeen bekend als proxy-authenticatie. We hebben <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">een wikipagina</a> met instructies voor het configureren van Nginx voor deze functie. Wanneer u deze optie selecteert, moet u ook een header voor de auth-proxy selecteren. Als er geen headers worden weergegeven, zijn er geen geldige headers door de upstream-proxy verstrekt.",
+                "password": " Dit is het standaard authenticatie type. Selecteer de optie 'Wachtwoord' om in te loggen bij deze applicatie met een geconfigureerde gebruikersnaam en wachtwoord. Er wordt slechts één gebruikersnaam en wachtwoord ondersteund. Wanneer u deze optie selecteert, moet u de velden voor de gebruikersnaam en het nieuwe wachtwoord invullen. Als dit het huidige authenticatietype is, moet u ook het veld voor het huidige wachtwoord invullen om wijzigingen aan te brengen.",
+                "noauth": "Deze configuratie wordt niet aanbevolen. Het authenticatietype 'Geen wachtwoord' staat alle verzoeken toe van elk geconfigureerd <code>upstream IP</code>. Het werkt ook met een authenticatie proxy om de gebruikersnaam in te stellen. Als er geen gebruikersnaam in de opgegeven header staat, wordt standaard admin gebruikt."
+            },
+            "label": "Authenticatie type",
+            "description": "Selecteer hoe u zich wilt authenticeren bij de client"
+        },
+        "upstreams": {
+            "placeholder": "127.0.0.1 ::1",
+            "tooltip": "Als de Notifiarr-client zich achter een reverse proxy (swag, nginx, enz.) bevindt, moet u hier het IP-adres van die proxy toevoegen. U kunt ook volledige netwerken opgeven. Dit bepaalt welk IP-adres wordt weggeschreven naar het logbestand van de webserver, de aanvrager of de <span class=\"text-warning\">X-Forwarded-For</span>-header. Vereist wanneer een aanvraag header wordt gebruikt voor authenticatie, of wanneer authenticatie is uitgeschakeld.",
+            "label": "Upstreams",
+            "description": "Vertrouwde proxy-IP- of CIDR-netwerken. Scheid netwerken met spaties."
+        },
+        "header": {
+            "tooltip": "Hier worden headers weergegeven die door de client of upstream worden aangeleverd en die mogelijk worden gebruikt voor proxy-authenticatie. Deze selectie wordt gebruikt als Authenticatietype is ingesteld op Header of Geen wachtwoord. Kies de header die uw gebruikersnaam weergeeft. Bij Geen wachtwoord wordt de header gebruikt om de gebruikersnaam in te stellen, maar is dit niet verplicht.",
+            "description": "Selecteer de header met uw gebruikersnaam",
+            "label": "Auth-header"
+        },
+        "username": {
+            "label": "Gebruikersnaam",
+            "description": "Uw gebruikersnaam voor inloggen",
+            "placeholder": "Standaard: admin"
+        },
+        "title": {
+            "Authentication": "Authenticatie",
+            "Authorization": "Autorisatie"
+        },
+        "password": {
+            "label": "Huidig wachtwoord",
+            "description": "Uw inlogwachtwoord",
+            "placeholder": "Voer uw huidige wachtwoord in"
+        },
+        "newPass": {
+            "label": "Nieuw wachtwoord",
+            "description": "Uw nieuwe inlogwachtwoord",
+            "placeholder": "Minimaal 9 tekens"
+        }
+    },
+    "config": {
+        "unstableCh": {
+            "description": "Als u het kanaal voor onstabiele updates inschakelt, controleert de toepassing de onstabiele website op automatische updates in plaats van GitHub.",
+            "label": "Onstabiel kanaal",
+            "tooltip": "Alleen beschikbaar voor gebruikers met ontwikkelaar stoegang."
+        },
+        "autoUpdate": {
+            "description": "Dit is hoe vaak de applicatie controleert op updates. Zodra er een gevonden is, wordt deze automatisch geïnstalleerd.",
+            "tooltip": "Dit werkt alleen op Windows.",
+            "label": "Automatische update"
+        },
+        "extraKeys": {
+            "description": "Extra API-sleutels voor integraties van derden. Gescheiden met een nieuwe regel.",
+            "label": "Extra sleutels",
+            "placeholder": ""
+        },
+        "apiKey": {
+            "description": "API-sleutel van uw Notifiarr.com-account.",
+            "tooltip": "U kunt dit vinden door in te loggen op Notifiarr.com, naar Profiel te gaan en vervolgens naar API-sleutels.",
+            "label": "API-sleutel",
+            "placeholder": "Voer hier uw API-sleutel in"
+        },
+        "logFile": {
+            "label": "Toepassings log bestand",
+            "description": "",
+            "placeholder": ""
+        },
+        "quiet": {
+            "description": "Stille logging in- of uitschakelen.",
+            "tooltip": "Door Quiet in te schakelen, print de app niets naar stdout. Dit is handig wanneer een logbestand is ingeschakeld en je niet wilt dat logs ook in een opstart daemon terechtkomen.",
+            "label": ""
+        },
+        "debug": {
+            "tooltip": "Door debuggen in te schakelen, worden er veel meer gegevens naar het logbestand geschreven. Gebruik de instellingen voor maximale body om de grootte van de payload te bepalen.",
+            "label": "Debug-logging",
+            "description": "Debug-logging in- of uitschakelen."
+        },
+        "ui": {
+            "darkMode": {
+                "label": "Donkere modus",
+                "description": "Donkere modus in- of uitschakelen."
+            },
+            "language": {
+                "description": "Taal van de frontend van de applicatie.",
+                "label": "Taal"
+            }
+        },
+        "watchFile": {
+            "path": {
+                "label": "Bestandspad",
+                "description": ""
+            }
+        },
+        "bindAddr": {
+            "placeholder": "0.0.0.0:5454",
+            "label": "Bind adres",
+            "description": "IP en poort waarnaar de app zal luisteren. Gebruik 0.0.0.0 om op alle interfaces te luisteren."
+        },
+        "errors": {
+            "AnUnknownErrorOccurred": "Er is een onbekende fout opgetreden",
+            "ConfigUpdateFailed": "Configuratie-update mislukt: {error}",
+            "InvalidCreds": "Ongeldige gebruikersnaam of wachtwoord.",
+            "LoginRequestTimedOut": "",
+            "LoginFailed": "",
+            "ProfileReqTimedOut": "",
+            "PleaseEnterBothUsernameAndPassword": ""
+        },
+        "titles": {
+            "Command": "Commando",
+            "Configuration": "Configuratie",
+            "Dark": "Donker",
+            "Endpoint": "Eindpunt",
+            "General": "Algemeen",
+            "Light": "Licht",
+            "Network": "",
+            "System": "",
+            "WatchFile": "",
+            "SSLConfiguration": "",
+            "Services": "",
+            "Logging": ""
+        },
+        "debugLog": {
+            "label": "Debug-log bestand",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "noUploads": {
+            "description": "Met <b>Uitgeschakeld</b> kunnen beheerders van Notifiarr.com deze client logbestanden naar de website laten uploaden. Met <b>Ingeschakeld</b> worden het uploaden van logbestanden voorkomen.",
+            "label": "Uploads weigeren",
+            "tooltip": ""
+        },
+        "services": {
+            "disabled": {
+                "tooltip": "Schakel hier de bewaking van alle netwerk- en servicecontroles in of uit.",
+                "description": "Service controles in- of uitschakelen.",
+                "label": ""
+            },
+            "logFile": {
+                "tooltip": "",
+                "placeholder": "",
+                "label": "",
+                "description": ""
+            },
+            "interval": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "parallel": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            }
+        },
+        "command": {
+            "name": {
+                "required": "Er is een opdracht nodig.",
+                "label": "",
+                "description": ""
+            }
+        },
+        "apt": {
+            "label": "APT-hook",
+            "description": "",
+            "tooltip": ""
+        },
+        "hostId": {
+            "tooltip": "Het wijzigen van deze waarde wordt afgeraden; deze zou automatisch gevonden moeten worden. Kopieer deze waarde niet naar een andere Notifiarr-clientinstallatie.",
+            "label": "Host ID",
+            "description": ""
+        },
+        "retries": {
+            "tooltip": "Standaard: 4 (instelling 0 gebruikt de standaardwaarde 4)",
+            "label": "",
+            "description": ""
+        },
+        "serial": {
+            "description": "Als u deze instelling uitschakelt, gebruikt de toepassing minder go-routines (threads) bij het verzamelen van gegevens uit geconfigureerde toepassingen.",
+            "label": "",
+            "tooltip": ""
+        },
+        "urlbase": {
+            "tooltip": "Voorbeeld: /notifiarr/",
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "logFileMb": {
+            "label": "Logbestand grootte",
+            "description": "",
+            "tooltip": ""
+        },
+        "httpLog": {
+            "label": "HTTP-logbestand",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "logFiles": {
+            "label": "Aantal logbestanden",
+            "description": "",
+            "tooltip": ""
+        },
+        "sslCertFile": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "maxBody": {
+            "tooltip": "",
+            "label": "",
+            "description": ""
+        },
+        "snapshot": {
+            "timeout": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "timeout": {
+            "label": "",
+            "description": ""
+        },
+        "endpoint": {
+            "name": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "sslKeyFile": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "service": {
+            "name": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "fileMode": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        }
+    },
+    "system": {
+        "UserInformation": {
+            "YoureSoGifted": "Je bent zo getalenteerd, en we houden van je! 💜",
+            "DateFormat": "Datumnotatie",
+            "title": "Gebruikersinformatie",
+            "Patron": "Patron",
+            "Subscriber": "Abonnee",
+            "AbsoluteBadAss": "Absoluut stoer",
+            "YesYesYouAre": "Ja, ja dat ben je! 💚",
+            "HellaAwesome": "Hoi geweldenaar"
+        },
+        "ClientInformation": {
+            "Uptime": "Uptime",
+            "Started": "Gestart",
+            "title": "Client informatie",
+            "Application": "Toepassingen",
+            "Version": "Versie"
+        },
+        "StorageData": {
+            "title": "Opslag gegevens",
+            "Total": "Totaal",
+            "Used": "Gebruikt",
+            "Free": "Vrij",
+            "FS": "FS",
+            "ro": "ro"
+        },
+        "NetworkInformation": {
+            "Netmask": "Netmask",
+            "title": "Netwerk informatie",
+            "IPAddress": "IP-adres",
+            "Gateway": "Gateway",
+            "Interface": "Interface"
+        },
+        "BuildInformation": {
+            "title": "Build informatie",
+            "Branch": "Branch",
+            "BuildUser": "Build gebruiker",
+            "BuildDate": "Build datum",
+            "GoVersion": "Go-versie",
+            "Integrity": "Integriteit"
+        },
+        "OperatingSystem": {
+            "title": "Besturingssysteem",
+            "Hostname": "Hostnaam",
+            "UniqueID": "Unieke ID",
+            "Platform": "Platform",
+            "KernelVersion": "Kernel versie",
+            "VirtualizationSystem": "Virtualisatie systeem"
+        },
+        "StartupParams": {
+            "title": "Opstart parameters",
+            "BinaryPath": "Binair pad",
+            "ConfigFile": "Configuratie bestand",
+            "EnvironmentPrefix": "Omgevings prefix",
+            "ExtraConfigFiles": "Extra configuratie bestanden",
+            "CustomAssets": "Aangepaste assets",
+            "UserID": "Gebruikers-ID",
+            "GroupID": "Groeps-ID",
+            "IPAddress": "IP-adres"
+        },
+        "EnvironmentVariables": {
+            "title": "Omgevingsvariabelen"
+        }
+    },
+    "MediaApps": {
+        "Plex": {
+            "title": "Plex",
+            "url": {
+                "placeholder": "http://plex.server.tv:32400",
+                "label": "",
+                "description": ""
+            },
+            "description": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "token": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            }
+        },
+        "Tautulli": {
+            "apiKey": {
+                "label": "API-sleutel",
+                "description": "API-sleutel voor de Tautulli-service.",
+                "placeholder": ""
+            },
+            "url": {
+                "placeholder": "http://tautulli.server.tv:8181",
+                "label": "",
+                "description": ""
+            },
+            "title": "",
+            "description": "",
+            "name": {
+                "label": "",
+                "description": ""
+            }
+        }
+    },
+    "monitoring": {
+        "ConfigureServices": "Configureer de servicecontroles die op de <go-to page=\"services\">Services pagina</go-to> worden weergegeven.",
+        "EnableOnConfig": "Schakel service controles in op de pagina <go-to page=\"configuration\">Configuratie</go-to>.",
+        "cardsView": "Kaart weergave",
+        "check": {
+            "interval": {
+                "title": "Controleer interval",
+                "tooltip": "Hoe vaak deze service wordt gecontroleerd.",
+                "short": "Interval"
+            },
+            "last": {
+                "tooltip": "Hoe lang geleden is deze service gecontroleerd?",
+                "short": "Laatste",
+                "title": "Laatste controle: {timeDuration} geleden",
+                "description": ""
+            },
+            "output": "Laatste controle-uitvoer",
+            "since": {
+                "tooltip": "Hoe lang de service al in deze staat verkeert.",
+                "short": "",
+                "title": "",
+                "description": ""
+            },
+            "name": "",
+            "state": {
+                "short": "",
+                "title": ""
+            },
+            "typeExpect": ""
+        },
+        "classicView": "Klassieke weergave",
+        "recheckFailed": "Service kon niet opnieuw worden gecontroleerd.",
+        "startFailed": "Het starten van de service controles is mislukt.",
+        "stopFailed": "Het stoppen van de service controles is mislukt.",
+        "hideAllOutputs": "Verberg alle uitvoer",
+        "ChecksDisabled": "",
+        "ChecksStopped": "",
+        "StartChecks": "",
+        "StopChecks": "",
+        "checkInitiated": "",
+        "nextRefresh": "",
+        "refreshInterval": "",
+        "showAllOutputs": ""
+    },
+    "StarrApps": {
+        "Readarr": {
+            "name": {
+                "label": "Instantienaam",
+                "description": "Naam van het Readarr-instantie.",
+                "placeholder": "aangepaste naam voor meldingen"
+            },
+            "username": {
+                "description": "Gebruikersnaam voor het Readarr-instantie.",
+                "placeholder": "admin",
+                "tooltip": "U hebt alleen een gebruikersnaam en wachtwoord nodig als u database back-ups wilt controleren. Deze kunnen niet via de API worden gedownload.",
+                "label": "Gebruikersnaam"
+            },
+            "password": {
+                "description": "Wachtwoord voor het Readarr-instantie.",
+                "label": "Wachtwoord",
+                "placeholder": "wachtwoord"
+            },
+            "addInstance": "Readarr-instantie toevoegen",
+            "url": {
+                "label": "URL",
+                "description": "URL van het Readarr-exemplaar.",
+                "placeholder": "http://readarr.server.tv:8787"
+            },
+            "apiKey": {
+                "label": "API-sleutel",
+                "description": "API-sleutel voor het Readarr-exemplaar.",
+                "placeholder": "readarr-api-sleutel"
+            },
+            "title": ""
+        },
+        "Radarr": {
+            "apiKey": {
+                "description": "API-sleutel voor de Radarr-instantie.",
+                "label": "API-sleutel",
+                "placeholder": ""
+            },
+            "addInstance": "Radarr-instantie toevoegen",
+            "username": {
+                "placeholder": "beheerder",
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "url": {
+                "placeholder": "http://radarr.server.tv:7878",
+                "label": "",
+                "description": ""
+            },
+            "title": "",
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Sonarr": {
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "addInstance": "Sonarr-instantie toevoegen",
+            "apiKey": {
+                "label": "API-sleutel",
+                "description": "API-sleutel voor de Sonarr-instantie.",
+                "placeholder": ""
+            },
+            "username": {
+                "placeholder": "beheerder",
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "url": {
+                "placeholder": "http://sonarr.server.tv:8989",
+                "label": "",
+                "description": ""
+            },
+            "password": {
+                "placeholder": "",
+                "label": "",
+                "description": ""
+            },
+            "title": ""
+        },
+        "Prowlarr": {
+            "apiKey": {
+                "label": "API-sleutel",
+                "description": "API-sleutel voor de Prowlarr-instantie.",
+                "placeholder": ""
+            },
+            "addInstance": "Prowlarr-instantie toevoegen",
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "username": {
+                "placeholder": "beheerder",
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "url": {
+                "placeholder": "http://prowlarr.server.tv:9696",
+                "label": "",
+                "description": ""
+            },
+            "title": "",
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Lidarr": {
+            "title": "Lidarr",
+            "addInstance": "Lidarr-instantie toevoegen",
+            "name": {
+                "label": "Instantienaam",
+                "description": "Naam van het Lidarr-instantie.",
+                "placeholder": "aangepaste naam voor meldingen"
+            },
+            "username": {
+                "placeholder": "beheerder",
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "apiKey": {
+                "label": "API-sleutel",
+                "description": "API-sleutel voor de Lidarr-instantie.",
+                "placeholder": "lidarr-api-key"
+            },
+            "url": {
+                "placeholder": "http://lidarr.server.tv:8686",
+                "label": "",
+                "description": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        }
+    },
+    "ServiceChecks": {
+        "ping": {
+            "count": {
+                "placeholder": "10",
+                "required": "Er is een aantal pakketten groter dan nul vereist.",
+                "label": "Aantal",
+                "description": ""
+            },
+            "minimum": {
+                "placeholder": "10",
+                "required": "Er is een minimum aantal pakketten groter dan nul vereist.",
+                "label": "",
+                "description": ""
+            },
+            "value": {
+                "tooltip": "Een IP-adres wordt over het algemeen aanbevolen. Als u ook DNS wilt testen, gebruik dan een hostnaam. De notatie is <code>host</code> of <code>10.11.12.13</code>. Er mogen geen spaties of extra tekens in staan. Om UDP-controles op Linux te laten werken, moet u ze inschakelen met de volgende opdracht: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Om ICMP-controles op Linux toe te staan, moet u de binaire notifiarr-functionaliteiten opgeven met de volgende opdracht: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. De eenvoudigste manier om beide in Docker te laten werken, is door de privileged mode in te schakelen, maar u kunt ook andere functionaliteiten instellen.",
+                "description": "Voer host of IP in om connectiviteit te controleren.",
+                "placeholder": "127.0.0.1",
+                "required": "Er is een host- of IP-adres vereist.",
+                "label": "Host of IP"
+            },
+            "interval": {
+                "placeholder": "100",
+                "label": "Interval",
+                "description": "Interval tussen pakketten in milliseconden."
+            }
+        },
+        "http": {
+            "codes": {
+                "label": "Aanvaardbare antwoordcodes",
+                "description": "Elke code die hier wordt weergegeven, wordt als acceptabel beschouwd. Als de service met een andere code reageert, wordt er een melding gegenereerd.",
+                "required": "Er is minimaal één verwachte antwoordcode vereist."
+            },
+            "headers": {
+                "placeholder": "Inhouds type: toepassing/json",
+                "label": "HTTP Headers",
+                "description": "HTTP-aanvraag headers, 1 per regel."
+            }
+        },
+        "process": {
+            "minimum": {
+                "required": "Er is een minimum aantal processen groter dan nul vereist.",
+                "tooltip": "Als u 2 invoert, ontvangt u een melding als er minder dan 2 processen actief zijn. Gebruik dit om gewaarschuwd te worden als er te weinig processen actief zijn.",
+                "label": "",
+                "description": ""
+            },
+            "value": {
+                "required": "Er is een procesnaam vereist.",
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            },
+            "maximum": {
+                "tooltip": "Als u 2 invoert, ontvangt u een melding als er meer dan 2 processen actief zijn. Gebruik dit om gewaarschuwd te worden als er te veel processen actief zijn.",
+                "label": "",
+                "description": ""
+            },
+            "running": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "restarts": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            }
+        },
+        "title": "Gezondheidscontroles",
+        "timeout": {
+            "label": "Controleer time-out",
+            "description": "Hoe lang moet er worden gewacht totdat de HTTP-aanvraag is voltooid?"
+        },
+        "addInstance": "Gezondheidscontrole maken",
+        "DeleteCheck": "Gezondheidscontrole verwijderen",
+        "tcp": {
+            "value": {
+                "placeholder": "127.0.0.1:22",
+                "required": "Er zijn een host en poort vereist, gescheiden door een dubbele punt.",
+                "tooltip": "Een IP-adres wordt over het algemeen aanbevolen. Als u ook DNS wilt testen, gebruik dan een hostnaam. De notatie is <code>host:poort</code>. Er mogen geen spaties of extra tekens in voorkomen.",
+                "description": "Voer host:poort of host:ip in om de connectiviteit te controleren.",
+                "label": "Host en poort"
+            }
+        },
+        "interval": {
+            "label": "Controleer interval",
+            "description": "Hoe vaak de service controleren."
+        },
+        "name": {
+            "label": "Controleer naam",
+            "placeholder": "aangepaste naam voor meldingen",
+            "description": "",
+            "tooltip": ""
+        },
+        "type": {
+            "label": "Controleer type",
+            "options": {
+                "http": "HTTP URL-controle",
+                "icmp": "ICMP Ping-controle",
+                "process": "",
+                "tcp": "",
+                "ping": ""
+            },
+            "description": "",
+            "tooltip": ""
+        },
+        "url": {
+            "placeholder": "https://my.site",
+            "label": "",
+            "description": ""
+        },
+        "description": "",
+        "processListLink": ""
+    },
+    "scheduler": {
+        "AddATime": "Voeg een tijd toe",
+        "times": {
+            "everyMonth": "",
+            "everyHour": "",
+            "everyDay": "",
+            "everyMinute": "",
+            "everyWeek": "",
+            "noneSelected": "",
+            "noDaysSelected": ""
+        },
+        "ops": {
+            "daily": "Dagelijks",
+            "hourly": "Per uur",
+            "noSchedule": "",
+            "minutely": "",
+            "weekly": "",
+            "monthly": ""
+        },
+        "daysOfMonth": "Dagen van de maand",
+        "daysOfWeek": "Dagen van de week",
+        "frequency": "Frequentie",
+        "empty": "Als u elke dag wilt uitvoeren, selecteert u de dagelijkse frequentie.",
+        "title": "",
+        "selectAFrequency": "",
+        "required": {
+            "daysOfWeek": "",
+            "daysOfMonth": "",
+            "atTimes": ""
+        }
+    },
+    "Downloaders": {
+        "Deluge": {
+            "addInstance": "Deluge-instantie toevoegen",
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "title": "Deluge",
+            "url": {
+                "placeholder": "http://deluge.server.tv:8112",
+                "label": "",
+                "description": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Qbittorrent": {
+            "addInstance": "Qbittorrent-instantie toevoegen",
+            "username": {
+                "placeholder": "beheerder",
+                "label": "",
+                "description": ""
+            },
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "url": {
+                "placeholder": "http://qbittorrent.server.tv:8080",
+                "label": "",
+                "description": ""
+            },
+            "title": "",
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "SabNZB": {
+            "apiKey": {
+                "description": "API-sleutel voor de SabNZB-instantie.",
+                "label": "API-sleutel",
+                "placeholder": ""
+            },
+            "addInstance": "SabNZB-instantie toevoegen",
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "url": {
+                "placeholder": "http://sabnzb.server.tv:8080",
+                "label": "",
+                "description": ""
+            },
+            "title": ""
+        },
+        "Rtorrent": {
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "addInstance": "Rtorrent-instantie toevoegen",
+            "username": {
+                "placeholder": "beheerder",
+                "label": "",
+                "description": ""
+            },
+            "url": {
+                "placeholder": "http://rtorrent.server.tv:8080",
+                "label": "",
+                "description": ""
+            },
+            "title": "",
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Transmission": {
+            "addInstance": "Transmissie-instantie toevoegen",
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "username": {
+                "placeholder": "beheerder",
+                "description": "",
+                "label": ""
+            },
+            "url": {
+                "placeholder": "http://transmission.server.tv:9091",
+                "label": "",
+                "description": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "title": ""
+        },
+        "NZBGet": {
+            "addInstance": "NZBGet-instantie toevoegen",
+            "username": {
+                "placeholder": "beheerder",
+                "label": "",
+                "description": ""
+            },
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "Toepassing naam",
+                "description": ""
+            },
+            "url": {
+                "placeholder": "http://nzbget.server.tv:6789",
+                "label": "",
+                "description": ""
+            },
+            "title": "",
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        }
+    },
+    "Commands": {
+        "description": "Opdrachten worden uitgevoerd door de client (de backend). Ze kunnen worden geactiveerd vanuit deze interface of vanaf een chatserver. Als u een opdracht wijzigt, moet u de configuratie opslaan voordat u deze vanuit de webinterface kunt uitvoeren.",
+        "regexMismatch": "Argument komt niet overeen met reguliere expressie.",
+        "command": {
+            "label": "Commando",
+            "description": "Opdracht om uit te voeren.",
+            "placeholder": "echo 'Hallo wereld!'",
+            "tooltip": ""
+        },
+        "title": "Commando lijst",
+        "addInstance": "Opdracht maken",
+        "name": {
+            "placeholder": "aangepaste naam voor meldingen",
+            "label": "",
+            "description": ""
+        },
+        "DeleteCommand": "Verwijderopdracht",
+        "enterCommandArguments": "Voer opdracht argumenten in",
+        "Executions": "Executies: {count}",
+        "Failures": "Mislukkingen: {count}",
+        "LastExecution": "Laatste uitvoering",
+        "timeout": {
+            "description": "Hoe lang de opdracht mag duren voordat deze wordt beëindigd.",
+            "label": ""
+        },
+        "log": {
+            "description": "Uitvoer van log opdracht.",
+            "label": "",
+            "tooltip": ""
+        },
+        "neverExecuted": "",
+        "commandRequiresArguments": "",
+        "noOutput": "",
+        "refreshed": "",
+        "notify": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        }
+    },
+    "FileWatcher": {
+        "pipe": {
+            "tooltip": "Schakel dit in als het bestand dat u bekijkt een benoemde FIFO-pipe is. U hebt dit waarschijnlijk niet nodig.",
+            "label": "FIFO Pipe",
+            "description": ""
+        },
+        "mustExist": {
+            "tooltip": "Als u dit inschakelt, wordt het bekijken van een bestand overgeslagen als het niet bestaat wanneer de applicatie start. Het bekijken van bestanden die niet bestaan, is nog steeds buggy en werkt mogelijk helemaal niet.",
+            "label": "Bestand moet bestaan",
+            "description": ""
+        },
+        "regex": {
+            "tooltip": "Expressies worden automatisch ingepakt in een wildcard-matcher: <code>.*</code>, dus gebruik geen <code>^</code> of <code>$</code> in uw expressie. Gebruik <code>(?i)</code> als prefix om reguliere expressies hoofdletter ongevoelig te maken.",
+            "placeholder": "GET.*some/path",
+            "label": "",
+            "description": "",
+            "required": ""
+        },
+        "disabled": {
+            "label": "Actief",
+            "description": "Schakel deze kijker uit."
+        },
+        "badges": {
+            "CurrentlyWatching": "Momenteel aan het kijken",
+            "WatcherStopped": ""
+        },
+        "DeleteWatcher": "Kijker verwijderen",
+        "titles": {
+            "Expression": "Expressie",
+            "RegularExpressionTester": "",
+            "TestString": ""
+        },
+        "path": {
+            "label": "Bestandspad",
+            "description": "",
+            "placeholder": "",
+            "required": ""
+        },
+        "skip": {
+            "description": "Alles wat aan deze expressie voldoet, wordt genegeerd.",
+            "placeholder": "GET.*some/path",
+            "label": ""
+        },
+        "logMatch": {
+            "tooltip": "Als u dit inschakelt, wordt de overeenkomende regel naar het notifiarr-logboek geschreven. Dit is handig voor foutopsporing, maar kan ruis veroorzaken.",
+            "label": "",
+            "description": ""
+        },
+        "poll": {
+            "label": "Bestandspeiling",
+            "tooltip": "Bestandssysteem gebeurtenissen werken niet op alle systemen. Als er geen overeenkomsten worden gevonden, schakel deze optie dan in om het bestands poller interval in te schakelen.",
+            "description": ""
+        },
+        "title": "",
+        "description": "",
+        "addInstance": "",
+        "buttons": {
+            "StopWatcher": "",
+            "StartWatcher": ""
+        }
+    },
+    "SnapshotApps": {
+        "Nvidia": {
+            "busIds": {
+                "placeholder": "0000:00:00.0,0000:00:00.1",
+                "label": "Bus IDs",
+                "description": "Door komma's gescheiden lijst met bus-ID's voor momentopname.",
+                "tooltip": ""
+            },
+            "disabled": {
+                "description": "GPU-snapshots in- of uitschakelen.",
+                "label": "GPU-snapshots"
+            },
+            "smiPath": {
+                "tooltip": "Als nvidia-smi (nvidia-smi.exe op Windows) zich niet in de PATH-omgeving bevindt, kunt u hier het volledige pad naar het binaire bestand opgeven.",
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "title": "",
+            "description": ""
+        },
+        "MySQL": {
+            "host": {
+                "placeholder": "127.0.0.1",
+                "label": "Host",
+                "description": "Host of IP-adres van de MySQL-server."
+            },
+            "port": {
+                "placeholder": "3306",
+                "label": "",
+                "description": ""
+            },
+            "addInstance": "MySQL-server toevoegen",
+            "name": {
+                "placeholder": "aangepaste naam voor meldingen",
+                "label": "",
+                "description": ""
+            },
+            "title": "",
+            "password": {
+                "description": "",
+                "placeholder": "",
+                "label": ""
+            },
+            "description": "",
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        }
+    },
+    "Endpoints": {
+        "query": {
+            "placeholder": "API-sleutel=1234567890",
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "badge": {
+            "header": "",
+            "body": "",
+            "query": ""
+        },
+        "addInstance": "Relay-URL toevoegen",
+        "DeleteEndpoint": "URL verwijderen",
+        "template": {
+            "required": "Er is een sjabloon vereist. Voer 'test' in als u niet zeker weet wat u moet invoeren.",
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "header": {
+            "placeholder": "Inhoudstype: toepassing/json",
+            "label": "HTTP Headers",
+            "description": "HTTP-aanvraag headers, 1 per regel.",
+            "tooltip": ""
+        },
+        "name": {
+            "placeholder": "aangepaste naam voor meldingen",
+            "description": "",
+            "label": ""
+        },
+        "timeout": {
+            "description": "Hoe lang moet er worden gewacht tot de HTTP-aanvraag is voltooid?",
+            "label": ""
+        },
+        "method": {
+            "description": "HTTP-verzoek",
+            "label": ""
+        },
+        "url": {
+            "placeholder": "https://pihole.myhome.lan/api/stats",
+            "label": "",
+            "description": ""
+        },
+        "title": "",
+        "body": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        }
+    },
+    "Actions": {
+        "triggers": {
+            "TrigCollectionGaps": {
+                "button": "Controleer de inzamelings gaten",
+                "label": "Verzameling gat",
+                "success": "Controle op hiaten in de verzameling gestart."
+            },
+            "TrigStop": {
+                "label": "Client herlaadt",
+                "button": ""
+            },
+            "TrigCustomCommand": {
+                "success": "Aangepaste opdracht gestart.",
+                "label": "Aangepaste opdracht: {name}",
+                "button": ""
+            },
+            "TrigAutoUpdate": {
+                "label": "Automatische update-update controle"
+            },
+            "TrigDashboard": {
+                "success": "Dashboard update gestart.",
+                "label": "Dashboard-update",
+                "button": ""
+            },
+            "TrigUploadFile": {
+                "options": {
+                    "app": "Logbestand van de toepassing.",
+                    "choose": "Kies een bestand om te uploaden.",
+                    "debug": "Debug-log bestand.",
+                    "http": "HTTP-logbestand."
+                },
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigPlexEmptyTrash": {
+                "label": "Plex-prullenbak leegmaken"
+            },
+            "TrigPlexSessionsCheck": {
+                "label": "Controleer of er voltooide Plex-sessies zijn"
+            },
+            "TrigLidarrCorrupt": {
+                "button": "Controleer Lidarr",
+                "label": "Corruptie van de Lidarr database",
+                "success": "Controle op corruptie van de Lidarr database gestart."
+            },
+            "TrigProwlarrCorrupt": {
+                "button": "Controleer Prowlarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigRadarrCorrupt": {
+                "button": "Controleer Radarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigReadarrCorrupt": {
+                "button": "Controleer Readarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigSonarrCorrupt": {
+                "button": "Controleer Sonarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigPlexSessions": {
+                "label": "Verzamel Plex-sessies",
+                "button": "Verzamel sessies nu",
+                "success": ""
+            },
+            "TrigStuckItems": {
+                "button": "Controleer op vastzittende items",
+                "label": "",
+                "success": ""
+            },
+            "TrigLidarrBackup": {
+                "button": "Controleer Lidarr",
+                "label": "Lidarr database back-ups",
+                "success": "Controle van Lidarr database back-ups gestart."
+            },
+            "TrigProwlarrBackup": {
+                "button": "Controleer Prowlarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigRadarrBackup": {
+                "button": "Controleer Radarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigReadarrBackup": {
+                "button": "Controleer Readarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigSonarrBackup": {
+                "button": "Controleer Sonarr",
+                "label": "",
+                "success": ""
+            },
+            "TrigUpCheck": {
+                "label": "Client naar website up-check"
+            },
+            "TrigDownloadingItems": {
+                "label": "Downloaden / voltooide items"
+            },
+            "TrigEndpointURL": {
+                "success": "Doorsturen van eindpunt-URL gestart.",
+                "label": "Eindpunt-URL doorgegeven aan website: {name}",
+                "button": ""
+            },
+            "TrigCFSyncLidarr": {
+                "label": "Lidarr profiel- en formaat synchronisatie",
+                "success": "Synchronisatie van Lidarr profiel en -indeling gestart.",
+                "button": ""
+            },
+            "TrigCFSyncLidarrInt": {
+                "label": "Lidarr aangepaste indeling synchronisatie per instantie"
+            },
+            "TrigLidarrQueue": {
+                "label": "Lidarr wachtrij cacher"
+            },
+            "TrigMDBListSync": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigCFSyncRadarr": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigRPSyncSonarr": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigSnapshot": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigCFSyncRadarrInt": {
+                "label": ""
+            },
+            "TrigRPSyncSonarrInt": {
+                "label": ""
+            },
+            "TrigCustomCronTimer": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigRadarrQueue": {
+                "label": ""
+            },
+            "TrigReadarrQueue": {
+                "label": ""
+            },
+            "TrigSonarrQueue": {
+                "label": ""
+            },
+            "TrigPollSite": {
+                "label": ""
+            }
+        },
+        "titles": {
+            "Counter": "Aantallen",
+            "Interval": "Interval",
+            "Triggers": "",
+            "Timers": "",
+            "Schedules": "",
+            "SiteCrons": "",
+            "Schedule": ""
+        },
+        "descriptions": {
+            "Triggers": "",
+            "Timers": "",
+            "Schedules": "",
+            "SiteCrons": ""
+        }
+    },
+    "SiteTunnel": {
+        "subText": "Klik op de knop <span class=\"text-success\">Ping tunnels</span> en selecteer de tunnel met de snelste responstijd als primaire tunnel. Selecteer een andere snelle tunnel als back-up.",
+        "phrases": {
+            "Disconnects": "Verbindingen verbreken",
+            "BackupTunnel": "Reserve tunnel",
+            "ActiveTunnel": "Actieve tunnel: {tunnel}",
+            "Connecting": "Verbinden",
+            "ConnectionPoolSize": "Grootte van de verbindings pool",
+            "Idle": "Inactief",
+            "LastActiveCheck": "Laatste actieve controle",
+            "LastConnection": "Laatste verbinding",
+            "PrimaryTunnel": "",
+            "Ping": "",
+            "Pinging": "",
+            "TunnelStats": "",
+            "Running": "",
+            "SocketURLActive": "",
+            "SocketURLInactive": "",
+            "SelectTunnel": "",
+            "TunnelsSaved": "",
+            "TunnelStatsStale": ""
+        }
+    },
+    "metrics": {
+        "ApplicationUptime": "Applicatie-uptime: <b>{timeDuration}</b>",
+        "apiHits": {
+            "title": "API-verzoeken",
+            "description": "Tellers voor binnenkomende API-verzoeken.",
+            "empty": ""
+        },
+        "fileWatcher": {
+            "title": "Bestandsbewaker",
+            "description": "Statistieken van de bestands bewaker.",
+            "empty": ""
+        },
+        "apps": {
+            "title": "Aanvraag verzoeken",
+            "description": "Statistieken over applicatie verzoeken. Deze tellers bevatten geen servicecontroles.",
+            "empty": ""
+        },
+        "httpRequests": {
+            "title": "HTTP-verzoeken",
+            "description": "Statistieken over inkomende HTTP-verzoeken. Inclusief websocket-tunnel verzoeken.",
+            "empty": ""
+        },
+        "logFiles": {
+            "description": "Tellers van logbestanden.",
+            "title": "Logbestanden",
+            "empty": ""
+        },
+        "timerEvents": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        },
+        "CountersReset": "",
+        "website": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        }
     }
 }
