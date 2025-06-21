@@ -1,1 +1,1501 @@
-{}
+{
+    "phrases": {
+        "NameInUseByInstance": "",
+        "ConfirmReloadBody": "",
+        "New": "",
+        "Invalid": "",
+        "Landing": {
+            "SelectASection": "",
+            "Welcome": ""
+        },
+        "UpdatingBackEnd": "",
+        "TryRefreshingThePage": "",
+        "Version": "",
+        "Every12Hours": "",
+        "Every6Hours": "",
+        "Every3Hours": "",
+        "Reloading": "",
+        "FailedToReload": "",
+        "ReloadSuccess": "",
+        "ReloadCheckTimedOut": "",
+        "ConfirmShutdown": "",
+        "ConfirmShutdownBody": "",
+        "ShutdownSuccess": "",
+        "FailedToShutdown": "",
+        "LoginHelp": "",
+        "Changed": "",
+        "DeleteInstance": "",
+        "DeletedNumber": "",
+        "ItsGone": "",
+        "URLMustBeginWithHttp": "",
+        "NameMustNotBeEmpty": "",
+        "ERROR": "",
+        "LoggingIn": "",
+        "LoggedIn": "",
+        "UpdateBackend": "",
+        "Loading": "",
+        "BackEndUpdated": "",
+        "FailedToUpdateBackEnd": "",
+        "ConfigurationSavedReloading": "",
+        "ConfigurationSaved": "",
+        "SavingConfiguration": "",
+        "ConfirmReload": "",
+        "HostMustNotBeEmpty": "",
+        "UsernameMustNotBeEmpty": "",
+        "APIKeyMustBeCountCharacters": "",
+        "TokenMustBeCountCharacters": "",
+        "LeavePage": "",
+        "LoginHelpBody": ""
+    },
+    "navigation": {
+        "titles": {
+            "Settings": "",
+            "Insights": "",
+            "Configuration": "",
+            "SiteTunnel": "",
+            "StarrApps": "",
+            "Downloaders": "",
+            "MediaApps": "",
+            "SnapshotApps": "",
+            "FileWatcher": "",
+            "Integrations": "",
+            "Monitoring": "",
+            "Metrics": "",
+            "LogFiles": "",
+            "System": "",
+            "TrustProfile": "",
+            "Landing": "",
+            "UnsavedChanges": "",
+            "Endpoints": "",
+            "Commands": "",
+            "Services": "",
+            "Actions": ""
+        },
+        "pageDescription": {
+            "Services": "",
+            "Integrations": "",
+            "Monitoring": "",
+            "Landing": "",
+            "Configuration": "",
+            "StarrApps": "",
+            "Downloaders": "",
+            "MediaApps": "",
+            "SnapshotApps": "",
+            "FileWatcher": "",
+            "Endpoints": "",
+            "Commands": "",
+            "Metrics": "",
+            "LogFiles": "",
+            "System": "",
+            "TrustProfile": "",
+            "SiteTunnel": "",
+            "Actions": ""
+        }
+    },
+    "words": {
+        "instance-options": {
+            "timeout": {
+                "label": "",
+                "description": ""
+            },
+            "validSsl": {
+                "label": "",
+                "description": ""
+            },
+            "interval": {
+                "label": "",
+                "description": ""
+            },
+            "deletes": {
+                "label": "",
+                "description": "",
+                "tooltip": "",
+                "countPerHour": ""
+            }
+        },
+        "select-option": {
+            "Enabled": "",
+            "Disabled": "",
+            "minute": "",
+            "minutes": "",
+            "hour": "",
+            "hours": "",
+            "second": "",
+            "seconds": "",
+            "megabytes": "",
+            "bytes": "",
+            "Off": "",
+            "Daily": "",
+            "custom": "",
+            "InstanceDisabled": "",
+            "NoTimeout": "",
+            "ChecksDisabled": ""
+        },
+        "clock": {
+            "days": {
+                "Sunday": "",
+                "Monday": "",
+                "Tuesday": "",
+                "Wednesday": "",
+                "Thursday": "",
+                "Friday": "",
+                "Saturday": ""
+            },
+            "short": {
+                "ms": "",
+                "s": "",
+                "m": "",
+                "h": "",
+                "d": "",
+                "w": ""
+            },
+            "ago": "",
+            "format": ""
+        },
+        "bytes": {
+            "short": {
+                "B": "",
+                "KB": "",
+                "MB": "",
+                "GB": "",
+                "TB": ""
+            }
+        }
+    },
+    "system": {
+        "UserInformation": {
+            "Patron": "",
+            "title": "",
+            "YesYesYouAre": "",
+            "HellaAwesome": "",
+            "YoureSoGifted": "",
+            "Subscriber": "",
+            "AbsoluteBadAss": "",
+            "DateFormat": ""
+        },
+        "BuildInformation": {
+            "BuildUser": "",
+            "Branch": "",
+            "title": "",
+            "BuildDate": "",
+            "GoVersion": "",
+            "Integrity": ""
+        },
+        "StorageData": {
+            "Used": "",
+            "Free": "",
+            "ro": "",
+            "title": "",
+            "Total": "",
+            "FS": ""
+        },
+        "StartupParams": {
+            "ConfigFile": "",
+            "EnvironmentPrefix": "",
+            "ExtraConfigFiles": "",
+            "CustomAssets": "",
+            "UserID": "",
+            "GroupID": "",
+            "IPAddress": "",
+            "title": "",
+            "BinaryPath": ""
+        },
+        "ClientInformation": {
+            "Application": "",
+            "Version": "",
+            "Started": "",
+            "title": "",
+            "Uptime": ""
+        },
+        "NetworkInformation": {
+            "Interface": "",
+            "title": "",
+            "IPAddress": "",
+            "Gateway": "",
+            "Netmask": ""
+        },
+        "OperatingSystem": {
+            "title": "",
+            "Hostname": "",
+            "UniqueID": "",
+            "Platform": "",
+            "KernelVersion": "",
+            "VirtualizationSystem": ""
+        },
+        "EnvironmentVariables": {
+            "title": ""
+        }
+    },
+    "StarrApps": {
+        "Radarr": {
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "title": "",
+            "addInstance": "",
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "apiKey": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Sonarr": {
+            "apiKey": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Lidarr": {
+            "apiKey": {
+                "description": "",
+                "placeholder": "",
+                "label": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            },
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Prowlarr": {
+            "url": {
+                "description": "",
+                "label": "",
+                "placeholder": ""
+            },
+            "username": {
+                "tooltip": "",
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "apiKey": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Readarr": {
+            "name": {
+                "description": "",
+                "label": "",
+                "placeholder": ""
+            },
+            "apiKey": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "title": "",
+            "addInstance": "",
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        }
+    },
+    "config": {
+        "titles": {
+            "Services": "",
+            "Logging": "",
+            "Dark": "",
+            "Light": "",
+            "Configuration": "",
+            "General": "",
+            "Network": "",
+            "System": "",
+            "WatchFile": "",
+            "Endpoint": "",
+            "Command": "",
+            "SSLConfiguration": ""
+        },
+        "debug": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "quiet": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "logFile": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "services": {
+            "parallel": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "disabled": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "interval": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "logFile": {
+                "label": "",
+                "description": "",
+                "tooltip": "",
+                "placeholder": ""
+            }
+        },
+        "command": {
+            "name": {
+                "label": "",
+                "description": "",
+                "required": ""
+            }
+        },
+        "service": {
+            "name": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "autoUpdate": {
+            "description": "",
+            "tooltip": "",
+            "label": ""
+        },
+        "unstableCh": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "errors": {
+            "InvalidCreds": "",
+            "LoginRequestTimedOut": "",
+            "LoginFailed": "",
+            "ProfileReqTimedOut": "",
+            "AnUnknownErrorOccurred": "",
+            "ConfigUpdateFailed": "",
+            "PleaseEnterBothUsernameAndPassword": ""
+        },
+        "apiKey": {
+            "label": "",
+            "description": "",
+            "tooltip": "",
+            "placeholder": ""
+        },
+        "extraKeys": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "bindAddr": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "sslKeyFile": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "sslCertFile": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "httpLog": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "debugLog": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "maxBody": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "logFileMb": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "logFiles": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "noUploads": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "snapshot": {
+            "timeout": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "ui": {
+            "darkMode": {
+                "label": "",
+                "description": ""
+            },
+            "language": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "watchFile": {
+            "path": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "endpoint": {
+            "name": {
+                "label": "",
+                "description": ""
+            }
+        },
+        "urlbase": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "hostId": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "serial": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "retries": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "apt": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "timeout": {
+            "label": "",
+            "description": ""
+        },
+        "fileMode": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        }
+    },
+    "buttons": {
+        "SaveConfiguration": "",
+        "ResetForm": "",
+        "Execute": "",
+        "HideMenu": "",
+        "ShowMenu": "",
+        "ShowOutput": "",
+        "HideOutput": "",
+        "RefreshOutput": "",
+        "NoStayHere": "",
+        "YesDeleteMyChanges": "",
+        "Login": "",
+        "Confirm": "",
+        "Cancel": "",
+        "Save": "",
+        "Close": "",
+        "SaveChanges": ""
+    },
+    "Commands": {
+        "description": "",
+        "title": "",
+        "addInstance": "",
+        "DeleteCommand": "",
+        "Executions": "",
+        "Failures": "",
+        "LastExecution": "",
+        "neverExecuted": "",
+        "enterCommandArguments": "",
+        "commandRequiresArguments": "",
+        "noOutput": "",
+        "refreshed": "",
+        "regexMismatch": "",
+        "name": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "command": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "notify": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "log": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "timeout": {
+            "label": "",
+            "description": ""
+        }
+    },
+    "monitoring": {
+        "ConfigureServices": "",
+        "EnableOnConfig": "",
+        "check": {
+            "output": "",
+            "name": "",
+            "state": {
+                "short": "",
+                "title": ""
+            },
+            "typeExpect": "",
+            "last": {
+                "short": "",
+                "title": "",
+                "tooltip": "",
+                "description": ""
+            },
+            "since": {
+                "short": "",
+                "title": "",
+                "tooltip": "",
+                "description": ""
+            },
+            "interval": {
+                "short": "",
+                "title": "",
+                "tooltip": ""
+            }
+        },
+        "ChecksDisabled": "",
+        "ChecksStopped": "",
+        "StartChecks": "",
+        "StopChecks": "",
+        "stopFailed": "",
+        "startFailed": "",
+        "recheckFailed": "",
+        "checkInitiated": "",
+        "nextRefresh": "",
+        "refreshInterval": "",
+        "cardsView": "",
+        "classicView": "",
+        "hideAllOutputs": "",
+        "showAllOutputs": ""
+    },
+    "ServiceChecks": {
+        "description": "",
+        "title": "",
+        "DeleteCheck": "",
+        "addInstance": "",
+        "processListLink": "",
+        "timeout": {
+            "label": "",
+            "description": ""
+        },
+        "interval": {
+            "label": "",
+            "description": ""
+        },
+        "name": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        },
+        "type": {
+            "label": "",
+            "description": "",
+            "tooltip": "",
+            "options": {
+                "process": "",
+                "http": "",
+                "tcp": "",
+                "ping": "",
+                "icmp": ""
+            }
+        },
+        "url": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "http": {
+            "headers": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "codes": {
+                "label": "",
+                "description": "",
+                "required": ""
+            }
+        },
+        "tcp": {
+            "value": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": "",
+                "required": ""
+            }
+        },
+        "ping": {
+            "value": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": "",
+                "required": ""
+            },
+            "count": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "required": ""
+            },
+            "minimum": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "required": ""
+            },
+            "interval": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "process": {
+            "value": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": "",
+                "required": ""
+            },
+            "running": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "restarts": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            },
+            "minimum": {
+                "label": "",
+                "description": "",
+                "required": "",
+                "tooltip": ""
+            },
+            "maximum": {
+                "label": "",
+                "description": "",
+                "tooltip": ""
+            }
+        }
+    },
+    "MediaApps": {
+        "Tautulli": {
+            "title": "",
+            "description": "",
+            "name": {
+                "label": "",
+                "description": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "apiKey": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Plex": {
+            "title": "",
+            "description": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "token": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            }
+        }
+    },
+    "profile": {
+        "phrase": {
+            "AuthTypeChange": "",
+            "ProfileUpdated": "",
+            "EnterCurrentPassword": "",
+            "ProxyAuthDisabled": "",
+            "Addit": "",
+            "ShowMeMore": "",
+            "ShowMoreDesc": "",
+            "PasswordOnlyUsed": "",
+            "HeaderOnlyUsed": "",
+            "SeeWikiForAuthProxyHelp": "",
+            "ShowMeLess": ""
+        },
+        "authType": {
+            "option_desc": {
+                "header": "",
+                "password": "",
+                "noauth": ""
+            },
+            "options": {
+                "header": "",
+                "password": "",
+                "noauth": ""
+            },
+            "label": "",
+            "description": ""
+        },
+        "upstreams": {
+            "label": "",
+            "placeholder": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "title": {
+            "Authentication": "",
+            "Authorization": ""
+        },
+        "header": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "username": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "password": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "newPass": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        }
+    },
+    "SnapshotApps": {
+        "MySQL": {
+            "name": {
+                "description": "",
+                "placeholder": "",
+                "label": ""
+            },
+            "host": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "title": "",
+            "description": "",
+            "addInstance": "",
+            "port": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Nvidia": {
+            "title": "",
+            "description": "",
+            "disabled": {
+                "label": "",
+                "description": ""
+            },
+            "busIds": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            },
+            "smiPath": {
+                "label": "",
+                "description": "",
+                "placeholder": "",
+                "tooltip": ""
+            }
+        }
+    },
+    "Downloaders": {
+        "Rtorrent": {
+            "password": {
+                "description": "",
+                "placeholder": "",
+                "label": ""
+            },
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Transmission": {
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "placeholder": "",
+                "label": "",
+                "description": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Qbittorrent": {
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "Deluge": {
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "SabNZB": {
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "apiKey": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        },
+        "NZBGet": {
+            "title": "",
+            "addInstance": "",
+            "name": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "url": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "username": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            },
+            "password": {
+                "label": "",
+                "description": "",
+                "placeholder": ""
+            }
+        }
+    },
+    "Endpoints": {
+        "query": {
+            "tooltip": "",
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "body": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "name": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "title": "",
+        "addInstance": "",
+        "DeleteEndpoint": "",
+        "badge": {
+            "header": "",
+            "query": "",
+            "body": ""
+        },
+        "template": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": "",
+            "required": ""
+        },
+        "timeout": {
+            "label": "",
+            "description": ""
+        },
+        "method": {
+            "label": "",
+            "description": ""
+        },
+        "url": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "header": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "tooltip": ""
+        }
+    },
+    "Actions": {
+        "titles": {
+            "Triggers": "",
+            "Timers": "",
+            "Schedules": "",
+            "SiteCrons": "",
+            "Counter": "",
+            "Interval": "",
+            "Schedule": ""
+        },
+        "descriptions": {
+            "Triggers": "",
+            "Timers": "",
+            "Schedules": "",
+            "SiteCrons": ""
+        },
+        "triggers": {
+            "TrigRadarrCorrupt": {
+                "button": "",
+                "label": "",
+                "success": ""
+            },
+            "TrigPlexEmptyTrash": {
+                "label": ""
+            },
+            "TrigUploadFile": {
+                "label": "",
+                "button": "",
+                "success": "",
+                "options": {
+                    "choose": "",
+                    "app": "",
+                    "debug": "",
+                    "http": ""
+                }
+            },
+            "TrigPlexSessions": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigPlexSessionsCheck": {
+                "label": ""
+            },
+            "TrigDashboard": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigMDBListSync": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigCollectionGaps": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigCFSyncLidarr": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigCFSyncRadarr": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigRPSyncSonarr": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigStop": {
+                "label": "",
+                "button": ""
+            },
+            "TrigSnapshot": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigProwlarrCorrupt": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigLidarrCorrupt": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigReadarrCorrupt": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigSonarrCorrupt": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigProwlarrBackup": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigLidarrBackup": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigRadarrBackup": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigReadarrBackup": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigSonarrBackup": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigUpCheck": {
+                "label": ""
+            },
+            "TrigEndpointURL": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigCustomCommand": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigAutoUpdate": {
+                "label": ""
+            },
+            "TrigCFSyncLidarrInt": {
+                "label": ""
+            },
+            "TrigCFSyncRadarrInt": {
+                "label": ""
+            },
+            "TrigRPSyncSonarrInt": {
+                "label": ""
+            },
+            "TrigCustomCronTimer": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigDownloadingItems": {
+                "label": ""
+            },
+            "TrigLidarrQueue": {
+                "label": ""
+            },
+            "TrigRadarrQueue": {
+                "label": ""
+            },
+            "TrigReadarrQueue": {
+                "label": ""
+            },
+            "TrigSonarrQueue": {
+                "label": ""
+            },
+            "TrigStuckItems": {
+                "label": "",
+                "button": "",
+                "success": ""
+            },
+            "TrigPollSite": {
+                "label": ""
+            }
+        }
+    },
+    "RegexTester": {
+        "testPattern": {
+            "description": "",
+            "placeholder": "",
+            "label": ""
+        },
+        "testRegex": {
+            "description": "",
+            "placeholder": "",
+            "label": ""
+        },
+        "TestResult": "",
+        "Test": "",
+        "Expression": "",
+        "Result": "",
+        "NoMatch": "",
+        "RegularExpressionTester": ""
+    },
+    "metrics": {
+        "httpRequests": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        },
+        "CountersReset": "",
+        "ApplicationUptime": "",
+        "logFiles": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        },
+        "apiHits": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        },
+        "website": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        },
+        "fileWatcher": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        },
+        "apps": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        },
+        "timerEvents": {
+            "title": "",
+            "description": "",
+            "empty": ""
+        }
+    },
+    "SiteTunnel": {
+        "subText": "",
+        "phrases": {
+            "PrimaryTunnel": "",
+            "BackupTunnel": "",
+            "Ping": "",
+            "Pinging": "",
+            "ActiveTunnel": "",
+            "TunnelStats": "",
+            "Disconnects": "",
+            "ConnectionPoolSize": "",
+            "Connecting": "",
+            "Idle": "",
+            "Running": "",
+            "LastConnection": "",
+            "LastActiveCheck": "",
+            "SocketURLActive": "",
+            "SocketURLInactive": "",
+            "SelectTunnel": "",
+            "TunnelsSaved": "",
+            "TunnelStatsStale": ""
+        }
+    },
+    "FileWatcher": {
+        "title": "",
+        "description": "",
+        "addInstance": "",
+        "DeleteWatcher": "",
+        "badges": {
+            "CurrentlyWatching": "",
+            "WatcherStopped": ""
+        },
+        "buttons": {
+            "StopWatcher": "",
+            "StartWatcher": ""
+        },
+        "titles": {
+            "RegularExpressionTester": "",
+            "Expression": "",
+            "TestString": ""
+        },
+        "path": {
+            "label": "",
+            "description": "",
+            "placeholder": "",
+            "required": ""
+        },
+        "disabled": {
+            "label": "",
+            "description": ""
+        },
+        "regex": {
+            "label": "",
+            "description": "",
+            "tooltip": "",
+            "placeholder": "",
+            "required": ""
+        },
+        "skip": {
+            "label": "",
+            "description": "",
+            "placeholder": ""
+        },
+        "poll": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "pipe": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "mustExist": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        },
+        "logMatch": {
+            "label": "",
+            "description": "",
+            "tooltip": ""
+        }
+    },
+    "scheduler": {
+        "title": "",
+        "daysOfWeek": "",
+        "daysOfMonth": "",
+        "frequency": "",
+        "selectAFrequency": "",
+        "AddATime": "",
+        "empty": "",
+        "required": {
+            "daysOfWeek": "",
+            "daysOfMonth": "",
+            "atTimes": ""
+        },
+        "ops": {
+            "noSchedule": "",
+            "minutely": "",
+            "hourly": "",
+            "daily": "",
+            "weekly": "",
+            "monthly": ""
+        },
+        "times": {
+            "noneSelected": "",
+            "noDaysSelected": "",
+            "everyMinute": "",
+            "everyHour": "",
+            "everyDay": "",
+            "everyWeek": "",
+            "everyMonth": ""
+        }
+    }
+}
