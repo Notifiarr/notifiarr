@@ -1454,9 +1454,16 @@
       "upload": "Upload",
       "delete": "Delete",
       "add": "Add",
-      "reload": "Reload"
+      "reload": "Reload",
+      "tooltip": "The <b>Download</b> button downloads the file to your computer. The <b>Upload</b> button uploads the file to the Notifiarr.com server. Only administrators can see uploaded files. The <b>Delete</b> button deletes the file from your hard drive. Files that are in use cannot be deleted. In use means this application is currently writing logs entries to it."
     },
     "Error": "Error loading log file: {error}",
+    "confirmDelete": "Delete {file}",
+    "deleteConfirm": "Are you sure you want to delete this file? This action cannot be undone.",
+    "deleteError": "Error deleting log file: {error}",
+    "deleteSuccess": "Log file deleted: {file}",
+    "uploadError": "Error uploading log file: {error}",
+    "uploadSuccess": "Log file uploading: {file}",
     "NoFileSelected": "No file selected.",
     "SelectFile": "Select a file to see what's in it!",
     "FilesInDirs": "{files} files in {dirs} dirs",
@@ -1465,6 +1472,6 @@
     "AddMoreLines": "Add more lines",
     "Reload": "Reload log file",
     "Highlight": "Highlight",
-    "Tooltip": "<ul><li>The first orange button on the left toggles the order of the lines in the file. By default it's ordered descending in the order it's written. Clicking the button reverses the file and makes it backward.</li><li>The second purple button toggles the built-in line highlight colors.</li><li>The number input indicates how many lines to load or add. Clicking the Add button adds the number of lines to the top of the file using the existing line count as the offset. Clicking the Reload button reloads the numbers of lines from the end of the file.</li><li>Use the highlight input to make specific text stand out. The Add button is disabled on in-use files because it's impossible to know how many lines were written since the last update.</li></ul>"
+    "Tooltip": "<ul><li>The first orange button on the left toggles the order of the lines in the file. By default it's ordered descending in the order it's written. Clicking the button reverses the file and makes it backward.</li><li>The second purple button toggles the built-in line highlight colors.</li><li>The number input indicates how many lines to load or add. Clicking the Add button adds the number of lines to the top of the file using the existing line count as the offset. Clicking the Reload button reloads the number of lines from the end of the file.</li><li>Use the highlight input to make specific text stand out. The Add button is disabled on in-use files because it's impossible to know how many lines were written since the last update.</li></ul>"
   }
 }

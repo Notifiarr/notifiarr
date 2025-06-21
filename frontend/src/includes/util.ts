@@ -33,7 +33,7 @@ export const failure = (m: string) =>
 export function since(date: Date | string): string {
   const now = new Date().getTime()
   const then = typeof date === 'string' ? new Date(date).getTime() : date.getTime()
-  return age(now - then, true)
+  return age(now > then ? now - then : 0, true)
 }
 
 /** age converts a milliseconds counter into human readable: 13h 5m 45s */

@@ -1,7 +1,6 @@
 <script lang="ts" module>
   import {
     faArrowsSpin,
-    faCloudDownload,
     faPrintMagnifyingGlass,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   export const page = {
@@ -15,29 +14,35 @@
 </script>
 
 <script lang="ts">
-  import { CardBody, Col, Container, Row, Table } from '@sveltestrap/sveltestrap'
+  import { CardBody, Col, Row, Table } from '@sveltestrap/sveltestrap'
   import T from '../../includes/Translate.svelte'
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
-  import { age, formatBytes, since } from '../../includes/util'
+  import { formatBytes, since } from '../../includes/util'
   import FileInfo from './FileInfo.svelte'
-  import type { LogFileInfo, LogFileInfos } from '../../api/notifiarrConfig'
+  import type { LogFileInfo } from '../../api/notifiarrConfig'
   import Fa from '../../includes/Fa.svelte'
   import { faListTimeline } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Content from './Content.svelte'
+  import theme from '../../includes/theme.svelte'
 
   let activeFile: LogFileInfo | null = $state(null)
-  const logs = $derived($profile.logFileInfo ?? ({} as LogFileInfos))
 
   const set = (event: MouseEvent, file: LogFileInfo) => {
     event.preventDefault()
     activeFile = file
   }
+
+  $effect(() => {
+    // This deactivates a file that gets deleted.
+    if (!$profile.logFileInfo?.list?.find(f => f.id == activeFile?.id)) {
+      activeFile = null
+    }
+  })
 </script>
 
 <Header {page} />
 <CardBody>
-  None of the buttons work yet.
   <Row>
     <Col md={7}>
       <h4><T id="LogFiles.titles.FileList" /></h4>
@@ -51,17 +56,17 @@
                 <small class="text-muted">
                   <T
                     id="LogFiles.FilesInDirs"
-                    files={logs.list?.length}
-                    dirs={logs.dirs?.length} />
+                    files={$profile.logFileInfo?.list?.length}
+                    dirs={$profile.logFileInfo?.dirs?.length} />
                 </small>
               </th>
-              <th class="text-nowrap">{formatBytes(logs.size ?? 0)}</th>
+              <th class="text-nowrap">{formatBytes($profile.logFileInfo?.size ?? 0)}</th>
               <th><T id="LogFiles.titles.Age" /></th>
             </tr>
           </thead>
 
           <tbody>
-            {#each logs.list ?? [] as file}
+            {#each $profile.logFileInfo?.list ?? [] as file}
               {@const isActive = activeFile?.id === file.id}
               <tr class="cursor-pointer" onclick={e => set(e, file)}>
                 <th class="fit {isActive ? 'isActive' : ''}">
@@ -90,8 +95,8 @@
 
     <Col md={5}>
       <h4><T id="LogFiles.titles.Details" /></h4>
-      {#if activeFile}
-        <FileInfo file={activeFile} />
+      {#if activeFile && $profile.logFileInfo && $profile.logFileInfo.list}
+        <FileInfo file={activeFile} bind:list={$profile.logFileInfo.list} />
       {:else}
         <p class="text-muted"><T id="LogFiles.NoFileSelected" /></p>
       {/if}
