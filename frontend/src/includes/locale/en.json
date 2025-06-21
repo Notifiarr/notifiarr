@@ -151,7 +151,8 @@
     "Landing": {
       "SelectASection": "Select a section from the navigation menu to get started.",
       "Welcome": "Welcome, {username}!"
-    }
+    },
+    "ShowMore": "Show more information"
   },
   "navigation": {
     "titles": {
@@ -1445,12 +1446,25 @@
       "Date": "Date",
       "FileList": "File List",
       "Details": "Details",
-      "FileContent": "File Content"
+      "FileContent": "File Content",
+      "LineCount": "Line Count"
     },
-    "button": { "download": "Download", "upload": "Upload", "delete": "Delete" },
+    "button": {
+      "download": "Download",
+      "upload": "Upload",
+      "delete": "Delete",
+      "add": "Add",
+      "reload": "Reload"
+    },
     "Error": "Error loading log file: {error}",
     "NoFileSelected": "No file selected.",
     "SelectFile": "Select a file to see what's in it!",
-    "FilesInDirs": "{files} files in {dirs} dirs"
+    "FilesInDirs": "{files} files in {dirs} dirs",
+    "ToggleLinesOrder": "Toggle lines order",
+    "ToggleColors": "Toggle default colors",
+    "AddMoreLines": "Add more lines",
+    "Reload": "Reload log file",
+    "Highlight": "Highlight",
+    "Tooltip": "<ul><li>The first orange button on the left toggles the order of the lines in the file. By default it's ordered descending in the order it's written. Clicking the button reverses the file and makes it backward.</li><li>The second purple button toggles the built-in line highlight colors.</li><li>The number input indicates how many lines to load or add. Clicking the Add button adds the number of lines to the top of the file using the existing line count as the offset. Clicking the Reload button reloads the numbers of lines from the end of the file.</li><li>Use the highlight input to make specific text stand out. The Add button is disabled on in-use files because it's impossible to know how many lines were written since the last update.</li></ul>"
   }
 }

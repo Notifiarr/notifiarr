@@ -10,6 +10,7 @@ var langs = []string{
 	"fi",
 	"fr",
 	"hu",
+	"it",
 	"nl",
 	"pl",
 	"pt",

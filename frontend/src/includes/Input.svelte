@@ -173,7 +173,7 @@
           onclick={toggleTooltip}
           outline
           style="width:44px;"
-          title="Show more information">
+          title={$_('phrases.ShowMore')}>
           {#if showTooltip}
             <Fa
               i={faArrowUpFromBracket}
