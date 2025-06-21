@@ -660,11 +660,11 @@
     "scheduler": {
         "AddATime": "Voeg een tijd toe",
         "times": {
-            "everyMonth": "{aantal, meervoud, één {One Time} andere {# time}} elke maand op dagen {daysOfMonth} op tijden{times}",
+            "everyMonth": "",
             "everyHour": "{aantal, meervoud, één {One Time} andere {# times}} elk uur op minuut:seconden {times}",
-            "everyDay": "{aantal, meervoud, één {One time} andere {# times}} elke dag soms {times}",
-            "everyMinute": "{aantal, meervoud, één {One Time} andere {# times}} elk uur op minuut op seconden {times}",
-            "everyWeek": "{aantal, meervoud, één {One time} andere {# times}} elke week op {daysOfWeek} soms {times}"
+            "everyDay": "",
+            "everyMinute": "",
+            "everyWeek": ""
         },
         "ops": {
             "daily": "Dagelijks",
