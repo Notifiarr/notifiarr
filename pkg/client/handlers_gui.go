@@ -355,6 +355,9 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 
 		return
 	}
+
+	logs.Log.Errorf("Handling Log File Request: file ID not found: %s", mux.Vars(req)["id"])
+	http.Error(response, "no file found", http.StatusNotFound)
 }
 
 func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http.Request) {
