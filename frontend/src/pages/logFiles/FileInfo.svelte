@@ -32,6 +32,7 @@
 
   const deleteFile = async () => {
     if (file.used) return
+
     const resp = await getUi(`deleteFile/logs/${file.id}`, false)
     if (resp.ok) {
       success($_('LogFiles.deleteSuccess', { values: { file: file.path } }))
@@ -39,6 +40,8 @@
     } else {
       warning($_('LogFiles.deleteError', { values: { error: resp.body } }))
     }
+
+    showDelModal = false
   }
 
   const uploadFile = async () => {
