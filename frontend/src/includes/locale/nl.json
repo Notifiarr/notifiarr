@@ -51,19 +51,19 @@
         "instance-options": {
             "interval": {
                 "label": "Gezondheidscontrole-interval",
-                "description": "Hoe vaak de bereikbaarheid van het exemplaar moet worden gecontroleerd."
+                "description": "Hoe vaak de bereikbaarheid van de instantie moet worden gecontroleerd."
             },
             "timeout": {
                 "label": "Verzoek-time-out",
-                "description": "Hoe lang moet er worden gewacht op een reactie van het exemplaar?"
+                "description": "Hoe lang moet er worden gewacht op een reactie van de instantie?"
             },
             "validSsl": {
                 "label": "SSL-certificaat valideren",
-                "description": "Als u het vakje aanvinkt, weet u zeker dat het exemplaar een geldig SSL-certificaat gebruikt."
+                "description": "Als u het vakje aanvinkt, weet u zeker dat de instantie een geldig SSL-certificaat gebruikt."
             },
             "deletes": {
                 "label": "Inhoud verwijderen",
-                "description": "Hiermee wordt het aantal verwijderverzoeken beperkt dat per uur naar dit exemplaar kan worden verzonden.",
+                "description": "Hiermee wordt het aantal verwijderverzoeken beperkt dat per uur naar deze instantie kan worden verzonden.",
                 "tooltip": "Hiermee bepaalt u hoeveel verwijderverzoeken er per uur zijn toegestaan. Met een instelling van 0 kunt u geen verwijderverzoeken versturen. Dit geldt voor het verwijderen van media, maar kan ook andere acties omvatten. Dit is een beperking om te voorkomen dat hackers uw content vernietigen.",
                 "countPerHour": "{count} per uur"
             }
@@ -319,8 +319,8 @@
             "AnUnknownErrorOccurred": "Er is een onbekende fout opgetreden",
             "ConfigUpdateFailed": "Configuratie-update mislukt: {error}",
             "InvalidCreds": "Ongeldige gebruikersnaam of wachtwoord.",
-            "LoginRequestTimedOut": "",
-            "LoginFailed": "",
+            "LoginRequestTimedOut": "Inlog verzoek is verlopen",
+            "LoginFailed": "Inloggen mislukt: {error}",
             "ProfileReqTimedOut": "",
             "PleaseEnterBothUsernameAndPassword": ""
         },
@@ -331,12 +331,12 @@
             "Endpoint": "Eindpunt",
             "General": "Algemeen",
             "Light": "Licht",
-            "Network": "",
+            "Network": "Netwerk",
             "System": "",
             "WatchFile": "",
             "SSLConfiguration": "",
             "Services": "",
-            "Logging": ""
+            "Logging": "Loggen"
         },
         "debugLog": {
             "label": "Debug-log bestand",
@@ -375,8 +375,8 @@
         "command": {
             "name": {
                 "required": "Er is een opdracht nodig.",
-                "label": "",
-                "description": ""
+                "label": "Naam",
+                "description": "Naam van het commando."
             }
         },
         "apt": {
@@ -407,7 +407,7 @@
         },
         "logFileMb": {
             "label": "Logbestand grootte",
-            "description": "",
+            "description": "Maximale grootte van het logbestand vóór rotatie.",
             "tooltip": ""
         },
         "httpLog": {
@@ -429,8 +429,8 @@
         },
         "maxBody": {
             "tooltip": "",
-            "label": "",
-            "description": ""
+            "label": "Maximale bestandsgrootte",
+            "description": "Maximale bestandsgrootte voor HTTP-verzoeken."
         },
         "snapshot": {
             "timeout": {
@@ -444,8 +444,8 @@
         },
         "endpoint": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Naam",
+                "description": "Naam van het eindpunt."
             }
         },
         "sslKeyFile": {
@@ -456,12 +456,12 @@
         },
         "service": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Naam",
+                "description": "Naam van de service."
             }
         },
         "fileMode": {
-            "label": "",
+            "label": "Logbestand Unix-modus",
             "description": "",
             "tooltip": ""
         }
@@ -541,7 +541,7 @@
             "description": "",
             "name": {
                 "label": "",
-                "description": "",
+                "description": "Naam van de Plex server.",
                 "placeholder": ""
             },
             "token": {
@@ -566,7 +566,7 @@
             "description": "",
             "name": {
                 "label": "",
-                "description": ""
+                "description": "Naam van de Tautulli service."
             }
         }
     },
@@ -610,7 +610,7 @@
         "StartChecks": "",
         "StopChecks": "",
         "checkInitiated": "",
-        "nextRefresh": "",
+        "nextRefresh": "Volgende vernieuwing over {timeDuration}.",
         "refreshInterval": "",
         "showAllOutputs": ""
     },
@@ -635,7 +635,7 @@
             "addInstance": "Readarr-instantie toevoegen",
             "url": {
                 "label": "URL",
-                "description": "URL van het Readarr-exemplaar.",
+                "description": "URL van het Readarr instantie",
                 "placeholder": "http://readarr.server.tv:8787"
             },
             "apiKey": {
@@ -661,7 +661,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het Radarr instantie."
             },
             "url": {
                 "placeholder": "http://radarr.server.tv:7878",
@@ -679,7 +679,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het Sonarr instantie."
             },
             "addInstance": "Sonarr-instantie toevoegen",
             "apiKey": {
@@ -715,7 +715,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het Prowlarr instantie."
             },
             "username": {
                 "placeholder": "beheerder",
@@ -777,8 +777,8 @@
             "minimum": {
                 "placeholder": "10",
                 "required": "Er is een minimum aantal pakketten groter dan nul vereist.",
-                "label": "",
-                "description": ""
+                "label": "Minimum",
+                "description": "Minimum aantal pakketten dat moet worden ontvangen."
             },
             "value": {
                 "tooltip": "Een IP-adres wordt over het algemeen aanbevolen. Als u ook DNS wilt testen, gebruik dan een hostnaam. De notatie is <code>host</code> of <code>10.11.12.13</code>. Er mogen geen spaties of extra tekens in staan. Om UDP-controles op Linux te laten werken, moet u ze inschakelen met de volgende opdracht: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Om ICMP-controles op Linux toe te staan, moet u de binaire notifiarr-functionaliteiten opgeven met de volgende opdracht: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. De eenvoudigste manier om beide in Docker te laten werken, is door de privileged mode in te schakelen, maar u kunt ook andere functionaliteiten instellen.",
@@ -809,8 +809,8 @@
             "minimum": {
                 "required": "Er is een minimum aantal processen groter dan nul vereist.",
                 "tooltip": "Als u 2 invoert, ontvangt u een melding als er minder dan 2 processen actief zijn. Gebruik dit om gewaarschuwd te worden als er te weinig processen actief zijn.",
-                "label": "",
-                "description": ""
+                "label": "Minimum",
+                "description": "Minimum aantal actieve processen dat aan de waarde moet voldoen."
             },
             "value": {
                 "required": "Er is een procesnaam vereist.",
@@ -821,8 +821,8 @@
             },
             "maximum": {
                 "tooltip": "Als u 2 invoert, ontvangt u een melding als er meer dan 2 processen actief zijn. Gebruik dit om gewaarschuwd te worden als er te veel processen actief zijn.",
-                "label": "",
-                "description": ""
+                "label": "Maximum",
+                "description": "Maximaal aantal actieve processen dat aan de waarde mag voldoen."
             },
             "running": {
                 "label": "",
@@ -889,16 +889,16 @@
             "everyDay": "",
             "everyMinute": "",
             "everyWeek": "",
-            "noneSelected": "",
-            "noDaysSelected": ""
+            "noneSelected": "(niets geselecteerd)",
+            "noDaysSelected": "(geen dagen geselecteerd)"
         },
         "ops": {
             "daily": "Dagelijks",
             "hourly": "Per uur",
             "noSchedule": "",
-            "minutely": "",
+            "minutely": "Minutieus",
             "weekly": "",
-            "monthly": ""
+            "monthly": "Maandelijks"
         },
         "daysOfMonth": "Dagen van de maand",
         "daysOfWeek": "Dagen van de week",
@@ -907,9 +907,9 @@
         "title": "",
         "selectAFrequency": "",
         "required": {
-            "daysOfWeek": "",
-            "daysOfMonth": "",
-            "atTimes": ""
+            "daysOfWeek": "Minimaal één dag van de week selecteren.",
+            "daysOfMonth": "Minimaal één dag van de maand selecteren.",
+            "atTimes": "Minimaal één keer selecteren om het schema uit te voeren."
         }
     },
     "Downloaders": {
@@ -918,7 +918,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het Deluge instantie."
             },
             "title": "Deluge",
             "url": {
@@ -942,7 +942,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het Qbittorrent instantie."
             },
             "url": {
                 "placeholder": "http://qbittorrent.server.tv:8080",
@@ -966,7 +966,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het SabNZB instantie."
             },
             "url": {
                 "placeholder": "http://sabnzb.server.tv:8080",
@@ -979,7 +979,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het Rtorrent instantie."
             },
             "addInstance": "Rtorrent-instantie toevoegen",
             "username": {
@@ -1004,7 +1004,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het Transmission instantie."
             },
             "username": {
                 "placeholder": "beheerder",
@@ -1033,7 +1033,7 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "Toepassing naam",
-                "description": ""
+                "description": "Naam van het NZBGet instantie."
             },
             "url": {
                 "placeholder": "http://nzbget.server.tv:6789",
@@ -1061,8 +1061,8 @@
         "addInstance": "Opdracht maken",
         "name": {
             "placeholder": "aangepaste naam voor meldingen",
-            "label": "",
-            "description": ""
+            "label": "Naam",
+            "description": "Naam van de opdracht. Wordt weergegeven in het logboek en in meldingen."
         },
         "DeleteCommand": "Verwijderopdracht",
         "enterCommandArguments": "Voer opdracht argumenten in",
@@ -1071,16 +1071,16 @@
         "LastExecution": "Laatste uitvoering",
         "timeout": {
             "description": "Hoe lang de opdracht mag duren voordat deze wordt beëindigd.",
-            "label": ""
+            "label": "Maximale looptijd"
         },
         "log": {
             "description": "Uitvoer van log opdracht.",
-            "label": "",
-            "tooltip": ""
+            "label": "Logboek uitvoer",
+            "tooltip": "Registreer de uitvoer van de opdracht in het toepassingslogboek van deze client."
         },
-        "neverExecuted": "",
+        "neverExecuted": "nooit uitgevoerd",
         "commandRequiresArguments": "",
-        "noOutput": "",
+        "noOutput": "Nog geen uitvoer. Probeer de opdracht uit te voeren en klik op Vernieuwen.",
         "refreshed": "",
         "notify": {
             "label": "",
@@ -1133,7 +1133,7 @@
         },
         "logMatch": {
             "tooltip": "Als u dit inschakelt, wordt de overeenkomende regel naar het notifiarr-logboek geschreven. Dit is handig voor foutopsporing, maar kan ruis veroorzaken.",
-            "label": "",
+            "label": "Logboek overeenkomsten",
             "description": ""
         },
         "poll": {
@@ -1185,9 +1185,9 @@
             "name": {
                 "placeholder": "aangepaste naam voor meldingen",
                 "label": "",
-                "description": ""
+                "description": "Naam van de MySQL server."
             },
-            "title": "",
+            "title": "MySQL",
             "password": {
                 "description": "",
                 "placeholder": "",
@@ -1230,8 +1230,8 @@
         },
         "name": {
             "placeholder": "aangepaste naam voor meldingen",
-            "description": "",
-            "label": ""
+            "description": "Naam van de relay URL.",
+            "label": "Naam"
         },
         "timeout": {
             "description": "Hoe lang moet er worden gewacht tot de HTTP-aanvraag is voltooid?",
@@ -1239,7 +1239,7 @@
         },
         "method": {
             "description": "HTTP-verzoek",
-            "label": ""
+            "label": "Methode"
         },
         "url": {
             "placeholder": "https://pihole.myhome.lan/api/stats",
@@ -1250,7 +1250,7 @@
         "body": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "{\"message\": \"Hallo wereld!\"}"
         }
     },
     "Actions": {
@@ -1284,9 +1284,9 @@
                     "debug": "Debug-log bestand.",
                     "http": "HTTP-logbestand."
                 },
-                "label": "",
+                "label": "Logbestand geüpload naar website",
                 "button": "",
-                "success": ""
+                "success": "Logbestand geüpload naar website."
             },
             "TrigPlexEmptyTrash": {
                 "label": "Plex-prullenbak leegmaken"
@@ -1377,9 +1377,9 @@
                 "label": "Lidarr wachtrij cacher"
             },
             "TrigMDBListSync": {
-                "label": "",
+                "label": "MDB-lijst synchronisatie",
                 "button": "",
-                "success": ""
+                "success": "Synchronisatie van MDB-lijst gestart."
             },
             "TrigCFSyncRadarr": {
                 "label": "",
@@ -1464,27 +1464,27 @@
         "apiHits": {
             "title": "API-verzoeken",
             "description": "Tellers voor binnenkomende API-verzoeken.",
-            "empty": ""
+            "empty": "Nog geen API-verzoeken."
         },
         "fileWatcher": {
             "title": "Bestandsbewaker",
             "description": "Statistieken van de bestands bewaker.",
-            "empty": ""
+            "empty": "Er zijn geen bestand bewakers geconfigureerd."
         },
         "apps": {
             "title": "Aanvraag verzoeken",
             "description": "Statistieken over applicatie verzoeken. Deze tellers bevatten geen servicecontroles.",
-            "empty": ""
+            "empty": "Nog geen applicatie verzoeken."
         },
         "httpRequests": {
             "title": "HTTP-verzoeken",
             "description": "Statistieken over inkomende HTTP-verzoeken. Inclusief websocket-tunnel verzoeken.",
-            "empty": ""
+            "empty": "Nog geen HTTP verzoeken."
         },
         "logFiles": {
             "description": "Tellers van logbestanden.",
             "title": "Logbestanden",
-            "empty": ""
+            "empty": "Geen logbestanden gevonden."
         },
         "timerEvents": {
             "title": "",
