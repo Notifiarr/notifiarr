@@ -164,14 +164,12 @@ func (c *Client) prefixURLbase(handler http.Handler) http.Handler {
 			return
 		}
 
-		url := &(*req.URL)
-		url.Path = path.Join(c.Config.URLBase, url.Path)
+		req.URL.Path = path.Join(c.Config.URLBase, req.URL.Path)
 
-		if url.RawPath != "" {
-			url.RawPath = path.Join(c.Config.URLBase, url.RawPath)
+		if req.URL.RawPath != "" {
+			req.URL.RawPath = path.Join(c.Config.URLBase, req.URL.RawPath)
 		}
 
-		req.URL = url
 		handler.ServeHTTP(writer, req)
 	})
 }

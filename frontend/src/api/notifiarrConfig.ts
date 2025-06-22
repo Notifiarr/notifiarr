@@ -738,7 +738,7 @@ export interface LogFileInfo {
   path: string;
   size: number;
   time: Date;
-  mode: number;
+  mode: string;
   used: boolean;
   user: string;
 };

@@ -3,8 +3,8 @@ package logs
 import (
 	"encoding/base64"
 	"expvar"
+	"fmt"
 	"io"
-	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -209,14 +209,14 @@ type LogFileInfos struct {
 
 // LogFileInfo is returned by GetAllLogFilePaths.
 type LogFileInfo struct {
-	ID   string      `json:"id"`
-	Name string      `json:"name"`
-	Path string      `json:"path"`
-	Size int64       `json:"size"`
-	Time time.Time   `json:"time"`
-	Mode fs.FileMode `json:"mode"`
-	Used bool        `json:"used"`
-	User string      `json:"user"`
+	ID   string    `json:"id"`
+	Name string    `json:"name"`
+	Path string    `json:"path"`
+	Size int64     `json:"size"`
+	Time time.Time `json:"time"`
+	Mode string    `json:"mode"`
+	Used bool      `json:"used"`
+	User string    `json:"user"`
 }
 
 // GetActiveLogFilePaths returns the configured log file paths.
@@ -290,15 +290,14 @@ func GetFilePaths(files ...string) *LogFileInfos { //nolint:cyclop
 				used = true
 			}
 		}
-		// fileDate := strings.TrimPrefix(strings.TrimSuffix(filePath, ".log"), strings.TrimSuffix(logFilePath, ".log"))
-		// parsedDate, _ := time.Parse(timerotator.FormatDefault, fileDate)
+
 		output.List = append(output.List, &LogFileInfo{
 			ID:   strings.TrimRight(base64.StdEncoding.EncodeToString([]byte(filePath)), "="),
 			Name: fileInfo.Name(),
 			Path: filePath,
 			Size: fileInfo.Size(),
 			Time: fileInfo.ModTime().Round(time.Second),
-			Mode: fileInfo.Mode(),
+			Mode: fmt.Sprintf("%s (%o)", fileInfo.Mode(), fileInfo.Mode()),
 			Used: used,
 			User: getFileOwner(fileInfo),
 		})
