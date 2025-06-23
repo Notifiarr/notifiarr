@@ -9,7 +9,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"html/template"
 	"net/http"
 	"os"
 	"os/signal"
@@ -51,7 +50,6 @@ type Client struct {
 	triggers   *triggers.Actions
 	Services   *services.Services
 	cookies    *securecookie.SecureCookie
-	template   *template.Template
 	tunnel     *mulery.Client
 	webauth    bool
 	noauth     bool
