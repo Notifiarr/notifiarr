@@ -14,8 +14,8 @@
 </script>
 
 <script lang="ts">
-  import { CardBody, Col, Row, Table } from '@sveltestrap/sveltestrap'
-  import T from '../../includes/Translate.svelte'
+  import { CardBody, Col, Popover, Row, Table } from '@sveltestrap/sveltestrap'
+  import T, { _ } from '../../includes/Translate.svelte'
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
   import { formatBytes, since } from '../../includes/util'
@@ -24,12 +24,21 @@
   import Fa from '../../includes/Fa.svelte'
   import { faListTimeline } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Content from './Content.svelte'
+  import { theme } from '../../includes/theme.svelte'
 
   let activeFile: LogFileInfo | null = $state(null)
+  let activeTail: LogFileInfo | null = $state(null)
 
-  const set = (event: MouseEvent, file: LogFileInfo) => {
-    event.preventDefault()
+  const viewFile = (e: MouseEvent, file: LogFileInfo) => {
+    e.preventDefault()
     activeFile = file
+    activeTail = null
+  }
+
+  const tailFile = (e: MouseEvent, file: LogFileInfo) => {
+    e.stopPropagation()
+    activeTail = file
+    activeFile = null
   }
 
   $effect(() => {
@@ -45,18 +54,28 @@
   <Row>
     <Col md={7}>
       <h4><T id="LogFiles.titles.FileList" /></h4>
-      <div style="max-height: 300px; overflow-y: auto">
-        <Table size="sm" striped>
+      <div style="max-height: 305px; overflow-y: auto">
+        <Table size="sm" striped borderless hover>
           <thead>
             <tr>
-              <th><Fa i={faArrowsSpin} /></th>
+              <Popover
+                target="followTooltip"
+                trigger="click"
+                theme={$theme}
+                placement="right">
+                <T id="LogFiles.FollowTooltip" />
+              </Popover>
+              <th id="followTooltip">
+                <a href="#moreInfo" onclick={e => e.preventDefault()}>
+                  <Fa i={faArrowsSpin} scale={1.2} /></a>
+              </th>
               <th>
                 <T id="LogFiles.titles.Name" />
                 <small class="text-muted">
                   <T
                     id="LogFiles.FilesInDirs"
-                    files={$profile.logFileInfo?.list?.length}
-                    dirs={$profile.logFileInfo?.dirs?.length} />
+                    fileCount={$profile.logFileInfo?.list?.length}
+                    dirCount={$profile.logFileInfo?.dirs?.length} />
                 </small>
               </th>
               <th class="text-nowrap">{formatBytes($profile.logFileInfo?.size ?? 0)}</th>
@@ -66,15 +85,26 @@
 
           <tbody>
             {#each $profile.logFileInfo?.list ?? [] as file}
-              {@const isActive = activeFile?.id === file.id}
-              <tr class="cursor-pointer" onclick={e => set(e, file)}>
-                <th class="fit {isActive ? 'isActive' : ''}">
-                  <Fa i={faListTimeline} />
+              {@const isActive = activeFile?.id === file.id || activeTail?.id === file.id}
+              {@const vals = { values: { fileName: file.name } }}
+              <tr
+                class="cursor-pointer"
+                onclick={e => viewFile(e, file)}
+                aria-label={$_('LogFiles.titles.OpenFile', vals)}
+                title={$_('LogFiles.titles.OpenFile', vals)}>
+                <th
+                  class="fit {isActive ? 'isActive' : ''}"
+                  aria-label={$_('LogFiles.titles.TailFile', vals)}
+                  title={$_('LogFiles.titles.TailFile', vals)}
+                  onclick={e => (file.used ? tailFile(e, file) : null)}>
+                  {#if file.used}<Fa i={faListTimeline} scale={1.2} />{:else}&nbsp;{/if}
                 </th>
                 <td class:isActive>
                   <a
+                    aria-label={$_('LogFiles.titles.OpenFile', vals)}
+                    title={$_('LogFiles.titles.OpenFile', vals)}
                     href={file.path}
-                    onclick={e => set(e, file)}
+                    onclick={e => viewFile(e, file)}
                     class="text-decoration-none">
                     {file.name}
                   </a>
@@ -94,8 +124,10 @@
 
     <Col md={5}>
       <h4><T id="LogFiles.titles.Details" /></h4>
-      {#if activeFile && $profile.logFileInfo && $profile.logFileInfo.list}
-        <FileInfo file={activeFile} bind:list={$profile.logFileInfo.list} />
+      {#if (activeFile || activeTail) && $profile.logFileInfo && $profile.logFileInfo.list}
+        <FileInfo
+          file={activeFile || activeTail!}
+          bind:list={$profile.logFileInfo.list} />
       {:else}
         <p class="text-muted"><T id="LogFiles.NoFileSelected" /></p>
       {/if}
@@ -104,9 +136,17 @@
 
   <Row>
     <Col md={12}>
-      <h4><T id="LogFiles.titles.FileContent" /></h4>
+      <h4>
+        {#if activeTail}
+          <T id="LogFiles.titles.FollowingFile" />
+        {:else}
+          <T id="LogFiles.titles.FileContent" />
+        {/if}
+      </h4>
       {#if activeFile}
         <Content file={activeFile} />
+      {:else if activeTail}
+        <Content file={activeTail} tail />
       {:else}
         <p class="text-muted"><T id="LogFiles.SelectFile" /></p>
       {/if}
@@ -127,11 +167,5 @@
 
   .cursor-pointer {
     cursor: pointer;
-  }
-
-  .cursor-pointer:hover td,
-  .cursor-pointer:hover th {
-    background-color: var(--bs-secondary-bg) !important;
-    color: var(--bs-secondary-color) !important;
   }
 </style>

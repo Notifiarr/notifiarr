@@ -128,7 +128,7 @@
   theme={$theme}
   centered>
   <ModalHeader>
-    <T id="LogFiles.confirmDelete" file={file.path} />
+    <T id="LogFiles.DeleteFile" filePath={file.path} />
   </ModalHeader>
   <ModalBody><T id="LogFiles.deleteConfirm" /></ModalBody>
   <ModalFooter>

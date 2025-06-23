@@ -11,7 +11,6 @@ import (
 
 	"github.com/CAFxX/httpcompression"
 	"github.com/Notifiarr/notifiarr/frontend"
-	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
@@ -147,9 +146,7 @@ func (c *Client) notFound(response http.ResponseWriter, request *http.Request) {
 
 	response.WriteHeader(http.StatusNotFound)
 
-	if err := c.template.ExecuteTemplate(response, "404.html", nil); err != nil {
-		logs.Log.Errorf("Sending HTTP Reply: %v", err)
-	}
+	_, _ = response.Write([]byte("404: Not Found"))
 }
 
 // slash is the GET handler for /.

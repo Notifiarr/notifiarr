@@ -26,41 +26,59 @@
     faArrowUpFromBracket,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { slide } from 'svelte/transition'
-  import { warning } from '../../includes/util'
+  import { delay, warning } from '../../includes/util'
+  import { FileTail } from './tail.svelte'
+  import { onMount } from 'svelte'
+  import { get } from 'svelte/store'
 
-  let { file }: { file: LogFileInfo } = $props()
+  /** This module handles simple static content display,
+   * and the tailing (active following) of files. */
+  let { file, tail }: { file: LogFileInfo; tail?: boolean } = $props()
 
   // Form variables.
   // svelte-ignore non_reactive_update
-  let lineCount = 500
+  let lineCount = tail ? 50 : 500
   let offset = lineCount
   let desc = $state(true) // false == ascending (backward)
   let highlight = $state('')
   let colors = $state(true)
   let showTooltip = $state(false)
-  let resp = $state<BackendResponse>()
+  let resp = $state<BackendResponse | FileTail>()
   let adding = $state(false)
+  let loaded = $state(file.id)
 
-  // Initial load, and when a new file is selected.
+  // Reload when a new file is selected.
   $effect(() => {
+    if (loaded !== file.id) {
+      loaded = file.id
+      load(file.id)
+    }
+  })
+
+  onMount(() => {
+    // Initial load.
     load(file.id)
+    return () => {
+      // Disconnect websocket on unmount (nav away).
+      if (resp instanceof FileTail) resp.destroy()
+    }
   })
 
   function colorLine(line: string) {
     // User search highlight.
-    if (highlight && line.includes(highlight)) return 'success text-white'
+    if (highlight && line.includes(highlight)) return 'bg-success text-white'
     if (colors) {
       // This is a trigger/action.
-      if (line.includes('requested]')) return 'primary-subtle'
+      if (line.includes('requested]')) return 'bg-primary-subtle'
       // Services checks.
-      if (line.includes('Critical')) return 'warning-subtle'
-      if (line.includes('DEBUG')) return 'primary-subtle'
+      if (line.includes('Critical')) return 'bg-warning-subtle'
+      if (line.includes('DEBUG')) return 'bg-primary-subtle'
       // Catches any error. Might be too many.
-      if (line.toLowerCase().includes('error')) return 'danger-subtle'
+      if (line.toLowerCase().includes('error')) return 'bg-danger-subtle'
       // Startup and info lines.
-      if (line.includes('=>')) return 'info-subtle'
+      if (line.includes('=>')) return 'bg-info-subtle'
       // Shutdown message(s).
-      if (line.includes('!!>')) return 'warning-subtle'
+      if (line.includes('!!>')) return 'bg-warning-subtle'
     }
     return ''
   }
@@ -73,8 +91,14 @@
     }
 
     adding = true
+    if (resp instanceof FileTail) {
+      await resp.destroy()
+      resp.body = get(_)('phrases.Loading')
+      await delay(1000)
+    }
     resp = undefined
-    resp = await getUi(`getFile/logs/${id}/${lineCount}/0`, false)
+    if (!tail) resp = await getUi(`getFile/logs/${id}/${lineCount}/0`, false)
+    else resp = await new FileTail(file, lineCount)
     offset = lineCount
     adding = false
   }
@@ -97,7 +121,7 @@
   <h3 class="text-success">
     <Fa i={faSpinner} spin scale={1.2} /> &nbsp; <T id="phrases.Loading" />
   </h3>
-{:else if resp.ok}
+{:else if tail || resp.ok}
   {@const list = desc
     ? resp.body.trimEnd().split('\n')
     : resp.body.trimEnd().split('\n').reverse()}
@@ -125,7 +149,7 @@
           active={!colors}
           title={$_('LogFiles.ToggleColors')}>
           <Fa
-            spin={adding}
+            spin={adding || (tail && resp.ok)}
             i={colors ? faColors : faSplotch}
             c1="purple"
             c2="violet"
@@ -140,13 +164,19 @@
           min={10}
           max={10000}
           bind:value={lineCount} />
-        <!-- Add Button -->
+        <!-- Add / Following Button -->
         <Button
           outline
           onclick={add}
           title={$_('LogFiles.AddMoreLines')}
-          disabled={file.used || adding}>
-          <T id="LogFiles.button.add" />
+          disabled={file.used || adding || tail}>
+          {#if !resp.ok}
+            <b class="text-danger"><T id="phrases.ERROR" /></b>
+          {:else if tail}
+            <T id="LogFiles.titles.Tailing" />
+          {:else}
+            <T id="LogFiles.button.add" />
+          {/if}
         </Button>
         <!-- Reload Button -->
         <Button outline onclick={load} title={$_('LogFiles.Reload')} disabled={adding}>
@@ -194,7 +224,7 @@
     <ListGroup flush numbered class="ps-0 text-nowrap ms-0">
       {#each list as line}
         <ListGroupItem class="p-0 border-0 lh-1 ms-0">
-          <span class="d-inline-block me-0 bg-{colorLine(line)}">
+          <span class="d-inline-block me-0 {colorLine(line)}">
             <pre class="mb-0 me-4 pre">{line}</pre>
           </span>
         </ListGroupItem>
