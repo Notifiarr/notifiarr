@@ -1169,7 +1169,7 @@
     "title": "Health Checks",
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
-    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page.",
+    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",
@@ -1478,5 +1478,15 @@
     "Highlight": "Highlight",
     "FollowTooltip": "The buttons in this column activelly follow a file as it's being written to.",
     "Tooltip": "<ol><li>The first orange button on the left toggles the order of the lines in the file. By default it's ordered descending in the order it's written. Clicking the button reverses the file and makes it backward. This works well when following a file that's being written to.</li><li>The second purple button toggles the built-in line highlight colors. It also spins when things are happening.</li><li>The number input indicates how many lines to load or add. When following a file, the number limits how many lines are displayed.</li><li>Clicking the Add button adds the number of lines to the top of the file using the existing line count as the offset. The Add button is disabled on in-use files because it's impossible to know how many lines were written since the last update. When following in-use files, the Add button is replaced by an indicator.</li><li>Clicking the Reload button reloads the number of lines from the end of the file.</li><li>Use the highlight input to make specific text stand out.</li></ol>"
+  },
+  "ModalWrap": {
+    "button": { "refresh": "Refresh Page Data", "fullscreen": "Toggle Fullscreen" }
+  },
+  "ProcessList": {
+    "title": "Running Process List",
+    "error": "Error loading process list: {error}",
+    "noData": "No process list returned.",
+    "footer": "{count} processes found.",
+    "button": { "wrapOn": "Turn Line Wrap On", "wrapOff": "Turn Line Wrap Off" }
   }
 }

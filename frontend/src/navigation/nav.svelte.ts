@@ -4,12 +4,14 @@ import type { Component } from 'svelte'
 import Landing from '../Landing.svelte'
 import { iequals, ltrim } from '../includes/util'
 import type { Props as FaProps } from '../includes/Fa.svelte'
-import { allPages } from './pages'
+import { allPages, others } from './pages'
 import { closeSidebar } from './Index.svelte'
+import { modal } from './Modals.svelte'
 
 // Page represents the data to render a page link.
 export interface Page extends FaProps {
   id: string
+  type?: 'modal' | 'page'
   component: Component
 }
 
@@ -43,6 +45,11 @@ class Navigator {
    */
   public goto = (event: Event | null, pid: string, subPages: string[] = []): void => {
     event?.preventDefault()
+
+    if (modal[pid]) {
+      modal[pid].toggle()
+      return // open the modal and bail.
+    }
 
     if (this.formChanged && event?.type !== 'force' && pid !== this.activePage) {
       this.showUnsavedAlert = pid
@@ -89,6 +96,11 @@ class Navigator {
     const page = allPages.find(p => iequals(p.id, newPage))
     this.ActivePage = page?.component || Landing
     return (this.activePage = page ? newPage : '')
+  }
+
+  private isModal = (page: string): Component | null => {
+    const p = others.find(p => iequals(p.id, page))
+    return p?.type === 'modal' ? p.component : null
   }
 }
 

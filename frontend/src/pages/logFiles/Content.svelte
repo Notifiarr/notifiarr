@@ -221,11 +221,11 @@
 
   <!-- File content is here. -->
   <div class="log-file-content" style="--line-number-width: {lineNumberWidth}">
-    <ListGroup flush numbered class="ps-0 text-nowrap ms-0">
+    <ListGroup flush numbered class="ps-0 text-nowrap">
       {#each list as line}
-        <ListGroupItem class="p-0 border-0 lh-1 ms-0">
-          <span class="d-inline-block me-0 {colorLine(line)}">
-            <pre class="mb-0 me-4 pre">{line}</pre>
+        <ListGroupItem class="p-0 border-0 lh-1">
+          <span class="li-content {colorLine(line)}">
+            <pre class="m-0 pre">{line}</pre>
           </span>
         </ListGroupItem>
       {/each}
@@ -238,12 +238,20 @@
 {/if}
 
 <style>
-  /* All this to make the line numbers look good,
-   * and they still need work to fix the right side
-   * margin overflow caused by the ::before pseudo element. */
+  /* All this to make the line numbers look good. */
 
   .log-file-content :global(.list-group) {
     counter-reset: liCounter;
+  }
+
+  .log-file-content :global(.list-group-item) {
+    clear: both;
+    position: relative;
+  }
+
+  .li-content {
+    display: inline-block;
+    margin-left: 2em;
   }
 
   .log-file-content :global(.list-group-item)::before {
@@ -255,7 +263,9 @@
     font-weight: 300;
     min-width: var(--line-number-width);
     text-align: right;
-    margin-right: 0.4rem;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 
   pre.pre {

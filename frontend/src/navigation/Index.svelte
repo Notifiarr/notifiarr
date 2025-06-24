@@ -26,6 +26,7 @@
   import { slide } from 'svelte/transition'
   import { onMount } from 'svelte'
   import Sidebar from './Sidebar.svelte'
+  import Modals from './Modals.svelte'
 
   const magicNumber = 1005
   // windowWidth is used for sidebar collapse state.
@@ -41,6 +42,8 @@
 </script>
 
 <svelte:window bind:innerWidth={windowWidth} on:popstate={e => nav.popstate(e)} />
+
+<Modals />
 
 {#if isMobile}
   <div class="menu-toggle-wrapper">
