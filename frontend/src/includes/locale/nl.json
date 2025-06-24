@@ -879,7 +879,7 @@
             "label": "URL",
             "description": "URL van de dienst die wordt gemonitord."
         },
-        "description": "Gebruik dit formulier om service controles te configureren. Voeg hier geen starr, media, snapshot of downloader apps toe. Geef ze een controle interval op hun respectievelijke configuratie pagina's. Schakel service controles volledig in en uit op de pagina <go-to page=\"configuration\">Configuratie</go-to>. Bekijk informatie over de status van actieve services op de pagina <go-to page=\"monitoring\">Monitoring</go-to>. Bekijk de <go-to page=\"Process List\">lijst met actieve processen hier</go-to> en gebruik deze ter inspiratie bij het maken van procescontroles..",
+        "description": "Gebruik dit formulier om service controles te configureren. Voeg hier geen starr, media, snapshot of downloader apps toe. Geef ze een controle interval op hun respectievelijke configuratie pagina's. Schakel service controles volledig in en uit op de pagina <go-to page=\"configuration\">Configuratie</go-to>. Bekijk informatie over de status van actieve services op de pagina <go-to page=\"monitoring\">Monitoring</go-to>. Bekijk de <go-to page=\"ProcessList\">lijst met actieve processen hier</go-to> en gebruik deze ter inspiratie bij het maken van procescontroles..",
         "processListLink": "Bekijk hier de lijst met actieve processen."
     },
     "scheduler": {
