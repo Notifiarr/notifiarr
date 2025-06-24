@@ -71,6 +71,7 @@
     style="width:44px;"
     type="button"
     outline
+    title="Validate SSL certificate"
     color="notifiarr"
     class={form['validSsl'] !== original['validSsl'] ? 'changed' : ''}
     onclick={() => (form['validSsl'] = !form['validSsl'])}>
@@ -83,6 +84,7 @@
     style="width:44px;"
     type="button"
     outline
+    title="Run as shell command"
     color="notifiarr"
     class={form['shell'] !== original['shell'] ? 'changed' : ''}
     onclick={() => (form['shell'] = !form['shell'])}>
@@ -106,6 +108,7 @@
         style="width:44px;"
         type="button"
         outline
+        title="Check instance"
         color="notifiarr"
         disabled={testing || disabled}
         onclick={checkInstance}>

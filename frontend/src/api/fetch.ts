@@ -2,6 +2,7 @@ import { get, writable } from 'svelte/store'
 import { delay, failure, ltrim, rtrim, success } from '../includes/util'
 import { _ } from 'svelte-i18n'
 import Cookies from 'js-cookie'
+import { locale } from '../includes/locale/index.svelte'
 
 export const LoggedOut = new Error('logged out')
 export const TimedOut = new Error('request timed out')
@@ -82,9 +83,11 @@ export async function checkReloaded(): Promise<void> {
   }
 
   return new Promise(async (resolve, reject) => {
-    await delay(600) // initial delay
-    for (let i = 0; i < 20; i++) {
-      await delay(300) // delay between checks
+    await delay(800) // initial delay (this + the first delay)
+    // This waits up to about 40 seconds, and makes 50 attempts.
+    for (let i = 0; i < 50; i++) {
+      // delay between checks
+      await delay(i < 5 ? 250 : i < 12 ? 400 : i < 18 ? 500 : i < 25 ? 600 : 1000)
       if (await checkReload()) return resolve()
     }
 
@@ -103,7 +106,10 @@ async function request(
   timeout: number = 5000,
 ): Promise<BackendResponse> {
   try {
-    const headers: HeadersInit = { Accept: json ? 'application/json' : 'text/plain' }
+    const headers: HeadersInit = {
+      Accept: json ? 'application/json' : 'text/plain',
+      'Accept-Language': locale.current,
+    }
     if (body) headers['Content-Type'] = 'application/json'
 
     uri = rtrim(get(urlbase), '/') + '/' + ltrim(uri, '/')
@@ -135,7 +141,6 @@ export async function fetchWithTimeout(
 
   try {
     const response = await fetch(url, options)
-    console.log('fetchWithTimeout2', response)
     clearTimeout(id)
     return response
   } catch (error) {

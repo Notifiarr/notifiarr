@@ -33,7 +33,7 @@ jobs:
         with:
           check_hidden: true
           ignore_words_list: vender, te
-          skip: .git,dist,node_modules,fortunes.txt,words.go,jquery*.js,swagger*.js,swagger*.map,bootstrap*.js,go.sum,package-lock.json
+          skip: .git,dist,node_modules,fortunes.txt,words.go,swagger*.js,swagger*.map,go.sum,*.json
 
   golangci-darwin:
     # description: "Runs golangci-lint on macos against freebsd and macos."

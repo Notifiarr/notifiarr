@@ -74,8 +74,8 @@ func (c *cmd) create() {
 		Fn:   c.syncRadarr,
 		C:    make(chan *common.ActionInput, 1),
 	}, &common.Action{
-		Name: TrigRPSyncSonarr,
-		Key:  "TrigRPSyncSonarr",
+		Name: TrigCFSyncSonarr,
+		Key:  "TrigCFSyncSonarr",
 		Fn:   c.syncSonarr,
 		C:    make(chan *common.ActionInput, 1),
 	}, &common.Action{
@@ -184,7 +184,7 @@ func (c *cmd) setupSonarr(info *clientinfo.ClientInfo) {
 			Key:  "TrigCFSyncSonarrInt",
 			Hide: true,
 			D:    dur,
-			Name: TrigRPSyncSonarrInt.WithInstance(instance),
+			Name: TrigCFSyncSonarrInt.WithInstance(instance),
 			Fn:   (&sonarrApp{app: &app, cmd: c, idx: idx}).syncSonarr,
 			C:    make(chan *common.ActionInput, 1),
 		})

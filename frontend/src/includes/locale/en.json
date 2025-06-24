@@ -151,7 +151,8 @@
     "Landing": {
       "SelectASection": "Select a section from the navigation menu to get started.",
       "Welcome": "Welcome, {username}!"
-    }
+    },
+    "ShowMore": "Show more information"
   },
   "navigation": {
     "titles": {
@@ -192,7 +193,7 @@
       "Integrations": "View action statistics and for all integrations.",
       "Monitoring": "View service and network health.",
       "Metrics": "View metric totals for client configurations.",
-      "LogFiles": "View and manage client log files.",
+      "LogFiles": "View, follow, download and upload client log files.",
       "System": "View system and client information and.",
       "TrustProfile": "Configure how you log into this Notifiarr client application.",
       "Landing": "This is the greatest place on Earth!"
@@ -1168,7 +1169,7 @@
     "title": "Health Checks",
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
-    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page.",
+    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",
@@ -1339,7 +1340,7 @@
         "button": "Sync all Radarr instances",
         "success": "Radarr profile and format sync initiated."
       },
-      "TrigRPSyncSonarr": {
+      "TrigCFSyncSonarr": {
         "label": "Sonarr profile and format sync",
         "button": "Sync all Sonarr instances",
         "success": "Sonarr profile and format sync initiated."
@@ -1414,7 +1415,7 @@
       "TrigAutoUpdate": { "label": "Auto-update update check" },
       "TrigCFSyncLidarrInt": { "label": "Lidarr custom format sync per instance" },
       "TrigCFSyncRadarrInt": { "label": "Radarr custom format sync per instance" },
-      "TrigRPSyncSonarrInt": { "label": "Sonarr custom format sync per instance" },
+      "TrigCFSyncSonarrInt": { "label": "Sonarr custom format sync per instance" },
       "TrigCustomCronTimer": {
         "label": "Website timer: {name}",
         "button": "Run Timer Now",
@@ -1432,5 +1433,67 @@
       },
       "TrigPollSite": { "label": "Site poller" }
     }
+  },
+  "LogFiles": {
+    "titles": {
+      "Name": "File Name",
+      "Age": "Age",
+      "Bytes": "Bytes",
+      "InUse": "In Use",
+      "Mode": "Mode",
+      "Owner": "Owner",
+      "Path": "Path",
+      "Date": "Date",
+      "FileList": "File List",
+      "Details": "Details",
+      "FileContent": "File Content",
+      "FollowingFile": "Following File",
+      "LineCount": "Line Count",
+      "OpenFile": "Open File {fileName}",
+      "TailFile": "Follow File {fileName}",
+      "Tailing": "Following"
+    },
+    "button": {
+      "download": "Download",
+      "upload": "Upload",
+      "delete": "Delete",
+      "add": "Add",
+      "reload": "Reload",
+      "tooltip": "The <b>Download</b> button downloads the file to your computer. The <b>Upload</b> button uploads the file to the Notifiarr.com server. Only administrators can see uploaded files. The <b>Delete</b> button deletes the file from your hard drive. Files that are in use cannot be deleted. In use means this application is currently writing logs entries to it."
+    },
+    "Error": "Error loading log file: {error}",
+    "DeleteFile": "Delete {filePath}",
+    "deleteConfirm": "Are you sure you want to delete this file? This action cannot be undone.",
+    "deleteError": "Error deleting log file: {error}",
+    "deleteSuccess": "Log file deleted: {file}",
+    "uploadError": "Error uploading log file: {error}",
+    "uploadSuccess": "Log file uploading: {file}",
+    "NoFileSelected": "No file selected.",
+    "SelectFile": "Select a file to see what's in it!",
+    "FilesInDirs": "{fileCount} files in {dirCount} dirs",
+    "ToggleLinesOrder": "Toggle lines order",
+    "ToggleColors": "Toggle default colors",
+    "AddMoreLines": "Add more lines",
+    "Reload": "Reload log file",
+    "Highlight": "Highlight",
+    "ToggleLineWrap": "Toggle Line Wrap",
+    "FollowTooltip": "The buttons in this column activelly follow a file as it's being written to.",
+    "Tooltip": "<ol><li>The first orange button on the left toggles the order of the lines in the file. By default it's ordered descending in the order it's written. Clicking the button reverses the file and makes it backward. This works well when following a file that's being written to.</li><li>The second purple button toggles the built-in line highlight colors. It also spins when things are happening.</li><li>The number input indicates how many lines to load or add. When following a file, the number limits how many lines are displayed.</li><li>Clicking the Add button adds the number of lines to the top of the file using the existing line count as the offset. The Add button is disabled on in-use files because it's impossible to know how many lines were written since the last update. When following in-use files, the Add button is replaced by an indicator.</li><li>Clicking the Reload button reloads the number of lines from the end of the file.</li><li>Use the highlight input to make specific text stand out.</li><li>The last button toggles line wrapping.</li></ol>"
+  },
+  "ModalWrap": {
+    "button": { "refresh": "Refresh Page Data", "fullscreen": "Toggle Fullscreen" }
+  },
+  "ProcessList": {
+    "title": "Running Process List",
+    "error": "Error loading process list: {error}",
+    "noData": "No process list returned.",
+    "footer": "{count} processes found.",
+    "button": { "wrapOn": "Turn Line Wrap On", "wrapOff": "Turn Line Wrap Off" }
+  },
+  "ClientInfo": {
+    "title": "Startup Payload",
+    "error": "Error loading startup payload: {error}",
+    "noData": "No startup payload returned.",
+    "description": "This is the payload that was sent to the client from Notifiarr.com when it started. It contains the client's configuration and other information."
   }
 }

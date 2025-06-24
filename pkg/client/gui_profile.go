@@ -53,45 +53,45 @@ type Profile struct {
 	Schedules       map[string]common.TriggerInfo `json:"schedules"`
 	SiteCrons       []*crontimer.Timer            `json:"siteCrons"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
-	LoggedIn        bool                          `json:"loggedIn"`
-	Updated         time.Time                     `json:"updated"`
-	Flags           *configfile.Flags             `json:"flags"`
-	Dynamic         bool                          `json:"dynamic"`
-	Webauth         bool                          `json:"webauth"`
-	Msg             string                        `json:"msg,omitempty"`
-	LogFiles        *logs.LogFileInfos            `json:"logFileInfo"`
-	ConfigFiles     *logs.LogFileInfos            `json:"configFileInfo"`
-	Expvar          mnd.AllData                   `json:"expvar"`
-	HostInfo        *host.InfoStat                `json:"hostInfo"`
-	Disks           map[string]snapshot.Partition `json:"disks"`
-	ProxyAllow      bool                          `json:"proxyAllow"`
-	PoolStats       map[string]*mulery.PoolSize   `json:"poolStats"`
-	Started         time.Time                     `json:"started"`
-	CmdList         []*cmdconfig.Config           `json:"cmdList"`
-	CheckResults    []*services.CheckResult       `json:"checkResults"`
-	CheckRunning    bool                          `json:"checkRunning"`
-	CheckDisabled   bool                          `json:"checkDisabled"`
-	Program         string                        `json:"program"`
-	Version         string                        `json:"version"`
-	Revision        string                        `json:"revision"`
-	Branch          string                        `json:"branch"`
-	BuildUser       string                        `json:"buildUser"`
-	BuildDate       string                        `json:"buildDate"`
-	GoVersion       string                        `json:"goVersion"`
-	OS              string                        `json:"os"`
-	Arch            string                        `json:"arch"`
-	Binary          string                        `json:"binary"`
-	Environment     map[string]string             `json:"environment"`
-	Docker          bool                          `json:"docker"`
-	UID             int                           `json:"uid"`
-	GID             int                           `json:"gid"`
-	IP              string                        `json:"ip"`
-	Gateway         string                        `json:"gateway"`
-	IfName          string                        `json:"ifName"`
-	Netmask         string                        `json:"netmask"`
-	MD5             string                        `json:"md5"`
-	ActiveTunnel    string                        `json:"activeTunnel"`
-	TunnelPoolStats map[string]*mulery.PoolSize   `json:"tunnelPoolStats"`
+	LoggedIn        bool                           `json:"loggedIn"`
+	Updated         time.Time                      `json:"updated"`
+	Flags           *configfile.Flags              `json:"flags"`
+	Dynamic         bool                           `json:"dynamic"`
+	Webauth         bool                           `json:"webauth"`
+	Msg             string                         `json:"msg,omitempty"`
+	LogFiles        *logs.LogFileInfos             `json:"logFileInfo"`
+	ConfigFiles     *logs.LogFileInfos             `json:"configFileInfo"`
+	Expvar          mnd.AllData                    `json:"expvar"`
+	HostInfo        *host.InfoStat                 `json:"hostInfo"`
+	Disks           map[string]*snapshot.Partition `json:"disks"`
+	ProxyAllow      bool                           `json:"proxyAllow"`
+	PoolStats       map[string]*mulery.PoolSize    `json:"poolStats"`
+	Started         time.Time                      `json:"started"`
+	CmdList         []*cmdconfig.Config            `json:"cmdList"`
+	CheckResults    []*services.CheckResult        `json:"checkResults"`
+	CheckRunning    bool                           `json:"checkRunning"`
+	CheckDisabled   bool                           `json:"checkDisabled"`
+	Program         string                         `json:"program"`
+	Version         string                         `json:"version"`
+	Revision        string                         `json:"revision"`
+	Branch          string                         `json:"branch"`
+	BuildUser       string                         `json:"buildUser"`
+	BuildDate       string                         `json:"buildDate"`
+	GoVersion       string                         `json:"goVersion"`
+	OS              string                         `json:"os"`
+	Arch            string                         `json:"arch"`
+	Binary          string                         `json:"binary"`
+	Environment     map[string]string              `json:"environment"`
+	Docker          bool                           `json:"docker"`
+	UID             int                            `json:"uid"`
+	GID             int                            `json:"gid"`
+	IP              string                         `json:"ip"`
+	Gateway         string                         `json:"gateway"`
+	IfName          string                         `json:"ifName"`
+	Netmask         string                         `json:"netmask"`
+	MD5             string                         `json:"md5"`
+	ActiveTunnel    string                         `json:"activeTunnel"`
+	TunnelPoolStats map[string]*mulery.PoolSize    `json:"tunnelPoolStats"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
@@ -121,6 +121,8 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	if c.tunnel != nil {
 		poolStats = c.tunnel.PoolStats()
 	}
+
+	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
 
 	if err := json.NewEncoder(resp).Encode(&Profile{
 		Triggers:        triggers,
@@ -154,7 +156,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		CheckRunning:    c.Services.Running(),
 		CheckDisabled:   c.Services.Disabled,
 		SiteCrons:       c.triggers.CronTimer.List(),
-		// Disks:           c.getDisks(req.Context()), // TODO: split disks from snapshot.
+		Disks:           c.getDisks(req.Context()),
 		Expvar:          mnd.GetAllData(),
 		HostInfo:        hostInfo,
 		Started:         version.Started.Round(time.Second),
@@ -186,9 +188,8 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 }
 
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
-	post, err := c.getProfilePostData(request)
-	if err != nil {
-		logs.Log.Errorf("%v", err)
+	post := &ProfilePost{}
+	if err := json.NewDecoder(request.Body).Decode(post); err != nil {
 		http.Error(response, "Invalid Request", http.StatusBadRequest)
 		return
 	}
@@ -242,16 +243,6 @@ type ProfilePost struct {
 	Header    string              `json:"header"`
 	NewPass   string              `json:"newPass"`
 	Upstreams string              `json:"upstreams"`
-}
-
-func (c *Client) getProfilePostData(request *http.Request) (*ProfilePost, error) {
-	post := &ProfilePost{}
-
-	if err := json.NewDecoder(request.Body).Decode(&post); err != nil {
-		return nil, fmt.Errorf("decoding request json: %w", err)
-	}
-
-	return post, nil
 }
 
 func (c *Client) handleProfilePostPassword(

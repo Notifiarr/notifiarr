@@ -44,7 +44,7 @@
     /** Optional options for select input. */
     options?: Option[] | undefined
     /** Optional validation function. */
-    validate?: (id: string, value: any) => string
+    validate?: (id: string, value: any) => string | undefined
     /** Optional input-box prefix attachment. */
     pre?: Snippet
     /** Optional input-box suffix attachment. */
@@ -168,7 +168,12 @@
     </Label>
     <InputGroup class="has-validation">
       {#if tooltip != id + '.tooltip'}
-        <Button color="secondary" onclick={toggleTooltip} outline style="width:44px;">
+        <Button
+          color="secondary"
+          onclick={toggleTooltip}
+          outline
+          style="width:44px;"
+          title={$_('phrases.ShowMore')}>
           {#if showTooltip}
             <Fa
               i={faArrowUpFromBracket}
@@ -227,7 +232,12 @@
 
       <!-- Include a password visibility toggler. -->
       {#if type === 'password'}
-        <Button type="button" outline onclick={togglePassword} style="width:44px;">
+        <Button
+          type="button"
+          outline
+          onclick={togglePassword}
+          style="width:44px;"
+          title="Toggle password visibility">
           <Fa
             i={passIcon}
             c1="royalblue"

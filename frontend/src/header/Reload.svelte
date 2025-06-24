@@ -57,7 +57,7 @@
   }
 </script>
 
-<a href="#reload" onclick={e => (e.preventDefault(), (isOpen = true))}>
+<a href="#reload" onclick={e => (e.preventDefault(), (isOpen = true))} title="reload">
   <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-2" />
 </a>
 

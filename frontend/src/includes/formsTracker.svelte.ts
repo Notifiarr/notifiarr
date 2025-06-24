@@ -41,7 +41,12 @@ export type App<T> = {
    * @param index - The index of the instance.
    * @returns The feedback of the field.
    */
-  validator?: (id: string, value: any, index: number, instances: T[]) => string
+  validator?: (
+    id: string,
+    value: any,
+    index: number,
+    instances: T[],
+  ) => string | undefined
 }
 
 /**
@@ -53,30 +58,33 @@ export type App<T> = {
  */
 export class FormListTracker<T> {
   /** List of invalid instances. */
-  private feedback: Record<number, Record<string, string>> = $state({})
+  private feedback: Record<number, Record<string, string | undefined>>
   /** The form-bound list of instances in our tabs. */
   public instances: T[]
   /** List of removed instance indexes. Use .length to get the number of removed instances. */
-  public removed: number[] = $state([])
+  public removed: number[]
   /** The original list of instances in our tabs. */
   public readonly original: T[]
   /** Data about the app we're validating. */
   public readonly app: App<T>
   /** If any instance in the list has non-empty feedback the form is invalid. */
-  public readonly invalid: boolean = $derived(
-    Object.values(this.feedback).some(v => Object.values(v).some(v => !!v)),
-  )
-
+  public readonly invalid: boolean
   /** If the form has changed from the original values. */
   public readonly formChanged: boolean
   /** The active instance tab. */
-  public active: number | undefined = $state(0)
+  public active: number | undefined
 
   constructor(instances: T[], app: App<T>) {
     this.instances = $state(deepCopy(instances ?? []))
     this.original = $state(deepCopy(instances ?? []))
     this.app = app
     this.formChanged = $derived(!deepEqual(this.instances, this.original))
+    this.feedback = $state({})
+    this.removed = $state([])
+    this.active = $state(0)
+    this.invalid = $derived(
+      Object.values(this.feedback).some(v => Object.values(v).some(v => !!v)),
+    )
   }
 
   /** Add a new instance to the list. */
@@ -136,10 +144,9 @@ export class FormListTracker<T> {
    * @param index - The index of the current instance the instances list. (0)
    * @updates The feedback for the instance.
    */
-  public validate = (id: string, value: any, index: number): string => {
+  public validate = (id: string, value: any, index: number): string | undefined => {
     if (!this.feedback[index]) this.feedback[index] = {}
-    this.feedback[index][id] =
-      this.app.validator?.(id, value, index, this.instances) ?? ''
+    this.feedback[index][id] = this.app.validator?.(id, value, index, this.instances)
     return this.feedback[index][id]
   }
 }

@@ -5,7 +5,7 @@
     form: T
     original: T
     app: App<T>
-    validate?: (id: string, value: any) => string
+    validate?: (id: string, value: any) => string | undefined
     index: number
     reset?: () => void
     active?: boolean
@@ -132,8 +132,8 @@
     white-space: initial;
     word-break: break-all;
     display: -webkit-box;
-    line-clamp: 1;
-    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
   }
 </style>

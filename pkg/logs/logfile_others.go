@@ -19,13 +19,11 @@ func getFileOwner(fileInfo os.FileInfo) string {
 
 	uid := strconv.FormatUint(uint64(stat.Uid), mnd.Base10)
 	gid := strconv.FormatUint(uint64(stat.Gid), mnd.Base10)
-	name := ""
 	usr := ""
 	grp := ""
 
 	if userName, err := user.LookupId(uid); err == nil {
 		usr = userName.Username
-		name = userName.Name
 	}
 
 	if groupName, err := user.LookupGroupId(gid); err == nil {
@@ -33,7 +31,7 @@ func getFileOwner(fileInfo os.FileInfo) string {
 	}
 
 	if usr != "" {
-		return name + ", " + usr + ":" + grp + " (" + uid + ":" + gid + ")"
+		return usr + ":" + grp + " (" + uid + ":" + gid + ")"
 	}
 
 	return uid + ":" + gid

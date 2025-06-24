@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -18,7 +17,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
-	"github.com/gorilla/schema"
 	apachelog "github.com/lestrrat-go/apache-logformat/v2"
 	mulery "golift.io/mulery/client"
 )
@@ -166,14 +164,12 @@ func (c *Client) prefixURLbase(handler http.Handler) http.Handler {
 			return
 		}
 
-		url := &(*req.URL)
-		url.Path = path.Join(c.Config.URLBase, url.Path)
+		req.URL.Path = path.Join(c.Config.URLBase, req.URL.Path)
 
-		if url.RawPath != "" {
-			url.RawPath = path.Join(c.Config.URLBase, url.RawPath)
+		if req.URL.RawPath != "" {
+			req.URL.RawPath = path.Join(c.Config.URLBase, req.URL.RawPath)
 		}
 
-		req.URL = url
 		handler.ServeHTTP(writer, req)
 	})
 }
@@ -289,13 +285,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 		BackupTunnel  []string `json:"BackupTunnel"`
 	}{}
 
-	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
-		err = c.decodeTunnelConfig(body, &input)
-	} else {
-		err = json.Unmarshal(body, &input)
-	}
-
-	if err != nil {
+	if err = json.Unmarshal(body, &input); err != nil {
 		logs.Log.Errorf("Saving Tunnel: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
@@ -328,25 +318,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 
 	tunnels := map[string]any{"success": true, "primary": input.PrimaryTunnel, "backups": input.BackupTunnel}
 
-	if request.Header.Get("Content-Type") != mnd.ContentTypeJSON {
-		http.Error(response, fmt.Sprintf("saved tunnel config. primary: %s, %d backups",
-			input.PrimaryTunnel, len(input.BackupTunnel)), http.StatusOK)
-	} else if err := json.NewEncoder(response).Encode(tunnels); err != nil {
+	if err := json.NewEncoder(response).Encode(tunnels); err != nil {
 		logs.Log.Errorf("Saving Tunnel: sending json response: %v", err)
 	}
-}
-
-// Support the old style.
-func (c *Client) decodeTunnelConfig(body []byte, input any) error {
-	decodedValue, err := url.ParseQuery(string(body))
-	if err != nil {
-		return fmt.Errorf("parsing request: %w", err)
-	}
-
-	err = schema.NewDecoder().Decode(&input, decodedValue)
-	if err != nil {
-		return fmt.Errorf("decoding request: %w", err)
-	}
-
-	return nil
 }

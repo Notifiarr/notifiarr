@@ -37,7 +37,7 @@
         active={nav.active(ProfilePage.id)}
         disabled={nav.active(ProfilePage.id)}
         onclick={e => nav.goto(e, ProfilePage.id)}>
-        <span class="nav-icon"><Fa {...ProfilePage} scale="1.3x" /></span>
+        <span class="nav-icon"><Fa {...ProfilePage} scale="1.2x" /></span>
         {$_('navigation.titles.' + ProfilePage.id)}
       </DropdownItem>
       <span class="lang-wrapper">
@@ -57,7 +57,7 @@
           c2="lightblue"
           d1="orange"
           d2="fuchsia"
-          scale="1.3x"
+          scale="1.2x"
           class="me-3" />
         {theme.isDark ? $_('config.titles.Light') : $_('config.titles.Dark')}
         <Input

@@ -39,7 +39,7 @@ const (
 	IsWindows       = runtime.GOOS == Windows
 	IsFreeBSD       = runtime.GOOS == "freebsd"
 	IsDarwin        = runtime.GOOS == "darwin"
-	ContentTypeJSON = "application/json"
+	ContentTypeJSON = "application/json; charset=utf-8"
 )
 
 // Application Defaults.

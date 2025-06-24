@@ -2,7 +2,9 @@ package snapshot
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os/exec"
 	"runtime"
 	"slices"
 	"strconv"
@@ -12,13 +14,21 @@ import (
 	"github.com/shirou/gopsutil/v4/disk"
 )
 
-func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error { //nolint:cyclop
+func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) []error {
 	if !run {
 		return nil
 	}
 
+	var errs []error
+	s.DiskUsage, errs = GetDisksUsage(ctx, allDrives)
+
+	return errs
+}
+
+func GetDisksUsage(ctx context.Context, allDrives bool) (map[string]*Partition, []error) { //nolint:cyclop
 	var (
 		errs        []error
+		output      = make(map[string]*Partition)
 		getAllDisks = allDrives || mnd.IsDocker
 	)
 
@@ -27,12 +37,10 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 		errs = append(errs, fmt.Errorf("unable to get partitions: %w", err))
 	}
 
-	s.DiskUsage = make(map[string]*Partition)
-
 	for idx := range partitions {
 		usage, err := disk.UsageWithContext(ctx, partitions[idx].Mountpoint)
 		if err != nil {
-			errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[idx].Mountpoint, err))
+			// errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[idx].Mountpoint, err))
 			continue
 		}
 
@@ -55,7 +63,7 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 			usage.Used = usage.Total - usage.Free
 		}
 
-		s.DiskUsage[partitions[idx].Device] = &Partition{
+		output[partitions[idx].Device] = &Partition{
 			Device:   partitions[idx].Mountpoint,
 			Total:    usage.Total,
 			Free:     usage.Free,
@@ -66,7 +74,7 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 		}
 	}
 
-	return errs
+	return output, errs
 }
 
 func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
@@ -76,6 +84,10 @@ func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
 
 	cmd, stdout, waitg, err := readyCommand(ctx, false, "quota", "--no-wrap", "--show-mntpoint", "--human-readable")
 	if err != nil {
+		if errors.Is(err, exec.ErrNotFound) {
+			return nil
+		}
+
 		return err
 	}
 
@@ -126,10 +138,21 @@ func getQuotaSize(line string) int {
 	}
 }
 
-// Does not work on windows at all. Linux and Solaris only.
 func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
+	var err error
+	if s.ZFSPool, err = GetZFSPoolData(ctx, pools); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Does not work on windows at all. Linux and Solaris only.
+func GetZFSPoolData(ctx context.Context, pools []string) (map[string]*Partition, error) {
+	output := make(map[string]*Partition)
+
 	if len(pools) == 0 {
-		return nil
+		return output, nil
 	}
 
 	// # zpool list -pH
@@ -139,10 +162,8 @@ func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 	// data3  996432412672  44307656704   952124755968  -       -        4    4   1.00  ONLINE  -
 	cmd, stdout, waitg, err := readyCommand(ctx, false, "zpool", "list", "-pH")
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	s.ZFSPool = make(map[string]*Partition)
 
 	go func() {
 		for stdout.Scan() {
@@ -150,14 +171,14 @@ func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 
 			for _, pool := range pools {
 				if len(fields) > 3 && strings.EqualFold(fields[0], pool) {
-					s.ZFSPool[pool] = &Partition{Device: fields[4], FSType: "zfs", Opts: []string{fields[9]}}
-					s.ZFSPool[pool].Total, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)
-					s.ZFSPool[pool].Free, _ = strconv.ParseUint(fields[3], mnd.Base10, mnd.Bits64)
+					output[pool] = &Partition{Device: fields[4], FSType: "zfs", Opts: []string{fields[9]}}
+					output[pool].Total, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)
+					output[pool].Free, _ = strconv.ParseUint(fields[3], mnd.Base10, mnd.Bits64)
 				}
 			}
 		}
 		waitg.Done()
 	}()
 
-	return runCommand(cmd, waitg)
+	return output, runCommand(cmd, waitg)
 }

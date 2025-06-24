@@ -25,8 +25,7 @@ export const validate = (
         return
       }
     })
-    if (found) return found
-    return value ? '' : get(_)('phrases.NameMustNotBeEmpty')
+    return value ? found : get(_)('phrases.NameMustNotBeEmpty')
   } else if (key == 'url') {
     return value.startsWith('http://') || value.startsWith('https://')
       ? ''

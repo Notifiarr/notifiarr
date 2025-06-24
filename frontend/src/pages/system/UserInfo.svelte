@@ -33,7 +33,7 @@
 </script>
 
 <!-- User Section -->
-<Header id="UserInformation" {...icon} />
+<Header id="UserInformation" {...icon} page="ClientInfo" />
 
 <Table>
   <tbody>

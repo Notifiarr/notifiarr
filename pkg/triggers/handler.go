@@ -139,7 +139,7 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 		return a.endpoint(input, content)
 	case "cfsync", "TrigCFSyncRadarr":
 		return a.cfsync(input, content)
-	case "rpsync", "TrigRPSyncSonarr":
+	case "rpsync", "TrigCFSyncSonarr":
 		return a.rpsync(input, content)
 	case "services":
 		return a.services(input)

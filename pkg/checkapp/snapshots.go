@@ -63,8 +63,12 @@ func testNvidia(ctx context.Context, config snapshot.NvidiaConfig) (string, int)
 		msg += "s:"
 	}
 
-	for _, adapter := range snaptest.Nvidia {
-		msg += "<br>" + adapter.BusID
+	for idx, adapter := range snaptest.Nvidia {
+		if idx != 0 {
+			msg += ", "
+		}
+
+		msg += adapter.BusID
 	}
 
 	return msg, http.StatusOK

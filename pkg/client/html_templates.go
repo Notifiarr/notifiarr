@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/jackpal/gateway"
 )
 
@@ -175,6 +176,22 @@ func revBytes(output bytes.Buffer) []byte {
 	}
 
 	return data
+}
+
+func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
+	disks, _ := snapshot.GetDisksUsage(ctx, true)
+	zfspools, _ := snapshot.GetZFSPoolData(ctx, c.Config.Snapshot.ZFSPools)
+	output := make(map[string]*snapshot.Partition)
+
+	for k, v := range disks {
+		output[k] = v
+	}
+
+	for k, v := range zfspools {
+		output[k] = v
+	}
+
+	return output
 }
 
 func getGateway() string {
