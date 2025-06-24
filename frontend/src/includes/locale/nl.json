@@ -115,7 +115,8 @@
         "NameInUseByInstance": "Deze naam wordt gebruikt door instantie {number}.",
         "APIKeyMustBeCountCharacters": "De API-sleutel moet minimaal {count} tekens lang zijn.",
         "TokenMustBeCountCharacters": "Het token moet minimaal {count} tekens lang zijn.",
-        "LeavePage": "Wilt u deze pagina echt verlaten?"
+        "LeavePage": "Wilt u deze pagina echt verlaten?",
+        "ShowMore": "Meer informatie weergeven"
     },
     "navigation": {
         "pageDescription": {
@@ -132,7 +133,7 @@
             "Endpoints": "Configureer relay eindpunt URL's en hun schema's.",
             "Integrations": "Bekijk actie statistieken voor alle integraties.",
             "Monitoring": "Bekijk de service- en netwerkstatus.",
-            "LogFiles": "Client logbestanden bekijken en beheren.",
+            "LogFiles": "Bekijk, volg, download en upload client logbestanden.",
             "Actions": "Hier vindt u interne Notifiarr-clientacties. Deze worden uitgevoerd door timers, schema's en gebeurtenissen van de website of een chatserver. Hoewel ze normaal gesproken alleen voor probleemoplossing worden gebruikt, kunt u ze in deze interface handmatig activeren.",
             "TrustProfile": "Configureer hoe u zich aanmeldt bij deze Notifiarr clienttoepassing.",
             "System": "Systeem- en klantgegevens bekijken en.",
@@ -878,7 +879,7 @@
             "label": "URL",
             "description": "URL van de dienst die wordt gemonitord."
         },
-        "description": "Gebruik dit formulier om service controles te configureren. Voeg hier geen starr, media, snapshot of downloader apps toe. Geef ze in plaats daarvan een controle interval op hun respectievelijke configuratie pagina's. Schakel service controles volledig uit en in op de pagina <go-to page=\"configuration\">Configuratie</go-to>. Bekijk informatie over de status van actieve services op de pagina <go-to page=\"monitoring\">Monitoring</go-to>.",
+        "description": "Gebruik dit formulier om service controles te configureren. Voeg hier geen starr, media, snapshot of downloader apps toe. Geef ze een controle interval op hun respectievelijke configuratie pagina's. Schakel service controles volledig in en uit op de pagina <go-to page=\"configuration\">Configuratie</go-to>. Bekijk informatie over de status van actieve services op de pagina <go-to page=\"monitoring\">Monitoring</go-to>. Bekijk de <go-to page=\"Process List\">lijst met actieve processen hier</go-to> en gebruik deze ter inspiratie bij het maken van procescontroles..",
         "processListLink": "Bekijk hier de lijst met actieve processen."
     },
     "scheduler": {
@@ -1411,6 +1412,14 @@
             },
             "TrigPollSite": {
                 "label": "Site poller"
+            },
+            "TrigCFSyncSonarr": {
+                "success": "Sonarr profiel en formaat sync gestart.",
+                "button": "Sync alle Sonarr instanties",
+                "label": "Sonarr profiel en formaat sync"
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "Sonarr aangepaste formaat sync per instantie"
             }
         },
         "titles": {
@@ -1489,6 +1498,74 @@
             "title": "Website verzoeken",
             "description": "Verzoeken aan Notifiarr.com.",
             "empty": "Nog geen website verzoeken."
+        }
+    },
+    "LogFiles": {
+        "titles": {
+            "FollowingFile": "Bestand volgen",
+            "Age": "Leeftijd",
+            "Date": "Datum",
+            "Details": "Details",
+            "FileContent": "Bestandsinhoud",
+            "FileList": "Bestandslijst",
+            "Name": "Bestandsnaam",
+            "TailFile": "Volg bestand {bestandsnaam}",
+            "Tailing": "Volgen",
+            "InUse": "In gebruik",
+            "Mode": "Modus",
+            "OpenFile": "Open bestand {fileName}",
+            "Owner": "Eigenaar",
+            "Path": "Pad",
+            "Bytes": "Bytes",
+            "LineCount": "Aantal regels"
+        },
+        "button": {
+            "add": "Toevoegen",
+            "delete": "Verwijderen",
+            "download": "Downloaden",
+            "reload": "Herladen",
+            "upload": "Uploaden",
+            "tooltip": "Met de knop <b>Downloaden</b> downloadt u het bestand naar uw computer. Met de knop <b>Uploaden</b> uploadt u het bestand naar de Notifiarr.com server. Alleen beheerders kunnen de geüploade bestanden zien. Met de knop <b>Verwijderen</b> verwijdert u het bestand van uw harde schijf. Bestanden die in gebruik zijn, kunnen niet worden verwijderd. 'In gebruik' betekent dat deze applicatie momenteel log gegevens naar de applicatie schrijft."
+        },
+        "AddMoreLines": "Meer regels toevoegen",
+        "deleteConfirm": "Weet u zeker dat u dit bestand wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+        "DeleteFile": "Verwijder {filePath}",
+        "deleteError": "Fout bij het verwijderen van het logbestand: {error}",
+        "Error": "Fout bij het laden van het logbestand: {error}",
+        "uploadError": "Fout bij het uploaden van het logbestand: {error}",
+        "FilesInDirs": "{fileCount} bestanden in {dirCount} mappen",
+        "Highlight": "Hoogtepunt",
+        "deleteSuccess": "Logbestand verwijderd: {bestand}",
+        "uploadSuccess": "Log bestand uploaden: {bestand}",
+        "NoFileSelected": "Geen bestand geselecteerd.",
+        "Reload": "Logbestand opnieuw laden",
+        "SelectFile": "Selecteer een bestand om te zien wat erin staat!",
+        "FollowTooltip": "De knoppen in deze kolom volgen actief een bestand terwijl het wordt geschreven.",
+        "ToggleColors": "Standaardkleuren wijzigen",
+        "ToggleLinesOrder": "Volgorde van regels wijzigen",
+        "ToggleLineWrap": "Regelafbreking in- of uitschakelen",
+        "Tooltip": "<ol><li>De eerste oranje knop links verandert de volgorde van de regels in het bestand. Standaard is de volgorde aflopend in de volgorde waarin de regels zijn geschreven. Door op de knop te klikken, wordt het bestand omgekeerd en teruggezet. Dit werkt goed bij het volgen van een bestand waarnaar wordt geschreven.</li><li>De tweede paarse knop schakelt de ingebouwde regel markerings kleuren in of uit. Deze draait ook wanneer er iets gebeurt.</li><li>De invoer met getallen geeft aan hoeveel regels er moeten worden geladen of toegevoegd. Bij het volgen van een bestand beperkt het getal het aantal weergegeven regels.</li><li>Door op de knop Toevoegen te klikken, wordt het aantal regels bovenaan het bestand toegevoegd met het bestaande aantal regels als offset. De knop Toevoegen is uitgeschakeld bij bestanden die in gebruik zijn, omdat het onmogelijk is om te weten hoeveel regels er zijn geschreven sinds de laatste update. Wanneer u bestanden volgt die in gebruik zijn, wordt de knop Toevoegen vervangen door een indicator.</li><li>Als u op de knop Vernieuwen klikt, wordt het aantal regels vanaf het einde van het bestand opnieuw geladen.</li><li>Gebruik de markeringsi nvoer om specifieke tekst te laten opvallen.</li><li>Met de laatste knop schakelt u de regelterugloop in of uit.</li></ol>"
+    },
+    "ProcessList": {
+        "footer": "{count} processen gevonden.",
+        "error": "Fout bij het laden van de proceslijst: {fout}",
+        "noData": "Geen proceslijst geretourneerd.",
+        "title": "Lijst met actieve processen",
+        "button": {
+            "wrapOff": "Regelafbreking uitschakelen",
+            "wrapOn": "Regelafbreking inschakelen"
+        }
+    },
+    "ClientInfo": {
+        "error": "Fout bij het laden van de opstart payload: {fout}",
+        "title": "Opstart Payload",
+        "description": "Dit is de payload die bij het opstarten door Notifiarr.com naar de client is verzonden. Deze bevat de configuratie van de client en andere informatie.",
+        "noData": "Geen opstart payload geretourneerd."
+    },
+    "ModalWrap": {
+        "button": {
+            "refresh": "Pagina gegevens vernieuwen",
+            "fullscreen": "Volledig scherm in-/uitschakelen"
         }
     }
 }
