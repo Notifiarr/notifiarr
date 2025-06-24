@@ -1255,11 +1255,6 @@
     },
     "Actions": {
         "triggers": {
-            "TrigRPSyncSonarr": {
-                "success": "",
-                "label": "",
-                "button": ""
-            },
             "TrigCustomCommand": {
                 "success": "",
                 "label": "",
@@ -1272,9 +1267,6 @@
                 "label": ""
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
-            },
-            "TrigRPSyncSonarrInt": {
                 "label": ""
             },
             "TrigCustomCronTimer": {
