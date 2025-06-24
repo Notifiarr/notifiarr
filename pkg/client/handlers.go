@@ -127,10 +127,16 @@ func (c *Client) httpAPIHandlers() {
 		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.AppsConfig.APIKey)
 		c.apps.Router.HandleFunc("/plex", c.PlexHandler).Methods("POST").Queries("token", tokens)
 		c.apps.Router.HandleFunc("/", c.PlexHandler).Methods("POST").Queries("token", tokens)
+		// Give it an api path to get around some proxies that block /plex.
+		c.apps.Router.HandleFunc("/api/plex/post", c.PlexHandler).
+			Methods("POST").Queries("token", tokens)
 
 		if c.Config.URLBase != "/" {
 			// Allow plex to use the base url too.
 			c.apps.Router.HandleFunc(path.Join(c.Config.URLBase, "plex"), c.PlexHandler).
+				Methods("POST").Queries("token", tokens)
+			// Give it an api path to get around some proxies that block /plex.
+			c.apps.Router.HandleFunc(path.Join(c.Config.URLBase, "api", "plex", "post"), c.PlexHandler).
 				Methods("POST").Queries("token", tokens)
 		}
 	}
