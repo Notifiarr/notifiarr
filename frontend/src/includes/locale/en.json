@@ -975,7 +975,7 @@
     "LastExecution": "Last Execution",
     "neverExecuted": "never executed",
     "enterCommandArguments": "Enter Command Arguments",
-    "commandRequiresArguments": "This command requires {count, plural, one {one argument. Enter it below.} other {# arguments. Enter them below.}}",
+    "commandRequiresArguments": "This command requires {count, plural, =1 {one argument. Enter it below.} other {# arguments. Enter them below.}}",
     "noOutput": "No output yet. Try executing the command then click refresh.",
     "refreshed": "refreshed {timeDuration} ago",
     "regexMismatch": "Argument does not match regular expression.",
@@ -987,6 +987,7 @@
     "command": {
       "label": "Command",
       "description": "Command to run.",
+      "required": "Command is required",
       "placeholder": "echo 'Hello, world!'",
       "tooltip": "This is the command that will execute when triggered.<br />Click the double-check icon to run the command right now. After it finishes, click refresh and show output to see the results.<br /><br />Check the box to wrap the command in a shell. On Windows, this will run the command with <code>cmd.exe</code> and on other operating systems, it will run the command with <code>/bin/bash</code>. This is useful for commands that require shell features like pipes and redirects. Custom positional arguments may be defined with this format: <code>({regex})</code> - that is a regular expression wrapped in curly braces and parentheses, ie. <code>({[a-z]})</code>. These arguments may be filled in by the person running the command; either in this Web UI or on your chat server. If a command has an argument, it is required; if it has multiple arguments, they're all required.<br /><br /> <h5>Examples</h5>Command using two arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />The above command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>.<br /> This command can be used to curl websites from within the scratch Docker container: <code>/notifiarr --curl ({https?://[^ ;]+})</code>"
     },
@@ -1029,11 +1030,11 @@
     "times": {
       "noneSelected": "(none selected)",
       "noDaysSelected": "(no days selected)",
-      "everyMinute": "{count, plural, one {One time} other {# times}} every minute at seconds {times}",
-      "everyHour": "{count, plural, one {One time} other {# times}} every hour at minute:seconds {times}",
-      "everyDay": "{count, plural, one {One time} other {# times}} every day at times {times}",
-      "everyWeek": "{count, plural, one {One time} other {# times}} every week on {daysOfWeek} at times {times}",
-      "everyMonth": "{count, plural, one {One time} other {# times}} every month on days {daysOfMonth} at times {times}"
+      "everyMinute": "{count, plural, =1 {One time} other {# times}} every minute at seconds {times}",
+      "everyHour": "{count, plural, =1 {One time} other {# times}} every hour at minute:seconds {times}",
+      "everyDay": "{count, plural, =1 {One time} other {# times}} every day at times {times}",
+      "everyWeek": "{count, plural, =1 {One time} other {# times}} every week on {daysOfWeek} at times {times}",
+      "everyMonth": "{count, plural, =1 {One time} other {# times}} every month on days {daysOfMonth} at times {times}"
     }
   },
   "Endpoints": {
@@ -1041,9 +1042,9 @@
     "addInstance": "Add Relay URL",
     "DeleteEndpoint": "Delete URL",
     "badge": {
-      "header": "{count, plural, one {1 header} other {# headers}}",
-      "query": "{count, plural, one {1 query} other {# queries}}",
-      "body": "{count, plural, one {1 character} other {# characters}}"
+      "header": "{count, plural, =1 {1 header} other {# headers}}",
+      "query": "{count, plural, =1 {1 query} other {# queries}}",
+      "body": "{count, plural, =1 {1 character} other {# characters}}"
     },
     "name": {
       "label": "Name",

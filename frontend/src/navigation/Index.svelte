@@ -87,7 +87,7 @@
     isOpen={nav.showUnsavedAlert !== ''}
     theme={$theme}
     color="warning"
-    style="z-index: 9999;">
+    zIndex={9999}>
     <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
     <ModalBody><T id="phrases.LeavePage" /></ModalBody>
     <ModalFooter>
