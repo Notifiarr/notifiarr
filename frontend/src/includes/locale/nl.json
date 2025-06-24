@@ -1386,11 +1386,6 @@
                 "button": "Synchroniseer alle Radarr instanties",
                 "success": "Radarr profiel en formaat sync gestart."
             },
-            "TrigRPSyncSonarr": {
-                "label": "Sonarr profiel en formaat sync",
-                "button": "Synchroniseer alle Sonarr instanties",
-                "success": "Sonarr profiel en formaat sync gestart."
-            },
             "TrigSnapshot": {
                 "label": "Snapshot collectie",
                 "button": "Update snapshot",
@@ -1398,9 +1393,6 @@
             },
             "TrigCFSyncRadarrInt": {
                 "label": "Radarr aangepaste formaat sync per instantie"
-            },
-            "TrigRPSyncSonarrInt": {
-                "label": "Sonarr aangepaste formaat sync per instantie"
             },
             "TrigCustomCronTimer": {
                 "label": "Website timer: {name}",

@@ -1237,11 +1237,6 @@
                 "button": "",
                 "success": ""
             },
-            "TrigRPSyncSonarr": {
-                "label": "",
-                "button": "",
-                "success": ""
-            },
             "TrigSnapshot": {
                 "label": "",
                 "button": "",
@@ -1317,9 +1312,6 @@
                 "label": ""
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
-            },
-            "TrigRPSyncSonarrInt": {
                 "label": ""
             },
             "TrigCustomCronTimer": {
