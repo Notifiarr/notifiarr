@@ -31,11 +31,11 @@
   }
 
   let { children, page, get, footer, isOpen = $bindable(false) }: Props = $props()
-
   let loading = $state(false)
   let resp = $state<BackendResponse>()
   let fullscreen = $state(false)
   export const toggle = () => (isOpen = !isOpen)
+  const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 110px)')
 
   const refresh = async () => {
     loading = true
@@ -47,13 +47,11 @@
   $effect(() => {
     if (isOpen) refresh()
   })
-
-  const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 110px)')
 </script>
 
 <Modal {isOpen} size="xl" theme={$theme} {fullscreen} {toggle}>
   <ModalHeader class="d-inline-block">
-    <Fa {...page} />
+    <Fa {...page} scale={1.4} class="me-2" />
     <T id="{page.id}.title" />
 
     <ButtonGroup class="float-end">

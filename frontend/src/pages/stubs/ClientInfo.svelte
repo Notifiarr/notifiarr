@@ -13,18 +13,16 @@
 </script>
 
 <script lang="ts">
-  import { type BackendResponse } from '../../api/fetch'
   import ModalWrap from './ModalWrap.svelte'
   import { profile } from '../../api/profile.svelte'
   import T from '../../includes/Translate.svelte'
 
   let isOpen = $state(false)
-  const get = async () =>
-    ({
-      ok: true,
-      body: await JSON.stringify($profile.clientInfo, null, 2),
-    }) as BackendResponse
   export const toggle = () => (isOpen = !isOpen)
+  const get = async () => ({
+    ok: true,
+    body: await JSON.stringify($profile.clientInfo, null, 2),
+  })
 </script>
 
 <ModalWrap {page} {get} bind:isOpen>

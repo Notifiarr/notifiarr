@@ -24,6 +24,8 @@
     faArrowDownShortWide,
     faArrowUpShortWide,
     faArrowUpFromBracket,
+    faArrowProgress,
+    faArrowRightArrowLeft,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { slide } from 'svelte/transition'
   import { delay, warning } from '../../includes/util'
@@ -46,6 +48,7 @@
   let resp = $state<BackendResponse | FileTail>()
   let adding = $state(false)
   let loaded = $state(file.id)
+  let wrap = $state(false)
 
   // Reload when a new file is selected.
   $effect(() => {
@@ -126,8 +129,8 @@
     ? resp.body.trimEnd().split('\n')
     : resp.body.trimEnd().split('\n').reverse()}
   {@const lineNumberWidth = Math.floor(Math.log10(list.length)) + 1 + 'ch'}
-  <Row class="mb-2">
-    <Col sm={12} md="auto">
+  <Row>
+    <Col sm={12} md="auto" class="mb-2">
       <InputGroup style="width: auto !important;">
         <!-- Toggle Lines Order Button -->
         <Button
@@ -184,7 +187,7 @@
         </Button>
       </InputGroup>
     </Col>
-    <Col>
+    <Col class="mb-2">
       <InputGroup>
         <!-- Show More Button (Tooltip) -->
         <Button
@@ -206,6 +209,20 @@
         </Button>
         <!-- Highlight Input -->
         <Input bind:value={highlight} placeholder={$_('LogFiles.Highlight')} />
+        <!-- Line Wrap Button -->
+        <Button
+          outline
+          onclick={() => (wrap = !wrap)}
+          aria-label={$_('LogFiles.ToggleLineWrap')}
+          title={$_('LogFiles.ToggleLineWrap')}>
+          <Fa
+            i={wrap ? faArrowProgress : faArrowRightArrowLeft}
+            c1="orange"
+            d1="gold"
+            c2="darkorange"
+            d2="orange"
+            scale={1.5} />
+        </Button>
       </InputGroup>
     </Col>
     <Col xs={12}>
@@ -221,11 +238,11 @@
 
   <!-- File content is here. -->
   <div class="log-file-content" style="--line-number-width: {lineNumberWidth}">
-    <ListGroup flush numbered class="ps-0 text-nowrap">
+    <ListGroup flush numbered class="ps-0 overflow-auto">
       {#each list as line}
         <ListGroupItem class="p-0 border-0 lh-1">
           <span class="li-content {colorLine(line)}">
-            <pre class="m-0 pre">{line}</pre>
+            <pre class="m-0 pre" class:wrap>{line}</pre>
           </span>
         </ListGroupItem>
       {/each}
@@ -272,5 +289,10 @@
     white-space: pre-wrap;
     word-break: break-all;
     word-wrap: break-word;
+  }
+
+  pre.wrap {
+    white-space: pre !important;
+    overflow: visible;
   }
 </style>
