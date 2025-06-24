@@ -884,11 +884,11 @@
     "scheduler": {
         "AddATime": "Voeg een tijd toe",
         "times": {
-            "everyMonth": "{count, plural, one {Eén keer} other {# tijden}} elke maand op dagen {dagen van de maand} op tijden {tijden}",
-            "everyHour": "{count, plural, one {Eén keer} other {# tijden}} elk uur op minuut:seconden {tijden}",
-            "everyDay": "{count, plural, one {Eén keer} other {# tijden}} iedere dag op tijden {tijden}",
-            "everyMinute": "{count, plural, one {Eén keer} other {# tijden}} elke minuut op seconden {tijden}",
-            "everyWeek": "{count, plural, one {Eén keer} other {# tijden}} every week on {dagen van de week} op tijden {tijden}",
+            "everyMonth": "{count, plural, =1 {Eén keer} other {# tijden}} elke maand op dagen {daysOfMonth} op tijden {times}",
+            "everyHour": "{count, plural, =1 {Eén keer} other {# tijden}} elk uur op minuut:seconden {times}",
+            "everyDay": "{count, plural, =1 {Eén keer} other {# tijden}} iedere dag op tijden {times}",
+            "everyMinute": "{count, plural, =1 {Eén keer} other {# tijden}} elke minuut op seconden {times}",
+            "everyWeek": "{count, plural, =1 {Eén keer} other {# tijden}} elke week op {daysOfWeek} op tijden {times}",
             "noneSelected": "(niets geselecteerd)",
             "noDaysSelected": "(geen dagen geselecteerd)"
         },
@@ -1054,6 +1054,7 @@
         "command": {
             "label": "Commando",
             "description": "Opdracht om uit te voeren.",
+            "required": "Opdracht is vereist",
             "placeholder": "echo 'Hallo wereld!'",
             "tooltip": "Dit is de opdracht die wordt uitgevoerd wanneer deze wordt geactiveerd.<br />Klik op het vinkje om de opdracht direct uit te voeren. Klik na afloop op Vernieuwen en uitvoer weergeven om de resultaten te bekijken.<br /><br />Vink het vakje aan om de opdracht in een shell te plaatsen. In Windows wordt de opdracht uitgevoerd met <code>cmd.exe</code> en op andere besturingssystemen met <code>/bin/bash</code>. Dit is handig voor opdrachten die shell-functies zoals pipes en redirects vereisen. Aangepaste positionele argumenten kunnen worden gedefinieerd met de volgende notatie: <code>({regex})</code> - een reguliere expressie tussen accolades en haakjes, d.w.z. <code>({[a-z]})</code>. Deze argumenten kunnen worden ingevuld door de persoon die de opdracht uitvoert; in deze web interface of op uw chat server. Als een opdracht een argument heeft, is dit vereist; Als er meerdere argumenten zijn, zijn ze allemaal vereist.<br /><br /> <h5>Voorbeelden</h5>Opdracht met twee argumenten: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />Met de bovenstaande opdracht kan een gebruiker elke combinatie van <code>ls -la</code> uitvoeren op <code>/tmp</code>, <code>/</code>, <code>/home</code> of <code>/lib</code>.<br /> Deze opdracht kan worden gebruikt om websites te curlen vanuit de Docker-container: <code>/notifiarr --curl ({https?://[^ ;]+})</code>"
         },
@@ -1079,7 +1080,7 @@
             "tooltip": "Registreer de uitvoer van de opdracht in het toepassingslogboek van deze client."
         },
         "neverExecuted": "nooit uitgevoerd",
-        "commandRequiresArguments": "Dit commando vereist {count, plural, one {één argument. Voer het hieronder in.} other {# argumenten. Voer ze hieronder in.}}",
+        "commandRequiresArguments": "Dit commando vereist {count, plural, =1 {één argument. Voer het hieronder in.} other {# argumenten. Voer ze hieronder in.}}",
         "noOutput": "Nog geen uitvoer. Probeer de opdracht uit te voeren en klik op Vernieuwen.",
         "refreshed": "vernieuwd {timeDuration} geleden",
         "notify": {
@@ -1209,9 +1210,9 @@
             "tooltip": "De query parameters worden aan de URL toegevoegd. De notatie moet <code>key=value</code> per regel zijn. Ongeldige waarden worden genegeerd en extra spaties worden weggelaten. Voeg het teken <code>?</code> of het ampersand (<code>&</code>) niet toe aan het begin van een regel. Sleutels en waarden worden automatisch URL-gecodeerd."
         },
         "badge": {
-            "header": "{count, plural, one {1 koptekst} other {# kopteksten}}",
-            "body": "{count, plural, one {1 karakter} other {# karakters}}",
-            "query": "{count, plural, one {1 vraag} other {# vragen}}"
+            "header": "{count, plural, =1 {1 koptekst} other {# kopteksten}}",
+            "body": "{count, plural, =1 {1 karakter} other {# karakters}}",
+            "query": "{count, plural, =1 {1 vraag} other {# vragen}}"
         },
         "addInstance": "Relay URL toevoegen",
         "DeleteEndpoint": "URL verwijderen",
