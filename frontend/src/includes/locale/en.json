@@ -1488,5 +1488,11 @@
     "noData": "No process list returned.",
     "footer": "{count} processes found.",
     "button": { "wrapOn": "Turn Line Wrap On", "wrapOff": "Turn Line Wrap Off" }
+  },
+  "ClientInfo": {
+    "title": "Startup Payload",
+    "error": "Error loading startup payload: {error}",
+    "noData": "No startup payload returned.",
+    "description": "This is the payload that was sent to the client from Notifiarr.com when it started. It contains the client's configuration and other information."
   }
 }

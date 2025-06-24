@@ -40,7 +40,7 @@
   const refresh = async () => {
     loading = true
     resp = await get()
-    delay(300)
+    await delay(300)
     loading = false
   }
 
@@ -51,7 +51,7 @@
   const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 110px)')
 </script>
 
-<Modal {isOpen} size="xl" theme={$theme} {fullscreen}>
+<Modal {isOpen} size="xl" theme={$theme} {fullscreen} {toggle}>
   <ModalHeader class="d-inline-block">
     <Fa {...page} />
     <T id="{page.id}.title" />
