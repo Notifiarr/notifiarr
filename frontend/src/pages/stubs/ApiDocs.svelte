@@ -21,16 +21,22 @@
   import Fa from '../../includes/Fa.svelte'
   import { faSpinner } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import { profile } from '../../api/profile.svelte'
+  import Header from '../../includes/Header.svelte'
 
   onMount(async () => {
     const SwaggerUI = await import('swagger-ui')
     const swaggerJson = await import('../../../public/api_swagger.json')
     await SwaggerUI.default({
-      spec: { ...swaggerJson, basePath: $urlbase },
+      spec: { ...swaggerJson, basePath: $urlbase, info: null },
+      defaultModelsExpandDepth: 0,
       dom_id: '#swagger-ui-container',
     }).preauthorizeApiKey('ApiKeyAuth', $profile.config.apiKey)
   })
 </script>
+
+<Header {page} badge="v{$profile.version}">
+  Some of the colors on this page, while in dark mode, still need to be fixed.
+</Header>
 
 <div id="swagger-ui-container" class:dark-mode={theme.isDark}>
   <CardBody>
