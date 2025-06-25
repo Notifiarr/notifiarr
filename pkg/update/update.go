@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -44,17 +45,55 @@ var (
 )
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
-func Restart(cmd *Command) error {
-	// A small pause to give the parent time to exit.
-	time.Sleep(time.Second)
-	// A small pause to give the new app time to fork.
+func Restart(cmd *Command, waitForPids ...int) error {
 	defer time.Sleep(time.Second)
+
+	// Wait for the parent process to exit.
+	if len(waitForPids) > 0 {
+		waitForPidsToExit(waitForPids)
+	}
 
 	if err := exec.Command(cmd.Path, cmd.Args...).Start(); err != nil { //nolint:gosec
 		return fmt.Errorf("executing command %w", err)
 	}
 
 	return nil
+}
+
+func waitForPidsToExit(pids []int) {
+	const (
+		sleepTime = 500 * time.Millisecond
+		loopCount = 150 // 75 seconds
+	)
+
+	for range loopCount {
+		found := false
+
+		for _, pid := range pids {
+			if found = isPidRunning(pid); found {
+				break
+			}
+		}
+
+		if !found {
+			return
+		}
+
+		time.Sleep(sleepTime)
+	}
+}
+
+func isPidRunning(pid int) bool {
+	process, err := os.FindProcess(pid)
+	if err != nil {
+		return false
+	}
+
+	if mnd.IsWindows {
+		return true
+	}
+
+	return process.Signal(syscall.Signal(0)) == nil
 }
 
 // Now downloads the new file to a temp name in the same folder as the running file.
