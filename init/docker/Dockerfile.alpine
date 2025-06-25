@@ -17,7 +17,7 @@ RUN go mod download \
 RUN apk add nodejs npm
 COPY pkg pkg
 COPY frontend frontend
-RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN go generate ./pkg/bindata/docs \
+RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
     && mkdir -p ./frontend/dist \
     && echo "Fake frontend build." > ./frontend/dist/index.html \
     && go generate ./frontend/src/api \

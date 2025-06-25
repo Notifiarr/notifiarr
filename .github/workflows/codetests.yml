@@ -49,8 +49,6 @@ jobs:
           go-version-file: 'go.mod'
       - name: go-generate
         run: |
-          # Swagger docs
-          GOOS=darwin go generate ./pkg/bindata/docs
           # Fake frontend build.
           mkdir -p ./frontend/dist
           echo "Fake frontend build." > ./frontend/dist/index.html
@@ -78,8 +76,6 @@ jobs:
         env:
           FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
         run: |
-          # Swagger docs
-          GOOS=linux go generate ./pkg/bindata/docs
           # Fake frontend build.
           mkdir -p ./frontend/dist
           echo "Fake frontend build." > ./frontend/dist/index.html

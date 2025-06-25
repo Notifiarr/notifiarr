@@ -41,7 +41,7 @@
 <div id="swagger-ui-container" class:dark-mode={theme.isDark}>
   <CardBody>
     <h5>
-      <Fa i={faSpinner} spin class="me-2" scale={1.5} c1="orange" c2="orange" />
+      <Fa i={faSpinner} spin class="me-2" scale={1.5} c1="orange" />
       <T id="phrases.Loading" />
     </h5>
   </CardBody>
