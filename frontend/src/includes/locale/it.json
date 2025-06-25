@@ -1,22 +1,22 @@
 {
     "words": {
         "select-option": {
-            "ChecksDisabled": "",
-            "Off": "",
+            "ChecksDisabled": "Controlli Disattivati",
+            "Off": "Spento",
             "Enabled": "",
             "Disabled": "",
-            "minute": "",
-            "minutes": "",
-            "hour": "",
-            "hours": "",
-            "second": "",
-            "seconds": "",
-            "megabytes": "",
-            "bytes": "",
-            "Daily": "",
+            "minute": "minuto",
+            "minutes": "minuti",
+            "hour": "ora",
+            "hours": "ore",
+            "second": "secondo",
+            "seconds": "secondi",
+            "megabytes": "megabytes",
+            "bytes": "bytes",
+            "Daily": "Giornaliero",
             "custom": "",
-            "InstanceDisabled": "",
-            "NoTimeout": ""
+            "InstanceDisabled": "Istanza Disattivata",
+            "NoTimeout": "Nessun Timeout"
         },
         "instance-options": {
             "interval": {
@@ -28,88 +28,88 @@
                 "description": ""
             },
             "validSsl": {
-                "label": "",
+                "label": "Valida Certificato SSL",
                 "description": ""
             },
             "deletes": {
                 "label": "",
                 "description": "",
                 "tooltip": "",
-                "countPerHour": ""
+                "countPerHour": "{count} per ora"
             }
         },
         "clock": {
             "days": {
-                "Sunday": "",
-                "Monday": "",
-                "Tuesday": "",
-                "Wednesday": "",
-                "Thursday": "",
-                "Friday": "",
-                "Saturday": ""
+                "Sunday": "Domenica",
+                "Monday": "Lunedì",
+                "Tuesday": "Martedì",
+                "Wednesday": "Mercoledì",
+                "Thursday": "Giovedì",
+                "Friday": "Venerdì",
+                "Saturday": "Sabato"
             },
             "short": {
-                "ms": "",
-                "s": "",
-                "m": "",
-                "h": "",
-                "d": "",
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
+                "m": "{minutes}m",
+                "h": "{hours}h",
+                "d": "{days}d",
                 "w": ""
             },
-            "format": "",
-            "ago": ""
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}",
+            "ago": "{timeDuration} fa"
         },
         "bytes": {
             "short": {
-                "B": "",
-                "KB": "",
-                "MB": "",
-                "GB": "",
-                "TB": ""
+                "B": "{bytes} B",
+                "KB": "{bytes} KB",
+                "MB": "{bytes} MB",
+                "GB": "{bytes} GB",
+                "TB": "{bytes} TB"
             }
         }
     },
     "config": {
         "titles": {
-            "Configuration": "",
-            "General": "",
-            "Network": "",
-            "System": "",
+            "Configuration": "Configurazione",
+            "General": "Generale",
+            "Network": "Rete",
+            "System": "Sistema",
             "WatchFile": "",
             "Endpoint": "",
             "Command": "",
-            "SSLConfiguration": "",
-            "Services": "",
+            "SSLConfiguration": "Configurazione SSL",
+            "Services": "Servizi",
             "Logging": "",
-            "Dark": "",
-            "Light": ""
+            "Dark": "Scuro",
+            "Light": "Chiaro"
         },
         "ui": {
             "darkMode": {
-                "label": "",
+                "label": "Modalità Scura",
                 "description": ""
             },
             "language": {
-                "label": "",
+                "label": "Lingua",
                 "description": ""
             }
         },
         "autoUpdate": {
-            "tooltip": "",
+            "tooltip": "Questo funziona solo su Windows.",
             "label": "",
             "description": ""
         },
         "errors": {
-            "InvalidCreds": "",
+            "InvalidCreds": "Username o password non validi.",
             "LoginRequestTimedOut": "",
             "LoginFailed": "",
             "ProfileReqTimedOut": "",
-            "AnUnknownErrorOccurred": "",
+            "AnUnknownErrorOccurred": "Si è verificato un errore sconosciuto",
             "ConfigUpdateFailed": "",
             "PleaseEnterBothUsernameAndPassword": ""
         },
         "apiKey": {
-            "label": "",
+            "label": "Chiave API",
             "description": "",
             "tooltip": "",
             "placeholder": ""
@@ -117,23 +117,23 @@
         "extraKeys": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "Uno per riga..."
         },
         "bindAddr": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "0.0.0.0:5454"
         },
         "sslKeyFile": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "/path/to/ssl-key.pem",
             "tooltip": ""
         },
         "sslCertFile": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "/path/to/ssl-cert.pem",
             "tooltip": ""
         },
         "debug": {
@@ -149,23 +149,23 @@
         "logFile": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "/path/to/notifiarr.log"
         },
         "httpLog": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "/path/to/http-notifiarr.log",
             "tooltip": ""
         },
         "debugLog": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "/path/to/debug-notifiarr.log",
             "tooltip": ""
         },
         "maxBody": {
             "label": "",
-            "description": "",
+            "description": "Dimensione massima del body per le richieste HTTP.",
             "tooltip": ""
         },
         "logFileMb": {
@@ -185,7 +185,7 @@
         },
         "snapshot": {
             "timeout": {
-                "label": "",
+                "label": "Timeout",
                 "description": ""
             }
         },
@@ -196,7 +196,7 @@
                 "tooltip": ""
             },
             "parallel": {
-                "label": "",
+                "label": "Controlli Paralleli",
                 "description": "",
                 "tooltip": ""
             },
@@ -209,7 +209,7 @@
                 "label": "",
                 "description": "",
                 "tooltip": "",
-                "placeholder": ""
+                "placeholder": "/path/to/services-notifiarr.log"
             }
         },
         "watchFile": {
@@ -220,31 +220,31 @@
         },
         "endpoint": {
             "name": {
-                "label": "",
+                "label": "Nome",
                 "description": ""
             }
         },
         "command": {
             "name": {
-                "label": "",
+                "label": "Nome",
                 "description": "",
                 "required": ""
             }
         },
         "service": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Nome",
+                "description": "Nome del servizio."
             }
         },
         "urlbase": {
             "label": "",
             "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "placeholder": "/notifiarr/",
+            "tooltip": "Esempio: /notifiarr/"
         },
         "hostId": {
-            "label": "",
+            "label": "ID Host",
             "description": "",
             "tooltip": ""
         },
@@ -264,7 +264,7 @@
             "tooltip": ""
         },
         "timeout": {
-            "label": "",
+            "label": "Timeout",
             "description": ""
         },
         "fileMode": {
@@ -280,11 +280,11 @@
     },
     "system": {
         "NetworkInformation": {
-            "title": "",
-            "IPAddress": "",
-            "Gateway": "",
+            "title": "Informazioni di Rete",
+            "IPAddress": "Indirizzo IP",
+            "Gateway": "Gateway",
             "Netmask": "",
-            "Interface": ""
+            "Interface": "Interfaccia"
         },
         "BuildInformation": {
             "title": "",
@@ -292,341 +292,341 @@
             "BuildUser": "",
             "BuildDate": "",
             "GoVersion": "",
-            "Integrity": ""
+            "Integrity": "Integrità"
         },
         "OperatingSystem": {
-            "title": "",
+            "title": "Sistema Operativo",
             "Hostname": "",
             "UniqueID": "",
-            "Platform": "",
-            "KernelVersion": "",
+            "Platform": "Piattaforma",
+            "KernelVersion": "Versione Kernel",
             "VirtualizationSystem": ""
         },
         "ClientInformation": {
             "title": "",
             "Application": "",
-            "Version": "",
+            "Version": "Versione",
             "Started": "",
             "Uptime": ""
         },
         "StorageData": {
             "title": "",
-            "Total": "",
+            "Total": "Total",
             "Used": "",
-            "Free": "",
+            "Free": "Libero",
             "FS": "",
             "ro": ""
         },
         "StartupParams": {
-            "title": "",
+            "title": "Parametri di Avvio",
             "BinaryPath": "",
             "ConfigFile": "",
             "EnvironmentPrefix": "",
             "ExtraConfigFiles": "",
             "CustomAssets": "",
-            "UserID": "",
+            "UserID": "ID Utente",
             "GroupID": "",
-            "IPAddress": ""
+            "IPAddress": "Indirizzo IP"
         },
         "UserInformation": {
-            "title": "",
-            "Patron": "",
+            "title": "Informazioni Utente",
+            "Patron": "Patron",
             "Subscriber": "",
             "AbsoluteBadAss": "",
-            "YesYesYouAre": "",
+            "YesYesYouAre": "Sì, sì lo sei! 💚",
             "HellaAwesome": "",
-            "YoureSoGifted": "",
-            "DateFormat": ""
+            "YoureSoGifted": "Sei così generoso, e noi ti amiamo! 💜",
+            "DateFormat": "Formato Data"
         },
         "EnvironmentVariables": {
-            "title": ""
+            "title": "Variabili d'ambiente"
         }
     },
     "StarrApps": {
         "Radarr": {
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Radarr.",
+                "placeholder": "admin",
+                "tooltip": "Sono necessari un username e una password solo se si desidera controllare i backup del database, poiché questi non possono essere scaricati tramite l'API."
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Radarr",
+            "addInstance": "Aggiungi Istanza Radarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome per l'istanza di Radarr.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Radarr.",
+                "placeholder": "http://radarr.server.tv:7878"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chiave API",
+                "description": "Chiave API per l'istanza di Radarr.",
+                "placeholder": "radarr-api-key"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password per l'istanza di Radarr.",
+                "placeholder": "password"
             }
         },
         "Sonarr": {
-            "title": "",
-            "addInstance": "",
+            "title": "Sonarr",
+            "addInstance": "Aggiungi Istanza Sonarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome per l'istanza di Sonarr.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Sonarr.",
+                "placeholder": "http://sonarr.server.tv:8989"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chiave API",
+                "description": "Chiave API per l'istanza di Sonarr.",
+                "placeholder": "sonarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Sonarr.",
+                "placeholder": "admin",
+                "tooltip": "Sono necessari un username e una password solo se si desidera controllare i backup del database, poiché questi non possono essere scaricati tramite l'API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password per l'istanza di Sonarr.",
+                "placeholder": "password"
             }
         },
         "Readarr": {
-            "title": "",
-            "addInstance": "",
+            "title": "Readarr",
+            "addInstance": "Aggiungi Istanza Readarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome per l'istanza di Readarr.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Readarr.",
+                "placeholder": "http://readarr.server.tv:8787"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chiave API",
+                "description": "Chiave API per l'istanza di Readarr.",
+                "placeholder": "readarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Readarr.",
+                "placeholder": "admin",
+                "tooltip": "Sono necessari un username e una password solo se si desidera controllare i backup del database, poiché questi non possono essere scaricati tramite l'API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password per l'istanza di Readarr.",
+                "placeholder": "password"
             }
         },
         "Lidarr": {
-            "title": "",
-            "addInstance": "",
+            "title": "Lidarr",
+            "addInstance": "Aggiungi Istanza Lidarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome per l'istanza di Lidarr.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Lidarr.",
+                "placeholder": "http://lidarr.server.tv:8686"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chiave API",
+                "description": "Chiave API per l'istanza di Lidarr.",
+                "placeholder": "lidarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Lidarr.",
+                "placeholder": "admin",
+                "tooltip": "Sono necessari un username e una password solo se si desidera controllare i backup del database, poiché questi non possono essere scaricati tramite l'API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password per l'istanza di Lidarr.",
+                "placeholder": "password"
             }
         },
         "Prowlarr": {
-            "title": "",
-            "addInstance": "",
+            "title": "Prowlarr",
+            "addInstance": "Aggiungi Istanza Prowlarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome per l'istanza di Prowlarr.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Prowlarr.",
+                "placeholder": "http://prowlarr.server.tv:9696"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chiave API",
+                "description": "Chiave API per l'istanza di Prowlarr.",
+                "placeholder": "prowlarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Prowlarr.",
+                "placeholder": "admin",
+                "tooltip": "Sono necessari un username e una password solo se si desidera controllare i backup del database, poiché questi non possono essere scaricati tramite l'API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password per l'istanza di Prowlarr.",
+                "placeholder": "password"
             }
         }
     },
     "Downloaders": {
         "NZBGet": {
             "password": {
-                "description": "",
-                "label": "",
-                "placeholder": ""
+                "description": "Password dell'istanza di NZBGet.",
+                "label": "Password",
+                "placeholder": "password"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "NZBGet",
+            "addInstance": "Aggiungi Istanza NZBGet",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome dell'istanza di NZBGet.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di NZBGet.",
+                "placeholder": "http://nzbget.server.tv:6789"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Username",
+                "description": "Username dell'istanza di NZBGet.",
+                "placeholder": "admin"
             }
         },
         "Qbittorrent": {
-            "title": "",
-            "addInstance": "",
+            "title": "Qbittorrent",
+            "addInstance": "Aggiungi Istanza Qbittorrent",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome dell'istanza di Qbittorrent.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Qbittorrent.",
+                "placeholder": "http://qbittorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Qbittorrent.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password dell'istanza di Qbittorrent.",
+                "placeholder": "password"
             }
         },
         "Rtorrent": {
-            "title": "",
-            "addInstance": "",
+            "title": "Rtorrent",
+            "addInstance": "Aggiungi Istanza Rtorrent",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome dell'istanza di Rtorrent.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Rtorrent.",
+                "placeholder": "http://rtorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Rtorrent.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password dell'istanza di Rtorrent.",
+                "placeholder": "password"
             }
         },
         "Transmission": {
-            "title": "",
-            "addInstance": "",
+            "title": "Transmission",
+            "addInstance": "Aggiungi Istanza Transmission",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome dell'istanza di Transmission.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Transmission.",
+                "placeholder": "http://transmission.server.tv:9091"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Username",
+                "description": "Username dell'istanza di Transmission.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password dell'istanza di Transmission.",
+                "placeholder": "password"
             }
         },
         "Deluge": {
-            "title": "",
-            "addInstance": "",
+            "title": "Deluge",
+            "addInstance": "Aggiungi Istanza Deluge",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome dell'istanza di Deluge",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Deluge.",
+                "placeholder": "http://deluge.server.tv:8112"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password dell'istanza di Deluge.",
+                "placeholder": "password"
             }
         },
         "SabNZB": {
-            "title": "",
-            "addInstance": "",
+            "title": "SabNZB",
+            "addInstance": "Aggiungi Istanza SabNZB",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Istanza",
+                "description": "Nome dell'istanza di SabNZB.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di SabNZB.",
+                "placeholder": "http://sabnzb.server.tv:8080"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chiave API",
+                "description": "Chiave API per l'istanza SabNZB.",
+                "placeholder": "sabnzb-api-key"
             }
         }
     },
@@ -638,25 +638,25 @@
         "DeleteCommand": "",
         "description": "",
         "Executions": "",
-        "neverExecuted": "",
+        "neverExecuted": "mai eseguito",
         "enterCommandArguments": "",
         "commandRequiresArguments": "",
         "noOutput": "",
         "refreshed": "",
         "regexMismatch": "",
         "name": {
-            "label": "",
+            "label": "Nome",
             "description": "",
-            "placeholder": ""
+            "placeholder": "nome personalizzato per le notifiche"
         },
         "command": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "echo 'Hello, world!'",
             "tooltip": ""
         },
         "notify": {
-            "label": "",
+            "label": "Notifica",
             "description": "",
             "tooltip": ""
         },
@@ -673,21 +673,21 @@
     "Endpoints": {
         "title": "",
         "addInstance": "",
-        "DeleteEndpoint": "",
+        "DeleteEndpoint": "Elimina URL",
         "badge": {
             "header": "",
             "query": "",
             "body": ""
         },
         "name": {
-            "label": "",
+            "label": "Nome",
             "description": "",
-            "placeholder": ""
+            "placeholder": "nome personalizzato per le notifiche"
         },
         "template": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "pihole",
             "tooltip": "",
             "required": ""
         },
@@ -696,49 +696,49 @@
             "description": ""
         },
         "method": {
-            "label": "",
+            "label": "Metodo",
             "description": ""
         },
         "url": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "https://pihole.myhome.lan/api/stats"
         },
         "header": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "Content-Type: application/json",
             "tooltip": ""
         },
         "query": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "apiKey=1234567890",
             "tooltip": ""
         },
         "body": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "{\"message\": \"Hello, world!\"}"
         }
     },
     "monitoring": {
         "check": {
             "interval": {
-                "short": "",
-                "title": "",
+                "short": "Intervallo",
+                "title": "Controlla Intervallo",
                 "tooltip": ""
             },
-            "name": "",
+            "name": "Nome Servizio",
             "state": {
                 "short": "",
                 "title": ""
             },
             "typeExpect": "",
             "last": {
-                "short": "",
-                "title": "",
-                "tooltip": "",
+                "short": "Ultimo",
+                "title": "Ultimo Controllo: {timeDuration} fa",
+                "tooltip": "Quanto tempo fa questo servizio è stato controllato.",
                 "description": ""
             },
             "since": {
@@ -759,7 +759,7 @@
         "startFailed": "",
         "recheckFailed": "",
         "checkInitiated": "",
-        "nextRefresh": "",
+        "nextRefresh": "Nuovo aggiornamento in {timeDuration}.",
         "refreshInterval": "",
         "cardsView": "",
         "classicView": "",
@@ -769,7 +769,7 @@
     "ServiceChecks": {
         "timeout": {
             "description": "",
-            "label": ""
+            "label": "Controlla Timeout"
         },
         "title": "",
         "DeleteCheck": "",
@@ -777,17 +777,17 @@
         "description": "",
         "processListLink": "",
         "interval": {
-            "label": "",
+            "label": "Controlla Intervallo",
             "description": ""
         },
         "name": {
-            "label": "",
+            "label": "Controlla Nome",
             "description": "",
-            "placeholder": "",
+            "placeholder": "nome personalizzato per le notifiche",
             "tooltip": ""
         },
         "type": {
-            "label": "",
+            "label": "Controlla Tipo",
             "description": "",
             "tooltip": "",
             "options": {
@@ -799,15 +799,15 @@
             }
         },
         "url": {
-            "label": "",
+            "label": "URL",
             "description": "",
-            "placeholder": ""
+            "placeholder": "https://my.site"
         },
         "http": {
             "headers": {
                 "label": "",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "Content-Type: application/json"
             },
             "codes": {
                 "label": "",
@@ -817,44 +817,44 @@
         },
         "tcp": {
             "value": {
-                "label": "",
+                "label": "Host e Porta",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "127.0.0.1:22",
                 "tooltip": "",
                 "required": ""
             }
         },
         "ping": {
             "value": {
-                "label": "",
+                "label": "Host o IP",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "127.0.0.1",
                 "tooltip": "",
                 "required": ""
             },
             "count": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "10",
                 "required": ""
             },
             "minimum": {
-                "label": "",
+                "label": "Minimo",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "10",
                 "required": ""
             },
             "interval": {
-                "label": "",
+                "label": "Intervallo",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "100"
             }
         },
         "process": {
             "value": {
                 "label": "",
-                "description": "",
-                "placeholder": "",
+                "description": "Il nome del processo da verificare.",
+                "placeholder": "notifiarr",
                 "tooltip": "",
                 "required": ""
             },
@@ -869,13 +869,13 @@
                 "tooltip": ""
             },
             "minimum": {
-                "label": "",
+                "label": "Minimo",
                 "description": "",
                 "required": "",
                 "tooltip": ""
             },
             "maximum": {
-                "label": "",
+                "label": "Massimo",
                 "description": "",
                 "tooltip": ""
             }
@@ -894,7 +894,7 @@
                 "button": "",
                 "success": "",
                 "options": {
-                    "choose": "",
+                    "choose": "Scegli un file da caricare",
                     "app": "",
                     "debug": "",
                     "http": ""
@@ -915,7 +915,7 @@
             },
             "TrigMDBListSync": {
                 "label": "",
-                "button": "",
+                "button": "Sincronizza lista MDB",
                 "success": ""
             },
             "TrigCollectionGaps": {
@@ -925,12 +925,12 @@
             },
             "TrigCFSyncLidarr": {
                 "label": "",
-                "button": "",
+                "button": "Sincronizza tutte le istanze Lidarr",
                 "success": ""
             },
             "TrigCFSyncRadarr": {
                 "label": "",
-                "button": "",
+                "button": "Sincronizza tutte le istanze Radarr",
                 "success": ""
             },
             "TrigStop": {
@@ -944,52 +944,52 @@
             },
             "TrigProwlarrCorrupt": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Prowlarr",
                 "success": ""
             },
             "TrigLidarrCorrupt": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Lidarr",
                 "success": ""
             },
             "TrigRadarrCorrupt": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Radarr",
                 "success": ""
             },
             "TrigReadarrCorrupt": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Readarr",
                 "success": ""
             },
             "TrigSonarrCorrupt": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Sonarr",
                 "success": ""
             },
             "TrigProwlarrBackup": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Prowlarr",
                 "success": ""
             },
             "TrigLidarrBackup": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Lidarr",
                 "success": ""
             },
             "TrigRadarrBackup": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Radarr",
                 "success": ""
             },
             "TrigReadarrBackup": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Readarr",
                 "success": ""
             },
             "TrigSonarrBackup": {
                 "label": "",
-                "button": "",
+                "button": "Controlla Sonarr",
                 "success": ""
             },
             "TrigUpCheck": {
@@ -1036,8 +1036,11 @@
             },
             "TrigStuckItems": {
                 "label": "",
-                "button": "",
+                "button": "Controlla per elementi bloccati",
                 "success": ""
+            },
+            "TrigCFSyncSonarr": {
+                "button": "Sincronizza tutte le istanze Sonarr"
             }
         },
         "titles": {
@@ -1046,7 +1049,7 @@
             "Schedules": "",
             "SiteCrons": "",
             "Counter": "",
-            "Interval": "",
+            "Interval": "Intervallo",
             "Schedule": ""
         },
         "descriptions": {
@@ -1057,19 +1060,19 @@
         }
     },
     "buttons": {
-        "Login": "",
-        "Confirm": "",
-        "Cancel": "",
-        "Save": "",
-        "Close": "",
-        "SaveChanges": "",
-        "SaveConfiguration": "",
+        "Login": "Login",
+        "Confirm": "Conferma",
+        "Cancel": "Annulla",
+        "Save": "Salva",
+        "Close": "Chiudi",
+        "SaveChanges": "Salva Modifiche",
+        "SaveConfiguration": "Salva Configurazione",
         "ResetForm": "",
-        "NoStayHere": "",
-        "YesDeleteMyChanges": "",
-        "Execute": "",
+        "NoStayHere": "No! Rimani qui",
+        "YesDeleteMyChanges": "Sì! Elimina le mie modifiche",
+        "Execute": "Esegui",
         "HideMenu": "",
-        "ShowMenu": "",
+        "ShowMenu": "Mostra Menu",
         "ShowOutput": "",
         "HideOutput": "",
         "RefreshOutput": ""
@@ -1079,7 +1082,7 @@
         "testPattern": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "[INFO] 2025-05-25 16:20:01 - Questa è una linea di log di test."
         },
         "testRegex": {
             "label": "",
@@ -1087,16 +1090,16 @@
             "placeholder": ""
         },
         "TestResult": "",
-        "Test": "",
+        "Test": "Test",
         "Expression": "",
         "Result": "",
-        "NoMatch": ""
+        "NoMatch": "Nessuna Corrispondenza"
     },
     "phrases": {
-        "ERROR": "",
+        "ERROR": "ERRORE",
         "LoggingIn": "",
         "LoggedIn": "",
-        "Loading": "",
+        "Loading": "Caricamento...",
         "UpdateBackend": "",
         "BackEndUpdated": "",
         "UpdatingBackEnd": "",
@@ -1105,10 +1108,10 @@
         "ConfigurationSavedReloading": "",
         "ConfigurationSaved": "",
         "SavingConfiguration": "",
-        "Version": "",
-        "Every12Hours": "",
-        "Every6Hours": "",
-        "Every3Hours": "",
+        "Version": "Versione {version}",
+        "Every12Hours": "Ogni 12 ore",
+        "Every6Hours": "Ogni 6 ore",
+        "Every3Hours": "Ogni 3 ore",
         "Reloading": "",
         "FailedToReload": "",
         "ConfirmReload": "",
@@ -1122,29 +1125,30 @@
         "LoginHelp": "",
         "LoginHelpBody": "",
         "Changed": "",
-        "New": "",
-        "Invalid": "",
-        "DeleteInstance": "",
+        "New": "Nuovo",
+        "Invalid": "Non valido",
+        "DeleteInstance": "Elimina Istanza",
         "DeletedNumber": "",
         "ItsGone": "",
-        "URLMustBeginWithHttp": "",
-        "NameMustNotBeEmpty": "",
-        "HostMustNotBeEmpty": "",
-        "UsernameMustNotBeEmpty": "",
+        "URLMustBeginWithHttp": "URL deve iniziare con http:// o https://",
+        "NameMustNotBeEmpty": "Nome non può essere vuoto.",
+        "HostMustNotBeEmpty": "Host non può essere vuoto.",
+        "UsernameMustNotBeEmpty": "Username non può essere vuoto.",
         "NameInUseByInstance": "",
         "APIKeyMustBeCountCharacters": "",
-        "TokenMustBeCountCharacters": "",
+        "TokenMustBeCountCharacters": "Token deve essere di {count} caratteri o più lungo.",
         "LeavePage": "",
         "Landing": {
             "SelectASection": "",
-            "Welcome": ""
-        }
+            "Welcome": "Benvenuto, {username}!"
+        },
+        "ShowMore": "Mostra più informazioni"
     },
     "navigation": {
         "titles": {
-            "Settings": "",
+            "Settings": "Impostazioni",
             "Insights": "",
-            "Configuration": "",
+            "Configuration": "Configurazione",
             "SiteTunnel": "",
             "StarrApps": "",
             "Downloaders": "",
@@ -1153,15 +1157,15 @@
             "FileWatcher": "",
             "Endpoints": "",
             "Commands": "",
-            "Services": "",
-            "Actions": "",
-            "Integrations": "",
+            "Services": "Servizi",
+            "Actions": "Azioni",
+            "Integrations": "Integrazioni",
             "Monitoring": "",
             "Metrics": "",
             "LogFiles": "",
-            "System": "",
+            "System": "Sistema",
             "TrustProfile": "",
-            "Landing": "",
+            "Landing": "Home Notifiarr",
             "UnsavedChanges": ""
         },
         "pageDescription": {
@@ -1182,13 +1186,13 @@
             "LogFiles": "",
             "System": "",
             "TrustProfile": "",
-            "Landing": ""
+            "Landing": "Questo è il posto più bello della Terra!"
         }
     },
     "profile": {
         "title": {
-            "Authentication": "",
-            "Authorization": ""
+            "Authentication": "Autenticazione",
+            "Authorization": "Autorizzazione"
         },
         "phrase": {
             "ShowMoreDesc": "",
@@ -1200,8 +1204,8 @@
             "ProxyAuthDisabled": "",
             "Addit": "",
             "SeeWikiForAuthProxyHelp": "",
-            "ShowMeMore": "",
-            "ShowMeLess": ""
+            "ShowMeMore": "Mostrami di più.",
+            "ShowMeLess": "Mostrami di meno."
         },
         "authType": {
             "label": "",
@@ -1209,7 +1213,7 @@
             "options": {
                 "password": "",
                 "header": "",
-                "noauth": ""
+                "noauth": "Nessuna Password (pericoloso)"
             },
             "option_desc": {
                 "password": "",
@@ -1220,7 +1224,7 @@
         "upstreams": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "127.0.0.1 ::1",
             "tooltip": ""
         },
         "header": {
@@ -1229,94 +1233,94 @@
             "tooltip": ""
         },
         "username": {
-            "label": "",
-            "description": "",
+            "label": "Username",
+            "description": "Il tuo username di login",
             "placeholder": ""
         },
         "password": {
             "label": "",
-            "description": "",
+            "description": "La tua password di login",
             "placeholder": ""
         },
         "newPass": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nuova Password",
+            "description": "La tua nuova password di login",
+            "placeholder": "9 caratteri minimi"
         }
     },
     "MediaApps": {
         "Plex": {
-            "title": "",
+            "title": "Plex",
             "description": "",
             "name": {
-                "label": "",
-                "description": "",
+                "label": "Nome Server",
+                "description": "Nome del server Plex",
                 "placeholder": ""
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL del server di Plex.",
+                "placeholder": "http://plex.server.tv:32400"
             },
             "token": {
-                "label": "",
-                "description": "",
+                "label": "Token",
+                "description": "Token per il server di Plex.",
                 "placeholder": "",
                 "tooltip": ""
             }
         },
         "Tautulli": {
-            "title": "",
+            "title": "Tautulli",
             "description": "",
             "name": {
                 "label": "",
-                "description": ""
+                "description": "Nome del servizio Tautulli"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL dell'istanza di Tautulli.",
+                "placeholder": "http://tautulli.server.tv:8181"
             },
             "apiKey": {
-                "label": "",
+                "label": "Chiave API",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "tautulli-api-key"
             }
         }
     },
     "SnapshotApps": {
         "MySQL": {
-            "title": "",
+            "title": "MySQL",
             "description": "",
             "addInstance": "",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome Server",
+                "description": "Nome del server MySQL.",
+                "placeholder": "nome personalizzato per le notifiche"
             },
             "host": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Host",
+                "description": "Host o indirizzo IP del server MySQL.",
+                "placeholder": "127.0.0.1"
             },
             "port": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Porta",
+                "description": "Porta del server MySQL",
+                "placeholder": "3306"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Username",
+                "description": "Username del server di MySQL.",
                 "placeholder": ""
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Password",
+                "description": "Password per il server di MySQL.",
+                "placeholder": "password"
             }
         },
         "Nvidia": {
-            "title": "",
+            "title": "Nvidia",
             "description": "",
             "disabled": {
                 "label": "",
@@ -1325,13 +1329,13 @@
             "busIds": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "0000:00:00.0,0000:00:00.1",
                 "tooltip": ""
             },
             "smiPath": {
-                "label": "",
+                "label": "Percorso nvidia-smi",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "/usr/bin/nvidia-smi",
                 "tooltip": ""
             }
         }
@@ -1347,10 +1351,10 @@
             "TunnelStats": "",
             "Disconnects": "",
             "ConnectionPoolSize": "",
-            "Connecting": "",
+            "Connecting": "Connettendo",
             "Idle": "",
             "Running": "",
-            "LastConnection": "",
+            "LastConnection": "Ultima Connessione",
             "LastActiveCheck": "",
             "SocketURLActive": "",
             "SocketURLInactive": "",
@@ -1380,8 +1384,8 @@
         "path": {
             "label": "",
             "description": "",
-            "placeholder": "",
-            "required": ""
+            "placeholder": "/var/log/nginx/access.log",
+            "required": "Percorso è richiesto"
         },
         "disabled": {
             "label": "",
@@ -1422,28 +1426,28 @@
     },
     "scheduler": {
         "title": "",
-        "daysOfWeek": "",
-        "daysOfMonth": "",
-        "frequency": "",
+        "daysOfWeek": "Giorni della settimana",
+        "daysOfMonth": "Giorni del mese",
+        "frequency": "Frequenza",
         "selectAFrequency": "",
         "AddATime": "",
         "empty": "",
         "required": {
-            "daysOfWeek": "",
-            "daysOfMonth": "",
+            "daysOfWeek": "Devi selezionare almeno un giorno della settimana.",
+            "daysOfMonth": "Devi selezionare almeno un giorno del mese.",
             "atTimes": ""
         },
         "ops": {
             "noSchedule": "",
-            "minutely": "",
-            "hourly": "",
-            "daily": "",
-            "weekly": "",
-            "monthly": ""
+            "minutely": "Ogni Minuto",
+            "hourly": "Ogni Ora",
+            "daily": "Giornaliero",
+            "weekly": "Settimanale",
+            "monthly": "Mensile"
         },
         "times": {
-            "noneSelected": "",
-            "noDaysSelected": "",
+            "noneSelected": "(nessuno selezionato)",
+            "noDaysSelected": "(nessun giorno selezionato)",
             "everyMinute": "",
             "everyHour": "",
             "everyDay": "",
@@ -1465,7 +1469,7 @@
             "empty": ""
         },
         "httpRequests": {
-            "title": "",
+            "title": "Richieste HTTP",
             "description": "",
             "empty": ""
         },
@@ -1489,5 +1493,26 @@
             "description": "",
             "empty": ""
         }
+    },
+    "LogFiles": {
+        "titles": {
+            "Bytes": "Bytes",
+            "Date": "Data",
+            "InUse": "In Uso",
+            "Details": "Dettagli",
+            "Name": "Nome File",
+            "FileList": "Lista File",
+            "Owner": "Proprietario",
+            "Path": "Percorso",
+            "OpenFile": "Apri File {fileName}"
+        },
+        "button": {
+            "delete": "Elimina",
+            "add": "Aggiungi"
+        },
+        "NoFileSelected": "Nessun file selezionato."
+    },
+    "ProcessList": {
+        "footer": "{count} processi trovati."
     }
 }
