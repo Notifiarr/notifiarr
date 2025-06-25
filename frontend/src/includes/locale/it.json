@@ -54,7 +54,7 @@
                 "m": "{minutes}m",
                 "h": "{hours}h",
                 "d": "{days}d",
-                "w": ""
+                "w": "{weeks}w"
             },
             "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}",
             "ago": "{timeDuration} fa"
@@ -112,7 +112,7 @@
             "label": "Chiave API",
             "description": "",
             "tooltip": "",
-            "placeholder": ""
+            "placeholder": "Inserisci la tua chiave API qui"
         },
         "extraKeys": {
             "label": "",
@@ -214,7 +214,7 @@
         },
         "watchFile": {
             "path": {
-                "label": "",
+                "label": "Percorso File",
                 "description": ""
             }
         },
@@ -312,7 +312,7 @@
         "StorageData": {
             "title": "",
             "Total": "Total",
-            "Used": "",
+            "Used": "Usato",
             "Free": "Libero",
             "FS": "",
             "ro": ""
@@ -864,7 +864,7 @@
                 "tooltip": ""
             },
             "restarts": {
-                "label": "",
+                "label": "Riavvii",
                 "description": "",
                 "tooltip": ""
             },
@@ -1092,7 +1092,7 @@
         "TestResult": "",
         "Test": "Test",
         "Expression": "",
-        "Result": "",
+        "Result": "Risultato",
         "NoMatch": "Nessuna Corrispondenza"
     },
     "phrases": {
@@ -1107,7 +1107,7 @@
         "TryRefreshingThePage": "",
         "ConfigurationSavedReloading": "",
         "ConfigurationSaved": "",
-        "SavingConfiguration": "",
+        "SavingConfiguration": "Salvando la configurazione...",
         "Version": "Versione {version}",
         "Every12Hours": "Ogni 12 ore",
         "Every6Hours": "Ogni 6 ore",
@@ -1118,7 +1118,7 @@
         "ConfirmReloadBody": "",
         "ReloadSuccess": "",
         "ReloadCheckTimedOut": "",
-        "ConfirmShutdown": "",
+        "ConfirmShutdown": "Conferma Spegnimento",
         "ConfirmShutdownBody": "",
         "ShutdownSuccess": "",
         "FailedToShutdown": "",
@@ -1196,7 +1196,7 @@
         },
         "phrase": {
             "ShowMoreDesc": "",
-            "PasswordOnlyUsed": "",
+            "PasswordOnlyUsed": "Username e Password sono utilizzati solamente se Modalità Autenticazione è impostato su Password",
             "HeaderOnlyUsed": "",
             "AuthTypeChange": "",
             "ProfileUpdated": "",
@@ -1208,7 +1208,7 @@
             "ShowMeLess": "Mostrami di meno."
         },
         "authType": {
-            "label": "",
+            "label": "Modalità Autenticazione",
             "description": "",
             "options": {
                 "password": "",
@@ -1238,9 +1238,9 @@
             "placeholder": ""
         },
         "password": {
-            "label": "",
+            "label": "Password Attuale",
             "description": "La tua password di login",
-            "placeholder": ""
+            "placeholder": "Inserisci la password attuale"
         },
         "newPass": {
             "label": "Nuova Password",
@@ -1382,7 +1382,7 @@
             "TestString": ""
         },
         "path": {
-            "label": "",
+            "label": "Percorso File",
             "description": "",
             "placeholder": "/var/log/nginx/access.log",
             "required": "Percorso è richiesto"
