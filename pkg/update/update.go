@@ -66,8 +66,10 @@ func waitForPidsToExit(pids []int) {
 		loopCount = 150 // 75 seconds
 	)
 
+	var found bool
+
 	for range loopCount {
-		found := false
+		found = false
 
 		for _, pid := range pids {
 			if found = isPidRunning(pid); found {
@@ -88,6 +90,8 @@ func isPidRunning(pid int) bool {
 	if err != nil {
 		return false
 	}
+
+	_ = process.Release()
 
 	if mnd.IsWindows {
 		return true
