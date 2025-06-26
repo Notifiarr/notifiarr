@@ -3,8 +3,8 @@
         "select-option": {
             "ChecksDisabled": "Controlli Disattivati",
             "Off": "Spento",
-            "Enabled": "",
-            "Disabled": "",
+            "Enabled": "Attivato",
+            "Disabled": "Disattivato",
             "minute": "minuto",
             "minutes": "minuti",
             "hour": "ora",
@@ -14,7 +14,7 @@
             "megabytes": "megabytes",
             "bytes": "bytes",
             "Daily": "Giornaliero",
-            "custom": "",
+            "custom": "personalizzato",
             "InstanceDisabled": "Istanza Disattivata",
             "NoTimeout": "Nessun Timeout"
         },
@@ -77,7 +77,7 @@
             "System": "Sistema",
             "WatchFile": "",
             "Endpoint": "",
-            "Command": "",
+            "Command": "Comando",
             "SSLConfiguration": "Configurazione SSL",
             "Services": "Servizi",
             "Logging": "",
@@ -87,7 +87,7 @@
         "ui": {
             "darkMode": {
                 "label": "Modalità Scura",
-                "description": ""
+                "description": "Attiva o disattiva la modalità scura."
             },
             "language": {
                 "label": "Lingua",
@@ -125,13 +125,13 @@
             "placeholder": "0.0.0.0:5454"
         },
         "sslKeyFile": {
-            "label": "",
+            "label": "File Chiave SSL",
             "description": "",
             "placeholder": "/path/to/ssl-key.pem",
             "tooltip": ""
         },
         "sslCertFile": {
-            "label": "",
+            "label": "File Certificato SSL",
             "description": "",
             "placeholder": "/path/to/ssl-cert.pem",
             "tooltip": ""
@@ -273,7 +273,7 @@
             "tooltip": ""
         },
         "unstableCh": {
-            "label": "",
+            "label": "Canale non stabile",
             "description": "",
             "tooltip": ""
         }
@@ -304,7 +304,7 @@
         },
         "ClientInformation": {
             "title": "",
-            "Application": "",
+            "Application": "Applicazione",
             "Version": "Versione",
             "Started": "",
             "Uptime": ""
@@ -631,10 +631,10 @@
         }
     },
     "Commands": {
-        "Failures": "",
+        "Failures": "Fallimenti: {count}",
         "LastExecution": "",
-        "title": "",
-        "addInstance": "",
+        "title": "Lista Comandi",
+        "addInstance": "Crea Comando",
         "DeleteCommand": "",
         "description": "",
         "Executions": "",
@@ -650,10 +650,11 @@
             "placeholder": "nome personalizzato per le notifiche"
         },
         "command": {
-            "label": "",
-            "description": "",
+            "label": "Comando",
+            "description": "Comando da eseguire.",
             "placeholder": "echo 'Hello, world!'",
-            "tooltip": ""
+            "tooltip": "",
+            "required": "Comando è rischiesto"
         },
         "notify": {
             "label": "Notifica",
@@ -887,7 +888,7 @@
                 "label": ""
             },
             "TrigPlexEmptyTrash": {
-                "label": ""
+                "label": "Svuota cestino Plex"
             },
             "TrigUploadFile": {
                 "label": "",
@@ -924,14 +925,14 @@
                 "success": ""
             },
             "TrigCFSyncLidarr": {
-                "label": "",
+                "label": "Sincronizzazione di profili e formati in Lidarr",
                 "button": "Sincronizza tutte le istanze Lidarr",
-                "success": ""
+                "success": "Sincronizzazione di profili e formati in Lidarr inizializzata."
             },
             "TrigCFSyncRadarr": {
-                "label": "",
+                "label": "Sincronizzazione di profili e formati in Radarr",
                 "button": "Sincronizza tutte le istanze Radarr",
-                "success": ""
+                "success": "Sincronizzazione di profili e formati in Radarr inizializzata."
             },
             "TrigStop": {
                 "label": "",
@@ -968,27 +969,27 @@
                 "success": ""
             },
             "TrigProwlarrBackup": {
-                "label": "",
+                "label": "Backup database di Prowlarr",
                 "button": "Controlla Prowlarr",
                 "success": ""
             },
             "TrigLidarrBackup": {
-                "label": "",
+                "label": "Backup database di Lidarr",
                 "button": "Controlla Lidarr",
                 "success": ""
             },
             "TrigRadarrBackup": {
-                "label": "",
+                "label": "Backup database di Radarr",
                 "button": "Controlla Radarr",
                 "success": ""
             },
             "TrigReadarrBackup": {
-                "label": "",
+                "label": "Backup database di Readarr",
                 "button": "Controlla Readarr",
                 "success": ""
             },
             "TrigSonarrBackup": {
-                "label": "",
+                "label": "Backup database di Sonarr",
                 "button": "Controlla Sonarr",
                 "success": ""
             },
@@ -1001,8 +1002,8 @@
                 "success": ""
             },
             "TrigCustomCommand": {
-                "label": "",
-                "button": "",
+                "label": "Comando personalizzato: {name}",
+                "button": "Esegui Comando",
                 "success": ""
             },
             "TrigAutoUpdate": {
@@ -1040,7 +1041,9 @@
                 "success": ""
             },
             "TrigCFSyncSonarr": {
-                "button": "Sincronizza tutte le istanze Sonarr"
+                "button": "Sincronizza tutte le istanze Sonarr",
+                "label": "Sincronizzazione di profili e formati in Sonarr",
+                "success": "Sincronizzazione di profili e formati in Sonarr inizializzata."
             }
         },
         "titles": {
@@ -1137,7 +1140,7 @@
         "NameInUseByInstance": "",
         "APIKeyMustBeCountCharacters": "",
         "TokenMustBeCountCharacters": "Token deve essere di {count} caratteri o più lungo.",
-        "LeavePage": "",
+        "LeavePage": "Vuoi lasciare questa pagina?",
         "Landing": {
             "SelectASection": "",
             "Welcome": "Benvenuto, {username}!"
@@ -1156,7 +1159,7 @@
             "SnapshotApps": "",
             "FileWatcher": "",
             "Endpoints": "",
-            "Commands": "",
+            "Commands": "Comandi",
             "Services": "Servizi",
             "Actions": "Azioni",
             "Integrations": "Integrazioni",
@@ -1166,7 +1169,7 @@
             "System": "Sistema",
             "TrustProfile": "",
             "Landing": "Home Notifiarr",
-            "UnsavedChanges": ""
+            "UnsavedChanges": "Modifiche non salvate"
         },
         "pageDescription": {
             "Configuration": "",
@@ -1202,7 +1205,7 @@
             "ProfileUpdated": "",
             "EnterCurrentPassword": "",
             "ProxyAuthDisabled": "",
-            "Addit": "",
+            "Addit": "Aggiungilo.",
             "SeeWikiForAuthProxyHelp": "",
             "ShowMeMore": "Mostrami di più.",
             "ShowMeLess": "Mostrami di meno."
@@ -1292,7 +1295,7 @@
         "MySQL": {
             "title": "MySQL",
             "description": "",
-            "addInstance": "",
+            "addInstance": "Aggiungi Server MySQL",
             "name": {
                 "label": "Nome Server",
                 "description": "Nome del server MySQL.",
@@ -1430,7 +1433,7 @@
         "daysOfMonth": "Giorni del mese",
         "frequency": "Frequenza",
         "selectAFrequency": "",
-        "AddATime": "",
+        "AddATime": "Aggiungi un orario",
         "empty": "",
         "required": {
             "daysOfWeek": "Devi selezionare almeno un giorno della settimana.",
@@ -1448,11 +1451,11 @@
         "times": {
             "noneSelected": "(nessuno selezionato)",
             "noDaysSelected": "(nessun giorno selezionato)",
-            "everyMinute": "",
-            "everyHour": "",
-            "everyDay": "",
-            "everyWeek": "",
-            "everyMonth": ""
+            "everyMinute": "{count, plural, =1 {Una volta} other {# volte}} ogni minuto al secondo {times}",
+            "everyHour": "{count, plural, =1 {Una volta} other {# volte}} ogni ora al minuto:secondi {times}",
+            "everyDay": "{count, plural, =1 {Una volta} other {# volte}} ogni giorno all'ora {times}",
+            "everyWeek": "{count, plural, =1 {Una volta} other {# volte}} ogni settimana il {daysOfWeek} all'ora {times}",
+            "everyMonth": "{count, plural, =1 {Una volta} other {# volte}} ogni mese nei giorni {daysOfMonth} all'ora {times}"
         }
     },
     "metrics": {
@@ -1464,7 +1467,7 @@
             "empty": ""
         },
         "apiHits": {
-            "title": "",
+            "title": "Richieste API",
             "description": "",
             "empty": ""
         },
@@ -1508,9 +1511,11 @@
         },
         "button": {
             "delete": "Elimina",
-            "add": "Aggiungi"
+            "add": "Aggiungi",
+            "download": "Download"
         },
-        "NoFileSelected": "Nessun file selezionato."
+        "NoFileSelected": "Nessun file selezionato.",
+        "deleteConfirm": "Sei sicuro di voler eliminare questo file? Questa azione non può essere annullata."
     },
     "ProcessList": {
         "footer": "{count} processi trovati."
