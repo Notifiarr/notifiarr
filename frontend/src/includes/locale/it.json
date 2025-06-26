@@ -635,7 +635,7 @@
         "LastExecution": "",
         "title": "Lista Comandi",
         "addInstance": "Crea Comando",
-        "DeleteCommand": "",
+        "DeleteCommand": "Elimina Comando",
         "description": "",
         "Executions": "",
         "neverExecuted": "mai eseguito",
@@ -831,7 +831,7 @@
                 "description": "",
                 "placeholder": "127.0.0.1",
                 "tooltip": "",
-                "required": ""
+                "required": "Un host o un indirizzo IP è richiesto."
             },
             "count": {
                 "label": "",
@@ -1326,7 +1326,7 @@
             "title": "Nvidia",
             "description": "",
             "disabled": {
-                "label": "",
+                "label": "Snapshot GPU",
                 "description": ""
             },
             "busIds": {
