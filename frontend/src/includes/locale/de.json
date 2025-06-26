@@ -2,7 +2,7 @@
     "phrases": {
         "UpdatingBackEnd": "",
         "LeavePage": "",
-        "Changed": "",
+        "Changed": "Geändert",
         "New": "",
         "Invalid": "",
         "DeleteInstance": "",
@@ -22,15 +22,15 @@
         "TryRefreshingThePage": "",
         "Every6Hours": "",
         "Every3Hours": "",
-        "ConfirmReloadBody": "",
+        "ConfirmReloadBody": "Willst du den Client wirklich neu laden?",
         "ReloadSuccess": "",
-        "APIKeyMustBeCountCharacters": "",
+        "APIKeyMustBeCountCharacters": "API-Schlüssel muss {count} Zeichen oder länger sein.",
         "TokenMustBeCountCharacters": "",
         "Reloading": "",
         "FailedToReload": "",
         "ConfirmReload": "",
         "ConfirmShutdown": "",
-        "ConfirmShutdownBody": "",
+        "ConfirmShutdownBody": "Willst du den Client wirklich herunterfahren? Du musst ihn dann auf dem Host, auf dem er läuft, neu starten.",
         "ShutdownSuccess": "",
         "FailedToShutdown": "",
         "LoginHelp": "",
@@ -120,7 +120,7 @@
             "Configuration": "",
             "General": "",
             "Network": "",
-            "Dark": ""
+            "Dark": "Dunkel"
         },
         "snapshot": {
             "timeout": {
@@ -158,26 +158,26 @@
         "bindAddr": {
             "description": "",
             "placeholder": "",
-            "label": ""
+            "label": "Adresse verknüpfen"
         },
         "errors": {
             "InvalidCreds": "",
             "LoginRequestTimedOut": "",
             "LoginFailed": "",
             "ProfileReqTimedOut": "",
-            "AnUnknownErrorOccurred": "",
+            "AnUnknownErrorOccurred": "Ein unbekannter Fehler ist aufgetreten",
             "ConfigUpdateFailed": "",
             "PleaseEnterBothUsernameAndPassword": ""
         },
         "apiKey": {
-            "label": "",
-            "description": "",
+            "label": "API-Schlüssel",
+            "description": "API-Schlüssel vom deinem Notifiarr.com Konto.",
             "tooltip": "",
             "placeholder": ""
         },
         "extraKeys": {
             "label": "",
-            "description": "",
+            "description": "Zusätzliche API-Schlüssel für Integrationen von Drittanbietern. Aufteilen auf neue Zeile.",
             "placeholder": ""
         },
         "quiet": {
@@ -186,7 +186,7 @@
             "tooltip": ""
         },
         "logFile": {
-            "label": "",
+            "label": "Anwendungsprotokolldatei",
             "description": "",
             "placeholder": ""
         },
@@ -286,7 +286,7 @@
                 "password": "",
                 "header": ""
             },
-            "label": "",
+            "label": "Authentifizierungstyp",
             "description": "",
             "option_desc": {
                 "password": "",
@@ -301,8 +301,8 @@
             "tooltip": ""
         },
         "title": {
-            "Authentication": "",
-            "Authorization": ""
+            "Authentication": "Authentifizierung",
+            "Authorization": "Autorisierung"
         },
         "header": {
             "label": "",
@@ -334,15 +334,15 @@
                 "placeholder": ""
             },
             "title": "",
-            "addInstance": "",
+            "addInstance": "Prowlarr Instanz hinzufügen",
             "name": {
                 "label": "",
                 "description": "",
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
-                "description": "",
+                "label": "API-Schlüssel",
+                "description": "API-Schlüssel für die Prowlarr Instanz",
                 "placeholder": ""
             }
         },
@@ -353,7 +353,7 @@
                 "label": "",
                 "placeholder": ""
             },
-            "addInstance": "",
+            "addInstance": "Radarr Instanz hinzufügen",
             "name": {
                 "label": "",
                 "description": "",
@@ -365,14 +365,14 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
-                "description": "",
+                "label": "API-Schlüssel",
+                "description": "API-Schlüssel für die Radarr Instanz.",
                 "placeholder": ""
             },
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "admin",
                 "tooltip": ""
             }
         },
@@ -381,7 +381,7 @@
                 "label": "",
                 "description": "",
                 "tooltip": "",
-                "placeholder": ""
+                "placeholder": "admin"
             },
             "name": {
                 "label": "",
@@ -394,12 +394,12 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
-                "description": "",
+                "label": "API-Schlüssel",
+                "description": "API-Schlüssel für die Readarr Instanz.",
                 "placeholder": ""
             },
             "title": "",
-            "addInstance": "",
+            "addInstance": "Readarr Instanz hinzufügen",
             "password": {
                 "label": "",
                 "description": "",
@@ -408,8 +408,8 @@
         },
         "Sonarr": {
             "apiKey": {
-                "description": "",
-                "label": "",
+                "description": "API-Schlüssel für die Sonarr Instanz.",
+                "label": "API-Schlüssel",
                 "placeholder": ""
             },
             "name": {
@@ -425,7 +425,7 @@
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "admin",
                 "tooltip": ""
             },
             "password": {
@@ -434,16 +434,16 @@
                 "placeholder": ""
             },
             "title": "",
-            "addInstance": ""
+            "addInstance": "Sonarr Instanz hinzufügen"
         },
         "Lidarr": {
             "apiKey": {
-                "label": "",
-                "description": "",
+                "label": "API-Schlüssel",
+                "description": "API-Schlüssel für die Lidarr Instanz",
                 "placeholder": ""
             },
             "title": "",
-            "addInstance": "",
+            "addInstance": "Lidarr Instanz hinzufügen",
             "name": {
                 "label": "",
                 "description": "",
@@ -457,7 +457,7 @@
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "admin",
                 "tooltip": ""
             },
             "password": {
@@ -470,7 +470,7 @@
     "Downloaders": {
         "Qbittorrent": {
             "title": "",
-            "addInstance": "",
+            "addInstance": "Qbittorrent Instanz hinzufügen",
             "name": {
                 "description": "",
                 "label": "",
@@ -494,7 +494,7 @@
         },
         "SabNZB": {
             "title": "",
-            "addInstance": "",
+            "addInstance": "SabNZB Instanz hinzufügen",
             "url": {
                 "label": "",
                 "description": "",
@@ -506,13 +506,13 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
-                "description": "",
+                "label": "API-Schlüssel",
+                "description": "API-Schlüssel für die SabNZB Instanz.",
                 "placeholder": ""
             }
         },
         "Rtorrent": {
-            "addInstance": "",
+            "addInstance": "Rtorrent Instanz hinzufügen",
             "title": "",
             "name": {
                 "label": "",
@@ -542,7 +542,7 @@
                 "label": ""
             },
             "title": "",
-            "addInstance": "",
+            "addInstance": "Transmission Instanz hinzufügen",
             "name": {
                 "label": "",
                 "description": "",
@@ -580,7 +580,7 @@
         },
         "NZBGet": {
             "title": "",
-            "addInstance": "",
+            "addInstance": "NZBGet Instanz hinzufügen",
             "name": {
                 "label": "",
                 "description": "",
@@ -635,7 +635,7 @@
             "seconds": "",
             "megabytes": "",
             "bytes": "",
-            "Daily": "",
+            "Daily": "Täglich",
             "custom": "",
             "Off": "",
             "minutes": "",
@@ -718,7 +718,7 @@
                 "description": "",
                 "placeholder": ""
             },
-            "addInstance": "",
+            "addInstance": "MySQL-Server hinzufügen",
             "title": "",
             "description": ""
         },
@@ -785,7 +785,7 @@
             "required": ""
         },
         "disabled": {
-            "label": "",
+            "label": "Aktiv",
             "description": ""
         },
         "pipe": {
@@ -807,7 +807,7 @@
     "metrics": {
         "apiHits": {
             "empty": "",
-            "title": "",
+            "title": "API-Anfragen",
             "description": ""
         },
         "website": {
@@ -821,7 +821,7 @@
             "description": ""
         },
         "CountersReset": "",
-        "ApplicationUptime": "",
+        "ApplicationUptime": "Anwendungsbetriebszeit:  <b>{timeDuration}</b>",
         "logFiles": {
             "title": "",
             "description": "",
@@ -838,7 +838,7 @@
             "empty": ""
         },
         "apps": {
-            "title": "",
+            "title": "Anwendungsanfragen",
             "description": "",
             "empty": ""
         }
@@ -903,7 +903,7 @@
             "value": {
                 "description": "",
                 "placeholder": "",
-                "required": "",
+                "required": "Ein Host oder IP-Adresse ist erforderlich.",
                 "label": "",
                 "tooltip": ""
             },
@@ -958,7 +958,7 @@
         "tcp": {
             "value": {
                 "tooltip": "",
-                "required": "",
+                "required": "Ein Host und Port getrennt durch ein Doppelpunkt sind erforderlich.",
                 "label": "",
                 "description": "",
                 "placeholder": ""
@@ -967,7 +967,7 @@
         "process": {
             "value": {
                 "tooltip": "",
-                "required": "",
+                "required": "Ein Prozessname ist erforderlich.",
                 "label": "",
                 "description": "",
                 "placeholder": ""
@@ -1028,8 +1028,8 @@
             "VirtualizationSystem": ""
         },
         "ClientInformation": {
-            "title": "",
-            "Application": "",
+            "title": "Client Informationen",
+            "Application": "Anwendung",
             "Version": "",
             "Started": "",
             "Uptime": ""
@@ -1094,8 +1094,8 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "description": "",
-                "label": "",
+                "description": "API-Schlüssel für den Tautulli Dienst.",
+                "label": "API-Schlüssel",
                 "placeholder": ""
             },
             "description": "",
@@ -1152,7 +1152,7 @@
                 "success": "",
                 "options": {
                     "choose": "",
-                    "app": "",
+                    "app": "Anwendungsprotokolldatei.",
                     "debug": "",
                     "http": ""
                 }
@@ -1284,9 +1284,9 @@
     "buttons": {
         "Login": "",
         "Confirm": "",
-        "Close": "",
+        "Close": "Schliessen",
         "SaveChanges": "",
-        "Cancel": "",
+        "Cancel": "Abbrechen",
         "Save": "",
         "Execute": "",
         "HideMenu": "",
@@ -1308,7 +1308,7 @@
             "Configuration": "",
             "SiteTunnel": "",
             "StarrApps": "",
-            "Downloaders": "",
+            "Downloaders": "Download Anwendung",
             "MediaApps": "",
             "SnapshotApps": "",
             "FileWatcher": "",
@@ -1321,7 +1321,7 @@
             "TrustProfile": "",
             "Landing": "",
             "UnsavedChanges": "",
-            "Actions": ""
+            "Actions": "Aktionen"
         },
         "pageDescription": {
             "Configuration": "",
@@ -1388,10 +1388,10 @@
         "phrases": {
             "Connecting": "",
             "PrimaryTunnel": "",
-            "BackupTunnel": "",
+            "BackupTunnel": "Backup-Tunnel",
             "Ping": "",
             "Pinging": "",
-            "ActiveTunnel": "",
+            "ActiveTunnel": "Aktiver Tunnel: {tunnel}",
             "TunnelStats": "",
             "Disconnects": "",
             "ConnectionPoolSize": "",
@@ -1418,13 +1418,13 @@
         "daysOfWeek": "",
         "frequency": "",
         "selectAFrequency": "",
-        "AddATime": "",
+        "AddATime": "Uhrzeit hinzufügen",
         "empty": "",
         "ops": {
             "noSchedule": "",
             "minutely": "",
             "hourly": "",
-            "daily": "",
+            "daily": "Täglich",
             "weekly": "",
             "monthly": ""
         },
@@ -1457,7 +1457,7 @@
             "tooltip": ""
         },
         "title": "",
-        "addInstance": "",
+        "addInstance": "Relay-URL hinzufügen",
         "DeleteEndpoint": "",
         "badge": {
             "header": "",
@@ -1481,7 +1481,7 @@
         "query": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "API-Schlüssel=1234567890",
             "tooltip": ""
         },
         "body": {
@@ -1489,5 +1489,15 @@
             "description": "",
             "placeholder": ""
         }
+    },
+    "LogFiles": {
+        "AddMoreLines": "Mehr Linien hinzufügen",
+        "button": {
+            "add": "Hinzufügen"
+        },
+        "titles": {
+            "Age": "Alter"
+        },
+        "deleteConfirm": "Willst du diese Datei wirklich löschen? Das kann nicht rückgängig gemacht werden."
     }
 }
