@@ -729,9 +729,9 @@
         "addInstance": "Ajouter une URL de relais",
         "DeleteEndpoint": "Supprimer l'URL",
         "badge": {
-            "header": "{count, plural, =1 {1 en-tête} autre {# en-têtes}}",
-            "query": "{count, plural, =1 {1 requête} autre {# requêtes}}",
-            "body": "{count, plural, =1 {1 caractère} autre {# caractères}}"
+            "header": "{count, plural, =1 {1 en-tête} other {# en-têtes}}",
+            "query": "{count, plural, =1 {1 requête} other {# requêtes}}",
+            "body": "{count, plural, =1 {1 caractère} other {# caractères}}"
         },
         "name": {
             "label": "Nom",
