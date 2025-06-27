@@ -153,15 +153,17 @@ textarea:focus {
   --bs-accordion-active-color: #04482c !important;
   --bs-accordion-bg: #cdf0cd42 !important;
   --bs-accordion-border-color: #6cf878 !important;
-  --bs-accordion-active-border-color: #6cf878 !important;
+  --bs-accordion-active-border-color: #a5f4ca !important;
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(169, 241, 215, 0.25) !important;
 }
 
 .dark-mode .accordion {
   --bs-accordion-active-bg: #03331f !important;
-  --bs-accordion-active-color: #9df6c8 !important;
+  --bs-accordion-active-color: #57b987 !important;
   --bs-accordion-bg: #212921 !important;
   --bs-accordion-border-color: #659369 !important;
   --bs-accordion-active-border-color: #659369 !important;
+  --bs-accordion-btn-focus-box-shadow: 0 0 0 0.25rem rgba(169, 241, 215, 0.25) !important;
 }
 
 .dark-mode .accordion-body {
