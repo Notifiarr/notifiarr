@@ -65,8 +65,10 @@
         form.username == 'webauth' ||
         form.username == 'noauth' ||
         form.username.includes(':') ||
-        // Make sure the auth type changed.
-        (form.authType === Auth.noauth && $profile?.upstreamType === Auth.noauth) ||
+        // Make sure the auth type changed, or upstreams changed.
+        (form.authType === Auth.noauth &&
+          $profile?.upstreamType === Auth.noauth &&
+          form.upstreams === $profile?.upstreamIp) ||
         // Enable the save button.
         false,
     )
