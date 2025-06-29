@@ -20,7 +20,7 @@
         },
         "instance-options": {
             "interval": {
-                "label": "",
+                "label": "Intervallo Controllo Salute",
                 "description": ""
             },
             "timeout": {
@@ -728,7 +728,7 @@
             "interval": {
                 "short": "Intervallo",
                 "title": "Controlla Intervallo",
-                "tooltip": ""
+                "tooltip": "Quanto spesso questo servizio è controllato."
             },
             "name": "Nome Servizio",
             "state": {
@@ -772,14 +772,14 @@
             "description": "",
             "label": "Controlla Timeout"
         },
-        "title": "",
+        "title": "Controlli Salute",
         "DeleteCheck": "",
         "addInstance": "",
         "description": "",
         "processListLink": "",
         "interval": {
             "label": "Controlla Intervallo",
-            "description": ""
+            "description": "Quanto spesso controllare il servizio."
         },
         "name": {
             "label": "Controlla Nome",
@@ -1074,7 +1074,7 @@
         "NoStayHere": "No! Rimani qui",
         "YesDeleteMyChanges": "Sì! Elimina le mie modifiche",
         "Execute": "Esegui",
-        "HideMenu": "",
+        "HideMenu": "Nascondi Menu",
         "ShowMenu": "Mostra Menu",
         "ShowOutput": "",
         "HideOutput": "",
