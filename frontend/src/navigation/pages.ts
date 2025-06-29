@@ -19,6 +19,7 @@ import Landing, { page as LandingPage } from '../Landing.svelte'
 import type { Page } from './nav.svelte'
 import ProcessList, { page as ProcessListPage } from '../pages/stubs/ProcessList.svelte'
 import ClientInfo, { page as ClientInfoPage } from '../pages/stubs/ClientInfo.svelte'
+import ApiDocs, { page as ApiDocsPage } from '../pages/stubs/ApiDocs.svelte'
 
 // Page structure for navigation with icons
 // 'id' (from page) is used for navigation AND translations.
@@ -51,6 +52,7 @@ export const others: Page[] = [
   { component: Landing, ...LandingPage },
   { component: ProcessList, ...ProcessListPage },
   { component: ClientInfo, ...ClientInfoPage },
+  { component: ApiDocs, ...ApiDocsPage },
 ]
 
 export const allPages: Page[] = [...settings, ...insights, ...others]

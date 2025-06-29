@@ -128,7 +128,7 @@
   {@const list = desc
     ? resp.body.trimEnd().split('\n')
     : resp.body.trimEnd().split('\n').reverse()}
-  {@const lineNumberWidth = Math.floor(Math.log10(list.length)) + 1 + 'ch'}
+  {@const lineNumberWidth = Math.floor(Math.log10(list.length)) + 1}
   <Row>
     <Col sm={12} md="auto" class="mb-2">
       <InputGroup style="width: auto !important;">
@@ -237,11 +237,13 @@
   </Row>
 
   <!-- File content is here. -->
-  <div class="log-file-content" style="--line-number-width: {lineNumberWidth}">
-    <ListGroup flush numbered class="ps-0 overflow-auto">
+  <div class="log-file-content" style="--line-number-width: {lineNumberWidth}ch;">
+    <ListGroup flush numbered class="ps-0 overflow-auto overflow-y-hidden">
       {#each list as line}
         <ListGroupItem class="p-0 border-0 lh-1">
-          <span class="li-content {colorLine(line)}">
+          <span
+            class="d-inline-block {colorLine(line)}"
+            style="margin-left: {lineNumberWidth + 1}ch;">
             <pre class="m-0 pre" class:wrap>{line}</pre>
           </span>
         </ListGroupItem>
@@ -266,11 +268,6 @@
     position: relative;
   }
 
-  .li-content {
-    display: inline-block;
-    margin-left: 2em;
-  }
-
   .log-file-content :global(.list-group-item)::before {
     color: var(--bs-secondary-color);
     font-family: monospace;
@@ -289,10 +286,15 @@
     white-space: pre-wrap;
     word-break: break-all;
     word-wrap: break-word;
+    scrollbar-width: none;
   }
 
   pre.wrap {
     white-space: pre !important;
     overflow: visible;
+  }
+
+  .log-file-content :global(.overflow-y-hidden) {
+    overflow-y: hidden !important;
   }
 </style>

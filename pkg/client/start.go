@@ -238,8 +238,8 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	if c.Flags.Restart {
 		return output, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
-			Args: []string{"--updated", "--delay", "5s", "--config", c.Flags.ConfigFile},
-		})
+			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
+		}, os.Getppid())
 	}
 
 	// Parse the config file and environment variables.

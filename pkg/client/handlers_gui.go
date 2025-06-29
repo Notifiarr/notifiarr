@@ -19,7 +19,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/bindata/docs"
 	"github.com/Notifiarr/notifiarr/pkg/checkapp"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
@@ -30,9 +29,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"github.com/shirou/gopsutil/v4/disk"
-	"github.com/swaggo/swag"
 	"golift.io/cnfgfile"
-	"golift.io/version"
 )
 
 // @title Notifiarr Client GUI API Documentation
@@ -671,32 +668,4 @@ func (c *Client) indexPage(_ context.Context, response http.ResponseWriter, requ
 	}
 
 	frontend.IndexHandler(response, request)
-}
-
-func (c *Client) handlerSwaggerDoc(response http.ResponseWriter, request *http.Request) {
-	instance := strings.TrimSuffix(mux.Vars(request)["instance"], ".json")
-	if instance == "" {
-		instance = "api"
-	}
-
-	if version.Version == "" {
-		docs.SwaggerInfoapi.Version = "v.dev"
-	} else {
-		docs.SwaggerInfoapi.Version = "v" + version.Version + "-" + version.Revision
-	}
-
-	docs.SwaggerInfoapi.BasePath = c.Config.URLBase
-	docs.SwaggerInfoapi.Host = request.Host
-
-	doc, err := swag.ReadDoc(instance)
-	if err != nil {
-		http.Error(response, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	_, _ = response.Write([]byte(doc))
-}
-
-func (c *Client) handleSwaggerIndex(response http.ResponseWriter, request *http.Request) {
-	// c.renderTemplate(request.Context(), response, request, "swagger/index.html", "")
 }

@@ -21,4 +21,6 @@
 <CardBody>
   <h4><T id="phrases.Landing.Welcome" username={$profile?.username} /></h4>
   <p><T id="phrases.Landing.SelectASection" /></p>
+
+  <go-to page="apidocs">API Docs</go-to>
 </CardBody>
