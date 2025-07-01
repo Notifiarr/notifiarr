@@ -31,8 +31,6 @@ jobs:
         env:
           FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
         run: |
-          # Swagger docs
-          go generate ./pkg/bindata/docs
           # The API defs won't build without a dist folder, and the next step creates it for real.
           mkdir -p ./frontend/dist
           echo "Fake frontend build." > ./frontend/dist/index.html

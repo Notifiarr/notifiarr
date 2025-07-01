@@ -176,7 +176,8 @@
       "System": "System",
       "TrustProfile": "Trust Profile",
       "Landing": "Notifiarr Home",
-      "UnsavedChanges": "Unsaved Changes"
+      "UnsavedChanges": "Unsaved Changes",
+      "ApiDocs": "Client API Documentation"
     },
     "pageDescription": {
       "Configuration": "Configure your Notifiarr client settings here.",

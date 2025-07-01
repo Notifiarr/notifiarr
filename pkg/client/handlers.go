@@ -93,10 +93,6 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/ajax/{path:cmdstats|cmdargs}/{hash}", c.handleCommandStats).Methods("GET")
 	gui.HandleFunc("/runCommand/{hash}", c.handleRunCommand).Methods("POST")
 	gui.HandleFunc("/ws", c.handleWebSockets).Queries("source", "{source}", "fileId", "{fileId}").Methods("GET")
-	gui.HandleFunc("/docs/json/{instance}", c.handlerSwaggerDoc).Methods("GET")
-	gui.HandleFunc("/ui.json", c.handlerSwaggerDoc).Methods("GET")
-	gui.Handle("/docs", http.RedirectHandler(path.Join(base, "ui", "docs")+"/", http.StatusFound))
-	gui.HandleFunc("/docs/", c.handleSwaggerIndex).Methods("GET")
 	gui.PathPrefix("/").HandlerFunc(c.notFound)
 }
 
