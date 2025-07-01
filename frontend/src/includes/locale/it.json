@@ -169,7 +169,7 @@
             "tooltip": ""
         },
         "logFileMb": {
-            "label": "",
+            "label": "Dimensione File Log",
             "description": "",
             "tooltip": ""
         },
@@ -761,7 +761,7 @@
         "recheckFailed": "",
         "checkInitiated": "",
         "nextRefresh": "Nuovo aggiornamento in {timeDuration}.",
-        "refreshInterval": "",
+        "refreshInterval": "Intervallo di aggiornamento",
         "cardsView": "",
         "classicView": "",
         "hideAllOutputs": "",
@@ -891,9 +891,9 @@
                 "label": "Svuota cestino Plex"
             },
             "TrigUploadFile": {
-                "label": "",
+                "label": "File log caricato sul sito web",
                 "button": "",
-                "success": "",
+                "success": "File log caricato sul sito web.",
                 "options": {
                     "choose": "Scegli un file da caricare",
                     "app": "",
@@ -1131,7 +1131,7 @@
         "New": "Nuovo",
         "Invalid": "Non valido",
         "DeleteInstance": "Elimina Istanza",
-        "DeletedNumber": "",
+        "DeletedNumber": "Eliminati {number}",
         "ItsGone": "",
         "URLMustBeginWithHttp": "URL deve iniziare con http:// o https://",
         "NameMustNotBeEmpty": "Nome non può essere vuoto.",
@@ -1165,7 +1165,7 @@
             "Integrations": "Integrazioni",
             "Monitoring": "",
             "Metrics": "",
-            "LogFiles": "",
+            "LogFiles": "File Log",
             "System": "Sistema",
             "TrustProfile": "",
             "Landing": "Home Notifiarr",
@@ -1462,7 +1462,7 @@
         "CountersReset": "",
         "ApplicationUptime": "",
         "logFiles": {
-            "title": "",
+            "title": "File Log",
             "description": "",
             "empty": ""
         },
@@ -1515,7 +1515,10 @@
             "download": "Download"
         },
         "NoFileSelected": "Nessun file selezionato.",
-        "deleteConfirm": "Sei sicuro di voler eliminare questo file? Questa azione non può essere annullata."
+        "deleteConfirm": "Sei sicuro di voler eliminare questo file? Questa azione non può essere annullata.",
+        "DeleteFile": "Elimina {filePath}",
+        "deleteSuccess": "File Log eliminato: {file}",
+        "uploadSuccess": "Caricando file log: {file}"
     },
     "ProcessList": {
         "footer": "{count} processi trovati."
