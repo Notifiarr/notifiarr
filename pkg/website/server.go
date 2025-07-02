@@ -24,6 +24,10 @@ const (
 	RetryDelay = 222 * time.Millisecond
 	// APIKeyLength is the string length of a valid notifiarr API key.
 	APIKeyLength = 36
+	// MaxTimeout is the maximum timeout for a request to notifiarr.com.
+	MaxTimeout = 3 * time.Minute
+	// MinTimeout is the minimum timeout for a request to notifiarr.com.
+	MinTimeout = 10 * time.Second
 )
 
 // Errors returned by this library.
@@ -146,7 +150,7 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log b
 		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, s.Config.Timeout.Duration)
+	ctx, cancel := context.WithTimeout(ctx, s.getTimeout())
 	defer cancel()
 
 	code, body, err := s.sendJSON(ctx, s.Config.BaseURL+uri, post, log)
@@ -160,6 +164,22 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log b
 	}
 
 	return resp, err
+}
+
+func (s *Server) getTimeout() time.Duration {
+	timeout := s.Config.Timeout.Duration
+	if timeout > MaxTimeout {
+		timeout = MaxTimeout
+	} else if timeout < MinTimeout {
+		timeout = MinTimeout
+	}
+
+	// As the channel fills up, we reduce the timeout proportionally to avoid long waits.
+	channelUtilization := float64(len(s.sendData)) / float64(cap(s.sendData))
+	// Minimum timeout is 8% of original, maximum is 100% of original
+	timeoutMultiplier := 1.0 - (channelUtilization * 0.92)
+
+	return time.Duration(float64(timeout) * timeoutMultiplier)
 }
 
 // SendData puts a send-data request to notifiarr.com into a channel queue.
