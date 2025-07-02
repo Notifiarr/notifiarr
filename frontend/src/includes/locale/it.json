@@ -24,7 +24,7 @@
                 "description": ""
             },
             "timeout": {
-                "label": "",
+                "label": "Timeout Richiesta",
                 "description": ""
             },
             "validSsl": {
@@ -105,7 +105,7 @@
             "LoginFailed": "",
             "ProfileReqTimedOut": "",
             "AnUnknownErrorOccurred": "Si è verificato un errore sconosciuto",
-            "ConfigUpdateFailed": "",
+            "ConfigUpdateFailed": "Aggiornamento della configurazione fallita: {error}",
             "PleaseEnterBothUsernameAndPassword": ""
         },
         "apiKey": {
@@ -201,7 +201,7 @@
                 "tooltip": ""
             },
             "interval": {
-                "label": "",
+                "label": "Intervallo di aggiornamento",
                 "description": "",
                 "tooltip": ""
             },
@@ -228,7 +228,7 @@
             "name": {
                 "label": "Nome",
                 "description": "",
-                "required": ""
+                "required": "Un comando è richiesto."
             }
         },
         "service": {
@@ -300,7 +300,7 @@
             "UniqueID": "",
             "Platform": "Piattaforma",
             "KernelVersion": "Versione Kernel",
-            "VirtualizationSystem": ""
+            "VirtualizationSystem": "Sistema di Virtualizzazione"
         },
         "ClientInformation": {
             "title": "",
@@ -320,7 +320,7 @@
         "StartupParams": {
             "title": "Parametri di Avvio",
             "BinaryPath": "",
-            "ConfigFile": "",
+            "ConfigFile": "File di Configurazione",
             "EnvironmentPrefix": "",
             "ExtraConfigFiles": "",
             "CustomAssets": "",
@@ -637,7 +637,7 @@
         "addInstance": "Crea Comando",
         "DeleteCommand": "Elimina Comando",
         "description": "",
-        "Executions": "",
+        "Executions": "Esecuzioni: {count}",
         "neverExecuted": "mai eseguito",
         "enterCommandArguments": "",
         "commandRequiresArguments": "",
@@ -693,7 +693,7 @@
             "required": ""
         },
         "timeout": {
-            "label": "",
+            "label": "Timeout Richiesta",
             "description": ""
         },
         "method": {
@@ -762,8 +762,8 @@
         "checkInitiated": "",
         "nextRefresh": "Nuovo aggiornamento in {timeDuration}.",
         "refreshInterval": "Intervallo di aggiornamento",
-        "cardsView": "",
-        "classicView": "",
+        "cardsView": "Visualizzazione a Carte",
+        "classicView": "Visualizzazione Classica",
         "hideAllOutputs": "",
         "showAllOutputs": ""
     },
@@ -811,8 +811,8 @@
                 "placeholder": "Content-Type: application/json"
             },
             "codes": {
-                "label": "",
-                "description": "",
+                "label": "Codici di Risposta Accettabili",
+                "description": "Qualunque codice qui è considerato accettabile. Se il servizio risponde con un altro codice sarà generata una notifica.",
                 "required": ""
             }
         },
@@ -892,7 +892,7 @@
             },
             "TrigUploadFile": {
                 "label": "File log caricato sul sito web",
-                "button": "",
+                "button": "Carica Log Ora",
                 "success": "File log caricato sul sito web.",
                 "options": {
                     "choose": "Scegli un file da caricare",
@@ -911,7 +911,7 @@
             },
             "TrigDashboard": {
                 "label": "",
-                "button": "",
+                "button": "Aggiorna dashboard",
                 "success": ""
             },
             "TrigMDBListSync": {
@@ -936,11 +936,11 @@
             },
             "TrigStop": {
                 "label": "",
-                "button": ""
+                "button": "Ricarica client"
             },
             "TrigSnapshot": {
                 "label": "",
-                "button": "",
+                "button": "Aggiorna snapshot",
                 "success": ""
             },
             "TrigProwlarrCorrupt": {
@@ -1049,11 +1049,11 @@
         "titles": {
             "Triggers": "",
             "Timers": "",
-            "Schedules": "",
+            "Schedules": "Programmi",
             "SiteCrons": "",
             "Counter": "",
             "Interval": "Intervallo",
-            "Schedule": ""
+            "Schedule": "Programma"
         },
         "descriptions": {
             "Triggers": "",
@@ -1094,7 +1094,7 @@
         },
         "TestResult": "",
         "Test": "Test",
-        "Expression": "",
+        "Expression": "Espressione",
         "Result": "Risultato",
         "NoMatch": "Nessuna Corrispondenza"
     },
@@ -1103,19 +1103,19 @@
         "LoggingIn": "",
         "LoggedIn": "",
         "Loading": "Caricamento...",
-        "UpdateBackend": "",
+        "UpdateBackend": "Aggiorna Backend",
         "BackEndUpdated": "",
-        "UpdatingBackEnd": "",
+        "UpdatingBackEnd": "Aggiornando il back-end...",
         "FailedToUpdateBackEnd": "",
         "TryRefreshingThePage": "",
-        "ConfigurationSavedReloading": "",
-        "ConfigurationSaved": "",
+        "ConfigurationSavedReloading": "Configurazione salvata! Ricaricando client...",
+        "ConfigurationSaved": "Configurazione salvata {timeDuration} fa!",
         "SavingConfiguration": "Salvando la configurazione...",
         "Version": "Versione {version}",
         "Every12Hours": "Ogni 12 ore",
         "Every6Hours": "Ogni 6 ore",
         "Every3Hours": "Ogni 3 ore",
-        "Reloading": "",
+        "Reloading": "Ricaricando...",
         "FailedToReload": "",
         "ConfirmReload": "",
         "ConfirmReloadBody": "",
@@ -1381,7 +1381,7 @@
         },
         "titles": {
             "RegularExpressionTester": "",
-            "Expression": "",
+            "Expression": "Espressione",
             "TestString": ""
         },
         "path": {
@@ -1428,7 +1428,7 @@
         }
     },
     "scheduler": {
-        "title": "",
+        "title": "Programma",
         "daysOfWeek": "Giorni della settimana",
         "daysOfMonth": "Giorni del mese",
         "frequency": "Frequenza",
@@ -1478,7 +1478,7 @@
         },
         "website": {
             "title": "",
-            "description": "",
+            "description": "Richieste a Notifiarr.com.",
             "empty": ""
         },
         "fileWatcher": {
@@ -1512,13 +1512,18 @@
         "button": {
             "delete": "Elimina",
             "add": "Aggiungi",
-            "download": "Download"
+            "download": "Download",
+            "upload": "Carica",
+            "reload": "Ricarica"
         },
         "NoFileSelected": "Nessun file selezionato.",
         "deleteConfirm": "Sei sicuro di voler eliminare questo file? Questa azione non può essere annullata.",
         "DeleteFile": "Elimina {filePath}",
         "deleteSuccess": "File Log eliminato: {file}",
-        "uploadSuccess": "Caricando file log: {file}"
+        "uploadSuccess": "Caricando file log: {file}",
+        "AddMoreLines": "Aggiungi più linee",
+        "SelectFile": "Selezionate un file per vedere cosa contiene!",
+        "Reload": "Ricarica file log"
     },
     "ProcessList": {
         "footer": "{count} processi trovati."
