@@ -178,9 +178,9 @@
             "ProfileReqTimedOut": "La demande de profil a expiré",
             "InvalidCreds": "Nom d'utilisateur ou mot de passe invalide.",
             "LoginRequestTimedOut": "La demande de connexion a expiré",
-            "LoginFailed": "Échec de la connexion : {error}",
+            "LoginFailed": "Échec de la connexion: {error}",
             "AnUnknownErrorOccurred": "Une erreur inconnue s'est produite",
-            "ConfigUpdateFailed": "Échec de la mise à jour de la configuration : {error}",
+            "ConfigUpdateFailed": "Échec de la mise à jour de la configuration: {error}",
             "PleaseEnterBothUsernameAndPassword": "Veuillez saisir à la fois le nom d'utilisateur et le mot de passe."
         },
         "apiKey": {
@@ -328,7 +328,7 @@
         "hostId": {
             "label": "ID d'hôte",
             "description": "Le paramètre ID d'hôte est utilisé pour identifier de manière unique cette installation client.",
-            "tooltip": "Il est déconseillé de modifier cette valeur ; elle devrait être trouvée automatiquement. Ne copiez pas cette valeur sur une autre installation du client Notifiarr."
+            "tooltip": "Il est déconseillé de modifier cette valeur; elle devrait être trouvée automatiquement. Ne copiez pas cette valeur sur une autre installation du client Notifiarr."
         },
         "serial": {
             "label": "Fils parallèles",
@@ -428,12 +428,12 @@
         },
         "clock": {
             "short": {
-                "ms": "{millisecondes}ms",
-                "s": "{secondes}s",
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
                 "m": "{minutes}m",
-                "h": "{heures}h",
-                "d": "{jours}j",
-                "w": "{semaines}s"
+                "h": "{hours}h",
+                "d": "{days}j",
+                "w": "{weeks}s"
             },
             "days": {
                 "Sunday": "Dimanche",
@@ -445,7 +445,7 @@
                 "Saturday": "Samedi"
             },
             "ago": "Il y a {timeDuration}",
-            "format": "{semaines}{jours}{heures}{minutes}{secondes}{millisecondes}"
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}"
         },
         "select-option": {
             "Off": "Désactivé",
@@ -467,11 +467,11 @@
         },
         "bytes": {
             "short": {
-                "B": "{octets} B",
-                "KB": "{octets} Ko",
-                "MB": "{octets} Mo",
-                "GB": "{octets} Go",
-                "TB": "{octets} To"
+                "B": "{bytes} B",
+                "KB": "{bytes} Ko",
+                "MB": "{bytes} Mo",
+                "GB": "{bytes} Go",
+                "TB": "{bytes} To"
             }
         }
     },
@@ -498,12 +498,12 @@
         "title": "Liste des commandes",
         "addInstance": "Créer une commande",
         "DeleteCommand": "Supprimer la commande",
-        "Executions": "Exécutions : {count}",
-        "Failures": "Échecs : {count}",
+        "Executions": "Exécutions: {count}",
+        "Failures": "Échecs: {count}",
         "LastExecution": "Dernière exécution",
         "neverExecuted": "jamais exécuté",
         "enterCommandArguments": "Entrer les arguments de commande",
-        "commandRequiresArguments": "Cette commande nécessite {nombre, pluriel, =1 {un argument. Saisissez-le ci-dessous.} autres {nombre d'arguments. Saisissez-les ci-dessous.}}",
+        "commandRequiresArguments": "Cette commande nécessite {count, plural, =1 {un argument. Saisissez-le ci-dessous.} other {# d'arguments. Saisissez-les ci-dessous.}}",
         "noOutput": "Aucune sortie pour le moment. Essayez d'exécuter la commande, puis cliquez sur « Actualiser ».",
         "refreshed": "rafraîchi il y a {timeDuration}",
         "regexMismatch": "L'argument ne correspond pas à l'expression régulière.",
@@ -516,7 +516,7 @@
             "label": "Commande",
             "description": "Commande à exécuter.",
             "placeholder": "echo 'Bonjour le monde !'",
-            "tooltip": "Il s'agit de la commande qui s'exécutera une fois déclenchée.<br />Cliquez sur l'icône de double-vérification pour exécuter la commande immédiatement. Une fois terminée, cliquez sur « Actualiser » et « Afficher la sortie » pour voir les résultats.<br /><br />Cochez la case pour encapsuler la commande dans un shell. Sous Windows, la commande sera exécutée avec <code>cmd.exe</code> et sous d'autres systèmes d'exploitation, avec <code>/bin/bash</code>. Ceci est utile pour les commandes qui nécessitent des fonctionnalités shell comme les pipes et les redirections. Des arguments positionnels personnalisés peuvent être définis au format suivant : <code>({regex})</code> ; il s'agit d'une expression régulière entourée d'accolades et de parenthèses, par exemple <code>({[az]})</code>. Ces arguments peuvent être renseignés par la personne qui exécute la commande, soit dans cette interface web, soit sur votre serveur de chat. Si une commande possède un argument, celui-ci est obligatoire ; S'il y a plusieurs arguments, ils sont tous obligatoires.<br /><br /> <h5>Exemples</h5>Commande utilisant deux arguments : <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />La commande ci-dessus permet à l'utilisateur d'effectuer n'importe quelle combinaison de <code>ls -la</code> sur <code>/tmp</code>, <code>/</code>, <code>/home</code> ou <code>/lib</code>.<br /> Cette commande peut être utilisée pour curler des sites Web à partir du conteneur Docker de travail : <code>/notifiarr --curl ({https?://[^ ;]+})</code>",
+            "tooltip": "Il s'agit de la commande qui s'exécutera une fois déclenchée.<br />Cliquez sur l'icône de double-vérification pour exécuter la commande immédiatement. Une fois terminée, cliquez sur Actualiser et Afficher la sortie pour voir les résultats.<br /><br />Cochez la case pour encapsuler la commande dans un shell. Sous Windows, la commande sera exécutée avec <code>cmd.exe</code> et sous d'autres systèmes d'exploitation, avec <code>/bin/bash</code>. Ceci est utile pour les commandes qui nécessitent des fonctionnalités shell comme les pipes et les redirections. Des arguments positionnels personnalisés peuvent être définis au format suivant: <code>({regex})</code>; il s'agit d'une expression régulière entourée d'accolades et de parenthèses, par exemple <code>({[a-z]})</code>. Ces arguments peuvent être renseignés par la personne qui exécute la commande, soit dans cette interface web, soit sur votre serveur de chat. Si une commande possède un argument, celui-ci est obligatoire; S'il y a plusieurs arguments, ils sont tous obligatoires.<br /><br /> <h5>Exemples</h5>Commande utilisant deux arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />La commande ci-dessus permet à l'utilisateur d'effectuer n'importe quelle combinaison de <code>ls -la</code> sur <code>/tmp</code>, <code>/</code>, <code>/home</code> ou <code>/lib</code>.<br /> Cette commande peut être utilisée pour curler des sites Web à partir du conteneur Docker de travail: <code>/notifiarr --curl ({https?://[^ ;]+})</code>",
             "required": "La commande est requise"
         },
         "notify": {
@@ -545,7 +545,7 @@
             "typeExpect": "Type/Attendre",
             "last": {
                 "short": "Dernier",
-                "title": "Dernière vérification : il y a {timeDuration}",
+                "title": "Dernière vérification: il y a {timeDuration}",
                 "tooltip": "Il y a combien de temps ce service a été vérifié.",
                 "description": "Service vérifié pour la dernière fois à"
             },
@@ -558,7 +558,7 @@
             "name": "Nom du service",
             "since": {
                 "short": "Depuis",
-                "title": "Durée dans l'état : {timeDuration}",
+                "title": "Durée dans l'état: {timeDuration}",
                 "tooltip": "Depuis combien de temps le service est dans cet état.",
                 "description": "Le service est dans cet état depuis"
             }
@@ -649,7 +649,7 @@
             "headers": {
                 "label": "En-têtes HTTP",
                 "description": "En-têtes de requête HTTP, 1 par ligne.",
-                "placeholder": "Type de contenu : application/json"
+                "placeholder": "Type de contenu: application/json"
             },
             "codes": {
                 "label": "Codes de réponse acceptables",
@@ -671,7 +671,7 @@
                 "label": "Hôte ou IP",
                 "description": "Entrez l'hôte ou l'adresse IP pour vérifier l'accessibilité.",
                 "placeholder": "127.0.0.1",
-                "tooltip": "Une adresse IP est généralement recommandée. Si vous souhaitez également tester le DNS, utilisez un nom d'hôte. Le format est <code>host</code> ou <code>10.11.12.13</code>. Il ne doit pas y avoir d'espaces ni de caractères supplémentaires. Pour que les vérifications UDP fonctionnent sous Linux, vous devez les activer avec la commande suivante : <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Pour autoriser les vérifications ICMP sous Linux, vous devez attribuer les capacités binaires de notifiarr avec la commande suivante : <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Le moyen le plus simple de faire fonctionner les deux dans Docker est d'activer le mode privilégié, mais vous pouvez également définir des capacités.",
+                "tooltip": "Une adresse IP est généralement recommandée. Si vous souhaitez également tester le DNS, utilisez un nom d'hôte. Le format est <code>host</code> ou <code>10.11.12.13</code>. Il ne doit pas y avoir d'espaces ni de caractères supplémentaires. Pour que les vérifications UDP fonctionnent sous Linux, vous devez les activer avec la commande suivante: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Pour autoriser les vérifications ICMP sous Linux, vous devez attribuer les capacités binaires de notifiarr avec la commande suivante: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Le moyen le plus simple de faire fonctionner les deux dans Docker est d'activer le mode privilégié, mais vous pouvez également définir des capacités.",
                 "required": "Une adresse hôte ou IP est requise."
             },
             "count": {
@@ -761,7 +761,7 @@
         "header": {
             "label": "En-têtes HTTP",
             "description": "En-têtes de requête HTTP, 1 par ligne.",
-            "placeholder": "Type de contenu : application/json",
+            "placeholder": "Type de contenu: application/json",
             "tooltip": "Les en-têtes de requête HTTP sont envoyés à l'URL tels quels. Le format doit être <code>clé: valeur</code> par ligne. L'espace et les deux points sont obligatoires. Les valeurs non valides sont ignorées et les espaces supplémentaires sont supprimés."
         },
         "query": {
@@ -782,23 +782,23 @@
         "LoggingIn": "Connexion...",
         "UpdateBackend": "Mettre à jour le backend",
         "UpdatingBackEnd": "Mise à jour du back-end...",
-        "FailedToUpdateBackEnd": "Échec de la mise à jour du back-end : {error}",
+        "FailedToUpdateBackEnd": "Échec de la mise à jour du back-end: {error}",
         "TryRefreshingThePage": "Essayez d'actualiser la page.",
         "ConfigurationSavedReloading": "Configuration enregistrée ! Rechargement du client…",
-        "ConfigurationSaved": "Configuration enregistrée il y a {timeDuration} !",
+        "ConfigurationSaved": "Configuration enregistrée il y a {timeDuration}!",
         "SavingConfiguration": "Sauvegarde de la configuration...",
         "Version": "Version {version}",
         "Every6Hours": "Toutes les 6 heures",
         "Every3Hours": "Toutes les 3 heures",
         "Reloading": "Rechargement...",
-        "FailedToReload": "Échec du rechargement : {error}",
+        "FailedToReload": "Échec du rechargement: {error}",
         "ConfirmReloadBody": "Êtes-vous sûr de vouloir recharger le client ?",
         "ReloadSuccess": "Rechargement réussi ! Client rechargé.",
         "ReloadCheckTimedOut": "Le délai de vérification du rechargement du serveur a expiré après 20 tentatives",
         "ConfirmShutdown": "Confirmer l'arrêt",
         "ConfirmShutdownBody": "Voulez-vous vraiment arrêter le client ? Vous devrez le redémarrer depuis l'hôte sur lequel il s'exécute.",
         "ShutdownSuccess": "Arrêt réussi ! Le client s'est arrêté.",
-        "FailedToShutdown": "Échec de l'arrêt : {error} - Essayez de recharger la page.",
+        "FailedToShutdown": "Échec de l'arrêt: {error} - Essayez de recharger la page.",
         "LoginHelp": "Aide à la connexion",
         "Invalid": "Invalide",
         "DeleteInstance": "Supprimer l'instance",
@@ -808,7 +808,7 @@
         "NameMustNotBeEmpty": "Le nom ne doit pas être vide.",
         "HostMustNotBeEmpty": "L'hôte ne doit pas être vide.",
         "UsernameMustNotBeEmpty": "Le nom d'utilisateur ne doit pas être vide.",
-        "NameInUseByInstance": "Ce nom est utilisé par l'instance {numéro}.",
+        "NameInUseByInstance": "Ce nom est utilisé par l'instance {number}.",
         "APIKeyMustBeCountCharacters": "La clé API doit comporter {count} caractères ou plus.",
         "TokenMustBeCountCharacters": "Le jeton doit comporter {count} caractères ou plus.",
         "LeavePage": "Voulez-vous vraiment quitter cette page ?",
@@ -986,7 +986,7 @@
             "PasswordOnlyUsed": "Le nom d'utilisateur et le mot de passe ne sont utilisés que si le type d'authentification est défini sur Mot de passe.",
             "HeaderOnlyUsed": "L'en-tête d'authentification n'est utilisé que si le type d'authentification n'est <b>pas</b> défini sur Mot de passe.",
             "AuthTypeChange": "Si le type d’authentification change, déconnectez-vous pour terminer le processus.",
-            "ProfileUpdated": "Profil mis à jour avec succès il y a {timeDuration} !",
+            "ProfileUpdated": "Profil mis à jour avec succès il y a {timeDuration}!",
             "EnterCurrentPassword": "Saisissez votre mot de passe actuel pour apporter des modifications.",
             "ProxyAuthDisabled": "L'authentification proxy est désactivée car votre flux en amont ({upstreamIp}) ne figure pas dans la liste des flux en amont autorisés.",
             "SeeWikiForAuthProxyHelp": "Consultez le <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">wiki</a> pour obtenir des instructions sur la configuration d'un proxy d'authentification.",
@@ -1090,7 +1090,7 @@
             "description": "Déclencheurs, minuteries et plannings exécutés."
         },
         "CountersReset": "Les compteurs de cette page se réinitialisent lorsque l'application se ferme.",
-        "ApplicationUptime": "Temps de disponibilité de l'application : <b>{timeDuration}</b>",
+        "ApplicationUptime": "Temps de disponibilité de l'application: &nbsp;<b>{timeDuration}</b>",
         "logFiles": {
             "title": "Fichiers journaux",
             "description": "Compteurs de fichiers journaux.",
@@ -1301,7 +1301,7 @@
             "BackupTunnel": "Tunnel de sauvegarde",
             "Ping": "Tunnels de ping",
             "Pinging": "Ping ...",
-            "ActiveTunnel": "Tunnel actif : {tunnel}",
+            "ActiveTunnel": "Tunnel actif: {tunnel}",
             "TunnelStats": "Statistiques du tunnel",
             "Disconnects": "Déconnexions",
             "ConnectionPoolSize": "Taille du pool de connexions",
@@ -1313,7 +1313,7 @@
             "SocketURLActive": "URL du socket (actif)",
             "SocketURLInactive": "URL du socket (inactif)",
             "SelectTunnel": "Sélectionnez un tunnel",
-            "TunnelsSaved": "Tunnels enregistrés il y a {timeDuration} !",
+            "TunnelsSaved": "Tunnels enregistrés il y a {timeDuration}!",
             "TunnelStatsStale": "Les données ci-dessus sont toujours obsolètes. Pour les mettre à jour, cliquez sur le lien « Mettre à jour le backend » dans l'en-tête de la page."
         }
     },
@@ -1444,12 +1444,12 @@
                 "label": "Vérification du site Web du client"
             },
             "TrigEndpointURL": {
-                "label": "URL du point de terminaison relayée au site Web : {name}",
+                "label": "URL du point de terminaison relayée au site Web: {name}",
                 "button": "Exécuter le point de terminaison",
                 "success": "L'URL du point de terminaison relayée a été initiée."
             },
             "TrigCustomCommand": {
-                "label": "Commande personnalisée : {name}",
+                "label": "Commande personnalisée: {name}",
                 "button": "Exécuter la commande",
                 "success": "Commande personnalisée lancée."
             },
@@ -1463,7 +1463,7 @@
                 "label": "Synchronisation du format personnalisé Radarr par instance"
             },
             "TrigCustomCronTimer": {
-                "label": "Minuterie du site Web : {name}",
+                "label": "Minuterie du site Web: {name}",
                 "button": "Exécuter la minuterie maintenant",
                 "success": "Minuterie du site Web lancée."
             },
@@ -1527,13 +1527,13 @@
             "reload": "Recharger",
             "tooltip": "Le bouton <b>Télécharger</b> télécharge le fichier sur votre ordinateur. Le bouton <b>Télécharger</b> le télécharge sur le serveur Notifiarr.com. Seuls les administrateurs peuvent voir les fichiers téléchargés. Le bouton <b>Supprimer</b> supprime le fichier de votre disque dur. Les fichiers en cours d'utilisation ne peuvent pas être supprimés. L'expression « En cours d'utilisation » signifie que l'application est en train d'y enregistrer des entrées de journal."
         },
-        "Error": "Erreur lors du chargement du fichier journal : {error}",
+        "Error": "Erreur lors du chargement du fichier journal: {error}",
         "DeleteFile": "Supprimer {filePath}",
         "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce fichier ? Cette action est irréversible.",
-        "deleteError": "Erreur lors de la suppression du fichier journal : {error}",
-        "deleteSuccess": "Fichier journal supprimé : {fichier}",
-        "uploadError": "Erreur lors du téléchargement du fichier journal : {error}",
-        "uploadSuccess": "Téléchargement du fichier journal : {file}",
+        "deleteError": "Erreur lors de la suppression du fichier journal: {error}",
+        "deleteSuccess": "Fichier journal supprimé: {fichier}",
+        "uploadError": "Erreur lors du téléchargement du fichier journal: {error}",
+        "uploadSuccess": "Téléchargement du fichier journal: {file}",
         "NoFileSelected": "Aucun fichier sélectionné.",
         "SelectFile": "Sélectionnez un fichier pour voir ce qu'il contient !",
         "FilesInDirs": "{fileCount} fichiers dans {dirCount} répertoires",
@@ -1554,7 +1554,7 @@
     },
     "ProcessList": {
         "title": "Liste des processus en cours d'exécution",
-        "error": "Erreur lors du chargement de la liste des processus : {error}",
+        "error": "Erreur lors du chargement de la liste des processus: {error}",
         "noData": "Aucune liste de processus renvoyée.",
         "footer": "{count} processus trouvés.",
         "button": {
@@ -1564,7 +1564,7 @@
     },
     "ClientInfo": {
         "title": "Charge utile de démarrage",
-        "error": "Erreur lors du chargement de la charge utile de démarrage : {error}",
+        "error": "Erreur lors du chargement de la charge utile de démarrage: {error}",
         "noData": "Aucune charge utile de démarrage n'a été renvoyée.",
         "description": "Il s'agit de la charge utile envoyée au client par Notifiarr.com lors de son démarrage. Elle contient la configuration du client et d'autres informations."
     }
