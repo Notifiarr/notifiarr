@@ -306,7 +306,7 @@
             "title": "",
             "Application": "Applicazione",
             "Version": "Versione",
-            "Started": "",
+            "Started": "Avviato",
             "Uptime": ""
         },
         "StorageData": {
@@ -632,7 +632,7 @@
     },
     "Commands": {
         "Failures": "Fallimenti: {count}",
-        "LastExecution": "",
+        "LastExecution": "Ultima Esecuzione",
         "title": "Lista Comandi",
         "addInstance": "Crea Comando",
         "DeleteCommand": "Elimina Comando",
@@ -732,7 +732,7 @@
             },
             "name": "Nome Servizio",
             "state": {
-                "short": "",
+                "short": "Stato",
                 "title": ""
             },
             "typeExpect": "",
@@ -794,7 +794,7 @@
             "options": {
                 "process": "",
                 "http": "",
-                "tcp": "",
+                "tcp": "Raggiungibilità Porta TCP",
                 "ping": "",
                 "icmp": ""
             }
@@ -1088,11 +1088,11 @@
             "placeholder": "[INFO] 2025-05-25 16:20:01 - Questa è una linea di log di test."
         },
         "testRegex": {
-            "label": "",
+            "label": "Prova Espressione",
             "description": "",
             "placeholder": ""
         },
-        "TestResult": "",
+        "TestResult": "Prova Risultato",
         "Test": "Test",
         "Expression": "Espressione",
         "Result": "Risultato",
@@ -1276,7 +1276,7 @@
             "title": "Tautulli",
             "description": "",
             "name": {
-                "label": "",
+                "label": "Nome Tautulli",
                 "description": "Nome del servizio Tautulli"
             },
             "url": {
@@ -1382,7 +1382,7 @@
         "titles": {
             "RegularExpressionTester": "",
             "Expression": "Espressione",
-            "TestString": ""
+            "TestString": "Prova Stringa"
         },
         "path": {
             "label": "Percorso File",
