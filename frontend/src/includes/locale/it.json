@@ -106,7 +106,7 @@
             "ProfileReqTimedOut": "",
             "AnUnknownErrorOccurred": "Si è verificato un errore sconosciuto",
             "ConfigUpdateFailed": "Aggiornamento della configurazione fallita: {error}",
-            "PleaseEnterBothUsernameAndPassword": ""
+            "PleaseEnterBothUsernameAndPassword": "Per favore inserisci entrambi username e password."
         },
         "apiKey": {
             "label": "Chiave API",
@@ -152,7 +152,7 @@
             "placeholder": "/path/to/notifiarr.log"
         },
         "httpLog": {
-            "label": "",
+            "label": "File Log HTTP",
             "description": "",
             "placeholder": "/path/to/http-notifiarr.log",
             "tooltip": ""
@@ -164,7 +164,7 @@
             "tooltip": ""
         },
         "maxBody": {
-            "label": "",
+            "label": "Dimensione Massima del Body",
             "description": "Dimensione massima del body per le richieste HTTP.",
             "tooltip": ""
         },
@@ -249,7 +249,7 @@
             "tooltip": ""
         },
         "serial": {
-            "label": "",
+            "label": "Thread Paralleli",
             "description": "",
             "tooltip": ""
         },
@@ -275,7 +275,7 @@
         "unstableCh": {
             "label": "Canale non stabile",
             "description": "",
-            "tooltip": ""
+            "tooltip": "Disponibile solamente per gli utenti con accesso sviluppatore."
         }
     },
     "system": {
@@ -698,7 +698,7 @@
         },
         "method": {
             "label": "Metodo",
-            "description": ""
+            "description": "Richiesta HTTP"
         },
         "url": {
             "label": "",
@@ -706,7 +706,7 @@
             "placeholder": "https://pihole.myhome.lan/api/stats"
         },
         "header": {
-            "label": "",
+            "label": "Header HTTP",
             "description": "",
             "placeholder": "Content-Type: application/json",
             "tooltip": ""
@@ -793,7 +793,7 @@
             "tooltip": "",
             "options": {
                 "process": "",
-                "http": "",
+                "http": "Verifica URL HTTP",
                 "tcp": "Raggiungibilità Porta TCP",
                 "ping": "",
                 "icmp": ""
@@ -806,7 +806,7 @@
         },
         "http": {
             "headers": {
-                "label": "",
+                "label": "Header HTTP",
                 "description": "",
                 "placeholder": "Content-Type: application/json"
             },
@@ -841,7 +841,7 @@
             },
             "minimum": {
                 "label": "Minimo",
-                "description": "",
+                "description": "Numero minimi di pacchetti che devono essere ricevuti.",
                 "placeholder": "10",
                 "required": ""
             },
@@ -860,7 +860,7 @@
                 "required": ""
             },
             "running": {
-                "label": "",
+                "label": "In esecuzione",
                 "description": "",
                 "tooltip": ""
             },
@@ -871,7 +871,7 @@
             },
             "minimum": {
                 "label": "Minimo",
-                "description": "",
+                "description": "Numero minimo di processi in esecuzione che devono corrisponde al valore.",
                 "required": "",
                 "tooltip": ""
             },
@@ -898,13 +898,13 @@
                     "choose": "Scegli un file da caricare",
                     "app": "",
                     "debug": "",
-                    "http": ""
+                    "http": "File log HTTP."
                 }
             },
             "TrigPlexSessions": {
                 "label": "",
                 "button": "",
-                "success": ""
+                "success": "Sessioni di Plex raccolte."
             },
             "TrigPlexSessionsCheck": {
                 "label": ""
@@ -915,9 +915,9 @@
                 "success": ""
             },
             "TrigMDBListSync": {
-                "label": "",
+                "label": "Sincronizzazione lista MDB",
                 "button": "Sincronizza lista MDB",
-                "success": ""
+                "success": "Sincronizzazione lista MDB inizializzata."
             },
             "TrigCollectionGaps": {
                 "label": "",
@@ -1164,7 +1164,7 @@
             "Actions": "Azioni",
             "Integrations": "Integrazioni",
             "Monitoring": "",
-            "Metrics": "",
+            "Metrics": "Metriche",
             "LogFiles": "File Log",
             "System": "Sistema",
             "TrustProfile": "",
@@ -1214,7 +1214,7 @@
             "label": "Modalità Autenticazione",
             "description": "",
             "options": {
-                "password": "",
+                "password": "Password: Username Locale",
                 "header": "",
                 "noauth": "Nessuna Password (pericoloso)"
             },
@@ -1258,7 +1258,7 @@
             "name": {
                 "label": "Nome Server",
                 "description": "Nome del server Plex",
-                "placeholder": ""
+                "placeholder": "Impostato automaticamente dal server"
             },
             "url": {
                 "label": "URL",
@@ -1356,7 +1356,7 @@
             "ConnectionPoolSize": "",
             "Connecting": "Connettendo",
             "Idle": "",
-            "Running": "",
+            "Running": "In esecuzione",
             "LastConnection": "Ultima Connessione",
             "LastActiveCheck": "",
             "SocketURLActive": "",
