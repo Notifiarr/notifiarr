@@ -297,7 +297,7 @@
         "OperatingSystem": {
             "title": "Sistema Operativo",
             "Hostname": "",
-            "UniqueID": "",
+            "UniqueID": "ID Unico",
             "Platform": "Piattaforma",
             "KernelVersion": "Versione Kernel",
             "VirtualizationSystem": "Sistema di Virtualizzazione"
@@ -1107,7 +1107,7 @@
         "BackEndUpdated": "",
         "UpdatingBackEnd": "Aggiornando il back-end...",
         "FailedToUpdateBackEnd": "",
-        "TryRefreshingThePage": "",
+        "TryRefreshingThePage": "Prova ad aggiornare la pagina.",
         "ConfigurationSavedReloading": "Configurazione salvata! Ricaricando client...",
         "ConfigurationSaved": "Configurazione salvata {timeDuration} fa!",
         "SavingConfiguration": "Salvando la configurazione...",
@@ -1127,7 +1127,7 @@
         "FailedToShutdown": "",
         "LoginHelp": "",
         "LoginHelpBody": "",
-        "Changed": "",
+        "Changed": "Cambiato",
         "New": "Nuovo",
         "Invalid": "Non valido",
         "DeleteInstance": "Elimina Istanza",
@@ -1137,7 +1137,7 @@
         "NameMustNotBeEmpty": "Nome non può essere vuoto.",
         "HostMustNotBeEmpty": "Host non può essere vuoto.",
         "UsernameMustNotBeEmpty": "Username non può essere vuoto.",
-        "NameInUseByInstance": "",
+        "NameInUseByInstance": "Questo nome è in uso dall'istanza {number}.",
         "APIKeyMustBeCountCharacters": "",
         "TokenMustBeCountCharacters": "Token deve essere di {count} caratteri o più lungo.",
         "LeavePage": "Vuoi lasciare questa pagina?",
@@ -1172,7 +1172,7 @@
             "UnsavedChanges": "Modifiche non salvate"
         },
         "pageDescription": {
-            "Configuration": "",
+            "Configuration": "Configura le impostazioni del tuo client Notifiarr qui.",
             "SiteTunnel": "",
             "StarrApps": "",
             "Downloaders": "",
