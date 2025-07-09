@@ -227,7 +227,7 @@
         "command": {
             "name": {
                 "label": "Nome",
-                "description": "",
+                "description": "Nome del comando.",
                 "required": "Un comando è richiesto."
             }
         },
@@ -1507,7 +1507,8 @@
             "FileList": "Lista File",
             "Owner": "Proprietario",
             "Path": "Percorso",
-            "OpenFile": "Apri File {fileName}"
+            "OpenFile": "Apri File {fileName}",
+            "Mode": "Modalità"
         },
         "button": {
             "delete": "Elimina",
