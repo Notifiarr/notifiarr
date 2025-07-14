@@ -658,7 +658,7 @@
         },
         "notify": {
             "label": "Notifica",
-            "description": "",
+            "description": "Invia notifica dopo l'esecuzione del comando.",
             "tooltip": ""
         },
         "log": {
@@ -944,54 +944,54 @@
                 "success": ""
             },
             "TrigProwlarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Prowlarr",
                 "button": "Controlla Prowlarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Prowlarr."
             },
             "TrigLidarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Lidarr",
                 "button": "Controlla Lidarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Lidarr."
             },
             "TrigRadarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Radarr",
                 "button": "Controlla Radarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Radarr."
             },
             "TrigReadarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Readarr",
                 "button": "Controlla Readarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Readarr."
             },
             "TrigSonarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Sonarr",
                 "button": "Controlla Sonarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Sonarr."
             },
             "TrigProwlarrBackup": {
                 "label": "Backup database di Prowlarr",
                 "button": "Controlla Prowlarr",
-                "success": ""
+                "success": "Controllo dei backup del database Prowlarr avviato."
             },
             "TrigLidarrBackup": {
                 "label": "Backup database di Lidarr",
                 "button": "Controlla Lidarr",
-                "success": ""
+                "success": "Controllo dei backup del database Lidarr avviato."
             },
             "TrigRadarrBackup": {
                 "label": "Backup database di Radarr",
                 "button": "Controlla Radarr",
-                "success": ""
+                "success": "Controllo dei backup del database Radarr avviato."
             },
             "TrigReadarrBackup": {
                 "label": "Backup database di Readarr",
                 "button": "Controlla Readarr",
-                "success": ""
+                "success": "Controllo dei backup del database Readarr avviato."
             },
             "TrigSonarrBackup": {
                 "label": "Backup database di Sonarr",
                 "button": "Controlla Sonarr",
-                "success": ""
+                "success": "Controllo dei backup del database Sonarr avviato."
             },
             "TrigUpCheck": {
                 "label": ""
@@ -1010,10 +1010,10 @@
                 "label": ""
             },
             "TrigCFSyncLidarrInt": {
-                "label": ""
+                "label": "Sincronizzazione del formato personalizzato Lidarr per istanza"
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
+                "label": "Sincronizzazione del formato personalizzato Radarr per istanza"
             },
             "TrigCustomCronTimer": {
                 "label": "",
@@ -1044,6 +1044,9 @@
                 "button": "Sincronizza tutte le istanze Sonarr",
                 "label": "Sincronizzazione di profili e formati in Sonarr",
                 "success": "Sincronizzazione di profili e formati in Sonarr inizializzata."
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "Sincronizzazione del formato personalizzato Sonarr per istanza"
             }
         },
         "titles": {
@@ -1206,7 +1209,7 @@
             "EnterCurrentPassword": "",
             "ProxyAuthDisabled": "",
             "Addit": "Aggiungilo.",
-            "SeeWikiForAuthProxyHelp": "",
+            "SeeWikiForAuthProxyHelp": "Vedi <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">la wiki</a> per le istruzioni per impostare un proxy di autenticazione.",
             "ShowMeMore": "Mostrami di più.",
             "ShowMeLess": "Mostrami di meno."
         },
@@ -1359,8 +1362,8 @@
             "Running": "In esecuzione",
             "LastConnection": "Ultima Connessione",
             "LastActiveCheck": "",
-            "SocketURLActive": "",
-            "SocketURLInactive": "",
+            "SocketURLActive": "URL Socket (attivo)",
+            "SocketURLInactive": "URL Socket (inattivo)",
             "SelectTunnel": "",
             "TunnelsSaved": "",
             "TunnelStatsStale": ""
