@@ -24,7 +24,7 @@
                 "description": ""
             },
             "timeout": {
-                "label": "",
+                "label": "Timeout Richiesta",
                 "description": ""
             },
             "validSsl": {
@@ -96,8 +96,8 @@
         },
         "autoUpdate": {
             "tooltip": "Questo funziona solo su Windows.",
-            "label": "",
-            "description": ""
+            "label": "Aggiornamento automatico",
+            "description": "Questa è la frequenza con cui l'applicazione verificherà la disponibilità di aggiornamenti. Quando ne viene trovato uno, verrà installato automaticamente."
         },
         "errors": {
             "InvalidCreds": "Username o password non validi.",
@@ -105,18 +105,18 @@
             "LoginFailed": "",
             "ProfileReqTimedOut": "",
             "AnUnknownErrorOccurred": "Si è verificato un errore sconosciuto",
-            "ConfigUpdateFailed": "",
-            "PleaseEnterBothUsernameAndPassword": ""
+            "ConfigUpdateFailed": "Aggiornamento della configurazione fallita: {error}",
+            "PleaseEnterBothUsernameAndPassword": "Per favore inserisci entrambi username e password."
         },
         "apiKey": {
             "label": "Chiave API",
-            "description": "",
+            "description": "Chiave API dal tuo account Notifiarr.com.",
             "tooltip": "",
             "placeholder": "Inserisci la tua chiave API qui"
         },
         "extraKeys": {
             "label": "",
-            "description": "",
+            "description": "Chiavi API aggiuntive per integrazioni di terze parti. Separale con nuove righe.",
             "placeholder": "Uno per riga..."
         },
         "bindAddr": {
@@ -152,7 +152,7 @@
             "placeholder": "/path/to/notifiarr.log"
         },
         "httpLog": {
-            "label": "",
+            "label": "File Log HTTP",
             "description": "",
             "placeholder": "/path/to/http-notifiarr.log",
             "tooltip": ""
@@ -164,12 +164,12 @@
             "tooltip": ""
         },
         "maxBody": {
-            "label": "",
+            "label": "Dimensione Massima del Body",
             "description": "Dimensione massima del body per le richieste HTTP.",
             "tooltip": ""
         },
         "logFileMb": {
-            "label": "",
+            "label": "Dimensione File Log",
             "description": "",
             "tooltip": ""
         },
@@ -201,7 +201,7 @@
                 "tooltip": ""
             },
             "interval": {
-                "label": "",
+                "label": "Intervallo di aggiornamento",
                 "description": "",
                 "tooltip": ""
             },
@@ -227,8 +227,8 @@
         "command": {
             "name": {
                 "label": "Nome",
-                "description": "",
-                "required": ""
+                "description": "Nome del comando.",
+                "required": "Un comando è richiesto."
             }
         },
         "service": {
@@ -249,7 +249,7 @@
             "tooltip": ""
         },
         "serial": {
-            "label": "",
+            "label": "Thread Paralleli",
             "description": "",
             "tooltip": ""
         },
@@ -275,7 +275,7 @@
         "unstableCh": {
             "label": "Canale non stabile",
             "description": "",
-            "tooltip": ""
+            "tooltip": "Disponibile solamente per gli utenti con accesso sviluppatore."
         }
     },
     "system": {
@@ -297,16 +297,16 @@
         "OperatingSystem": {
             "title": "Sistema Operativo",
             "Hostname": "",
-            "UniqueID": "",
+            "UniqueID": "ID Unico",
             "Platform": "Piattaforma",
             "KernelVersion": "Versione Kernel",
-            "VirtualizationSystem": ""
+            "VirtualizationSystem": "Sistema di Virtualizzazione"
         },
         "ClientInformation": {
             "title": "",
             "Application": "Applicazione",
             "Version": "Versione",
-            "Started": "",
+            "Started": "Avviato",
             "Uptime": ""
         },
         "StorageData": {
@@ -320,7 +320,7 @@
         "StartupParams": {
             "title": "Parametri di Avvio",
             "BinaryPath": "",
-            "ConfigFile": "",
+            "ConfigFile": "File di Configurazione",
             "EnvironmentPrefix": "",
             "ExtraConfigFiles": "",
             "CustomAssets": "",
@@ -632,12 +632,12 @@
     },
     "Commands": {
         "Failures": "Fallimenti: {count}",
-        "LastExecution": "",
+        "LastExecution": "Ultima Esecuzione",
         "title": "Lista Comandi",
         "addInstance": "Crea Comando",
         "DeleteCommand": "Elimina Comando",
         "description": "",
-        "Executions": "",
+        "Executions": "Esecuzioni: {count}",
         "neverExecuted": "mai eseguito",
         "enterCommandArguments": "",
         "commandRequiresArguments": "",
@@ -658,7 +658,7 @@
         },
         "notify": {
             "label": "Notifica",
-            "description": "",
+            "description": "Invia notifica dopo l'esecuzione del comando.",
             "tooltip": ""
         },
         "log": {
@@ -690,15 +690,15 @@
             "description": "",
             "placeholder": "pihole",
             "tooltip": "",
-            "required": ""
+            "required": "È necessario un modello. Se non sei sicuro di cosa inserire, inserisci “test”."
         },
         "timeout": {
-            "label": "",
+            "label": "Timeout Richiesta",
             "description": ""
         },
         "method": {
             "label": "Metodo",
-            "description": ""
+            "description": "Richiesta HTTP"
         },
         "url": {
             "label": "",
@@ -706,7 +706,7 @@
             "placeholder": "https://pihole.myhome.lan/api/stats"
         },
         "header": {
-            "label": "",
+            "label": "Header HTTP",
             "description": "",
             "placeholder": "Content-Type: application/json",
             "tooltip": ""
@@ -732,7 +732,7 @@
             },
             "name": "Nome Servizio",
             "state": {
-                "short": "",
+                "short": "Stato",
                 "title": ""
             },
             "typeExpect": "",
@@ -761,9 +761,9 @@
         "recheckFailed": "",
         "checkInitiated": "",
         "nextRefresh": "Nuovo aggiornamento in {timeDuration}.",
-        "refreshInterval": "",
-        "cardsView": "",
-        "classicView": "",
+        "refreshInterval": "Intervallo di aggiornamento",
+        "cardsView": "Visualizzazione a Carte",
+        "classicView": "Visualizzazione Classica",
         "hideAllOutputs": "",
         "showAllOutputs": ""
     },
@@ -793,8 +793,8 @@
             "tooltip": "",
             "options": {
                 "process": "",
-                "http": "",
-                "tcp": "",
+                "http": "Verifica URL HTTP",
+                "tcp": "Raggiungibilità Porta TCP",
                 "ping": "",
                 "icmp": ""
             }
@@ -806,14 +806,14 @@
         },
         "http": {
             "headers": {
-                "label": "",
+                "label": "Header HTTP",
                 "description": "",
                 "placeholder": "Content-Type: application/json"
             },
             "codes": {
-                "label": "",
-                "description": "",
-                "required": ""
+                "label": "Codici di Risposta Accettabili",
+                "description": "Qualunque codice qui è considerato accettabile. Se il servizio risponde con un altro codice sarà generata una notifica.",
+                "required": "È richiesto almeno un codice di risposta previsto."
             }
         },
         "tcp": {
@@ -822,7 +822,7 @@
                 "description": "",
                 "placeholder": "127.0.0.1:22",
                 "tooltip": "",
-                "required": ""
+                "required": "È necessario specificare un host e una porta separati da due punti."
             }
         },
         "ping": {
@@ -837,13 +837,13 @@
                 "label": "",
                 "description": "",
                 "placeholder": "10",
-                "required": ""
+                "required": "È necessario un numero di pacchetti maggiore di zero."
             },
             "minimum": {
                 "label": "Minimo",
-                "description": "",
+                "description": "Numero minimi di pacchetti che devono essere ricevuti.",
                 "placeholder": "10",
-                "required": ""
+                "required": "È richiesto un numero minimo di pacchetti maggiore di zero."
             },
             "interval": {
                 "label": "Intervallo",
@@ -857,10 +857,10 @@
                 "description": "Il nome del processo da verificare.",
                 "placeholder": "notifiarr",
                 "tooltip": "",
-                "required": ""
+                "required": "È necessario specificare il nome di un processo."
             },
             "running": {
-                "label": "",
+                "label": "In esecuzione",
                 "description": "",
                 "tooltip": ""
             },
@@ -871,8 +871,8 @@
             },
             "minimum": {
                 "label": "Minimo",
-                "description": "",
-                "required": "",
+                "description": "Numero minimo di processi in esecuzione che devono corrisponde al valore.",
+                "required": "È richiesto un numero minimo di processi maggiore di zero.",
                 "tooltip": ""
             },
             "maximum": {
@@ -891,33 +891,33 @@
                 "label": "Svuota cestino Plex"
             },
             "TrigUploadFile": {
-                "label": "",
-                "button": "",
-                "success": "",
+                "label": "File log caricato sul sito web",
+                "button": "Carica Log Ora",
+                "success": "File log caricato sul sito web.",
                 "options": {
                     "choose": "Scegli un file da caricare",
                     "app": "",
                     "debug": "",
-                    "http": ""
+                    "http": "File log HTTP."
                 }
             },
             "TrigPlexSessions": {
                 "label": "",
                 "button": "",
-                "success": ""
+                "success": "Sessioni di Plex raccolte."
             },
             "TrigPlexSessionsCheck": {
                 "label": ""
             },
             "TrigDashboard": {
                 "label": "",
-                "button": "",
+                "button": "Aggiorna dashboard",
                 "success": ""
             },
             "TrigMDBListSync": {
-                "label": "",
+                "label": "Sincronizzazione lista MDB",
                 "button": "Sincronizza lista MDB",
-                "success": ""
+                "success": "Sincronizzazione lista MDB inizializzata."
             },
             "TrigCollectionGaps": {
                 "label": "",
@@ -936,62 +936,62 @@
             },
             "TrigStop": {
                 "label": "",
-                "button": ""
+                "button": "Ricarica client"
             },
             "TrigSnapshot": {
                 "label": "",
-                "button": "",
+                "button": "Aggiorna snapshot",
                 "success": ""
             },
             "TrigProwlarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Prowlarr",
                 "button": "Controlla Prowlarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Prowlarr."
             },
             "TrigLidarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Lidarr",
                 "button": "Controlla Lidarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Lidarr."
             },
             "TrigRadarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Radarr",
                 "button": "Controlla Radarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Radarr."
             },
             "TrigReadarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Readarr",
                 "button": "Controlla Readarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Readarr."
             },
             "TrigSonarrCorrupt": {
-                "label": "",
+                "label": "Corruzione del database Sonarr",
                 "button": "Controlla Sonarr",
-                "success": ""
+                "success": "È stato avviato il controllo della corruzione del database di Sonarr."
             },
             "TrigProwlarrBackup": {
                 "label": "Backup database di Prowlarr",
                 "button": "Controlla Prowlarr",
-                "success": ""
+                "success": "Controllo dei backup del database Prowlarr avviato."
             },
             "TrigLidarrBackup": {
                 "label": "Backup database di Lidarr",
                 "button": "Controlla Lidarr",
-                "success": ""
+                "success": "Controllo dei backup del database Lidarr avviato."
             },
             "TrigRadarrBackup": {
                 "label": "Backup database di Radarr",
                 "button": "Controlla Radarr",
-                "success": ""
+                "success": "Controllo dei backup del database Radarr avviato."
             },
             "TrigReadarrBackup": {
                 "label": "Backup database di Readarr",
                 "button": "Controlla Readarr",
-                "success": ""
+                "success": "Controllo dei backup del database Readarr avviato."
             },
             "TrigSonarrBackup": {
                 "label": "Backup database di Sonarr",
                 "button": "Controlla Sonarr",
-                "success": ""
+                "success": "Controllo dei backup del database Sonarr avviato."
             },
             "TrigUpCheck": {
                 "label": ""
@@ -1010,10 +1010,10 @@
                 "label": ""
             },
             "TrigCFSyncLidarrInt": {
-                "label": ""
+                "label": "Sincronizzazione del formato personalizzato Lidarr per istanza"
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
+                "label": "Sincronizzazione del formato personalizzato Radarr per istanza"
             },
             "TrigCustomCronTimer": {
                 "label": "",
@@ -1044,16 +1044,19 @@
                 "button": "Sincronizza tutte le istanze Sonarr",
                 "label": "Sincronizzazione di profili e formati in Sonarr",
                 "success": "Sincronizzazione di profili e formati in Sonarr inizializzata."
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "Sincronizzazione del formato personalizzato Sonarr per istanza"
             }
         },
         "titles": {
             "Triggers": "",
             "Timers": "",
-            "Schedules": "",
+            "Schedules": "Programmi",
             "SiteCrons": "",
             "Counter": "",
             "Interval": "Intervallo",
-            "Schedule": ""
+            "Schedule": "Programma"
         },
         "descriptions": {
             "Triggers": "",
@@ -1088,13 +1091,13 @@
             "placeholder": "[INFO] 2025-05-25 16:20:01 - Questa è una linea di log di test."
         },
         "testRegex": {
-            "label": "",
+            "label": "Prova Espressione",
             "description": "",
             "placeholder": ""
         },
-        "TestResult": "",
+        "TestResult": "Prova Risultato",
         "Test": "Test",
-        "Expression": "",
+        "Expression": "Espressione",
         "Result": "Risultato",
         "NoMatch": "Nessuna Corrispondenza"
     },
@@ -1103,19 +1106,19 @@
         "LoggingIn": "",
         "LoggedIn": "",
         "Loading": "Caricamento...",
-        "UpdateBackend": "",
+        "UpdateBackend": "Aggiorna Backend",
         "BackEndUpdated": "",
-        "UpdatingBackEnd": "",
+        "UpdatingBackEnd": "Aggiornando il back-end...",
         "FailedToUpdateBackEnd": "",
-        "TryRefreshingThePage": "",
-        "ConfigurationSavedReloading": "",
-        "ConfigurationSaved": "",
+        "TryRefreshingThePage": "Prova ad aggiornare la pagina.",
+        "ConfigurationSavedReloading": "Configurazione salvata! Ricaricando client...",
+        "ConfigurationSaved": "Configurazione salvata {timeDuration} fa!",
         "SavingConfiguration": "Salvando la configurazione...",
         "Version": "Versione {version}",
         "Every12Hours": "Ogni 12 ore",
         "Every6Hours": "Ogni 6 ore",
         "Every3Hours": "Ogni 3 ore",
-        "Reloading": "",
+        "Reloading": "Ricaricando...",
         "FailedToReload": "",
         "ConfirmReload": "",
         "ConfirmReloadBody": "",
@@ -1127,18 +1130,18 @@
         "FailedToShutdown": "",
         "LoginHelp": "",
         "LoginHelpBody": "",
-        "Changed": "",
+        "Changed": "Cambiato",
         "New": "Nuovo",
         "Invalid": "Non valido",
         "DeleteInstance": "Elimina Istanza",
-        "DeletedNumber": "",
+        "DeletedNumber": "Eliminati {number}",
         "ItsGone": "",
         "URLMustBeginWithHttp": "URL deve iniziare con http:// o https://",
         "NameMustNotBeEmpty": "Nome non può essere vuoto.",
         "HostMustNotBeEmpty": "Host non può essere vuoto.",
         "UsernameMustNotBeEmpty": "Username non può essere vuoto.",
-        "NameInUseByInstance": "",
-        "APIKeyMustBeCountCharacters": "",
+        "NameInUseByInstance": "Questo nome è in uso dall'istanza {number}.",
+        "APIKeyMustBeCountCharacters": "La chiave API deve essere composta da {count} caratteri o più.",
         "TokenMustBeCountCharacters": "Token deve essere di {count} caratteri o più lungo.",
         "LeavePage": "Vuoi lasciare questa pagina?",
         "Landing": {
@@ -1164,15 +1167,15 @@
             "Actions": "Azioni",
             "Integrations": "Integrazioni",
             "Monitoring": "",
-            "Metrics": "",
-            "LogFiles": "",
+            "Metrics": "Metriche",
+            "LogFiles": "File Log",
             "System": "Sistema",
             "TrustProfile": "",
             "Landing": "Home Notifiarr",
             "UnsavedChanges": "Modifiche non salvate"
         },
         "pageDescription": {
-            "Configuration": "",
+            "Configuration": "Configura le impostazioni del tuo client Notifiarr qui.",
             "SiteTunnel": "",
             "StarrApps": "",
             "Downloaders": "",
@@ -1206,7 +1209,7 @@
             "EnterCurrentPassword": "",
             "ProxyAuthDisabled": "",
             "Addit": "Aggiungilo.",
-            "SeeWikiForAuthProxyHelp": "",
+            "SeeWikiForAuthProxyHelp": "Vedi <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">la wiki</a> per le istruzioni per impostare un proxy di autenticazione.",
             "ShowMeMore": "Mostrami di più.",
             "ShowMeLess": "Mostrami di meno."
         },
@@ -1214,7 +1217,7 @@
             "label": "Modalità Autenticazione",
             "description": "",
             "options": {
-                "password": "",
+                "password": "Password: Username Locale",
                 "header": "",
                 "noauth": "Nessuna Password (pericoloso)"
             },
@@ -1258,7 +1261,7 @@
             "name": {
                 "label": "Nome Server",
                 "description": "Nome del server Plex",
-                "placeholder": ""
+                "placeholder": "Impostato automaticamente dal server"
             },
             "url": {
                 "label": "URL",
@@ -1276,7 +1279,7 @@
             "title": "Tautulli",
             "description": "",
             "name": {
-                "label": "",
+                "label": "Nome Tautulli",
                 "description": "Nome del servizio Tautulli"
             },
             "url": {
@@ -1356,11 +1359,11 @@
             "ConnectionPoolSize": "",
             "Connecting": "Connettendo",
             "Idle": "",
-            "Running": "",
+            "Running": "In esecuzione",
             "LastConnection": "Ultima Connessione",
             "LastActiveCheck": "",
-            "SocketURLActive": "",
-            "SocketURLInactive": "",
+            "SocketURLActive": "URL Socket (attivo)",
+            "SocketURLInactive": "URL Socket (inattivo)",
             "SelectTunnel": "",
             "TunnelsSaved": "",
             "TunnelStatsStale": ""
@@ -1381,8 +1384,8 @@
         },
         "titles": {
             "RegularExpressionTester": "",
-            "Expression": "",
-            "TestString": ""
+            "Expression": "Espressione",
+            "TestString": "Prova Stringa"
         },
         "path": {
             "label": "Percorso File",
@@ -1403,7 +1406,7 @@
         },
         "skip": {
             "label": "",
-            "description": "",
+            "description": "Qualsiasi elemento corrispondente a questa espressione viene ignorato.",
             "placeholder": ""
         },
         "poll": {
@@ -1428,7 +1431,7 @@
         }
     },
     "scheduler": {
-        "title": "",
+        "title": "Programma",
         "daysOfWeek": "Giorni della settimana",
         "daysOfMonth": "Giorni del mese",
         "frequency": "Frequenza",
@@ -1462,7 +1465,7 @@
         "CountersReset": "",
         "ApplicationUptime": "",
         "logFiles": {
-            "title": "",
+            "title": "File Log",
             "description": "",
             "empty": ""
         },
@@ -1478,7 +1481,7 @@
         },
         "website": {
             "title": "",
-            "description": "",
+            "description": "Richieste a Notifiarr.com.",
             "empty": ""
         },
         "fileWatcher": {
@@ -1507,15 +1510,25 @@
             "FileList": "Lista File",
             "Owner": "Proprietario",
             "Path": "Percorso",
-            "OpenFile": "Apri File {fileName}"
+            "OpenFile": "Apri File {fileName}",
+            "Mode": "Modalità",
+            "Age": "Età"
         },
         "button": {
             "delete": "Elimina",
             "add": "Aggiungi",
-            "download": "Download"
+            "download": "Download",
+            "upload": "Carica",
+            "reload": "Ricarica"
         },
         "NoFileSelected": "Nessun file selezionato.",
-        "deleteConfirm": "Sei sicuro di voler eliminare questo file? Questa azione non può essere annullata."
+        "deleteConfirm": "Sei sicuro di voler eliminare questo file? Questa azione non può essere annullata.",
+        "DeleteFile": "Elimina {filePath}",
+        "deleteSuccess": "File Log eliminato: {file}",
+        "uploadSuccess": "Caricando file log: {file}",
+        "AddMoreLines": "Aggiungi più linee",
+        "SelectFile": "Selezionate un file per vedere cosa contiene!",
+        "Reload": "Ricarica file log"
     },
     "ProcessList": {
         "footer": "{count} processi trovati."

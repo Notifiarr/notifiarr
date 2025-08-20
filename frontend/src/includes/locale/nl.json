@@ -160,7 +160,8 @@
             "Monitoring": "Monitoring",
             "Metrics": "Metrieken",
             "Services": "Diensten",
-            "Actions": "Acties"
+            "Actions": "Acties",
+            "ApiDocs": "Client-API Documentatie"
         }
     },
     "RegexTester": {
