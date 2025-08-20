@@ -174,10 +174,12 @@ func (s *Server) getTimeout() time.Duration {
 		timeout = MinTimeout
 	}
 
+	const multiplier = 0.92
+
 	// As the channel fills up, we reduce the timeout proportionally to avoid long waits.
 	channelUtilization := float64(len(s.sendData)) / float64(cap(s.sendData))
 	// Minimum timeout is 8% of original, maximum is 100% of original
-	timeoutMultiplier := 1.0 - (channelUtilization * 0.92)
+	timeoutMultiplier := 1.0 - (channelUtilization * multiplier)
 
 	return time.Duration(float64(timeout) * timeoutMultiplier)
 }
