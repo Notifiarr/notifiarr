@@ -34,7 +34,7 @@ require (
 	github.com/swaggo/swag v1.16.4
 	golang.org/x/crypto v0.39.0
 	golang.org/x/mod v0.25.0
-	golang.org/x/sys v0.33.0
+	golang.org/x/sys v0.35.0
 	golang.org/x/text v0.26.0
 	golang.org/x/time v0.12.0
 	golift.io/cache v0.0.2
