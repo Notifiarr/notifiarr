@@ -125,7 +125,7 @@
         "bindAddr": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "0.0.0.0:5454"
         },
         "sslKeyFile": {
             "label": "",
@@ -305,7 +305,7 @@
             "label": "",
             "tooltip": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "127.0.0.1 ::1"
         },
         "phrase": {
             "ProxyAuthDisabled": "",
@@ -362,7 +362,7 @@
     "ServiceChecks": {
         "ping": {
             "interval": {
-                "placeholder": "",
+                "placeholder": "100",
                 "label": "",
                 "description": ""
             },
@@ -370,19 +370,19 @@
                 "tooltip": "",
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "127.0.0.1",
                 "required": ""
             },
             "count": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "10",
                 "required": ""
             },
             "minimum": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "10",
                 "required": ""
             }
         },
@@ -468,7 +468,7 @@
             "value": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "127.0.0.1:22",
                 "tooltip": "",
                 "required": ""
             }
@@ -1451,7 +1451,7 @@
             "host": {
                 "label": "",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "127.0.0.1"
             },
             "port": {
                 "label": "",
