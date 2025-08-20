@@ -2,7 +2,7 @@
     "StarrApps": {
         "Readarr": {
             "apiKey": {
-                "label": "",
+                "label": "API-nyckel",
                 "description": "",
                 "placeholder": ""
             },
@@ -21,7 +21,7 @@
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "admin",
                 "tooltip": ""
             },
             "password": {
@@ -52,7 +52,7 @@
             "apiKey": {
                 "description": "",
                 "placeholder": "",
-                "label": ""
+                "label": "API-nyckel"
             },
             "password": {
                 "label": "",
@@ -74,14 +74,14 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
+                "label": "API-nyckel",
                 "description": "",
                 "placeholder": ""
             },
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "admin",
                 "tooltip": ""
             },
             "password": {
@@ -92,7 +92,7 @@
         },
         "Prowlarr": {
             "username": {
-                "placeholder": "",
+                "placeholder": "admin",
                 "label": "",
                 "description": "",
                 "tooltip": ""
@@ -110,7 +110,7 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
+                "label": "API-nyckel",
                 "description": "",
                 "placeholder": ""
             },
@@ -133,14 +133,14 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
+                "label": "API-nyckel",
                 "description": "",
                 "placeholder": ""
             },
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "admin",
                 "tooltip": ""
             },
             "password": {
@@ -156,11 +156,11 @@
             "host": {
                 "description": "",
                 "label": "",
-                "placeholder": ""
+                "placeholder": "127.0.0.1"
             },
             "title": "",
             "description": "",
-            "addInstance": "",
+            "addInstance": "Lägg till MySQL server",
             "name": {
                 "label": "",
                 "description": "",
@@ -169,7 +169,7 @@
             "port": {
                 "label": "",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "3306"
             },
             "username": {
                 "label": "",
@@ -224,7 +224,7 @@
             },
             "username": {
                 "label": "",
-                "placeholder": "",
+                "placeholder": "admin",
                 "description": ""
             }
         },
@@ -244,7 +244,7 @@
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "admin"
             },
             "password": {
                 "label": "",
@@ -261,7 +261,7 @@
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "admin"
             },
             "title": "",
             "addInstance": "",
@@ -316,7 +316,7 @@
             "username": {
                 "label": "",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "admin"
             }
         },
         "SabNZB": {
@@ -333,7 +333,7 @@
                 "placeholder": ""
             },
             "apiKey": {
-                "label": "",
+                "label": "API-nyckel",
                 "description": "",
                 "placeholder": ""
             }
@@ -514,7 +514,7 @@
             "apiKey": {
                 "description": "",
                 "placeholder": "",
-                "label": ""
+                "label": "API-nyckel"
             }
         }
     },
@@ -832,33 +832,33 @@
                 "description": "",
                 "tooltip": "",
                 "required": "",
-                "placeholder": ""
+                "placeholder": "127.0.0.1:22"
             }
         },
         "ping": {
             "value": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "127.0.0.1",
                 "tooltip": "",
                 "required": ""
             },
             "count": {
                 "description": "",
                 "label": "",
-                "placeholder": "",
+                "placeholder": "10",
                 "required": ""
             },
             "minimum": {
                 "label": "",
                 "description": "",
-                "placeholder": "",
+                "placeholder": "10",
                 "required": ""
             },
             "interval": {
                 "label": "",
                 "description": "",
-                "placeholder": ""
+                "placeholder": "100"
             }
         },
         "process": {
@@ -917,7 +917,7 @@
             "required": ""
         },
         "disabled": {
-            "label": "",
+            "label": "Aktiv",
             "description": ""
         },
         "regex": {
@@ -1063,12 +1063,12 @@
             "LoginRequestTimedOut": "",
             "LoginFailed": "",
             "ProfileReqTimedOut": "",
-            "AnUnknownErrorOccurred": "",
+            "AnUnknownErrorOccurred": "Ett okänt fel har inträffat",
             "ConfigUpdateFailed": "",
             "PleaseEnterBothUsernameAndPassword": ""
         },
         "apiKey": {
-            "label": "",
+            "label": "API-nyckel",
             "description": "",
             "tooltip": "",
             "placeholder": ""
@@ -1081,7 +1081,7 @@
         "bindAddr": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "0.0.0.0:5454"
         },
         "sslKeyFile": {
             "label": "",
@@ -1417,7 +1417,7 @@
         "upstreams": {
             "label": "",
             "description": "",
-            "placeholder": "",
+            "placeholder": "127.0.0.1 ::1",
             "tooltip": ""
         },
         "header": {
@@ -1438,7 +1438,7 @@
         "newPass": {
             "label": "",
             "description": "",
-            "placeholder": ""
+            "placeholder": "Minst 9 tecken"
         }
     },
     "RegexTester": {
@@ -1465,7 +1465,7 @@
         "daysOfMonth": "",
         "frequency": "",
         "selectAFrequency": "",
-        "AddATime": "",
+        "AddATime": "Lägg till tid",
         "empty": "",
         "required": {
             "daysOfWeek": "",
@@ -1488,6 +1488,15 @@
             "everyDay": "",
             "everyWeek": "",
             "everyMonth": ""
+        }
+    },
+    "LogFiles": {
+        "AddMoreLines": "Lägg till fler rader",
+        "button": {
+            "add": "Lägg till"
+        },
+        "titles": {
+            "Age": "Ålder"
         }
     }
 }
