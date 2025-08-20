@@ -15,19 +15,18 @@ const reloadClient = async () => {
 }
 
 // Some triggers require a specific input to be passed. This function returns that input value.
-export const option = (info: TriggerInfo): any => {
+export const option = (info: TriggerInfo): string => {
   if (info.key == 'TrigCustomCommand')
     // This one requires a hash of the command.
-    return get(profile).config.commands?.find(c => c.name == info.name)?.hash
+    return get(profile).config.commands?.find(c => c.name == info.name)?.hash || 'rip'
 
   if (info.key == 'TrigCustomCronTimer')
     // This one requires the index of the cron.
-    get(profile).siteCrons?.forEach((cron, i) => {
-      if (info.name.endsWith("'" + cron.name + "'")) return i
-    })
+    return `${get(profile).siteCrons?.findIndex(cron => info.name.endsWith(`'${cron.name}'`))}`
 
-  // This one requires the name of the endpoint.
-  if (info.key == 'TrigEndpointURL') return info.name
+  if (info.key == 'TrigEndpointURL')
+    // This one requires the name of the endpoint.
+    return info.name
 
   return ''
 }
@@ -40,12 +39,13 @@ export const run = async (info: TriggerInfo, content?: any): Promise<BackendResp
     return { ok: true, body: '' }
   }
 
-  const url = ['trigger', info.key, encodeURIComponent(content ?? option(info))]
-    .filter(v => v)
-    .join('/')
+  content = encodeURIComponent(content ?? option(info))
+  const url = ['trigger', info.key, content].filter(v => v).join('/')
+
   const resp = await getUi(url + '?ts=' + now, false)
   if (resp.ok) await profile.refresh()
   else return resp
+
   const diff = Date.now() - now
   // It always takes at least 1 second to run.
   if (diff < 1000) await new Promise(resolve => setTimeout(resolve, 1000 - diff))
