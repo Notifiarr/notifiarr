@@ -80,6 +80,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -231,6 +232,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -238,6 +240,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "artist ID",
                         "name": "artistID",
                         "in": "path",
@@ -308,6 +311,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -315,6 +319,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "music brains ID",
                         "name": "mbid",
                         "in": "path",
@@ -403,6 +408,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -410,6 +416,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "album ID",
                         "name": "albumID",
                         "in": "path",
@@ -480,6 +487,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -554,6 +562,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -651,6 +660,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -724,6 +734,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -819,6 +830,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -826,6 +838,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Custom Format ID",
                         "name": "formatID",
                         "in": "path",
@@ -896,6 +909,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -903,6 +917,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "album ID",
                         "name": "albumID",
                         "in": "path",
@@ -973,6 +988,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1046,6 +1062,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1137,7 +1154,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -1210,6 +1228,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1308,6 +1327,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1335,7 +1355,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -1405,6 +1426,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1478,6 +1500,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1551,6 +1574,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1625,6 +1649,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1652,7 +1677,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -1725,6 +1751,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1732,6 +1759,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -1847,6 +1875,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -1923,6 +1952,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2026,6 +2056,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2033,6 +2064,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "queue ID to delete",
                         "name": "queueID",
                         "in": "path",
@@ -2133,6 +2165,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2153,7 +2186,8 @@
                                         "message": {
                                             "type": "object",
                                             "additionalProperties": {
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "format": "int64"
                                             }
                                         }
                                     }
@@ -2213,6 +2247,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2286,6 +2321,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2359,6 +2395,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2384,7 +2421,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -2436,6 +2474,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2443,6 +2482,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "tag ID to update",
                         "name": "tagID",
                         "in": "path",
@@ -2468,7 +2508,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -2523,6 +2564,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2530,6 +2572,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "move files? true/false",
                         "name": "moveFiles",
                         "in": "query",
@@ -2630,6 +2673,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -2855,6 +2899,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Application instance (1-index).",
                         "name": "instance",
                         "in": "path",
@@ -3255,6 +3300,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -3353,6 +3399,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -3380,7 +3427,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -3450,6 +3498,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -3526,6 +3575,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -3677,6 +3727,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -3684,6 +3735,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "TMDB ID",
                         "name": "tmdbid",
                         "in": "path",
@@ -3772,6 +3824,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -3779,6 +3832,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Movie ID",
                         "name": "movieID",
                         "in": "path",
@@ -3849,6 +3903,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -3923,6 +3978,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4020,6 +4076,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4093,6 +4150,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4188,6 +4246,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4195,6 +4254,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Custom Format ID",
                         "name": "formatID",
                         "in": "path",
@@ -4265,6 +4325,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4272,6 +4333,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "movie file ID to delete",
                         "name": "movieFileID",
                         "in": "path",
@@ -4348,6 +4410,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4355,6 +4418,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "movie ID to delete",
                         "name": "movieID",
                         "in": "path",
@@ -4431,6 +4495,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4505,6 +4570,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4605,6 +4671,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4613,7 +4680,8 @@
                     {
                         "type": "array",
                         "items": {
-                            "type": "integer"
+                            "type": "integer",
+                            "format": "int64"
                         },
                         "collectionFormat": "csv",
                         "description": "exclusion IDs to delete, comma separated",
@@ -4686,6 +4754,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4759,6 +4828,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4766,6 +4836,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Movie ID",
                         "name": "movieID",
                         "in": "path",
@@ -4836,6 +4907,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -4910,6 +4982,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5010,6 +5083,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5017,6 +5091,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Import List ID",
                         "name": "listID",
                         "in": "path",
@@ -5114,6 +5189,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5205,7 +5281,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -5278,6 +5355,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5376,6 +5454,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5403,7 +5482,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -5473,6 +5553,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5546,6 +5627,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5620,6 +5702,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5647,7 +5730,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -5720,6 +5804,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5727,6 +5812,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -5840,6 +5926,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -5847,6 +5934,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -5935,6 +6023,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6008,6 +6097,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6078,6 +6168,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6152,6 +6243,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6255,6 +6347,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6262,6 +6355,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "queue ID to delete",
                         "name": "queueID",
                         "in": "path",
@@ -6362,6 +6456,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6382,7 +6477,8 @@
                                         "message": {
                                             "type": "object",
                                             "additionalProperties": {
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "format": "int64"
                                             }
                                         }
                                     }
@@ -6442,6 +6538,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6515,6 +6612,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6588,6 +6686,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6613,7 +6712,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -6665,6 +6765,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6672,6 +6773,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "tag ID to update",
                         "name": "tagID",
                         "in": "path",
@@ -6697,7 +6799,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -6752,6 +6855,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -6759,6 +6863,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "move files? true/false",
                         "name": "moveFiles",
                         "in": "query",
@@ -6859,6 +6964,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7010,6 +7116,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7017,6 +7124,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "author ID",
                         "name": "authorID",
                         "in": "path",
@@ -7087,6 +7195,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7094,6 +7203,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Good Reads ID",
                         "name": "gridID",
                         "in": "path",
@@ -7182,6 +7292,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7189,6 +7300,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Book ID",
                         "name": "bookID",
                         "in": "path",
@@ -7259,6 +7371,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7335,6 +7448,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7433,6 +7547,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7460,7 +7575,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -7530,6 +7646,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7603,6 +7720,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7677,6 +7795,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7704,7 +7823,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -7777,6 +7897,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7784,6 +7905,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -7887,6 +8009,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7960,6 +8083,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -7967,6 +8091,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "queue ID to delete",
                         "name": "queueID",
                         "in": "path",
@@ -8067,6 +8192,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8087,7 +8213,8 @@
                                         "message": {
                                             "type": "object",
                                             "additionalProperties": {
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "format": "int64"
                                             }
                                         }
                                     }
@@ -8147,6 +8274,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8220,6 +8348,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8293,6 +8422,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8318,7 +8448,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -8370,6 +8501,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8377,6 +8509,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "tag ID to update",
                         "name": "tagID",
                         "in": "path",
@@ -8402,7 +8535,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -8457,6 +8591,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8464,6 +8599,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "move files? true/false",
                         "name": "moveFiles",
                         "in": "query",
@@ -8564,6 +8700,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8707,6 +8844,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8714,6 +8852,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "move files? true/false",
                         "name": "moveFiles",
                         "in": "query",
@@ -8796,6 +8935,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8947,6 +9087,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -8954,6 +9095,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "TVDB ID",
                         "name": "tvdbid",
                         "in": "path",
@@ -9045,6 +9187,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9142,6 +9285,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9149,6 +9293,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Series ID",
                         "name": "seriesID",
                         "in": "path",
@@ -9219,6 +9364,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9226,6 +9372,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Command ID returned by executing a command",
                         "name": "commandID",
                         "in": "path",
@@ -9296,6 +9443,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9370,6 +9518,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9467,6 +9616,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9540,6 +9690,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9547,6 +9698,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Custom Format ID",
                         "name": "formatID",
                         "in": "path",
@@ -9642,6 +9794,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9649,6 +9802,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Custom Format ID",
                         "name": "formatID",
                         "in": "path",
@@ -9719,6 +9873,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9726,6 +9881,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "episode file ID to delete, not episode ID",
                         "name": "episodeFileID",
                         "in": "path",
@@ -9802,6 +9958,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9809,6 +9966,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Series ID",
                         "name": "seriesID",
                         "in": "path",
@@ -9879,6 +10037,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -9886,6 +10045,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Series ID",
                         "name": "seriesID",
                         "in": "path",
@@ -9959,6 +10119,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10033,6 +10194,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10133,6 +10295,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10140,6 +10303,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Import List ID",
                         "name": "listID",
                         "in": "path",
@@ -10237,6 +10401,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10310,6 +10475,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10401,7 +10567,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -10474,6 +10641,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10572,6 +10740,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10599,7 +10768,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -10669,6 +10839,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10742,6 +10913,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10816,6 +10988,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10843,7 +11016,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -10916,6 +11090,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -10923,6 +11098,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -11036,6 +11212,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11043,6 +11220,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -11131,6 +11309,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11204,6 +11383,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11274,6 +11454,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11348,6 +11529,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11451,6 +11633,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11458,6 +11641,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "queue ID to delete",
                         "name": "queueID",
                         "in": "path",
@@ -11558,6 +11742,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11632,6 +11817,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11659,7 +11845,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -11729,6 +11916,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11802,6 +11990,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11809,6 +11998,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -11922,6 +12112,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -11929,6 +12120,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "profile ID to update",
                         "name": "profileID",
                         "in": "path",
@@ -12017,6 +12209,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -12037,7 +12230,8 @@
                                         "message": {
                                             "type": "object",
                                             "additionalProperties": {
-                                                "type": "integer"
+                                                "type": "integer",
+                                                "format": "int64"
                                             }
                                         }
                                     }
@@ -12097,6 +12291,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -12173,6 +12368,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -12270,6 +12466,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -12343,6 +12540,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -12368,7 +12566,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -12420,6 +12619,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -12427,6 +12627,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "tag ID to update",
                         "name": "tagID",
                         "in": "path",
@@ -12452,7 +12653,8 @@
                                     "type": "object",
                                     "properties": {
                                         "message": {
-                                            "type": "integer"
+                                            "type": "integer",
+                                            "format": "int64"
                                         }
                                     }
                                 }
@@ -12504,6 +12706,7 @@
                 "parameters": [
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "instance ID",
                         "name": "instance",
                         "in": "path",
@@ -12511,6 +12714,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Episode ID",
                         "name": "episodeID",
                         "in": "path",
@@ -14092,6 +14296,7 @@
                     },
                     {
                         "type": "integer",
+                        "format": "int64",
                         "description": "Application instance (1-index).",
                         "name": "instance",
                         "in": "path",
@@ -15024,6 +15229,7 @@
             "properties": {
                 "time.Duration": {
                     "type": "integer",
+                    "format": "int64",
                     "enum": [
                         -9223372036854775808,
                         9223372036854775807,
@@ -15033,14 +15239,11 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
                         1000000000,
-                        60000000000,
-                        3600000000000
+                        60000000000
                     ],
                     "x-enum-varnames": [
                         "minDuration",
@@ -15051,14 +15254,11 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
                         "Second",
-                        "Minute",
-                        "Hour"
+                        "Minute"
                     ]
                 }
             }
@@ -17679,6 +17879,9 @@
                 "ratings": {
                     "$ref": "#/definitions/starr.OpenRatings"
                 },
+                "releaseDate": {
+                    "type": "string"
+                },
                 "runtime": {
                     "type": "integer"
                 },
@@ -19567,6 +19770,22 @@
             "x-enum-comments": {
                 "MonitorLatestSeason": "obsolete"
             },
+            "x-enum-descriptions": [
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "obsolete",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ],
             "x-enum-varnames": [
                 "MonitorUnknown",
                 "MonitorAll",

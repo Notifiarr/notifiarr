@@ -811,7 +811,7 @@
       },
       "url": {
         "label": "URL",
-        "description": "URL of the Transmission instance.",
+        "description": "URL of the Transmission instance. It <b>must</b> include the <code>/transmission/rpc</code> suffix.",
         "placeholder": "http://transmission.server.tv:9091"
       },
       "username": {
