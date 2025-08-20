@@ -18,7 +18,7 @@ import (
 
 func (c *Client) toggleServer(ctx context.Context) {
 	if !menu["stat"].Checked() {
-		ui.Toast("Started web server") //nolint:errcheck
+		ui.Toast(ctx, "Started web server") //nolint:errcheck
 		logs.Log.Printf("[user requested] Starting Web Server, baseurl: %s, bind address: %s",
 			c.Config.URLBase, c.Config.BindAddr)
 		go c.RunWebServer()
@@ -26,7 +26,7 @@ func (c *Client) toggleServer(ctx context.Context) {
 		return
 	}
 
-	ui.Toast("Paused web server") //nolint:errcheck
+	ui.Toast(ctx, "Paused web server") //nolint:errcheck
 	logs.Log.Printf("[user requested] Pausing Web Server")
 
 	if err := c.StopWebServer(ctx); err != nil {
@@ -34,13 +34,13 @@ func (c *Client) toggleServer(ctx context.Context) {
 	}
 }
 
-func (c *Client) rotateLogs() {
+func (c *Client) rotateLogs(ctx context.Context) {
 	logs.Log.Printf("[user requested] Rotating Log Files!")
-	ui.Toast("Rotating log files") //nolint:errcheck
+	ui.Toast(ctx, "Rotating log files") //nolint:errcheck
 
 	for _, err := range logs.Log.Rotate() {
 		if err != nil {
-			ui.Toast("Error rotating log files: %v", err) //nolint:errcheck
+			ui.Toast(ctx, "Error rotating log files: %v", err) //nolint:errcheck
 			logs.Log.Errorf("Rotating Log Files: %v", err)
 		}
 	}
@@ -143,7 +143,7 @@ func (c *Client) menuPanic() {
 	panic("user requested panic")
 }
 
-func (c *Client) openGUI() {
+func (c *Client) openGUI(ctx context.Context) {
 	uri := "http://127.0.0.1"
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		uri = "https://127.0.0.1"
@@ -151,21 +151,21 @@ func (c *Client) openGUI() {
 
 	// This always has a colon, or the app will not start.
 	port := strings.Split(c.Config.BindAddr, ":")[1]
-	if err := ui.OpenURL(uri + ":" + port + c.Config.URLBase); err != nil {
+	if err := ui.OpenURL(ctx, uri+":"+port+c.Config.URLBase); err != nil {
 		logs.Log.Errorf("Opening URL: %v", err)
 	}
 }
 
 //nolint:errcheck
-func (c *Client) autoStart() {
+func (c *Client) autoStart(ctx context.Context) {
 	if menu["auto"].Checked() {
 		menu["auto"].Uncheck()
 
 		if file, err := ui.DeleteStartupLink(); err != nil {
-			ui.Toast("Failed disabling autostart: %s", err.Error())
+			ui.Toast(ctx, "Failed disabling autostart: %s", err.Error())
 			logs.Log.Errorf("[user requested] Disabling auto start: %v", err)
 		} else {
-			ui.Toast("Removed auto start file: %s", file)
+			ui.Toast(ctx, "Removed auto start file: %s", file)
 			logs.Log.Printf("[user requested] Removed auto start file: %s", file)
 		}
 
@@ -174,15 +174,15 @@ func (c *Client) autoStart() {
 
 	menu["auto"].Check()
 
-	if loaded, file, err := ui.CreateStartupLink(); err != nil {
-		ui.Toast("Failed enabling autostart: %s", err.Error())
+	if loaded, file, err := ui.CreateStartupLink(ctx); err != nil {
+		ui.Toast(ctx, "Failed enabling autostart: %s", err.Error())
 		logs.Log.Errorf("[user requested] Enabling auto start: %v", err)
 	} else if mnd.IsDarwin && !loaded {
-		ui.Toast("Created auto start file: %s - Exiting so launchctl can restart the app.", file)
+		ui.Toast(ctx, "Created auto start file: %s - Exiting so launchctl can restart the app.", file)
 		logs.Log.Printf("[user requested] Created auto start file: %s (exiting)", file)
 		c.sigkil <- &update.Signal{Text: "launchctl restart"}
 	} else {
-		ui.Toast("Created auto start file: %s", file)
+		ui.Toast(ctx, "Created auto start file: %s", file)
 		logs.Log.Printf("[user requested] Created auto start file: %s", file)
 	}
 }
@@ -197,7 +197,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 	if err := c.StopWebServer(ctx); err != nil {
 		logs.Log.Errorf("Stopping web server: %v", err)
 
-		if err = ui.Toast("Stopping web server failed, password not updated."); err != nil {
+		if err = ui.Toast(ctx, "Stopping web server failed, password not updated."); err != nil {
 			logs.Log.Errorf("Creating Toast Notification: %v", err)
 		}
 
@@ -211,7 +211,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 		_, _ = ui.Error("Updating Web UI Password: " + err.Error())
 	}
 
-	if err = ui.Toast("Web UI password updated. Save config to persist this change."); err != nil {
+	if err = ui.Toast(ctx, "Web UI password updated. Save config to persist this change."); err != nil {
 		logs.Log.Errorf("Creating Toast Notification: %v", err)
 	}
 

@@ -172,7 +172,7 @@ func (c *Client) start(ctx context.Context, msgs []string, newPassword string) e
 	}
 
 	if c.Flags.Updated {
-		go ui.Toast("%s updated to v%s-%s", mnd.Title, version.Version, version.Revision) //nolint:errcheck
+		go ui.Toast(ctx, "%s updated to v%s-%s", mnd.Title, version.Version, version.Revision) //nolint:errcheck
 	}
 
 	if newPassword != "" {
@@ -217,7 +217,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 		open, _ := ui.Question("http://127.0.0/1:5454 - Your Web UI password was set to "+newPassword+
 			" and was also printed in the log file:"+c.Config.LogFile+"\n\nOpen Web UI?\n", false)
 		if open {
-			_ = ui.OpenURL("http://127.0.0.1:5454")
+			_ = ui.OpenURL(ctx, "http://127.0.0.1:5454")
 		}
 	}()
 }
@@ -236,7 +236,7 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	output := []string{msg}
 
 	if c.Flags.Restart {
-		return output, newPassword, update.Restart(&update.Command{ //nolint:wrapcheck
+		return output, newPassword, update.Restart(ctx, &update.Command{ //nolint:wrapcheck
 			Path: os.Args[0],
 			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
 		}, os.Getppid())
@@ -420,14 +420,14 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 		logs.Log.Printf(" 🌀 %s v%s-%s Configuration Reloaded! No config file, Uptime: %s",
 			c.Flags.Name(), version.Version, version.Revision, uptime)
 
-		if err = ui.Toast("Configuration Reloaded! No config file."); err != nil {
+		if err = ui.Toast(ctx, "Configuration Reloaded! No config file."); err != nil {
 			logs.Log.Errorf("Creating Toast Notification: %v", err)
 		}
 	} else {
 		logs.Log.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s, Uptime: %s",
 			c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile, uptime)
 
-		if err = ui.Toast("Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
+		if err = ui.Toast(ctx, "Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
 			logs.Log.Errorf("Creating Toast Notification: %v", err)
 		}
 	}

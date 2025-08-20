@@ -3,6 +3,7 @@ package snapshot
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -35,12 +36,12 @@ type Synology struct {
 */
 
 // GetSynology checks if the app is running on a Synology, and gets system info.
-func GetSynology(snapshot bool) (*Synology, error) { //nolint:cyclop
+func GetSynology(ctx context.Context, snapshot bool) (*Synology, error) { //nolint:cyclop
 	if !mnd.IsSynology {
 		return nil, ErrNotSynology
 	}
 
-	synoHA, err := getSynoHAStats(snapshot)
+	synoHA, err := getSynoHAStats(ctx, snapshot)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +91,7 @@ func GetSynology(snapshot bool) (*Synology, error) { //nolint:cyclop
 // getSynoHAStats uses `sudo synoha` to pull high-availability disk statuses.
 // This package is not installed on most systems,
 // this function ends at the LookPath in that case.
-func getSynoHAStats(run bool) (map[string]string, error) {
+func getSynoHAStats(ctx context.Context, run bool) (map[string]string, error) {
 	if !run {
 		return nil, nil //nolint:nilnil
 	}
@@ -112,7 +113,7 @@ func getSynoHAStats(run bool) (map[string]string, error) {
 	for _, arg := range cmds {
 		cmdout.Reset()
 
-		cmd := exec.Command("sudo", synoha, "--"+arg)
+		cmd := exec.CommandContext(ctx, "sudo", synoha, "--"+arg)
 		cmd.Stderr = io.Discard // Do not care about error output.
 		cmd.Stdout = &cmdout    // Use buffer for command output.
 

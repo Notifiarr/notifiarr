@@ -161,7 +161,7 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 	}
 
 	var err error
-	if snap.Synology, err = GetSynology(true); err != nil && !errors.Is(err, ErrNotSynology) {
+	if snap.Synology, err = GetSynology(ctx, true); err != nil && !errors.Is(err, ErrNotSynology) {
 		errs = append(errs, err)
 	} else if snap.Synology != nil {
 		snap.Synology.SetInfo(snap.System.InfoStat)

@@ -139,7 +139,6 @@ func (c *cmd) checkAndUpdate(ctx context.Context, action *common.ActionInput) {
 		return // Only Windows can auto update.
 	}
 
-	//nolint:wsl
 	if c.UnstableCh {
 		mnd.Log.Debugf("[cron requested] Checking Unstable website for Update.")
 		data, err = update.CheckUnstable(ctx, mnd.DefaultName, version.Revision)
