@@ -45,7 +45,7 @@ var (
 )
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
-func Restart(cmd *Command, waitForPids ...int) error {
+func Restart(ctx context.Context, cmd *Command, waitForPids ...int) error {
 	defer time.Sleep(time.Second)
 
 	// Wait for the parent process to exit.
@@ -53,7 +53,7 @@ func Restart(cmd *Command, waitForPids ...int) error {
 		waitForPidsToExit(waitForPids)
 	}
 
-	if err := exec.Command(cmd.Path, cmd.Args...).Start(); err != nil { //nolint:gosec
+	if err := exec.CommandContext(ctx, cmd.Path, cmd.Args...).Start(); err != nil { //nolint:gosec
 		return fmt.Errorf("executing command %w", err)
 	}
 
@@ -133,7 +133,7 @@ func NowWithContext(ctx context.Context, update *Command) (string, error) {
 
 	mnd.Log.Printf("[UPDATE] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
 
-	if err := exec.Command(update.Path, update.Args...).Start(); err != nil { //nolint:gosec
+	if err := exec.CommandContext(ctx, update.Path, update.Args...).Start(); err != nil { //nolint:gosec
 		return backupFile, fmt.Errorf("executing restart command: %w", err)
 	}
 

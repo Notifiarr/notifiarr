@@ -111,7 +111,7 @@ func (s *Service) checkNow(ctx context.Context) *result {
 	case CheckHTTP:
 		return s.checkHTTP(ctx)
 	case CheckTCP:
-		return s.checkTCP()
+		return s.checkTCP(ctx)
 	case CheckPING, CheckICMP:
 		return s.checkPING()
 	case CheckPROC:
@@ -262,13 +262,14 @@ func RemoveSecrets(appURL, message string) string {
 	return message
 }
 
-func (s *ServiceConfig) checkTCP() *result {
+func (s *ServiceConfig) checkTCP(ctx context.Context) *result {
 	res := &result{
 		state:  StateUnknown,
 		output: &Output{str: "unknown"},
 	}
 
-	switch conn, err := net.DialTimeout("tcp", s.Value, s.Timeout.Duration); {
+	dialer := &net.Dialer{Timeout: s.Timeout.Duration}
+	switch conn, err := dialer.DialContext(ctx, "tcp", s.Value); {
 	case err != nil:
 		res.state = StateCritical
 		res.output = &Output{str: "connection error: " + err.Error()}

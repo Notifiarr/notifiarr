@@ -262,9 +262,7 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 			cases = append(cases[:idx], cases[idx+1:]...)
 			died = c.killWatcher(item)
 		case idx == 1:
-			mnd.Log.Printf("==> Temp DEBUG: fileWatcherTicker (before)")
 			died = c.fileWatcherTicker(died)
-			mnd.Log.Printf("==> Temp DEBUG: fileWatcherTicker (after)")
 		case data.IsNil(), data.IsZero(), !data.Elem().CanInterface():
 			mnd.Log.Errorf("Got non-addressable file watcher data from %s", item.Path)
 			mnd.FileWatcher.Add(item.Path+Errors, 1)

@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -20,7 +21,7 @@ func HasGUI() bool {
 	return hasGUI
 }
 
-func Toast(msg string, vars ...interface{}) error {
+func Toast(ctx context.Context, msg string, vars ...interface{}) error {
 	if !hasGUI {
 		return nil
 	}
@@ -36,7 +37,7 @@ func Toast(msg string, vars ...interface{}) error {
 		return fmt.Errorf("cannot locate terminal-notifier: %w, app folder: %s, ../: %s", err, app, list)
 	}
 
-	err = StartCmd(app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "io.golift.notifiarr")
+	err = StartCmd(ctx, app, "-title", mnd.Title, "-message", fmt.Sprintf(msg, vars...), "-sender", "io.golift.notifiarr")
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}
@@ -45,8 +46,8 @@ func Toast(msg string, vars ...interface{}) error {
 }
 
 // StartCmd starts a command.
-func StartCmd(command string, args ...string) error {
-	cmd := exec.Command(command, args...)
+func StartCmd(ctx context.Context, command string, args ...string) error {
+	cmd := exec.CommandContext(ctx, command, args...)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
@@ -58,23 +59,23 @@ func StartCmd(command string, args ...string) error {
 }
 
 // OpenCmd opens anything.
-func OpenCmd(cmd ...string) error {
-	return StartCmd(opener, cmd...)
+func OpenCmd(ctx context.Context, cmd ...string) error {
+	return StartCmd(ctx, opener, cmd...)
 }
 
 // OpenURL opens URL Links.
-func OpenURL(url string) error {
-	return OpenCmd(url)
+func OpenURL(ctx context.Context, url string) error {
+	return OpenCmd(ctx, url)
 }
 
 // OpenLog opens Log Files.
-func OpenLog(logFile string) error {
-	return OpenCmd("-b", "com.apple.Console", logFile)
+func OpenLog(ctx context.Context, logFile string) error {
+	return OpenCmd(ctx, "-b", "com.apple.Console", logFile)
 }
 
 // OpenFile open Config Files.
-func OpenFile(filePath string) error {
-	return OpenCmd("-t", filePath)
+func OpenFile(ctx context.Context, filePath string) error {
+	return OpenCmd(ctx, "-t", filePath)
 }
 
 func HasStartupLink() (string, bool) {
@@ -104,7 +105,7 @@ func DeleteStartupLink() (string, error) {
 	return link, nil
 }
 
-func CreateStartupLink() (bool, string, error) {
+func CreateStartupLink(ctx context.Context) (bool, string, error) {
 	dir, err := os.UserHomeDir()
 	if err != nil {
 		return false, "", fmt.Errorf("finding home dir: %w", err)
@@ -136,11 +137,11 @@ func CreateStartupLink() (bool, string, error) {
 	}
 
 	loaded := false
-	if err := StartCmd("launchctl", "list", "io.golift.notifiarr"); err == nil {
+	if err := StartCmd(ctx, "launchctl", "list", "io.golift.notifiarr"); err == nil {
 		loaded = true
 	}
 
-	if err := StartCmd("launchctl", "load", "-w", path); err != nil {
+	if err := StartCmd(ctx, "launchctl", "load", "-w", path); err != nil {
 		return loaded, path, fmt.Errorf("loading launch agent: %w", err)
 	}
 

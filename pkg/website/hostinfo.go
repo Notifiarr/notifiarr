@@ -47,7 +47,7 @@ func (s *Server) GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //no
 		return nil, fmt.Errorf("getting host info: %w", err)
 	}
 
-	syn, err := snapshot.GetSynology(false) // false makes it not do snapshot data, just get syno info.
+	syn, err := snapshot.GetSynology(ctx, false) // false makes it not do snapshot data, just get syno info.
 	if err == nil {
 		// This method writes synology data into hostInfo.
 		syn.SetInfo(hostInfo)

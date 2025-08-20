@@ -41,7 +41,7 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 		systray.SetTooltip(mnd.PrintVersionInfo(c.Flags.Name()))
 		// systray.SetOnClick(c.showMenu) // buggy
 		systray.SetOnRClick(c.showMenu)
-		systray.SetOnDClick(func(_ systray.IMenu) { c.openGUI() })
+		systray.SetOnDClick(func(_ systray.IMenu) { c.openGUI(ctx) })
 		c.makeMenus(ctx, clientInfo) // make the menu before starting the web server.
 		c.setupMenus(clientInfo)     // code that runs on reload, too.
 
@@ -123,10 +123,10 @@ func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInf
 	menu["stat"].Disable() // so the webserver cannot be started twice on startup.
 
 	c.configMenu(ctx)
-	c.linksMenu()
-	c.logsMenu()
-	c.notifiarrMenu()
-	c.debugMenu()
+	c.linksMenu(ctx)
+	c.logsMenu(ctx)
+	c.notifiarrMenu(ctx)
+	c.debugMenu(ctx)
 
 	menu["update"] = systray.AddMenuItem("Update", "check GitHub for updated version")
 	menu["update"].Click(func() { go c.triggers.AutoUpdate.CheckForUpdate(ctx, false) })
@@ -137,13 +137,13 @@ func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInf
 	}
 
 	menu["gui"] = systray.AddMenuItem("Open WebUI", "open the web page for this Notifiarr client")
-	menu["gui"].Click(c.openGUI)
+	menu["gui"].Click(func() { c.openGUI(ctx) })
 
 	_, hasLink := ui.HasStartupLink()
 	menu["auto"] = systray.AddMenuItemCheckbox("Auto Start", "start the Notifiarr client after login", hasLink)
-	menu["auto"].Click(c.autoStart)
+	menu["auto"].Click(func() { c.autoStart(ctx) })
 	menu["sub"] = systray.AddMenuItem("Subscribe", "subscribe for premium features")
-	menu["sub"].Click(func() { ui.OpenURL("https://github.com/sponsors/Notifiarr") })
+	menu["sub"].Click(func() { ui.OpenURL(ctx, "https://github.com/sponsors/Notifiarr") })
 	menu["exit"] = systray.AddMenuItem("Quit", "exit "+c.Flags.Name())
 	menu["exit"].Click(func() {
 		logs.Log.Printf("Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
@@ -162,7 +162,7 @@ func (c *Client) configMenu(ctx context.Context) {
 
 	menu["edit"] = conf.AddSubMenuItem("Edit", "edit configuration")
 	menu["edit"].Click(func() {
-		ui.OpenFile(c.Flags.ConfigFile)
+		ui.OpenFile(ctx, c.Flags.ConfigFile)
 		logs.Log.Print("user requested] Editing Config File:", c.Flags.ConfigFile)
 	})
 
@@ -181,11 +181,11 @@ func (c *Client) configMenu(ctx context.Context) {
 		if menu["svcs"].Checked() {
 			menu["svcs"].Uncheck()
 			c.Services.Stop()
-			ui.Toast("Stopped checking services!")
+			ui.Toast(ctx, "Stopped checking services!")
 		} else {
 			menu["svcs"].Check()
 			c.Services.Start(ctx, c.apps.Plex.Name())
-			ui.Toast("Service checks started!")
+			ui.Toast(ctx, "Service checks started!")
 		}
 	})
 
@@ -195,65 +195,65 @@ func (c *Client) configMenu(ctx context.Context) {
 	})
 }
 
-func (c *Client) linksMenu() {
+func (c *Client) linksMenu(ctx context.Context) {
 	link := systray.AddMenuItem("Links", "external resources")
 	menu["link"] = link
 
 	menu["hp"] = link.AddSubMenuItem("Notifiarr.com", "open Notifiarr.com")
-	menu["hp"].Click(func() { ui.OpenURL("https://notifiarr.com/") })
+	menu["hp"].Click(func() { ui.OpenURL(ctx, "https://notifiarr.com/") })
 
 	menu["wiki"] = link.AddSubMenuItem("Notifiarr.Wiki", "open Notifiarr wiki")
-	menu["wiki"].Click(func() { ui.OpenURL("https://notifiarr.wiki/") })
+	menu["wiki"].Click(func() { ui.OpenURL(ctx, "https://notifiarr.wiki/") })
 
 	menu["trash"] = link.AddSubMenuItem("TRaSH Guide", "open TRaSH wiki for Notifiarr")
-	menu["trash"].Click(func() { ui.OpenURL("https://trash-guides.info/Notifiarr/Quick-Start/") })
+	menu["trash"].Click(func() { ui.OpenURL(ctx, "https://trash-guides.info/Notifiarr/Quick-Start/") })
 
 	menu["disc1"] = link.AddSubMenuItem("Notifiarr Discord", "open Notifiarr discord server")
-	menu["disc1"].Click(func() { ui.OpenURL("https://notifiarr.com/discord") })
+	menu["disc1"].Click(func() { ui.OpenURL(ctx, "https://notifiarr.com/discord") })
 
 	menu["disc2"] = link.AddSubMenuItem("Go Lift Discord", "open Go Lift discord server")
-	menu["disc2"].Click(func() { ui.OpenURL("https://golift.io/discord") })
+	menu["disc2"].Click(func() { ui.OpenURL(ctx, "https://golift.io/discord") })
 
 	menu["gh"] = link.AddSubMenuItem("GitHub Project", c.Flags.Name()+" on GitHub")
-	menu["gh"].Click(func() { ui.OpenURL("https://github.com/Notifiarr/notifiarr/") })
+	menu["gh"].Click(func() { ui.OpenURL(ctx, "https://github.com/Notifiarr/notifiarr/") })
 }
 
-func (c *Client) logsMenu() {
+func (c *Client) logsMenu(ctx context.Context) {
 	logsMenu := systray.AddMenuItem("Logs", "log file info")
 	menu["logs"] = logsMenu
 
 	menu["logs_view"] = logsMenu.AddSubMenuItem("View", "view the application log")
 	menu["logs_view"].Click(func() {
-		ui.OpenLog(c.Config.LogFile)
+		ui.OpenLog(ctx, c.Config.LogFile)
 		logs.Log.Print("[user requested] Viewing App Log File:", c.Config.LogFile)
 	})
 
 	menu["logs_http"] = logsMenu.AddSubMenuItem("HTTP", "view the HTTP log")
 	menu["logs_http"].Click(func() {
-		ui.OpenLog(c.Config.HTTPLog)
+		ui.OpenLog(ctx, c.Config.HTTPLog)
 		logs.Log.Print("[user requested] Viewing HTTP Log File:", c.Config.HTTPLog)
 	})
 
 	menu["debug_logs2"] = logsMenu.AddSubMenuItem("Debug", "view the Debug log")
 	menu["debug_logs2"].Click(func() {
-		ui.OpenLog(c.Config.LogConfig.DebugLog)
+		ui.OpenLog(ctx, c.Config.LogConfig.DebugLog)
 		logs.Log.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
 	})
 
 	menu["logs_svcs"] = logsMenu.AddSubMenuItem("Services", "view the Services log")
 	menu["logs_svcs"].Click(func() {
-		ui.OpenLog(c.Config.Services.LogFile)
+		ui.OpenLog(ctx, c.Config.Services.LogFile)
 		logs.Log.Print("[user requested] Viewing Services Log File:", c.Config.Services.LogFile)
 	})
 
 	menu["logs_rotate"] = logsMenu.AddSubMenuItem("Rotate", "rotate both log files")
-	menu["logs_rotate"].Click(c.rotateLogs)
+	menu["logs_rotate"].Click(func() { c.rotateLogs(ctx) })
 }
 
 // notifiarrMenu makes the Notifiarr menu.
 //
 //nolint:lll
-func (c *Client) notifiarrMenu() {
+func (c *Client) notifiarrMenu(ctx context.Context) {
 	data := systray.AddMenuItem("Notifiarr", "plex sessions, system snapshots, service checks")
 	menu["data"] = data
 	menu["gaps"] = data.AddSubMenuItem("Send Radarr Gaps", "[premium feature] trigger radarr collections gaps")
@@ -274,16 +274,16 @@ func (c *Client) notifiarrMenu() {
 	menu["backReadarr"] = data.AddSubMenuItem("Send Readarr Backups", "send backup file list for each instance to Notifiarr")
 	menu["backSonarr"] = data.AddSubMenuItem("Send Sonarr Backups", "send backup file list for each instance to Notifiarr")
 
-	c.notifiarrMenuActions()
+	c.notifiarrMenuActions(ctx)
 }
 
-func (c *Client) notifiarrMenuActions() {
+func (c *Client) notifiarrMenuActions(ctx context.Context) {
 	menu["gaps"].Click(func() { c.triggers.Gaps.Send(website.EventUser) })
 	menu["synccf"].Click(func() { c.triggers.CFSync.SyncRadarrCF(website.EventUser) })
 	menu["syncqp"].Click(func() { c.triggers.CFSync.SyncSonarrRP(website.EventUser) })
 	menu["svcs_prod"].Click(func() {
 		logs.Log.Printf("[user requested] Checking services and sending results to Notifiarr.")
-		ui.Toast("Running and sending %d Service Checks.", c.Services.SvcCount())
+		ui.Toast(ctx, "Running and sending %d Service Checks.", c.Services.SvcCount())
 		c.Services.RunChecks(website.EventUser)
 	})
 	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(website.EventUser) })
@@ -321,20 +321,20 @@ func (c *Client) notifiarrMenuActions() {
 	})
 }
 
-func (c *Client) debugMenu() {
+func (c *Client) debugMenu(ctx context.Context) {
 	debug := systray.AddMenuItem("Debug", "Debug Menu")
 	menu["debug"] = debug
 
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["debug_logs"].Click(func() {
-		ui.OpenLog(c.Config.LogConfig.DebugLog)
+		ui.OpenLog(ctx, c.Config.LogConfig.DebugLog)
 		logs.Log.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
 	})
 
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
 	menu["svcs_log"].Click(func() {
 		logs.Log.Print("[user requested] Checking services and logging results.")
-		ui.Toast("Running and logging %d Service Checks.", c.Services.SvcCount())
+		ui.Toast(ctx, "Running and logging %d Service Checks.", c.Services.SvcCount())
 		c.Services.RunChecks("log")
 	})
 

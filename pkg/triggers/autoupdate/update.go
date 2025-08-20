@@ -42,7 +42,7 @@ func (c *cmd) checkForUpdates(ctx context.Context, unstable bool) {
 	case data.Outdate && runtime.GOOS == mnd.Windows:
 		c.upgradeWindows(ctx, data)
 	case data.Outdate:
-		c.downloadUpdate(data, unstable)
+		c.downloadUpdate(ctx, data, unstable)
 	default:
 		_, _ = ui.Info("You're up to date! Version: " + data.Current + " @ " + where + "\n" +
 			"Updated: " + data.RelDate.Format("Jan 2, 2006") + mnd.DurationAge(data.RelDate))
@@ -64,7 +64,7 @@ func (c *cmd) upgradeWindows(ctx context.Context, update *update.Update) {
 }
 
 // downloadUpdate is the pop-up a mac user sees when they click update in the menu.
-func (c *cmd) downloadUpdate(update *update.Update, unstable bool) {
+func (c *cmd) downloadUpdate(ctx context.Context, update *update.Update, unstable bool) {
 	msg := "An Update from GitHub is available! Download?\n\n"
 
 	if unstable {
@@ -76,6 +76,6 @@ func (c *cmd) downloadUpdate(update *update.Update, unstable bool) {
 		"New Version: "+update.Current+"\n"+
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAge(update.RelDate), false)
 	if yes {
-		_ = ui.OpenURL(update.CurrURL)
+		_ = ui.OpenURL(ctx, update.CurrURL)
 	}
 }

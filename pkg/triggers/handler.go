@@ -1,6 +1,7 @@
 package triggers
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"path"
@@ -124,10 +125,11 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	_ = req.ParseForm()
 	input.Args = req.PostForm["args"]
 
-	return a.runTrigger(input, trigger, content)
+	return a.runTrigger(req.Context(), input, trigger, content)
 }
 
-func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string) (int, string) { //nolint:cyclop,funlen
+//nolint:cyclop,funlen
+func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, trigger, content string) (int, string) {
 	switch trigger {
 	case "custom", "TrigCustomCronTimer":
 		return a.customTimer(input, content)
@@ -180,7 +182,7 @@ func (a *Actions) runTrigger(input *common.ActionInput, trigger, content string)
 	case "reload", "TrigStop":
 		return a.handleConfigReload()
 	case "notification":
-		return a.notification(content)
+		return a.notification(ctx, content)
 	case "emptyplextrash", "TrigPlexEmptyTrash":
 		return a.emptyplextrash(input, content)
 	case "mdblist", "TrigMDBListSync":
@@ -496,9 +498,9 @@ func (a *Actions) handleConfigReload() (int, string) {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trigger/notification/{content} [get]
 // @Security     ApiKeyAuth
-func (a *Actions) notification(content string) (int, string) {
+func (a *Actions) notification(ctx context.Context, content string) (int, string) {
 	if content != "" {
-		ui.Toast("Notification: %s", content) //nolint:errcheck
+		ui.Toast(ctx, "Notification: %s", content) //nolint:errcheck
 		mnd.Log.Printf("NOTIFICATION: %s", content)
 
 		return http.StatusOK, "Local Nntification sent."

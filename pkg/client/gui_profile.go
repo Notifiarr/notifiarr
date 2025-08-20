@@ -106,7 +106,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	username, dynamic := c.getUserName(req)
 	upstreamIP := strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]")
 	binary, _ := os.Executable()
-	outboundIP := clientinfo.GetOutboundIP()
+	outboundIP := clientinfo.GetOutboundIP(req.Context())
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
 	hostInfo, _ := website.Site.GetHostInfo(req.Context())

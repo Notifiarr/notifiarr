@@ -15,8 +15,11 @@ linters:
     - predeclared
     - recvcheck
     - revive
+    - wsl_v5
     - wsl
+    - noinlineerr
     - staticcheck
+    - embeddedstructfieldcheck
   exclusions:
     presets:
       - comments

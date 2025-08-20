@@ -5,6 +5,7 @@
 package ui
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -24,13 +25,13 @@ func HasGUI() bool {
 }
 
 // Toast does not do anything on this OS.
-func Toast(_ string, _ ...interface{}) error {
+func Toast(_ context.Context, _ string, _ ...interface{}) error {
 	return nil
 }
 
 // StartCmd starts a command.
-func StartCmd(command string, args ...string) error {
-	cmd := exec.Command(command, args...)
+func StartCmd(ctx context.Context, command string, args ...string) error {
+	cmd := exec.CommandContext(ctx, command, args...)
 	cmd.Stdout = io.Discard
 	cmd.Stderr = io.Discard
 
@@ -42,23 +43,23 @@ func StartCmd(command string, args ...string) error {
 }
 
 // OpenCmd opens anything.
-func OpenCmd(cmd ...string) error {
+func OpenCmd(ctx context.Context, cmd ...string) error {
 	return fmt.Errorf("%w: %s: %s", ErrUnsupported, runtime.GOOS, cmd)
 }
 
 // OpenURL opens URL Links.
-func OpenURL(url string) error {
-	return OpenCmd(url)
+func OpenURL(ctx context.Context, url string) error {
+	return OpenCmd(ctx, url)
 }
 
 // OpenLog opens Log Files.
-func OpenLog(logFile string) error {
-	return OpenCmd(logFile)
+func OpenLog(ctx context.Context, logFile string) error {
+	return OpenCmd(ctx, logFile)
 }
 
 // OpenFile open Config Files.
-func OpenFile(filePath string) error {
-	return OpenCmd(filePath)
+func OpenFile(ctx context.Context, filePath string) error {
+	return OpenCmd(ctx, filePath)
 }
 
 func HasStartupLink() (string, bool) {
@@ -69,6 +70,6 @@ func DeleteStartupLink() (string, error) {
 	return "", ErrUnsupported
 }
 
-func CreateStartupLink() (bool, string, error) {
+func CreateStartupLink(_ context.Context) (bool, string, error) {
 	return false, "", ErrUnsupported
 }

@@ -147,7 +147,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 			Started:   version.Started,
 			Docker:    mnd.IsDocker,
 			HasGUI:    ui.HasGUI(),
-			Listen:    GetOutboundIP() + ":" + port,
+			Listen:    GetOutboundIP(ctx) + ":" + port,
 			Tunnel:    true, // no toggle for this.
 		},
 		Num: map[string]int{
@@ -236,8 +236,10 @@ func (c *Config) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
 	return users, nil
 }
 
-func GetOutboundIP() string {
-	conn, err := net.Dial("udp", "1.1.1.1:437")
+func GetOutboundIP(ctx context.Context) string {
+	dialer := &net.Dialer{Timeout: 1 * time.Second}
+
+	conn, err := dialer.DialContext(ctx, "udp", "1.1.1.1:437")
 	if err != nil {
 		return ""
 	}
