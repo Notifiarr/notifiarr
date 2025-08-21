@@ -20,7 +20,7 @@ jobs:
     name: Make macOS DMG
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # we need the whole thing so we can count commits.
           fetch-depth: '0'
@@ -79,7 +79,7 @@ jobs:
           sample-size: 1024 # Number of kilobytes to download during the speed from each mirror
           sample-time: 3 # Maximum number of seconds within the sample download from a mirror must finish
           country: 'us' # The country code for selecting Ubuntu mirrors. If not set, defaults to http://mirrors.ubuntu.com/mirrors.txt
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # we need the whole thing so we can count commits.
           fetch-depth: '0'
@@ -229,7 +229,7 @@ jobs:
     name: Deploy ArchLinux AUR
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: '0'
       - name: Download SHA files from build

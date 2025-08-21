@@ -10,7 +10,7 @@ jobs:
         os: [ubuntu, macos, windows]
     runs-on: ${{ matrix.os }}-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
@@ -26,7 +26,7 @@ jobs:
   codespell:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: codespell-project/actions-codespell@v2
         with:
           check_hidden: true
@@ -43,7 +43,7 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
@@ -68,7 +68,7 @@ jobs:
     env:
       GOOS: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
