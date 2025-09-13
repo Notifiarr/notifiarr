@@ -25,7 +25,7 @@
   type Props = {
     children: Snippet<[any]>
     page: Omit<Page, 'component'>
-    get: () => Promise<BackendResponse>
+    get?: () => Promise<BackendResponse>
     footer?: Snippet<[any]>
     isOpen: boolean
   }
@@ -38,10 +38,15 @@
   const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 110px)')
 
   const refresh = async () => {
-    loading = true
-    resp = await get()
-    await delay(300)
-    loading = false
+    try {
+      loading = true
+      resp = get ? await get() : undefined
+      await delay(300)
+    } catch (error) {
+      resp = { ok: false, body: error }
+    } finally {
+      loading = false
+    }
   }
 
   $effect(() => {
@@ -55,22 +60,24 @@
     <T id="{page.id}.title" />
 
     <ButtonGroup class="float-end">
-      <Button
-        id="refreshM"
-        outline
-        color="secondary"
-        size="sm"
-        on:click={refresh}
-        aria-label={$_('ModalWrap.button.refresh')}
-        title={$_('ModalWrap.button.refresh')}>
-        <Fa
-          i={faArrowsRotate}
-          c1="steelblue"
-          c2="firebrick"
-          d2="pink"
-          scale={1.5}
-          spin={loading} />
-      </Button>
+      {#if get}
+        <Button
+          id="refreshM"
+          outline
+          color="secondary"
+          size="sm"
+          on:click={refresh}
+          aria-label={$_('ModalWrap.button.refresh')}
+          title={$_('ModalWrap.button.refresh')}>
+          <Fa
+            i={faArrowsRotate}
+            c1="steelblue"
+            c2="firebrick"
+            d2="pink"
+            scale={1.5}
+            spin={loading} />
+        </Button>
+      {/if}
       <Button
         id="fullscreenM"
         outline
@@ -112,8 +119,8 @@
   <ModalBody style="max-height: {height}; overflow: auto;">
     {#if loading && !resp}
       <T id="phrases.Loading" />
-    {:else if resp && resp.ok}
-      {@render children(resp.body)}
+    {:else if (resp && resp.ok) || !get}
+      {@render children(resp?.body)}
     {:else if resp && !resp.ok}
       <T id="{page.id}.error" error={resp.body} />
     {:else}

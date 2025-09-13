@@ -41,6 +41,1250 @@ export enum Frequency {
 };
 
 /**
+ * Integrations is the data returned by the UI integrations endpoint.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Integrations>
+ */
+export interface Integrations {
+  snapshot?: Snapshot;
+  snapshotAge: Date;
+  plex?: PMSInfo;
+  plexAge: Date;
+  sessions?: Sessions;
+  sessionsAge: Date;
+  dashboard?: States;
+  dashboardAge: Date;
+  tautulliUsers?: Users;
+  tautulliUsersAge: Date;
+  tautulli?: Info;
+  tautulliAge: Date;
+  lidarr: {
+    status?: SystemStatus[];
+    statusAge?: Date[];
+    queue?: Queue[];
+    queueAge?: Date[];
+  };
+  radarr: {
+    status?: RadarrSystemStatus[];
+    statusAge?: Date[];
+    queue?: RadarrQueue[];
+    queueAge?: Date[];
+  };
+  readarr: {
+    status?: ReadarrSystemStatus[];
+    statusAge?: Date[];
+    queue?: ReadarrQueue[];
+    queueAge?: Date[];
+  };
+  sonarr: {
+    status?: SonarrSystemStatus[];
+    statusAge?: Date[];
+    queue?: SonarrQueue[];
+    queueAge?: Date[];
+  };
+  prowlarr: {
+    status?: ProwlarrSystemStatus[];
+    statusAge?: Date[];
+  };
+};
+
+/**
+ * Snapshot is the output data sent to Notifiarr.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Snapshot>
+ */
+export interface Snapshot {
+  version: string;
+  system: {
+    username: string;
+    cpuPerc: number;
+    memFree: number;
+    memUsed: number;
+    memTotal: number;
+    temperatures?: Record<string, number>;
+    users: number;
+    cpuTime: TimesStat;
+  };
+  raid?: RaidData;
+  driveAges?: Record<string, number>;
+  driveTemps?: Record<string, number>;
+  driveHealth?: Record<string, string>;
+  diskUsage?: Record<string, null | Partition>;
+  quotas?: Record<string, null | Partition>;
+  zfsPools?: Record<string, null | Partition>;
+  ioTop?: IOTopData;
+  ioStat?: IoStatDisk[];
+  ioStat2?: Record<string, IOCountersStat>;
+  processes?: Process[];
+  mysql?: Record<string, null | MySQLServerData>;
+  nvidia?: NvidiaOutput[];
+  ipmiSensors?: IPMISensor[];
+  synology?: Synology;
+};
+
+/**
+ * A HostInfoStat describes the host status.
+ * This is not in the psutil but it useful.
+ * @see golang: <github.com/shirou/gopsutil/v4/host.InfoStat>
+ */
+export interface InfoStat {
+  hostname: string;
+  uptime: number;
+  bootTime: number;
+  procs: number;
+  os: string;
+  platform: string;
+  platformFamily: string;
+  platformVersion: string;
+  kernelVersion: string;
+  kernelArch: string;
+  virtualizationSystem: string;
+  virtualizationRole: string;
+  hostId: string;
+};
+
+/**
+ * @see golang: <github.com/shirou/gopsutil/v4/load.AvgStat>
+ */
+export interface AvgStat {
+  load1: number;
+  load5: number;
+  load15: number;
+};
+
+/**
+ * TimesStat contains the amounts of time the CPU has spent performing different
+ * kinds of work. Time units are in seconds. It is based on linux /proc/stat file.
+ * @see golang: <github.com/shirou/gopsutil/v4/cpu.TimesStat>
+ */
+export interface TimesStat {
+  cpu: string;
+  user: number;
+  system: number;
+  idle: number;
+  nice: number;
+  iowait: number;
+  irq: number;
+  softirq: number;
+  steal: number;
+  guest: number;
+  guestNice: number;
+};
+
+/**
+ * RaidData contains raid information from mdstat and/or megacli.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.RaidData>
+ */
+export interface RaidData {
+  mdstat?: string;
+  megacli?: MegaCLI[];
+};
+
+/**
+ * MegaCLI represents the megaraid cli output.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.MegaCLI>
+ */
+export interface MegaCLI {
+  drive: string;
+  target: string;
+  adapter: string;
+  data?: Record<string, string>;
+};
+
+/**
+ * Partition is used for ZFS pools as well as normal Disk arrays.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Partition>
+ */
+export interface Partition {
+  name: string;
+  total: number;
+  free: number;
+  used: number;
+  fsType?: string;
+  readOnly?: boolean;
+  opts?: string[];
+};
+
+/**
+ * IOTopData is the data structure for iotop output.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.IOTopData>
+ */
+export interface IOTopData {
+  totalRead: number;
+  totalWrite: number;
+  currentRead: number;
+  currentWrite: number;
+  procs?: IOTopProc[];
+};
+
+/**
+ * IOTopProc is part of IOTopData.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.IOTopProc>
+ */
+export interface IOTopProc {
+  pid: number;
+  prio: string;
+  user: string;
+  diskRead: number;
+  diskWrite: number;
+  swapIn: number;
+  io: number;
+  command: string;
+};
+
+/**
+ * IoStatDisk is part of IoStatData.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.IoStatDisk>
+ */
+export interface IoStatDisk {
+  disk_device: string;
+  rs: number;
+  ws: number;
+  ds: number;
+  rkBs: number;
+  wkBs: number;
+  dkBs: number;
+  rrqms: number;
+  wrqms: number;
+  drqms: number;
+  rrqm: number;
+  wrqm: number;
+  drqm: number;
+  r_await: number;
+  w_await: number;
+  d_await: number;
+  rareqsz: number;
+  wareqsz: number;
+  dareqsz: number;
+  aqusz: number;
+  util: number;
+};
+
+/**
+ * @see golang: <github.com/shirou/gopsutil/v4/disk.IOCountersStat>
+ */
+export interface IOCountersStat {
+  readCount: number;
+  mergedReadCount: number;
+  writeCount: number;
+  mergedWriteCount: number;
+  readBytes: number;
+  writeBytes: number;
+  readTime: number;
+  writeTime: number;
+  iopsInProgress: number;
+  ioTime: number;
+  weightedIO: number;
+  name: string;
+  serialNumber: string;
+  label: string;
+};
+
+/**
+ * Process is a PID's basic info.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Process>
+ */
+export interface Process {
+  name: string;
+  pid: number;
+  memPercent: number;
+  cpuPercent: number;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.MySQLServerData>
+ */
+export interface MySQLServerData {
+  name: string;
+  processes?: MySQLProcess[];
+  globalstatus?: Record<string, null | any>;
+};
+
+/**
+ * MySQLProcess represents the data returned from SHOW PROCESS LIST.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.MySQLProcess>
+ */
+export interface MySQLProcess {
+  id: number;
+  user: string;
+  host: string;
+  db: NullString;
+  command: string;
+  time: number;
+  state: string;
+  info: NullString;
+  progress: number;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.NullString>
+ */
+export interface NullString extends SqlNullString {};
+
+/**
+ * @see golang: <database/sql.NullString>
+ */
+export interface SqlNullString {
+  String: string;
+  Valid: boolean;
+};
+
+/**
+ * NvidiaOutput is what we send to the website.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.NvidiaOutput>
+ */
+export interface NvidiaOutput {
+  name: string;
+  driverVersion: string;
+  pState: string;
+  vBios: string;
+  busId: string;
+  temperature: number;
+  utiliization: number;
+  memTotal: number;
+  memFree: number;
+};
+
+/**
+ * IPMISensor contains the data for one sensor.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.IPMISensor>
+ */
+export interface IPMISensor {
+  name: string;
+  value: number;
+  unit: string;
+  state: string;
+};
+
+/**
+ * Synology is the data we care about from the config file.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Synology>
+ */
+export interface Synology {
+  last_admin_login_build: string;
+  manager: string;
+  vender: string;
+  upnpmodelname: string;
+  udc_check_state: string;
+  ha?: Record<string, string>;
+};
+
+/**
+ * PMSInfo is the `/` path on Plex.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.PMSInfo>
+ */
+export interface PMSInfo {
+  allowCameraUpload: boolean;
+  allowChannelAccess: boolean;
+  allowSharing: boolean;
+  allowSync: boolean;
+  allowTuners: boolean;
+  backgroundProcessing: boolean;
+  certificate: boolean;
+  companionProxy: boolean;
+  countryCode: string;
+  diagnostics: string;
+  Directory?: Directory[];
+  eventStream: boolean;
+  friendlyName: string;
+  hubSearch: boolean;
+  itemClusters: boolean;
+  livetv: number;
+  machineIdentifier: string;
+  maxUploadBitrate: number;
+  maxUploadBitrateReason: string;
+  maxUploadBitrateReasonMessage: string;
+  mediaProviders: boolean;
+  multiuser: boolean;
+  myPlex: boolean;
+  myPlexMappingState: string;
+  myPlexSigninState: string;
+  myPlexSubscription: boolean;
+  myPlexUsername: string;
+  offlineTranscode: number;
+  ownerFeatures: string;
+  photoAutoTag: boolean;
+  platform: string;
+  platformVersion: string;
+  pluginHost: boolean;
+  pushNotifications: boolean;
+  readOnlyLibraries: boolean;
+  requestParametersInCookie: boolean;
+  size: number;
+  streamingBrainABRVersion: number;
+  streamingBrainVersion: number;
+  sync: boolean;
+  transcoderActiveVideoSessions: number;
+  transcoderAudio: boolean;
+  transcoderLyrics: boolean;
+  transcoderPhoto: boolean;
+  transcoderSubtitles: boolean;
+  transcoderVideo: boolean;
+  transcoderVideoBitrates: string;
+  transcoderVideoQualities: string;
+  transcoderVideoResolutions: string;
+  updatedAt: number;
+  updater: boolean;
+  version: string;
+  voiceSearch: boolean;
+};
+
+/**
+ * Directory is part of the PMSInfo.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Directory>
+ */
+export interface Directory {
+  count: number;
+  key: string;
+  title: string;
+};
+
+/**
+ * Sessions is the config input data.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Sessions>
+ */
+export interface Sessions {
+  server: string;
+  hostId: string;
+  sessions?: Session[];
+};
+
+/**
+ * Session is a Plex json struct.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Session>
+ */
+export interface Session {
+  User: User;
+  Player: Player;
+  TranscodeSession: Transcode;
+  addedAt: number;
+  art: string;
+  audienceRating: number;
+  audienceRatingImage: string;
+  contentRating: string;
+  duration: number;
+  guid: string;
+  grandparentArt: string;
+  grandparentGuid: string;
+  grandparentKey: string;
+  grandparentRatingKey: string;
+  grandparentTheme: string;
+  grandparentThumb: string;
+  grandparentTitle: string;
+  index: number;
+  key: string;
+  lastViewedAt: number;
+  librarySectionID: string;
+  librarySectionKey: string;
+  librarySectionTitle: string;
+  originallyAvailableAt: string;
+  parentGuid: string;
+  parentIndex: number;
+  parentKey: string;
+  parentRatingKey: string;
+  parentThumb: string;
+  parentTitle: string;
+  primaryExtraKey: string;
+  rating: number;
+  ratingImage: string;
+  ratingKey: string;
+  sessionKey: string;
+  studio: string;
+  summary: string;
+  thumb: string;
+  title: string;
+  titleSort: string;
+  type: string;
+  updatedAt: number;
+  viewCount: number;
+  viewOffset: number;
+  year: number;
+  Session: {
+    bandwidth: number;
+    id: string;
+    location: string;
+  };
+  Guid?: GUID[];
+  Media?: Media[];
+  Rating?: Rating[];
+};
+
+/**
+ * User is part of a Plex Session.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.User>
+ */
+export interface User {
+  id: string;
+  thumb: string;
+  title: string;
+};
+
+/**
+ * Player is part of a Plex Session.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Player>
+ */
+export interface Player {
+  address: string;
+  device: string;
+  machineIdentifier: string;
+  model: string;
+  platform: string;
+  platformVersion: string;
+  product: string;
+  profile: string;
+  remotePublicAddress: string;
+  state: string;
+  stateTime: StructDur;
+  title: string;
+  userID: number;
+  vendor: string;
+  version: string;
+  relayed: boolean;
+  local: boolean;
+  secure: boolean;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.structDur>
+ */
+export interface StructDur extends Date {};
+
+/**
+ * Transcode is part of a Plex Session.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Transcode>
+ */
+export interface Transcode {
+  audioChannels: number;
+  audioCodec: string;
+  audioDecision: string;
+  container: string;
+  context: string;
+  duration: number;
+  key: string;
+  maxOffsetAvailable: number;
+  minOffsetAvailable: number;
+  progress: number;
+  protocol: string;
+  remaining: number;
+  size: number;
+  sourceAudioCodec: string;
+  sourceVideoCodec: string;
+  speed: number;
+  timeStamp: number;
+  videoCodec: string;
+  videoDecision: string;
+  throttled: boolean;
+  complete: boolean;
+  transcodeHwFullPipeline: boolean;
+  transcodeHwRequested: boolean;
+};
+
+/**
+ * GUID is a reusable type from the Section library.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.GUID>
+ */
+export interface GUID {
+  id: string;
+};
+
+/**
+ * Media is part of a Plex Session.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Media>
+ */
+export interface Media {
+  aspectRatio: string;
+  audioChannels: number;
+  audioCodec: string;
+  audioProfile: string;
+  bitrate: number;
+  container: string;
+  duration: number;
+  height: number;
+  id: string;
+  protocol: string;
+  optimizedForStreaming: boolean;
+  videoCodec: string;
+  videoFrameRate: string;
+  videoProfile: string;
+  videoResolution: string;
+  width: number;
+  selected: boolean;
+  Part?: MediaPart[];
+};
+
+/**
+ * MediaPart is part of a Plex Session.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.MediaPart>
+ */
+export interface MediaPart {
+  audioProfile: string;
+  bitrate: number;
+  container: string;
+  decision: string;
+  duration: number;
+  file: string;
+  height: number;
+  id: string;
+  indexes: string;
+  key: string;
+  protocol: string;
+  selected: boolean;
+  size: number;
+  optimizedForStreaming: boolean;
+  videoProfile: string;
+  width: number;
+  Stream?: MediaStream[];
+};
+
+/**
+ * MediaStream is part of a Plex Session.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.MediaStream>
+ */
+export interface MediaStream {
+  audioChannelLayout?: string;
+  bitDepth?: number;
+  bitrate: number;
+  bitrateMode?: string;
+  channels?: number;
+  chromaLocation?: string;
+  chromaSubsampling?: string;
+  codec: string;
+  codedHeight?: number;
+  codedWidth?: number;
+  colorPrimaries?: string;
+  colorTrc?: string;
+  decision: string;
+  default?: boolean;
+  displayTitle: string;
+  extendedDisplayTitle: string;
+  frameRate?: number;
+  hasScalingMatrix?: boolean;
+  height?: number;
+  id: string;
+  index: number;
+  language?: string;
+  languageCode?: string;
+  level?: number;
+  location: string;
+  profile: string;
+  refFrames?: number;
+  samplingRate?: number;
+  scanType?: string;
+  selected?: boolean;
+  streamType: number;
+  width?: number;
+  languageTag?: string;
+};
+
+/**
+ * Rating is part of Plex metadata.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.Rating>
+ */
+export interface Rating {
+  image: string;
+  value?: any;
+  type: string;
+};
+
+/**
+ * States is our compiled states for the dashboard.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/dashboard.States>
+ */
+export interface States {
+  lidarr?: State[];
+  radarr?: State[];
+  readarr?: State[];
+  sonarr?: State[];
+  nzbget?: State[];
+  rtorrent?: State[];
+  qbit?: State[];
+  deluge?: State[];
+  sabnzbd?: State[];
+  transmission?: State[];
+  plexSessions?: any;
+};
+
+/**
+ * State is partially filled out once for each app instance.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/dashboard.State>
+ */
+export interface State {
+  /**
+   * Shared
+   */
+  error: string;
+  instance: number;
+  missing?: number;
+  size: number;
+  percent?: number;
+  upcoming?: number;
+  next?: Sortable[];
+  latest?: Sortable[];
+  onDisk?: number;
+  elapsed: string;
+  name: string;
+  /**
+   * Radarr
+   */
+  movies?: number;
+  /**
+   * Sonarr
+   */
+  shows?: number;
+  episodes?: number;
+  /**
+   * Readarr
+   */
+  authors?: number;
+  books?: number;
+  editions?: number;
+  /**
+   * Lidarr
+   */
+  artists?: number;
+  albums?: number;
+  tracks?: number;
+  /**
+   * Downloader
+   */
+  downloads?: number;
+  uploaded?: number;
+  incomplete?: number;
+  downloaded?: number;
+  uploading?: number;
+  downloading?: number;
+  seeding?: number;
+  paused?: number;
+  errors?: number;
+  month?: number;
+  week?: number;
+  day?: number;
+};
+
+/**
+ * Sortable holds data about any Starr item. Kind of a generic data store.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/dashboard.Sortable>
+ */
+export interface Sortable {
+  name: string;
+  subName?: string;
+  date: Date;
+  season?: number;
+  episode?: number;
+};
+
+/**
+ * Users is the entire get_users API response.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli.Users>
+ */
+export interface Users {
+  response: {
+    result: string;
+    message: string;
+    data?: TautulliUser[];
+  };
+};
+
+/**
+ * User is the user data from the get_users API call.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli.User>
+ */
+export interface TautulliUser {
+  row_id: number;
+  user_id: number;
+  username: string;
+  friendly_name: string;
+  thumb: string;
+  email: string;
+  server_token: string;
+  shared_libraries?: string[];
+  filter_all: string;
+  filter_movies: string;
+  filter_tv: string;
+  filter_music: string;
+  filter_photos: string;
+  is_active: number;
+  is_admin: number;
+  is_home_user: number;
+  is_allow_sync: number;
+  is_restricted: number;
+  do_notify: number;
+  keep_history: number;
+  allow_guest: number;
+};
+
+/**
+ * Info represent the data returned by the get_tautulli_info command.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli.Info>
+ */
+export interface Info {
+  tautulli_install_type: string;
+  tautulli_version: string;
+  tautulli_branch: string;
+  tautulli_commit: string;
+  tautulli_platform: string;
+  tautulli_platform_release: string;
+  tautulli_platform_version: string;
+  tautulli_platform_linux_distro: string;
+  tautulli_platform_device_name: string;
+  tautulli_python_version: string;
+};
+
+/**
+ * SystemStatus is the /api/v1/system/status endpoint.
+ * @see golang: <golift.io/starr/lidarr.SystemStatus>
+ */
+export interface SystemStatus {
+  appData: string;
+  appName: string;
+  authentication: string;
+  branch: string;
+  buildTime: Date;
+  instanceName: string;
+  isAdmin: boolean;
+  isDebug: boolean;
+  isDocker: boolean;
+  isLinux: boolean;
+  isNetCore: boolean;
+  isOsx: boolean;
+  isProduction: boolean;
+  isUserInteractive: boolean;
+  isWindows: boolean;
+  migrationVersion: number;
+  mode: string;
+  osName: string;
+  packageAuthor: string;
+  packageUpdateMechanism: string;
+  packageVersion: string;
+  runtimeName: string;
+  runtimeVersion: string;
+  sqliteVersion: string;
+  startTime: Date;
+  startupPath: string;
+  urlBase: string;
+  version: string;
+};
+
+/**
+ * Queue is the /api/v1/queue endpoint.
+ * @see golang: <golift.io/starr/lidarr.Queue>
+ */
+export interface Queue {
+  page: number;
+  pageSize: number;
+  sortKey: string;
+  sortDirection: string;
+  totalRecords: number;
+  records?: QueueRecord[];
+};
+
+/**
+ * QueueRecord represents the records returns by the /api/v1/queue endpoint.
+ * @see golang: <golift.io/starr/lidarr.QueueRecord>
+ */
+export interface QueueRecord {
+  downloadClientHasPostImportCategory: boolean;
+  artistId: number;
+  albumId: number;
+  quality?: Quality;
+  size: number;
+  title: string;
+  sizeleft: number;
+  timeleft: string;
+  estimatedCompletionTime: Date;
+  status: string;
+  trackedDownloadStatus: string;
+  statusMessages?: StatusMessage[];
+  downloadId: string;
+  protocol: string;
+  downloadClient: string;
+  indexer: string;
+  outputPath: string;
+  downloadForced: boolean;
+  id: number;
+  errorMessage: string;
+};
+
+/**
+ * Quality is a download quality profile attached to a movie, book, track or series.
+ * It may contain 1 or more profiles.
+ * Sonarr nor Readarr use Name or ID in this struct.
+ * @see golang: <golift.io/starr.Quality>
+ */
+export interface Quality {
+  name?: string;
+  id?: number;
+  quality?: BaseQuality;
+  items?: Quality[];
+  allowed: boolean;
+  revision?: QualityRevision;
+};
+
+/**
+ * BaseQuality is a base quality profile.
+ * @see golang: <golift.io/starr.BaseQuality>
+ */
+export interface BaseQuality {
+  id: number;
+  name: string;
+  source?: string;
+  resolution?: number;
+  modifier?: string;
+};
+
+/**
+ * QualityRevision is probably used in Sonarr.
+ * @see golang: <golift.io/starr.QualityRevision>
+ */
+export interface QualityRevision {
+  version: number;
+  real: number;
+  isRepack?: boolean;
+};
+
+/**
+ * StatusMessage represents the status of the item. All apps use this.
+ * @see golang: <golift.io/starr.StatusMessage>
+ */
+export interface StatusMessage {
+  title: string;
+  messages?: string[];
+};
+
+/**
+ * SystemStatus is the /api/v3/system/status endpoint.
+ * @see golang: <golift.io/starr/radarr.SystemStatus>
+ */
+export interface RadarrSystemStatus {
+  appData: string;
+  appName: string;
+  authentication: string;
+  branch: string;
+  buildTime: Date;
+  databaseType: string;
+  databaseVersion: string;
+  instanceName: string;
+  isAdmin: boolean;
+  isDebug: boolean;
+  isDocker: boolean;
+  isLinux: boolean;
+  isNetCore: boolean;
+  isOsx: boolean;
+  isProduction: boolean;
+  isUserInteractive: boolean;
+  isWindows: boolean;
+  migrationVersion: number;
+  mode: string;
+  osName: string;
+  packageAuthor: string;
+  packageUpdateMechanism: string;
+  packageVersion: string;
+  runtimeName: string;
+  runtimeVersion: string;
+  startTime: Date;
+  startupPath: string;
+  urlBase: string;
+  version: string;
+};
+
+/**
+ * Queue is the /api/v3/queue endpoint.
+ * @see golang: <golift.io/starr/radarr.Queue>
+ */
+export interface RadarrQueue {
+  page: number;
+  pageSize: number;
+  sortKey: string;
+  sortDirection: string;
+  totalRecords: number;
+  records?: RadarrQueueRecord[];
+};
+
+/**
+ * QueueRecord is part of the activity Queue.
+ * @see golang: <golift.io/starr/radarr.QueueRecord>
+ */
+export interface RadarrQueueRecord {
+  downloadClientHasPostImportCategory: boolean;
+  movieId: number;
+  languages?: Value[];
+  quality?: Quality;
+  customFormats?: CustomFormatOutput[];
+  size: number;
+  title: string;
+  sizeleft: number;
+  timeleft: string;
+  estimatedCompletionTime: Date;
+  status: string;
+  trackedDownloadStatus: string;
+  trackedDownloadState: string;
+  statusMessages?: StatusMessage[];
+  downloadId: string;
+  protocol: string;
+  downloadClient: string;
+  indexer: string;
+  outputPath: string;
+  id: number;
+  errorMessage: string;
+};
+
+/**
+ * Value is generic ID/Name struct applied to a few places.
+ * @see golang: <golift.io/starr.Value>
+ */
+export interface Value {
+  id: number;
+  name: string;
+};
+
+/**
+ * CustomFormatOutput is the output from the CustomFormat methods.
+ * @see golang: <golift.io/starr/radarr.CustomFormatOutput>
+ */
+export interface CustomFormatOutput {
+  id: number;
+  name: string;
+  includeCustomFormatWhenRenaming: boolean;
+  specifications?: CustomFormatOutputSpec[];
+};
+
+/**
+ * CustomFormatOutputSpec is part of a CustomFormatOutput.
+ * @see golang: <golift.io/starr/radarr.CustomFormatOutputSpec>
+ */
+export interface CustomFormatOutputSpec {
+  name: string;
+  implementation: string;
+  implementationName: string;
+  infoLink: string;
+  negate: boolean;
+  required: boolean;
+  fields?: FieldOutput[];
+};
+
+/**
+ * FieldOutput is generic Name/Value struct applied to a few places.
+ * @see golang: <golift.io/starr.FieldOutput>
+ */
+export interface FieldOutput {
+  advanced?: boolean;
+  order?: number;
+  helpLink?: string;
+  helpText?: string;
+  hidden?: string;
+  label?: string;
+  name: string;
+  selectOptionsProviderAction?: string;
+  type?: string;
+  privacy: string;
+  value?: any;
+  selectOptions?: SelectOption[];
+};
+
+/**
+ * SelectOption is part of Field.
+ * @see golang: <golift.io/starr.SelectOption>
+ */
+export interface SelectOption {
+  dividerAfter?: boolean;
+  order: number;
+  value: number;
+  hint: string;
+  name: string;
+};
+
+/**
+ * SystemStatus is the /api/v1/system/status endpoint.
+ * @see golang: <golift.io/starr/readarr.SystemStatus>
+ */
+export interface ReadarrSystemStatus {
+  appData: string;
+  appName: string;
+  authentication: string;
+  branch: string;
+  buildTime: Date;
+  databaseType: string;
+  databaseVersion: string;
+  instanceName: string;
+  isAdmin: boolean;
+  isDebug: boolean;
+  isDocker: boolean;
+  isLinux: boolean;
+  isMono: boolean;
+  isNetCore: boolean;
+  isOsx: boolean;
+  isProduction: boolean;
+  isUserInteractive: boolean;
+  isWindows: boolean;
+  migrationVersion: number;
+  mode: string;
+  osName: string;
+  osVersion: string;
+  packageAuthor: string;
+  packageUpdateMechanism: string;
+  packageVersion: string;
+  runtimeName: string;
+  runtimeVersion: string;
+  startTime: Date;
+  startupPath: string;
+  urlBase: string;
+  version: string;
+};
+
+/**
+ * Queue is the /api/v1/queue endpoint.
+ * @see golang: <golift.io/starr/readarr.Queue>
+ */
+export interface ReadarrQueue {
+  page: number;
+  pageSize: number;
+  sortKey: string;
+  sortDirection: string;
+  totalRecords: number;
+  records?: ReadarrQueueRecord[];
+};
+
+/**
+ * QueueRecord is a book from the queue API path.
+ * @see golang: <golift.io/starr/readarr.QueueRecord>
+ */
+export interface ReadarrQueueRecord {
+  downloadClientHasPostImportCategory: boolean;
+  authorId: number;
+  bookId: number;
+  quality?: Quality;
+  size: number;
+  title: string;
+  sizeleft: number;
+  timeleft: string;
+  estimatedCompletionTime: Date;
+  status: string;
+  trackedDownloadStatus?: string;
+  trackedDownloadState?: string;
+  statusMessages?: StatusMessage[];
+  downloadId?: string;
+  protocol: string;
+  downloadClient?: string;
+  indexer: string;
+  outputPath?: string;
+  downloadForced: boolean;
+  id: number;
+  errorMessage: string;
+};
+
+/**
+ * SystemStatus is the /api/v3/system/status endpoint.
+ * @see golang: <golift.io/starr/sonarr.SystemStatus>
+ */
+export interface SonarrSystemStatus {
+  appData: string;
+  appName: string;
+  authentication: string;
+  branch: string;
+  buildTime: Date;
+  instanceName: string;
+  isAdmin: boolean;
+  isDebug: boolean;
+  isLinux: boolean;
+  isMono: boolean;
+  isMonoRuntime: boolean;
+  isOsx: boolean;
+  isProduction: boolean;
+  isUserInteractive: boolean;
+  isWindows: boolean;
+  mode: string;
+  osName: string;
+  osVersion: string;
+  packageAuthor: string;
+  packageUpdateMechanism: string;
+  packageVersion: string;
+  runtimeName: string;
+  runtimeVersion: string;
+  sqliteVersion: string;
+  startTime: Date;
+  startupPath: string;
+  urlBase: string;
+  version: string;
+};
+
+/**
+ * Queue is the /api/v3/queue endpoint.
+ * @see golang: <golift.io/starr/sonarr.Queue>
+ */
+export interface SonarrQueue {
+  page: number;
+  pageSize: number;
+  sortKey: string;
+  sortDirection: string;
+  totalRecords: number;
+  records?: SonarrQueueRecord[];
+};
+
+/**
+ * QueueRecord is part of Queue.
+ * @see golang: <golift.io/starr/sonarr.QueueRecord>
+ */
+export interface SonarrQueueRecord {
+  downloadClientHasPostImportCategory: boolean;
+  id: number;
+  seriesId: number;
+  episodeId: number;
+  language?: Value;
+  quality?: Quality;
+  size: number;
+  title: string;
+  sizeleft: number;
+  timeleft: string;
+  estimatedCompletionTime: Date;
+  status: string;
+  trackedDownloadStatus: string;
+  trackedDownloadState: string;
+  statusMessages?: StatusMessage[];
+  downloadId: string;
+  protocol: string;
+  downloadClient: string;
+  indexer: string;
+  outputPath: string;
+  errorMessage: string;
+};
+
+/**
+ * SystemStatus is the /api/v1/system/status endpoint.
+ * @see golang: <golift.io/starr/prowlarr.SystemStatus>
+ */
+export interface ProwlarrSystemStatus {
+  appData: string;
+  appName: string;
+  authentication: string;
+  branch: string;
+  buildTime: Date;
+  databaseType: string;
+  databaseVersion: string;
+  instanceName: string;
+  isAdmin: boolean;
+  isDebug: boolean;
+  isDocker: boolean;
+  isLinux: boolean;
+  isMono: boolean;
+  isNetCore: boolean;
+  isOsx: boolean;
+  isProduction: boolean;
+  isUserInteractive: boolean;
+  isWindows: boolean;
+  migrationVersion: number;
+  mode: string;
+  osName: string;
+  osVersion: string;
+  packageAuthor: string;
+  packageUpdateMechanism: string;
+  packageVersion: string;
+  runtimeName: string;
+  runtimeVersion: string;
+  startTime: Date;
+  startupPath: string;
+  urlBase: string;
+  version: string;
+};
+
+/**
  * Profile is the data returned by the profile GET endpoint.
  * Basically everything.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Profile>
@@ -406,8 +1650,8 @@ export interface DelugeConfig extends ExtraConfig, DelugeConfig0 {};
 export interface DelugeConfig0 {
   url: string;
   password: string;
-  httppass: string;
-  httpuser: string;
+  http_pass: string;
+  http_user: string;
   version: string;
 };
 
@@ -425,8 +1669,8 @@ export interface QbitConfig0 {
   url: string;
   username: string;
   password: string;
-  httppass: string;
-  httpuser: string;
+  http_pass: string;
+  http_user: string;
 };
 
 /**
@@ -759,41 +2003,6 @@ export interface AllData {
 };
 
 /**
- * A HostInfoStat describes the host status.
- * This is not in the psutil but it useful.
- * @see golang: <github.com/shirou/gopsutil/v4/host.InfoStat>
- */
-export interface InfoStat {
-  hostname: string;
-  uptime: number;
-  bootTime: number;
-  procs: number;
-  os: string;
-  platform: string;
-  platformFamily: string;
-  platformVersion: string;
-  kernelVersion: string;
-  kernelArch: string;
-  virtualizationSystem: string;
-  virtualizationRole: string;
-  hostId: string;
-};
-
-/**
- * Partition is used for ZFS pools as well as normal Disk arrays.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Partition>
- */
-export interface Partition {
-  name: string;
-  total: number;
-  free: number;
-  used: number;
-  fsType?: string;
-  readOnly?: boolean;
-  opts?: string[];
-};
-
-/**
  * PoolSize represent the number of open connections per status.
  * @see golang: <golift.io/mulery/client.PoolSize>
  */
@@ -856,28 +2065,38 @@ export interface Stats {
 };
 
 // Packages parsed:
-//   1. github.com/Notifiarr/notifiarr/frontend
-//   2. github.com/Notifiarr/notifiarr/pkg/apps
-//   3. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
-//   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
-//   5. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
-//   6. github.com/Notifiarr/notifiarr/pkg/client
-//   7. github.com/Notifiarr/notifiarr/pkg/configfile
-//   8. github.com/Notifiarr/notifiarr/pkg/logs
-//   9. github.com/Notifiarr/notifiarr/pkg/mnd
-//  10. github.com/Notifiarr/notifiarr/pkg/services
-//  11. github.com/Notifiarr/notifiarr/pkg/snapshot
-//  12. github.com/Notifiarr/notifiarr/pkg/triggers/commands
-//  13. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
-//  14. github.com/Notifiarr/notifiarr/pkg/triggers/common
-//  15. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
-//  16. github.com/Notifiarr/notifiarr/pkg/triggers/crontimer
-//  17. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
-//  18. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
-//  19. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
-//  20. github.com/shirou/gopsutil/v4/host
-//  21. golift.io/deluge
-//  22. golift.io/mulery/client
-//  23. golift.io/nzbget
-//  24. golift.io/qbit
-//  25. golift.io/starr
+//   1. database/sql
+//   2. github.com/Notifiarr/notifiarr/frontend
+//   3. github.com/Notifiarr/notifiarr/pkg/apps
+//   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
+//   5. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
+//   6. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
+//   7. github.com/Notifiarr/notifiarr/pkg/client
+//   8. github.com/Notifiarr/notifiarr/pkg/configfile
+//   9. github.com/Notifiarr/notifiarr/pkg/logs
+//  10. github.com/Notifiarr/notifiarr/pkg/mnd
+//  11. github.com/Notifiarr/notifiarr/pkg/services
+//  12. github.com/Notifiarr/notifiarr/pkg/snapshot
+//  13. github.com/Notifiarr/notifiarr/pkg/triggers/commands
+//  14. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
+//  15. github.com/Notifiarr/notifiarr/pkg/triggers/common
+//  16. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
+//  17. github.com/Notifiarr/notifiarr/pkg/triggers/crontimer
+//  18. github.com/Notifiarr/notifiarr/pkg/triggers/dashboard
+//  19. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
+//  20. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
+//  21. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
+//  22. github.com/shirou/gopsutil/v4/cpu
+//  23. github.com/shirou/gopsutil/v4/disk
+//  24. github.com/shirou/gopsutil/v4/host
+//  25. github.com/shirou/gopsutil/v4/load
+//  26. golift.io/deluge
+//  27. golift.io/mulery/client
+//  28. golift.io/nzbget
+//  29. golift.io/qbit
+//  30. golift.io/starr
+//  31. golift.io/starr/lidarr
+//  32. golift.io/starr/prowlarr
+//  33. golift.io/starr/radarr
+//  34. golift.io/starr/readarr
+//  35. golift.io/starr/sonarr

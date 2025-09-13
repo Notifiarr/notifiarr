@@ -33,6 +33,9 @@ func main() {
 
 	docs := gotydoc.New()
 	goat := goty.NewGoty(&goty.Config{
+		GlobalOverrides: goty.Override{
+			KeepUnderscores: true,
+		},
 		Docs: docs,
 		Overrides: goty.Overrides{
 			cnfg.Duration{}:                 {Type: "string"},
@@ -65,7 +68,7 @@ func main() {
 		{Name: "Monthly", Value: scheduler.Monthly},
 	})
 	log.Println("==> parsing config structs")
-	goat.Parse(client.Profile{}, client.ProfilePost{}, commands.Stats{})
+	goat.Parse(client.Integrations{}, client.Profile{}, client.ProfilePost{}, commands.Stats{})
 
 	log.Println("==> splitting packages")
 	vendorPkgs, localPkgs := splitPkgs(goat.Pkgs())

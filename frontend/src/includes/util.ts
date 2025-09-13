@@ -37,7 +37,9 @@ export function since(date: Date | string): string {
 }
 
 /** age converts a milliseconds counter into human readable: 13h 5m 45s */
-export function age(milliseconds: number, includeSeconds = false): string {
+export function age(milliseconds: number | Date, includeSeconds = false): string {
+  if (typeof milliseconds !== 'number')
+    milliseconds = new Date().getTime() - new Date(milliseconds).getTime()
   const t = get(_) // translate function
   let seconds = Math.floor(milliseconds / 1000)
   if (!seconds) return t('words.clock.short.s', { values: { seconds: 0 } })
