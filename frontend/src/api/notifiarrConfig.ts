@@ -93,7 +93,7 @@ export interface Integrations {
  */
 export interface Snapshot {
   version: string;
-  system: {
+  system: InfoStat & AvgStat & {
     username: string;
     cpuPerc: number;
     memFree: number;
