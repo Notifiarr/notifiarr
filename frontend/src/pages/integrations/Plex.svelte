@@ -1,11 +1,14 @@
 <script lang="ts">
   import { profile } from '../../api/profile.svelte'
-  import type { PMSInfo, Sessions } from '../../api/notifiarrConfig'
+  import type { ApiResponse, PMSInfo, Sessions } from '../../api/notifiarrConfig'
   import { Card, Table, CardHeader } from '@sveltestrap/sveltestrap'
-  import { age } from '../../includes/util'
+  import { age, warning } from '../../includes/util'
   import Modal from './Modal.svelte'
   import { color, getLogo } from './data'
   import T, { _ } from '../../includes/Translate.svelte'
+  import { getApi, type BackendResponse } from '../../api/fetch'
+  import ModalWrap from '../stubs/ModalWrap.svelte'
+  import { faVideo } from '@fortawesome/sharp-duotone-light-svg-icons'
 
   type Props = { status?: PMSInfo; sessions?: Sessions; plexAge: Date; sessionsAge: Date }
   const { status, sessions, plexAge, sessionsAge }: Props = $props()
@@ -14,6 +17,9 @@
   let sessionsModal: Modal | null = $state(null)
   let sessionsJson: Modal | null = $state(null)
   const app = 'plex'
+
+  const refreshSessions = async (): Promise<BackendResponse> =>
+    await getApi('plex/1/sessions', true)
 </script>
 
 <Card outline color={color(app)}>
@@ -60,7 +66,7 @@
             <td class="text-break">{status.myPlexUsername}</td>
           </tr>
           <tr>
-            <td class="text-nowrap"><T id="Integrations.mediaTitles.Platform" /></td>
+            <td class="text-nowrap"><T id="system.OperatingSystem.Platform" /></td>
             <td class="text-break">{status.platform}</td>
           </tr>
         {/if}
@@ -99,66 +105,76 @@
   </Table>
 </Card>
 
-<Modal pageId="plexStatus" bind:this={sessionsModal}>
-  <Table striped bordered>
-    <thead>
-      <tr>
-        <td><b><T id="Integrations.mediaTitles.User" /></b></td>
-        <td><b><T id="Integrations.mediaTitles.Session" /></b></td>
-        <td><b><T id="Integrations.mediaTitles.Complete" /></b></td>
-        <td><b><T id="Integrations.mediaTitles.Encoding" /></b></td>
-        <td><b><T id="Integrations.mediaTitles.Title" /></b></td>
-      </tr>
-    </thead>
-    <tbody class="table-body">
-      {#each sessions?.sessions ?? [] as session}
+<ModalWrap
+  page={{ id: 'Integrations.plexSessions', i: faVideo }}
+  get={() => getApi('plex/1/sessions')}
+  bind:this={sessionsModal}>
+  {#snippet children(resp: ApiResponse)}
+    {@const sessions = (resp?.message as Sessions) ?? {}}
+    <Table striped bordered>
+      <thead>
         <tr>
-          <td title="uid: {session.User.id}" class="text-nowrap">
-            <img
-              referrerpolicy="no-referrer"
-              src={session.User.thumb}
-              height="25"
-              width="25"
-              class="float-start me-2"
-              alt={session.User.title} />
-            <h5>{session.User.title}</h5></td>
-          <td>
-            {session.type}
-            <i class="text-{session.Player.state == 'paused' ? 'danger' : 'success'}">
-              <T
-                id="Integrations.phrases.StateForTime"
-                state={session.Player.state}
-                timeDuration={age(
-                  (session.Player.stateTime as unknown as number) * 1000,
-                )} />
-            </i>
-          </td>
-          <td>
-            {session.Player.title},
-            {((session.viewOffset / session.duration) * 100).toFixed(1)}%
-          </td>
-
-          <td>
-            {#each session.Media ?? [] as media, idx}
-              {media.container}({media.videoCodec} @ {media.videoResolution} / {media.videoFrameRate},
-              {media.audioCodec} * {media.audioChannels}){#if idx < session.Media!.length - 1};{/if}
-            {/each}
-          </td>
-          <td>
-            {#if session.grandparentTitle}{session.grandparentTitle};{/if}
-            {session.title}
-            {#if session.grandparentTitle}
-              - S{session.parentIndex.toString().padStart(2, '0')}E{session.index
-                .toString()
-                .padStart(2, '0')}
-            {/if}
-            {#if session.year}({session.year}){/if}
-          </td>
+          <td colspan="2"><b><T id="Integrations.mediaTitles.User" /></b></td>
+          <td><b><T id="Integrations.mediaTitles.Session" /></b></td>
+          <td><b><T id="Integrations.mediaTitles.Complete" /></b></td>
+          <td><b><T id="Integrations.mediaTitles.Encoding" /></b></td>
+          <td><b><T id="Integrations.mediaTitles.Title" /></b></td>
         </tr>
-      {/each}
-    </tbody>
-  </Table>
-</Modal>
+      </thead>
+      <tbody class="table-body">
+        {#each sessions?.sessions ?? [] as session}
+          <tr>
+            <td title="uid: {session.User.id}" style="border-right: none;">
+              <img
+                referrerpolicy="no-referrer"
+                src={session.User.thumb}
+                height="25"
+                width="25"
+                alt={session.User.title} />
+            </td>
+            <td title="uid: {session.User.id}" style="border-left: none;">
+              <h5>{session.User.title}</h5></td>
+            <td>
+              {session.type}
+              <i class="text-{session.Player.state == 'paused' ? 'danger' : 'success'}">
+                <T
+                  id="Integrations.phrases.StateForTime"
+                  state={session.Player.state}
+                  timeDuration={age(
+                    (session.Player.stateTime as unknown as number) * 1000,
+                  )} />
+              </i>
+            </td>
+            <td>
+              {session.Player.title},
+              {((session.viewOffset / session.duration) * 100).toFixed(1)}%
+            </td>
+
+            <td>
+              {#each session.Media ?? [] as media, idx}
+                {media.container}({media.videoCodec} @ {media.videoResolution} / {media.videoFrameRate},
+                {media.audioCodec} * {media.audioChannels}){#if idx < session.Media!.length - 1};{/if}
+              {/each}
+            </td>
+            <td>
+              {#if session.grandparentTitle}{session.grandparentTitle};{/if}
+              {session.title}
+              {#if session.grandparentTitle}
+                - S{session.parentIndex.toString().padStart(2, '0')}E{session.index
+                  .toString()
+                  .padStart(2, '0')}
+              {/if}
+              {#if session.year}({session.year}){/if}
+            </td>
+          </tr>
+        {/each}
+      </tbody>
+    </Table>
+  {/snippet}
+  {#snippet footer(resp: BackendResponse)}
+    <T id="Integrations.plexSessions.footer" />
+  {/snippet}
+</ModalWrap>
 
 <style>
   .table-body :global(tr:last-of-type td) {

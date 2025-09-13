@@ -110,12 +110,12 @@ func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body lidarr.AddAlbumInput true "new item content"
 // @Accept       json
-// @Success      201  {object} apps.Respond.apiResponse{message=lidarr.Album} "created"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json payload"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
-// @Failure      422  {object} apps.Respond.apiResponse{message=string} "no item ID provided"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error during check"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error during add"
+// @Success      201  {object} apps.ApiResponse{message=lidarr.Album} "created"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json payload"
+// @Failure      409  {object} apps.ApiResponse{message=string} "item already exists"
+// @Failure      422  {object} apps.ApiResponse{message=string} "no item ID provided"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error during check"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error during add"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/add [post]
 // @Security     ApiKeyAuth
@@ -151,8 +151,8 @@ func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        artistID  path   int64  true  "artist ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.Artist} "ok"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=lidarr.Artist} "ok"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/artist/{artistID} [get]
 // @Security     ApiKeyAuth
@@ -187,9 +187,9 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        mbid  path   int64  true  "music brains ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "not found"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "already exists"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "not found"
+// @Failure      409  {object} apps.ApiResponse{message=string} "already exists"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/check/{mbid} [get]
 // @Security     ApiKeyAuth
@@ -212,8 +212,8 @@ func lidarrCheckAlbum(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        albumID  path   int64  true  "album ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.Album} "ok"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=lidarr.Album} "ok"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/get/{albumID} [get]
 // @Security     ApiKeyAuth
@@ -234,8 +234,8 @@ func lidarrGetAlbum(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        albumID  path   int64  true  "album ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "status"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "status"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/command/search/{albumID} [get]
 // @Security     ApiKeyAuth
@@ -258,8 +258,8 @@ func lidarrTriggerSearchAlbum(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=map[int64]string} "map of ID to name"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/metadataProfiles [get]
 // @Security     ApiKeyAuth
@@ -283,8 +283,8 @@ func lidarrMetadata(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.Naming} "naming conventions"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=lidarr.Naming} "naming conventions"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/naming [get]
 // @Security     ApiKeyAuth
@@ -303,9 +303,9 @@ func lidarrGetNaming(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        PUT body lidarr.Naming  true  "naming conventions"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64} "naming ID"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64} "naming ID"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json input"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/naming [put]
 // @Security     ApiKeyAuth
@@ -332,9 +332,9 @@ func lidarrUpdateNaming(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body lidarr.CustomFormatInput  true  "New Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.CustomFormatOutput}  "custom format"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=lidarr.CustomFormatOutput}  "custom format"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/customformats [post]
 // @Security     ApiKeyAuth
@@ -359,8 +359,8 @@ func lidarrAddCustomFormat(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.CustomFormatOutput}  "custom formats"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]lidarr.CustomFormatOutput}  "custom formats"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/customformats [get]
 // @Security     ApiKeyAuth
@@ -380,9 +380,9 @@ func lidarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        PUT body lidarr.CustomFormatInput  true  "Updated Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=lidarr.CustomFormatOutput}  "custom format"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=lidarr.CustomFormatOutput}  "custom format"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/customformats/{formatID} [put]
 // @Security     ApiKeyAuth
@@ -406,8 +406,8 @@ func lidarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        formatID  path   int64  true  "Custom Format ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/customformats/{formatID} [delete]
 // @Security     ApiKeyAuth
@@ -427,8 +427,8 @@ func lidarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=apps.deleteResponse}  "item delete counters"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=apps.deleteResponse}  "item delete counters"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/customformats/all [delete]
 // @Security     ApiKeyAuth
@@ -467,9 +467,9 @@ func lidarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        PUT body []lidarr.QualityDefinition  true  "Updated quality definitions"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.QualityDefinition}  "quality definitions return"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]lidarr.QualityDefinition}  "quality definitions return"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualitydefinition [put]
 // @Security     ApiKeyAuth
@@ -494,8 +494,8 @@ func lidarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=map[int64]string} "map of ID to name"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualityDefinitions [get]
 // @Security     ApiKeyAuth
@@ -520,8 +520,8 @@ func lidarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=map[int64]string} "map of ID to name"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualityProfiles [get]
 // @Security     ApiKeyAuth
@@ -546,8 +546,8 @@ func lidarrQualityProfiles(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.QualityProfile} "all profiles"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]lidarr.QualityProfile} "all profiles"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualityProfile [get]
 // @Security     ApiKeyAuth
@@ -568,9 +568,9 @@ func lidarrGetQualityProfile(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body lidarr.QualityProfile true "new item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new profile ID"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64} "new profile ID"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualityProfile [post]
 // @Security     ApiKeyAuth
@@ -600,10 +600,10 @@ func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
 // @Param        PUT body lidarr.QualityProfile true "updated item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      422  {object} apps.Respond.apiResponse{message=string} "no profile ID"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      422  {object} apps.ApiResponse{message=string} "no profile ID"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualityProfile/{profileID} [put]
 // @Security     ApiKeyAuth
@@ -635,8 +635,8 @@ func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=map[string]int64} "map of path->space free"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=map[string]int64} "map of path->space free"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/rootFolder [get]
 // @Security     ApiKeyAuth
@@ -662,8 +662,8 @@ func lidarrRootFolders(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        query     path   string  true  "title search string"
 // @Param        instance  path   int64   true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]apps.lidarrSearchAlbum.albumData}  "minimal album data"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]apps.lidarrSearchAlbum.albumData}  "minimal album data"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/search/{query} [get]
 // @Security     ApiKeyAuth
@@ -738,8 +738,8 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "tags"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]starr.Tag} "tags"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/tag [get]
 // @Security     ApiKeyAuth
@@ -759,8 +759,8 @@ func lidarrGetTags(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tagID     path   int64  true  "tag ID to update"
 // @Param        label     path   string  true  "new label"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64}  "tag ID"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/tag/{tagID}/{label} [put]
 // @Security     ApiKeyAuth
@@ -781,8 +781,8 @@ func lidarrUpdateTag(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        label     path   string true  "new tag's label"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64}  "tag ID"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/tag/{label} [put]
 // @Security     ApiKeyAuth
@@ -803,9 +803,9 @@ func lidarrSetTag(req *http.Request) (int, interface{}) {
 // @Param        instance  path  int64  true  "instance ID"
 // @Param        moveFiles query int64  true  "move files? true/false"
 // @Param        PUT body lidarr.Album  true  "album content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/update [put]
 // @Security     ApiKeyAuth
@@ -834,9 +834,9 @@ func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path  int64  true  "instance ID"
 // @Param        PUT body lidarr.Artist  true  "album content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/updateartist [put]
 // @Security     ApiKeyAuth
@@ -861,8 +861,8 @@ func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
 // @Tags         Lidarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]lidarr.NotificationOutput} "notifications"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]lidarr.NotificationOutput} "notifications"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/notifications [get]
 // @Security     ApiKeyAuth
@@ -893,8 +893,8 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Param        blocklist        query   bool  false  "add item to blocklist?"
 // @Param        skipRedownload   query   bool  false  "skip downloading this again?"
 // @Param        changeCategory   query   bool  false  "tell download client to change categories?"
-// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Failure      423  {object} string "rate limit reached"
 // @Router       /api/lidarr/{instance}/queue/{queueID} [delete]
@@ -925,9 +925,9 @@ func lidarrDeleteQueue(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        PUT body lidarr.NotificationInput  true  "notification content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/notification [put]
 // @Security     ApiKeyAuth
@@ -954,9 +954,9 @@ func lidarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body lidarr.NotificationInput true "new item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new notification ID"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64} "new notification ID"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/notification [post]
 // @Security     ApiKeyAuth

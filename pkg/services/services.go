@@ -293,7 +293,7 @@ func (s *Services) handleTrigger(req *http.Request, event website.EventType) (in
 // @Summary      Get service check results
 // @Tags         Triggers
 // @Produce      json
-// @Success      200  {object} apps.Respond.apiResponse{message=[]CheckResult} "list check results"
+// @Success      200  {object} apps.ApiResponse{message=[]CheckResult} "list check results"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/services/list [get]
 // @Security     ApiKeyAuth

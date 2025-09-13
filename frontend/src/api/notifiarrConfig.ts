@@ -2064,6 +2064,21 @@ export interface Stats {
   lastArgs?: string[];
 };
 
+/**
+ * ApiResponse is a standard response to our caller. JSON encoded blobs.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ApiResponse>
+ */
+export interface ApiResponse {
+  /**
+   * The status always matches the HTTP response.
+   */
+  status: string;
+  /**
+   * This message contains the request-specific response payload.
+   */
+  message?: any;
+};
+
 // Packages parsed:
 //   1. database/sql
 //   2. github.com/Notifiarr/notifiarr/frontend

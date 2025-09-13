@@ -22,8 +22,8 @@ import (
 // @Produce      json
 // @Accept       json
 // @Param        request body TrashAggInput true "list of instances"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]RadarrTrashPayload} "contains app info included appStatus"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad input payload or missing app"
+// @Success      200  {object} apps.ApiResponse{message=[]RadarrTrashPayload} "contains app info included appStatus"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad input payload or missing app"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trash/radarr [post]
 // @Security     ApiKeyAuth
@@ -37,8 +37,8 @@ func _() {}
 // @Produce      json
 // @Accept       json
 // @Param        request body TrashAggInput true "list of instances"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]LidarrTrashPayload} "contains app info included appStatus"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad input payload or missing app"
+// @Success      200  {object} apps.ApiResponse{message=[]LidarrTrashPayload} "contains app info included appStatus"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad input payload or missing app"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trash/lidarr [post]
 // @Security     ApiKeyAuth
@@ -53,8 +53,8 @@ func _() {}
 // @Produce      json
 // @Accept       json
 // @Param        request body TrashAggInput true "list of instances"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]SonarrTrashPayload} "contains app info included appStatus"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad input payload or missing app"
+// @Success      200  {object} apps.ApiResponse{message=[]SonarrTrashPayload} "contains app info included appStatus"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad input payload or missing app"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trash/sonarr [post]
 // @Security     ApiKeyAuth

@@ -1512,7 +1512,31 @@
       "title": "Raw Snapshot Data",
       "Age": "Snapshot Age",
       "Data": "Snapshot Data",
-      "System": "System Snapshot"
+      "Latest": "Latest Snapshot",
+      "System": "System Snapshot",
+      "titles": {
+        "CPUPercent": "CPU Percent",
+        "MemoryFree": "Memory Free",
+        "MemoryUsed": "Memory Used",
+        "MemoryTotal": "Memory Total",
+        "UserCPUTime": "User CPU Time",
+        "SystemCPUTime": "System CPU Time",
+        "IdleCPUTime": "Idle CPU Time",
+        "NvidiaGPUs": "Nvidia GPUs",
+        "MySQLServers": "MySQL Servers",
+        "IPMISensors": "IPMI Sensors",
+        "Synology": "Synology",
+        "RaidConfigs": "Raid Configs",
+        "ZFSPools": "ZFS Pools",
+        "Processes": "Processes",
+        "DriveTemps": "Drive Temps",
+        "DriveHealth": "Drive Health",
+        "DiskUsage": "Disk Usage",
+        "DiskQuotas": "Disk Quotas",
+        "IOTop": "IO Top",
+        "IOStat": "IO Stat",
+        "IOStat2": "IO Stat 2"
+      }
     },
     "starrTitles": {
       "QueueAge": "Queue Age",
@@ -1566,8 +1590,12 @@
     "tautulliUsers": { "title": "Tautulli Users" },
     "tautulliUsersJson": { "title": "Raw Tautulli Users" },
     "plexStatus": { "title": "Plex Media Server Info" },
+    "plexSessions": {
+      "title": "Current Plex Media Server Sessions",
+      "footer": "Displaying current Plex sessions, not the cached data. See the raw JSON modal for the cached data."
+    },
+    "plexSessionsJson": { "title": "Raw Plex Media Server Sessions" },
     "mediaTitles": {
-      "Platform": "Platform",
       "PlexPass": "Plex Pass",
       "ServerOwner": "Server Owner",
       "Sessions": "Sessions",

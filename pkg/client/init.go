@@ -55,6 +55,7 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 	c.printReadarr(&clientInfo.Actions.Apps.Readarr)
 	c.printSonarr(&clientInfo.Actions.Apps.Sonarr)
 	c.printDeluge()
+	c.printTransmission()
 	c.printNZBGet()
 	c.printQbit()
 	c.printRtorrent()
@@ -255,6 +256,21 @@ func (c *Client) printDeluge() {
 	for i, f := range c.Config.Deluge {
 		logs.Log.Printf(" =>    Server %d: %s password:%v timeout:%s valid_ssl:%v",
 			i+1, f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
+	}
+}
+
+// printTransmission is called on startup to print info about each configured server.
+func (c *Client) printTransmission() {
+	s := servers
+	if len(c.Config.Transmission) == 1 {
+		s = server
+	}
+
+	logs.Log.Print(" => Transmission Config:", len(c.Config.Transmission), s)
+
+	for i, f := range c.Config.Transmission {
+		logs.Log.Printf(" =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
+			i+1, f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 

@@ -27,14 +27,14 @@
     page: Omit<Page, 'component'>
     get?: () => Promise<BackendResponse>
     footer?: Snippet<[any]>
-    isOpen: boolean
+    isOpen?: boolean
   }
 
   let { children, page, get, footer, isOpen = $bindable(false) }: Props = $props()
   let loading = $state(false)
   let resp = $state<BackendResponse>()
   let fullscreen = $state(false)
-  export const toggle = () => (isOpen = !isOpen)
+  export const toggle = (e?: Event) => (e?.preventDefault(), (isOpen = !isOpen))
   const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 110px)')
 
   const refresh = async () => {
@@ -77,7 +77,11 @@
             scale={1.5}
             spin={loading} />
         </Button>
+        <Popover target="refreshM" trigger="hover" theme={$theme}>
+          <T id="ModalWrap.button.refresh" />
+        </Popover>
       {/if}
+
       <Button
         id="fullscreenM"
         outline
@@ -93,6 +97,10 @@
           d2="pink"
           scale={1.5} />
       </Button>
+      <Popover target="fullscreenM" trigger="hover" theme={$theme}>
+        <T id="ModalWrap.button.fullscreen" />
+      </Popover>
+
       <Button
         id="closeM"
         outline
@@ -104,13 +112,6 @@
         <Fa i={faXmarkLarge} c2="orange" d2="gold" scale={1.5} />
       </Button>
     </ButtonGroup>
-
-    <Popover target="refreshM" trigger="hover" theme={$theme}>
-      <T id="ModalWrap.button.refresh" />
-    </Popover>
-    <Popover target="fullscreenM" trigger="hover" theme={$theme}>
-      <T id="ModalWrap.button.fullscreen" />
-    </Popover>
     <Popover target="closeM" trigger="hover" theme={$theme}>
       <T id="buttons.Close" />
     </Popover>

@@ -129,7 +129,7 @@
 
   <!-- Snapshot data -->
   {#if resp.snapshot}
-    <Row><Col><h4><T id="Integrations.Snapshot.Data" /></h4></Col></Row>
+    <Row><Col><h4><T id="Integrations.Snapshot.Latest" /></h4></Col></Row>
     <Row>
       <Snapshot snapshot={resp.snapshot} snapshotAge={resp.snapshotAge} />
     </Row>

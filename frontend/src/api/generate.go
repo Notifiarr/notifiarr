@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/client"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
@@ -68,7 +69,13 @@ func main() {
 		{Name: "Monthly", Value: scheduler.Monthly},
 	})
 	log.Println("==> parsing config structs")
-	goat.Parse(client.Integrations{}, client.Profile{}, client.ProfilePost{}, commands.Stats{})
+	goat.Parse(
+		client.Integrations{},
+		client.Profile{},
+		client.ProfilePost{},
+		commands.Stats{},
+		apps.ApiResponse{},
+	)
 
 	log.Println("==> splitting packages")
 	vendorPkgs, localPkgs := splitPkgs(goat.Pkgs())

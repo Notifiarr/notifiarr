@@ -61,7 +61,7 @@
           <td class="text-break">{status?.tautulli_branch}</td>
         </tr>
         <tr>
-          <td class="text-nowrap"><T id="Integrations.mediaTitles.Platform" /></td>
+          <td class="text-nowrap"><T id="system.OperatingSystem.Platform" /></td>
           <td class="text-break">{status?.tautulli_platform}</td>
         </tr>
       {/if}
