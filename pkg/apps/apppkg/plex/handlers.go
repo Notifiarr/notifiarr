@@ -36,8 +36,9 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 
 		for _, currSess := range sessions.Sessions {
 			currSess.Player.StateTime.Time = now
+			sessions, _ := item.Data.(*Sessions)
 
-			for _, prevSess := range item.Data.(*Sessions).Sessions {
+			for _, prevSess := range sessions.Sessions {
 				if currSess.Player.State == prevSess.Player.State {
 					// since the state is the same, copy the previous start time.
 					currSess.Player.StateTime.Time = prevSess.Player.StateTime.Time

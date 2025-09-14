@@ -26,6 +26,7 @@ const (
 	localPrefix    = "github.com/Notifiarr/notifiarr/"
 )
 
+//nolint:funlen
 func main() {
 	vendorDir := os.Getenv("VENDOR_DIR")
 	if vendorDir == "" {

@@ -27,8 +27,6 @@ import (
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trash/radarr [post]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func _() {}
 
 // @Description  Returns custom format and related data for multiple Lidarr instances at once. May be slow.
@@ -42,8 +40,6 @@ func _() {}
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trash/lidarr [post]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func _() {}
 
 // Handler is passed into the webserver as an HTTP handler.
@@ -58,8 +54,6 @@ func _() {}
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/trash/sonarr [post]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func (a *Action) Handler(req *http.Request) (int, interface{}) {
 	return a.cmd.aggregateTrash(req)
 }

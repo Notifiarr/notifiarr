@@ -1220,8 +1220,6 @@ func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualitydefinition [put]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	var input []*sonarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {

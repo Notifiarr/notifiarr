@@ -1023,8 +1023,6 @@ func radarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/radarr/{instance}/qualitydefinition [put]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func radarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	var input []*radarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {

@@ -481,6 +481,8 @@ type Integrations struct {
 }
 
 // handleIntegrations returns the current integrations statuses and data.
+//
+//nolint:cyclop,funlen
 func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.Request) {
 	integrations := Integrations{}
 	integrations.Lidarr.Status = make([]*lidarr.SystemStatus, len(c.apps.Lidarr))

@@ -473,8 +473,6 @@ func lidarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/qualitydefinition [put]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func lidarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	var input []*lidarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
@@ -667,8 +665,6 @@ func lidarrRootFolders(req *http.Request) (int, interface{}) {
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/lidarr/{instance}/search/{query} [get]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func lidarrSearchAlbum(req *http.Request) (int, interface{}) {
 	albums, err := getLidarr(req).GetAlbumContext(req.Context(), "")
 	if err != nil {
