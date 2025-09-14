@@ -1572,16 +1572,52 @@
     "Integrations": {
         "titles": {
             "BuildTime": "Bouwtijd",
-            "Branch": "Tak"
+            "Branch": "Tak",
+            "DashboardAge": "Dashboard Leeftijd",
+            "CacheAge": "Cache leeftijd"
         },
         "starrTitles": {
             "Books": "Boeken",
-            "Artists": "Artiest"
+            "Artists": "Artiest",
+            "Episodes": "Afleveringen",
+            "Editions": "Edities",
+            "Elapsed": "Verstreken"
         },
         "DriveData": {
             "titles": {
-                "Age": "Leeftijd"
+                "Age": "Leeftijd",
+                "Drive": "Schijf"
+            },
+            "title": "Schijf data",
+            "driveInformation": {
+                "title": "Schijf informatie"
             }
+        },
+        "Snapshot": {
+            "titles": {
+                "DriveHealth": "Schijf gezondheid",
+                "DriveTemps": "Schijf temps",
+                "DiskUsage": "Schijfgebruik",
+                "DiskQuotas": "Schijf quota's",
+                "CPUPercent": "CPU procent"
+            }
+        },
+        "downloadTitles": {
+            "Downloads": "Downloads",
+            "Errors": "Fouten",
+            "Downloaded": "Gedownload",
+            "Day": "Dag",
+            "Downloading": "Downloaden"
+        },
+        "mediaTitles": {
+            "Email": "Email",
+            "CustomName": "Aangepaste naam",
+            "Complete": "Compleet",
+            "Encoding": "Codering"
+        },
+        "plexSessions": {
+            "title": "Huidige sessies van Plex Media Server",
+            "footer": "Weergave van huidige Plex sessies, niet van de cachegegevens. Zie het onbewerkte JSON-modal voor de cachegegevens."
         }
     }
 }
