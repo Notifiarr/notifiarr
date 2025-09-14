@@ -1016,7 +1016,7 @@
             "url": {
                 "placeholder": "http://transmission.server.tv:9091",
                 "label": "URL",
-                "description": "URL van de transmissie instantie."
+                "description": "URL van het Transmission-instancie. Deze <b>moet</b> het achtervoegsel <code>/transmission/rpc</code> bevatten."
             },
             "password": {
                 "label": "Wachtwoord",
