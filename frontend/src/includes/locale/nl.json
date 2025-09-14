@@ -1568,5 +1568,20 @@
             "refresh": "Pagina gegevens vernieuwen",
             "fullscreen": "Volledig scherm in-/uitschakelen"
         }
+    },
+    "Integrations": {
+        "titles": {
+            "BuildTime": "Bouwtijd",
+            "Branch": "Tak"
+        },
+        "starrTitles": {
+            "Books": "Boeken",
+            "Artists": "Artiest"
+        },
+        "DriveData": {
+            "titles": {
+                "Age": "Leeftijd"
+            }
+        }
     }
 }
