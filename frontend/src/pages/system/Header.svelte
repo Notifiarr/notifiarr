@@ -7,11 +7,18 @@
   import { _ } from '../../includes/Translate.svelte'
 
   type faProps = Omit<FaP, 'i'>
-  type Props = { id: string; logo?: string; i?: IconDefinition; page?: string } & faProps
+  type Props = {
+    id: string
+    logo?: string
+    i?: IconDefinition
+    page?: string
+    parent?: string
+  } & faProps
 
   let {
     id,
     logo = undefined,
+    parent = 'system',
     i = faQuestion,
     scale = 1.3,
     style = 'margin-bottom: 3px;',
@@ -28,7 +35,7 @@
   {:else}
     <Fa {...rest} {i} {scale} {style} class="me-2" />
   {/if}
-  {$_('system.' + id + '.title')}
+  {$_(parent + '.' + id + '.title')}
 </h4>
 
 <style>

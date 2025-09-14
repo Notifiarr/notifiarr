@@ -1508,6 +1508,19 @@
       "Branch": "Branch",
       "BuildTime": "Build Time"
     },
+    "DriveData": {
+      "title": "Drive Data",
+      "driveInformation": { "title": "Drive Information" },
+      "mdStatRaid": { "title": "MDStat Raid" },
+      "titles": {
+        "Drive": "Drive",
+        "Temp": "Temp",
+        "Health": "Health",
+        "Age": "Age",
+        "Setting": "Setting",
+        "Value": "Value"
+      }
+    },
     "Snapshot": {
       "title": "Raw Snapshot Data",
       "Age": "Snapshot Age",

@@ -7,6 +7,11 @@
 
   type Props = { snapshot: Snapshot; snapshotAge: Date }
   let { snapshot, snapshotAge }: Props = $props()
+
+  const totalCPUTime =
+    snapshot.system.cpuTime.user +
+    snapshot.system.cpuTime.system +
+    snapshot.system.cpuTime.idle
 </script>
 
 <Col class="mb-2" sm={12} md={6}>
@@ -35,11 +40,17 @@
         </tr>
         <tr>
           <td class="text-break"><T id="Integrations.Snapshot.titles.MemoryFree" /></td>
-          <td class="text-break">{formatBytes(snapshot.system.memFree)}</td>
+          <td class="text-break">
+            {formatBytes(snapshot.system.memFree)}
+            ({((snapshot.system.memFree / snapshot.system.memTotal) * 100).toFixed(1)}%)
+          </td>
         </tr>
         <tr>
           <td class="text-break"><T id="Integrations.Snapshot.titles.MemoryUsed" /></td>
-          <td class="text-break">{formatBytes(snapshot.system.memUsed)}</td>
+          <td class="text-break">
+            {formatBytes(snapshot.system.memUsed)}
+            ({((snapshot.system.memUsed / snapshot.system.memTotal) * 100).toFixed(1)}%)
+          </td>
         </tr>
         <tr>
           <td class="text-break"><T id="Integrations.Snapshot.titles.MemoryTotal" /></td>
@@ -47,16 +58,25 @@
         </tr>
         <tr>
           <td class="text-break"><T id="Integrations.Snapshot.titles.UserCPUTime" /></td>
-          <td class="text-break">{age(snapshot.system.cpuTime.user * 1000)}</td>
+          <td class="text-break">
+            {age(snapshot.system.cpuTime.user * 1000)}
+            ({((snapshot.system.cpuTime.user / totalCPUTime) * 100).toFixed(1)}%)
+          </td>
         </tr>
         <tr>
           <td class="text-break">
             <T id="Integrations.Snapshot.titles.SystemCPUTime" /></td>
-          <td class="text-break">{age(snapshot.system.cpuTime.system * 1000)}</td>
+          <td class="text-break">
+            {age(snapshot.system.cpuTime.system * 1000)}
+            ({((snapshot.system.cpuTime.system / totalCPUTime) * 100).toFixed(1)}%)
+          </td>
         </tr>
         <tr>
           <td class="text-break"><T id="Integrations.Snapshot.titles.IdleCPUTime" /></td>
-          <td class="text-break">{age(snapshot.system.cpuTime.idle * 1000)}</td>
+          <td class="text-break">
+            {age(snapshot.system.cpuTime.idle * 1000)}
+            ({((snapshot.system.cpuTime.idle / totalCPUTime) * 100).toFixed(1)}%)
+          </td>
         </tr>
         <tr>
           <td class="text-break"><T id="Integrations.mediaTitles.Users" /></td>

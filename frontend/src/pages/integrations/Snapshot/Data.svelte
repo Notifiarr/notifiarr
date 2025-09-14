@@ -5,11 +5,21 @@
   import { profile } from '../../../api/profile.svelte'
   import Modal from '../Modal.svelte'
   import T, { _ } from '../../../includes/Translate.svelte'
+  import Drives from './Drives.svelte'
 
   type Props = { snapshot: Snapshot; snapshotAge: Date }
   let { snapshot, snapshotAge }: Props = $props()
   let snapshotModal: Modal | null = $state(null)
+  let driveModal: Modal | null = $state(null)
 </script>
+
+<Modal pageId="DriveData" bind:this={driveModal}>
+  <Drives
+    driveTemps={snapshot.driveTemps ?? {}}
+    driveHealth={snapshot.driveHealth ?? {}}
+    driveAges={snapshot.driveAges ?? {}}
+    mdstat={snapshot.raid?.mdstat?.split('\n').map(line => line.split('=', 2)) ?? []} />
+</Modal>
 
 <Col class="mb-2" sm={12} md={6}>
   <Card outline color="tertiary">
@@ -54,13 +64,19 @@
           </tr>
         {/if}
         <tr>
-          <td class="text-break"><T id="Integrations.Snapshot.titles.RaidConfigs" /></td>
+          <td class="text-break">
+            <a href="#driveData" onclick={driveModal?.toggle}>
+              <T id="Integrations.Snapshot.titles.RaidConfigs" /></a>
+          </td>
           <td class="text-break">
             {snapshot.raid?.megacli?.length ?? 0 + (snapshot.raid?.mdstat ? 1 : 0)}</td>
         </tr>
-        {#if snapshot.zfsPools?.length}
+        {#if Object.keys(snapshot.zfsPools ?? {}).length}
           <tr>
-            <td class="text-break"><T id="Integrations.Snapshot.titles.ZFSPools" /></td>
+            <td class="text-break">
+              <a href="#driveData" onclick={driveModal?.toggle}>
+                <T id="Integrations.Snapshot.titles.ZFSPools" /></a>
+            </td>
             <td class="text-break">{Object.keys(snapshot.zfsPools ?? {}).length ?? 0}</td>
           </tr>
         {/if}
@@ -72,17 +88,26 @@
           <td class="text-break">{snapshot.processes?.length ?? 0}</td>
         </tr>
         <tr>
-          <td class="text-break"><T id="Integrations.Snapshot.titles.DriveTemps" /></td>
+          <td class="text-break">
+            <a href="#driveData" onclick={driveModal?.toggle}>
+              <T id="Integrations.Snapshot.titles.DriveTemps" /></a>
+          </td>
           <td class="text-break">
             {Object.keys(snapshot.driveTemps ?? {}).length ?? 0}</td>
         </tr>
         <tr>
-          <td class="text-break"><T id="Integrations.Snapshot.titles.DriveHealth" /></td>
+          <td class="text-break">
+            <a href="#driveData" onclick={driveModal?.toggle}>
+              <T id="Integrations.Snapshot.titles.DriveHealth" /></a>
+          </td>
           <td class="text-break">
             {Object.keys(snapshot.driveHealth ?? {}).length ?? 0}</td>
         </tr>
         <tr>
-          <td class="text-break"><T id="Integrations.Snapshot.titles.DiskUsage" /></td>
+          <td class="text-break">
+            <a href="#driveData" onclick={driveModal?.toggle}>
+              <T id="Integrations.Snapshot.titles.DiskUsage" /></a>
+          </td>
           <td class="text-break">{Object.keys(snapshot.diskUsage ?? {}).length ?? 0}</td>
         </tr>
         {#if snapshot.quotas?.length}
