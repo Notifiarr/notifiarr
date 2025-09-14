@@ -1,4 +1,4 @@
-<!-- Process list page: ps aux -->
+<!-- Displays the client info payload from the website as JSON in a modal. -->
 <script lang="ts" module>
   import { faCodeCompare } from '@fortawesome/sharp-duotone-light-svg-icons'
   export const page = {

@@ -24,7 +24,7 @@
     "svelte-check": "^4.2.1",
     "svelte-fa": "^4.0.4",
     "typescript": "~5.9.0",
-    "vite": "^6.3.5"
+    "vite": "^7.1.5"
   },
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.7.2",

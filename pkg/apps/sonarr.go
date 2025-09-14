@@ -118,12 +118,12 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body sonarr.AddSeriesInput true "new item content"
-// @Success      201  {object} apps.Respond.apiResponse{message=sonarr.Series} "series content"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json payload"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
-// @Failure      422  {object} apps.Respond.apiResponse{message=string} "no item ID provided"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error during check"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error during add"
+// @Success      201  {object} apps.ApiResponse{message=sonarr.Series} "series content"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json payload"
+// @Failure      409  {object} apps.ApiResponse{message=string} "item already exists"
+// @Failure      422  {object} apps.ApiResponse{message=string} "no item ID provided"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error during check"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error during add"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/add [post]
 // @Security     ApiKeyAuth
@@ -173,9 +173,9 @@ func sonarrData(series *sonarr.Series) map[string]interface{} {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tvdbid    path   int64  true  "TVDB ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=string} "series does not exist"
-// @Failure      409  {object} apps.Respond.apiResponse{message=string} "item already exists"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=string} "series does not exist"
+// @Failure      409  {object} apps.ApiResponse{message=string} "item already exists"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/check/{tvdbid} [get]
 // @Security     ApiKeyAuth
@@ -198,8 +198,8 @@ func sonarrCheckSeries(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance   path   int64  true  "instance ID"
 // @Param        seriesID   path   int64  true  "Series ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=sonarr.Series} "series content"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=sonarr.Series} "series content"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/get/{seriesID} [get]
 // @Security     ApiKeyAuth
@@ -220,8 +220,8 @@ func sonarrGetSeries(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance   path   int64  true  "instance ID"
 // @Param        seriesID   path   int64  true  "Series ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=[]sonarr.Episode} "episodes content"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=[]sonarr.Episode} "episodes content"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/getEpisodes/{seriesID} [get]
 // @Security     ApiKeyAuth
@@ -242,8 +242,8 @@ func sonarrGetEpisodes(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance    path   int64  true  "instance ID"
 // @Param        episodeID   path   int64  true  "Episode ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=sonarr.Episode} "episode content"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=sonarr.Episode} "episode content"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/unmonitor/{episodeID} [get]
 // @Security     ApiKeyAuth
@@ -266,8 +266,8 @@ func sonarrUnmonitorEpisode(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        seriesID   path   int64  true  "Series ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=string} "search status"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=string} "search status"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/command/search/{seriesID} [get]
 // @Security     ApiKeyAuth
@@ -292,9 +292,9 @@ func sonarrTriggerSearchSeries(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body sonarr.CommandRequest true "command content, must include series ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=sonarr.CommandResponse} "command response"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json input"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=sonarr.CommandResponse} "command response"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json input"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/command [post]
 // @Security     ApiKeyAuth
@@ -321,8 +321,8 @@ func sonarrTriggerCommand(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        commandID   path   int64  true  "Command ID returned by executing a command"
-// @Success      201  {object} apps.Respond.apiResponse{message=sonarr.CommandResponse} "command status"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=sonarr.CommandResponse} "command status"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/command/{commandID} [get]
 // @Security     ApiKeyAuth
@@ -343,8 +343,8 @@ func sonarrStatusCommand(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=map[int64]string} "map of ID to name"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/languageProfiles [get]
 // @Security     ApiKeyAuth
@@ -369,8 +369,8 @@ func sonarrLangProfiles(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=[]sonarr.QualityProfile} "all profiles"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=[]sonarr.QualityProfile} "all profiles"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualityProfile [get]
 // @Security     ApiKeyAuth
@@ -389,8 +389,8 @@ func sonarrGetQualityProfile(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=map[int64]string} "map of ID to name"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=map[int64]string} "map of ID to name"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualityProfiles [get]
 // @Security     ApiKeyAuth
@@ -417,9 +417,9 @@ func sonarrGetQualityProfiles(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body sonarr.QualityProfile true "new item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new profile ID"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64} "new profile ID"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualityProfile [post]
 // @Security     ApiKeyAuth
@@ -449,10 +449,10 @@ func sonarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
 // @Param        PUT body sonarr.QualityProfile true "updated item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      422  {object} apps.Respond.apiResponse{message=string} "no profile ID"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      422  {object} apps.ApiResponse{message=string} "no profile ID"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualityProfile/{profileID} [put]
 // @Security     ApiKeyAuth
@@ -485,9 +485,9 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "no profile ID"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "no profile ID"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualityProfile/{profileID} [delete]
 // @Security     ApiKeyAuth
@@ -511,8 +511,8 @@ func sonarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=apps.deleteResponse} "delete status"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error getting profiles"
+// @Success      200  {object} apps.ApiResponse{message=apps.deleteResponse} "delete status"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error getting profiles"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualityProfiles/all [delete]
 // @Security     ApiKeyAuth
@@ -550,8 +550,8 @@ func sonarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      201  {object} apps.Respond.apiResponse{message=[]sonarr.ReleaseProfile} "all profiles"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      201  {object} apps.ApiResponse{message=[]sonarr.ReleaseProfile} "all profiles"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/releaseProfile [get]
 // @Security     ApiKeyAuth
@@ -572,9 +572,9 @@ func sonarrGetReleaseProfiles(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body sonarr.ReleaseProfile true "new item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new profile ID"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64} "new profile ID"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/releaseProfile [post]
 // @Security     ApiKeyAuth
@@ -604,10 +604,10 @@ func sonarrAddReleaseProfile(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
 // @Param        PUT body sonarr.ReleaseProfile true "updated item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      422  {object} apps.Respond.apiResponse{message=string} "no profile ID"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      422  {object} apps.ApiResponse{message=string} "no profile ID"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/releaseProfile/{profileID} [put]
 // @Security     ApiKeyAuth
@@ -640,9 +640,9 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        profileID  path   int64  true  "profile ID to update"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "no profile ID"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "no profile ID"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/releaseProfile/{profileID} [delete]
 // @Security     ApiKeyAuth
@@ -666,8 +666,8 @@ func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=apps.deleteResponse} "delete status"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error getting profiles"
+// @Success      200  {object} apps.ApiResponse{message=apps.deleteResponse} "delete status"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error getting profiles"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/releaseProfile/all [delete]
 // @Security     ApiKeyAuth
@@ -705,8 +705,8 @@ func sonarrDeleteAllReleaseProfiles(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=map[string]int64} "map of path->space free"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=map[string]int64} "map of path->space free"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/rootFolder [get]
 // @Security     ApiKeyAuth
@@ -731,8 +731,8 @@ func sonarrRootFolders(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.Naming} "naming conventions"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=sonarr.Naming} "naming conventions"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/naming [get]
 // @Security     ApiKeyAuth
@@ -751,9 +751,9 @@ func sonarrGetNaming(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Accept       json
 // @Param        PUT body sonarr.Naming  true  "naming conventions"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64} "naming ID"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64} "naming ID"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json input"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/naming [put]
 // @Security     ApiKeyAuth
@@ -779,8 +779,8 @@ func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        query     path   string  true  "title search string"
 // @Param        instance  path   int64   true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]apps.sonarrSearchSeries.seriesData}  "minimal series data"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]apps.sonarrSearchSeries.seriesData}  "minimal series data"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/search/{query} [get]
 // @Security     ApiKeyAuth
@@ -860,8 +860,8 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]starr.Tag} "tags"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]starr.Tag} "tags"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/tag [get]
 // @Security     ApiKeyAuth
@@ -881,8 +881,8 @@ func sonarrGetTags(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        tagID     path   int64  true  "tag ID to update"
 // @Param        label     path   string  true  "new label"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64}  "tag ID"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/tag/{tagID}/{label} [put]
 // @Security     ApiKeyAuth
@@ -903,8 +903,8 @@ func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        label     path   string  true  "tag label"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64}  "tag ID"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64}  "tag ID"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/tag/{label} [put]
 // @Security     ApiKeyAuth
@@ -924,8 +924,8 @@ func sonarrSetTag(req *http.Request) (int, interface{}) {
 // @Param        instance  path  int64  true  "instance ID"
 // @Param        moveFiles query int64  true  "move files? true/false"
 // @Param        PUT body sonarr.Series true  "series content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string}  "OK"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string}  "OK"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance} [put]
 // @Security     ApiKeyAuth
@@ -954,9 +954,9 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64       true  "instance ID"
 // @Param        POST body sonarr.SeasonPass  true  "Season pass content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string}  "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/seasonPass [post]
 // @Security     ApiKeyAuth
@@ -983,9 +983,9 @@ func sonarrSeasonPass(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body sonarr.CustomFormatInput  true  "New Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.CustomFormatOutput}  "custom format"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=sonarr.CustomFormatOutput}  "custom format"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/customformats [post]
 // @Security     ApiKeyAuth
@@ -1010,8 +1010,8 @@ func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.CustomFormatOutput}  "custom formats"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]sonarr.CustomFormatOutput}  "custom formats"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/customformats [get]
 // @Security     ApiKeyAuth
@@ -1032,9 +1032,9 @@ func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        formatID  path   int64  true  "Custom Format ID"
 // @Param        PUT body sonarr.CustomFormatInput  true  "Updated Custom Format content"
-// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.CustomFormatOutput}  "custom format"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=sonarr.CustomFormatOutput}  "custom format"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/customformats/{formatID} [put]
 // @Security     ApiKeyAuth
@@ -1058,8 +1058,8 @@ func sonarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        formatID  path   int64  true  "Custom Format ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/customformats/{formatID} [delete]
 // @Security     ApiKeyAuth
@@ -1079,8 +1079,8 @@ func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=apps.deleteResponse}  "item delete counters"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=apps.deleteResponse}  "item delete counters"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/customformats/all [delete]
 // @Security     ApiKeyAuth
@@ -1117,8 +1117,8 @@ func sonarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.ImportListOutput}  "list of import lists"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]sonarr.ImportListOutput}  "list of import lists"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/importlist [get]
 // @Security     ApiKeyAuth
@@ -1139,9 +1139,9 @@ func sonarrGetImportLists(req *http.Request) (int, interface{}) {
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        listID  path   int64  true  "Import List ID"
 // @Param        PUT body sonarr.ImportListInput  true  "Updated Import List Content"
-// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.ImportListOutput}  "import list returns"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=sonarr.ImportListOutput}  "import list returns"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/importlist/{listID} [put]
 // @Security     ApiKeyAuth
@@ -1168,9 +1168,9 @@ func sonarrUpdateImportList(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body sonarr.ImportListInput  true  "New Import List"
-// @Success      200  {object} apps.Respond.apiResponse{message=sonarr.ImportListOutput}  "import list returns"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=sonarr.ImportListOutput}  "import list returns"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/importlist [post]
 // @Security     ApiKeyAuth
@@ -1193,8 +1193,8 @@ func sonarrAddImportList(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.QualityDefinition}  "quality definitions list"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]sonarr.QualityDefinition}  "quality definitions list"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualitydefinition [get]
 // @Security     ApiKeyAuth
@@ -1214,14 +1214,12 @@ func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        PUT body []sonarr.QualityDefinition  true  "Updated Import Listcontent"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.QualityDefinition}  "quality definitions return"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "invalid json provided"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]sonarr.QualityDefinition}  "quality definitions return"
+// @Failure      400  {object} apps.ApiResponse{message=string} "invalid json provided"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/qualitydefinition [put]
 // @Security     ApiKeyAuth
-//
-//nolint:lll
 func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	var input []*sonarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
@@ -1241,8 +1239,8 @@ func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 // @Tags         Sonarr
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=[]sonarr.NotificationOutput} "notifications"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=[]sonarr.NotificationOutput} "notifications"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/notifications [get]
 // @Security     ApiKeyAuth
@@ -1270,9 +1268,9 @@ func sonarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        PUT body sonarr.NotificationInput  true  "notification content"
-// @Success      200  {object} apps.Respond.apiResponse{message=string} "ok"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "bad json input"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string} "ok"
+// @Failure      400  {object} apps.ApiResponse{message=string} "bad json input"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/notification [put]
 // @Security     ApiKeyAuth
@@ -1299,9 +1297,9 @@ func sonarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Accept       json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        POST body sonarr.NotificationInput true "new item content"
-// @Success      200  {object} apps.Respond.apiResponse{message=int64} "new notification ID"
-// @Failure      400  {object} apps.Respond.apiResponse{message=string} "json input error"
-// @Failure      503  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=int64} "new notification ID"
+// @Failure      400  {object} apps.ApiResponse{message=string} "json input error"
+// @Failure      503  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/sonarr/{instance}/notification [post]
 // @Security     ApiKeyAuth
@@ -1331,8 +1329,8 @@ func sonarrAddNotification(req *http.Request) (int, interface{}) {
 // @Param        blocklist        query   bool  false  "add item to blocklist?"
 // @Param        skipRedownload   query   bool  false  "skip downloading this again?"
 // @Param        changeCategory   query   bool  false  "tell download client to change categories?"
-// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Failure      423  {object} string "rate limit reached"
 // @Router       /api/sonarr/{instance}/queue/{queueID} [delete]
@@ -1362,8 +1360,8 @@ func sonarrDeleteQueue(req *http.Request) (int, interface{}) {
 // @Produce      json
 // @Param        instance  path   int64  true  "instance ID"
 // @Param        episodeFileID  path   int64  true  "episode file ID to delete, not episode ID"
-// @Success      200  {object} apps.Respond.apiResponse{message=string}  "ok"
-// @Failure      500  {object} apps.Respond.apiResponse{message=string} "instance error"
+// @Success      200  {object} apps.ApiResponse{message=string}  "ok"
+// @Failure      500  {object} apps.ApiResponse{message=string} "instance error"
 // @Failure      404  {object} string "bad token or api key"
 // @Failure      423  {object} string "rate limit reached"
 // @Router       /api/sonarr/{instance}/delete/{episodeFileID} [post]

@@ -19,17 +19,27 @@ import (
 
 	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli"
 	"github.com/Notifiarr/notifiarr/pkg/checkapp"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"github.com/shirou/gopsutil/v4/disk"
 	"golift.io/cnfgfile"
+	"golift.io/starr/lidarr"
+	"golift.io/starr/prowlarr"
+	"golift.io/starr/radarr"
+	"golift.io/starr/readarr"
+	"golift.io/starr/sonarr"
 )
 
 // @title Notifiarr Client GUI API Documentation
@@ -423,6 +433,164 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 
 	if err := json.NewEncoder(response).Encode(cmd.Stats()); err != nil {
 		logs.Log.Errorf("Encoding command stats: %v", err)
+	}
+}
+
+// Integrations is the data returned by the UI integrations endpoint.
+type Integrations struct {
+	Snapshot         *snapshot.Snapshot `json:"snapshot"`
+	SnapshotAge      time.Time          `json:"snapshotAge"`
+	Plex             *plex.PMSInfo      `json:"plex"`
+	PlexAge          time.Time          `json:"plexAge"`
+	Sessions         *plex.Sessions     `json:"sessions"`
+	SessionsAge      time.Time          `json:"sessionsAge"`
+	Dashboard        *dashboard.States  `json:"dashboard"`
+	DashboardAge     time.Time          `json:"dashboardAge"`
+	TautulliUsers    *tautulli.Users    `json:"tautulliUsers"`
+	TautulliUsersAge time.Time          `json:"tautulliUsersAge"`
+	Tautulli         *tautulli.Info     `json:"tautulli"`
+	TautulliAge      time.Time          `json:"tautulliAge"`
+	Lidarr           struct {
+		Status    []*lidarr.SystemStatus `json:"status"`
+		StatusAge []time.Time            `json:"statusAge"`
+		Queue     []*lidarr.Queue        `json:"queue"`
+		QueueAge  []time.Time            `json:"queueAge"`
+	} `json:"lidarr"`
+	Radarr struct {
+		Status    []*radarr.SystemStatus `json:"status"`
+		StatusAge []time.Time            `json:"statusAge"`
+		Queue     []*radarr.Queue        `json:"queue"`
+		QueueAge  []time.Time            `json:"queueAge"`
+	} `json:"radarr"`
+	Readarr struct {
+		Status    []*readarr.SystemStatus `json:"status"`
+		StatusAge []time.Time             `json:"statusAge"`
+		Queue     []*readarr.Queue        `json:"queue"`
+		QueueAge  []time.Time             `json:"queueAge"`
+	} `json:"readarr"`
+	Sonarr struct {
+		Status    []*sonarr.SystemStatus `json:"status"`
+		StatusAge []time.Time            `json:"statusAge"`
+		Queue     []*sonarr.Queue        `json:"queue"`
+		QueueAge  []time.Time            `json:"queueAge"`
+	} `json:"sonarr"`
+	Prowlarr struct {
+		Status    []*prowlarr.SystemStatus `json:"status"`
+		StatusAge []time.Time              `json:"statusAge"`
+	} `json:"prowlarr"`
+}
+
+// handleIntegrations returns the current integrations statuses and data.
+//
+//nolint:cyclop,funlen
+func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.Request) {
+	integrations := Integrations{}
+	integrations.Lidarr.Status = make([]*lidarr.SystemStatus, len(c.apps.Lidarr))
+	integrations.Lidarr.Queue = make([]*lidarr.Queue, len(c.apps.Lidarr))
+	integrations.Radarr.Status = make([]*radarr.SystemStatus, len(c.apps.Radarr))
+	integrations.Radarr.Queue = make([]*radarr.Queue, len(c.apps.Radarr))
+	integrations.Readarr.Status = make([]*readarr.SystemStatus, len(c.apps.Readarr))
+	integrations.Readarr.Queue = make([]*readarr.Queue, len(c.apps.Readarr))
+	integrations.Sonarr.Status = make([]*sonarr.SystemStatus, len(c.apps.Sonarr))
+	integrations.Sonarr.Queue = make([]*sonarr.Queue, len(c.apps.Sonarr))
+	integrations.Prowlarr.Status = make([]*prowlarr.SystemStatus, len(c.apps.Prowlarr))
+	integrations.Lidarr.StatusAge = make([]time.Time, len(c.apps.Lidarr))
+	integrations.Radarr.StatusAge = make([]time.Time, len(c.apps.Radarr))
+	integrations.Readarr.StatusAge = make([]time.Time, len(c.apps.Readarr))
+	integrations.Sonarr.StatusAge = make([]time.Time, len(c.apps.Sonarr))
+	integrations.Prowlarr.StatusAge = make([]time.Time, len(c.apps.Prowlarr))
+	integrations.Lidarr.QueueAge = make([]time.Time, len(c.apps.Lidarr))
+	integrations.Radarr.QueueAge = make([]time.Time, len(c.apps.Radarr))
+	integrations.Readarr.QueueAge = make([]time.Time, len(c.apps.Readarr))
+	integrations.Sonarr.QueueAge = make([]time.Time, len(c.apps.Sonarr))
+
+	if item := data.Get("snapshot"); item != nil {
+		integrations.SnapshotAge = item.Time
+		integrations.Snapshot, _ = item.Data.(*snapshot.Snapshot)
+	}
+
+	if ps := data.Get("plexStatus"); ps != nil {
+		integrations.PlexAge = ps.Time
+		integrations.Plex, _ = ps.Data.(*plex.PMSInfo)
+	}
+
+	if item := data.Get("plexCurrentSessions"); item != nil {
+		integrations.SessionsAge = item.Time
+		integrations.Sessions, _ = item.Data.(*plex.Sessions)
+	}
+
+	if item := data.GetWithID("tautulliStatus", 1); item != nil {
+		integrations.TautulliAge = item.Time
+		integrations.Tautulli, _ = item.Data.(*tautulli.Info)
+	}
+
+	if item := data.Get("tautulliUsers"); item != nil {
+		integrations.TautulliUsersAge = item.Time
+		integrations.TautulliUsers, _ = item.Data.(*tautulli.Users)
+	}
+
+	if item := data.Get("dashboard"); item != nil {
+		integrations.DashboardAge = item.Time
+		integrations.Dashboard, _ = item.Data.(*dashboard.States)
+	}
+
+	for idx := range c.apps.Lidarr {
+		if item := data.GetWithID("lidarrStatus", idx); item != nil {
+			integrations.Lidarr.StatusAge[idx] = item.Time
+			integrations.Lidarr.Status[idx], _ = item.Data.(*lidarr.SystemStatus)
+		}
+
+		if item := data.GetWithID("lidarr", idx); item != nil {
+			integrations.Lidarr.QueueAge[idx] = item.Time
+			integrations.Lidarr.Queue[idx], _ = item.Data.(*lidarr.Queue)
+		}
+	}
+
+	for idx := range c.apps.Radarr {
+		if item := data.GetWithID("radarrStatus", idx); item != nil {
+			integrations.Radarr.StatusAge[idx] = item.Time
+			integrations.Radarr.Status[idx], _ = item.Data.(*radarr.SystemStatus)
+		}
+
+		if item := data.GetWithID("radarr", idx); item != nil {
+			integrations.Radarr.QueueAge[idx] = item.Time
+			integrations.Radarr.Queue[idx], _ = item.Data.(*radarr.Queue)
+		}
+	}
+
+	for idx := range c.apps.Readarr {
+		if item := data.GetWithID("readarrStatus", idx); item != nil {
+			integrations.Readarr.StatusAge[idx] = item.Time
+			integrations.Readarr.Status[idx], _ = item.Data.(*readarr.SystemStatus)
+		}
+
+		if item := data.GetWithID("readarr", idx); item != nil {
+			integrations.Readarr.QueueAge[idx] = item.Time
+			integrations.Readarr.Queue[idx], _ = item.Data.(*readarr.Queue)
+		}
+	}
+
+	for idx := range c.apps.Sonarr {
+		if item := data.GetWithID("sonarrStatus", idx); item != nil {
+			integrations.Sonarr.StatusAge[idx] = item.Time
+			integrations.Sonarr.Status[idx], _ = item.Data.(*sonarr.SystemStatus)
+		}
+
+		if item := data.GetWithID("sonarr", idx); item != nil {
+			integrations.Sonarr.QueueAge[idx] = item.Time
+			integrations.Sonarr.Queue[idx], _ = item.Data.(*sonarr.Queue)
+		}
+	}
+
+	for idx := range c.apps.Prowlarr {
+		if item := data.GetWithID("prowlarrStatus", idx); item != nil {
+			integrations.Prowlarr.StatusAge[idx] = item.Time
+			integrations.Prowlarr.Status[idx], _ = item.Data.(*prowlarr.SystemStatus)
+		}
+	}
+
+	if err := json.NewEncoder(response).Encode(integrations); err != nil {
+		logs.Log.Errorf("Encoding integrations: %v", err)
 	}
 }
 

@@ -1,4 +1,4 @@
-import { get, writable } from 'svelte/store'
+import { get } from 'svelte/store'
 import { urlbase } from '../api/fetch'
 import type { Component } from 'svelte'
 import Landing from '../Landing.svelte'
@@ -86,7 +86,8 @@ class Navigator {
   // popstate is split from goto(), so we can call it from popstate.
   /**  Call this only when the back button is clicked. */
   public popstate = (e: PopStateEvent) => (
-    e.preventDefault(), this.setActivePage(e.state?.uri ?? '')
+    e.preventDefault(),
+    this.setActivePage(e.state?.uri ?? '')
   )
 
   /** active returns true if the provided page id is currently selected. */

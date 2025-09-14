@@ -84,6 +84,7 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/profile", c.handleProfile).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}/{content}", c.triggers.Handler).Methods("GET")
 	gui.HandleFunc("/trigger/{trigger}", c.triggers.Handler).Methods("GET")
+	gui.HandleFunc("/integrations", c.handleIntegrations).Methods("GET")
 	gui.HandleFunc("/tunnel/ping", c.pingTunnels).Methods("GET")
 	gui.HandleFunc("/tunnel/save", c.saveTunnels).Methods("POST")
 	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
@@ -241,7 +242,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 // @Produce      json
 // @Param        app      path string  true  "Application" Enums(lidarr, prowlarr, radarr, readarr, sonarr)
 // @Param        instance path int64   true  "Application instance (1-index)."
-// @Success      200  {object} apps.Respond.apiResponse{message=map[string]map[int]bool} "map for app->instance->up"
+// @Success      200  {object} apps.ApiResponse{message=map[string]map[int]bool} "map for app->instance->up"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/ping/{app}/{instance} [get]
 // @Security     ApiKeyAuth
@@ -253,7 +254,7 @@ func _() {}
 // @Tags         Client
 // @Produce      json
 // @Param        apps  path   string  true  "Application, comma separated" Enums(lidarr, prowlarr, radarr, readarr, sonarr)
-// @Success      200  {object} apps.Respond.apiResponse{message=map[string]map[int]bool} "map for app->instance->up"
+// @Success      200  {object} apps.ApiResponse{message=map[string]map[int]bool} "map for app->instance->up"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/ping/{apps} [get]
 // @Security     ApiKeyAuth
@@ -265,7 +266,7 @@ func _() {}
 // @Summary      Ping all starr instances.
 // @Tags         Client
 // @Produce      json
-// @Success      200  {object} apps.Respond.apiResponse{message=map[string]map[int]bool} "map for app->instance->up"
+// @Success      200  {object} apps.ApiResponse{message=map[string]map[int]bool} "map for app->instance->up"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/ping [get]
 // @Security     ApiKeyAuth

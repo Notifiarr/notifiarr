@@ -3,6 +3,7 @@ import { delay, failure, ltrim, rtrim, success } from '../includes/util'
 import { _ } from 'svelte-i18n'
 import Cookies from 'js-cookie'
 import { locale } from '../includes/locale/index.svelte'
+import { profile } from './profile.svelte'
 
 export const LoggedOut = new Error('logged out')
 export const TimedOut = new Error('request timed out')
@@ -111,6 +112,7 @@ async function request(
       'Accept-Language': locale.current,
     }
     if (body) headers['Content-Type'] = 'application/json'
+    if (uri.startsWith('api/')) headers['X-Api-Key'] = get(profile).config.apiKey
 
     uri = rtrim(get(urlbase), '/') + '/' + ltrim(uri, '/')
     const response = await fetchWithTimeout(uri, { method, headers, body }, timeout)

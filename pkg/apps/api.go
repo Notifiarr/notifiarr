@@ -125,6 +125,14 @@ func (a *Apps) CheckAPIKey(next http.Handler) http.HandlerFunc {
 	}
 }
 
+// ApiResponse is a standard response to our caller. JSON encoded blobs.
+type ApiResponse struct {
+	// The status always matches the HTTP response.
+	Status string `json:"status"`
+	// This message contains the request-specific response payload.
+	Msg interface{} `json:"message"`
+}
+
 // Respond sends a standard response to our caller. JSON encoded blobs. Returns size of data sent.
 func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 { //nolint:varnamelen
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
@@ -144,14 +152,6 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 		msg = m.Error()
 	}
 
-	//
-	type apiResponse struct {
-		// The status always matches the HTTP response.
-		Status string `json:"status"`
-		// This message contains the request-specific response payload.
-		Msg interface{} `json:"message"`
-	}
-
 	mnd.APIHits.Add(statusTxt, 1)
 	w.Header().Set("Content-Type", mnd.ContentTypeJSON)
 	w.WriteHeader(stat)
@@ -159,7 +159,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 {
 	json := json.NewEncoder(counter)
 	json.SetEscapeHTML(false)
 
-	err := json.Encode(&apiResponse{Status: statusTxt, Msg: msg})
+	err := json.Encode(&ApiResponse{Status: statusTxt, Msg: msg})
 	if err != nil {
 		mnd.Log.Errorf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}

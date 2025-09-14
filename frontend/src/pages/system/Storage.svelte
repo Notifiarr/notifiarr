@@ -33,10 +33,8 @@
             <div class="col-md-3">{free}: {formatBytes(disk?.free || 0)}</div>
             <div class="col-md-3">{used}: {formatBytes(disk?.used || 0)}</div>
             <div class="col-md-3">
-              {fs}: {disk?.fsType}
-              {#if disk?.readOnly}
-                <span class="text-muted">({ro})</span>
-              {/if}
+              {fs}: {disk?.fsType}{#if disk?.opts?.length},
+                {disk.opts.join(', ')}{/if}
             </div>
           </div>
         </td>
