@@ -1581,16 +1581,23 @@
             "Artists": "Artiest",
             "Episodes": "Afleveringen",
             "Editions": "Edities",
-            "Elapsed": "Verstreken"
+            "Elapsed": "Verstreken",
+            "Movies": "Films",
+            "Missing": "Ontbreekt",
+            "OnDisk": "Op schijf"
         },
         "DriveData": {
             "titles": {
                 "Age": "Leeftijd",
-                "Drive": "Schijf"
+                "Drive": "Schijf",
+                "Health": "Gezondheid"
             },
             "title": "Schijf data",
             "driveInformation": {
                 "title": "Schijf informatie"
+            },
+            "mdStatRaid": {
+                "title": "MDStat Raid"
             }
         },
         "Snapshot": {
@@ -1599,15 +1606,28 @@
                 "DriveTemps": "Schijf temps",
                 "DiskUsage": "Schijfgebruik",
                 "DiskQuotas": "Schijf quota's",
-                "CPUPercent": "CPU procent"
-            }
+                "CPUPercent": "CPU procent",
+                "MemoryFree": "Geheugen vrij",
+                "MemoryTotal": "Geheugen totaal",
+                "MemoryUsed": "Gebruikt geheugen",
+                "MySQLServers": "MySQL Servers",
+                "NvidiaGPUs": "Nvidia GPUs",
+                "IOStat": "IO statistiek",
+                "IOStat2": "IO statistiek 2",
+                "IOTop": "IO Top",
+                "IPMISensors": "IPMI sensoren",
+                "IdleCPUTime": "Inactieve CPU tijd"
+            },
+            "Latest": "Laatste Snapshot"
         },
         "downloadTitles": {
             "Downloads": "Downloads",
             "Errors": "Fouten",
             "Downloaded": "Gedownload",
             "Day": "Dag",
-            "Downloading": "Downloaden"
+            "Downloading": "Downloaden",
+            "Incomplete": "Onvolledig",
+            "Month": "Maand"
         },
         "mediaTitles": {
             "Email": "Email",
@@ -1618,6 +1638,10 @@
         "plexSessions": {
             "title": "Huidige sessies van Plex Media Server",
             "footer": "Weergave van huidige Plex sessies, niet van de cachegegevens. Zie het onbewerkte JSON-modal voor de cachegegevens."
+        },
+        "phrases": {
+            "NoPlexData": "Geen plex integratie gegevens.",
+            "NoCachedSessions": "Geen sessies in cache opgeslagen."
         }
     }
 }
