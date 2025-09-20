@@ -304,27 +304,39 @@ func readBodyForLog(body io.Reader, max int64) (string, int64) {
 func (s *Server) watchSendDataChan(ctx context.Context) {
 	defer func() {
 		defer mnd.Log.CapturePanic()
+		close(s.stopSendData)
 		mnd.Log.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
 	}()
 
-	for data := range s.sendData {
-		switch resp, elapsed, err := s.sendRequest(ctx, data); {
-		case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
-			continue
-		case errors.Is(err, ErrNon200):
-			mnd.Log.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
-				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
-		case err != nil:
-			mnd.Log.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
-				data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
-		case !data.ErrorsOnly:
-			mnd.Log.Printf("[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
-				data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
-		default:
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case data, ok := <-s.sendData:
+			if !ok {
+				return
+			}
+
+			s.actionDataChan(ctx, data)
 		}
 	}
+}
 
-	close(s.stopSendData)
+// actionDataChan sends a request to the website and logs the result.
+func (s *Server) actionDataChan(ctx context.Context, data *Request) {
+	switch resp, elapsed, err := s.sendRequest(ctx, data); {
+	case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
+		return
+	case errors.Is(err, ErrNon200):
+		mnd.Log.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+			data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
+	case err != nil:
+		mnd.Log.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+			data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
+	case !data.ErrorsOnly:
+		mnd.Log.Printf("[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
+			data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
+	}
 }
 
 func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, time.Duration, error) {
