@@ -48,7 +48,11 @@
       procCheck.maximum = 0
       resetValidators()
     } else {
-      form.expect = `count:${procCheck.minimum ?? 1}:${procCheck.maximum ?? 0}${procCheck.restarts ? ',restart' : ''}`
+      const os = original.expect.split(':').length
+      form.expect =
+        `count:${procCheck.minimum}` +
+        (procCheck.maximum > 0 || os > 2 ? `:${procCheck.maximum}` : '') +
+        (procCheck.restarts ? ',restart' : '')
       validate?.(app.id + '.process.restarts', procCheck.restarts)
       validate?.(app.id + '.process.minimum', procCheck.minimum)
       validate?.(app.id + '.process.maximum', procCheck.maximum)

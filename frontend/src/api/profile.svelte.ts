@@ -98,7 +98,7 @@ class ConfigProfile {
   }
 
   /** Use writeConfig to update a partial configuration on the backend and reload. */
-  public async writeConfig(config: Config) {
+  public async writeConfig(config: Config): Promise<boolean> {
     this.status = get(_)('phrases.SavingConfiguration')
     this.error = ''
     this.updated = null
@@ -113,12 +113,15 @@ class ConfigProfile {
       this.formError = this.error = get(_)('config.errors.ConfigUpdateFailed', {
         values: { error: body },
       })
-      return
+
+      return false
     }
 
     // Update the local store with the new config.
     await this.set({ ...get(this.profile), config: newConfig })
     await this.waitForReload()
+
+    return true
   }
 
   public async login(name: string, password: string): Promise<string | null> {

@@ -65,7 +65,7 @@
     },
   }
 
-  if (!$profile.config.snapshot.nvidia.busIDs) {
+  if (!$profile.config.snapshot.nvidia.busIDs?.length) {
     $profile.config.snapshot.nvidia.busIDs = ['']
   }
 

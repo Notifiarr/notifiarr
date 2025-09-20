@@ -42,7 +42,6 @@ type Client struct {
 	plexTimer  *cooldown.Timer
 	Flags      *configfile.Flags
 	Config     *configfile.Config
-	Input      *configfile.Config
 	server     *http.Server
 	sigkil     chan os.Signal
 	sighup     chan os.Signal
@@ -198,8 +197,6 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	c.Config.APIKey, _, _ = ui.Entry("Enter 'All' API Key from notifiarr.com", "api-key-from-notifiarr.com")
 	if website.Site.ValidAPIKey() != nil {
 		c.Config.APIKey = "api-key-from-notifiarr.com"
-	} else {
-		c.Input.APIKey = c.Config.APIKey
 	}
 
 	// write new config file to temporary path.
@@ -364,8 +361,8 @@ func (c *Client) Exit(ctx context.Context, reload func()) error {
 
 // getConfig is the piece shared between loadConfiguration and reloadConfiguration.
 func (c *Client) getConfig() (*configfile.SetupResult, error) {
-	var err error
-	if c.Input, err = c.Config.Get(c.Flags); err != nil {
+	err := c.Config.Get(c.Flags)
+	if err != nil {
 		return nil, fmt.Errorf("getting config: %w", err)
 	}
 

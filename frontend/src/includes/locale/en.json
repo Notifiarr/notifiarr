@@ -1127,7 +1127,7 @@
     }
   },
   "monitoring": {
-    "ConfigureServices": "Configure the service checks displayed on the <go-to page=\"services\">Services page</go-to>.",
+    "ConfigureServices": "Service checks for configured integrations are enabled by giving them a check interval on their respective configuration pages. Some of these checks are from the <go-to page=\"starrapps\">Starr Apps</go-to> page, or the <go-to page=\"downloaders\">Download Apps</go-to> page, or the <go-to page=\"mediaapps\">Media Apps</go-to> page. The rest of the service checks displayed can be found on the <go-to page=\"services\">Services page</go-to>.",
     "ChecksDisabled": "Service Checks: Disabled",
     "ChecksStopped": "Service Checks: Stopped",
     "EnableOnConfig": "Enable service checks on the <go-to page=\"configuration\">Configuration</go-to> page.",
