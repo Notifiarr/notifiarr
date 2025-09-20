@@ -80,28 +80,22 @@
       </div>
     {/key}
   </Card>
-
-  <!-- This uses global variables to show a modal whenever any (connected)
-     form has changes and you might lose them by navigating away. -->
-  <Modal
-    isOpen={nav.showUnsavedAlert !== ''}
-    theme={$theme}
-    color="warning"
-    zIndex={9999}>
-    <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
-    <ModalBody><T id="phrases.LeavePage" /></ModalBody>
-    <ModalFooter>
-      <Button color="primary" onclick={() => (nav.showUnsavedAlert = '')}>
-        <T id="buttons.NoStayHere" />
-      </Button>
-      <Button
-        color="danger"
-        onclick={() => nav.goto(nav.forceEvent, nav.showUnsavedAlert)}>
-        <T id="buttons.YesDeleteMyChanges" />
-      </Button>
-    </ModalFooter>
-  </Modal>
 </Col>
+
+<!-- This uses global variables to show a modal whenever any (connected)
+     form has changes and you might lose them by navigating away. -->
+<Modal isOpen={nav.showUnsavedAlert !== ''} theme={$theme} style="z-index: 9999;">
+  <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
+  <ModalBody><T id="phrases.LeavePage" /></ModalBody>
+  <ModalFooter>
+    <Button color="primary" onclick={() => (nav.showUnsavedAlert = '')}>
+      <T id="buttons.NoStayHere" />
+    </Button>
+    <Button color="danger" onclick={() => nav.goto(nav.forceEvent, nav.showUnsavedAlert)}>
+      <T id="buttons.YesDeleteMyChanges" />
+    </Button>
+  </ModalFooter>
+</Modal>
 
 <style>
   .sidebar-col {
