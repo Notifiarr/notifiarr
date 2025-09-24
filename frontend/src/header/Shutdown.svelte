@@ -1,16 +1,10 @@
 <script lang="ts">
-  import {
-    Button,
-    Modal,
-    ModalBody,
-    ModalFooter,
-    ModalHeader,
-  } from '@sveltestrap/sveltestrap'
+  import { Button, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap'
   import { getUi } from '../api/fetch'
-  import { theme } from '../includes/theme.svelte'
   import { _ } from '../includes/Translate.svelte'
   import { faPowerOff } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import Fa from '../includes/Fa.svelte'
+  import MyModal from '../includes/MyModal.svelte'
 
   let isOpen = $state(false)
   let shutdown: any = $state()
@@ -21,7 +15,7 @@
   <Fa i={faPowerOff} c1="salmon" c2="maroon" d1="firebrick" d2="red" class="me-2" />
 </a>
 
-<Modal {isOpen} toggle={() => (isOpen = false)} theme={$theme}>
+<MyModal {isOpen} toggle={() => (isOpen = false)}>
   <ModalHeader>{$_('phrases.ConfirmShutdown')}</ModalHeader>
   {#if shutdown}
     <ModalBody>
@@ -41,4 +35,4 @@
         {$_('buttons.Cancel')}</Button>
     </ModalFooter>
   {/if}
-</Modal>
+</MyModal>
