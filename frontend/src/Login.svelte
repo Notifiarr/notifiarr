@@ -3,9 +3,7 @@
   import { delay } from './includes/util'
   import { _ } from './includes/Translate.svelte'
   import { profile } from './api/profile.svelte'
-  import { theme } from './includes/theme.svelte'
   import {
-    Modal,
     ModalHeader,
     ModalBody,
     ModalFooter,
@@ -15,6 +13,7 @@
     CardFooter,
     Input,
   } from '@sveltestrap/sveltestrap'
+  import MyModal from './includes/MyModal.svelte'
 
   let username = $state('')
   let password = $state('')
@@ -48,15 +47,11 @@
 </script>
 
 <!-- Login Help Modal -->
-<Modal
-  isOpen={showHelpModal}
-  toggle={onclick}
-  theme={$theme}
-  modalClassName={showHelpModal ? 'show' : ''}>
+<MyModal isOpen={showHelpModal} toggle={onclick}>
   <ModalHeader>{$_('phrases.LoginHelp')}</ModalHeader>
   <ModalBody>{@html $_('phrases.LoginHelpBody')}</ModalBody>
   <ModalFooter><Button {onclick}>{$_('buttons.Close')}</Button></ModalFooter>
-</Modal>
+</MyModal>
 
 <CardBody>
   <form {onsubmit}>

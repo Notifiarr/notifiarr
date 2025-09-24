@@ -15,7 +15,6 @@
     Card,
     Col,
     Button,
-    Modal,
     ModalHeader,
     ModalBody,
     ModalFooter,
@@ -27,6 +26,7 @@
   import { onMount } from 'svelte'
   import Sidebar from './Sidebar.svelte'
   import Modals from './Modals.svelte'
+  import MyModal from '../includes/MyModal.svelte'
 
   const magicNumber = 1005
   // windowWidth is used for sidebar collapse state.
@@ -84,10 +84,7 @@
 
 <!-- This uses global variables to show a modal whenever any (connected)
      form has changes and you might lose them by navigating away. -->
-<Modal
-  isOpen={nav.showUnsavedAlert !== ''}
-  theme={$theme}
-  modalClassName={nav.showUnsavedAlert !== '' ? 'show' : ''}>
+<MyModal isOpen={nav.showUnsavedAlert !== ''}>
   <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
   <ModalBody><T id="phrases.LeavePage" /></ModalBody>
   <ModalFooter>
@@ -98,7 +95,7 @@
       <T id="buttons.YesDeleteMyChanges" />
     </Button>
   </ModalFooter>
-</Modal>
+</MyModal>
 
 <style>
   .sidebar-col {

@@ -3,17 +3,11 @@
   import { get } from 'svelte/store'
   import { getUi, checkReloaded } from '../api/fetch'
   import { updateBackend, showMsg } from './Index.svelte'
-  import {
-    Button,
-    Modal,
-    ModalBody,
-    ModalFooter,
-    ModalHeader,
-  } from '@sveltestrap/sveltestrap'
+  import { Button, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap'
   import { Spinner } from '@sveltestrap/sveltestrap'
-  import { theme } from '../includes/theme.svelte'
   import { faRotate } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import Fa from '../includes/Fa.svelte'
+  import MyModal from '../includes/MyModal.svelte'
 
   let isOpen = $state(false)
   let reloading = $state(false)
@@ -61,7 +55,7 @@
   <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-2" />
 </a>
 
-<Modal {isOpen} toggle={reset} theme={$theme} modalClassName={isOpen ? 'show' : ''}>
+<MyModal {isOpen} toggle={reset}>
   <ModalHeader>{$_('phrases.ConfirmReload')}</ModalHeader>
   {#if reloading}
     <ModalBody><Spinner size="sm" /> {$_('phrases.Reloading')}</ModalBody>
@@ -72,4 +66,4 @@
       <Button color="secondary" onclick={reset}>{$_('buttons.Cancel')}</Button>
     </ModalFooter>
   {/if}
-</Modal>
+</MyModal>

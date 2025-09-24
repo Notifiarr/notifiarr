@@ -3,13 +3,13 @@
   import {
     Button,
     ButtonGroup,
-    Modal,
     ModalBody,
     ModalFooter,
     ModalHeader,
     Popover,
   } from '@sveltestrap/sveltestrap'
   import { theme } from '../../includes/theme.svelte'
+  import MyModal from '../../includes/MyModal.svelte'
   import T, { _ } from '../../includes/Translate.svelte'
   import Fa from '../../includes/Fa.svelte'
   import type { Page } from '../../navigation/nav.svelte'
@@ -54,13 +54,7 @@
   })
 </script>
 
-<Modal
-  {isOpen}
-  size="xl"
-  theme={$theme}
-  modalClassName={isOpen ? 'show' : ''}
-  {fullscreen}
-  {toggle}>
+<MyModal {isOpen} size="xl" {fullscreen} {toggle}>
   <ModalHeader class="d-inline-block">
     <Fa {...page} scale={1.4} class="me-2" />
     <T id="{page.id}.title" />
@@ -136,4 +130,4 @@
   </ModalBody>
 
   {#if footer}<ModalFooter>{@render footer(resp)}</ModalFooter>{/if}
-</Modal>
+</MyModal>
