@@ -122,7 +122,13 @@
 </div>
 
 <!-- Modal is used to run commands that have custom arguments (regexes). -->
-<Modal toggle={cancel} isOpen={formResolve != null} size="lg" theme={$theme} centered>
+<Modal
+  toggle={cancel}
+  isOpen={formResolve != null}
+  size="lg"
+  theme={$theme}
+  centered
+  modalClassName={formResolve != null ? 'show' : ''}>
   <ModalHeader><T id="Commands.enterCommandArguments" /></ModalHeader>
   <form onsubmit={e => e.preventDefault()}>
     <ModalBody>

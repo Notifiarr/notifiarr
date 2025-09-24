@@ -54,7 +54,13 @@
   })
 </script>
 
-<Modal {isOpen} size="xl" theme={$theme} {fullscreen} {toggle}>
+<Modal
+  {isOpen}
+  size="xl"
+  theme={$theme}
+  modalClassName={isOpen ? 'show' : ''}
+  {fullscreen}
+  {toggle}>
   <ModalHeader class="d-inline-block">
     <Fa {...page} scale={1.4} class="me-2" />
     <T id="{page.id}.title" />

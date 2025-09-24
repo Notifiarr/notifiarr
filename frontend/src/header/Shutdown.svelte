@@ -21,7 +21,11 @@
   <Fa i={faPowerOff} c1="salmon" c2="maroon" d1="firebrick" d2="red" class="me-2" />
 </a>
 
-<Modal {isOpen} toggle={() => (isOpen = false)} theme={$theme}>
+<Modal
+  {isOpen}
+  toggle={() => (isOpen = false)}
+  theme={$theme}
+  modalClassName={isOpen ? 'show' : ''}>
   <ModalHeader>{$_('phrases.ConfirmShutdown')}</ModalHeader>
   {#if shutdown}
     <ModalBody>

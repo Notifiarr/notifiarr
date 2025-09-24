@@ -37,16 +37,22 @@
     else loggedIn()
   }
 
-  const loggedIn = async () => (
-    showMsg($_('phrases.LoggedIn')), await delay(4567), showMsg('')
-  )
+  const loggedIn = async () => {
+    showMsg($_('phrases.LoggedIn'))
+    await delay(4567)
+    showMsg('')
+  }
 
   const onclick = (e?: Event) => (e?.preventDefault(), (showHelpModal = false))
   const open = (e?: Event) => (e?.preventDefault(), (showHelpModal = true))
 </script>
 
 <!-- Login Help Modal -->
-<Modal isOpen={showHelpModal} toggle={onclick} theme={$theme}>
+<Modal
+  isOpen={showHelpModal}
+  toggle={onclick}
+  theme={$theme}
+  modalClassName={showHelpModal ? 'show' : ''}>
   <ModalHeader>{$_('phrases.LoginHelp')}</ModalHeader>
   <ModalBody>{@html $_('phrases.LoginHelpBody')}</ModalBody>
   <ModalFooter><Button {onclick}>{$_('buttons.Close')}</Button></ModalFooter>

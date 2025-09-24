@@ -61,7 +61,7 @@
   <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-2" />
 </a>
 
-<Modal {isOpen} toggle={reset} theme={$theme}>
+<Modal {isOpen} toggle={reset} theme={$theme} modalClassName={isOpen ? 'show' : ''}>
   <ModalHeader>{$_('phrases.ConfirmReload')}</ModalHeader>
   {#if reloading}
     <ModalBody><Spinner size="sm" /> {$_('phrases.Reloading')}</ModalBody>

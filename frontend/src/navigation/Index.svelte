@@ -84,7 +84,10 @@
 
 <!-- This uses global variables to show a modal whenever any (connected)
      form has changes and you might lose them by navigating away. -->
-<Modal isOpen={nav.showUnsavedAlert !== ''} theme={$theme} style="z-index: 9999;">
+<Modal
+  isOpen={nav.showUnsavedAlert !== ''}
+  theme={$theme}
+  modalClassName={nav.showUnsavedAlert !== '' ? 'show' : ''}>
   <ModalHeader><h5><T id="navigation.titles.UnsavedChanges" /></h5></ModalHeader>
   <ModalBody><T id="phrases.LeavePage" /></ModalBody>
   <ModalFooter>

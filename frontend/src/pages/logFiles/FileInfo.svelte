@@ -126,6 +126,7 @@
   isOpen={showDelModal}
   toggle={() => (showDelModal = false)}
   theme={$theme}
+  modalClassName={showDelModal ? 'show' : ''}
   centered>
   <ModalHeader>
     <T id="LogFiles.DeleteFile" filePath={file.path} />

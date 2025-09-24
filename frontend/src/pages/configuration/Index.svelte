@@ -23,6 +23,7 @@
   import System from './System.svelte'
   import Network from './Network.svelte'
   import { deepEqual } from '../../includes/util'
+  import { nav } from '../../navigation/nav.svelte'
 
   // Local state that syncs with profile store.
   let config = $state($profile.config)
@@ -44,6 +45,13 @@
 
   // Reset config when profile is updated (when reload button is clicked).
   $effect(() => reset(!!profile.updated))
+
+  // Keep track of form changes. This causes an "unsaved changes" modal to be shown.
+  $effect(() => {
+    nav.formChanged =
+      !deepEqual($profile.config, config) ||
+      extraKeys !== ($profile.config.extraKeys?.join('\n') ?? '')
+  })
 </script>
 
 <Header {page} badge={$_('phrases.Version', { values: { version: config.version } })} />
@@ -79,7 +87,4 @@
   <Logging bind:config original={$profile.config} />
 </CardBody>
 
-<Footer
-  {submit}
-  saveDisabled={deepEqual($profile.config, config) &&
-    extraKeys === ($profile.config.extraKeys?.join('\n') ?? '')} />
+<Footer {submit} saveDisabled={!nav.formChanged} />
