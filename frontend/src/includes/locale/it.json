@@ -1209,7 +1209,7 @@
             "EnterCurrentPassword": "",
             "ProxyAuthDisabled": "",
             "Addit": "Aggiungilo.",
-            "SeeWikiForAuthProxyHelp": "Vedi <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">la wiki</a> per le istruzioni per impostare un proxy di autenticazione.",
+            "SeeWikiForAuthProxyHelp": "Vedi <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">la wiki</a> per le istruzioni per impostare un proxy di autenticazione.",
             "ShowMeMore": "Mostrami di più.",
             "ShowMeLess": "Mostrami di meno."
         },
