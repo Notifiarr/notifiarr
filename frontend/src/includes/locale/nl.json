@@ -1701,7 +1701,7 @@
             "title": "Raw SabNZBD Dashboard"
         },
         "sonarrQueue": {
-            "title": "Ruwe Sonarr wachtrij"
+            "title": "Raw Sonarr Wachtrij"
         },
         "transmissionDashboard": {
             "title": "Raw Transmission Dashboard"
@@ -1722,7 +1722,7 @@
             "title": "Raw Lidarr Info"
         },
         "plexSessionsJson": {
-            "title": "Ruwe Plex Media Server sessies"
+            "title": "Raw Plex Media Server sessies"
         },
         "sonarrStatus": {
             "title": "Raw Sonarr Info"
@@ -1740,16 +1740,16 @@
             "title": "Raw Radarr Dashboard"
         },
         "radarrQueue": {
-            "title": "Raw Radarr Queue"
+            "title": "Raw Radarr Wachtrij"
         },
         "delugeDashboard": {
             "title": "Raw Deluge Dashboard"
         },
         "readarrQueue": {
-            "title": "Ruwe Readarr Queue"
+            "title": "Raw Readarr Wachtrij"
         },
         "lidarrQueue": {
-            "title": "Ruwe Lidarr wachtrij"
+            "title": "Raw Lidarr wachtrij"
         }
     }
 }
