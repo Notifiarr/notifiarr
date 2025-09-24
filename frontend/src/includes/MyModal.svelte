@@ -4,23 +4,13 @@
  -->
 <script lang="ts">
   import { Modal } from '@sveltestrap/sveltestrap'
-  import type { ComponentProps, Snippet } from 'svelte'
   import { theme } from './theme.svelte'
 
-  type Props = {
-    isOpen?: boolean
-    modalClassName?: string
-    children?: Snippet
-    [key: string]: any
-  }
-
-  const { isOpen, modalClassName, children, ...rest }: Props = $props()
+  type Props = { isOpen?: boolean; children?: any; [key: string]: any }
+  const { isOpen, children, ...rest }: Props = $props()
+  const modalClassName = $derived(rest.modalClassName + (isOpen ? ' show' : ''))
 </script>
 
-<Modal
-  {isOpen}
-  modalClassName={modalClassName + (isOpen ? ' show' : '')}
-  theme={$theme}
-  {...rest}>
+<Modal {...{ ...rest, isOpen, modalClassName, theme: $theme }}>
   {@render children?.()}
 </Modal>
