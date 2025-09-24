@@ -11,7 +11,7 @@
             "hours": "ore",
             "second": "secondo",
             "seconds": "secondi",
-            "megabytes": "megabytes",
+            "megabytes": "megabyte",
             "bytes": "bytes",
             "Daily": "Giornaliero",
             "custom": "personalizzato",
@@ -52,8 +52,8 @@
                 "ms": "{milliseconds}ms",
                 "s": "{seconds}s",
                 "m": "{minutes}m",
-                "h": "{hours}h",
-                "d": "{days}d",
+                "h": "{hours}o",
+                "d": "{days}g",
                 "w": "{weeks}w"
             },
             "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}",
@@ -1532,5 +1532,68 @@
     },
     "ProcessList": {
         "footer": "{count} processi trovati."
+    },
+    "Integrations": {
+        "titles": {
+            "Version": "Versione",
+            "Size": "Dimensione"
+        },
+        "DriveData": {
+            "titles": {
+                "Age": "Età",
+                "Setting": "Impostazione",
+                "Value": "Valore",
+                "Health": "Salute"
+            }
+        },
+        "Snapshot": {
+            "titles": {
+                "MemoryFree": "Memoria Libera",
+                "MemoryTotal": "Memoria Totale",
+                "MemoryUsed": "Memoria Utilizzata",
+                "Processes": "Processi",
+                "Synology": "Synology",
+                "MySQLServers": "Server MySQL"
+            },
+            "Latest": "Ultimo Snapshot"
+        },
+        "starrTitles": {
+            "Editions": "Edizioni",
+            "Episodes": "Episodi",
+            "Movies": "Film",
+            "Missing": "Mancante",
+            "Tracks": "Tracce",
+            "Artists": "Artisti",
+            "Books": "Libri",
+            "Shows": "Serie TV"
+        },
+        "downloadTitles": {
+            "Downloading": "Scaricando",
+            "Paused": "In Pausa",
+            "TotalSize": "Dimensione Totale",
+            "Uploading": "Caricando",
+            "Month": "Mese",
+            "Uploaded": "Caricato",
+            "Week": "Settimana",
+            "Day": "Giorno",
+            "Seeding": "In Seed",
+            "Incomplete": "Incompleto",
+            "Errors": "Errori",
+            "Downloaded": "Scaricati"
+        },
+        "mediaTitles": {
+            "ServerOwner": "Proprietario Server",
+            "Sessions": "Sessioni",
+            "SessionsAge": "Età Sessione",
+            "User": "Utente",
+            "Users": "Utenti",
+            "CustomName": "Nome Personalizzato",
+            "Email": "Email",
+            "PlexUsername": "Username Plex",
+            "Session": "Sessione",
+            "Title": "Titolo",
+            "Complete": "Completo",
+            "PlexPass": "Pass Plex"
+        }
     }
 }
