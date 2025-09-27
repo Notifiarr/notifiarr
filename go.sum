@@ -72,6 +72,8 @@ github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d h1:dHYKX8CBAs1zSGXm
 github.com/gen2brain/dlgs v0.0.0-20220603100644-40c77870fa8d/go.mod h1:/eFcjDXaU2THSOOqLxOPETIbHETnamk8FA/hMjhg/gU=
 github.com/go-co-op/gocron/v2 v2.16.5 h1:j228Jxk7bb9CF8LKR3gS+bK3rcjRUINjlVI+ZMp26Ss=
 github.com/go-co-op/gocron/v2 v2.16.5/go.mod h1:zAfC/GFQ668qHxOVl/D68Jh5Ce7sDqX6TJnSQyRkRBc=
+github.com/go-co-op/gocron/v2 v2.16.6 h1:zI2Ya9sqvuLcgqJgV79LwoJXM8h20Z/drtB7ATbpRWo=
+github.com/go-co-op/gocron/v2 v2.16.6/go.mod h1:zAfC/GFQ668qHxOVl/D68Jh5Ce7sDqX6TJnSQyRkRBc=
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
