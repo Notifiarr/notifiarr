@@ -15,7 +15,7 @@
   import { theme as thm } from '../../includes/theme.svelte'
   import { profile } from '../../api/profile.svelte'
   import { run } from './run'
-  import { failure, successIf } from '../../includes/util'
+  import { failure, rtrim, successIf } from '../../includes/util'
 
   type Props = { type: 'Triggers' | 'Timers' | 'Schedules'; info: TriggerInfo }
   const { type, info }: Props = $props()
@@ -98,7 +98,10 @@
     </tr>
 
     {#if type === 'Timers'}
-      <tr><th><T id="Actions.titles.Interval" /></th><td>{info.dur}</td></tr>
+      <tr>
+        <th><T id="Actions.titles.Interval" /></th>
+        <td>{rtrim(info.dur.split('.')[0], 's')}{info.dur.endsWith('s') ? 's' : ''}</td>
+      </tr>
     {:else if type === 'Schedules'}
       <tr><th><T id="Actions.titles.Schedule" /></th><td>{info.dur}</td></tr>
     {/if}
