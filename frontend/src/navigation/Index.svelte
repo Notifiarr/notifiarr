@@ -23,7 +23,7 @@
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
   import { slide } from 'svelte/transition'
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import Sidebar from './Sidebar.svelte'
   import Modals from './Modals.svelte'
   import MyModal from '../includes/MyModal.svelte'
@@ -35,7 +35,11 @@
   // Use this to limit the sidebar height to the content height.
   let contentHeight = $state(0)
 
-  onMount(() => nav.onMount())
+  onMount(async () => {
+    await tick()
+    await nav.onMount()
+  })
+
   $effect(() => {
     if (windowWidth < magicNumber) sidebarOpen = false
   })

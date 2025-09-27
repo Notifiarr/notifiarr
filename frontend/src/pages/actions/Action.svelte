@@ -18,9 +18,9 @@
   import { failure, successIf } from '../../includes/util'
 
   type Props = { type: 'Triggers' | 'Timers' | 'Schedules'; info: TriggerInfo }
-  let { type, info }: Props = $props()
+  const { type, info }: Props = $props()
 
-  const id = btoa(info.key + info.name).split('=')[0]
+  const id = btoa(info.key.split('').reverse().join('') + info.name).split('=')[0]
   const theme = $derived($thm)
   let disabled = $state(false)
 
@@ -43,14 +43,20 @@
 </script>
 
 <CardHeader>
-  <Popover target={id} trigger="hover" {theme}>
+  <Popover target={id + 'label'} trigger="hover" {theme}>
     {#if info.key == 'TrigCustomCronTimer'}
       {$profile.siteCrons?.find(c => info.name.endsWith("'" + c.name + "'"))?.description}
     {:else}
       {info.name}
     {/if}
   </Popover>
-  <div {id}><T id="Actions.triggers.{info.key}.label" name={info.name} /></div>
+  <span id={id + 'label'}>
+    {#if info.key == 'TrigCustomCronTimer'}
+      <T id="Actions.triggers.{info.key}.label" name={info.name.split("'")[1]} />
+    {:else}
+      <T id="Actions.triggers.{info.key}.label" name={info.name} />
+    {/if}
+  </span>
 </CardHeader>
 
 <Table class="mb-0" borderless striped>
@@ -61,9 +67,9 @@
         {info.runs || 0}
         <!-- If a button is defined in the translation file, show a button to trigger the action. -->
         {#if button}
-          <Popover target={id + 'b'} trigger="hover" {theme}>{button}</Popover>
+          <Popover target={id + 'button'} trigger="hover" {theme}>{button}</Popover>
           <Dropdown class="d-inline-block float-end">
-            <DropdownToggle id={id + 'b'} {onclick} {disabled} color="transparent">
+            <DropdownToggle id={id + 'button'} {onclick} {disabled} color="transparent">
               <Fa
                 i={faCirclePlay}
                 spin={disabled}
