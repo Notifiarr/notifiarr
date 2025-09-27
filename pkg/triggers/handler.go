@@ -143,6 +143,8 @@ func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, tri
 		return a.cfsync(input, content)
 	case "rpsync", "TrigCFSyncSonarr":
 		return a.rpsync(input, content)
+	case "TrigCFSyncLidarr":
+		return http.StatusNotImplemented, "Lidarr sync is not implemented."
 	case "services":
 		return a.services(input)
 	case "sessions", "TrigPlexSessions":
