@@ -3,7 +3,6 @@
   import {
     Button,
     Col,
-    Modal,
     Row,
     Input as Box,
     ModalHeader,
@@ -16,9 +15,9 @@
   import { type Command } from '../../api/notifiarrConfig'
   import type { ChildProps } from '../../includes/Instances.svelte'
   import CheckedInput from '../../includes/CheckedInput.svelte'
-  import { theme } from '../../includes/theme.svelte'
   import { delay } from '../../includes/util'
   import Output from './Output.svelte'
+  import MyModal from '../../includes/MyModal.svelte'
 
   let {
     form = $bindable(),
@@ -122,7 +121,7 @@
 </div>
 
 <!-- Modal is used to run commands that have custom arguments (regexes). -->
-<Modal toggle={cancel} isOpen={formResolve != null} size="lg" theme={$theme} centered>
+<MyModal toggle={cancel} isOpen={formResolve != null} size="lg" centered>
   <ModalHeader><T id="Commands.enterCommandArguments" /></ModalHeader>
   <form onsubmit={e => e.preventDefault()}>
     <ModalBody>
@@ -163,4 +162,4 @@
         }}><T id="buttons.Execute" /></Button>
     </ModalFooter>
   </form>
-</Modal>
+</MyModal>

@@ -72,7 +72,7 @@
     "phrases": {
         "BackEndUpdated": "Back-end {timeDuration} geleden bijgewerkt.",
         "ReloadSuccess": "Herladen succesvol! Client is herladen.",
-        "LoginHelpBody": "Bent u uw wachtwoord vergeten? Raadpleeg dan de wikipagina <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_new\">vergeten wachtwoorden</a>. Als dit uw eerste keer is dat u inlogt, kunt u uw wachtwoord vinden in het logbestand van de client. Als u de client een API-sleutel hebt gegeven voordat u deze voor het eerst startte, is uw wachtwoord de API-sleutel.",
+        "LoginHelpBody": "Bent u uw wachtwoord vergeten? Raadpleeg dan de wikipagina <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_blank\">vergeten wachtwoorden</a>. Als dit uw eerste keer is dat u inlogt, kunt u uw wachtwoord vinden in het logbestand van de client. Als u de client een API-sleutel hebt gegeven voordat u deze voor het eerst startte, is uw wachtwoord de API-sleutel.",
         "FailedToUpdateBackEnd": "Back-end updaten mislukt: {error}",
         "TryRefreshingThePage": "Probeer de pagina te vernieuwen.",
         "ConfigurationSavedReloading": "Configuratie opgeslagen! Client wordt opnieuw geladen...",
@@ -123,7 +123,7 @@
             "SnapshotApps": "De meeste snapshot configuraties vindt u op de website Notifiarr.com. Hieronder vindt u de plug-in instellingen voor de snapshotfunctie.",
             "FileWatcher": "Let op bestandswijzigingen en activeer acties! Deze Notifiarr client kan (log)bestanden controleren op regels die overeenkomen met een reguliere expressie. Dit is vergelijkbaar met <code>tail -f file | grep string</code> en stelt u in staat om meldingen te versturen wanneer er bijvoorbeeld een nieuwe regel in een logbestand is geschreven die overeenkomt met een reguliere expressie.",
             "Metrics": "Bekijk metrische totalen voor client configuraties.",
-            "SiteTunnel": "Deze client onderhoud een permanente websocket verbinding met notifiarr.com via een <a href=\"https://github.com/golift/mulery\" target=\"_new\">Mulery-tunnel</a>. Deze tunnel stelt de website in staat om verzoeken naar uw client te sturen zonder dat er een poort hoeft te worden geopend of een statisch IP-adres hoeft te worden gebruikt. Op deze pagina kunt u uw primaire tunnel selecteren en welke tunnel u als back-up wilt gebruiken voor het geval de primaire tunnel ontoegankelijk wordt.",
+            "SiteTunnel": "Deze client onderhoud een permanente websocket verbinding met notifiarr.com via een <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery-tunnel</a>. Deze tunnel stelt de website in staat om verzoeken naar uw client te sturen zonder dat er een poort hoeft te worden geopend of een statisch IP-adres hoeft te worden gebruikt. Op deze pagina kunt u uw primaire tunnel selecteren en welke tunnel u als back-up wilt gebruiken voor het geval de primaire tunnel ontoegankelijk wordt.",
             "Commands": "Aangepaste opdrachten en scripts instellen en uitvoeren.",
             "Services": "De Notifiarr client toepassing kan services bewaken via HTTP-controles, TCP poort controles of controles op processen die wel of niet worden uitgevoerd. <b>De clientservice controles werken met de Notifiarr.com netwerkintegratie.</b>",
             "Configuration": "Configureer hier uw Notifiarr clientinstellingen.",
@@ -131,7 +131,7 @@
             "Downloaders": "Beheer downloadclients.",
             "MediaApps": "Beheer mediaspelers en gerelateerde services.",
             "Endpoints": "Configureer relay eindpunt URL's en hun schema's.",
-            "Integrations": "Bekijk actie statistieken voor alle integraties.",
+            "Integrations": "Deze pagina geeft gegevens weer die deze clienttoepassing in het geheugen heeft opgeslagen voor de verschillende geconfigureerde integraties.",
             "Monitoring": "Bekijk de service- en netwerkstatus.",
             "LogFiles": "Bekijk, volg, download en upload client logbestanden.",
             "Actions": "Hier vindt u interne Notifiarr-clientacties. Deze worden uitgevoerd door timers, schema's en gebeurtenissen van de website of een chatserver. Hoewel ze normaal gesproken alleen voor probleemoplossing worden gebruikt, kunt u ze in deze interface handmatig activeren.",
@@ -210,7 +210,7 @@
             "AuthTypeChange": "Als het authenticatie type verandert, meldt u zich af om het proces te voltooien.",
             "ProfileUpdated": "Profiel succesvol bijgewerkt {timeDuration} geleden!",
             "EnterCurrentPassword": "Voer uw huidige wachtwoord in om wijzigingen aan te brengen.",
-            "SeeWikiForAuthProxyHelp": "Zie <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">de wiki</a> voor instructies over het instellen van een authenticatie proxy.",
+            "SeeWikiForAuthProxyHelp": "Zie <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">de wiki</a> voor instructies over het instellen van een authenticatie proxy.",
             "ShowMeMore": "Laat meer zien.",
             "ShowMeLess": "Laat minder zien."
         },
@@ -221,7 +221,7 @@
                 "header": "Auth Proxy: koptekst"
             },
             "option_desc": {
-                "header": "Selecteer deze optie om in te loggen bij deze applicatie met een HTTP header die een gebruikersnaam bevat. Dit staat algemeen bekend als proxy authenticatie. We hebben <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">een wikipagina</a> met instructies voor het configureren van Nginx voor deze functie. Wanneer u deze optie selecteert, moet u ook een header voor de auth proxy selecteren. Als er geen headers worden weergegeven, zijn er geen geldige headers door de upstream proxy verstrekt.",
+                "header": "Selecteer deze optie om in te loggen bij deze applicatie met een HTTP header die een gebruikersnaam bevat. Dit staat algemeen bekend als proxy authenticatie. We hebben <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">een wikipagina</a> met instructies voor het configureren van Nginx voor deze functie. Wanneer u deze optie selecteert, moet u ook een header voor de auth proxy selecteren. Als er geen headers worden weergegeven, zijn er geen geldige headers door de upstream proxy verstrekt.",
                 "password": " Dit is het standaard authenticatie type. Selecteer de optie 'Wachtwoord' om in te loggen bij deze applicatie met een geconfigureerde gebruikersnaam en wachtwoord. Er wordt slechts één gebruikersnaam en wachtwoord ondersteund. Wanneer u deze optie selecteert, moet u de velden voor de gebruikersnaam en het nieuwe wachtwoord invullen. Als dit het huidige authenticatietype is, moet u ook het veld voor het huidige wachtwoord invullen om wijzigingen aan te brengen.",
                 "noauth": "Deze configuratie wordt niet aanbevolen. Het authenticatietype 'Geen wachtwoord' staat alle verzoeken toe van elk geconfigureerd <code>upstream IP</code>. Het werkt ook met een authenticatie proxy om de gebruikersnaam in te stellen. Als er geen gebruikersnaam in de opgegeven header staat, wordt standaard admin gebruikt."
             },
@@ -540,7 +540,7 @@
                 "label": "URL",
                 "description": "URL van de Plex server."
             },
-            "description": "De Plex integratie is uitgebreid en veel van de instellingen worden geconfigureerd op de <a href=\"https://notifiarr.com/\" target=\"_new\">Notifiarr.com website</a>.",
+            "description": "De Plex integratie is uitgebreid en veel van de instellingen worden geconfigureerd op de <a href=\"https://notifiarr.com/\" target=\"_blank\">Notifiarr.com website</a>.",
             "name": {
                 "label": "Server naam",
                 "description": "Naam van de Plex server.",
@@ -550,7 +550,7 @@
                 "label": "Token",
                 "description": "Token voor de Plex server.",
                 "placeholder": "pl3x-to_Ken",
-                "tooltip": "Instructies voor het vinden van uw Plex token vindt u in <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_new\">dit Plex artikel</a>."
+                "tooltip": "Instructies voor het vinden van uw Plex token vindt u in <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">dit Plex artikel</a>."
             }
         },
         "Tautulli": {
@@ -1223,7 +1223,7 @@
             "label": "Payload sjabloon",
             "description": "Kopieer de payload in deze sjabloon.",
             "placeholder": "pihole",
-            "tooltip": "De website gebruikt de template om te bepalen hoe de payload kan worden omgezet in een chat melding. Bekijk een lijst met beschikbare templates of maak je eigen template op <a href=\"https://notifiarr.com/\" target=\"_new\">de website</a> @ <code>Integraties: Eindpunten</code>."
+            "tooltip": "De website gebruikt de template om te bepalen hoe de payload kan worden omgezet in een chat melding. Bekijk een lijst met beschikbare templates of maak je eigen template op <a href=\"https://notifiarr.com/\" target=\"_blank\">de website</a> @ <code>Integraties: Eindpunten</code>."
         },
         "header": {
             "placeholder": "Inhoud-Type: toepassing/json",
@@ -1567,6 +1567,189 @@
         "button": {
             "refresh": "Pagina gegevens vernieuwen",
             "fullscreen": "Volledig scherm in-/uitschakelen"
+        }
+    },
+    "Integrations": {
+        "titles": {
+            "BuildTime": "Bouwtijd",
+            "Branch": "Tak",
+            "DashboardAge": "Dashboard Leeftijd",
+            "CacheAge": "Cache leeftijd",
+            "Size": "Grootte",
+            "StatusAge": "Status Leeftijd",
+            "Version": "Versie"
+        },
+        "starrTitles": {
+            "Books": "Boeken",
+            "Artists": "Artiest",
+            "Episodes": "Afleveringen",
+            "Editions": "Edities",
+            "Elapsed": "Verstreken",
+            "Movies": "Films",
+            "Missing": "Ontbreekt",
+            "OnDisk": "Op schijf",
+            "QueueAge": "Wachttijd",
+            "QueueSize": "Wachtrij grootte",
+            "Shows": "Shows",
+            "Tracks": "Tracks"
+        },
+        "DriveData": {
+            "titles": {
+                "Age": "Leeftijd",
+                "Drive": "Schijf",
+                "Health": "Gezondheid",
+                "Temp": "Temp",
+                "Setting": "Instelling",
+                "Value": "Waarde"
+            },
+            "title": "Schijf data",
+            "driveInformation": {
+                "title": "Schijf informatie"
+            },
+            "mdStatRaid": {
+                "title": "MDStat Raid"
+            }
+        },
+        "Snapshot": {
+            "titles": {
+                "DriveHealth": "Schijf gezondheid",
+                "DriveTemps": "Schijf temps",
+                "DiskUsage": "Schijfgebruik",
+                "DiskQuotas": "Schijf quota's",
+                "CPUPercent": "CPU procent",
+                "MemoryFree": "Geheugen vrij",
+                "MemoryTotal": "Geheugen totaal",
+                "MemoryUsed": "Gebruikt geheugen",
+                "MySQLServers": "MySQL Servers",
+                "NvidiaGPUs": "Nvidia GPUs",
+                "IOStat": "IO statistiek",
+                "IOStat2": "IO statistiek 2",
+                "IOTop": "IO Top",
+                "IPMISensors": "IPMI sensoren",
+                "IdleCPUTime": "Inactieve CPU tijd",
+                "SystemCPUTime": "Systeem CPU tijd",
+                "UserCPUTime": "CPU tijd van gebruiker",
+                "RaidConfigs": "Raid configuraties",
+                "Synology": "Synology",
+                "ZFSPools": "ZFS Pools",
+                "Processes": "Processen"
+            },
+            "Latest": "Laatste Snapshot",
+            "Age": "Snapshot Leeftijd",
+            "Data": "Snapshot Data",
+            "System": "Systeem Snapshot",
+            "title": "Raw Snapshot Data"
+        },
+        "downloadTitles": {
+            "Downloads": "Downloads",
+            "Errors": "Fouten",
+            "Downloaded": "Gedownload",
+            "Day": "Dag",
+            "Downloading": "Downloaden",
+            "Incomplete": "Onvolledig",
+            "Month": "Maand",
+            "Paused": "Gepauzeerd",
+            "Seeding": "Seeding",
+            "TotalSize": "Totale grootte",
+            "Uploaded": "Geüpload",
+            "Uploading": "Uploaden",
+            "Week": "Week"
+        },
+        "mediaTitles": {
+            "Email": "Email",
+            "CustomName": "Aangepaste naam",
+            "Complete": "Compleet",
+            "Encoding": "Codering",
+            "PlexPass": "Plex Pass",
+            "ServerOwner": "Server beheerder",
+            "Sessions": "Sessies",
+            "SessionsAge": "Sessies Leeftijd",
+            "User": "Gebruiker",
+            "Users": "Gebruikers",
+            "PlexUsername": "Plex gebruikersnaam",
+            "Session": "Sessie",
+            "Title": "Titel"
+        },
+        "plexSessions": {
+            "title": "Huidige sessies van Plex Media Server",
+            "footer": "Weergave van huidige Plex sessies, niet van de cachegegevens. Zie het onbewerkte JSON-modal voor de cachegegevens."
+        },
+        "phrases": {
+            "NoPlexData": "Geen plex integratie gegevens.",
+            "NoCachedSessions": "Geen sessies in cache opgeslagen.",
+            "StateForTime": "{state} voor {timeDuration}"
+        },
+        "lidarrDashboard": {
+            "title": "Raw Lidarr Dashboard"
+        },
+        "readarrDashboard": {
+            "title": "Raw Readarr Dashboard"
+        },
+        "sonarrDashboard": {
+            "title": "Raw Sonarr Dashboard"
+        },
+        "nzbgetDashboard": {
+            "title": "Raw NZBGet Dashboard"
+        },
+        "qbitDashboard": {
+            "title": "Raw QBit Dashboard"
+        },
+        "rtorrentDashboard": {
+            "title": "Raw rTorrent Dashboard"
+        },
+        "sabnzbdDashboard": {
+            "title": "Raw SabNZBD Dashboard"
+        },
+        "sonarrQueue": {
+            "title": "Raw Sonarr Wachtrij"
+        },
+        "transmissionDashboard": {
+            "title": "Raw Transmission Dashboard"
+        },
+        "prowlarrStatus": {
+            "title": "Raw Prowlarr Info"
+        },
+        "radarrStatus": {
+            "title": "Raw Radarr Info"
+        },
+        "readarrStatus": {
+            "title": "Raw Readarr Info"
+        },
+        "plexStatus": {
+            "title": "Plex Media Server informatie"
+        },
+        "lidarrStatus": {
+            "title": "Raw Lidarr Info"
+        },
+        "plexSessionsJson": {
+            "title": "Raw Plex Media Server sessies"
+        },
+        "sonarrStatus": {
+            "title": "Raw Sonarr Info"
+        },
+        "tautulliStatus": {
+            "title": "Raw Tautulli Info"
+        },
+        "tautulliUsersJson": {
+            "title": "Raw Tautulli gebruikers"
+        },
+        "tautulliUsers": {
+            "title": "Tautulli gebruikers"
+        },
+        "radarrDashboard": {
+            "title": "Raw Radarr Dashboard"
+        },
+        "radarrQueue": {
+            "title": "Raw Radarr Wachtrij"
+        },
+        "delugeDashboard": {
+            "title": "Raw Deluge Dashboard"
+        },
+        "readarrQueue": {
+            "title": "Raw Readarr Wachtrij"
+        },
+        "lidarrQueue": {
+            "title": "Raw Lidarr wachtrij"
         }
     }
 }

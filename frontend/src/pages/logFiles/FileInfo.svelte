@@ -3,7 +3,6 @@
     Button,
     ButtonGroup,
     Card,
-    Modal,
     ModalBody,
     ModalFooter,
     ModalHeader,
@@ -23,7 +22,7 @@
   import { getUi, urlbase } from '../../api/fetch'
   import { success, warning } from '../../includes/util'
   import { slide } from 'svelte/transition'
-  import { theme } from '../../includes/theme.svelte'
+  import MyModal from '../../includes/MyModal.svelte'
 
   let { file, list = $bindable() }: { file: LogFileInfo; list: LogFileInfo[] } = $props()
 
@@ -122,11 +121,7 @@
   </div>
 {/if}
 
-<Modal
-  isOpen={showDelModal}
-  toggle={() => (showDelModal = false)}
-  theme={$theme}
-  centered>
+<MyModal isOpen={showDelModal} toggle={() => (showDelModal = false)} centered>
   <ModalHeader>
     <T id="LogFiles.DeleteFile" filePath={file.path} />
   </ModalHeader>
@@ -139,7 +134,7 @@
       <T id="buttons.Cancel" />
     </Button>
   </ModalFooter>
-</Modal>
+</MyModal>
 
 <style>
   .fit th {

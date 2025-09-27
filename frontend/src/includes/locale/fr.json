@@ -401,7 +401,7 @@
             "System": "Afficher les informations système et client et.",
             "TrustProfile": "Configurez la manière dont vous vous connectez à cette application client Notifiarr.",
             "Landing": "C'est le plus bel endroit sur Terre !",
-            "SiteTunnel": "Ce client maintient une connexion websocket persistante à notifiarr.com via un <a href=\"https://github.com/golift/mulery\" target=\"_new\">tunnel Mulery</a>. Ce tunnel permet au site web d'adresser des requêtes à votre client sans avoir à ouvrir de port ni à utiliser d'adresse IP statique. Cette page vous permet de sélectionner votre tunnel principal et celui que vous souhaitez utiliser comme tunnel de secours en cas d'inaccessibilité du tunnel principal.",
+            "SiteTunnel": "Ce client maintient une connexion websocket persistante à notifiarr.com via un <a href=\"https://github.com/golift/mulery\" target=\"_blank\">tunnel Mulery</a>. Ce tunnel permet au site web d'adresser des requêtes à votre client sans avoir à ouvrir de port ni à utiliser d'adresse IP statique. Cette page vous permet de sélectionner votre tunnel principal et celui que vous souhaitez utiliser comme tunnel de secours en cas d'inaccessibilité du tunnel principal.",
             "Actions": "Retrouvez ici les actions internes du client Notifiarr. Elles sont exécutées par des minuteurs, des planifications et des événements provenant du site web ou d'un serveur de chat. Généralement réservées au dépannage, vous pouvez les déclencher manuellement dans cette interface."
         }
     },
@@ -742,7 +742,7 @@
             "label": "Modèle de charge utile",
             "description": "Analyser la charge utile dans ce modèle.",
             "placeholder": "trou d'homme",
-            "tooltip": "Le modèle est utilisé par le site web pour déterminer comment transformer la charge utile en notification de chat. Consultez la liste des modèles disponibles ou créez le vôtre sur <a href=\"https://notifiarr.com/\" target=\"_new\">le site web</a> @ <code>Integrations : Endpoints</code>.",
+            "tooltip": "Le modèle est utilisé par le site web pour déterminer comment transformer la charge utile en notification de chat. Consultez la liste des modèles disponibles ou créez le vôtre sur <a href=\"https://notifiarr.com/\" target=\"_blank\">le site web</a> @ <code>Integrations : Endpoints</code>.",
             "required": "Un modèle est requis. Saisissez « test » si vous ne savez pas quoi saisir."
         },
         "timeout": {
@@ -820,7 +820,7 @@
         "Changed": "Modifié",
         "New": "Nouveau",
         "ERROR": "ERREUR",
-        "LoginHelpBody": "Si vous avez oublié votre mot de passe, veuillez consulter la page wiki <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_new\">mots de passe oubliés</a>. Si c'est votre première connexion, vous trouverez votre mot de passe dans le fichier journal du client. Si vous avez fourni une clé API au client avant de le démarrer pour la première fois, votre mot de passe est la clé API.",
+        "LoginHelpBody": "Si vous avez oublié votre mot de passe, veuillez consulter la page wiki <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_blank\">mots de passe oubliés</a>. Si c'est votre première connexion, vous trouverez votre mot de passe dans le fichier journal du client. Si vous avez fourni une clé API au client avant de le démarrer pour la première fois, votre mot de passe est la clé API.",
         "Loading": "Chargement...",
         "BackEndUpdated": "Back-end mis à jour il y a {timeDuration}.",
         "ShowMore": "Afficher plus d'informations"
@@ -989,7 +989,7 @@
             "ProfileUpdated": "Profil mis à jour avec succès il y a {timeDuration}!",
             "EnterCurrentPassword": "Saisissez votre mot de passe actuel pour apporter des modifications.",
             "ProxyAuthDisabled": "L'authentification proxy est désactivée car votre flux en amont ({upstreamIp}) ne figure pas dans la liste des flux en amont autorisés.",
-            "SeeWikiForAuthProxyHelp": "Consultez le <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">wiki</a> pour obtenir des instructions sur la configuration d'un proxy d'authentification.",
+            "SeeWikiForAuthProxyHelp": "Consultez le <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wiki</a> pour obtenir des instructions sur la configuration d'un proxy d'authentification.",
             "ShowMeMore": "Montre m'en plus.",
             "ShowMeLess": "Montre-moi moins."
         },
@@ -1059,7 +1059,7 @@
         },
         "Plex": {
             "title": "Plex",
-            "description": "L'intégration Plex est complète et de nombreux paramètres sont configurés sur le <a href=\"https://notifiarr.com/\" target=\"_new\">site Web Notifiarr.com</a>.",
+            "description": "L'intégration Plex est complète et de nombreux paramètres sont configurés sur le <a href=\"https://notifiarr.com/\" target=\"_blank\">site Web Notifiarr.com</a>.",
             "name": {
                 "label": "Nom du serveur",
                 "description": "Nom du serveur Plex.",
@@ -1074,7 +1074,7 @@
                 "label": "Jeton",
                 "description": "Jeton pour le serveur Plex.",
                 "placeholder": "pl3x-à_Ken",
-                "tooltip": "Vous pouvez trouver des instructions pour localiser votre jeton Plex dans <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_new\">cet article Plex</a>."
+                "tooltip": "Vous pouvez trouver des instructions pour localiser votre jeton Plex dans <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">cet article Plex</a>."
             }
         }
     },

@@ -18,7 +18,10 @@ import (
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
 func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) {
-	sessions, err := c.getSessions(ctx, time.Second)
+	sessionCtx, cancel := context.WithTimeout(ctx, c.Plex.Timeout.Duration)
+	defer cancel()
+
+	sessions, err := c.getSessions(sessionCtx, time.Second)
 	if err != nil {
 		logs.Log.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.Server.URL, err)
 		return
