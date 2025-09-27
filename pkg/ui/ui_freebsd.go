@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/gen2brain/beeep"
+	"github.com/ncruces/zenity"
 )
 
 // SystrayIcon is the icon in the system tray or task bar.
@@ -20,13 +20,13 @@ func HasGUI() bool {
 	return hasGUI
 }
 
-// Toast does not work properly on FreeBSD because we cross compile it without dbus. :(
+// Toast may not work properly on FreeBSD because we cross compile it without dbus. :(
 func Toast(_ context.Context, msg string, v ...interface{}) error {
 	if !hasGUI {
 		return nil
 	}
 
-	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), GetPNG())
+	err := zenity.Notify(fmt.Sprintf(msg, v...), zenity.Title(mnd.Title), zenity.Icon(GetPNG()))
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}

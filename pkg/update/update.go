@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/ui"
 )
 
 const (
@@ -45,40 +46,33 @@ var (
 )
 
 // Restart is meant to be called from a special flag that reloads the app after an upgrade.
-func Restart(ctx context.Context, cmd *Command, waitForPids ...int) error {
+func Restart(ctx context.Context, cmd *Command, waitForPid int) error {
 	defer time.Sleep(time.Second)
+	_ = ui.Toast(ctx, "Restarting Notifiarr client...")
 
 	// Wait for the parent process to exit.
-	if len(waitForPids) > 0 {
-		waitForPidsToExit(waitForPids)
-	}
+	waitForPidToExit(waitForPid)
 
-	if err := exec.CommandContext(ctx, cmd.Path, cmd.Args...).Start(); err != nil { //nolint:gosec
+	execCmd := exec.Command(cmd.Path, cmd.Args...) //nolint:noctx // Can't put a context on this. Let it go.
+	if err := execCmd.Start(); err != nil {        //nolint:gosec
+		ui.Error("Restarting Notifiarr client: " + err.Error())
 		return fmt.Errorf("executing command %w", err)
 	}
+
+	go execCmd.Wait() //nolint:errcheck // Do not care here either.
 
 	return nil
 }
 
-func waitForPidsToExit(pids []int) {
+func waitForPidToExit(pid int) {
 	const (
 		sleepTime = 500 * time.Millisecond
 		loopCount = 150 // 75 seconds
 	)
 
-	var found bool
-
 	for range loopCount {
-		found = false
-
-		for _, pid := range pids {
-			if found = isPidRunning(pid); found {
-				break
-			}
-		}
-
-		if !found {
-			return
+		if !isPidRunning(pid) {
+			break
 		}
 
 		time.Sleep(sleepTime)
@@ -133,9 +127,13 @@ func NowWithContext(ctx context.Context, update *Command) (string, error) {
 
 	mnd.Log.Printf("[UPDATE] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
 
-	if err := exec.CommandContext(ctx, update.Path, update.Args...).Start(); err != nil { //nolint:gosec
+	cmd := exec.Command(update.Path, update.Args...) //nolint:noctx // Can't put a context on this. Let it go.
+	if err := cmd.Start(); err != nil {              //nolint:gosec
 		return backupFile, fmt.Errorf("executing restart command: %w", err)
 	}
+
+	go cmd.Wait() //nolint:errcheck // Do not care here either.
+	time.Sleep(1 * time.Second)
 
 	return backupFile, nil
 }
@@ -162,13 +160,13 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 
 	backupFile := strings.TrimSuffix(u.Path, dotExe)
 	backupFile += ".backup." + time.Now().Format(backupTimeFormat) + suff
-	mnd.Log.Debugf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
+	mnd.Log.Printf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
 
 	if err := os.Rename(u.Path, backupFile); err != nil {
 		return backupFile, fmt.Errorf("renaming original file: %w", err)
 	}
 
-	mnd.Log.Debugf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
+	mnd.Log.Printf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
 
 	u.cleanOldBackups()
 
@@ -186,7 +184,7 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 	}
 	defer tempFile.Close()
 
-	mnd.Log.Debugf("[UPDATE] Primed Temp File: %s", tempFile.Name())
+	mnd.Log.Printf("[UPDATE] Primed Temp File: %s", tempFile.Name())
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.URL, nil)
 	if err != nil {

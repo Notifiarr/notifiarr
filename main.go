@@ -25,12 +25,12 @@ import (
 func main() {
 	// setup log package in case we throw an error in main.go before logging is setup.
 	log.SetFlags(log.LstdFlags)
-	log.SetPrefix("[ERROR] ")
+	log.SetPrefix("[CRITICAL] ")
 
 	defer logPanic()
 
 	if err := client.Start(); err != nil {
-		_, _ = ui.Error(err.Error())
+		ui.Error(err.Error())
 		defer log.Fatal(err)
 	}
 }

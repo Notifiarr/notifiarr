@@ -3,19 +3,13 @@
 package ui
 
 // Warning wraps dlgs.Warning.
-func Warning(_ string) (bool, error) {
-	return true, nil
-}
+func Warning(_ string) {}
 
 // Error wraps dlgs.Error.
-func Error(_ string) (bool, error) {
-	return true, nil
-}
+func Error(_ string) {}
 
 // Info wraps dlgs.Info.
-func Info(_ string) (bool, error) {
-	return true, nil
-}
+func Info(_ string) {}
 
 // Entry wraps dlgs.Entry.
 func Entry(_, val string) (string, bool, error) {

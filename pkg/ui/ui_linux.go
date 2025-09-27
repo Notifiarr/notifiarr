@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/gen2brain/beeep"
+	"github.com/ncruces/zenity"
 )
 
 // SystrayIcon is the icon in the system tray or task bar.
@@ -25,7 +25,7 @@ func Toast(_ context.Context, msg string, v ...interface{}) error {
 		return nil
 	}
 
-	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), GetPNG())
+	err := zenity.Notify(fmt.Sprintf(msg, v...), zenity.Title(mnd.Title), zenity.Icon(GetPNG()))
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}

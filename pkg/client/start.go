@@ -233,8 +233,13 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	output := []string{msg}
 
 	if c.Flags.Restart {
+		executablePath, err := os.Executable()
+		if err != nil || executablePath == "" {
+			executablePath = os.Args[0]
+		}
+
 		return output, newPassword, update.Restart(ctx, &update.Command{ //nolint:wrapcheck
-			Path: os.Args[0],
+			Path: executablePath,
 			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
 		}, os.Getppid())
 	}
