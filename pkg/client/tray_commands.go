@@ -115,7 +115,7 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 	val, _, _ := ui.Entry("Enter path to write config file:", c.Flags.ConfigFile)
 
 	if val == "" {
-		_, _ = ui.Error("No Config File Provided")
+		ui.Error("No Config File Provided")
 		return
 	}
 
@@ -123,12 +123,12 @@ func (c *Client) writeConfigFile(ctx context.Context) {
 
 	if _, err := c.Config.Write(ctx, val, false); err != nil {
 		logs.Log.Errorf("Writing Config File: %v", err)
-		_, _ = ui.Error("Writing Config File: " + err.Error())
+		ui.Error("Writing Config File: " + err.Error())
 
 		return
 	}
 
-	_, _ = ui.Info("Wrote Config File: " + val)
+	ui.Info("Wrote Config File: " + val)
 }
 
 func (c *Client) menuPanic() {
@@ -208,7 +208,7 @@ func (c *Client) updatePassword(ctx context.Context) {
 
 	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
 		logs.Log.Errorf("Updating Web UI Password: %v", err)
-		_, _ = ui.Error("Updating Web UI Password: " + err.Error())
+		ui.Error("Updating Web UI Password: " + err.Error())
 	}
 
 	if err = ui.Toast(ctx, "Web UI password updated. Save config to persist this change."); err != nil {

@@ -3,11 +3,12 @@
 package ui
 
 import (
+	"errors"
 	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/gen2brain/dlgs"
+	"github.com/ncruces/zenity"
 	"golift.io/version"
 )
 
@@ -20,46 +21,54 @@ func now() string {
 }
 
 // Warning wraps dlgs.Warning.
-func Warning(msg string) (bool, error) {
+func Warning(msg string) {
 	if !HasGUI() {
-		return true, nil
+		return
 	}
 
-	return dlgs.Warning(title(), msg+now()) //nolint:wrapcheck
+	_ = zenity.Warning(msg+now(), zenity.Title(title()))
 }
 
-// Error wraps dlgs.Error.
-func Error(msg string) (bool, error) {
+// Error wraps zenity.Error.
+func Error(msg string) {
 	if !HasGUI() {
-		return true, nil
+		return
 	}
 
-	return dlgs.Error(title("ERROR"), msg+now()) //nolint:wrapcheck
+	_ = zenity.Error(msg+now(), zenity.Title(title("ERROR")))
 }
 
-// Info wraps dlgs.Info.
-func Info(msg string) (bool, error) {
+// Info wraps zenity.Info.
+func Info(msg string) {
 	if !HasGUI() {
-		return true, nil
+		return
 	}
 
-	return dlgs.Info(title(), msg+now()) //nolint:wrapcheck
+	_ = zenity.Info(msg+now(), zenity.Title(title()))
 }
 
-// Entry wraps dlgs.Entry.
+// Entry wraps zenity.Entry. Returns the entry text and true if ok is clicked.
 func Entry(msg, val string) (string, bool, error) {
 	if !HasGUI() {
 		return val, true, nil
 	}
 
-	return dlgs.Entry(title(), msg+now(), val) //nolint:wrapcheck
+	entry, err := zenity.Entry(msg+now(), zenity.Title(title()), zenity.EntryText(val))
+
+	return entry, !errors.Is(err, zenity.ErrCanceled), err //nolint:wrapcheck
 }
 
-// Question wraps dlgs.Question.
+// Question wraps zenity.Question. Returns true if yes or ok is clicked.
 func Question(text string, defaultCancel bool) (bool, error) {
 	if !HasGUI() {
 		return true, nil
 	}
 
-	return dlgs.Question(title(), text+now(), defaultCancel) //nolint:wrapcheck
+	opts := []zenity.Option{zenity.Title(title())}
+	if defaultCancel {
+		opts = append(opts, zenity.DefaultCancel())
+	}
+
+	err := zenity.Question(text+now(), opts...)
+	return !errors.Is(err, zenity.ErrCanceled), err //nolint:wrapcheck
 }
