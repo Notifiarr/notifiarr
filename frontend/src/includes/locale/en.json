@@ -133,7 +133,7 @@
     "ShutdownSuccess": "Shutdown successful! Client stopped.",
     "FailedToShutdown": "Failed to shutdown: {error} - Try reloading the page.",
     "LoginHelp": "Login Help",
-    "LoginHelpBody": "If you've forgotten your password, please see the <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_new\">forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key.",
+    "LoginHelpBody": "If you've forgotten your password, please see the <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_blank\">forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key.",
     "Changed": "Changed",
     "New": "New",
     "Invalid": "Invalid",
@@ -181,7 +181,7 @@
     },
     "pageDescription": {
       "Configuration": "Configure your Notifiarr client settings here.",
-      "SiteTunnel": "This client keeps a persistent websocket connection to notifiarr.com using a <a href=\"https://github.com/golift/mulery\" target=\"_new\">Mulery tunnel</a>. This tunnel allows the website to make requests to your client without the need for opening a port, or having a static IP. This page allows you to select your primary tunnel and which tunnel you wish to use as backup in case the primary becomes inaccessible.",
+      "SiteTunnel": "This client keeps a persistent websocket connection to notifiarr.com using a <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery tunnel</a>. This tunnel allows the website to make requests to your client without the need for opening a port, or having a static IP. This page allows you to select your primary tunnel and which tunnel you wish to use as backup in case the primary becomes inaccessible.",
       "StarrApps": "Setup Starr integrations.",
       "Downloaders": "Manage download clients.",
       "MediaApps": "Manage media players and related services.",
@@ -401,7 +401,7 @@
       "EnterCurrentPassword": "Enter your current password to make changes.",
       "ProxyAuthDisabled": "Proxy authentication is disabled because your upstream ({upstreamIp}) is not in the allowed upstreams list.",
       "Addit": "Add it.",
-      "SeeWikiForAuthProxyHelp": "See <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">the wiki</a> for instructions setting up an authentication proxy.",
+      "SeeWikiForAuthProxyHelp": "See <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">the wiki</a> for instructions setting up an authentication proxy.",
       "ShowMeMore": "Show me more.",
       "ShowMeLess": "Show me less."
     },
@@ -415,7 +415,7 @@
       },
       "option_desc": {
         "password": " This is the default authentication type. Select the Password option to log into this application with a configured username and password. Only 1 username and password is supported. When selecting this option, you must fill in the username and new password fields. If this is the current authentication type you must also fill in the current password field to make changes.",
-        "header": "Select this option to log into this application using an HTTP header that contains a username. This is commonly known as proxy authentication. We have <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_new\">a wiki page</a> that provides instructions to configure Nginx for this feature. When selecting this option, you must also select a header for the auth proxy. If no headers are displayed, then no valid headers were provided by the upstream proxy.",
+        "header": "Select this option to log into this application using an HTTP header that contains a username. This is commonly known as proxy authentication. We have <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">a wiki page</a> that provides instructions to configure Nginx for this feature. When selecting this option, you must also select a header for the auth proxy. If no headers are displayed, then no valid headers were provided by the upstream proxy.",
         "noauth": "This configuration is not recommended. The No Password authentication type allows any request from any configured <code>upstream IP</code>. It also works with an auth proxy to set the username. If no username is in the provided header, then it defaults to admin."
       }
     },
@@ -511,7 +511,7 @@
   "MediaApps": {
     "Plex": {
       "title": "Plex",
-      "description": "The Plex integration is comprehensive, and many of the settings are configured on the <a href=\"https://notifiarr.com/\" target=\"_new\">Notifiarr.com website</a>.",
+      "description": "The Plex integration is comprehensive, and many of the settings are configured on the <a href=\"https://notifiarr.com/\" target=\"_blank\">Notifiarr.com website</a>.",
       "name": {
         "label": "Server Name",
         "description": "Name of the Plex server.",
@@ -526,7 +526,7 @@
         "label": "Token",
         "description": "Token for the Plex server.",
         "placeholder": "pl3x-to_Ken",
-        "tooltip": "You may find directions for locating your Plex token at <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_new\">this Plex Article</a>."
+        "tooltip": "You may find directions for locating your Plex token at <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">this Plex Article</a>."
       }
     },
     "Tautulli": {
@@ -1056,7 +1056,7 @@
       "label": "Payload Template",
       "description": "Parse payload into this template.",
       "placeholder": "pihole",
-      "tooltip": "The template is used by the website to figure out how to turn the payload into a chat notification. Find a list of available templates or create your own on <a href=\"https://notifiarr.com/\" target=\"_new\">the website</a> @ <code>Integrations: Endpoints</code>.",
+      "tooltip": "The template is used by the website to figure out how to turn the payload into a chat notification. Find a list of available templates or create your own on <a href=\"https://notifiarr.com/\" target=\"_blank\">the website</a> @ <code>Integrations: Endpoints</code>.",
       "required": "A template is required. Enter 'test' if you are not sure what to enter."
     },
     "timeout": {
@@ -1628,5 +1628,10 @@
       "NoPlexData": "No plex integration data.",
       "StateForTime": "{state} for {timeDuration}"
     }
+  },
+  "Languages": {
+    "menuTitle": "Language Help",
+    "title": "Localization Support",
+    "body": "This application is available in multiple languages. You can change the language by clicking the language selector in the profile menu. Some languages do not have active translators, so some translations may be incomplete. If you are interested in helping translate the application, please <a href=\"https://notifiarr.com/discord\" target=\"_blank\">visit us on Discord</a>. Head into the <code>#role-request</code> channel and type <code>!roleTranslate</code>. That gives you access to the <code>#translate</code> channel. Please join there and express your interest."
   }
 }

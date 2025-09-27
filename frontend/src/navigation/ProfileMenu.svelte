@@ -15,6 +15,7 @@
   import { Input } from '@sveltestrap/sveltestrap'
   import { faStarship, faSun } from '@fortawesome/sharp-duotone-light-svg-icons'
   import { page as ProfilePage } from '../pages/profile/Index.svelte'
+  import { page as LanguagesPage } from '../pages/stubs/Languages.svelte'
   import { closeSidebar } from './Index.svelte'
 
   let newLang = $derived(locale.current)
@@ -49,6 +50,10 @@
           {/each}
         </Input>
       </span>
+      <DropdownItem class="nav-link-custom" onclick={e => nav.goto(e, LanguagesPage.id)}>
+        <span class="nav-icon"><Fa {...LanguagesPage} scale="1.2x" /></span>
+        {$_(LanguagesPage.id + '.menuTitle')}
+      </DropdownItem>
       <DropdownItem class="nav-link-custom" onclick={theme.toggle}>
         <Fa
           i={faStarship}
