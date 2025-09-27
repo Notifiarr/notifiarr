@@ -128,7 +128,7 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	return a.runTrigger(req.Context(), input, trigger, content)
 }
 
-//nolint:cyclop,funlen
+//nolint:cyclop,funlen,gocyclo
 func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, trigger, content string) (int, string) {
 	switch trigger {
 	case "custom", "TrigCustomCronTimer":
@@ -143,6 +143,8 @@ func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, tri
 		return a.cfsync(input, content)
 	case "rpsync", "TrigCFSyncSonarr":
 		return a.rpsync(input, content)
+	case "TrigCFSyncLidarr":
+		return http.StatusNotImplemented, "Lidarr sync is not implemented."
 	case "services":
 		return a.services(input)
 	case "sessions", "TrigPlexSessions":

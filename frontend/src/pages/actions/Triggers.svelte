@@ -6,7 +6,7 @@
 
   type Obj = Record<string, TriggerInfo>
   type Props = { type: 'Triggers' | 'Timers' | 'Schedules'; obj: Obj }
-  let { type, obj }: Props = $props()
+  const { type, obj }: Props = $props()
   const color = (runs: number) => (runs > 0 ? 'success-subtle' : 'info-subtle')
 </script>
 

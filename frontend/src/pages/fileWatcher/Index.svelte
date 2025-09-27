@@ -36,7 +36,10 @@
       {index + 1}. {flt.original?.[index]?.path}
     {/snippet}
     {#snippet headerCollapsed(index)}
+      <span class="text-primary">Match:</span>
       {flt.original?.[index]?.regex}
+      <span class="text-warning">Skip:</span>
+      {flt.original?.[index]?.skip}
     {/snippet}
   </Instances>
   <!-- Test regular expression -->
