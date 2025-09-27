@@ -38,13 +38,13 @@ func (c *cmd) checkForUpdates(ctx context.Context, unstable bool) {
 	switch {
 	case err != nil:
 		mnd.Log.Errorf("%s Update Check: %v", where, err)
-		_, _ = ui.Error("Checking version on " + where + ": " + err.Error())
+		ui.Error("Checking version on " + where + ": " + err.Error())
 	case data.Outdate && runtime.GOOS == mnd.Windows:
 		c.upgradeWindows(ctx, data)
 	case data.Outdate:
 		c.downloadUpdate(ctx, data, unstable)
 	default:
-		_, _ = ui.Info("You're up to date! Version: " + data.Current + " @ " + where + "\n" +
+		ui.Info("You're up to date! Version: " + data.Current + " @ " + where + "\n" +
 			"Updated: " + data.RelDate.Format("Jan 2, 2006") + mnd.DurationAge(data.RelDate))
 	}
 }
@@ -58,7 +58,7 @@ func (c *cmd) upgradeWindows(ctx context.Context, update *update.Update) {
 	if yes {
 		if err := c.updateNow(ctx, update, "user requested"); err != nil {
 			mnd.Log.Errorf("Application Update Failed: %v", err)
-			_, _ = ui.Error("Updating Notifiarr:\n" + err.Error() + "\n")
+			ui.Error("Updating Notifiarr:\n" + err.Error() + "\n")
 		}
 	}
 }

@@ -11,8 +11,8 @@ import (
 	"syscall"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/gen2brain/beeep"
 	"github.com/jxeng/shortcut"
+	"github.com/ncruces/zenity"
 	"golang.org/x/sys/windows"
 )
 
@@ -25,7 +25,7 @@ func HasGUI() bool {
 }
 
 func Toast(_ context.Context, msg string, v ...interface{}) error {
-	err := beeep.Notify(mnd.Title, fmt.Sprintf(msg, v...), GetPNG())
+	err := zenity.Notify(fmt.Sprintf(msg, v...), zenity.Title(mnd.Title), zenity.Icon(GetPNG()))
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)
 	}
