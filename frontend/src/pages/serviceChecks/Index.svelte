@@ -99,7 +99,7 @@
         c2="#0B5345"
         d1="#9FE2BF"
         d2="#40E0D0"
-        scale="1.8"
+        scale="1.4"
         class="header-icon" />
       {index + 1}. {flt.original?.[index]?.name}
     {/snippet}
@@ -115,6 +115,6 @@
 <style>
   :global(.header-icon) {
     margin-right: 8px;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
 </style>
