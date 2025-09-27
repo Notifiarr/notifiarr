@@ -1632,6 +1632,6 @@
   "Languages": {
     "menuTitle": "Language Help",
     "title": "Localization Support",
-    "body": "This application is available in multiple languages. You can change the language by clicking the language selector in the profile menu. Some languages do not have active translators, so some translations may be incomplete. If you are interested in helping translate the application, please <a href=\"https://notifiarr.com/discord\" target=\"_blank\">visit us on Discord</a>. Leave a message in any channel, even <code>#off-topic</code>, and we'll get you started."
+    "body": "This application is available in multiple languages. You can change the language by clicking the language selector in the profile menu. Some languages do not have active translators, so some translations may be incomplete. If you are interested in helping translate the application, please <a href=\"https://notifiarr.com/discord\" target=\"_blank\">visit us on Discord</a>. Head into the <code>#role-request</code> channel and type <code>!roleTranslate</code>. That gives you access to the <code>#translate</code> channel. Please join there and express your interest."
   }
 }
