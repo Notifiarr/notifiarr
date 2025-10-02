@@ -11,7 +11,7 @@
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import { nav } from '../../navigation/nav.svelte'
-  import Tab, { getTab } from '../../includes/InstancesTab.svelte'
+  import Tab, { setTab, goto } from '../../includes/InstancesTab.svelte'
   import type {
     DelugeConfig,
     NZBGetConfig,
@@ -42,22 +42,26 @@
     if (!profile.error) Object.values(flt).forEach(iv => iv.resetAll())
   }
 
-  let tab = $state(getTab(App.tabs))
-
   $effect(() => {
     nav.formChanged = Object.values(flt).some(iv => iv.formChanged)
   })
+  setTab(App.tabs) // this sets the initial tab.
 </script>
 
+<!-- update the tab when the user navigates back -->
+<svelte:window on:popstate={() => setTab(App.tabs)} />
+
 <Header {page} />
+
 <CardBody>
-  <TabContent on:tab={e => nav.goto(e, page.id, [e.detail.toString()])}>
-    <Tab flt={flt.Qbittorrent} bind:tab titles={App.title} />
-    <Tab flt={flt.Rtorrent} bind:tab titles={App.title} />
-    <Tab flt={flt.Transmission} bind:tab titles={App.title} />
-    <Tab flt={flt.Deluge} bind:tab titles={App.title} />
-    <Tab flt={flt.SabNZB} bind:tab titles={App.title} />
-    <Tab flt={flt.NZBGet} bind:tab titles={App.title} />
+  <!-- only nav.goto if the tab is different -->
+  <TabContent on:tab={e => goto(e, page.id)}>
+    <Tab flt={flt.Qbittorrent} titles={App.title} />
+    <Tab flt={flt.Rtorrent} titles={App.title} />
+    <Tab flt={flt.Transmission} titles={App.title} />
+    <Tab flt={flt.Deluge} titles={App.title} />
+    <Tab flt={flt.SabNZB} titles={App.title} />
+    <Tab flt={flt.NZBGet} titles={App.title} />
   </TabContent>
 </CardBody>
 

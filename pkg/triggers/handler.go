@@ -128,7 +128,7 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	return a.runTrigger(req.Context(), input, trigger, content)
 }
 
-//nolint:cyclop,funlen
+//nolint:cyclop,funlen,gocyclo
 func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, trigger, content string) (int, string) {
 	switch trigger {
 	case "custom", "TrigCustomCronTimer":

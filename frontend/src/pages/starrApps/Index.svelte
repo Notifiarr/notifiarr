@@ -9,7 +9,7 @@
   import { CardBody, TabContent } from '@sveltestrap/sveltestrap'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
-  import Tab, { getTab } from '../../includes/InstancesTab.svelte'
+  import Tab, { goto, setTab } from '../../includes/InstancesTab.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import type { StarrConfig } from '../../api/notifiarrConfig'
   import { FormListTracker } from '../../includes/formsTracker.svelte'
@@ -38,22 +38,25 @@
     Object.values(flt).forEach(iv => iv.resetAll())
   }
 
-  let tab = $state(getTab(Starr.tabs))
-
   $effect(() => {
     nav.formChanged = Object.values(flt).some(iv => iv.formChanged)
   })
+  setTab(Starr.tabs) // this sets the initial tab.
 </script>
+
+<!-- update the tab when the user navigates back -->
+<svelte:window on:popstate={() => setTab(Starr.tabs)} />
 
 <Header {page} />
 
 <CardBody>
-  <TabContent on:tab={e => nav.goto(e, page.id, [e.detail.toString()])}>
-    <Tab flt={flt.Sonarr} bind:tab titles={Starr.title} />
-    <Tab flt={flt.Radarr} bind:tab titles={Starr.title} />
-    <Tab flt={flt.Readarr} bind:tab titles={Starr.title} />
-    <Tab flt={flt.Lidarr} bind:tab titles={Starr.title} />
-    <Tab flt={flt.Prowlarr} bind:tab titles={Starr.title} />
+  <!-- only nav.goto if the tab is different -->
+  <TabContent on:tab={e => goto(e, page.id)}>
+    <Tab flt={flt.Sonarr} titles={Starr.title} />
+    <Tab flt={flt.Radarr} titles={Starr.title} />
+    <Tab flt={flt.Readarr} titles={Starr.title} />
+    <Tab flt={flt.Lidarr} titles={Starr.title} />
+    <Tab flt={flt.Prowlarr} titles={Starr.title} />
   </TabContent>
 </CardBody>
 
