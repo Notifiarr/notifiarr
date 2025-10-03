@@ -1563,7 +1563,7 @@
         "description": "Dit is de payload die bij het opstarten door Notifiarr.com naar de client is verzonden. Deze bevat de configuratie van de client en andere informatie.",
         "noData": "Geen opstart payload geretourneerd."
     },
-    "ModalWrap": {
+    "Nodal": {
         "button": {
             "refresh": "Pagina gegevens vernieuwen",
             "fullscreen": "Volledig scherm in-/uitschakelen"
