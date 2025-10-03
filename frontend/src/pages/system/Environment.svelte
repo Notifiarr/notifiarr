@@ -2,7 +2,7 @@
   import { faCubes } from '@fortawesome/sharp-duotone-light-svg-icons'
   import { profile } from '../../api/profile.svelte'
   import { Table } from '@sveltestrap/sveltestrap'
-  import Header from './Header.svelte'
+  import Header from '../../includes/Helem.svelte'
 </script>
 
 <!-- Environment Section -->

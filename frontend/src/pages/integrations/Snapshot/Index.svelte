@@ -2,7 +2,7 @@
   import { Card, CardHeader, Table, Col } from '@sveltestrap/sveltestrap'
   import type { Snapshot } from '../../../api/notifiarrConfig'
   import { age, formatBytes } from '../../../includes/util'
-  import T, { _ } from '../../../includes/Translate.svelte'
+  import T from '../../../includes/Translate.svelte'
   import Data from './Data.svelte'
 
   type Props = { snapshot: Snapshot; snapshotAge: Date }
