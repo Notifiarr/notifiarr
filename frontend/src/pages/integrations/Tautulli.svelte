@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { Card, CardHeader, Popover, Table } from '@sveltestrap/sveltestrap'
+  import { Card, CardHeader, Table } from '@sveltestrap/sveltestrap'
   import { age } from '../../includes/util'
   import { color, getLogo, title } from './data'
   import type { TautulliConfig, Info, TautulliUser } from '../../api/notifiarrConfig'
   import Modal from './Modal.svelte'
   import T, { _ } from '../../includes/Translate.svelte'
   import { profile } from '../../api/profile.svelte'
+  import Nodal from '../../includes/Nodal.svelte'
 
   type Props = {
     index?: number
@@ -19,7 +20,7 @@
   const { index = 0, config, status, statusAge, users, usersAge }: Props = $props()
   const app = 'tautulli'
   let statusModal: Modal | null = $state(null)
-  let usersModal: Modal | null = $state(null)
+  let usersModal: Nodal | null = $state(null)
   let usersJson: Modal | null = $state(null)
 </script>
 
@@ -72,8 +73,8 @@
         <tr>
           <td class="text-nowrap"><T id="Integrations.mediaTitles.Users" /></td>
           <td>
-            <a href="#{app}Users" onclick={usersModal?.toggle}>{users.length}</a>
-            <Modal pageId="{app}Users" bind:this={usersModal}>
+            <a href="#{app}Users" onclick={usersModal?.open}>{users.length}</a>
+            <Nodal title="Integrations.{app}Users" bind:this={usersModal}>
               <Table responsive striped>
                 <thead>
                   <tr>
@@ -102,7 +103,7 @@
                   {/each}
                 </tbody>
               </Table>
-            </Modal>
+            </Nodal>
           </td>
         </tr>
         <tr>

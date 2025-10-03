@@ -2,7 +2,7 @@
   import { faCompactDisc } from '@fortawesome/sharp-duotone-light-svg-icons'
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
-  import Header from './Header.svelte'
+  import Header from '../../includes/Helem.svelte'
   import { formatBytes } from '../../includes/util'
   import { _ } from '../../includes/Translate.svelte'
   import { get } from 'svelte/store'

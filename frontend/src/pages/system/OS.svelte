@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
-  import Header from './Header.svelte'
+  import Header from '../../includes/Helem.svelte'
   import T from '../../includes/Translate.svelte'
   import {
     faDocker,

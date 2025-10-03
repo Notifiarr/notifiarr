@@ -2,7 +2,7 @@
   import logo from '../../assets/notifiarr.svg?inline'
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
-  import Header from './Header.svelte'
+  import Header from '../../includes/Helem.svelte'
   import { age } from '../../includes/util'
   import { date, time } from '../../includes/Translate.svelte'
   import T from '../../includes/Translate.svelte'
