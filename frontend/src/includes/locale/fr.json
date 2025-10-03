@@ -1546,7 +1546,7 @@
         "FollowTooltip": "Les boutons de cette colonne suivent activement un fichier pendant son écriture.",
         "Tooltip": "<ol><li>Le premier bouton orange à gauche modifie l'ordre des lignes du fichier. Par défaut, l'ordre d'écriture est décroissant. Cliquer sur ce bouton inverse le fichier et le fait reculer. Cela fonctionne bien pour suivre un fichier en cours d'écriture.</li><li>Le deuxième bouton violet active/désactive les couleurs de surbrillance des lignes intégrées. Il tourne également en fonction des événements.</li><li>Le nombre saisi indique le nombre de lignes à charger ou à ajouter. Lorsque vous suivez un fichier, ce nombre limite le nombre de lignes affichées.</li><li>Cliquer sur le bouton Ajouter ajoute le nombre de lignes au début du fichier en utilisant le nombre de lignes existantes comme décalage. Le bouton Ajouter est désactivé sur les fichiers en cours d'utilisation, car il est impossible de savoir combien de lignes ont été écrites depuis la dernière mise à jour. Lorsque vous suivez des fichiers en cours d'utilisation, le bouton Ajouter est remplacé par un indicateur.</li><li>Cliquer sur le bouton Recharger recharge le nombre de lignes à partir de la fin du fichier.</li><li>Utilisez la saisie en surbrillance pour faire ressortir un texte spécifique.</li><li>Le dernier bouton active le retour à la ligne.</li></ol>"
     },
-    "ModalWrap": {
+    "Nodal": {
         "button": {
             "refresh": "Actualiser les données de la page",
             "fullscreen": "Basculer en plein écran"

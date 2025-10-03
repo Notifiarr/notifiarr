@@ -1,5 +1,9 @@
 <!-- Process list page: ps aux -->
 <script lang="ts" module>
+  import { getUi } from '../../api/fetch'
+  import { Button } from '@sveltestrap/sveltestrap'
+  import T from '../../includes/Translate.svelte'
+  import Nodal from '../../includes/Nodal.svelte'
   import { faListTree } from '@fortawesome/sharp-duotone-solid-svg-icons'
   export const page = {
     type: 'modal' as const,
@@ -13,20 +17,15 @@
 </script>
 
 <script lang="ts">
-  import { getUi } from '../../api/fetch'
-  import { Button } from '@sveltestrap/sveltestrap'
-  import T from '../../includes/Translate.svelte'
-  import ModalWrap from './ModalWrap.svelte'
-
   let wrap = $state(false)
   let isOpen = $state(false)
   const get = async () => await getUi('ps', false)
   export const toggle = () => (isOpen = !isOpen)
 </script>
 
-<ModalWrap {page} {get} bind:isOpen>
-  {#snippet children(ps)}
-    <pre style="overflow: visible;" class:wrap>{ps}</pre>
+<Nodal {get} bind:isOpen title={page.id} fa={page} esc size="xl" full>
+  {#snippet children(resp)}
+    <pre style="overflow: visible;" class:wrap>{resp?.body ?? ''}</pre>
   {/snippet}
   {#snippet footer(resp)}
     {#if resp && resp.ok}
@@ -38,7 +37,7 @@
       <T id="{page.id}.button.{wrap ? 'wrapOff' : 'wrapOn'}" />
     </Button>
   {/snippet}
-</ModalWrap>
+</Nodal>
 
 <style>
   pre.wrap {

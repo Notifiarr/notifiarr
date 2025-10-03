@@ -3,22 +3,13 @@
   import { delay } from './includes/util'
   import { _ } from './includes/Translate.svelte'
   import { profile } from './api/profile.svelte'
-  import {
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
-    Button,
-    Spinner,
-    CardBody,
-    CardFooter,
-    Input,
-  } from '@sveltestrap/sveltestrap'
-  import MyModal from './includes/MyModal.svelte'
+  import { Button, Spinner, CardBody, CardFooter, Input } from '@sveltestrap/sveltestrap'
+  import Nodal from './includes/Nodal.svelte'
 
   let username = $state('')
   let password = $state('')
   let isLoading = $state(false)
-  let showHelpModal = $state(false)
+  let helpModal = $state<Nodal>()
   let { error } = $props()
 
   async function onsubmit(e: Event) {
@@ -41,17 +32,12 @@
     await delay(4567)
     showMsg('')
   }
-
-  const onclick = (e?: Event) => (e?.preventDefault(), (showHelpModal = false))
-  const open = (e?: Event) => (e?.preventDefault(), (showHelpModal = true))
 </script>
 
 <!-- Login Help Modal -->
-<MyModal isOpen={showHelpModal} toggle={onclick}>
-  <ModalHeader>{$_('phrases.LoginHelp')}</ModalHeader>
-  <ModalBody>{@html $_('phrases.LoginHelpBody')}</ModalBody>
-  <ModalFooter><Button {onclick}>{$_('buttons.Close')}</Button></ModalFooter>
-</MyModal>
+<Nodal title="phrases.LoginHelp" bind:this={helpModal}>
+  {@html $_('phrases.LoginHelpBody')}
+</Nodal>
 
 <CardBody>
   <form {onsubmit}>
@@ -76,6 +62,6 @@
 </CardBody>
 
 <CardFooter class="mt-2">
-  <a href="#showhelp" onclick={open}>{$_('phrases.LoginHelp')}</a>
+  <a href="#showhelp" onclick={helpModal?.open}>{$_('phrases.LoginHelp')}</a>
   {#if error}• <span class="text-danger">{error}</span>{/if}
 </CardFooter>
