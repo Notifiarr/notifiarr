@@ -3,11 +3,11 @@
   import { get } from 'svelte/store'
   import { getUi, checkReloaded } from '../api/fetch'
   import { updateBackend, showMsg } from './Index.svelte'
-  import { Button, ModalBody, ModalFooter, ModalHeader } from '@sveltestrap/sveltestrap'
+  import { Button } from '@sveltestrap/sveltestrap'
   import { Spinner } from '@sveltestrap/sveltestrap'
   import { faRotate } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import Fa from '../includes/Fa.svelte'
-  import MyModal from '../includes/MyModal.svelte'
+  import Nodal from '../includes/Nodal.svelte'
 
   let isOpen = $state(false)
   let reloading = $state(false)
@@ -35,15 +35,14 @@
         </span>`,
       )
     } finally {
-      reset(e)
+      reset()
     }
 
     await updateBackend()
   }
 
   // Called on cancel and after a reload.
-  const reset = (e?: Event) => {
-    e?.preventDefault()
+  const reset = () => {
     finish?.() // resolve (external) promise
     finish = null // reset (external) promise
     isOpen = false // close the modal
@@ -52,18 +51,19 @@
 </script>
 
 <a href="#reload" onclick={e => (e.preventDefault(), (isOpen = true))} title="reload">
-  <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-2" />
+  <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-2" spin={isOpen} />
 </a>
 
-<MyModal {isOpen} toggle={reset}>
-  <ModalHeader>{$_('phrases.ConfirmReload')}</ModalHeader>
+<Nodal bind:isOpen title="phrases.ConfirmReload" follow={reset} disabled={reloading} esc>
   {#if reloading}
-    <ModalBody><Spinner size="sm" /> {$_('phrases.Reloading')}</ModalBody>
+    <Spinner size="sm" /> {$_('phrases.Reloading')}
   {:else}
-    <ModalBody>{$_('phrases.ConfirmReloadBody')}</ModalBody>
-    <ModalFooter>
-      <Button color="danger" {onclick}>{$_('buttons.Confirm')}</Button>
-      <Button color="secondary" onclick={reset}>{$_('buttons.Cancel')}</Button>
-    </ModalFooter>
+    {$_('phrases.ConfirmReloadBody')}
   {/if}
-</MyModal>
+  {#snippet footer()}
+    <Button color="danger" {onclick} disabled={reloading}>
+      {$_('buttons.Confirm')}</Button>
+    <Button color="secondary" onclick={reset} disabled={reloading}>
+      {$_('buttons.Cancel')}</Button>
+  {/snippet}
+</Nodal>

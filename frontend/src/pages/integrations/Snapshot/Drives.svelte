@@ -2,7 +2,7 @@
   import { Table } from '@sveltestrap/sveltestrap'
   import Storage from '../../system/Storage.svelte'
   import { age } from '../../../includes/util'
-  import Header from '../../system/Header.svelte'
+  import H from '../../../includes/Helem.svelte'
   import { faHardDrive, faHeartPulse } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import T from '../../../includes/Translate.svelte'
 
@@ -44,7 +44,7 @@
 </script>
 
 <!-- Drive Information -->
-<Header
+<H
   parent="Integrations.DriveData"
   id="driveInformation"
   i={faHeartPulse}
@@ -78,7 +78,7 @@
 <Storage />
 
 <!-- MDSTAT -->
-<Header
+<H
   parent="Integrations.DriveData"
   id="mdStatRaid"
   i={faHardDrive}

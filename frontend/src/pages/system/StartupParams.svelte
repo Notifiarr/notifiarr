@@ -2,7 +2,7 @@
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import { faSlidersH } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import Header from './Header.svelte'
+  import Header from '../../includes/Helem.svelte'
   import T from '../../includes/Translate.svelte'
 </script>
 

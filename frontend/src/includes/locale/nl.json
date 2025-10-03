@@ -573,7 +573,7 @@
         }
     },
     "monitoring": {
-        "ConfigureServices": "Configureer de service controles die op de <go-to page=\"services\">Services pagina</go-to> worden weergegeven.",
+        "ConfigureServices": "Service controles voor geconfigureerde integraties worden ingeschakeld door ze een controle-interval te geven op de betreffende configuratie pagina's. Sommige van deze controles zijn afkomstig van de pagina <go-to page=\"starr apps\">Starr Apps</go-to>, de pagina <go-to page=\"downloaders\">Download Apps</go-to> of de pagina <go-to page=\"media apps\">Media Apps</go-to>. De overige weergegeven service controles zijn te vinden op de pagina <go-to page=\"services\">Services</go-to>.",
         "EnableOnConfig": "Schakel service controles in op de pagina <go-to page=\"configuration\">Configuratie</go-to>.",
         "cardsView": "Kaart weergave",
         "check": {
@@ -1563,7 +1563,7 @@
         "description": "Dit is de payload die bij het opstarten door Notifiarr.com naar de client is verzonden. Deze bevat de configuratie van de client en andere informatie.",
         "noData": "Geen opstart payload geretourneerd."
     },
-    "ModalWrap": {
+    "Nodal": {
         "button": {
             "refresh": "Pagina gegevens vernieuwen",
             "fullscreen": "Volledig scherm in-/uitschakelen"
@@ -1751,5 +1751,10 @@
         "lidarrQueue": {
             "title": "Raw Lidarr wachtrij"
         }
+    },
+    "Languages": {
+        "menuTitle": "Taalhulp",
+        "title": "Lokalisatie ondersteuning",
+        "body": "Deze applicatie is beschikbaar in meerdere talen. Je kunt de taal wijzigen door op de taal kiezer in het profiel menu te klikken. Sommige talen hebben geen actieve vertalers, dus sommige vertalingen kunnen onvolledig zijn. Als je wilt helpen met het vertalen van de applicatie, bezoek ons dan op Discord. Ga naar het kanaal <code>#role-request</code> en typ <code>!roleTranslate</code>. Je krijgt dan toegang tot het kanaal <code>#translate</code>. Word daar lid en laat je interesse blijken."
     }
 }

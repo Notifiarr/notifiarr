@@ -5,9 +5,6 @@
     Col,
     Row,
     Input as Box,
-    ModalHeader,
-    ModalBody,
-    ModalFooter,
     FormGroup,
     Badge,
   } from '@sveltestrap/sveltestrap'
@@ -17,7 +14,7 @@
   import CheckedInput from '../../includes/CheckedInput.svelte'
   import { delay } from '../../includes/util'
   import Output from './Output.svelte'
-  import MyModal from '../../includes/MyModal.svelte'
+  import Nodal from '../../includes/Nodal.svelte'
 
   let {
     form = $bindable(),
@@ -121,45 +118,47 @@
 </div>
 
 <!-- Modal is used to run commands that have custom arguments (regexes). -->
-<MyModal toggle={cancel} isOpen={formResolve != null} size="lg" centered>
-  <ModalHeader><T id="Commands.enterCommandArguments" /></ModalHeader>
-  <form onsubmit={e => e.preventDefault()}>
-    <ModalBody>
-      <p class="text-muted">
-        <T id="Commands.commandRequiresArguments" count={form.args} />
-      </p>
-      <p><b class="text-primary font-monospace">{form.command}</b></p>
-      {#each form.argValues ?? [] as arg, i}
-        <FormGroup floating>
-          <div slot="label">
-            <Badge>{i + 1}</Badge> &nbsp; <b class="text-primary font-monospace">{arg}</b>
-          </div>
-          <Box
-            tabindex={i + 1}
-            bind:value={runArgs[i]}
-            invalid={!checkRegex(runArgs[i], i)}
-            feedback={$_('Commands.regexMismatch')} />
-        </FormGroup>
-      {/each}
-    </ModalBody>
-    <ModalFooter>
-      <Button
-        outline
-        type="button"
-        color="warning"
-        onclick={cancel}
-        tabindex={form.args + 3}>
-        <T id="buttons.Cancel" /></Button>
-      <Button
-        type="submit"
-        color="notifiarr"
-        disabled={!runArgs.every(checkRegex)}
-        tabindex={form.args + 2}
-        onclick={e => {
-          e.preventDefault()
-          formResolve?.()
-          formResolve = null
-        }}><T id="buttons.Execute" /></Button>
-    </ModalFooter>
-  </form>
-</MyModal>
+<Nodal
+  follow={cancel}
+  isOpen={formResolve != null}
+  size="lg"
+  centered
+  title="Commands.enterCommandArguments"
+  esc>
+  <p class="text-muted">
+    <T id="Commands.commandRequiresArguments" count={form.args} />
+  </p>
+  <p><b class="text-primary font-monospace">{form.command}</b></p>
+  {#each form.argValues ?? [] as arg, i}
+    <FormGroup floating>
+      <div slot="label">
+        <Badge>{i + 1}</Badge> &nbsp; <b class="text-primary font-monospace">{arg}</b>
+      </div>
+      <Box
+        tabindex={i + 1}
+        bind:value={runArgs[i]}
+        invalid={!checkRegex(runArgs[i], i)}
+        feedback={$_('Commands.regexMismatch')} />
+    </FormGroup>
+  {/each}
+  {#snippet footer()}
+    <Button
+      outline
+      type="button"
+      color="warning"
+      onclick={cancel}
+      tabindex={form.args + 3}>
+      <T id="buttons.Cancel" /></Button>
+    <Button
+      type="submit"
+      color="notifiarr"
+      disabled={!runArgs.every(checkRegex)}
+      tabindex={form.args + 2}
+      onclick={e => {
+        e.preventDefault()
+        formResolve?.()
+        formResolve = null
+      }}>
+      <T id="buttons.Execute" /></Button>
+  {/snippet}
+</Nodal>

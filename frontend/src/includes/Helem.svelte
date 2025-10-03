@@ -1,19 +1,23 @@
+<!-- H4 (or whatever element) abstraction with a logo or icon and a title. -->
+
 <script lang="ts">
   import {
     faQuestion,
     type IconDefinition,
   } from '@fortawesome/sharp-duotone-light-svg-icons'
-  import Fa, { type Props as FaP } from '../../includes/Fa.svelte'
-  import { _ } from '../../includes/Translate.svelte'
+  import Fa, { type Props as FaProps } from './Fa.svelte'
+  import { _ } from './Translate.svelte'
 
-  type faProps = Omit<FaP, 'i'>
   type Props = {
     id: string
     logo?: string
     i?: IconDefinition
     page?: string
     parent?: string
-  } & faProps
+    elem?: string
+    elemstyle?: string
+    class?: string
+  } & Omit<FaProps, 'i'>
 
   let {
     id,
@@ -23,20 +27,31 @@
     scale = 1.3,
     style = 'margin-bottom: 3px;',
     page = undefined,
+    elem = 'h4',
+    elemstyle = '',
+    class: className = '',
     ...rest
   }: Props = $props()
+
+  const title = $_([parent, id].filter(v => v).join('.'))
 </script>
 
-<h4>
+{#snippet image()}
   {#if logo}
     <img src={logo} alt="Logo" class="logo" />
-  {:else if page}
-    <go-to {page}><Fa {...rest} {i} {scale} {style} class="me-2" /></go-to>
   {:else}
     <Fa {...rest} {i} {scale} {style} class="me-2" />
   {/if}
-  {$_(parent + '.' + id + '.title')}
-</h4>
+{/snippet}
+
+<svelte:element this={elem} class={className} style={elemstyle}>
+  {#if page}
+    <go-to {page}>{@render image()}</go-to>
+  {:else}
+    {@render image()}
+  {/if}
+  {typeof title === 'string' ? title : title['title']}
+</svelte:element>
 
 <style>
   .logo {

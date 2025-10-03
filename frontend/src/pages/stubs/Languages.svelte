@@ -1,6 +1,9 @@
 <!-- Displays a simple Languages help modal. -->
 <script lang="ts" module>
+  import Nodal from '../../includes/Nodal.svelte'
+  import T from '../../includes/Translate.svelte'
   import { faLanguage } from '@fortawesome/sharp-duotone-light-svg-icons'
+
   export const page = {
     type: 'modal' as const,
     id: 'Languages',
@@ -13,11 +16,9 @@
 </script>
 
 <script lang="ts">
-  import ModalWrap from './ModalWrap.svelte'
-  import T from '../../includes/Translate.svelte'
-
-  let modal = $state<ModalWrap>()
-  export const toggle = () => modal?.toggle()
+  let isOpen = $state(false)
+  export const toggle = () => (isOpen = !isOpen)
 </script>
 
-<ModalWrap {page} bind:this={modal}><T id="{page.id}.body" /></ModalWrap>
+<Nodal bind:isOpen title={page.id} fa={page} size="lg" esc>
+  <T id="{page.id}.body" /></Nodal>

@@ -1,13 +1,5 @@
 <script lang="ts">
-  import {
-    Button,
-    ButtonGroup,
-    Card,
-    ModalBody,
-    ModalFooter,
-    ModalHeader,
-    Table,
-  } from '@sveltestrap/sveltestrap'
+  import { Button, ButtonGroup, Card, Table } from '@sveltestrap/sveltestrap'
   import type { LogFileInfo } from '../../api/notifiarrConfig'
   import { profile } from '../../api/profile.svelte'
   import T, { _, datetime } from '../../includes/Translate.svelte'
@@ -22,7 +14,7 @@
   import { getUi, urlbase } from '../../api/fetch'
   import { success, warning } from '../../includes/util'
   import { slide } from 'svelte/transition'
-  import MyModal from '../../includes/MyModal.svelte'
+  import Nodal from '../../includes/Nodal.svelte'
 
   let { file, list = $bindable() }: { file: LogFileInfo; list: LogFileInfo[] } = $props()
 
@@ -121,20 +113,22 @@
   </div>
 {/if}
 
-<MyModal isOpen={showDelModal} toggle={() => (showDelModal = false)} centered>
-  <ModalHeader>
-    <T id="LogFiles.DeleteFile" filePath={file.path} />
-  </ModalHeader>
-  <ModalBody><T id="LogFiles.deleteConfirm" /></ModalBody>
-  <ModalFooter>
+<Nodal
+  bind:isOpen={showDelModal}
+  centered
+  title="LogFiles.DeleteFile"
+  values={{ filePath: file.path }}
+  esc>
+  <T id="LogFiles.deleteConfirm" />
+  {#snippet footer()}
     <Button color="danger" outline onclick={deleteFile}>
       <T id="LogFiles.button.delete" />
     </Button>
     <Button color="primary" outline onclick={() => (showDelModal = false)}>
       <T id="buttons.Cancel" />
     </Button>
-  </ModalFooter>
-</MyModal>
+  {/snippet}
+</Nodal>
 
 <style>
   .fit th {

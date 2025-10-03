@@ -1,25 +1,22 @@
 <script lang="ts">
   import { profile } from '../../api/profile.svelte'
-  import type { ApiResponse, PMSInfo, Sessions } from '../../api/notifiarrConfig'
+  import type { PMSInfo, Sessions } from '../../api/notifiarrConfig'
   import { Card, Table, CardHeader } from '@sveltestrap/sveltestrap'
-  import { age, warning } from '../../includes/util'
+  import { age } from '../../includes/util'
   import Modal from './Modal.svelte'
   import { color, getLogo } from './data'
   import T, { _ } from '../../includes/Translate.svelte'
   import { getApi, type BackendResponse } from '../../api/fetch'
-  import ModalWrap from '../stubs/ModalWrap.svelte'
   import { faVideo } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import Nodal from '../../includes/Nodal.svelte'
 
   type Props = { status?: PMSInfo; sessions?: Sessions; plexAge: Date; sessionsAge: Date }
   const { status, sessions, plexAge, sessionsAge }: Props = $props()
 
   let statusModal: Modal | null = $state(null)
-  let sessionsModal: Modal | null = $state(null)
+  let sessionsModal: Nodal | null = $state(null)
   let sessionsJson: Modal | null = $state(null)
   const app = 'plex'
-
-  const refreshSessions = async (): Promise<BackendResponse> =>
-    await getApi('plex/1/sessions', true)
 </script>
 
 <Card outline color={color(app)}>
@@ -85,7 +82,7 @@
           <tr>
             <td class="text-nowrap"><T id="Integrations.mediaTitles.Sessions" /></td>
             <td class="text-break">
-              <a href="#PlexSessions" onclick={sessionsModal?.toggle}>
+              <a href="#PlexSessions" onclick={sessionsModal?.open}>
                 {sessions.sessions.length}</a>
             </td>
           </tr>
@@ -105,12 +102,13 @@
   </Table>
 </Card>
 
-<ModalWrap
-  page={{ id: 'Integrations.plexSessions', i: faVideo }}
+<Nodal
+  title="Integrations.plexSessions"
+  fa={{ i: faVideo }}
   get={() => getApi('plex/1/sessions')}
   bind:this={sessionsModal}>
-  {#snippet children(resp: ApiResponse)}
-    {@const sessions = (resp?.message as Sessions) ?? {}}
+  {#snippet children(resp?: BackendResponse)}
+    {@const sessions = (resp?.body?.message as Sessions) ?? {}}
     <Table striped bordered>
       <thead>
         <tr>
@@ -171,10 +169,10 @@
       </tbody>
     </Table>
   {/snippet}
-  {#snippet footer(resp: BackendResponse)}
+  {#snippet footer(resp?: BackendResponse)}
     <T id="Integrations.plexSessions.footer" />
   {/snippet}
-</ModalWrap>
+</Nodal>
 
 <style>
   .table-body :global(tr:last-of-type td) {

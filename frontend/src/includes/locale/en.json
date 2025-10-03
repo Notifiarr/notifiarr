@@ -531,7 +531,7 @@
     },
     "Tautulli": {
       "title": "Tautulli",
-      "description": "Tautulli provides a feature that allows you to give your Plex users custom usernames. By integrating Notifiarr client with Tautulli, those custom usernames will be displayed in your chat server notifications. When not enabled, Plex usernames or email addresses are used instead. This is entirely optional. The Notifiarr website also provides this same feature and allows you to map Plex users to custom names. You may also add a Tuaitulli instance here simply to monitor it with service checks.",
+      "description": "Tautulli provides a feature that allows you to give your Plex users custom usernames. By integrating Notifiarr client with Tautulli, those custom usernames will be displayed in your chat server notifications. When not enabled, Plex usernames or email addresses are used instead. This is entirely optional. The Notifiarr website also provides this same feature and allows you to map Plex users to custom names. You may also add a Tautulli instance here simply to monitor it with service checks.",
       "name": {
         "label": "Tautulli Name",
         "description": "Name of the Tautulli service."
@@ -1230,7 +1230,7 @@
         "label": "Host or IP",
         "description": "Enter host or ip to check reachability.",
         "placeholder": "127.0.0.1",
-        "tooltip": "An IP address is generally recommended. If you also want to test DNS, use a hostname. The format is <code>host</code> or <code>10.11.12.13</code>. There should be no spaces or extra characters. To allow UDP checks to work on Linux, you must enable them with this command: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. To allow ICMP checks in Linux, you must give the notifiarr binary capabilities with this command: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Easiest way to make both work in Docker is to enable privileged mode, but you may set capabailities too.",
+        "tooltip": "An IP address is generally recommended. If you also want to test DNS, use a hostname. The format is <code>host</code> or <code>10.11.12.13</code>. There should be no spaces or extra characters. To allow UDP checks to work on Linux, you must enable them with this command: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. To allow ICMP checks in Linux, you must give the notifiarr binary capabilities with this command: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Easiest way to make both work in Docker is to enable privileged mode, but you may set capabilities too.",
         "required": "A host or IP address is required."
       },
       "count": {
@@ -1479,11 +1479,16 @@
     "Reload": "Reload log file",
     "Highlight": "Highlight",
     "ToggleLineWrap": "Toggle Line Wrap",
-    "FollowTooltip": "The buttons in this column activelly follow a file as it's being written to.",
+    "FollowTooltip": "The buttons in this column actively follow a file as it's being written to.",
     "Tooltip": "<ol><li>The first orange button on the left toggles the order of the lines in the file. By default it's ordered descending in the order it's written. Clicking the button reverses the file and makes it backward. This works well when following a file that's being written to.</li><li>The second purple button toggles the built-in line highlight colors. It also spins when things are happening.</li><li>The number input indicates how many lines to load or add. When following a file, the number limits how many lines are displayed.</li><li>Clicking the Add button adds the number of lines to the top of the file using the existing line count as the offset. The Add button is disabled on in-use files because it's impossible to know how many lines were written since the last update. When following in-use files, the Add button is replaced by an indicator.</li><li>Clicking the Reload button reloads the number of lines from the end of the file.</li><li>Use the highlight input to make specific text stand out.</li><li>The last button toggles line wrapping.</li></ol>"
   },
-  "ModalWrap": {
-    "button": { "refresh": "Refresh Page Data", "fullscreen": "Toggle Fullscreen" }
+  "Nodal": {
+    "button": {
+      "refresh": "Refresh Page Data",
+      "fullscreen": "Toggle Fullscreen",
+      "raw": "Toggle Raw Data"
+    },
+    "noResponse": "No response data."
   },
   "ProcessList": {
     "title": "Running Process List",
