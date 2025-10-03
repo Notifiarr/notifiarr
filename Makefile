@@ -270,11 +270,11 @@ notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst: package_build_linux_aarch
 notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst.sig: notifiarr-$(VERSION)-$(ITERATION)-aarch64.pkg.tar.zst
 	[ "$(SIGNING_KEY)" = "" ] || gpg --local-user "$(SIGNING_KEY)" --output $@ --detach-sig $<
 
-zstarmhf: notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst.sig
+zstarmhf: notifiarr-$(VERSION)-$(ITERATION)-arm7hf.pkg.tar.zst notifiarr-$(VERSION)-$(ITERATION)-arm7hf.pkg.tar.zst.sig
 notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst: package_build_linux_armhf_zst check_fpm
 	@echo "Building 32-bit ARM6/7 HF 'pacman' package for notifiarr version '$(VERSION)-$(ITERATION)'."
 	fpm -s dir -t pacman $(PACKAGE_ARGS) -a armhf -v $(VERSION) -C $< $(EXTRA_FPM_FLAGS)
-notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst.sig: notifiarr-$(VERSION)-$(ITERATION)-armhf.pkg.tar.zst
+notifiarr-$(VERSION)-$(ITERATION)-arm7hf.pkg.tar.zst.sig: notifiarr-$(VERSION)-$(ITERATION)-arm7hf.pkg.tar.zst
 	[ "$(SIGNING_KEY)" = "" ] || gpg --local-user "$(SIGNING_KEY)" --output $@ --detach-sig $<
 
 freebsd_pkg: notifiarr-$(VERSION)_$(ITERATION).amd64.txz
