@@ -25,8 +25,9 @@
   import Fa from '../../includes/Fa.svelte'
   import Cookies from 'js-cookie'
   import TableView from './TableView.svelte'
-  import type { Row } from './run'
   import T, { _ } from '../../includes/Translate.svelte'
+  import type { TriggerInfo } from '../../api/notifiarrConfig'
+  import { val } from './run'
 
   const toggleCards = () =>
     Cookies.set('showActionCards', (showCards = !showCards).toString())
@@ -35,15 +36,8 @@
 
   let filter = $state('')
 
-  const timers = $derived<Row[]>(
-    Object.values($profile.timers ?? []).map(t => ({ ...t, type: 'Timer' })),
-  )
-  const schedules = $derived<Row[]>(
-    Object.values($profile.schedules ?? []).map(s => ({ ...s, type: 'Schedule' })),
-  )
-  const triggers = $derived<Row[]>(
-    Object.values($profile.triggers ?? []).map(t => ({ ...t, type: 'Trigger' })),
-  )
+  const sift = (rows?: TriggerInfo[]): TriggerInfo[] =>
+    rows?.filter(row => val(row).toLowerCase().includes(filter.toLowerCase())) ?? []
 </script>
 
 <Header {page}>
@@ -53,8 +47,9 @@
         <Fa i={faX} scale="1.2" />
       </Button>
     {/if}
+    <!-- Filter input. Clear button is above.-->
     <Input bind:value={filter} placeholder={$_('Actions.titles.Filter')} />
-    <!-- Toggle cards view -->
+    <!-- Toggle cards view. -->
     <Button color="info" outline onclick={toggleCards} id="cards-btn">
       <Fa i={icon} c1="lightblue" d1="slateblue" scale="1.5" />
     </Button>
@@ -66,10 +61,15 @@
 
 {#if showCards}
   <CardBody class="py-0">
-    {#if timers.length > 0}<Triggers type="Timers" rows={timers} {filter} />{/if}
-    {#if schedules.length > 0}<Triggers type="Schedules" rows={schedules} {filter} />{/if}
-    {#if triggers.length > 0}<Triggers type="Triggers" rows={triggers} {filter} />{/if}
+    <Triggers type="Timers" rows={sift($profile.timers)} />
+    <Triggers type="Schedules" rows={sift($profile.schedules)} />
+    <Triggers type="Triggers" rows={sift($profile.triggers)} />
   </CardBody>
 {:else}
-  <TableView rows={[...timers, ...schedules, ...triggers]} {filter} />
+  <TableView
+    rows={[
+      sift($profile.timers),
+      sift($profile.schedules),
+      sift($profile.triggers),
+    ].flat()} />
 {/if}
