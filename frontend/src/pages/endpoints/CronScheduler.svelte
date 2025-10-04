@@ -23,11 +23,12 @@
     Label,
     Row,
   } from '@sveltestrap/sveltestrap'
-  import { Frequency, Weekday, type CronJob } from '../../api/notifiarrConfig'
+  import { Frequency, type CronJob } from '../../api/notifiarrConfig'
   import { deepCopy, deepEqual } from '../../includes/util'
   import Select from 'svelte-select'
   import Fa from '../../includes/Fa.svelte'
   import { faRightToLine } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import { cronDesc, cronTimes, weekdays } from './schedule'
 
   type Props = {
     cron: CronJob
@@ -63,25 +64,6 @@
     feedback['atTimes'] = validate?.('cron.atTimes', cron.atTimes?.length ?? 0) ?? ''
   }
 
-  /** Pad a number with a leading zero. */
-  const pad = (n: number) => n.toString().padStart(2, '0')
-  /** Get a human-readable string of the times. */
-  const cronTimes = (freq: Frequency): string[] => {
-    if (freq === Frequency.Minutely) return cron.atTimes?.map(t => `${pad(t[2])}`) ?? []
-    if (freq === Frequency.Hourly)
-      return cron.atTimes?.map(t => `${pad(t[1])}:${pad(t[2])}`) ?? []
-    return cron.atTimes?.map(t => t.map(l => pad(l)).join(':')) ?? []
-  }
-
-  const weekdays = {
-    [Weekday.Sunday]: $_('words.clock.days.Sunday'),
-    [Weekday.Monday]: $_('words.clock.days.Monday'),
-    [Weekday.Tuesday]: $_('words.clock.days.Tuesday'),
-    [Weekday.Wednesday]: $_('words.clock.days.Wednesday'),
-    [Weekday.Thursday]: $_('words.clock.days.Thursday'),
-    [Weekday.Friday]: $_('words.clock.days.Friday'),
-    [Weekday.Saturday]: $_('words.clock.days.Saturday'),
-  }
   let dayVal = Object.entries(weekdays).map(([v, label]) => ({ label, value: Number(v) }))
 
   const validateDays = (subtract: number) => {
@@ -127,37 +109,7 @@
         .sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2])
     }
   }
-
-  /** Keep a human-readable string of the times. */
-  const times = $derived.by(
-    () => cronTimes(cron.frequency).join(', ') || $_('scheduler.times.noneSelected'),
-  )
 </script>
-
-{#snippet description()}
-  {#if cron.frequency === Frequency.Minutely}
-    <T id="scheduler.times.everyMinute" count={cron.atTimes?.length ?? 1} {times} />
-  {:else if cron.frequency == Frequency.Hourly}
-    <T id="scheduler.times.everyHour" count={cron.atTimes?.length ?? 1} {times} />
-  {:else if cron.frequency == Frequency.Daily}
-    <T id="scheduler.times.everyDay" count={cron.atTimes?.length ?? 1} {times} />
-  {:else if cron.frequency == Frequency.Weekly}
-    <T
-      id="scheduler.times.everyWeek"
-      count={(cron.atTimes?.length ?? 1) * (cron.daysOfWeek?.length ?? 1)}
-      daysOfWeek={cron.daysOfWeek?.map(d => weekdays[d]).join(', ') ||
-        $_('scheduler.times.noDaysSelected')}
-      {times} />
-  {:else if cron.frequency == Frequency.Monthly}
-    <T
-      id="scheduler.times.everyMonth"
-      count={(cron.atTimes?.length ?? 1) * (cron.daysOfMonth?.length ?? 1)}
-      daysOfMonth={cron.daysOfMonth?.join(', ') || $_('scheduler.times.noDaysSelected')}
-      {times} />
-  {:else}
-    <T id="scheduler.selectAFrequency" />
-  {/if}
-{/snippet}
 
 <div class="cron-scheduler mb-2">
   <Row>
@@ -176,7 +128,7 @@
           <option value={Frequency.Weekly}><T id="scheduler.ops.weekly" /></option>
           <option value={Frequency.Monthly}><T id="scheduler.ops.monthly" /></option>
         </Input>
-        <small class="text-muted">{@render description?.()}</small>
+        <small class="text-muted">{cronDesc(cron)}</small>
       </FormGroup>
     </Col>
   </Row>
@@ -236,7 +188,7 @@
                 inputAttributes={{ readonly: true }}
                 placeholder="⬅ {$_('scheduler.AddATime')}"
                 on:clear={deleteTime}
-                value={cronTimes(cron.frequency)} />
+                value={cronTimes(cron)} />
             </div>
           </td>
         </tr>
@@ -259,7 +211,7 @@
         : 'changed ' + (cron.daysOfWeek?.length ? 'is-valid' : 'is-invalid')}"
       placeholder={$_('scheduler.daysOfWeek')}
       bind:justValue={cron.daysOfWeek}
-      value={cron.daysOfWeek?.map(d => ({ value: d, label: weekdays[d] })) ?? undefined}
+      value={cron.daysOfWeek?.map(d => ({ value: d, label: weekdays()[d] })) ?? undefined}
       multiple
       searchable
       clearable

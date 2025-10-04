@@ -1307,9 +1307,9 @@ export interface Profile {
   upstreamHeader: string;
   upstreamType: AuthType;
   languages?: Record<string, null | Record<string, LocalizedLanguage>>;
-  triggers?: Record<string, TriggerInfo>;
-  timers?: Record<string, TriggerInfo>;
-  schedules?: Record<string, TriggerInfo>;
+  triggers?: TriggerInfo[];
+  timers?: TriggerInfo[];
+  schedules?: TriggerInfo[];
   siteCrons?: Timer[];
   /**
    * LoggedIn is only used by the front end. Backend does not set or use it.
@@ -1931,8 +1931,10 @@ export interface LocalizedLanguage {
 export interface TriggerInfo {
   name: string;
   key: string;
-  dur: string;
-  runs: string;
+  interval?: number;
+  cron?: CronJob;
+  runs: number;
+  kind: string;
 };
 
 /**

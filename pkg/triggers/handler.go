@@ -32,13 +32,6 @@ func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 	http.Error(response, data, code)
 }
 
-type trigger struct {
-	Kind string `json:"kind"`
-	Name string `json:"name"`
-	Dur  string `json:"interval,omitempty"`
-	Path string `json:"apiPath,omitempty"`
-}
-
 type timer struct {
 	Name string `json:"name"`
 	Dur  string `json:"interval"`
@@ -49,53 +42,26 @@ type timer struct {
 }
 
 type triggerOutput struct {
-	Triggers []*trigger `json:"triggers"`
-	Timers   []*timer   `json:"timers"`
+	// Triggers and actions internal to the client.
+	Triggers []common.TriggerInfo `json:"triggers"`
+	// Timers provided by the website to offload scheduling.
+	Timers []*timer `json:"timers"`
 }
 
 // @Description  Returns a list of triggers and website timers with their intervals, if configured.
 // @Summary      Get trigger list
 // @Tags         Triggers
 // @Produce      json
-// @Success      200  {object} apps.ApiResponse{message=triggers.triggerOutput} "lists of triggers and timers"
+// @Success      200  {object} apps.ApiResponse{message=triggers.triggerOutput} "lists of triggers and website timers"
 // @Failure      404  {object} string "bad token or api key"
 // @Router       /api/triggers [get]
 // @Security     ApiKeyAuth
 func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
 	triggers, timers, schedules := a.GatherTriggerInfo()
-	temp := make(map[string]*trigger) // used to dedup.
-
-	for name, info := range triggers {
-		if info.Dur == "0s" {
-			temp[name] = &trigger{Kind: "trigger", Name: name}
-		} else {
-			temp[name] = &trigger{Kind: "trigger", Name: name, Dur: info.Dur}
-		}
-	}
-
-	for name, info := range timers {
-		if _, ok := temp[name]; !ok {
-			temp[name] = &trigger{Kind: "timer", Name: name, Dur: info.Dur}
-		}
-	}
-
-	for name, info := range schedules {
-		if _, ok := temp[name]; !ok {
-			temp[name] = &trigger{Kind: "schedule", Name: name, Dur: info.Dur}
-		}
-	}
-
 	cronTimers := a.CronTimer.List()
 	reply := &triggerOutput{
-		Triggers: make([]*trigger, len(temp)),
+		Triggers: append(triggers, append(timers, schedules...)...),
 		Timers:   make([]*timer, len(cronTimers)),
-	}
-
-	idx := 0
-
-	for _, t := range temp {
-		reply.Triggers[idx] = t
-		idx++
 	}
 
 	for idx, action := range cronTimers {
