@@ -31,27 +31,27 @@ import (
 // Profile is the data returned by the profile GET endpoint.
 // Basically everything.
 type Profile struct {
-	Username        string                        `json:"username"`
-	Config          configfile.Config             `json:"config"`
-	ClientInfo      *clientinfo.ClientInfo        `json:"clientInfo"`
-	IsWindows       bool                          `json:"isWindows"`
-	IsLinux         bool                          `json:"isLinux"`
-	IsDarwin        bool                          `json:"isDarwin"`
-	IsDocker        bool                          `json:"isDocker"`
-	IsUnstable      bool                          `json:"isUnstable"`
-	IsFreeBSD       bool                          `json:"isFreeBsd"`
-	IsSynology      bool                          `json:"isSynology"`
-	Headers         http.Header                   `json:"headers"`
-	Fortune         string                        `json:"fortune"`
-	UpstreamIP      string                        `json:"upstreamIp"`
-	UpstreamAllowed bool                          `json:"upstreamAllowed"`
-	UpstreamHeader  string                        `json:"upstreamHeader"`
-	UpstreamType    configfile.AuthType           `json:"upstreamType"`
-	Languages       frontend.Languages            `json:"languages"`
-	Triggers        map[string]common.TriggerInfo `json:"triggers"`
-	Timers          map[string]common.TriggerInfo `json:"timers"`
-	Schedules       map[string]common.TriggerInfo `json:"schedules"`
-	SiteCrons       []*crontimer.Timer            `json:"siteCrons"`
+	Username        string                 `json:"username"`
+	Config          configfile.Config      `json:"config"`
+	ClientInfo      *clientinfo.ClientInfo `json:"clientInfo"`
+	IsWindows       bool                   `json:"isWindows"`
+	IsLinux         bool                   `json:"isLinux"`
+	IsDarwin        bool                   `json:"isDarwin"`
+	IsDocker        bool                   `json:"isDocker"`
+	IsUnstable      bool                   `json:"isUnstable"`
+	IsFreeBSD       bool                   `json:"isFreeBsd"`
+	IsSynology      bool                   `json:"isSynology"`
+	Headers         http.Header            `json:"headers"`
+	Fortune         string                 `json:"fortune"`
+	UpstreamIP      string                 `json:"upstreamIp"`
+	UpstreamAllowed bool                   `json:"upstreamAllowed"`
+	UpstreamHeader  string                 `json:"upstreamHeader"`
+	UpstreamType    configfile.AuthType    `json:"upstreamType"`
+	Languages       frontend.Languages     `json:"languages"`
+	Triggers        []common.TriggerInfo   `json:"triggers"`
+	Timers          []common.TriggerInfo   `json:"timers"`
+	Schedules       []common.TriggerInfo   `json:"schedules"`
+	SiteCrons       []*crontimer.Timer     `json:"siteCrons"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
 	LoggedIn        bool                           `json:"loggedIn"`
 	Updated         time.Time                      `json:"updated"`

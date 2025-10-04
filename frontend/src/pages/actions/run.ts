@@ -1,10 +1,11 @@
 import { get } from 'svelte/store'
 import { getUi, type BackendResponse } from '../../api/fetch'
-import { type TriggerInfo } from '../../api/notifiarrConfig'
+import { type CronJob, type TriggerInfo } from '../../api/notifiarrConfig'
 import { profile } from '../../api/profile.svelte'
 import { reload } from '../../header/Reload.svelte'
-import { warning } from '../../includes/util'
+import { age, warning } from '../../includes/util'
 import { _ } from '../../includes/Translate.svelte'
+import { cronDesc } from '../endpoints/schedule'
 
 export type Row = TriggerInfo & { type: string }
 
@@ -59,8 +60,10 @@ export const run = async (info: TriggerInfo, content?: any): Promise<BackendResp
 export const dur = (row: Row): string => {
   if (row.type === 'Trigger') return get(_)(`Actions.titles.Never`)
   if (row.type === 'Timer')
-    return get(_)(`phrases.EveryDuration`, { values: { timeDuration: row.dur } })
-  return row.dur
+    return get(_)(`phrases.EveryDuration`, {
+      values: { timeDuration: age(row.interval ?? 0, true) },
+    })
+  return `${cronDesc(row.cron ?? ({} as CronJob))}`
 }
 
 /** Formats and translates the name of the action, used for sorting and filtering. */

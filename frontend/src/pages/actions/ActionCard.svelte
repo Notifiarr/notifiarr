@@ -1,10 +1,12 @@
 <script lang="ts">
   import { CardHeader, Table } from '@sveltestrap/sveltestrap'
   import T from '../../includes/Translate.svelte'
-  import { rtrim } from '../../includes/util'
+  import { age } from '../../includes/util'
   import NameCell from './NameCell.svelte'
   import RunsCell from './RunsCell.svelte'
   import { type Row } from './run'
+  import { cronDesc } from '../endpoints/schedule'
+  import { type CronJob } from '../../api/notifiarrConfig'
 
   type Props = { type: 'Triggers' | 'Timers' | 'Schedules'; row: Row }
   const { type, row }: Props = $props()
@@ -22,10 +24,13 @@
     {#if type === 'Timers'}
       <tr>
         <th><T id="Actions.titles.Interval" /></th>
-        <td>{rtrim(row.dur.split('.')[0], 's')}{row.dur.endsWith('s') ? 's' : ''}</td>
+        <td>{age(row.interval ?? 0, true)}</td>
       </tr>
     {:else if type === 'Schedules'}
-      <tr><th><T id="Actions.titles.Schedule" /></th><td>{row.dur}</td></tr>
+      <tr>
+        <th><T id="Actions.titles.Schedule" /></th>
+        <td>{cronDesc(row.cron ?? ({} as CronJob))}</td>
+      </tr>
     {/if}
   </tbody>
 </Table>

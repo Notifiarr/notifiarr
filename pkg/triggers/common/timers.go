@@ -3,9 +3,11 @@ package common
 import (
 	"context"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
@@ -49,17 +51,19 @@ func (c *Config) Run(ctx context.Context) {
 }
 
 type TriggerInfo struct {
-	Name string `json:"name"`
-	Key  string `json:"key"`
-	Dur  string `json:"dur"`
-	Runs string `json:"runs"`
+	Name string             `json:"name"`
+	Key  string             `json:"key"`
+	Dur  int64              `json:"interval,omitempty"`
+	Cron *scheduler.CronJob `json:"cron,omitempty"`
+	Runs int                `json:"runs"`
+	Kind string             `json:"kind"`
 }
 
 //nolint:nonamedreturns,cyclop
-func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]TriggerInfo) {
-	triggers = make(map[string]TriggerInfo)
-	timers = make(map[string]TriggerInfo)
-	schedules = make(map[string]TriggerInfo)
+func (c *Config) GatherTriggerInfo() (triggers, timers, schedules []TriggerInfo) {
+	triggers = make([]TriggerInfo, 0)
+	timers = make([]TriggerInfo, 0)
+	schedules = make([]TriggerInfo, 0)
 
 	for _, action := range append(c.list, c.stop) {
 		if action == nil {
@@ -67,51 +71,48 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules map[string]Tri
 		}
 
 		if action.C != nil && action.t == nil && action.job == nil {
-			runs := mnd.TimerCounts.Get(string(action.Name))
-
-			count := ""
-			if runs != nil {
-				count = runs.String()
+			count := 0
+			if runs := mnd.TimerCounts.Get(string(action.Name)); runs != nil {
+				count, _ = strconv.Atoi(runs.String())
 			}
 
-			triggers[string(action.Name)] = TriggerInfo{
+			triggers = append(triggers, TriggerInfo{
 				Name: string(action.Name),
 				Key:  action.Key,
-				Dur:  action.D.String(),
+				Dur:  action.D.Milliseconds(),
 				Runs: count,
-			}
+				Kind: "Trigger",
+			})
 		}
 
 		if action.t != nil {
-			runs := mnd.TimerCounts.Get(string(action.Name))
-
-			count := ""
-			if runs != nil {
-				count = runs.String()
+			count := 0
+			if runs := mnd.TimerCounts.Get(string(action.Name)); runs != nil {
+				count, _ = strconv.Atoi(runs.String())
 			}
 
-			timers[string(action.Name)] = TriggerInfo{
+			timers = append(timers, TriggerInfo{
 				Name: string(action.Name),
 				Key:  action.Key,
-				Dur:  action.D.String(),
+				Dur:  action.D.Milliseconds(),
 				Runs: count,
-			}
+				Kind: "Timer",
+			})
 		}
 
 		if action.job != nil {
-			runs := mnd.TimerCounts.Get(string(action.Name))
-
-			count := ""
-			if runs != nil {
-				count = runs.String()
+			count := 0
+			if runs := mnd.TimerCounts.Get(string(action.Name)); runs != nil {
+				count, _ = strconv.Atoi(runs.String())
 			}
 
-			schedules[string(action.Name)] = TriggerInfo{
+			schedules = append(schedules, TriggerInfo{
 				Name: string(action.Name),
 				Key:  action.Key,
-				Dur:  action.J.String(),
+				Cron: action.J,
 				Runs: count,
-			}
+				Kind: "Schedule",
+			})
 		}
 	}
 
@@ -123,26 +124,18 @@ func (c *Config) printStartupLog() {
 	mnd.Log.Printf("==> Actions Started: %d Timers and %d Triggers and %d Schedules",
 		len(timers), len(triggers), len(schedules))
 
-	for name := range triggers {
-		if _, ok := timers[name]; ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Timer, interval: %s", name, timers[name].Dur)
-		} else if _, ok := schedules[name]; ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name].Dur)
-		} else {
-			mnd.Log.Debugf("==> Enabled Action: %s Trigger only.", name)
-		}
+	for _, trigger := range triggers {
+		mnd.Log.Debugf("==> Enabled Action %s: %s Trigger only.", trigger.Key, trigger.Name)
 	}
 
-	for name := range timers {
-		if _, ok := triggers[name]; !ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Timer only, interval: %s", name, timers[name].Dur)
-		}
+	for _, timer := range timers {
+		mnd.Log.Debugf("==> Enabled Action %s: %s Timer, interval: %s",
+			timer.Key, timer.Name, time.Duration(timer.Dur*int64(time.Millisecond)).String())
 	}
 
-	for name := range schedules {
-		if _, ok := triggers[name]; !ok {
-			mnd.Log.Debugf("==> Enabled Action: %s Trigger and Schedule: %s", name, schedules[name].Dur)
-		}
+	for _, schedule := range schedules {
+		mnd.Log.Debugf("==> Enabled Action %s: %s Schedule: %s",
+			schedule.Key, schedule.Name, schedule.Cron.String())
 	}
 }
 
