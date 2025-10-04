@@ -2,7 +2,7 @@
   import golift from '../../assets/golift.png?inline'
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
-  import Header from './Helem.svelte'
+  import Header from '../../includes/Helem.svelte'
   import T, { date } from '../../includes/Translate.svelte'
   import { age } from '../../includes/util'
   const buildDate = new Date($profile.buildDate).getTime()

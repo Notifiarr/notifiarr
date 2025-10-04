@@ -4,6 +4,9 @@ import { type TriggerInfo } from '../../api/notifiarrConfig'
 import { profile } from '../../api/profile.svelte'
 import { reload } from '../../header/Reload.svelte'
 import { warning } from '../../includes/util'
+import { _ } from '../../includes/Translate.svelte'
+
+export type Row = TriggerInfo & { type: string }
 
 const reloadClient = async () => {
   try {
@@ -50,4 +53,18 @@ export const run = async (info: TriggerInfo, content?: any): Promise<BackendResp
   // It always takes at least 1 second to run.
   if (diff < 1000) await new Promise(resolve => setTimeout(resolve, 1000 - diff))
   return resp
+}
+
+/** Formats the interval or schedule. */
+export const dur = (row: Row): string => {
+  if (row.type === 'Trigger') return get(_)(`Actions.titles.Never`)
+  if (row.type === 'Timer')
+    return get(_)(`phrases.EveryDuration`, { values: { timeDuration: row.dur } })
+  return row.dur
+}
+
+/** Formats and translates the name of the action, used for sorting and filtering. */
+export const val = (row: Row): string => {
+  let name = row.key == 'TrigCustomCronTimer' ? row.name.split("'")[1] : row.name
+  return get(_)(`Actions.triggers.${row.key}.label`, { values: { name } })
 }
