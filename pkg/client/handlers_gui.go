@@ -42,14 +42,14 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// @title Notifiarr Client GUI API Documentation
-// @description Monitors local services and sends notifications.
-// @termsOfService https://notifiarr.com
-// @contact.name Notifiarr Discord
-// @contact.url https://notifiarr.com/discord
-// @license.name MIT
-// @license.url https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
-// @BasePath /
+//	@title			Notifiarr Client GUI API Documentation
+//	@description	Monitors local services and sends notifications.
+//	@termsOfService	https://notifiarr.com
+//	@contact.name	Notifiarr Discord
+//	@contact.url	https://notifiarr.com/discord
+//	@license.name	MIT
+//	@license.url	https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
+//	@BasePath		/ui
 
 const (
 	minPasswordLen = 9
@@ -171,6 +171,17 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 }
 
 // getFileDeleteHandler deletes log and config files.
+//
+//	@Summary		Delete files
+//	@Description	Deletes a log or config file.
+//	@Tags			Files,UI
+//	@Produce		text/plain
+//	@Param			source	path		string	true	"log or config"
+//	@Param			id		path		string	true	"file id"
+//	@Success		202		{string}	string	"ok"
+//	@Failure		400		{string}	string	"bad input"
+//	@Failure		500		{string}	string	"error removing file"
+//	@Router			/deleteFile/{source}/{id} [get]
 func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Request) {
 	if mux.Vars(req)["source"] != fileSourceLogs {
 		http.Error(response, "invalid source", http.StatusBadRequest)
@@ -228,7 +239,23 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 }
 
 // getFileDownloadHandler downloads log files to the browser.
+//
+//	@Summary		Download files
+//	@Description	Downloads a log file (to a browser) as a zip file.
+//	@Tags			Files,UI
+//	@Produce		application/zip
+//	@Param			source	path		string	true	"log or config"
+//	@Param			id		path		string	true	"file id"
+//	@Success		200		{object}	any		"zip file content"
+//	@Failure		400		{string}	string	"bad input"
+//	@Failure		500		{string}	string	"error opening file"
+//	@Router			/downloadFile/{source}/{id} [get]
 func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.Request) {
+	if mux.Vars(req)["source"] != fileSourceLogs {
+		http.Error(response, "invalid source", http.StatusBadRequest)
+		return
+	}
+
 	id := mux.Vars(req)["id"]
 	for _, fileInfo := range logs.Log.GetAllLogFilePaths().List {
 		if fileInfo.ID != id {

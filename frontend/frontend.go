@@ -1,7 +1,8 @@
 package frontend
 
 //go:generate sh generate.sh
-//go:generate go run github.com/swaggo/swag/cmd/swag@latest i --parseDependency --instanceName api --outputTypes json  --parseInternal --dir ../ -g main.go --output ./public
+//go:generate go run github.com/swaggo/swag/cmd/swag@latest i --parseDependency --instanceName api --outputTypes json  --parseInternal --tags !UI --dir ../ -g main.go --output ./public
+//go:generate go run github.com/swaggo/swag/cmd/swag@latest i --parseDependency --instanceName ui --outputTypes json  --parseInternal --tags UI --dir ../ -g pkg/client/handlers_gui.go --output ./public
 
 import (
 	"embed"
