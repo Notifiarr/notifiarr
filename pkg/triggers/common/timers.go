@@ -71,10 +71,8 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules []TriggerInfo)
 		}
 
 		if action.C != nil && action.t == nil && action.job == nil {
-			runs := mnd.TimerCounts.Get(string(action.Name))
-
 			count := 0
-			if runs != nil {
+			if runs := mnd.TimerCounts.Get(string(action.Name)); runs != nil {
 				count, _ = strconv.Atoi(runs.String())
 			}
 
@@ -88,10 +86,8 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules []TriggerInfo)
 		}
 
 		if action.t != nil {
-			runs := mnd.TimerCounts.Get(string(action.Name))
-
 			count := 0
-			if runs != nil {
+			if runs := mnd.TimerCounts.Get(string(action.Name)); runs != nil {
 				count, _ = strconv.Atoi(runs.String())
 			}
 
@@ -105,10 +101,8 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules []TriggerInfo)
 		}
 
 		if action.job != nil {
-			runs := mnd.TimerCounts.Get(string(action.Name))
-
 			count := 0
-			if runs != nil {
+			if runs := mnd.TimerCounts.Get(string(action.Name)); runs != nil {
 				count, _ = strconv.Atoi(runs.String())
 			}
 
@@ -131,15 +125,17 @@ func (c *Config) printStartupLog() {
 		len(timers), len(triggers), len(schedules))
 
 	for _, trigger := range triggers {
-		mnd.Log.Printf("==> Enabled Action: %s Trigger only.", trigger.Name)
+		mnd.Log.Debugf("==> Enabled Action %s: %s Trigger only.", trigger.Key, trigger.Name)
 	}
 
 	for _, timer := range timers {
-		mnd.Log.Printf("==> Enabled Action: %s Timer only, interval: %s", timer.Name, timer.Dur)
+		mnd.Log.Debugf("==> Enabled Action %s: %s Timer, interval: %s",
+			timer.Key, timer.Name, time.Duration(timer.Dur*int64(time.Millisecond)).String())
 	}
 
 	for _, schedule := range schedules {
-		mnd.Log.Printf("==> Enabled Action: %s Trigger and Schedule: %s", schedule.Name, schedule.Dur)
+		mnd.Log.Debugf("==> Enabled Action %s: %s Schedule: %s",
+			schedule.Key, schedule.Name, schedule.Cron.String())
 	}
 }
 
