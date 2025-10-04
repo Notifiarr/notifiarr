@@ -9,11 +9,12 @@
   import { theme as thm } from '../../includes/theme.svelte'
   import { _ } from '../../includes/Translate.svelte'
   import Fa from '../../includes/Fa.svelte'
-  import { run, type Row } from './run'
   import { failure, successIf } from '../../includes/util'
   import { faCirclePlay } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import type { TriggerInfo } from '../../api/notifiarrConfig'
+  import { run } from './run'
 
-  type Props = { row: Row }
+  type Props = { row: TriggerInfo }
   const { row }: Props = $props()
 
   const id = $derived(btoa(row.key.split('').reverse().join('') + row.name).split('=')[0])

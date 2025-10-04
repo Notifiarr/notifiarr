@@ -14193,7 +14193,7 @@
                 "summary": "Get trigger list",
                 "responses": {
                     "200": {
-                        "description": "lists of triggers and timers",
+                        "description": "lists of triggers and website timers",
                         "schema": {
                             "allOf": [
                                 {
@@ -15262,6 +15262,29 @@
                         "Minute",
                         "Hour"
                     ]
+                }
+            }
+        },
+        "common.TriggerInfo": {
+            "type": "object",
+            "properties": {
+                "cron": {
+                    "$ref": "#/definitions/scheduler.CronJob"
+                },
+                "interval": {
+                    "type": "integer"
+                },
+                "key": {
+                    "type": "string"
+                },
+                "kind": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "runs": {
+                    "type": "integer"
                 }
             }
         },
@@ -19137,6 +19160,54 @@
                 }
             }
         },
+        "scheduler.CronJob": {
+            "type": "object",
+            "properties": {
+                "atTimes": {
+                    "description": "AtTimes is a list of 'hours, minutes, seconds' to schedule for Daily/Weekly/Monthly frequencies.\nAlso used in Minutely and Hourly schedules, a bit awkwardly.",
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        }
+                    }
+                },
+                "daysOfMonth": {
+                    "description": "DaysOfMonth is a list of days to schedule. 1 to 31 or -31 to -1 to count backward.",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "daysOfWeek": {
+                    "description": "DaysOfWeek is a list of days to schedule. 0-6. 0 = Sunday.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/scheduler.Weekday"
+                    }
+                },
+                "frequency": {
+                    "description": "Frequency to configure the job. Pass 0 disable the cron.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/scheduler.Frequency"
+                        }
+                    ]
+                },
+                "interval": {
+                    "description": "Interval for Daily, Weekly and Monthly Frequencies. 1 = every day/week/month, 2 = every other, and so on.",
+                    "type": "integer"
+                },
+                "months": {
+                    "description": "Months to schedule. 1 to 12. 1 = January.",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
         "scheduler.Frequency": {
             "type": "integer",
             "enum": [
@@ -20717,36 +20788,21 @@
                 }
             }
         },
-        "triggers.trigger": {
-            "type": "object",
-            "properties": {
-                "apiPath": {
-                    "type": "string"
-                },
-                "interval": {
-                    "type": "string"
-                },
-                "kind": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
         "triggers.triggerOutput": {
             "type": "object",
             "properties": {
                 "timers": {
+                    "description": "Timers provided by the website to offload scheduling.",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/triggers.timer"
                     }
                 },
                 "triggers": {
+                    "description": "Triggers and actions internal to the client.",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/triggers.trigger"
+                        "$ref": "#/definitions/common.TriggerInfo"
                     }
                 }
             }

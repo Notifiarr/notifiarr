@@ -1,12 +1,11 @@
 import { get } from 'svelte/store'
 import { getUi, type BackendResponse } from '../../api/fetch'
-import { type TriggerInfo } from '../../api/notifiarrConfig'
+import { type CronJob, type TriggerInfo } from '../../api/notifiarrConfig'
 import { profile } from '../../api/profile.svelte'
 import { reload } from '../../header/Reload.svelte'
-import { warning } from '../../includes/util'
+import { age, warning } from '../../includes/util'
 import { _ } from '../../includes/Translate.svelte'
-
-export type Row = TriggerInfo & { type: string }
+import { cronDesc } from '../endpoints/schedule'
 
 const reloadClient = async () => {
   try {
@@ -56,15 +55,17 @@ export const run = async (info: TriggerInfo, content?: any): Promise<BackendResp
 }
 
 /** Formats the interval or schedule. */
-export const dur = (row: Row): string => {
-  if (row.type === 'Trigger') return get(_)(`Actions.titles.Never`)
-  if (row.type === 'Timer')
-    return get(_)(`phrases.EveryDuration`, { values: { timeDuration: row.dur } })
-  return row.dur
+export const dur = (row: TriggerInfo): string => {
+  if (row.kind === 'Trigger') return get(_)(`Actions.titles.Never`)
+  if (row.kind === 'Timer')
+    return get(_)(`phrases.EveryDuration`, {
+      values: { timeDuration: age(row.interval ?? 0, true) },
+    })
+  return `${cronDesc(row.cron ?? ({} as CronJob))}`
 }
 
 /** Formats and translates the name of the action, used for sorting and filtering. */
-export const val = (row: Row): string => {
+export const val = (row: TriggerInfo): string => {
   let name = row.key == 'TrigCustomCronTimer' ? row.name.split("'")[1] : row.name
   return get(_)(`Actions.triggers.${row.key}.label`, { values: { name } })
 }
