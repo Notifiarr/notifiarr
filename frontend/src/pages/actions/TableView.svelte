@@ -52,7 +52,7 @@
   rowKey="name"
   classNameInput="form-control form-control-sm"
   classNameSelect="form-select form-select-sm"
-  classNameTable="table table-sm table-striped mb-0"
+  classNameTable="table table-sm table-striped table-borderless mb-0"
   classNameRow="table-row"
   sortOrders={[-1, 1, 0]}
   {columns}
