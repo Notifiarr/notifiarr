@@ -4,11 +4,10 @@
   import { age } from '../../includes/util'
   import NameCell from './NameCell.svelte'
   import RunsCell from './RunsCell.svelte'
-  import { type Row } from './run'
   import { cronDesc } from '../endpoints/schedule'
-  import { type CronJob } from '../../api/notifiarrConfig'
+  import { type CronJob, type TriggerInfo } from '../../api/notifiarrConfig'
 
-  type Props = { type: 'Triggers' | 'Timers' | 'Schedules'; row: Row }
+  type Props = { type: 'Triggers' | 'Timers' | 'Schedules'; row: TriggerInfo }
   const { type, row }: Props = $props()
 </script>
 

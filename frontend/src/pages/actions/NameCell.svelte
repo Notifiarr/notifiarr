@@ -3,9 +3,9 @@
   import { profile } from '../../api/profile.svelte'
   import { theme as thm } from '../../includes/theme.svelte'
   import T from '../../includes/Translate.svelte'
-  import type { Row } from './run'
+  import type { TriggerInfo } from '../../api/notifiarrConfig'
 
-  type Props = { row: Row }
+  type Props = { row: TriggerInfo }
   const { row }: Props = $props()
   const id = $derived(btoa(row.key.split('').reverse().join('') + row.name).split('=')[0])
 </script>

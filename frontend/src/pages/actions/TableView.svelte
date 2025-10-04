@@ -3,16 +3,17 @@
   import NameCell from './NameCell.svelte'
   import RunsCell from './RunsCell.svelte'
   import { _ } from '../../includes/Translate.svelte'
-  import { type Row, val, dur } from './run'
+  import { type TriggerInfo } from '../../api/notifiarrConfig'
+  import { val, dur } from './run'
 
-  type Props = { rows: Row[]; filter?: string }
-  const { rows, filter = '' }: Props = $props()
+  type Props = { rows: TriggerInfo[] }
+  const { rows }: Props = $props()
 
-  const columns: TableColumn<Row>[] = [
+  const columns: TableColumn<TriggerInfo>[] = [
     {
       title: $_(`Actions.titles.Type`),
-      key: 'type',
-      value: (row: Row) => $_(`Actions.titles.${row.type}`),
+      key: 'kind',
+      value: (row: TriggerInfo) => $_(`Actions.titles.${row.kind}`),
       sortable: true,
       headerClass: 'ps-2',
       class: 'ps-2',
@@ -28,7 +29,7 @@
       title: $_(`Actions.titles.Counter`),
       key: 'runs',
       renderComponent: RunsCell,
-      value: (row: Row) => Number(row.runs),
+      value: (row: TriggerInfo) => row.runs,
       sortable: true,
     },
     {
@@ -39,12 +40,6 @@
       class: 'pe-2',
     },
   ]
-
-  const filtered = $derived(
-    filter
-      ? rows.filter(row => val(row).toLowerCase().includes(filter.toLowerCase()))
-      : rows,
-  )
 </script>
 
 <Table
@@ -57,4 +52,4 @@
   sortBy="name"
   sortOrder={1}
   {columns}
-  rows={filtered} />
+  {rows} />
