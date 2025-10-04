@@ -1296,7 +1296,7 @@
       "Schedule": "Schedule",
       "Type": "Type",
       "When": "When",
-      "Name": "Name",
+      "Action": "Action",
       "Never": "Never",
       "Filter": "Filter"
     },

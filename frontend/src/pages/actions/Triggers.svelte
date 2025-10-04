@@ -18,12 +18,12 @@
 {#if filtered.length > 0}
   <BSRow>
     <Col>
-      <h4><T id={`Actions.titles.${type}`} /></h4>
+      <h4 class="my-2"><T id={`Actions.titles.${type}`} /></h4>
       <T id={`Actions.descriptions.${type}`} />
     </Col>
   </BSRow>
 
-  <BSRow>
+  <BSRow class="mb-3">
     {#each filtered as row}
       <Col sm={6} xl={4} xxl={3}>
         <Card class="mt-3" outline color={color(Number(row.runs))}>

@@ -64,12 +64,12 @@
   </InputGroup>
 </Header>
 
-<CardBody>
-  {#if showCards}
+{#if showCards}
+  <CardBody class="py-0">
     {#if timers.length > 0}<Triggers type="Timers" rows={timers} {filter} />{/if}
     {#if schedules.length > 0}<Triggers type="Schedules" rows={schedules} {filter} />{/if}
     {#if triggers.length > 0}<Triggers type="Triggers" rows={triggers} {filter} />{/if}
-  {:else}
-    <TableView rows={[...timers, ...schedules, ...triggers]} {filter} />
-  {/if}
-</CardBody>
+  </CardBody>
+{:else}
+  <TableView rows={[...timers, ...schedules, ...triggers]} {filter} />
+{/if}

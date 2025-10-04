@@ -14,9 +14,11 @@
       key: 'type',
       value: (row: Row) => $_(`Actions.titles.${row.type}`),
       sortable: true,
+      headerClass: 'ps-2',
+      class: 'ps-2',
     },
     {
-      title: $_(`Actions.titles.Name`),
+      title: $_(`Actions.titles.Action`),
       key: 'name',
       renderComponent: NameCell,
       value: val,
@@ -29,7 +31,13 @@
       value: (row: Row) => Number(row.runs),
       sortable: true,
     },
-    { title: $_(`Actions.titles.When`), key: 'when', value: dur, sortable: true },
+    {
+      title: $_(`Actions.titles.When`),
+      key: 'when',
+      value: dur,
+      sortable: true,
+      class: 'pe-2',
+    },
   ]
 
   // Smash all the triggers, timers, and schedules into one array and add a type column.
@@ -44,7 +52,7 @@
   rowKey="name"
   classNameInput="form-control form-control-sm"
   classNameSelect="form-select form-select-sm"
-  classNameTable="table table-sm table-striped"
+  classNameTable="table table-sm table-striped mb-0"
   classNameRow="table-row"
   sortOrders={[-1, 1, 0]}
   {columns}
