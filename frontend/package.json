@@ -38,6 +38,7 @@
     "prettier-plugin-svelte": "^3.4.0",
     "svelte-i18n": "^4.0.1",
     "svelte-select": "^5.8.3",
+    "svelte-table": "^0.6.5",
     "swagger-ui": "^5.25.2",
     "swagger-ui-themes": "^3.0.1"
   }
