@@ -122,6 +122,7 @@
     "Every12Hours": "Every 12 hours",
     "Every6Hours": "Every 6 hours",
     "Every3Hours": "Every 3 hours",
+    "EveryDuration": "Every {timeDuration}",
     "Reloading": "Reloading...",
     "FailedToReload": "Failed to reload: {error}",
     "ConfirmReload": "Confirm Reload",
@@ -1287,10 +1288,17 @@
       "Triggers": "Triggers",
       "Timers": "Timers",
       "Schedules": "Schedules",
+      "Trigger": "Trigger",
+      "Timer": "Timer",
       "SiteCrons": "Website Timers",
       "Counter": "Counter",
       "Interval": "Interval",
-      "Schedule": "Schedule"
+      "Schedule": "Schedule",
+      "Type": "Type",
+      "When": "When",
+      "Action": "Action",
+      "Never": "Never",
+      "Filter": "Filter"
     },
     "descriptions": {
       "Triggers": "These actions have no timer and no schedule.",

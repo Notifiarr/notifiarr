@@ -87,7 +87,7 @@
         <T id={`monitoring.${showOutputAll ? 'hideAllOutputs' : 'showAllOutputs'}`} />
       </Popover>
       <Button color="info" outline onclick={toggleOutput} id="showAll-button">
-        <Fa i={showAllI} c1="blue" d1="slateblue" scale="1.5" />
+        <Fa i={showAllI} c1="lightblue" d1="slateblue" scale="1.5" />
       </Button>
     {/if}
     <Popover target="refresh-button" placement="left" trigger="hover" {theme}>
