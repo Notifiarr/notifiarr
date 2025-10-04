@@ -40,7 +40,6 @@
     },
   ]
 
-  // Smash all the triggers, timers, and schedules into one array and add a type column.
   const filtered = $derived(
     filter
       ? rows.filter(row => val(row).toLowerCase().includes(filter.toLowerCase()))
@@ -55,5 +54,7 @@
   classNameTable="table table-sm table-striped table-borderless mb-0"
   classNameRow="table-row"
   sortOrders={[-1, 1, 0]}
+  sortBy="name"
+  sortOrder={1}
   {columns}
   rows={filtered} />
