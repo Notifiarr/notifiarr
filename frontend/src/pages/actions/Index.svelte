@@ -26,7 +26,7 @@
   import Cookies from 'js-cookie'
   import TableView from './TableView.svelte'
   import type { Row } from './run'
-  import T from '../../includes/Translate.svelte'
+  import T, { _ } from '../../includes/Translate.svelte'
 
   const toggleCards = () =>
     Cookies.set('showActionCards', (showCards = !showCards).toString())
@@ -50,10 +50,11 @@
   <InputGroup>
     {#if filter}
       <Button color="warning" outline onclick={() => (filter = '')}>
-        <Fa i={faX} scale="1.5" />
+        <Fa i={faX} scale="1.2" />
       </Button>
     {/if}
-    <Input bind:value={filter} placeholder="Filter" />
+    <Input bind:value={filter} placeholder={$_('Actions.titles.Filter')} />
+    <!-- Toggle cards view -->
     <Button color="info" outline onclick={toggleCards} id="cards-btn">
       <Fa i={icon} c1="lightblue" d1="slateblue" scale="1.5" />
     </Button>

@@ -1297,7 +1297,8 @@
       "Type": "Type",
       "When": "When",
       "Name": "Name",
-      "Never": "Never"
+      "Never": "Never",
+      "Filter": "Filter"
     },
     "descriptions": {
       "Triggers": "These actions have no timer and no schedule.",
