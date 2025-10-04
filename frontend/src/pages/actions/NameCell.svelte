@@ -12,7 +12,7 @@
 
 <!-- We use the row.name in a popover. It's not translated. -->
 <Popover target={id + 'label'} trigger="hover" theme={$thm}>
-  {row.key}:
+  <code>{row.key}</code><br />
   {#if row.key == 'TrigCustomCronTimer'}
     {$profile.siteCrons?.find(c => row.name.endsWith("'" + c.name + "'"))?.description}
   {:else}
