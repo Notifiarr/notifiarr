@@ -25,7 +25,7 @@ import (
 // @Success		200		{object}	apps.ApiResponse{message=[]RadarrTrashPayload}	"contains app info included appStatus"
 // @Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
 // @Failure		404		{object}	string											"bad token or api key"
-// @Router			/api/trash/radarr [post]
+// @Router			/trash/radarr [post]
 // @Security		ApiKeyAuth
 func _() {}
 
@@ -38,7 +38,7 @@ func _() {}
 // @Success		200		{object}	apps.ApiResponse{message=[]LidarrTrashPayload}	"contains app info included appStatus"
 // @Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
 // @Failure		404		{object}	string											"bad token or api key"
-// @Router			/api/trash/lidarr [post]
+// @Router			/trash/lidarr [post]
 // @Security		ApiKeyAuth
 func _() {}
 
@@ -53,7 +53,7 @@ func _() {}
 //	@Success		200		{object}	apps.ApiResponse{message=[]SonarrTrashPayload}	"contains app info included appStatus"
 //	@Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
 //	@Failure		404		{object}	string											"bad token or api key"
-//	@Router			/api/trash/sonarr [post]
+//	@Router			/trash/sonarr [post]
 //	@Security		ApiKeyAuth
 func (a *Action) Handler(req *http.Request) (int, interface{}) {
 	return a.cmd.aggregateTrash(req)

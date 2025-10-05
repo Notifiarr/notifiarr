@@ -25,8 +25,8 @@
   import Header from '../../includes/Header.svelte'
 
   const apiDocs = [
-    { what: 'PrivateAPI', file: 'api_swagger.json', path: '' },
-    { what: 'WebUI', file: 'ui_swagger.json', path: '/ui' },
+    { what: 'PrivateAPI', file: 'api_swagger.json', path: 'api' },
+    { what: 'WebUI', file: 'ui_swagger.json', path: 'ui' },
   ]
 
   let loadError = $state('')
@@ -84,7 +84,8 @@
       </option>
     {/each}
   </Input>
-  <T id={`ApiDocs.${doc.what}.body`} />
+  <p><T id={`ApiDocs.${doc.what}.body`} /></p>
+  <ul class="mb-0"><li><b>Base Path:</b> <code>{$urlbase + doc.path}</code></li></ul>
 </Header>
 
 <div id="swagger-ui-container" class:dark-mode={theme.isDark}>

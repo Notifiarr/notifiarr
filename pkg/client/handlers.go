@@ -243,7 +243,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 // @Param			instance	path		int64												true	"Application instance (1-index)."
 // @Success		200			{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/ping/{app}/{instance} [get]
+// @Router			/ping/{app}/{instance} [get]
 // @Security		ApiKeyAuth
 func _() {}
 
@@ -255,7 +255,7 @@ func _() {}
 // @Param			apps	path		string												true	"Application, comma separated"	Enums(lidarr, prowlarr, radarr, readarr, sonarr)
 // @Success		200		{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404		{object}	string												"bad token or api key"
-// @Router			/api/ping/{apps} [get]
+// @Router			/ping/{apps} [get]
 // @Security		ApiKeyAuth
 //
 //nolint:lll
@@ -267,7 +267,7 @@ func _() {}
 // @Produce		json
 // @Success		200	{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404	{object}	string												"bad token or api key"
-// @Router			/api/ping [get]
+// @Router			/ping [get]
 // @Security		ApiKeyAuth
 func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) { //nolint:cyclop
 	apps := strings.Split(mux.Vars(req)["app"], ",")

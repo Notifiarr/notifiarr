@@ -18,7 +18,7 @@ import (
 // @contact.url				https://notifiarr.com/discord
 // @license.name				MIT
 // @license.url				https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
-// @BasePath					/
+// @BasePath					/api/
 // @securityDefinitions.apikey	ApiKeyAuth
 // @in							header
 // @name						X-API-Key
