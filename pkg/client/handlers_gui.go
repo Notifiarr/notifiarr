@@ -502,21 +502,29 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 //	@Success		200	{object}	checkapp.CheckAllOutput	"all check results"
 //	@Router			/checkAllInstances [get]
 func (c *Client) handleCheckAll(response http.ResponseWriter, request *http.Request) {
-	output := checkapp.CheckAll(request.Context(), &checkapp.CheckAllInput{
+	input := &checkapp.CheckAllInput{
 		Sonarr:       c.Config.Sonarr,
 		Radarr:       c.Config.Radarr,
 		Readarr:      c.Config.Readarr,
 		Lidarr:       c.Config.Lidarr,
 		Prowlarr:     c.Config.Prowlarr,
-		Plex:         []apps.PlexConfig{c.Config.Plex},
-		Tautulli:     []apps.TautulliConfig{c.Config.Tautulli},
 		NZBGet:       c.Config.NZBGet,
 		Deluge:       c.Config.Deluge,
 		Qbit:         c.Config.Qbit,
 		Rtorrent:     c.Config.Rtorrent,
 		Transmission: c.Config.Transmission,
 		SabNZB:       c.Config.SabNZB,
-	})
+	}
+
+	if c.Config.Plex.URL != "" && c.Config.Plex.Token != "" {
+		input.Plex = []apps.PlexConfig{c.Config.Plex}
+	}
+
+	if c.Config.Tautulli.URL != "" && c.Config.Tautulli.APIKey != "" {
+		input.Tautulli = []apps.TautulliConfig{c.Config.Tautulli}
+	}
+
+	output := checkapp.CheckAll(request.Context(), input)
 	if err := json.NewEncoder(response).Encode(output); err != nil {
 		logs.Log.Errorf("Encoding check all instances: %v", err)
 	}

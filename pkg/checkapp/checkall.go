@@ -7,7 +7,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
-	"golift.io/starr"
 )
 
 type CheckAllInput struct {
@@ -32,7 +31,6 @@ type TestResult struct {
 	Msg     string           `json:"message"`
 	Elapsed string           `json:"elapsed"`
 	Config  apps.ExtraConfig `json:"config"`
-	App     string           `json:"app"`
 }
 
 // CheckAllOutput is the output from a check all instances test.
@@ -128,7 +126,6 @@ func chk[D any](ctx context.Context, d D, fn func(context.Context, D) (string, i
 func (c *checkAll) checkAllStarr(ctx context.Context) {
 	for i, sonarr := range c.input.Sonarr {
 		c.output.Sonarr[i].Config = sonarr.ExtraConfig
-		c.output.Sonarr[i].App = starr.Sonarr.String()
 		c.ch <- &job{res: &c.output.Sonarr[i], fn: chk(ctx, sonarr, Sonarr)}
 	}
 

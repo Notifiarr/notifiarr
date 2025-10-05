@@ -1469,7 +1469,7 @@
       "delete": "Delete",
       "add": "Add",
       "reload": "Reload",
-      "tooltip": "The <b>Download</b> button downloads the file to your computer. The <b>Upload</b> button uploads the file to the Notifiarr.com server. Only administrators can see uploaded files. The <b>Delete</b> button deletes the file from your hard drive. Files that are in use cannot be deleted. In use means this application is currently writing logs entries to it."
+      "tooltip": "The <b>Download</b> button downloads the file to your computer. The <b>Upload</b> button uploads the file to the Notifiarr.com server. Only administrators can see uploaded files. The <b>Delete</b> button deletes the file from your hard drive. Files that are in use cannot be deleted. In use means this application is currently writing log entries to it."
     },
     "Error": "Error loading log file: {error}",
     "DeleteFile": "Delete {filePath}",

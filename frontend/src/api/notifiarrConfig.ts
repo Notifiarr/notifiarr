@@ -2115,7 +2115,6 @@ export interface TestResult {
   message: string;
   elapsed: string;
   config: ExtraConfig;
-  app: string;
 };
 
 // Packages parsed:
