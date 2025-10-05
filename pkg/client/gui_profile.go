@@ -96,6 +96,14 @@ type Profile struct {
 
 // handleProfile returns the current user's username in a JSON response.
 //
+//	@Summary		Get user profile
+//	@Description	Returns comprehensive profile information including config, triggers, system info, and user settings.
+//	@Tags			System
+//	@Produce		json
+//	@Success		200	{object}	Profile	"comprehensive profile data"
+//	@Failure		401	{string}	string	"unauthorized"
+//	@Router			/profile [get]
+//
 //nolint:funlen
 func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	clientInfo := clientinfo.Get()
@@ -187,6 +195,20 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// handleProfilePost handles profile updates including authentication settings and upstream configuration.
+//
+//	@Summary		Update user profile
+//	@Description	Updates user profile settings including authentication type, password, header, and upstream configuration.
+//	@Tags			System
+//	@Accept			json
+//	@Produce		text/plain
+//	@Param			profile	body		ProfilePost	true	"Profile update data"
+//	@Success		200		{string}	string		"success message"
+//	@Failure		400		{string}	string		"invalid request or password"
+//	@Failure		500		{string}	string		"error saving config"
+//	@Router			/profile [post]
+//
+//nolint:lll
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
 	post := &ProfilePost{}
 	if err := json.NewDecoder(request.Body).Decode(post); err != nil {

@@ -73,7 +73,6 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET")
 	gui.HandleFunc("/profile", c.handleProfilePost).Methods("POST")
 	gui.HandleFunc("/ps", c.handleProcessList).Methods("GET")
-	gui.HandleFunc("/regexTest", c.handleRegexTest).Methods("POST")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST").Queries("noreload", "{noreload}")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
 	gui.HandleFunc("/reload", c.handleReload).Methods("GET")
@@ -236,40 +235,40 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 	})
 }
 
-// @Description  Returns true or false for 1 requested instance. True is up, false is down.
-// @Summary      Ping 1 starr instance.
-// @Tags         Client
-// @Produce      json
-// @Param        app      path string  true  "Application" Enums(lidarr, prowlarr, radarr, readarr, sonarr)
-// @Param        instance path int64   true  "Application instance (1-index)."
-// @Success      200  {object} apps.ApiResponse{message=map[string]map[int]bool} "map for app->instance->up"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/ping/{app}/{instance} [get]
-// @Security     ApiKeyAuth
+// @Description	Returns true or false for 1 requested instance. True is up, false is down.
+// @Summary		Ping 1 starr instance.
+// @Tags			Client
+// @Produce		json
+// @Param			app			path		string												true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Param			instance	path		int64												true	"Application instance (1-index)."
+// @Success		200			{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
+// @Failure		404			{object}	string												"bad token or api key"
+// @Router			/ping/{app}/{instance} [get]
+// @Security		ApiKeyAuth
 func _() {}
 
-// @Description  Returns true or false for every instance for starr app requested. True is up, false is down.
-// @Description  Multiple apps may be provided by separating them with a comma. ie /api/ping/radarr,sonarr
-// @Summary      Ping all instances for 1 or more starr apps.
-// @Tags         Client
-// @Produce      json
-// @Param        apps  path   string  true  "Application, comma separated" Enums(lidarr, prowlarr, radarr, readarr, sonarr)
-// @Success      200  {object} apps.ApiResponse{message=map[string]map[int]bool} "map for app->instance->up"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/ping/{apps} [get]
-// @Security     ApiKeyAuth
+// @Description	Returns true or false for every instance for starr app requested. True is up, false is down.
+// @Description	Multiple apps may be provided by separating them with a comma. ie /api/ping/radarr,sonarr
+// @Summary		Ping all instances for 1 or more starr apps.
+// @Tags			Client
+// @Produce		json
+// @Param			apps	path		string												true	"Application, comma separated"	Enums(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Success		200		{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
+// @Failure		404		{object}	string												"bad token or api key"
+// @Router			/ping/{apps} [get]
+// @Security		ApiKeyAuth
 //
 //nolint:lll
 func _() {}
 
-// @Description  Returns true or false for each configured starr instance. True is up, false is down.
-// @Summary      Ping all starr instances.
-// @Tags         Client
-// @Produce      json
-// @Success      200  {object} apps.ApiResponse{message=map[string]map[int]bool} "map for app->instance->up"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/ping [get]
-// @Security     ApiKeyAuth
+// @Description	Returns true or false for each configured starr instance. True is up, false is down.
+// @Summary		Ping all starr instances.
+// @Tags			Client
+// @Produce		json
+// @Success		200	{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
+// @Failure		404	{object}	string												"bad token or api key"
+// @Router			/ping [get]
+// @Security		ApiKeyAuth
 func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) { //nolint:cyclop
 	apps := strings.Split(mux.Vars(req)["app"], ",")
 	instance, _ := strconv.Atoi(mux.Vars(req)["instance"])

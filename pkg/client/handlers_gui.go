@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -42,14 +41,14 @@ import (
 	"golift.io/starr/sonarr"
 )
 
-// @title Notifiarr Client GUI API Documentation
-// @description Monitors local services and sends notifications.
-// @termsOfService https://notifiarr.com
-// @contact.name Notifiarr Discord
-// @contact.url https://notifiarr.com/discord
-// @license.name MIT
-// @license.url https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
-// @BasePath /
+//	@title			Notifiarr Client GUI API Documentation
+//	@description	Monitors local services and sends notifications.
+//	@termsOfService	https://notifiarr.com
+//	@contact.name	Notifiarr Discord
+//	@contact.url	https://notifiarr.com/discord
+//	@license.name	MIT
+//	@license.url	https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
+//	@BasePath		/ui
 
 const (
 	minPasswordLen = 9
@@ -171,6 +170,17 @@ func (c *Client) logoutHandler(response http.ResponseWriter, request *http.Reque
 }
 
 // getFileDeleteHandler deletes log and config files.
+//
+//	@Summary		Delete files
+//	@Description	Deletes a log or config file.
+//	@Tags			Files
+//	@Produce		text/plain
+//	@Param			source	path		string	true	"log or config"
+//	@Param			id		path		string	true	"file id"
+//	@Success		200		{string}	string	"ok"
+//	@Failure		400		{string}	string	"bad input"
+//	@Failure		500		{string}	string	"error removing file"
+//	@Router			/deleteFile/{source}/{id} [get]
 func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Request) {
 	if mux.Vars(req)["source"] != fileSourceLogs {
 		http.Error(response, "invalid source", http.StatusBadRequest)
@@ -203,6 +213,17 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 }
 
 // uploadFileHandler uploads a log file to notifiarr.com.
+//
+//	@Summary		Upload files
+//	@Description	Uploads a log file to notifiarr.com.
+//	@Tags			Files
+//	@Produce		text/plain
+//	@Param			source	path		string	true	"log"
+//	@Param			id		path		string	true	"file id"
+//	@Success		200		{string}	string	"ok"
+//	@Failure		400		{string}	string	"bad input"
+//	@Failure		500		{string}	string	"error uploading file"
+//	@Router			/uploadFile/{source}/{id} [get]
 func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Request) {
 	if mux.Vars(req)["source"] != fileSourceLogs {
 		http.Error(response, "invalid source", http.StatusBadRequest)
@@ -223,12 +244,32 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 		user, _ := c.getUserName(req)
 		logs.Log.Printf("[gui '%s' requested] Uploaded file: %s", user, fileInfo.Path)
 
+		if _, err := response.Write([]byte("ok")); err != nil {
+			logs.Log.Errorf("Writing HTTP Response: %v", err)
+		}
+
 		return
 	}
 }
 
 // getFileDownloadHandler downloads log files to the browser.
+//
+//	@Summary		Download files
+//	@Description	Downloads a log file (to a browser) as a zip file.
+//	@Tags			Files
+//	@Produce		application/zip
+//	@Param			source	path		string	true	"log or config"
+//	@Param			id		path		string	true	"file id"
+//	@Success		200		{object}	any		"zip file content"
+//	@Failure		400		{string}	string	"bad input"
+//	@Failure		500		{string}	string	"error opening file"
+//	@Router			/downloadFile/{source}/{id} [get]
 func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.Request) {
+	if mux.Vars(req)["source"] != fileSourceLogs {
+		http.Error(response, "invalid source", http.StatusBadRequest)
+		return
+	}
+
 	id := mux.Vars(req)["id"]
 	for _, fileInfo := range logs.Log.GetAllLogFilePaths().List {
 		if fileInfo.ID != id {
@@ -264,6 +305,14 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 	}
 }
 
+// handleShutdown initiates application shutdown.
+//
+//	@Summary		Shutdown application
+//	@Description	Initiates graceful shutdown of the application.
+//	@Tags			System
+//	@Produce		text/plain
+//	@Success		200	{string}	string	"OK"
+//	@Router			/shutdown [get]
 func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
 	defer func() {
 		c.sigkil <- &update.Signal{Text: "shutdown gui triggered"}
@@ -272,6 +321,14 @@ func (c *Client) handleShutdown(response http.ResponseWriter, _ *http.Request) {
 	http.Error(response, "OK", http.StatusOK)
 }
 
+// handleReload triggers a configuration reload.
+//
+//	@Summary		Reload configuration
+//	@Description	Triggers an immediate reload of the application configuration.
+//	@Tags			System
+//	@Produce		text/plain
+//	@Success		200	{string}	string	"OK"
+//	@Router			/reload [get]
 func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
 	c.reloadAppNow()
 	http.Error(response, "OK", http.StatusOK)
@@ -285,6 +342,15 @@ func (c *Client) reloadAppNow() {
 	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
 }
 
+// handlePing returns the application status.
+//
+//	@Summary		Ping application
+//	@Description	Returns application status, indicating if it's reloading or running normally.
+//	@Tags			System
+//	@Produce		text/plain
+//	@Success		200	{string}	string	"OK"
+//	@Failure		423	{string}	string	"Reloading"
+//	@Router			/ping [get]
 func (c *Client) handlePing(response http.ResponseWriter, _ *http.Request) {
 	c.RLock()
 	defer c.RUnlock()
@@ -296,6 +362,16 @@ func (c *Client) handlePing(response http.ResponseWriter, _ *http.Request) {
 	}
 }
 
+// handleServicesStopStart stops or starts service checks.
+//
+//	@Summary		Start/stop service checks
+//	@Description	Starts or stops all service checks.
+//	@Tags			Integrations
+//	@Produce		text/plain
+//	@Param			action	path		string						true	"Action to perform"	Enums(stop, start)
+//	@Success		200		{string}	string						"Service Checks Stopped or Service Checks Started"
+//	@Failure		400		{string}	string						"invalid action"
+//	@Router			/services/{action} [get]
 func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http.Request) {
 	user, _ := c.getUserName(req)
 
@@ -313,6 +389,16 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 	}
 }
 
+// handleServicesCheck runs a specific service check.
+//
+//	@Summary		Check service
+//	@Description	Runs a specific service check by name.
+//	@Tags			Integrations
+//	@Produce		text/plain
+//	@Param			service	path		string	true	"Service name to check"
+//	@Success		200		{string}	string	"Service Check Initiated"
+//	@Failure		400		{string}	string	"error running service check"
+//	@Router			/services/check/{service} [get]
 func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Request) {
 	svc := mux.Vars(req)["service"]
 	if err := c.Services.RunCheck(website.EventAPI, svc); err != nil {
@@ -326,6 +412,22 @@ func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Req
 }
 
 // getFileHandler returns portions of a config or log file based on request parameters.
+//
+//	@Summary		Get file contents
+//	@Description	Returns portions of a log or config file based on request parameters like lines, skip, and sort.
+//	@Tags			Files
+//	@Produce		text/plain
+//	@Param			source	path		string	true	"log or config"
+//	@Param			id		path		string	true	"file id"
+//	@Param			lines	path		int		true	"number of lines to return"
+//	@Param			skip	path		int		true	"number of lines to skip"
+//	@Param			sort	query		string	false	"sort order (asc/desc)"
+//	@Success		200		{string}	string	"file contents"
+//	@Failure		400		{string}	string	"invalid source"
+//	@Failure		500		{string}	string	"error reading file"
+//	@Router			/getFile/{source}/{id}/{lines}/{skip} [get]
+//	@Router			/getFile/{source}/{id}/{lines} [get]
+//	@Router			/getFile/{source}/{id} [get]
 func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request) {
 	var fileInfos *logs.LogFileInfos
 
@@ -367,6 +469,17 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 	http.Error(response, "no file found", http.StatusNotFound)
 }
 
+// handleInstanceCheck validates instance configuration.
+//
+//	@Summary		Check instance configuration
+//	@Description	Validates and tests the configuration for a specific application instance.
+//	@Tags			Integrations
+//	@Produce		text/plain
+//	@Param			type	path		string	true	"Application type"
+//	@Param			index	path		int		true	"Instance index"
+//	@Success		200		{string}	string	"configuration check result"
+//	@Failure		400		{string}	string	"parsing error"
+//	@Router			/checkInstance/{type}/{index} [post]
 func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http.Request) {
 	mnd.ConfigPostDecoder.RegisterConverter([]string{}, func(input string) reflect.Value {
 		return reflect.ValueOf(strings.Fields(input))
@@ -382,6 +495,15 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 
 // handleFileBrowser returns a list of files and folders in a path.
 // part of the file browser javascript code.
+//
+//	@Summary		Browse file system
+//	@Description	Returns a list of files and folders in the specified directory path.
+//	@Tags			Files
+//	@Produce		json
+//	@Param			dir	query		string	false	"Directory path to browse"
+//	@Success		200	{object}	object{dirs=[]string,files=[]string}	"directory contents"
+//	@Failure		406	{string}	string									"error reading directory"
+//	@Router			/browse [get]
 func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.Request) {
 	type dir struct {
 		Dirs  []string `json:"dirs"`
@@ -424,6 +546,18 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 }
 
 // handleCommandStats is for js getCmdStats.
+//
+//	@Summary		Get command statistics
+//	@Description	Returns execution statistics for a specific command.
+//	@Tags			Integrations
+//	@Produce		json
+//	@Param			path	path		string	true	"Command path identifier" Enums(cmdstats, cmdargs)
+//	@Param			hash	path		string	true	"Command hash"
+//	@Success		200		{object}	any		"command statistics"
+//	@Failure		400		{string}	string	"invalid command hash"
+//	@Router			/ajax/{path}/{hash} [get]
+//
+//nolint:dupword
 func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.Request) {
 	cmd := c.triggers.Commands.GetByHash(mux.Vars(request)["hash"])
 	if cmd == nil {
@@ -481,6 +615,13 @@ type Integrations struct {
 }
 
 // handleIntegrations returns the current integrations statuses and data.
+//
+//	@Summary		Get integrations status
+//	@Description	Returns current status and data for all configured integrations including apps, Plex, Tautulli, etc.
+//	@Tags			Integrations
+//	@Produce		json
+//	@Success		200	{object}	Integrations	"integrations status data"
+//	@Router			/integrations [get]
 //
 //nolint:cyclop,funlen
 func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.Request) {
@@ -596,6 +737,17 @@ func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.
 
 // handleRunCommand only handles commands with arguments.
 // Commands without arguments are handled as an instance test.
+//
+//	@Summary		Run command
+//	@Description	Executes a specific command with provided arguments.
+//	@Tags			Integrations
+//	@Accept			application/x-www-form-urlencoded
+//	@Produce		text/plain
+//	@Param			hash	path		string					true	"Command hash"
+//	@Param			args	formData	[]string				false	"Command arguments"	collectionFormat(multi)
+//	@Success		200		{string}	string					"success message"
+//	@Failure		400		{string}	string					"invalid command hash"
+//	@Router			/runCommand/{hash} [post]
 func (c *Client) handleRunCommand(response http.ResponseWriter, request *http.Request) {
 	cmd := c.triggers.Commands.GetByHash(mux.Vars(request)["hash"])
 	if cmd == nil {
@@ -613,6 +765,14 @@ func (c *Client) handleRunCommand(response http.ResponseWriter, request *http.Re
 }
 
 // handleProcessList just returns the running process list for a human to view.
+//
+//	@Summary		Get process list
+//	@Description	Returns a list of currently running system processes.
+//	@Tags			System
+//	@Produce		text/plain
+//	@Success		200	{string}	string	"process list data"
+//	@Failure		500	{string}	string	"error getting process list"
+//	@Router			/ps [get]
 func (c *Client) handleProcessList(response http.ResponseWriter, request *http.Request) {
 	if ps, err := getProcessList(request.Context()); err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
@@ -622,6 +782,18 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 	}
 }
 
+// handleStartFileWatcher starts a file watcher.
+//
+//	@Summary		Start file watcher
+//	@Description	Starts monitoring a specific file for changes.
+//	@Tags			Integrations
+//	@Produce		text/plain
+//	@Param			index	path		int		true	"File watcher index"
+//	@Success		200		{string}	string	"success message"
+//	@Failure		400		{string}	string	"invalid or unknown index"
+//	@Failure		406		{string}	string	"watcher already running"
+//	@Failure		500		{string}	string	"error starting watcher"
+//	@Router			/startFileWatch/{index} [get]
 func (c *Client) handleStartFileWatcher(response http.ResponseWriter, request *http.Request) {
 	idx, err := strconv.Atoi(mux.Vars(request)["index"])
 	if err != nil {
@@ -648,6 +820,18 @@ func (c *Client) handleStartFileWatcher(response http.ResponseWriter, request *h
 	http.Error(response, "Started: "+watch.Path, http.StatusOK)
 }
 
+// handleStopFileWatcher stops a file watcher.
+//
+//	@Summary		Stop file watcher
+//	@Description	Stops monitoring a specific file for changes.
+//	@Tags			Integrations
+//	@Produce		text/plain
+//	@Param			index	path		int		true	"File watcher index"
+//	@Success		200		{string}	string	"success message"
+//	@Failure		400		{string}	string	"invalid or unknown index"
+//	@Failure		406		{string}	string	"watcher already stopped"
+//	@Failure		500		{string}	string	"error stopping watcher"
+//	@Router			/stopFileWatch/{index} [get]
 func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *http.Request) {
 	idx, err := strconv.Atoi(mux.Vars(request)["index"])
 	if err != nil {
@@ -678,24 +862,19 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 	http.Error(response, "Stopped: "+watch.Path, http.StatusOK)
 }
 
-// handleRegexTest tests a regular expression.
-func (c *Client) handleRegexTest(response http.ResponseWriter, request *http.Request) {
-	regex := request.PostFormValue("regexTestRegex")
-	line := request.PostFormValue("regexTestLine")
-
-	switch reg, err := regexp.Compile(regex); {
-	case err != nil:
-		http.Error(response, "Regex Parse Failed: "+err.Error(), http.StatusNotAcceptable)
-	case regex == "":
-		http.Error(response, "Regular Expression is blank!", http.StatusBadRequest)
-	case reg.MatchString(line):
-		http.Error(response, "Regular Expression matches! Found: "+reg.FindString(line), http.StatusOK)
-	default:
-		http.Error(response, "Regular Expression does not match!", http.StatusBadRequest)
-	}
-}
-
 // handleConfigPost handles the reconfig endpoint.
+//
+//	@Summary		Update configuration
+//	@Description	Updates the application configuration with new settings and optionally triggers a reload.
+//	@Tags			System
+//	@Accept			json
+//	@Produce		text/plain
+//	@Param			noreload	query		string	false	"set to 'true' to skip reload"
+//	@Param			config		body		configfile.Config	true	"Configuration data"
+//	@Success		200			{string}	string				"success message"
+//	@Failure		400			{string}	string				"invalid request or config"
+//	@Failure		500			{string}	string				"error saving config"
+//	@Router			/reconfig [post]
 func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Request) {
 	user, _ := c.getUserName(request)
 

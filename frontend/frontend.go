@@ -1,12 +1,12 @@
 package frontend
 
 //go:generate sh generate.sh
-//go:generate go run github.com/swaggo/swag/cmd/swag@latest i --parseDependency --instanceName api --outputTypes json  --parseInternal --dir ../ -g main.go --output ./public
 
 import (
 	"embed"
 	"io/fs"
 	"net/http"
+	"path"
 	"strings"
 
 	"golang.org/x/text/cases"
@@ -41,6 +41,7 @@ func init() {
 type responseWriter struct {
 	http.ResponseWriter
 	Asset     bool
+	Asset2    bool
 	SendIndex bool
 }
 
@@ -90,16 +91,17 @@ func Translations() Languages {
 // IndexHandler returns an asset from the file system if it exists, otherwise the index page.
 // Useful for a single page app.
 func IndexHandler(resp http.ResponseWriter, req *http.Request) {
-	// We serve assets from any parent path.
-	asset, path := stripBefore(req.URL.Path, "/assets/")
-	if asset {
-		req.URL.Path = path
-	}
+	// Remove the URLBase from the file's path.
+	req.URL.Path = strings.TrimPrefix(strings.TrimPrefix(req.URL.Path, URLBase), "/")
 
 	// The frontend uses this cookie to know what path to send API requests to.
 	http.SetCookie(resp, &http.Cookie{Name: "urlbase", Value: URLBase})
 
-	response := &responseWriter{ResponseWriter: resp, Asset: asset}
+	response := &responseWriter{
+		ResponseWriter: resp,
+		Asset:          strings.HasPrefix(req.URL.Path, "assets/"),
+		Asset2:         isAsset(req.URL.Path),
+	}
 	handler.ServeHTTP(response, req)
 
 	if !response.SendIndex {
@@ -110,25 +112,39 @@ func IndexHandler(resp http.ResponseWriter, req *http.Request) {
 	http.ServeFileFS(resp, req, Root, "index.html")
 }
 
+// isAsset returns true if the file is an asset or an allowed file type in the public/ directory.
+func isAsset(filepath string) bool {
+	return strings.HasPrefix(filepath, "assets/") || map[string]bool{
+		".json": true,
+		".svg":  true,
+		".png":  true,
+		".jpg":  true,
+		".ico":  true,
+	}[strings.ToLower(path.Ext(filepath))]
+}
+
 func (w *responseWriter) WriteHeader(status int) {
 	w.ResponseWriter.Header().Set("Cache-Control", "no-cache")
 
 	// if it's found, return 200
 	if status != http.StatusNotFound {
-		w.ResponseWriter.Header().Set("Cache-Control", "max-age=31536000")
+		if w.Asset {
+			w.ResponseWriter.Header().Set("Cache-Control", "max-age=31536000")
+		} else if w.Asset2 {
+			w.ResponseWriter.Header().Set("Cache-Control", "max-age=300")
+		}
 		w.ResponseWriter.WriteHeader(status)
 
 		return
 	}
 
 	// if the request was for an asset and it's 404, return 404.
-	if w.Asset {
+	if w.Asset || w.Asset2 {
 		w.ResponseWriter.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	// if it's not found and doesn't contain "assets", return index
-	w.ResponseWriter.WriteHeader(http.StatusOK)
 	w.SendIndex = true
 }
 
@@ -138,13 +154,4 @@ func (w *responseWriter) Write(p []byte) (int, error) {
 	}
 
 	return len(p), nil
-}
-
-// stripBefore strips any prefix from a string if the sub-string exists.
-func stripBefore(s, sub string) (bool, string) {
-	if index := strings.Index(s, sub); index != -1 {
-		return true, s[index:]
-	}
-
-	return false, s
 }

@@ -12,15 +12,16 @@ import (
 
 // HandleSessions provides a web handler to the notifiarr client that
 // returns the current Plex sessions. The handler satisfies apps.APIHandler, sorry.
-// @Description  Returns Plex sessions directly from Plex.
-// @Summary      Retrieve Plex sessions.
-// @Tags         Plex
-// @Produce      json
-// @Success      200  {object} apps.ApiResponse{message=Sessions} "contains app info included appStatus"
-// @Failure      500  {object} apps.ApiResponse{message=string} "Plex error"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/1/sessions [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Returns Plex sessions directly from Plex.
+//	@Summary		Retrieve Plex sessions.
+//	@Tags			Plex
+//	@Produce		json
+//	@Success		200	{object}	apps.ApiResponse{message=Sessions}	"contains app info included appStatus"
+//	@Failure		500	{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Failure		404	{object}	string								"bad token or api key"
+//	@Router			/plex/1/sessions [get]
+//	@Security		ApiKeyAuth
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -52,17 +53,18 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 
 // HandleKillSession provides a web handler to the notifiarr client that
 // allows notifiarr.com (via Discord request) to end a Plex session.
-// @Description  Kills a Plex session by ID and sends a message to the user.
-// @Summary      Kill a Plex session.
-// @Tags         Plex
-// @Produce      json
-// @Param        sessionId  query   string  true  "Plex session ID"
-// @Param        reason     query   string  true  "Reason the session is being terminated. Sent to the user."
-// @Success      200  {object} apps.ApiResponse{message=string} "success"
-// @Failure      500  {object} apps.ApiResponse{message=string} "Plex error"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/1/kill [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Kills a Plex session by ID and sends a message to the user.
+//	@Summary		Kill a Plex session.
+//	@Tags			Plex
+//	@Produce		json
+//	@Param			sessionId	query		string								true	"Plex session ID"
+//	@Param			reason		query		string								true	"Reason the session is being terminated. Sent to the user."
+//	@Success		200			{object}	apps.ApiResponse{message=string}	"success"
+//	@Failure		500			{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Failure		404			{object}	string								"bad token or api key"
+//	@Router			/plex/1/kill [get]
+//	@Security		ApiKeyAuth
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
 		ctx       = r.Context()
@@ -81,15 +83,16 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 
 // HandleDirectory provides a web handler to the notifiarr client that
 // returns the plex library directory.
-// @Description  Returns the Plex Library Directory.
-// @Summary      Retrieve the Plex Library Directory.
-// @Tags         Plex
-// @Produce      json
-// @Success      200  {object} apps.ApiResponse{message=SectionDirectory} "Plex Library Directory"
-// @Failure      500  {object} apps.ApiResponse{message=string} "Plex error"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/1/directory [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Returns the Plex Library Directory.
+//	@Summary		Retrieve the Plex Library Directory.
+//	@Tags			Plex
+//	@Produce		json
+//	@Success		200	{object}	apps.ApiResponse{message=SectionDirectory}	"Plex Library Directory"
+//	@Failure		500	{object}	apps.ApiResponse{message=string}			"Plex error"
+//	@Failure		404	{object}	string										"bad token or api key"
+//	@Router			/plex/1/directory [get]
+//	@Security		ApiKeyAuth
 func (s *Server) HandleDirectory(req *http.Request) (int, interface{}) {
 	plexID, _ := req.Context().Value(starr.Plex).(int)
 
@@ -110,16 +113,17 @@ func (s *Server) HandleDirectory(req *http.Request) (int, interface{}) {
 
 // HandleEmptyTrash provides a web handler to the notifiarr client that
 // empties a plex library trash.
-// @Description  Empties the Plex library trash for the provided library key. Get the library key from the Directory.
-// @Summary      Empty Plex Trash
-// @Tags         Plex
-// @Produce      json
-// @Param        libraryKey   path    string true  "Plex Library Section Key"
-// @Success      200  {object} apps.ApiResponse{message=string} "ok"
-// @Failure      500  {object} apps.ApiResponse{message=string} "Plex error"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/1/emptytrash/{libraryKey} [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Empties the Plex library trash for the provided library key. Get the library key from the Directory.
+//	@Summary		Empty Plex Trash
+//	@Tags			Plex
+//	@Produce		json
+//	@Param			libraryKey	path		string								true	"Plex Library Section Key"
+//	@Success		200			{object}	apps.ApiResponse{message=string}	"ok"
+//	@Failure		500			{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Failure		404			{object}	string								"bad token or api key"
+//	@Router			/plex/1/emptytrash/{libraryKey} [get]
+//	@Security		ApiKeyAuth
 func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
@@ -133,16 +137,17 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 
 // HandleMarkWatched provides a web handler to the notifiarr client that
 // marks an items as watched.
-// @Description  Marks a movie or show or audio track as watched.
-// @Summary      Mark a Plex item as watched.
-// @Tags         Plex
-// @Produce      json
-// @Param        itemKey  path    string true  "Plex Item Key"
-// @Success      200  {object} apps.ApiResponse{message=string} "ok"
-// @Failure      500  {object} apps.ApiResponse{message=string} "Plex error"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/plex/1/markwatched/{itemKey} [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Marks a movie or show or audio track as watched.
+//	@Summary		Mark a Plex item as watched.
+//	@Tags			Plex
+//	@Produce		json
+//	@Param			itemKey	path		string								true	"Plex Item Key"
+//	@Success		200		{object}	apps.ApiResponse{message=string}	"ok"
+//	@Failure		500		{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Failure		404		{object}	string								"bad token or api key"
+//	@Router			/plex/1/markwatched/{itemKey} [get]
+//	@Security		ApiKeyAuth
 func (s *Server) HandleMarkWatched(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 

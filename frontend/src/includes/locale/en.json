@@ -1646,5 +1646,18 @@
     "menuTitle": "Language Help",
     "title": "Localization Support",
     "body": "This application is available in multiple languages. You can change the language by clicking the language selector in the profile menu. Some languages do not have active translators, so some translations may be incomplete. If you are interested in helping translate the application, please <a href=\"https://notifiarr.com/discord\" target=\"_blank\">visit us on Discord</a>. Head into the <code>#role-request</code> channel and type <code>!roleTranslate</code>. That gives you access to the <code>#translate</code> channel. Please join there and express your interest."
+  },
+  "ApiDocs": {
+    "Choose": "Choose an API to view",
+    "Contrast": "Please report any contrast problems with this page.",
+    "BasePath": "<b>Base Path</b>: <code>{basePath}</code>",
+    "PrivateAPI": {
+      "title": "Private API ({basePath})",
+      "body": "This is the API specification for the Notifiarr.com website. The website uses this API to interact with the client."
+    },
+    "WebUI": {
+      "title": "Web UI ({basePath})",
+      "body": "This specification is for the methods used by the Notifiarr Client frontend to interact with the backend. You're using the frontend right now."
+    }
   }
 }

@@ -16,44 +16,45 @@ import (
  * So we made this file to aggregate responses from each of the app types.
  */
 
-// @Description  Returns custom format and related data for multiple Radarr instances at once. May be slow.
-// @Summary      Retrieve custom format data from multiple Radarr instances.
-// @Tags         TRaSH,Radarr
-// @Produce      json
-// @Accept       json
-// @Param        request body TrashAggInput true "list of instances"
-// @Success      200  {object} apps.ApiResponse{message=[]RadarrTrashPayload} "contains app info included appStatus"
-// @Failure      400  {object} apps.ApiResponse{message=string} "bad input payload or missing app"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/trash/radarr [post]
-// @Security     ApiKeyAuth
+// @Description	Returns custom format and related data for multiple Radarr instances at once. May be slow.
+// @Summary		Retrieve custom format data from multiple Radarr instances.
+// @Tags			TRaSH,Radarr
+// @Produce		json
+// @Accept			json
+// @Param			request	body		TrashAggInput									true	"list of instances"
+// @Success		200		{object}	apps.ApiResponse{message=[]RadarrTrashPayload}	"contains app info included appStatus"
+// @Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
+// @Failure		404		{object}	string											"bad token or api key"
+// @Router			/trash/radarr [post]
+// @Security		ApiKeyAuth
 func _() {}
 
-// @Description  Returns custom format and related data for multiple Lidarr instances at once. May be slow.
-// @Summary      Retrieve custom format data from multiple Lidarr instances.
-// @Tags         TRaSH,Lidarr
-// @Produce      json
-// @Accept       json
-// @Param        request body TrashAggInput true "list of instances"
-// @Success      200  {object} apps.ApiResponse{message=[]LidarrTrashPayload} "contains app info included appStatus"
-// @Failure      400  {object} apps.ApiResponse{message=string} "bad input payload or missing app"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/trash/lidarr [post]
-// @Security     ApiKeyAuth
+// @Description	Returns custom format and related data for multiple Lidarr instances at once. May be slow.
+// @Summary		Retrieve custom format data from multiple Lidarr instances.
+// @Tags			TRaSH,Lidarr
+// @Produce		json
+// @Accept			json
+// @Param			request	body		TrashAggInput									true	"list of instances"
+// @Success		200		{object}	apps.ApiResponse{message=[]LidarrTrashPayload}	"contains app info included appStatus"
+// @Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
+// @Failure		404		{object}	string											"bad token or api key"
+// @Router			/trash/lidarr [post]
+// @Security		ApiKeyAuth
 func _() {}
 
 // Handler is passed into the webserver as an HTTP handler.
-// @Description  Returns custom format and related data for multiple Sonarr instances at once. May be slow.
-// @Summary      Retrieve custom format data from multiple Sonarr instances.
-// @Tags         TRaSH,Sonarr
-// @Produce      json
-// @Accept       json
-// @Param        request body TrashAggInput true "list of instances"
-// @Success      200  {object} apps.ApiResponse{message=[]SonarrTrashPayload} "contains app info included appStatus"
-// @Failure      400  {object} apps.ApiResponse{message=string} "bad input payload or missing app"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/trash/sonarr [post]
-// @Security     ApiKeyAuth
+//
+//	@Description	Returns custom format and related data for multiple Sonarr instances at once. May be slow.
+//	@Summary		Retrieve custom format data from multiple Sonarr instances.
+//	@Tags			TRaSH,Sonarr
+//	@Produce		json
+//	@Accept			json
+//	@Param			request	body		TrashAggInput									true	"list of instances"
+//	@Success		200		{object}	apps.ApiResponse{message=[]SonarrTrashPayload}	"contains app info included appStatus"
+//	@Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
+//	@Failure		404		{object}	string											"bad token or api key"
+//	@Router			/trash/sonarr [post]
+//	@Security		ApiKeyAuth
 func (a *Action) Handler(req *http.Request) (int, interface{}) {
 	return a.cmd.aggregateTrash(req)
 }
