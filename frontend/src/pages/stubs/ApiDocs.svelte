@@ -31,7 +31,7 @@
 
   let loadError = $state('')
   let doc = $state(apiDocs[0])
-  let ui: any
+  let ui = $state<any>()
 
   // https://github.com/swagger-api/swagger-ui/issues/5981
   const UrlMutatorPlugin = (system: any) => ({
