@@ -25,8 +25,8 @@
   import Header from '../../includes/Header.svelte'
 
   const apiDocs = [
-    { what: 'PrivateAPI', file: 'api_swagger.json', path: 'api' },
-    { what: 'WebUI', file: 'ui_swagger.json', path: 'ui' },
+    { id: 'api', file: 'api_swagger.json', path: 'api' },
+    { id: 'ui', file: 'ui_swagger.json', path: 'ui' },
   ]
 
   let loadError = $state('')
@@ -37,6 +37,8 @@
   const UrlMutatorPlugin = (system: any) => ({
     rootInjects: {
       setBasePath: (basePath: string) => {
+        if (doc.id === 'api')
+          system.preauthorizeApiKey('ApiKeyAuth', $profile.config.apiKey)
         const jsonSpec = system.getState().toJSON().spec.json
         return system.specActions.updateJsonSpec({ ...jsonSpec, basePath })
       },
@@ -47,8 +49,6 @@
     ui.specActions.updateUrl($urlbase + doc.file)
     ui.specActions.download($urlbase + doc.file)
     ui.setBasePath($urlbase + doc.path)
-    if (doc.what === 'PrivateAPI')
-      ui.preauthorizeApiKey('ApiKeyAuth', $profile.config.apiKey)
   }
 
   onMount(async () => {
@@ -62,11 +62,7 @@
         plugins: [UrlMutatorPlugin],
         defaultModelsExpandDepth: 0,
         dom_id: '#swagger-ui-container',
-        onComplete: () => {
-          ui.setBasePath($urlbase + doc.path)
-          if (doc.what === 'PrivateAPI')
-            ui.preauthorizeApiKey('ApiKeyAuth', $profile.config.apiKey)
-        },
+        onComplete: () => ui.setBasePath($urlbase + doc.path),
       })
     } catch (error) {
       loadError = error instanceof Error ? error.message : `${error}`
@@ -79,12 +75,12 @@
   <Input type="select" bind:value={doc} {onchange} class="mb-2">
     <option value={null} disabled><T id="ApiDocs.Choose" /></option>
     {#each apiDocs as ad}
-      <option value={ad} selected={ad.what === doc.what}>
-        <T id={`ApiDocs.${ad.what}.title`} basePath={$urlbase + ad.path} />
+      <option value={ad} selected={ad.id === doc.id}>
+        <T id={`ApiDocs.${ad.id}.title`} basePath={$urlbase + ad.path} />
       </option>
     {/each}
   </Input>
-  <T id={`ApiDocs.${doc.what}.body`} />
+  <T id={`ApiDocs.${doc.id}.body`} />
   <ul class="mb-0 mt-2">
     <li><T id="ApiDocs.BasePath" basePath={$urlbase + doc.path} /></li>
   </ul>
