@@ -14389,84 +14389,6 @@
                     }
                 }
             }
-        },
-        "/trigger/{trigger}": {
-            "get": {
-                "description": "Executes a specific trigger action.",
-                "produces": [
-                    "text/plain"
-                ],
-                "tags": [
-                    "Triggers",
-                    "UI"
-                ],
-                "summary": "Trigger action",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Trigger name to execute",
-                        "name": "trigger",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "trigger result",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "unknown trigger",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/trigger/{trigger}/{content}": {
-            "get": {
-                "description": "Executes a specific trigger action.",
-                "produces": [
-                    "text/plain"
-                ],
-                "tags": [
-                    "Triggers",
-                    "UI"
-                ],
-                "summary": "Trigger action",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Trigger name to execute",
-                        "name": "trigger",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Optional content for the trigger",
-                        "name": "content",
-                        "in": "path"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "trigger result",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "unknown trigger",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
@@ -15317,8 +15239,6 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -15335,8 +15255,6 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",

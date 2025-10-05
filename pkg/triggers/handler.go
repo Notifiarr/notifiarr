@@ -30,7 +30,7 @@ func (a *Actions) APIHandler(req *http.Request) (int, interface{}) {
 //
 //	@Summary		Trigger action
 //	@Description	Executes a specific trigger action.
-//	@Tags			Triggers,UI
+//	@Tags			System
 //	@Produce		text/plain
 //	@Param			trigger	path		string	true	"Trigger name to execute"
 //	@Param			content	path		string	false	"Optional content for the trigger"
