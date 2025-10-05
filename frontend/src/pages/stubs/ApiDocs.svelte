@@ -75,7 +75,7 @@
 </script>
 
 <Header {page} badge="v{$profile.version}">
-  <p>Some of the colors on this page, while in dark mode, still need to be fixed.</p>
+  <p><T id="ApiDocs.Contrast" /></p>
   <Input type="select" bind:value={doc} {onchange} class="mb-2">
     <option value={null} disabled><T id="ApiDocs.Choose" /></option>
     {#each apiDocs as ad}
@@ -84,8 +84,10 @@
       </option>
     {/each}
   </Input>
-  <p><T id={`ApiDocs.${doc.what}.body`} /></p>
-  <ul class="mb-0"><li><b>Base Path:</b> <code>{$urlbase + doc.path}</code></li></ul>
+  <T id={`ApiDocs.${doc.what}.body`} />
+  <ul class="mb-0 mt-2">
+    <li><T id="ApiDocs.BasePath" basePath={$urlbase + doc.path} /></li>
+  </ul>
 </Header>
 
 <div id="swagger-ui-container" class:dark-mode={theme.isDark}>
