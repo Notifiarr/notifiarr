@@ -348,7 +348,7 @@ func (c *Client) Exit(ctx context.Context, reload func()) error {
 		select {
 		case data := <-c.reload:
 			reload()
-			if err, reload = c.reloadConfiguration(ctx, data.event, data.msg); err != nil {
+			if reload, err = c.reloadConfiguration(ctx, data.event, data.msg); err != nil {
 				return err
 			}
 		case sigc := <-c.sigkil:
@@ -356,7 +356,7 @@ func (c *Client) Exit(ctx context.Context, reload func()) error {
 			return c.stop(ctx, website.EventSignal)
 		case sigc := <-c.sighup:
 			reload()
-			err, reload = c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
+			reload, err = c.reloadConfiguration(ctx, website.EventSignal, "Caught Signal: "+sigc.String())
 			if err != nil {
 				return err
 			}
@@ -387,12 +387,12 @@ func (c *Client) getConfig() (*configfile.SetupResult, error) {
 // reloadConfiguration is called from a menu tray item or when a HUP signal is received.
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
-func (c *Client) reloadConfiguration(ctx context.Context, event website.EventType, source string) (error, func()) {
+func (c *Client) reloadConfiguration(ctx context.Context, event website.EventType, source string) (func(), error) {
 	logs.Log.Printf("==> Reloading Configuration (%s): %s", event, source)
 
 	err := c.stop(ctx, event)
 	if err != nil {
-		return fmt.Errorf("stopping web server: %w", err), nil
+		return nil, fmt.Errorf("stopping web server: %w", err)
 	}
 
 	// start over.
@@ -400,11 +400,11 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 
 	result, err := c.getConfig()
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
 
 	if errs := logs.Log.Close(); len(errs) > 0 {
-		return fmt.Errorf("closing logger: %w", errs[0]), nil
+		return nil, fmt.Errorf("closing logger: %w", errs[0])
 	}
 
 	defer func() {
@@ -441,7 +441,7 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 	// This doesn't need to lock because web server is not running.
 	c.reloading = false // We're done.
 
-	return nil, reload
+	return reload, nil
 }
 
 // stop is called from at least two different exit points and on reload.

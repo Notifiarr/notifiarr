@@ -205,6 +205,14 @@ func (l *tunnelLogger) Printf(format string, v ...interface{}) {
 const pingTimeout = 7 * time.Second
 
 // pingTunnels is a gui request to check timing to each tunnel.
+//
+//	@Summary		Ping tunnel servers
+//	@Description	Tests connectivity and response times to all configured tunnel servers.
+//	@Tags			System
+//	@Produce		json
+//	@Success		200	{object}	map[int]string	"map of tunnel index to ping time"
+//	@Failure		500	{string}	string			"no client info (startup error)"
+//	@Router			/tunnel/ping [get]
 func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request) {
 	info := clientinfo.Get()
 	if info == nil {
@@ -270,6 +278,17 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 	inCh <- map[int]string{idx: time.Since(start).Round(time.Millisecond).String()}
 }
 
+// saveTunnels saves user-selected tunnel preferences.
+//
+//	@Summary		Save tunnel preferences
+//	@Description	Saves the user's preferred primary and backup tunnel server selections.
+//	@Tags			System
+//	@Accept			json
+//	@Produce		text/plain
+//	@Param			tunnels	body		object{PrimaryTunnel=string,BackupTunnel=[]string}	true	"Tunnel configuration"
+//	@Success		200		{string}	string														"success message"
+//	@Failure		500		{string}	string														"error saving tunnels"
+//	@Router			/tunnel/save [post]
 func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {

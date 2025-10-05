@@ -70,7 +70,8 @@ type PlexConTest struct {
 }
 
 // PlexInfo represents a small slice of the Plex Media Server Data.
-// @Description Contains some very basic Plex data, including the name and version.
+//
+//	@Description	Contains some very basic Plex data, including the name and version.
 type PlexInfo struct {
 	FriendlyName       string `json:"friendlyName"`
 	Version            string `json:"version"`
@@ -100,14 +101,15 @@ type AppStatuses struct {
 }
 
 // InfoHandler is like the version handler except it doesn't poll all the apps.
-// @Description  Returns information about the client's configuration. This endpoint returns all the instance IDs (and instance names if present). Use the returned instance IDs with endpoints that accept an instance ID.
-// @Summary      Retrieve client info.
-// @Tags         Client
-// @Produce      json
-// @Success      200  {object} apps.ApiResponse{message=AppInfo} "contains all info except appStatus"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/info [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Returns information about the client's configuration. This endpoint returns all the instance IDs (and instance names if present). Use the returned instance IDs with endpoints that accept an instance ID.
+//	@Summary		Retrieve client info.
+//	@Tags			Client
+//	@Produce		json
+//	@Success		200	{object}	apps.ApiResponse{message=AppInfo}	"contains all info except appStatus"
+//	@Failure		404	{object}	string								"bad token or api key"
+//	@Router			/api/info [get]
+//	@Security		ApiKeyAuth
 //
 //nolint:lll
 func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
@@ -115,14 +117,15 @@ func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
 }
 
 // VersionHandler returns application run and build time data and application statuses.
-// @Description  Returns information about the client's configuration, and polls multiple applications for up-status and version.
-// @Summary      Retrieve client info + starr/plex info.
-// @Tags         Client
-// @Produce      json
-// @Success      200  {object} apps.ApiResponse{message=AppInfo} "contains app info included appStatus"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/version [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Returns information about the client's configuration, and polls multiple applications for up-status and version.
+//	@Summary		Retrieve client info + starr/plex info.
+//	@Tags			Client
+//	@Produce		json
+//	@Success		200	{object}	apps.ApiResponse{message=AppInfo}	"contains app info included appStatus"
+//	@Failure		404	{object}	string								"bad token or api key"
+//	@Router			/api/version [get]
+//	@Security		ApiKeyAuth
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 	output := c.Info(r.Context(), false)
 	output.AppsStatus = c.appStatsForVersion(r.Context())
@@ -131,17 +134,18 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 }
 
 // VersionHandlerInstance returns application run and build time data and the status for the requested instance.
-// @Description  Returns information about the client's configuration, and polls 1 application instance for up-status and version.
-// @Description  Plex and Tautulli only support app instance 1.
-// @Summary      Retrieve client info + 1 app's info.
-// @Tags         Client
-// @Produce      json
-// @Param        app      path string  true  "Application" Enums(lidarr, prowlarr, radarr, readarr, sonarr, plex, tautulli)
-// @Param        instance path int64   true  "Application instance (1-index)."
-// @Success      200  {object} apps.ApiResponse{message=AppInfo} "contains app info included appStatus"
-// @Failure      404  {object} string "bad token or api key"
-// @Router       /api/version/{app}/{instance} [get]
-// @Security     ApiKeyAuth
+//
+//	@Description	Returns information about the client's configuration, and polls 1 application instance for up-status and version.
+//	@Description	Plex and Tautulli only support app instance 1.
+//	@Summary		Retrieve client info + 1 app's info.
+//	@Tags			Client
+//	@Produce		json
+//	@Param			app			path		string								true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr, plex, tautulli)
+//	@Param			instance	path		int64								true	"Application instance (1-index)."
+//	@Success		200			{object}	apps.ApiResponse{message=AppInfo}	"contains app info included appStatus"
+//	@Failure		404			{object}	string								"bad token or api key"
+//	@Router			/api/version/{app}/{instance} [get]
+//	@Security		ApiKeyAuth
 func (c *Config) VersionHandlerInstance(r *http.Request) (int, interface{}) {
 	output := c.Info(r.Context(), false)
 	instance, _ := strconv.Atoi(mux.Vars(r)["instance"])

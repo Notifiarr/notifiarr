@@ -28,6 +28,17 @@ func (c *Client) socketLog(code int, r *http.Request) {
 		r.Method, r.RequestURI, r.Proto, code, r.Header.Get("Referer"), r.Header.Get("User-Agent"))))
 }
 
+// handleWebSockets establishes a WebSocket connection for real-time log file streaming.
+//
+//	@Summary		WebSocket log streaming
+//	@Description	Establishes a WebSocket connection to stream log file content in real-time.
+//	@Tags			Files
+//	@Param			source	query		string	true	"Source type (logs)"
+//	@Param			fileId	query		string	true	"File ID to stream"
+//	@Success		101		{string}	string	"WebSocket connection established"
+//	@Failure		400		{string}	string	"invalid source or file not found"
+//	@Failure		500		{string}	string	"tail error or websocket upgrade failed"
+//	@Router			/ws [get]
 func (c *Client) handleWebSockets(response http.ResponseWriter, request *http.Request) {
 	defer logs.Log.CapturePanic()
 
