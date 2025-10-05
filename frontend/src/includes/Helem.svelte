@@ -6,7 +6,7 @@
     type IconDefinition,
   } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Fa, { type Props as FaProps } from './Fa.svelte'
-  import { _ } from './Translate.svelte'
+  import { _, json } from './Translate.svelte'
 
   type Props = {
     id: string
@@ -33,7 +33,7 @@
     ...rest
   }: Props = $props()
 
-  const title = $_([parent, id].filter(v => v).join('.'))
+  const title = $json([parent, id].filter(v => v).join('.'))
 </script>
 
 {#snippet image()}
@@ -50,7 +50,7 @@
   {:else}
     {@render image()}
   {/if}
-  {typeof title === 'string' ? title : title['title']}
+  {typeof title === 'string' ? title : (title as any)['title']}
 </svelte:element>
 
 <style>

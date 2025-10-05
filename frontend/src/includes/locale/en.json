@@ -1651,11 +1651,11 @@
     "Choose": "Choose an API to view",
     "Contrast": "Please report any contrast problems with this page.",
     "BasePath": "<b>Base Path</b>: <code>{basePath}</code>",
-    "PrivateAPI": {
+    "api": {
       "title": "Private API ({basePath})",
       "body": "This is the API specification for the Notifiarr.com website. The website uses this API to interact with the client."
     },
-    "WebUI": {
+    "ui": {
       "title": "Web UI ({basePath})",
       "body": "This specification is for the methods used by the Notifiarr Client frontend to interact with the backend. You're using the frontend right now."
     }
@@ -1663,6 +1663,13 @@
   "TestAllInstances": {
     "title": "Test All Instances",
     "Instance": "Instance",
-    "Message": "Message"
+    "Message": "Message",
+    "Status": "Status",
+    "Updated": "<b>Test Updated</b>: <code>{timeDuration}</code>",
+    "TestElapsed": "<b>Test Elapsed</b>: <code>{timeDuration}</code>",
+    "Concurrency": "<b>Concurrency</b>: <code>{workerCount}</code>",
+    "Tested": "<b>Instances Tested</b>: <code>{testCount}</code>",
+    "clickRefresh": "Click the refresh button in the top-right to test again.",
+    "footer": "Use this troubleshooting tool to verify that all your instances are reachable and configured correctly. The timeout is hard coded to 15 seconds, which is close to how long the website will wait for a response."
   }
 }

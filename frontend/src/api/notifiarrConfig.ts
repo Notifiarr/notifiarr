@@ -2101,6 +2101,9 @@ export interface CheckAllOutput {
   Transmission?: TestResult[];
   SabNZB?: TestResult[];
   timeMS: number;
+  elapsed: number;
+  workers: number;
+  instances: number;
 };
 
 /**
@@ -2110,6 +2113,9 @@ export interface CheckAllOutput {
 export interface TestResult {
   status: number;
   message: string;
+  elapsed: string;
+  config: ExtraConfig;
+  app: string;
 };
 
 // Packages parsed:

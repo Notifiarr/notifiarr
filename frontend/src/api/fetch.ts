@@ -20,7 +20,11 @@ export type BackendResponse = { ok: boolean; body: any }
  * @param json Whether to parse the response as JSON.
  * @returns A promise that resolves to the response body as either text or JSON.
  */
-export async function getUi(uri: string, json: boolean = true): Promise<BackendResponse> {
+export async function getUi(
+  uri: string,
+  json: boolean = true,
+  timeout: number = 5000,
+): Promise<BackendResponse> {
   return await request('ui/' + uri, 'GET', null, json)
 }
 
