@@ -73,7 +73,6 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET")
 	gui.HandleFunc("/profile", c.handleProfilePost).Methods("POST")
 	gui.HandleFunc("/ps", c.handleProcessList).Methods("GET")
-	gui.HandleFunc("/regexTest", c.handleRegexTest).Methods("POST")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST").Queries("noreload", "{noreload}")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
 	gui.HandleFunc("/reload", c.handleReload).Methods("GET")

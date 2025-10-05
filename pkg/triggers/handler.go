@@ -27,6 +27,17 @@ func (a *Actions) APIHandler(req *http.Request) (int, interface{}) {
 }
 
 // Handler handles GUI (non-API) trigger requests.
+//
+//	@Summary		Trigger action
+//	@Description	Executes a specific trigger action.
+//	@Tags			Triggers,UI
+//	@Produce		text/plain
+//	@Param			trigger	path		string	true	"Trigger name to execute"
+//	@Param			content	path		string	false	"Optional content for the trigger"
+//	@Success		200		{string}	string	"trigger result"
+//	@Failure		400		{string}	string	"unknown trigger"
+//	@Router			/trigger/{trigger} [get]
+//	@Router			/trigger/{trigger}/{content} [get]
 func (a *Actions) Handler(response http.ResponseWriter, req *http.Request) {
 	code, data := a.handleTrigger(req, website.EventGUI)
 	http.Error(response, data, code)

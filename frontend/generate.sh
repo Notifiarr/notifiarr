@@ -5,6 +5,17 @@
 # And builds the frontend using npm.
 
 set -e
+
+# Generate the API docs.
+go run github.com/swaggo/swag/cmd/swag@latest i \
+    --parseDependency --instanceName api --outputTypes json \
+    --parseInternal --tags !System,!Integrations,!Files --dir ../ -g main.go --output ./public
+
+# Generate the UI docs.
+go run github.com/swaggo/swag/cmd/swag@latest i \
+    --parseDependency --instanceName ui --outputTypes json \
+    --parseInternal --tags System,Integrations,Files --dir ../ -g pkg/client/handlers_gui.go --output ./public
+
 # Install dependencies.
 npm install
 
