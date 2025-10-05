@@ -108,7 +108,7 @@ type AppStatuses struct {
 //	@Produce		json
 //	@Success		200	{object}	apps.ApiResponse{message=AppInfo}	"contains all info except appStatus"
 //	@Failure		404	{object}	string								"bad token or api key"
-//	@Router			/api/info [get]
+//	@Router			/info [get]
 //	@Security		ApiKeyAuth
 //
 //nolint:lll
@@ -124,7 +124,7 @@ func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
 //	@Produce		json
 //	@Success		200	{object}	apps.ApiResponse{message=AppInfo}	"contains app info included appStatus"
 //	@Failure		404	{object}	string								"bad token or api key"
-//	@Router			/api/version [get]
+//	@Router			/version [get]
 //	@Security		ApiKeyAuth
 func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 	output := c.Info(r.Context(), false)
@@ -144,7 +144,7 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 //	@Param			instance	path		int64								true	"Application instance (1-index)."
 //	@Success		200			{object}	apps.ApiResponse{message=AppInfo}	"contains app info included appStatus"
 //	@Failure		404			{object}	string								"bad token or api key"
-//	@Router			/api/version/{app}/{instance} [get]
+//	@Router			/version/{app}/{instance} [get]
 //	@Security		ApiKeyAuth
 func (c *Config) VersionHandlerInstance(r *http.Request) (int, interface{}) {
 	output := c.Info(r.Context(), false)

@@ -14,9 +14,9 @@
         },
         "version": "1.0"
     },
-    "basePath": "/",
+    "basePath": "/api/",
     "paths": {
-        "/api/info": {
+        "/info": {
             "get": {
                 "security": [
                     {
@@ -59,7 +59,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/add": {
+        "/lidarr/{instance}/add": {
             "post": {
                 "security": [
                     {
@@ -214,7 +214,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/artist/{artistID}": {
+        "/lidarr/{instance}/artist/{artistID}": {
             "get": {
                 "security": [
                     {
@@ -293,7 +293,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/check/{mbid}": {
+        "/lidarr/{instance}/check/{mbid}": {
             "get": {
                 "security": [
                     {
@@ -390,7 +390,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/command/search/{albumID}": {
+        "/lidarr/{instance}/command/search/{albumID}": {
             "get": {
                 "security": [
                     {
@@ -469,7 +469,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/customformats": {
+        "/lidarr/{instance}/customformats": {
             "get": {
                 "security": [
                     {
@@ -642,7 +642,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/customformats/all": {
+        "/lidarr/{instance}/customformats/all": {
             "delete": {
                 "security": [
                     {
@@ -713,7 +713,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/customformats/{formatID}": {
+        "/lidarr/{instance}/customformats/{formatID}": {
             "put": {
                 "security": [
                     {
@@ -891,7 +891,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/get/{albumID}": {
+        "/lidarr/{instance}/get/{albumID}": {
             "get": {
                 "security": [
                     {
@@ -970,7 +970,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/metadataProfiles": {
+        "/lidarr/{instance}/metadataProfiles": {
             "get": {
                 "security": [
                     {
@@ -1044,7 +1044,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/naming": {
+        "/lidarr/{instance}/naming": {
             "get": {
                 "security": [
                     {
@@ -1207,7 +1207,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/notification": {
+        "/lidarr/{instance}/notification": {
             "put": {
                 "security": [
                     {
@@ -1408,7 +1408,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/notifications": {
+        "/lidarr/{instance}/notifications": {
             "get": {
                 "security": [
                     {
@@ -1482,7 +1482,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/qualityDefinitions": {
+        "/lidarr/{instance}/qualityDefinitions": {
             "get": {
                 "security": [
                     {
@@ -1556,7 +1556,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/qualityProfile": {
+        "/lidarr/{instance}/qualityProfile": {
             "get": {
                 "security": [
                     {
@@ -1730,7 +1730,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/qualityProfile/{profileID}": {
+        "/lidarr/{instance}/qualityProfile/{profileID}": {
             "put": {
                 "security": [
                     {
@@ -1857,7 +1857,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/qualityProfiles": {
+        "/lidarr/{instance}/qualityProfiles": {
             "get": {
                 "security": [
                     {
@@ -1931,7 +1931,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/qualitydefinition": {
+        "/lidarr/{instance}/qualitydefinition": {
             "put": {
                 "security": [
                     {
@@ -2038,7 +2038,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/queue/{queueID}": {
+        "/lidarr/{instance}/queue/{queueID}": {
             "delete": {
                 "security": [
                     {
@@ -2147,7 +2147,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/rootFolder": {
+        "/lidarr/{instance}/rootFolder": {
             "get": {
                 "security": [
                     {
@@ -2222,7 +2222,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/search/{query}": {
+        "/lidarr/{instance}/search/{query}": {
             "get": {
                 "security": [
                     {
@@ -2303,7 +2303,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/tag": {
+        "/lidarr/{instance}/tag": {
             "get": {
                 "security": [
                     {
@@ -2377,7 +2377,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/tag/{label}": {
+        "/lidarr/{instance}/tag/{label}": {
             "put": {
                 "security": [
                     {
@@ -2456,7 +2456,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/tag/{tagID}/{label}": {
+        "/lidarr/{instance}/tag/{tagID}/{label}": {
             "put": {
                 "security": [
                     {
@@ -2543,7 +2543,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/update": {
+        "/lidarr/{instance}/update": {
             "put": {
                 "security": [
                     {
@@ -2652,7 +2652,7 @@
                 }
             }
         },
-        "/api/lidarr/{instance}/updateartist": {
+        "/lidarr/{instance}/updateartist": {
             "put": {
                 "security": [
                     {
@@ -2753,7 +2753,7 @@
                 }
             }
         },
-        "/api/ping": {
+        "/ping": {
             "get": {
                 "security": [
                     {
@@ -2802,7 +2802,7 @@
                 }
             }
         },
-        "/api/ping/{apps}": {
+        "/ping/{apps}": {
             "get": {
                 "security": [
                     {
@@ -2867,7 +2867,7 @@
                 }
             }
         },
-        "/api/ping/{app}/{instance}": {
+        "/ping/{app}/{instance}": {
             "get": {
                 "security": [
                     {
@@ -2940,7 +2940,66 @@
                 }
             }
         },
-        "/api/plex/1/directory": {
+        "/plex": {
+            "post": {
+                "description": "Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,\nand may include snapshot data and/or fetched session data. Does not require X-API-Key header.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "Plex"
+                ],
+                "summary": "Accept Plex Media Server Webhook",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Plex Token or Client API Key",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "webhook payload",
+                        "name": "POST",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/plex.IncomingWebhook"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "accepted",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "208": {
+                        "description": "ignored",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "bad input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/plex/1/directory": {
             "get": {
                 "security": [
                     {
@@ -3001,7 +3060,7 @@
                 }
             }
         },
-        "/api/plex/1/emptytrash/{libraryKey}": {
+        "/plex/1/emptytrash/{libraryKey}": {
             "get": {
                 "security": [
                     {
@@ -3071,7 +3130,7 @@
                 }
             }
         },
-        "/api/plex/1/kill": {
+        "/plex/1/kill": {
             "get": {
                 "security": [
                     {
@@ -3148,7 +3207,7 @@
                 }
             }
         },
-        "/api/plex/1/markwatched/{itemKey}": {
+        "/plex/1/markwatched/{itemKey}": {
             "get": {
                 "security": [
                     {
@@ -3218,7 +3277,7 @@
                 }
             }
         },
-        "/api/plex/1/sessions": {
+        "/plex/1/sessions": {
             "get": {
                 "security": [
                     {
@@ -3279,7 +3338,7 @@
                 }
             }
         },
-        "/api/prowlarr/{instance}/notification": {
+        "/prowlarr/{instance}/notification": {
             "put": {
                 "security": [
                     {
@@ -3480,7 +3539,7 @@
                 }
             }
         },
-        "/api/prowlarr/{instance}/notifications": {
+        "/prowlarr/{instance}/notifications": {
             "get": {
                 "security": [
                     {
@@ -3554,7 +3613,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/add": {
+        "/radarr/{instance}/add": {
             "post": {
                 "security": [
                     {
@@ -3709,7 +3768,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/check/{tmdbid}": {
+        "/radarr/{instance}/check/{tmdbid}": {
             "get": {
                 "security": [
                     {
@@ -3806,7 +3865,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/command/search/{movieID}": {
+        "/radarr/{instance}/command/search/{movieID}": {
             "get": {
                 "security": [
                     {
@@ -3885,7 +3944,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/customformats": {
+        "/radarr/{instance}/customformats": {
             "get": {
                 "security": [
                     {
@@ -4058,7 +4117,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/customformats/all": {
+        "/radarr/{instance}/customformats/all": {
             "delete": {
                 "security": [
                     {
@@ -4129,7 +4188,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/customformats/{formatID}": {
+        "/radarr/{instance}/customformats/{formatID}": {
             "put": {
                 "security": [
                     {
@@ -4307,7 +4366,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/delete/{movieFileID}": {
+        "/radarr/{instance}/delete/{movieFileID}": {
             "delete": {
                 "security": [
                     {
@@ -4392,7 +4451,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/delete/{movieID}": {
+        "/radarr/{instance}/delete/{movieID}": {
             "post": {
                 "security": [
                     {
@@ -4477,7 +4536,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/exclusions": {
+        "/radarr/{instance}/exclusions": {
             "get": {
                 "security": [
                     {
@@ -4653,7 +4712,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/exclusions/{exclusionIDs}": {
+        "/radarr/{instance}/exclusions/{exclusionIDs}": {
             "delete": {
                 "security": [
                     {
@@ -4736,7 +4795,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/get": {
+        "/radarr/{instance}/get": {
             "get": {
                 "security": [
                     {
@@ -4810,7 +4869,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/get/{movieID}": {
+        "/radarr/{instance}/get/{movieID}": {
             "get": {
                 "security": [
                     {
@@ -4889,7 +4948,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/importlist": {
+        "/radarr/{instance}/importlist": {
             "get": {
                 "security": [
                     {
@@ -5062,7 +5121,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/importlist/{listID}": {
+        "/radarr/{instance}/importlist/{listID}": {
             "put": {
                 "security": [
                     {
@@ -5171,7 +5230,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/naming": {
+        "/radarr/{instance}/naming": {
             "get": {
                 "security": [
                     {
@@ -5334,7 +5393,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/notification": {
+        "/radarr/{instance}/notification": {
             "put": {
                 "security": [
                     {
@@ -5535,7 +5594,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/notifications": {
+        "/radarr/{instance}/notifications": {
             "get": {
                 "security": [
                     {
@@ -5609,7 +5668,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/qualityProfile": {
+        "/radarr/{instance}/qualityProfile": {
             "get": {
                 "security": [
                     {
@@ -5783,7 +5842,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/qualityProfile/{profileID}": {
+        "/radarr/{instance}/qualityProfile/{profileID}": {
             "put": {
                 "security": [
                     {
@@ -6005,7 +6064,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/qualityProfiles": {
+        "/radarr/{instance}/qualityProfiles": {
             "get": {
                 "security": [
                     {
@@ -6079,7 +6138,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/qualityProfiles/all": {
+        "/radarr/{instance}/qualityProfiles/all": {
             "delete": {
                 "security": [
                     {
@@ -6150,7 +6209,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/qualitydefinition": {
+        "/radarr/{instance}/qualitydefinition": {
             "get": {
                 "security": [
                     {
@@ -6329,7 +6388,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/queue/{queueID}": {
+        "/radarr/{instance}/queue/{queueID}": {
             "delete": {
                 "security": [
                     {
@@ -6438,7 +6497,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/rootFolder": {
+        "/radarr/{instance}/rootFolder": {
             "get": {
                 "security": [
                     {
@@ -6513,7 +6572,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/search/{query}": {
+        "/radarr/{instance}/search/{query}": {
             "get": {
                 "security": [
                     {
@@ -6594,7 +6653,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/tag": {
+        "/radarr/{instance}/tag": {
             "get": {
                 "security": [
                     {
@@ -6668,7 +6727,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/tag/{label}": {
+        "/radarr/{instance}/tag/{label}": {
             "put": {
                 "security": [
                     {
@@ -6747,7 +6806,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/tag/{tagID}/{label}": {
+        "/radarr/{instance}/tag/{tagID}/{label}": {
             "put": {
                 "security": [
                     {
@@ -6834,7 +6893,7 @@
                 }
             }
         },
-        "/api/radarr/{instance}/update": {
+        "/radarr/{instance}/update": {
             "put": {
                 "security": [
                     {
@@ -6943,7 +7002,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/add": {
+        "/readarr/{instance}/add": {
             "post": {
                 "security": [
                     {
@@ -7098,7 +7157,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/author/{authorID}": {
+        "/readarr/{instance}/author/{authorID}": {
             "get": {
                 "security": [
                     {
@@ -7177,7 +7236,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/check/{gridID}": {
+        "/readarr/{instance}/check/{gridID}": {
             "get": {
                 "security": [
                     {
@@ -7274,7 +7333,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/get/{bookID}": {
+        "/readarr/{instance}/get/{bookID}": {
             "get": {
                 "security": [
                     {
@@ -7353,7 +7412,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/metadataProfiles": {
+        "/readarr/{instance}/metadataProfiles": {
             "get": {
                 "security": [
                     {
@@ -7427,7 +7486,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/notification": {
+        "/readarr/{instance}/notification": {
             "put": {
                 "security": [
                     {
@@ -7628,7 +7687,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/notifications": {
+        "/readarr/{instance}/notifications": {
             "get": {
                 "security": [
                     {
@@ -7702,7 +7761,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/qualityProfile": {
+        "/readarr/{instance}/qualityProfile": {
             "get": {
                 "security": [
                     {
@@ -7876,7 +7935,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/qualityProfile/{profileID}": {
+        "/readarr/{instance}/qualityProfile/{profileID}": {
             "put": {
                 "security": [
                     {
@@ -7991,7 +8050,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/qualityProfiles": {
+        "/readarr/{instance}/qualityProfiles": {
             "get": {
                 "security": [
                     {
@@ -8065,7 +8124,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/queue/{queueID}": {
+        "/readarr/{instance}/queue/{queueID}": {
             "delete": {
                 "security": [
                     {
@@ -8174,7 +8233,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/rootFolder": {
+        "/readarr/{instance}/rootFolder": {
             "get": {
                 "security": [
                     {
@@ -8249,7 +8308,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/search/{query}": {
+        "/readarr/{instance}/search/{query}": {
             "get": {
                 "security": [
                     {
@@ -8330,7 +8389,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/tag": {
+        "/readarr/{instance}/tag": {
             "get": {
                 "security": [
                     {
@@ -8404,7 +8463,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/tag/{label}": {
+        "/readarr/{instance}/tag/{label}": {
             "put": {
                 "security": [
                     {
@@ -8483,7 +8542,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/tag/{tagID}/{label}": {
+        "/readarr/{instance}/tag/{tagID}/{label}": {
             "put": {
                 "security": [
                     {
@@ -8570,7 +8629,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/update": {
+        "/readarr/{instance}/update": {
             "put": {
                 "security": [
                     {
@@ -8679,7 +8738,7 @@
                 }
             }
         },
-        "/api/readarr/{instance}/updateauthor": {
+        "/readarr/{instance}/updateauthor": {
             "put": {
                 "security": [
                     {
@@ -8780,7 +8839,7 @@
                 }
             }
         },
-        "/api/services/list": {
+        "/services/list": {
             "get": {
                 "security": [
                     {
@@ -8826,7 +8885,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}": {
+        "/sonarr/{instance}": {
             "put": {
                 "security": [
                     {
@@ -8914,7 +8973,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/add": {
+        "/sonarr/{instance}/add": {
             "post": {
                 "security": [
                     {
@@ -9069,7 +9128,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/check/{tvdbid}": {
+        "/sonarr/{instance}/check/{tvdbid}": {
             "get": {
                 "security": [
                     {
@@ -9166,7 +9225,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/command": {
+        "/sonarr/{instance}/command": {
             "post": {
                 "security": [
                     {
@@ -9267,7 +9326,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/command/search/{seriesID}": {
+        "/sonarr/{instance}/command/search/{seriesID}": {
             "get": {
                 "security": [
                     {
@@ -9346,7 +9405,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/command/{commandID}": {
+        "/sonarr/{instance}/command/{commandID}": {
             "get": {
                 "security": [
                     {
@@ -9425,7 +9484,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/customformats": {
+        "/sonarr/{instance}/customformats": {
             "get": {
                 "security": [
                     {
@@ -9598,7 +9657,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/customformats/all": {
+        "/sonarr/{instance}/customformats/all": {
             "delete": {
                 "security": [
                     {
@@ -9669,7 +9728,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/customformats/{formatID}": {
+        "/sonarr/{instance}/customformats/{formatID}": {
             "put": {
                 "security": [
                     {
@@ -9855,7 +9914,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/delete/{episodeFileID}": {
+        "/sonarr/{instance}/delete/{episodeFileID}": {
             "post": {
                 "security": [
                     {
@@ -9940,7 +9999,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/get/{seriesID}": {
+        "/sonarr/{instance}/get/{seriesID}": {
             "get": {
                 "security": [
                     {
@@ -10019,7 +10078,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/getEpisodes/{seriesID}": {
+        "/sonarr/{instance}/getEpisodes/{seriesID}": {
             "get": {
                 "security": [
                     {
@@ -10101,7 +10160,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/importlist": {
+        "/sonarr/{instance}/importlist": {
             "get": {
                 "security": [
                     {
@@ -10274,7 +10333,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/importlist/{listID}": {
+        "/sonarr/{instance}/importlist/{listID}": {
             "put": {
                 "security": [
                     {
@@ -10383,7 +10442,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/languageProfiles": {
+        "/sonarr/{instance}/languageProfiles": {
             "get": {
                 "security": [
                     {
@@ -10457,7 +10516,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/naming": {
+        "/sonarr/{instance}/naming": {
             "get": {
                 "security": [
                     {
@@ -10620,7 +10679,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/notification": {
+        "/sonarr/{instance}/notification": {
             "put": {
                 "security": [
                     {
@@ -10821,7 +10880,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/notifications": {
+        "/sonarr/{instance}/notifications": {
             "get": {
                 "security": [
                     {
@@ -10895,7 +10954,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/qualityProfile": {
+        "/sonarr/{instance}/qualityProfile": {
             "get": {
                 "security": [
                     {
@@ -11069,7 +11128,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/qualityProfile/{profileID}": {
+        "/sonarr/{instance}/qualityProfile/{profileID}": {
             "put": {
                 "security": [
                     {
@@ -11291,7 +11350,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/qualityProfiles": {
+        "/sonarr/{instance}/qualityProfiles": {
             "get": {
                 "security": [
                     {
@@ -11365,7 +11424,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/qualityProfiles/all": {
+        "/sonarr/{instance}/qualityProfiles/all": {
             "delete": {
                 "security": [
                     {
@@ -11436,7 +11495,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/qualitydefinition": {
+        "/sonarr/{instance}/qualitydefinition": {
             "get": {
                 "security": [
                     {
@@ -11615,7 +11674,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/queue/{queueID}": {
+        "/sonarr/{instance}/queue/{queueID}": {
             "delete": {
                 "security": [
                     {
@@ -11724,7 +11783,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/releaseProfile": {
+        "/sonarr/{instance}/releaseProfile": {
             "get": {
                 "security": [
                     {
@@ -11898,7 +11957,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/releaseProfile/all": {
+        "/sonarr/{instance}/releaseProfile/all": {
             "delete": {
                 "security": [
                     {
@@ -11969,7 +12028,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/releaseProfile/{profileID}": {
+        "/sonarr/{instance}/releaseProfile/{profileID}": {
             "put": {
                 "security": [
                     {
@@ -12191,7 +12250,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/rootFolder": {
+        "/sonarr/{instance}/rootFolder": {
             "get": {
                 "security": [
                     {
@@ -12266,7 +12325,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/search/{query}": {
+        "/sonarr/{instance}/search/{query}": {
             "get": {
                 "security": [
                     {
@@ -12347,7 +12406,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/seasonPass": {
+        "/sonarr/{instance}/seasonPass": {
             "post": {
                 "security": [
                     {
@@ -12448,7 +12507,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/tag": {
+        "/sonarr/{instance}/tag": {
             "get": {
                 "security": [
                     {
@@ -12522,7 +12581,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/tag/{label}": {
+        "/sonarr/{instance}/tag/{label}": {
             "put": {
                 "security": [
                     {
@@ -12601,7 +12660,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/tag/{tagID}/{label}": {
+        "/sonarr/{instance}/tag/{tagID}/{label}": {
             "put": {
                 "security": [
                     {
@@ -12688,7 +12747,7 @@
                 }
             }
         },
-        "/api/sonarr/{instance}/unmonitor/{episodeID}": {
+        "/sonarr/{instance}/unmonitor/{episodeID}": {
             "get": {
                 "security": [
                     {
@@ -12767,7 +12826,7 @@
                 }
             }
         },
-        "/api/trash/lidarr": {
+        "/trash/lidarr": {
             "post": {
                 "security": [
                     {
@@ -12846,7 +12905,7 @@
                 }
             }
         },
-        "/api/trash/radarr": {
+        "/trash/radarr": {
             "post": {
                 "security": [
                     {
@@ -12925,7 +12984,7 @@
                 }
             }
         },
-        "/api/trash/sonarr": {
+        "/trash/sonarr": {
             "post": {
                 "security": [
                     {
@@ -13004,7 +13063,7 @@
                 }
             }
         },
-        "/api/trigger/backup/{app}": {
+        "/trigger/backup/{app}": {
             "get": {
                 "security": [
                     {
@@ -13074,7 +13133,7 @@
                 }
             }
         },
-        "/api/trigger/cfsync/{instance}": {
+        "/trigger/cfsync/{instance}": {
             "get": {
                 "security": [
                     {
@@ -13126,7 +13185,7 @@
                 }
             }
         },
-        "/api/trigger/clientlogs/{enabled}": {
+        "/trigger/clientlogs/{enabled}": {
             "get": {
                 "security": [
                     {
@@ -13178,7 +13237,7 @@
                 }
             }
         },
-        "/api/trigger/command/{hash}": {
+        "/trigger/command/{hash}": {
             "get": {
                 "security": [
                     {
@@ -13331,7 +13390,7 @@
                 }
             }
         },
-        "/api/trigger/corrupt/{app}": {
+        "/trigger/corrupt/{app}": {
             "get": {
                 "security": [
                     {
@@ -13401,7 +13460,7 @@
                 }
             }
         },
-        "/api/trigger/custom/{idx}": {
+        "/trigger/custom/{idx}": {
             "get": {
                 "security": [
                     {
@@ -13459,7 +13518,7 @@
                 }
             }
         },
-        "/api/trigger/dashboard": {
+        "/trigger/dashboard": {
             "get": {
                 "security": [
                     {
@@ -13502,7 +13561,7 @@
                 }
             }
         },
-        "/api/trigger/emptyplextrash/{libraryKeys}": {
+        "/trigger/emptyplextrash/{libraryKeys}": {
             "get": {
                 "security": [
                     {
@@ -13577,7 +13636,7 @@
                 }
             }
         },
-        "/api/trigger/endpoint/{name}": {
+        "/trigger/endpoint/{name}": {
             "get": {
                 "security": [
                     {
@@ -13647,7 +13706,7 @@
                 }
             }
         },
-        "/api/trigger/gaps": {
+        "/trigger/gaps": {
             "get": {
                 "security": [
                     {
@@ -13690,7 +13749,7 @@
                 }
             }
         },
-        "/api/trigger/mdblist": {
+        "/trigger/mdblist": {
             "get": {
                 "security": [
                     {
@@ -13733,7 +13792,7 @@
                 }
             }
         },
-        "/api/trigger/notification/{content}": {
+        "/trigger/notification/{content}": {
             "get": {
                 "security": [
                     {
@@ -13803,7 +13862,7 @@
                 }
             }
         },
-        "/api/trigger/reload": {
+        "/trigger/reload": {
             "get": {
                 "security": [
                     {
@@ -13846,7 +13905,7 @@
                 }
             }
         },
-        "/api/trigger/rpsync/{instance}": {
+        "/trigger/rpsync/{instance}": {
             "get": {
                 "security": [
                     {
@@ -13898,7 +13957,7 @@
                 }
             }
         },
-        "/api/trigger/services": {
+        "/trigger/services": {
             "get": {
                 "security": [
                     {
@@ -13941,7 +14000,7 @@
                 }
             }
         },
-        "/api/trigger/sessions": {
+        "/trigger/sessions": {
             "get": {
                 "security": [
                     {
@@ -14002,7 +14061,7 @@
                 }
             }
         },
-        "/api/trigger/snapshot": {
+        "/trigger/snapshot": {
             "get": {
                 "security": [
                     {
@@ -14045,7 +14104,7 @@
                 }
             }
         },
-        "/api/trigger/stuckitems": {
+        "/trigger/stuckitems": {
             "get": {
                 "security": [
                     {
@@ -14088,7 +14147,7 @@
                 }
             }
         },
-        "/api/trigger/uploadlog/{file}": {
+        "/trigger/uploadlog/{file}": {
             "get": {
                 "security": [
                     {
@@ -14176,7 +14235,7 @@
                 }
             }
         },
-        "/api/triggers": {
+        "/triggers": {
             "get": {
                 "security": [
                     {
@@ -14219,7 +14278,7 @@
                 }
             }
         },
-        "/api/version": {
+        "/version": {
             "get": {
                 "security": [
                     {
@@ -14262,7 +14321,7 @@
                 }
             }
         },
-        "/api/version/{app}/{instance}": {
+        "/version/{app}/{instance}": {
             "get": {
                 "security": [
                     {
@@ -14320,65 +14379,6 @@
                                     }
                                 }
                             ]
-                        }
-                    },
-                    "404": {
-                        "description": "bad token or api key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/plex": {
-            "post": {
-                "description": "Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,\nand may include snapshot data and/or fetched session data. Does not require X-API-Key header.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "text/plain"
-                ],
-                "tags": [
-                    "Plex"
-                ],
-                "summary": "Accept Plex Media Server Webhook",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Plex Token or Client API Key",
-                        "name": "token",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "webhook payload",
-                        "name": "POST",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/plex.IncomingWebhook"
-                        }
-                    }
-                ],
-                "responses": {
-                    "202": {
-                        "description": "accepted",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "208": {
-                        "description": "ignored",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "bad input",
-                        "schema": {
-                            "type": "string"
                         }
                     },
                     "404": {
@@ -15239,6 +15239,8 @@
                         1000000000,
                         60000000000,
                         3600000000000,
+                        -9223372036854775808,
+                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -15255,6 +15257,8 @@
                         "Second",
                         "Minute",
                         "Hour",
+                        "minDuration",
+                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",

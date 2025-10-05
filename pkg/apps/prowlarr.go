@@ -68,7 +68,7 @@ func (a *AppsConfig) setupProwlarr() ([]Prowlarr, error) {
 // @Success		200			{object}	apps.ApiResponse{message=[]prowlarr.NotificationOutput}	"notifications"
 // @Failure		503			{object}	apps.ApiResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
-// @Router			/api/prowlarr/{instance}/notifications [get]
+// @Router			/prowlarr/{instance}/notifications [get]
 // @Security		ApiKeyAuth
 func prowlarrGetNotifications(req *http.Request) (int, interface{}) {
 	notifs, err := getProwlarr(req).GetNotificationsContext(req.Context())
@@ -98,7 +98,7 @@ func prowlarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"bad json input"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/prowlarr/{instance}/notification [put]
+// @Router			/prowlarr/{instance}/notification [put]
 // @Security		ApiKeyAuth
 func prowlarrUpdateNotification(req *http.Request) (int, interface{}) {
 	var notif prowlarr.NotificationInput
@@ -127,7 +127,7 @@ func prowlarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"json input error"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/prowlarr/{instance}/notification [post]
+// @Router			/prowlarr/{instance}/notification [post]
 // @Security		ApiKeyAuth
 func prowlarrAddNotification(req *http.Request) (int, interface{}) {
 	var notif prowlarr.NotificationInput

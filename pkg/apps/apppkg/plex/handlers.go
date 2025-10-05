@@ -20,7 +20,7 @@ import (
 //	@Success		200	{object}	apps.ApiResponse{message=Sessions}	"contains app info included appStatus"
 //	@Failure		500	{object}	apps.ApiResponse{message=string}	"Plex error"
 //	@Failure		404	{object}	string								"bad token or api key"
-//	@Router			/api/plex/1/sessions [get]
+//	@Router			/plex/1/sessions [get]
 //	@Security		ApiKeyAuth
 func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
@@ -63,7 +63,7 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 //	@Success		200			{object}	apps.ApiResponse{message=string}	"success"
 //	@Failure		500			{object}	apps.ApiResponse{message=string}	"Plex error"
 //	@Failure		404			{object}	string								"bad token or api key"
-//	@Router			/api/plex/1/kill [get]
+//	@Router			/plex/1/kill [get]
 //	@Security		ApiKeyAuth
 func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 	var (
@@ -91,7 +91,7 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 //	@Success		200	{object}	apps.ApiResponse{message=SectionDirectory}	"Plex Library Directory"
 //	@Failure		500	{object}	apps.ApiResponse{message=string}			"Plex error"
 //	@Failure		404	{object}	string										"bad token or api key"
-//	@Router			/api/plex/1/directory [get]
+//	@Router			/plex/1/directory [get]
 //	@Security		ApiKeyAuth
 func (s *Server) HandleDirectory(req *http.Request) (int, interface{}) {
 	plexID, _ := req.Context().Value(starr.Plex).(int)
@@ -122,7 +122,7 @@ func (s *Server) HandleDirectory(req *http.Request) (int, interface{}) {
 //	@Success		200			{object}	apps.ApiResponse{message=string}	"ok"
 //	@Failure		500			{object}	apps.ApiResponse{message=string}	"Plex error"
 //	@Failure		404			{object}	string								"bad token or api key"
-//	@Router			/api/plex/1/emptytrash/{libraryKey} [get]
+//	@Router			/plex/1/emptytrash/{libraryKey} [get]
 //	@Security		ApiKeyAuth
 func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
@@ -146,7 +146,7 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 //	@Success		200		{object}	apps.ApiResponse{message=string}	"ok"
 //	@Failure		500		{object}	apps.ApiResponse{message=string}	"Plex error"
 //	@Failure		404		{object}	string								"bad token or api key"
-//	@Router			/api/plex/1/markwatched/{itemKey} [get]
+//	@Router			/plex/1/markwatched/{itemKey} [get]
 //	@Security		ApiKeyAuth
 func (s *Server) HandleMarkWatched(r *http.Request) (int, interface{}) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)

@@ -125,7 +125,7 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 // @Failure		503			{object}	apps.ApiResponse{message=string}		"instance error during check"
 // @Failure		500			{object}	apps.ApiResponse{message=string}		"instance error during add"
 // @Failure		404			{object}	string									"bad token or api key"
-// @Router			/api/sonarr/{instance}/add [post]
+// @Router			/sonarr/{instance}/add [post]
 // @Security		ApiKeyAuth
 func sonarrAddSeries(req *http.Request) (int, interface{}) {
 	var payload sonarr.AddSeriesInput
@@ -177,7 +177,7 @@ func sonarrData(series *sonarr.Series) map[string]interface{} {
 // @Failure		409			{object}	apps.ApiResponse{message=string}	"item already exists"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/check/{tvdbid} [get]
+// @Router			/sonarr/{instance}/check/{tvdbid} [get]
 // @Security		ApiKeyAuth
 func sonarrCheckSeries(req *http.Request) (int, interface{}) {
 	tvdbid, _ := strconv.ParseInt(mux.Vars(req)["tvdbid"], mnd.Base10, mnd.Bits64)
@@ -201,7 +201,7 @@ func sonarrCheckSeries(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=sonarr.Series}	"series content"
 // @Failure		503			{object}	apps.ApiResponse{message=string}		"instance error"
 // @Failure		404			{object}	string									"bad token or api key"
-// @Router			/api/sonarr/{instance}/get/{seriesID} [get]
+// @Router			/sonarr/{instance}/get/{seriesID} [get]
 // @Security		ApiKeyAuth
 func sonarrGetSeries(req *http.Request) (int, interface{}) {
 	seriesID, _ := strconv.ParseInt(mux.Vars(req)["seriesid"], mnd.Base10, mnd.Bits64)
@@ -223,7 +223,7 @@ func sonarrGetSeries(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=[]sonarr.Episode}	"episodes content"
 // @Failure		503			{object}	apps.ApiResponse{message=string}			"instance error"
 // @Failure		404			{object}	string										"bad token or api key"
-// @Router			/api/sonarr/{instance}/getEpisodes/{seriesID} [get]
+// @Router			/sonarr/{instance}/getEpisodes/{seriesID} [get]
 // @Security		ApiKeyAuth
 func sonarrGetEpisodes(req *http.Request) (int, interface{}) {
 	seriesID, _ := strconv.ParseInt(mux.Vars(req)["seriesid"], mnd.Base10, mnd.Bits64)
@@ -245,7 +245,7 @@ func sonarrGetEpisodes(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=sonarr.Episode}	"episode content"
 // @Failure		503			{object}	apps.ApiResponse{message=string}			"instance error"
 // @Failure		404			{object}	string										"bad token or api key"
-// @Router			/api/sonarr/{instance}/unmonitor/{episodeID} [get]
+// @Router			/sonarr/{instance}/unmonitor/{episodeID} [get]
 // @Security		ApiKeyAuth
 func sonarrUnmonitorEpisode(req *http.Request) (int, interface{}) {
 	episodeID, _ := strconv.ParseInt(mux.Vars(req)["episodeid"], mnd.Base10, mnd.Bits64)
@@ -269,7 +269,7 @@ func sonarrUnmonitorEpisode(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=string}	"search status"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/command/search/{seriesID} [get]
+// @Router			/sonarr/{instance}/command/search/{seriesID} [get]
 // @Security		ApiKeyAuth
 func sonarrTriggerSearchSeries(req *http.Request) (int, interface{}) {
 	seriesID, _ := strconv.ParseInt(mux.Vars(req)["seriesid"], mnd.Base10, mnd.Bits64)
@@ -296,7 +296,7 @@ func sonarrTriggerSearchSeries(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}					"invalid json input"
 // @Failure		503			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/command [post]
+// @Router			/sonarr/{instance}/command [post]
 // @Security		ApiKeyAuth
 func sonarrTriggerCommand(req *http.Request) (int, interface{}) {
 	var command sonarr.CommandRequest
@@ -324,7 +324,7 @@ func sonarrTriggerCommand(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=sonarr.CommandResponse}	"command status"
 // @Failure		503			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/command/{commandID} [get]
+// @Router			/sonarr/{instance}/command/{commandID} [get]
 // @Security		ApiKeyAuth
 func sonarrStatusCommand(req *http.Request) (int, interface{}) {
 	commandID, _ := strconv.ParseInt(mux.Vars(req)["commandid"], mnd.Base10, mnd.Bits64)
@@ -346,7 +346,7 @@ func sonarrStatusCommand(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=map[int64]string}	"map of ID to name"
 // @Failure		500			{object}	apps.ApiResponse{message=string}			"instance error"
 // @Failure		404			{object}	string										"bad token or api key"
-// @Router			/api/sonarr/{instance}/languageProfiles [get]
+// @Router			/sonarr/{instance}/languageProfiles [get]
 // @Security		ApiKeyAuth
 func sonarrLangProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
@@ -372,7 +372,7 @@ func sonarrLangProfiles(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=[]sonarr.QualityProfile}	"all profiles"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualityProfile [get]
+// @Router			/sonarr/{instance}/qualityProfile [get]
 // @Security		ApiKeyAuth
 func sonarrGetQualityProfile(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
@@ -392,7 +392,7 @@ func sonarrGetQualityProfile(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=map[int64]string}	"map of ID to name"
 // @Failure		500			{object}	apps.ApiResponse{message=string}			"instance error"
 // @Failure		404			{object}	string										"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualityProfiles [get]
+// @Router			/sonarr/{instance}/qualityProfiles [get]
 // @Security		ApiKeyAuth
 func sonarrGetQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
@@ -421,7 +421,7 @@ func sonarrGetQualityProfiles(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"json input error"
 // @Failure		500			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualityProfile [post]
+// @Router			/sonarr/{instance}/qualityProfile [post]
 // @Security		ApiKeyAuth
 func sonarrAddQualityProfile(req *http.Request) (int, interface{}) {
 	var profile sonarr.QualityProfile
@@ -454,7 +454,7 @@ func sonarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		422			{object}	apps.ApiResponse{message=string}	"no profile ID"
 // @Failure		500			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualityProfile/{profileID} [put]
+// @Router			/sonarr/{instance}/qualityProfile/{profileID} [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 	var profile sonarr.QualityProfile
@@ -489,7 +489,7 @@ func sonarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"no profile ID"
 // @Failure		500			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualityProfile/{profileID} [delete]
+// @Router			/sonarr/{instance}/qualityProfile/{profileID} [delete]
 // @Security		ApiKeyAuth
 func sonarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
 	profileID, _ := strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
@@ -514,7 +514,7 @@ func sonarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=apps.deleteResponse}	"delete status"
 // @Failure		500			{object}	apps.ApiResponse{message=string}				"instance error getting profiles"
 // @Failure		404			{object}	string											"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualityProfiles/all [delete]
+// @Router			/sonarr/{instance}/qualityProfiles/all [delete]
 // @Security		ApiKeyAuth
 func sonarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 	// Get all the profiles from sonarr.
@@ -553,7 +553,7 @@ func sonarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 // @Success		201			{object}	apps.ApiResponse{message=[]sonarr.ReleaseProfile}	"all profiles"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/releaseProfile [get]
+// @Router			/sonarr/{instance}/releaseProfile [get]
 // @Security		ApiKeyAuth
 func sonarrGetReleaseProfiles(req *http.Request) (int, interface{}) {
 	// Get the profiles from sonarr.
@@ -576,7 +576,7 @@ func sonarrGetReleaseProfiles(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"json input error"
 // @Failure		500			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/releaseProfile [post]
+// @Router			/sonarr/{instance}/releaseProfile [post]
 // @Security		ApiKeyAuth
 func sonarrAddReleaseProfile(req *http.Request) (int, interface{}) {
 	var profile sonarr.ReleaseProfile
@@ -609,7 +609,7 @@ func sonarrAddReleaseProfile(req *http.Request) (int, interface{}) {
 // @Failure		422			{object}	apps.ApiResponse{message=string}	"no profile ID"
 // @Failure		500			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/releaseProfile/{profileID} [put]
+// @Router			/sonarr/{instance}/releaseProfile/{profileID} [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 	var profile sonarr.ReleaseProfile
@@ -644,7 +644,7 @@ func sonarrUpdateReleaseProfile(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"no profile ID"
 // @Failure		500			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/releaseProfile/{profileID} [delete]
+// @Router			/sonarr/{instance}/releaseProfile/{profileID} [delete]
 // @Security		ApiKeyAuth
 func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
 	profileID, _ := strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
@@ -669,7 +669,7 @@ func sonarrDeleteReleaseProfile(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=apps.deleteResponse}	"delete status"
 // @Failure		500			{object}	apps.ApiResponse{message=string}				"instance error getting profiles"
 // @Failure		404			{object}	string											"bad token or api key"
-// @Router			/api/sonarr/{instance}/releaseProfile/all [delete]
+// @Router			/sonarr/{instance}/releaseProfile/all [delete]
 // @Security		ApiKeyAuth
 func sonarrDeleteAllReleaseProfiles(req *http.Request) (int, interface{}) {
 	profiles, err := getSonarr(req).GetReleaseProfilesContext(req.Context())
@@ -708,7 +708,7 @@ func sonarrDeleteAllReleaseProfiles(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=map[string]int64}	"map of path->space free"
 // @Failure		500			{object}	apps.ApiResponse{message=string}			"instance error"
 // @Failure		404			{object}	string										"bad token or api key"
-// @Router			/api/sonarr/{instance}/rootFolder [get]
+// @Router			/sonarr/{instance}/rootFolder [get]
 // @Security		ApiKeyAuth
 func sonarrRootFolders(req *http.Request) (int, interface{}) {
 	// Get folder list from Sonarr.
@@ -734,7 +734,7 @@ func sonarrRootFolders(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=sonarr.Naming}	"naming conventions"
 // @Failure		500			{object}	apps.ApiResponse{message=string}		"instance error"
 // @Failure		404			{object}	string									"bad token or api key"
-// @Router			/api/sonarr/{instance}/naming [get]
+// @Router			/sonarr/{instance}/naming [get]
 // @Security		ApiKeyAuth
 func sonarrGetNaming(req *http.Request) (int, interface{}) {
 	naming, err := getSonarr(req).GetNamingContext(req.Context())
@@ -755,7 +755,7 @@ func sonarrGetNaming(req *http.Request) (int, interface{}) {
 // @Failure		400	{object}	apps.ApiResponse{message=string}	"bad json input"
 // @Failure		500	{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404	{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/naming [put]
+// @Router			/sonarr/{instance}/naming [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
 	var naming sonarr.Naming
@@ -782,7 +782,7 @@ func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=[]apps.sonarrSearchSeries.seriesData}	"minimal series data"
 // @Failure		503			{object}	apps.ApiResponse{message=string}								"instance error"
 // @Failure		404			{object}	string															"bad token or api key"
-// @Router			/api/sonarr/{instance}/search/{query} [get]
+// @Router			/sonarr/{instance}/search/{query} [get]
 // @Security		ApiKeyAuth
 //
 //nolint:lll
@@ -863,7 +863,7 @@ func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 // @Success		200			{object}	apps.ApiResponse{message=[]starr.Tag}	"tags"
 // @Failure		503			{object}	apps.ApiResponse{message=string}		"instance error"
 // @Failure		404			{object}	string									"bad token or api key"
-// @Router			/api/sonarr/{instance}/tag [get]
+// @Router			/sonarr/{instance}/tag [get]
 // @Security		ApiKeyAuth
 func sonarrGetTags(req *http.Request) (int, interface{}) {
 	tags, err := getSonarr(req).GetTagsContext(req.Context())
@@ -884,7 +884,7 @@ func sonarrGetTags(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=int64}		"tag ID"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/tag/{tagID}/{label} [put]
+// @Router			/sonarr/{instance}/tag/{tagID}/{label} [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
@@ -906,7 +906,7 @@ func sonarrUpdateTag(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=int64}		"tag ID"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/tag/{label} [put]
+// @Router			/sonarr/{instance}/tag/{label} [put]
 // @Security		ApiKeyAuth
 func sonarrSetTag(req *http.Request) (int, interface{}) {
 	tag, err := getSonarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
@@ -927,7 +927,7 @@ func sonarrSetTag(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=string}	"OK"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance} [put]
+// @Router			/sonarr/{instance} [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 	var series sonarr.AddSeriesInput
@@ -958,7 +958,7 @@ func sonarrUpdateSeries(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"invalid json provided"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/seasonPass [post]
+// @Router			/sonarr/{instance}/seasonPass [post]
 // @Security		ApiKeyAuth
 func sonarrSeasonPass(req *http.Request) (int, interface{}) {
 	var seasonPass sonarr.SeasonPass
@@ -987,7 +987,7 @@ func sonarrSeasonPass(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}					"invalid json provided"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/customformats [post]
+// @Router			/sonarr/{instance}/customformats [post]
 // @Security		ApiKeyAuth
 func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
 	var cusform sonarr.CustomFormatInput
@@ -1013,7 +1013,7 @@ func sonarrAddCustomFormat(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=[]sonarr.CustomFormatOutput}	"custom formats"
 // @Failure		500			{object}	apps.ApiResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
-// @Router			/api/sonarr/{instance}/customformats [get]
+// @Router			/sonarr/{instance}/customformats [get]
 // @Security		ApiKeyAuth
 func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
 	cusform, err := getSonarr(req).GetCustomFormatsContext(req.Context())
@@ -1036,7 +1036,7 @@ func sonarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}					"invalid json provided"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/customformats/{formatID} [put]
+// @Router			/sonarr/{instance}/customformats/{formatID} [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 	var cusform sonarr.CustomFormatInput
@@ -1061,7 +1061,7 @@ func sonarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=string}	"ok"
 // @Failure		500			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/customformats/{formatID} [delete]
+// @Router			/sonarr/{instance}/customformats/{formatID} [delete]
 // @Security		ApiKeyAuth
 func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 	cfID, _ := strconv.ParseInt(mux.Vars(req)["cfid"], mnd.Base10, mnd.Bits64)
@@ -1082,7 +1082,7 @@ func sonarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=apps.deleteResponse}	"item delete counters"
 // @Failure		500			{object}	apps.ApiResponse{message=string}				"instance error"
 // @Failure		404			{object}	string											"bad token or api key"
-// @Router			/api/sonarr/{instance}/customformats/all [delete]
+// @Router			/sonarr/{instance}/customformats/all [delete]
 // @Security		ApiKeyAuth
 func sonarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 	formats, err := getSonarr(req).GetCustomFormatsContext(req.Context())
@@ -1120,7 +1120,7 @@ func sonarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=[]sonarr.ImportListOutput}	"list of import lists"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/importlist [get]
+// @Router			/sonarr/{instance}/importlist [get]
 // @Security		ApiKeyAuth
 func sonarrGetImportLists(req *http.Request) (int, interface{}) {
 	ilist, err := getSonarr(req).GetImportListsContext(req.Context())
@@ -1143,7 +1143,7 @@ func sonarrGetImportLists(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}					"invalid json provided"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/importlist/{listID} [put]
+// @Router			/sonarr/{instance}/importlist/{listID} [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateImportList(req *http.Request) (int, interface{}) {
 	var ilist sonarr.ImportListInput
@@ -1172,7 +1172,7 @@ func sonarrUpdateImportList(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}					"invalid json provided"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/api/sonarr/{instance}/importlist [post]
+// @Router			/sonarr/{instance}/importlist [post]
 // @Security		ApiKeyAuth
 func sonarrAddImportList(req *http.Request) (int, interface{}) {
 	var ilist sonarr.ImportListInput
@@ -1196,7 +1196,7 @@ func sonarrAddImportList(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=[]sonarr.QualityDefinition}	"quality definitions list"
 // @Failure		500			{object}	apps.ApiResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualitydefinition [get]
+// @Router			/sonarr/{instance}/qualitydefinition [get]
 // @Security		ApiKeyAuth
 func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 	output, err := getSonarr(req).GetQualityDefinitionsContext(req.Context())
@@ -1218,7 +1218,7 @@ func sonarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}						"invalid json provided"
 // @Failure		500			{object}	apps.ApiResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
-// @Router			/api/sonarr/{instance}/qualitydefinition [put]
+// @Router			/sonarr/{instance}/qualitydefinition [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 	var input []*sonarr.QualityDefinition
@@ -1242,7 +1242,7 @@ func sonarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 // @Success		200			{object}	apps.ApiResponse{message=[]sonarr.NotificationOutput}	"notifications"
 // @Failure		503			{object}	apps.ApiResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
-// @Router			/api/sonarr/{instance}/notifications [get]
+// @Router			/sonarr/{instance}/notifications [get]
 // @Security		ApiKeyAuth
 func sonarrGetNotifications(req *http.Request) (int, interface{}) {
 	notifs, err := getSonarr(req).GetNotificationsContext(req.Context())
@@ -1272,7 +1272,7 @@ func sonarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"bad json input"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/notification [put]
+// @Router			/sonarr/{instance}/notification [put]
 // @Security		ApiKeyAuth
 func sonarrUpdateNotification(req *http.Request) (int, interface{}) {
 	var notif sonarr.NotificationInput
@@ -1301,7 +1301,7 @@ func sonarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Failure		400			{object}	apps.ApiResponse{message=string}	"json input error"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/api/sonarr/{instance}/notification [post]
+// @Router			/sonarr/{instance}/notification [post]
 // @Security		ApiKeyAuth
 func sonarrAddNotification(req *http.Request) (int, interface{}) {
 	var notif sonarr.NotificationInput
@@ -1333,7 +1333,7 @@ func sonarrAddNotification(req *http.Request) (int, interface{}) {
 // @Failure		500					{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404					{object}	string								"bad token or api key"
 // @Failure		423					{object}	string								"rate limit reached"
-// @Router			/api/sonarr/{instance}/queue/{queueID} [delete]
+// @Router			/sonarr/{instance}/queue/{queueID} [delete]
 // @Security		ApiKeyAuth
 func sonarrDeleteQueue(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["queueID"]
@@ -1364,7 +1364,7 @@ func sonarrDeleteQueue(req *http.Request) (int, interface{}) {
 // @Failure		500				{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404				{object}	string								"bad token or api key"
 // @Failure		423				{object}	string								"rate limit reached"
-// @Router			/api/sonarr/{instance}/delete/{episodeFileID} [post]
+// @Router			/sonarr/{instance}/delete/{episodeFileID} [post]
 // @Security		ApiKeyAuth
 func sonarrDeleteEpisode(req *http.Request) (int, interface{}) {
 	idString := mux.Vars(req)["episodeFileID"]
