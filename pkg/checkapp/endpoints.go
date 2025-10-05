@@ -11,7 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
 )
 
-func testEndpoint(ctx context.Context, input *Input) (string, int) {
+func Endpoint(ctx context.Context, input *Input) (string, int) {
 	endpoint := getTestEndpoint(input, input.Index)
 	client := endpoint.GetClient()
 	body := bytes.NewBufferString(endpoint.Body)

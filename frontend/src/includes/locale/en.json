@@ -1659,5 +1659,10 @@
       "title": "Web UI ({basePath})",
       "body": "This specification is for the methods used by the Notifiarr Client frontend to interact with the backend. You're using the frontend right now."
     }
+  },
+  "TestAllInstances": {
+    "title": "Test All Instances",
+    "Instance": "Instance",
+    "Message": "Message"
   }
 }

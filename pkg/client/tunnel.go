@@ -286,8 +286,8 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 //	@Accept			json
 //	@Produce		text/plain
 //	@Param			tunnels	body		object{PrimaryTunnel=string,BackupTunnel=[]string}	true	"Tunnel configuration"
-//	@Success		200		{string}	string														"success message"
-//	@Failure		500		{string}	string														"error saving tunnels"
+//	@Success		200		{string}	string												"success message"
+//	@Failure		500		{string}	string												"error saving tunnels"
 //	@Router			/tunnel/save [post]
 func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
 	body, err := io.ReadAll(request.Body)
