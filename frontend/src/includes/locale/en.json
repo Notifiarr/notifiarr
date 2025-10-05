@@ -1649,6 +1649,8 @@
   },
   "ApiDocs": {
     "Choose": "Choose an API to view",
+    "Contrast": "Please report any contrast problems with this page.",
+    "BasePath": "<b>Base Path</b>: <code>{basePath}</code>",
     "PrivateAPI": {
       "title": "Private API ({basePath})",
       "body": "This is the API specification for the Notifiarr.com website. The website uses this API to interact with the client."
