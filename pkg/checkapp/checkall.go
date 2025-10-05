@@ -66,41 +66,18 @@ type checkAll struct {
 }
 
 const (
-	timeout   = 5 * time.Second
-	workerDiv = 2
-	buffer    = 100
+	timeout = 5 * time.Second
+	divider = 2
+	cBuffer = 100
 )
 
 // CheckAll checks all the starr, media and downloader apps and returns the results.
 func CheckAll(ctx context.Context, input *CheckAllInput) *CheckAllOutput {
-	return (&checkAll{
-		input:  input,
-		output: initOutput(input),
-		ch:     make(chan *job, buffer),
-	}).run(ctx)
+	return newCheckAll(input).run(ctx)
 }
 
-func (c *checkAll) run(ctx context.Context) *CheckAllOutput {
-	wait := c.workPool(c.output.Instances/workerDiv + 1)
-
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
-	start := time.Now()
-	c.checkAllStarr(ctx)
-	c.checkAllMedia(ctx)
-	c.checkAllDownloaders(ctx)
-	close(c.ch)
-	wait()
-
-	c.output.Elapsed = time.Since(start).Milliseconds()
-	c.output.Workers = c.output.Instances/workerDiv + 1
-
-	return c.output
-}
-
-func initOutput(input *CheckAllInput) *CheckAllOutput {
-	return &CheckAllOutput{
+func newCheckAll(input *CheckAllInput) *checkAll {
+	output := &CheckAllOutput{
 		Sonarr:   make([]TestResult, len(input.Sonarr)),
 		Radarr:   make([]TestResult, len(input.Radarr)),
 		Readarr:  make([]TestResult, len(input.Readarr)),
@@ -121,6 +98,27 @@ func initOutput(input *CheckAllInput) *CheckAllOutput {
 			len(input.Qbit) + len(input.Rtorrent) + len(input.Transmission) +
 			len(input.SabNZB),
 	}
+
+	return &checkAll{input: input, ch: make(chan *job, cBuffer), output: output}
+}
+
+func (c *checkAll) run(ctx context.Context) *CheckAllOutput {
+	c.output.Workers = c.output.Instances/divider + 1
+	wait := c.workPool(c.output.Workers)
+
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	start := time.Now()
+	c.checkAllStarr(ctx)
+	c.checkAllMedia(ctx)
+	c.checkAllDownloaders(ctx)
+	close(c.ch)
+	wait()
+
+	c.output.Elapsed = time.Since(start).Milliseconds()
+
+	return c.output
 }
 
 func chk[D any](ctx context.Context, d D, fn func(context.Context, D) (string, int)) func() (string, int) {
@@ -210,7 +208,7 @@ func (c *checkAll) workPool(workers int) func() {
 		start time.Time
 	)
 
-	logs.Log.Debugf("[gui requested] Checking all instances with %d workers", workers)
+	logs.Log.Debugf("[gui requested] Checking %d instances with %d workers.", c.output.Instances, workers)
 
 	for range workers {
 		wtgrp.Add(1)
