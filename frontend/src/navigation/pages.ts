@@ -21,6 +21,7 @@ import ProcessList, { page as ProcessListPage } from '../pages/stubs/ProcessList
 import ClientInfo, { page as ClientInfoPage } from '../pages/stubs/ClientInfo.svelte'
 import ApiDocs, { page as ApiDocsPage } from '../pages/stubs/ApiDocs.svelte'
 import Languages, { page as LanguagesPage } from '../pages/stubs/Languages.svelte'
+import TestAll, { page as TestAllPage } from '../pages/stubs/TestAllInstances.svelte'
 
 // Page structure for navigation with icons
 // 'id' (from page) is used for navigation AND translations.
@@ -55,6 +56,7 @@ export const others: Page[] = [
   { component: ClientInfo, ...ClientInfoPage },
   { component: ApiDocs, ...ApiDocsPage },
   { component: Languages, ...LanguagesPage },
+  { component: TestAll, ...TestAllPage },
 ]
 
 export const allPages: Page[] = [...settings, ...insights, ...others]

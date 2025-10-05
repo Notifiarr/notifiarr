@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/checkapp"
 	"github.com/Notifiarr/notifiarr/pkg/client"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
@@ -76,6 +77,7 @@ func main() {
 		client.ProfilePost{},
 		commands.Stats{},
 		apps.ApiResponse{},
+		checkapp.CheckAllOutput{},
 	)
 
 	log.Println("==> splitting packages")

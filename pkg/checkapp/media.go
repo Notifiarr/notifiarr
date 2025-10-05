@@ -9,7 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 )
 
-func testPlex(ctx context.Context, app apps.PlexConfig) (string, int) {
+func Plex(ctx context.Context, app apps.PlexConfig) (string, int) {
 	server := app.Setup(0)
 
 	info, err := server.GetInfo(ctx)
@@ -20,7 +20,7 @@ func testPlex(ctx context.Context, app apps.PlexConfig) (string, int) {
 	return "Plex OK! Version: " + info.Version, http.StatusOK
 }
 
-func testTautulli(ctx context.Context, app apps.TautulliConfig) (string, int) {
+func Tautulli(ctx context.Context, app apps.TautulliConfig) (string, int) {
 	tautulli := app.Setup(0)
 
 	if app.APIKey == "" {

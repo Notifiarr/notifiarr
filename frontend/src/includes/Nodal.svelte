@@ -78,6 +78,7 @@
   let resp = $state<BackendResponse>()
   let fullscreen = $state(false)
   let showRaw = $state(false)
+  let ok = $state(false) // we use ok to keep the refresh from running away
 
   const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 110px)')
   const modalClassName = $derived(rest.modalClassName + (isOpen ? ' show' : ''))
@@ -102,17 +103,18 @@
       resp = { ok: false, body: error }
     } finally {
       loading = false
+      if (ok != resp?.ok) ok = resp?.ok ?? false
     }
   }
 
   $effect(() => {
-    if (isOpen) refresh()
+    if (isOpen && !ok) refresh()
   })
 </script>
 
 <Modal
   {...{ ...rest, isOpen, modalClassName, theme: $theme, fullscreen }}
-  toggle={esc ? close : undefined}>
+  toggle={esc && !disabled ? close : undefined}>
   <ModalHeader class="d-inline-block">
     <!-- Header title and icon. -->
     {#if fa}<Fa {...fa} scale={1.4} class="me-2" />{/if}

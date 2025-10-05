@@ -107,6 +107,26 @@
                 }
             }
         },
+        "/checkAllInstances": {
+            "get": {
+                "description": "Checks all the starr, media and downloader apps and returns the results.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integrations"
+                ],
+                "summary": "Check all instances",
+                "responses": {
+                    "200": {
+                        "description": "all check results",
+                        "schema": {
+                            "$ref": "#/definitions/checkapp.CheckAllOutput"
+                        }
+                    }
+                }
+            }
+        },
         "/checkInstance/{type}/{index}": {
             "post": {
                 "description": "Validates and tests the configuration for a specific application instance.",
@@ -1397,6 +1417,103 @@
                 },
                 "validSsl": {
                     "type": "boolean"
+                }
+            }
+        },
+        "checkapp.CheckAllOutput": {
+            "type": "object",
+            "properties": {
+                "Deluge": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Lidarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "NZBGet": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Plex": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Prowlarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Qbittorrent": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Radarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Readarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Rtorrent": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "SabNZB": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Sonarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Tautulli": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Transmission": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "timeMS": {
+                    "type": "integer"
+                }
+            }
+        },
+        "checkapp.TestResult": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
                 }
             }
         },

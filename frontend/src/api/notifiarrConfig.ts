@@ -2081,6 +2081,37 @@ export interface ApiResponse {
   message?: any;
 };
 
+/**
+ * CheckAllOutput is the output from a check all instances test.
+ * The JSON keys are used for human display, so ya.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/checkapp.CheckAllOutput>
+ */
+export interface CheckAllOutput {
+  Sonarr?: TestResult[];
+  Radarr?: TestResult[];
+  Readarr?: TestResult[];
+  Lidarr?: TestResult[];
+  Prowlarr?: TestResult[];
+  Plex?: TestResult[];
+  Tautulli?: TestResult[];
+  NZBGet?: TestResult[];
+  Deluge?: TestResult[];
+  Qbittorrent?: TestResult[];
+  Rtorrent?: TestResult[];
+  Transmission?: TestResult[];
+  SabNZB?: TestResult[];
+  timeMS: number;
+};
+
+/**
+ * TestResult is the result from an instance test.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/checkapp.TestResult>
+ */
+export interface TestResult {
+  status: number;
+  message: string;
+};
+
 // Packages parsed:
 //   1. database/sql
 //   2. github.com/Notifiarr/notifiarr/frontend
@@ -2088,32 +2119,33 @@ export interface ApiResponse {
 //   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
 //   5. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
 //   6. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
-//   7. github.com/Notifiarr/notifiarr/pkg/client
-//   8. github.com/Notifiarr/notifiarr/pkg/configfile
-//   9. github.com/Notifiarr/notifiarr/pkg/logs
-//  10. github.com/Notifiarr/notifiarr/pkg/mnd
-//  11. github.com/Notifiarr/notifiarr/pkg/services
-//  12. github.com/Notifiarr/notifiarr/pkg/snapshot
-//  13. github.com/Notifiarr/notifiarr/pkg/triggers/commands
-//  14. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
-//  15. github.com/Notifiarr/notifiarr/pkg/triggers/common
-//  16. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
-//  17. github.com/Notifiarr/notifiarr/pkg/triggers/crontimer
-//  18. github.com/Notifiarr/notifiarr/pkg/triggers/dashboard
-//  19. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
-//  20. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
-//  21. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
-//  22. github.com/shirou/gopsutil/v4/cpu
-//  23. github.com/shirou/gopsutil/v4/disk
-//  24. github.com/shirou/gopsutil/v4/host
-//  25. github.com/shirou/gopsutil/v4/load
-//  26. golift.io/deluge
-//  27. golift.io/mulery/client
-//  28. golift.io/nzbget
-//  29. golift.io/qbit
-//  30. golift.io/starr
-//  31. golift.io/starr/lidarr
-//  32. golift.io/starr/prowlarr
-//  33. golift.io/starr/radarr
-//  34. golift.io/starr/readarr
-//  35. golift.io/starr/sonarr
+//   7. github.com/Notifiarr/notifiarr/pkg/checkapp
+//   8. github.com/Notifiarr/notifiarr/pkg/client
+//   9. github.com/Notifiarr/notifiarr/pkg/configfile
+//  10. github.com/Notifiarr/notifiarr/pkg/logs
+//  11. github.com/Notifiarr/notifiarr/pkg/mnd
+//  12. github.com/Notifiarr/notifiarr/pkg/services
+//  13. github.com/Notifiarr/notifiarr/pkg/snapshot
+//  14. github.com/Notifiarr/notifiarr/pkg/triggers/commands
+//  15. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
+//  16. github.com/Notifiarr/notifiarr/pkg/triggers/common
+//  17. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
+//  18. github.com/Notifiarr/notifiarr/pkg/triggers/crontimer
+//  19. github.com/Notifiarr/notifiarr/pkg/triggers/dashboard
+//  20. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
+//  21. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
+//  22. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
+//  23. github.com/shirou/gopsutil/v4/cpu
+//  24. github.com/shirou/gopsutil/v4/disk
+//  25. github.com/shirou/gopsutil/v4/host
+//  26. github.com/shirou/gopsutil/v4/load
+//  27. golift.io/deluge
+//  28. golift.io/mulery/client
+//  29. golift.io/nzbget
+//  30. golift.io/qbit
+//  31. golift.io/starr
+//  32. golift.io/starr/lidarr
+//  33. golift.io/starr/prowlarr
+//  34. golift.io/starr/radarr
+//  35. golift.io/starr/readarr
+//  36. golift.io/starr/sonarr
