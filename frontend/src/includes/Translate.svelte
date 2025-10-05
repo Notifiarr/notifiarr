@@ -2,8 +2,8 @@
 
 <script module lang="ts">
   import { derived, get } from 'svelte/store'
-  import { _, time as t, date as d, isLoading, locale } from 'svelte-i18n'
-  export { _ } // pass it through
+  import { _, json, time as t, date as d, isLoading, locale } from 'svelte-i18n'
+  export { _, json } // pass it through
   export const isReady = derived(locale, $locale => typeof $locale === 'string')
 
   export function datetime(datetime: string | Date | number): string {
