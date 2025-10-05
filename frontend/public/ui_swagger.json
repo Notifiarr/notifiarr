@@ -876,6 +876,82 @@
                 }
             }
         },
+        "/trigger/{trigger}": {
+            "get": {
+                "description": "Executes a specific trigger action.",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Trigger action",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trigger name to execute",
+                        "name": "trigger",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "trigger result",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "unknown trigger",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/trigger/{trigger}/{content}": {
+            "get": {
+                "description": "Executes a specific trigger action.",
+                "produces": [
+                    "text/plain"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Trigger action",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Trigger name to execute",
+                        "name": "trigger",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Optional content for the trigger",
+                        "name": "content",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "trigger result",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "unknown trigger",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/tunnel/ping": {
             "get": {
                 "description": "Tests connectivity and response times to all configured tunnel servers.",
@@ -3303,6 +3379,36 @@
                 1048576,
                 524288,
                 2401763328,
+                511,
+                2147483648,
+                1073741824,
+                536870912,
+                268435456,
+                134217728,
+                67108864,
+                33554432,
+                16777216,
+                8388608,
+                4194304,
+                2097152,
+                1048576,
+                524288,
+                2401763328,
+                511,
+                2147483648,
+                1073741824,
+                536870912,
+                268435456,
+                134217728,
+                67108864,
+                33554432,
+                16777216,
+                8388608,
+                4194304,
+                2097152,
+                1048576,
+                524288,
+                2401763328,
                 511
             ],
             "x-enum-comments": {
@@ -3336,9 +3442,39 @@
                 "t: sticky",
                 "?: non-regular file; nothing else is known about this file",
                 "",
+                "Unix permission bits, 0o777",
+                "d: is a directory",
+                "a: append-only",
+                "l: exclusive use",
+                "T: temporary file; Plan 9 only",
+                "L: symbolic link",
+                "D: device file",
+                "p: named pipe (FIFO)",
+                "S: Unix domain socket",
+                "u: setuid",
+                "g: setgid",
+                "c: Unix character device, when ModeDevice is set",
+                "t: sticky",
+                "?: non-regular file; nothing else is known about this file",
+                "",
                 "Unix permission bits, 0o777"
             ],
             "x-enum-varnames": [
+                "ModeDir",
+                "ModeAppend",
+                "ModeExclusive",
+                "ModeTemporary",
+                "ModeSymlink",
+                "ModeDevice",
+                "ModeNamedPipe",
+                "ModeSocket",
+                "ModeSetuid",
+                "ModeSetgid",
+                "ModeCharDevice",
+                "ModeSticky",
+                "ModeIrregular",
+                "ModeType",
+                "ModePerm",
                 "ModeDir",
                 "ModeAppend",
                 "ModeExclusive",
