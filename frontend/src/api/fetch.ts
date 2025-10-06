@@ -2,7 +2,7 @@ import { get, writable } from 'svelte/store'
 import { delay, failure, ltrim, rtrim, success } from '../includes/util'
 import { _ } from 'svelte-i18n'
 import Cookies from 'js-cookie'
-import { locale } from '../includes/locale/index.svelte'
+import { locale } from '../includes/locale/locale.svelte'
 import { profile } from './profile.svelte'
 
 export const LoggedOut = new Error('logged out')
