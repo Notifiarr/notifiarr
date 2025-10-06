@@ -247,51 +247,31 @@ func (l *Logger) GetAllLogFilePaths() *LogFileInfos {
 // a folder with the provided file(s). This is useful to find "all the log files"
 // or "all the .conf files" in a folder. Simply pass in 1 or more file paths, and
 // any files in the same folder with the same extension will be returned.
-func GetFilePaths(files ...string) *LogFileInfos { //nolint:cyclop
-	contain := make(map[string]struct{})
-	dirs := make(map[string]struct{})
+func GetFilePaths(files ...string) *LogFileInfos {
+	var (
+		similar, output = getSimilarFiles(files)
+		used            = false
+		idx             = 0
+		fileInfos       = make(map[string]os.FileInfo)
+	)
 
-	for _, logFilePath := range files {
-		dirExpanded, err := homedir.Expand(logFilePath)
-		if err != nil {
-			dirExpanded = logFilePath
-		}
-
-		ext := filepath.Ext(logFilePath)
-		if ext == "" {
-			continue
-		}
-
-		files, err := filepath.Glob(filepath.Join(filepath.Dir(dirExpanded), "*"+ext))
-		if err != nil {
-			continue
-		}
-
-		for _, filePath := range files {
-			contain[filePath] = struct{}{}
-			dirs[filepath.Dir(filePath)] = struct{}{}
+	// Gather the file infos for the provided files so we can compare them to the found files.
+	for _, name := range files {
+		if stat, err := os.Stat(name); err == nil {
+			fileInfos[name] = stat
 		}
 	}
 
-	output := &LogFileInfos{List: []*LogFileInfo{}, Dirs: map2list(dirs)}
-
-	var used bool
-
-	for filePath := range contain {
-		fileInfo, err := os.Stat(filePath)
-		if err != nil || fileInfo.IsDir() {
-			continue
-		}
-
-		used = false
-
-		for _, name := range files {
-			if name == filePath {
-				used = true
+	for filePath, fileInfo := range similar {
+		// Check if the found file is the same as a provided in-use (log) file.
+		for _, file := range fileInfos {
+			if used = os.SameFile(fileInfo, file); used {
+				break
 			}
 		}
 
-		output.List = append(output.List, &LogFileInfo{
+		// Add the file to the list.
+		output.List[idx] = &LogFileInfo{
 			ID:   strings.TrimRight(base64.StdEncoding.EncodeToString([]byte(filePath)), "="),
 			Name: fileInfo.Name(),
 			Path: filePath,
@@ -300,7 +280,9 @@ func GetFilePaths(files ...string) *LogFileInfos { //nolint:cyclop
 			Mode: fmt.Sprintf("%s (%o)", fileInfo.Mode(), fileInfo.Mode()),
 			Used: used,
 			User: getFileOwner(fileInfo),
-		})
+		}
+		idx++
+		// Add the size of the file to the total size.
 		output.Size += fileInfo.Size()
 	}
 
@@ -321,10 +303,57 @@ func (l *LogFileInfos) Less(i, j int) bool {
 	return l.List[i].Time.After(l.List[j].Time)
 }
 
+func getSimilarFiles(files []string) (map[string]os.FileInfo, *LogFileInfos) {
+	var (
+		similar = make(map[string]os.FileInfo)
+		ignored = make(map[string]struct{}) // to avoid excessive os.Stat calls for dirs.
+		dirs    = make(map[string]struct{}) // to de-dup parent folders.
+	)
+
+	for _, filePath := range files {
+		// Get the extension of the file, ignore it if it has none.
+		ext := filepath.Ext(filePath)
+		if ext == "" {
+			continue
+		}
+
+		// Expand a ~ in the path.
+		if x, err := homedir.Expand(filePath); err == nil {
+			filePath = x
+		}
+
+		// Find other files in the same directory with the same extension.
+		files, err := filepath.Glob(filepath.Join(filepath.Dir(filePath), "*"+ext))
+		if err != nil {
+			continue
+		}
+
+		// Add the files to the similar map and the dirs map.
+		for _, file := range files {
+			dirs[filepath.Dir(file)] = struct{}{}
+			// This dedupes files by name, and we only add files we can read.
+			if _, ok := ignored[file]; !ok && similar[file] == nil {
+				if f, err := os.Stat(file); err == nil && !f.IsDir() {
+					similar[file] = f
+				} else { // This dedupes directories and unreadable files.
+					ignored[file] = struct{}{}
+				}
+			}
+		}
+	}
+
+	return similar, &LogFileInfos{List: make([]*LogFileInfo, len(similar)), Dirs: map2list(dirs)}
+}
+
 func map2list(input map[string]struct{}) []string {
-	output := []string{}
+	var (
+		output = make([]string, len(input))
+		idx    = 0
+	)
+
 	for name := range input {
-		output = append(output, name)
+		output[idx] = name
+		idx++
 	}
 
 	return output
