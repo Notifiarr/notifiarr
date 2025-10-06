@@ -9,7 +9,7 @@
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
   import { _ } from '../includes/Translate.svelte'
-  import { locale, Flags } from '../includes/locale/index.svelte'
+  import { locale, Flags } from '../includes/locale/locale.svelte'
   import { profile } from '../api/profile.svelte'
   import Fa from '../includes/Fa.svelte'
   import { Input } from '@sveltestrap/sveltestrap'

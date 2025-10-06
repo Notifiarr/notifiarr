@@ -62,8 +62,13 @@ func (s *Services) add(svc *ServiceConfig) {
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
 func (s *Services) Start(ctx context.Context, plexName string) {
+	s.log = mnd.Log
+	if s.LogFile != "" {
+		s.log = logs.CustomLog(s.LogFile, "Services")
+	}
+
 	if len(s.services) == 0 {
-		mnd.Log.Printf("==> Service Checker Disabled! No services to check.")
+		s.log.Printf("==> Service Checker Disabled! No services to check.")
 		return
 	}
 
@@ -76,13 +81,8 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	s.triggerChan = make(chan website.EventType)
 	s.checkChan = make(chan triggerCheck)
 
-	logger := mnd.Log
-	if s.LogFile != "" {
-		logger = logs.CustomLog(s.LogFile, "Services")
-	}
-
 	for name := range s.services {
-		s.services[name].log = logger
+		s.services[name].log = s.log
 	}
 
 	s.applyLocalOverrides(plexName)
@@ -113,6 +113,11 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 
 	mnd.Log.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
 		word, len(s.services), s.Interval, s.Parallel)
+
+	if s.log != mnd.Log {
+		s.log.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
+			word, len(s.services), s.Interval, s.Parallel)
+	}
 }
 
 func (s *Services) applyLocalOverrides(plexName string) {
@@ -149,7 +154,7 @@ func (s *Services) loadServiceStates(ctx context.Context) {
 
 	values, err := website.Site.GetState(ctx, names...)
 	if err != nil {
-		mnd.Log.ErrorfNoShare("Getting initial service states from website: %v", err)
+		s.log.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return
 	}
 
@@ -158,12 +163,12 @@ func (s *Services) loadServiceStates(ctx context.Context) {
 			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
 				var svc Service
 				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
-					mnd.Log.ErrorfNoShare("Service check data for '%s' returned from site is invalid: %v", name, err)
+					s.log.ErrorfNoShare("Service check data for '%s' returned from site is invalid: %v", name, err)
 					break
 				}
 
 				if time.Since(svc.LastCheck) < 2*time.Hour {
-					mnd.Log.Printf("==> Set service state with website-saved data: %s, %s for %s",
+					s.log.Printf("==> Set service state with website-saved data: %s, %s for %s",
 						name, svc.State, time.Since(svc.Since).Round(time.Second))
 
 					s.services[name].Output = svc.Output
@@ -180,8 +185,8 @@ func (s *Services) loadServiceStates(ctx context.Context) {
 
 func (s *Services) runServiceChecker() { //nolint:cyclop
 	defer func() {
-		defer mnd.Log.CapturePanic()
-		mnd.Log.Printf("==> Service Checker Stopped!")
+		defer s.log.CapturePanic()
+		s.log.Printf("==> Service Checker Stopped!")
 		s.stopChan <- struct{}{} // signal we're finished.
 	}()
 
@@ -205,14 +210,14 @@ func (s *Services) runServiceChecker() { //nolint:cyclop
 
 			return
 		case event := <-s.checkChan:
-			mnd.Log.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
+			s.log.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(s.checks), cap(s.checks))
 
 			if s.runCheck(event.Service, true, time.Now()) {
 				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()})
 			}
 		case event := <-s.triggerChan:
-			mnd.Log.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(s.checks), cap(s.checks))
+			s.log.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(s.checks), cap(s.checks))
 			s.runChecks(true, time.Now())
 
 			if event != "log" {
@@ -222,11 +227,11 @@ func (s *Services) runServiceChecker() { //nolint:cyclop
 
 			data, err := json.MarshalIndent(&Results{Svcs: s.GetResults(), Interval: s.Interval.Seconds()}, "", " ")
 			if err != nil {
-				mnd.Log.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
+				s.log.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
 				continue
 			}
 
-			mnd.Log.Debug("Service Checks Payload (log only):", string(data))
+			s.log.Debug("Service Checks Payload (log only):", string(data))
 		case now := <-checker.C:
 			if s.runChecks(false, now) {
 				s.SendResults(&Results{What: website.EventCron, Svcs: s.GetResults()})
@@ -279,7 +284,7 @@ func (s *Services) APIHandler(req *http.Request) (int, any) {
 
 func (s *Services) handleTrigger(req *http.Request, event website.EventType) (int, any) {
 	action := mux.Vars(req)["action"]
-	mnd.Log.Debugf("[%s requested] Incoming Service Action: %s (%s)", event, action)
+	s.log.Debugf("[%s requested] Incoming Service Action: %s (%s)", event, action)
 
 	switch action {
 	case "list":
