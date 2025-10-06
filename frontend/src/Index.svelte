@@ -64,7 +64,7 @@
               <!-- This is the login page, before logging in. -->
               <Card outline theme={$theme} class="mt-2" color="notifiarr">
                 <CardHeader><CardTitle>{$_('buttons.Login')}</CardTitle></CardHeader>
-                <Login {error} />
+                <Login error={error.match(/GET .+profile failed: 0 : $/) ? '' : error} />
               </Card>
             </Col>
           {/if}

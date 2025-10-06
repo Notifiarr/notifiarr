@@ -516,7 +516,8 @@
       "name": {
         "label": "Server Name",
         "description": "Name of the Plex server.",
-        "placeholder": "Set automatically by server"
+        "placeholder": "Set automatically by server",
+        "tooltip": "The name of the Plex Media Server is used in notifications, logs and service checks. It is set automatically by the Plex server."
       },
       "url": {
         "label": "URL",

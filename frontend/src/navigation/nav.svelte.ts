@@ -38,6 +38,15 @@ class Navigator {
     // else window.history.replaceState({ uri: page }, '', get(urlbase) + page)
   }
 
+  /** Update the URI of the current page. Useful for tab navigation. */
+  public updateURI = (pid: string, subPages: string[] = []) => {
+    const params = new URLSearchParams(window.location.search).toString()
+    const path = [pid, ...subPages].join('/').toLowerCase()
+    const uri = `${get(urlbase)}${path}${params ? `?${params}` : ''}`
+    // Push the new page into the browser history.
+    window.history.pushState({ uri: this.activePage }, '', uri)
+  }
+
   /**
    * Used to navigate to a page.
    * @param event - from an onclick handler, optional.
@@ -60,11 +69,8 @@ class Navigator {
     this.formChanged = false
     pid = this.setActivePage(pid)
     closeSidebar()
-    const params = new URLSearchParams(window.location.search).toString()
-    const path = [pid, ...subPages].join('/').toLowerCase()
-    const uri = `${get(urlbase)}${path}${params ? `?${params}` : ''}`
-    // Push the new page into the browser history.
-    window.history.pushState({ uri: this.activePage }, '', uri)
+
+    this.updateURI(pid, subPages)
   }
 
   /**

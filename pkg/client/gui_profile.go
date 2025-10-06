@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/frontend"
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -52,6 +53,7 @@ type Profile struct {
 	Timers          []common.TriggerInfo   `json:"timers"`
 	Schedules       []common.TriggerInfo   `json:"schedules"`
 	SiteCrons       []*crontimer.Timer     `json:"siteCrons"`
+	PlexInfo        *plex.PMSInfo          `json:"plexInfo"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
 	LoggedIn        bool                           `json:"loggedIn"`
 	Updated         time.Time                      `json:"updated"`
@@ -122,6 +124,11 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	poolStats := map[string]*mulery.PoolSize{}
 	triggers, timers, schedules := c.triggers.GatherTriggerInfo()
 
+	plexInfo := &plex.PMSInfo{}
+	if ps := data.Get("plexStatus"); ps != nil {
+		plexInfo, _ = ps.Data.(*plex.PMSInfo)
+	}
+
 	if at := data.Get("activeTunnel"); at != nil {
 		activeTunnel, _ = at.Data.(string)
 	}
@@ -133,6 +140,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
 
 	if err := json.NewEncoder(resp).Encode(&Profile{
+		PlexInfo:        plexInfo,
 		Triggers:        triggers,
 		Timers:          timers,
 		Schedules:       schedules,

@@ -194,8 +194,11 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 		output: &Output{str: "unknown"},
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
-	defer cancel()
+	if s.Timeout.Duration > 0 {
+		var cancel func()
+		ctx, cancel = context.WithTimeout(ctx, s.Timeout.Duration)
+		defer cancel()
+	}
 
 	client, req, err := s.checkHTTPReq(ctx)
 	if err != nil {
