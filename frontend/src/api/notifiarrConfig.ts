@@ -1311,6 +1311,7 @@ export interface Profile {
   timers?: TriggerInfo[];
   schedules?: TriggerInfo[];
   siteCrons?: Timer[];
+  plexInfo?: PMSInfo;
   /**
    * LoggedIn is only used by the front end. Backend does not set or use it.
    */
@@ -2115,7 +2116,6 @@ export interface TestResult {
   message: string;
   elapsed: string;
   config: ExtraConfig;
-  app: string;
 };
 
 // Packages parsed:

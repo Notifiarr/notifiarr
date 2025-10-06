@@ -1538,9 +1538,6 @@
         "checkapp.TestResult": {
             "type": "object",
             "properties": {
-                "app": {
-                    "type": "string"
-                },
                 "config": {
                     "$ref": "#/definitions/apps.ExtraConfig"
                 },
@@ -1896,6 +1893,9 @@
                 },
                 "os": {
                     "type": "string"
+                },
+                "plexInfo": {
+                    "$ref": "#/definitions/plex.PMSInfo"
                 },
                 "poolStats": {
                     "type": "object",

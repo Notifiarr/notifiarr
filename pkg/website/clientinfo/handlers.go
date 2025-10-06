@@ -398,8 +398,6 @@ func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexS
 func (c *Config) plexVersionReply(stat *plex.PMSInfo, err error) []*PlexConTest {
 	if stat == nil {
 		stat = &plex.PMSInfo{}
-	} else {
-		data.Save("plexStatus", stat)
 	}
 
 	return []*PlexConTest{{

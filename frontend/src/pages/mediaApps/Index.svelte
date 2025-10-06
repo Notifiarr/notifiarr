@@ -63,7 +63,10 @@
   }
 
   let iv = $derived({
-    Plex: new FormListTracker([$profile.config.plex ?? plexApp.empty], plexApp),
+    Plex: new FormListTracker(
+      [{ ...$profile.config.plex, name: $profile.plexInfo?.friendlyName ?? '' }],
+      plexApp,
+    ),
     Tautulli: new FormListTracker(
       [$profile.config.tautulli ?? tautulliApp.empty!],
       tautulliApp,
