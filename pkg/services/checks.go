@@ -145,12 +145,12 @@ func (s *Service) update(res *result) bool {
 	s.Output = res.output
 
 	if s.State == res.state {
-		mnd.Log.Printf("Service Checked: %s, state: %s for %v, output: %s",
+		s.log.Printf("Service Checked: %s, state: %s for %v, output: %s",
 			s.Name, s.State, time.Since(s.Since).Round(time.Second), s.Output)
 		return false
 	}
 
-	mnd.Log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.State, res.state, s.Output)
+	s.log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.State, res.state, s.Output)
 	s.Since = s.LastCheck
 	s.State = res.state
 
