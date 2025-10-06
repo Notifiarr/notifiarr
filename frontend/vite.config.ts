@@ -24,7 +24,6 @@ export default defineConfig({
           //   './src/includes/util.ts',
           //   './src/includes/theme.svelte.ts',
           // ],
-          'api-docs': ['swagger-ui', 'swagger-ui/dist/swagger-ui.css'],
         },
       },
     },
