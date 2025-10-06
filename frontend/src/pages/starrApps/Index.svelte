@@ -52,11 +52,11 @@
 <CardBody>
   <!-- only nav.goto if the tab is different -->
   <TabContent on:tab={e => goto(e, page.id)}>
-    <Tab flt={flt.Sonarr} titles={Starr.title} />
-    <Tab flt={flt.Radarr} titles={Starr.title} />
-    <Tab flt={flt.Readarr} titles={Starr.title} />
-    <Tab flt={flt.Lidarr} titles={Starr.title} />
-    <Tab flt={flt.Prowlarr} titles={Starr.title} />
+    <Tab bind:flt={flt.Sonarr} titles={Starr.title} />
+    <Tab bind:flt={flt.Radarr} titles={Starr.title} />
+    <Tab bind:flt={flt.Readarr} titles={Starr.title} />
+    <Tab bind:flt={flt.Lidarr} titles={Starr.title} />
+    <Tab bind:flt={flt.Prowlarr} titles={Starr.title} />
   </TabContent>
 </CardBody>
 

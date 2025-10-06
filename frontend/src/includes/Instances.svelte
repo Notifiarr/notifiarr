@@ -27,19 +27,20 @@
   import type { FormListTracker } from './formsTracker.svelte'
   import type { Component, Snippet, SvelteComponent } from 'svelte'
 
-  let {
-    flt,
-    Child,
-    headerActive = $bindable(),
-    headerCollapsed = $bindable(),
-    deleteButton = 'phrases.DeleteInstance',
-  }: {
+  type Props = {
     flt: FormListTracker<any>
     Child: Component<ChildProps<any>>
     headerActive: Snippet<[number]>
     headerCollapsed?: Snippet<[number]>
     deleteButton?: string
-  } = $props()
+  }
+  let {
+    flt = $bindable(),
+    Child,
+    headerActive = $bindable(),
+    headerCollapsed = $bindable(),
+    deleteButton = 'phrases.DeleteInstance',
+  }: Props = $props()
 
   // The child component is binded to this variable.
   // This is used to call the reset() function of the child component (if it exists).

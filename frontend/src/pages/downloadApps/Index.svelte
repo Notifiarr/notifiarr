@@ -56,12 +56,12 @@
 <CardBody>
   <!-- only nav.goto if the tab is different -->
   <TabContent on:tab={e => goto(e, page.id)}>
-    <Tab flt={flt.Qbittorrent} titles={App.title} />
-    <Tab flt={flt.Rtorrent} titles={App.title} />
-    <Tab flt={flt.Transmission} titles={App.title} />
-    <Tab flt={flt.Deluge} titles={App.title} />
-    <Tab flt={flt.SabNZB} titles={App.title} />
-    <Tab flt={flt.NZBGet} titles={App.title} />
+    <Tab bind:flt={flt.Qbittorrent} titles={App.title} />
+    <Tab bind:flt={flt.Rtorrent} titles={App.title} />
+    <Tab bind:flt={flt.Transmission} titles={App.title} />
+    <Tab bind:flt={flt.Deluge} titles={App.title} />
+    <Tab bind:flt={flt.SabNZB} titles={App.title} />
+    <Tab bind:flt={flt.NZBGet} titles={App.title} />
   </TabContent>
 </CardBody>
 

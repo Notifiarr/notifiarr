@@ -9,7 +9,7 @@
   }
   /** Goto is a shortcut to nav.goto when the tab changes. */
   export const goto = (e: CustomEvent<string | number>, pid: string) =>
-    tab != e.detail && nav.goto(e, pid, [e.detail.toString()])
+    tab != e.detail && nav.updateURI(pid, [e.detail.toString()])
 </script>
 
 <script lang="ts">
@@ -21,7 +21,7 @@
   import Instance from './Instance.svelte'
 
   type Props<T> = { flt: FormListTracker<T>; titles: Record<string, string> }
-  const { flt, titles }: Props<any> = $props()
+  let { flt = $bindable(), titles }: Props<any> = $props()
 </script>
 
 {#key tab}
@@ -40,7 +40,7 @@
       </h5>
     </div>
 
-    <Instances {flt} Child={Instance}>
+    <Instances bind:flt Child={Instance}>
       {#snippet headerActive(index)}
         {index + 1}. {flt.original[index]?.name}
       {/snippet}
