@@ -66,8 +66,11 @@ func GetAllProcesses(ctx context.Context) ([]*ProcInfo, error) {
 
 // start a loop through processes to find the one we care about.
 func (s *Service) checkProccess(ctx context.Context) *result {
-	ctx, cancel := context.WithTimeout(ctx, s.Timeout.Duration)
-	defer cancel()
+	if s.Timeout.Duration > 0 {
+		var cancel func()
+		ctx, cancel = context.WithTimeout(ctx, s.Timeout.Duration)
+		defer cancel()
+	}
 
 	processes, err := process.ProcessesWithContext(ctx)
 	if err != nil {
