@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"golift.io/cnfg"
 )
@@ -40,7 +39,7 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 
 	for _, svc := range svcs {
 		svc.ServiceConfig.validated = true
-		svc.log = mnd.Log
+		svc.log = s.log
 		svc.State = StateUnknown
 		svc.Since = now
 		s.add(svc.ServiceConfig)

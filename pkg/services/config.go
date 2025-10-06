@@ -57,6 +57,7 @@ type data struct {
 	triggerChan chan website.EventType
 	checkChan   chan triggerCheck
 	stopLock    sync.Mutex
+	log         mnd.Logger
 }
 
 // CheckType locks us into a few specific types of checks.
