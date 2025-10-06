@@ -92,7 +92,8 @@ func Translations() Languages {
 // Useful for a single page app.
 func IndexHandler(resp http.ResponseWriter, req *http.Request) {
 	// Remove the URLBase from the file's path.
-	req.URL.Path = strings.TrimPrefix(strings.TrimPrefix(req.URL.Path, URLBase), "/")
+	req.URL.Path = stripBefore(strings.TrimPrefix(
+		strings.TrimPrefix(req.URL.Path, URLBase), "/"), "/assets/")
 
 	// The frontend uses this cookie to know what path to send API requests to.
 	http.SetCookie(resp, &http.Cookie{Name: "urlbase", Value: URLBase})
@@ -154,4 +155,13 @@ func (w *responseWriter) Write(p []byte) (int, error) {
 	}
 
 	return len(p), nil
+}
+
+// stripBefore strips any prefix from a string if the sub-string exists.
+func stripBefore(s, sub string) string {
+	if index := strings.Index(s, sub); index != -1 {
+		return s[index:]
+	}
+
+	return s
 }
