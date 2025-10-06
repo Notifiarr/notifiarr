@@ -1,7 +1,6 @@
 import { init, register, locale as lang, getLocaleFromNavigator } from 'svelte-i18n'
 import { failure } from '../util'
 import { nav } from '../../navigation/nav.svelte'
-import { get } from 'svelte/store'
 
 /*
 https://phrase.com/blog/posts/a-step-by-step-guide-to-svelte-localization-with-svelte-i18n-v3/
