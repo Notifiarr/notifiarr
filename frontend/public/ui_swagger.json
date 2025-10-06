@@ -107,6 +107,26 @@
                 }
             }
         },
+        "/checkAllInstances": {
+            "get": {
+                "description": "Checks all the starr, media and downloader apps and returns the results.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Integrations"
+                ],
+                "summary": "Check all instances",
+                "responses": {
+                    "200": {
+                        "description": "all check results",
+                        "schema": {
+                            "$ref": "#/definitions/checkapp.CheckAllOutput"
+                        }
+                    }
+                }
+            }
+        },
         "/checkInstance/{type}/{index}": {
             "post": {
                 "description": "Validates and tests the configuration for a specific application instance.",
@@ -1162,6 +1182,26 @@
                 }
             }
         },
+        "apps.ExtraConfig": {
+            "type": "object",
+            "properties": {
+                "deletes": {
+                    "type": "integer"
+                },
+                "interval": {
+                    "$ref": "#/definitions/cnfg.Duration"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "timeout": {
+                    "$ref": "#/definitions/cnfg.Duration"
+                },
+                "validSsl": {
+                    "type": "boolean"
+                }
+            }
+        },
         "apps.NZBGetConfig": {
             "type": "object",
             "properties": {
@@ -1397,6 +1437,118 @@
                 },
                 "validSsl": {
                     "type": "boolean"
+                }
+            }
+        },
+        "checkapp.CheckAllOutput": {
+            "type": "object",
+            "properties": {
+                "Deluge": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Lidarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "NZBGet": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Plex": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Prowlarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Qbittorrent": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Radarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Readarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Rtorrent": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "SabNZB": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Sonarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Tautulli": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "Transmission": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
+                "elapsed": {
+                    "type": "integer"
+                },
+                "instances": {
+                    "type": "integer"
+                },
+                "timeMS": {
+                    "type": "integer"
+                },
+                "workers": {
+                    "type": "integer"
+                }
+            }
+        },
+        "checkapp.TestResult": {
+            "type": "object",
+            "properties": {
+                "config": {
+                    "$ref": "#/definitions/apps.ExtraConfig"
+                },
+                "elapsed": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
                 }
             }
         },
@@ -3395,20 +3547,9 @@
                 524288,
                 2401763328,
                 511,
-                2147483648,
-                1073741824,
-                536870912,
-                268435456,
-                134217728,
-                67108864,
-                33554432,
-                16777216,
                 8388608,
                 4194304,
-                2097152,
                 1048576,
-                524288,
-                2401763328,
                 511
             ],
             "x-enum-comments": {
@@ -3443,20 +3584,9 @@
                 "?: non-regular file; nothing else is known about this file",
                 "",
                 "Unix permission bits, 0o777",
-                "d: is a directory",
-                "a: append-only",
-                "l: exclusive use",
-                "T: temporary file; Plan 9 only",
-                "L: symbolic link",
-                "D: device file",
-                "p: named pipe (FIFO)",
-                "S: Unix domain socket",
                 "u: setuid",
                 "g: setgid",
-                "c: Unix character device, when ModeDevice is set",
                 "t: sticky",
-                "?: non-regular file; nothing else is known about this file",
-                "",
                 "Unix permission bits, 0o777"
             ],
             "x-enum-varnames": [
@@ -3475,20 +3605,9 @@
                 "ModeIrregular",
                 "ModeType",
                 "ModePerm",
-                "ModeDir",
-                "ModeAppend",
-                "ModeExclusive",
-                "ModeTemporary",
-                "ModeSymlink",
-                "ModeDevice",
-                "ModeNamedPipe",
-                "ModeSocket",
                 "ModeSetuid",
                 "ModeSetgid",
-                "ModeCharDevice",
                 "ModeSticky",
-                "ModeIrregular",
-                "ModeType",
                 "ModePerm"
             ]
         },

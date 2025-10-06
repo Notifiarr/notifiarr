@@ -68,54 +68,54 @@ func testInstance(ctx context.Context, input *Input) (string, int) {
 	switch strings.ToLower(input.Type) {
 	// commands.go
 	case "commands":
-		return testCommand(ctx, input)
-		// endpoints.go
+		return Command(ctx, input)
+	// endpoints.go
 	case "endpoints":
-		return testEndpoint(ctx, input)
+		return Endpoint(ctx, input)
 	// downloaders.go
 	case "nzbget":
-		return checkAndRun(ctx, testNZBGet, input, input.Post.AppsConfig, input.Post.NZBGet)
+		return checkAndRun(ctx, NZBGet, input, input.Post.AppsConfig, input.Post.NZBGet)
 	case "deluge":
-		return checkAndRun(ctx, testDeluge, input, input.Post.AppsConfig, input.Post.Deluge)
+		return checkAndRun(ctx, Deluge, input, input.Post.AppsConfig, input.Post.Deluge)
 	case "qbit", "qbittorrent":
-		return checkAndRun(ctx, testQbit, input, input.Post.AppsConfig, input.Post.Qbit)
+		return checkAndRun(ctx, Qbit, input, input.Post.AppsConfig, input.Post.Qbit)
 	case "rtorrent":
-		return checkAndRun(ctx, testRtorrent, input, input.Post.AppsConfig, input.Post.Rtorrent)
+		return checkAndRun(ctx, Rtorrent, input, input.Post.AppsConfig, input.Post.Rtorrent)
 	case "transmission":
-		return checkAndRun(ctx, testTransmission, input, input.Post.AppsConfig, input.Post.Transmission)
+		return checkAndRun(ctx, Transmission, input, input.Post.AppsConfig, input.Post.Transmission)
 	case "sabnzb", "sabnzbd":
-		return checkAndRun(ctx, testSabNZB, input, input.Post.AppsConfig, input.Post.SabNZB)
+		return checkAndRun(ctx, SabNZB, input, input.Post.AppsConfig, input.Post.SabNZB)
 	// starr.go
 	case "lidarr":
-		return checkAndRun(ctx, testLidarr, input, input.Post.AppsConfig, input.Post.Lidarr)
+		return checkAndRun(ctx, Lidarr, input, input.Post.AppsConfig, input.Post.Lidarr)
 	case "prowlarr":
-		return checkAndRun(ctx, testProwlarr, input, input.Post.AppsConfig, input.Post.Prowlarr)
+		return checkAndRun(ctx, Prowlarr, input, input.Post.AppsConfig, input.Post.Prowlarr)
 	case "radarr":
-		return checkAndRun(ctx, testRadarr, input, input.Post.AppsConfig, input.Post.Radarr)
+		return checkAndRun(ctx, Radarr, input, input.Post.AppsConfig, input.Post.Radarr)
 	case "readarr":
-		return checkAndRun(ctx, testReadarr, input, input.Post.AppsConfig, input.Post.Readarr)
+		return checkAndRun(ctx, Readarr, input, input.Post.AppsConfig, input.Post.Readarr)
 	case "sonarr":
-		return checkAndRun(ctx, testSonarr, input, input.Post.AppsConfig, input.Post.Sonarr)
+		return checkAndRun(ctx, Sonarr, input, input.Post.AppsConfig, input.Post.Sonarr)
 	// snapshots.go
 	case "mysql":
-		return checkAndRun(ctx, testMySQL, input, input.Post.Snapshot, input.Post.Snapshot.MySQL)
+		return checkAndRun(ctx, MySQL, input, input.Post.Snapshot, input.Post.Snapshot.MySQL)
 	case "nvidia":
-		return checkAndRun(ctx, testNvidia, input, input.Post.Snapshot,
+		return checkAndRun(ctx, Nvidia, input, input.Post.Snapshot,
 			[]snapshot.NvidiaConfig{input.Post.Snapshot.Nvidia}) // ad-hoc slice, index is already 0.
 	// services.go
 	case "tcp":
-		return checkAndRun(ctx, testTCP, input, input.Post.Service, input.Post.Service)
+		return checkAndRun(ctx, SvcTCP, input, input.Post.Service, input.Post.Service)
 	case "http":
-		return checkAndRun(ctx, testHTTP, input, input.Post.Service, input.Post.Service)
+		return checkAndRun(ctx, SvcHTTP, input, input.Post.Service, input.Post.Service)
 	case "process":
-		return checkAndRun(ctx, testProcess, input, input.Post.Service, input.Post.Service)
+		return checkAndRun(ctx, SvcProcess, input, input.Post.Service, input.Post.Service)
 	case "ping", "icmp":
-		return checkAndRun(ctx, testPing, input, input.Post.Service, input.Post.Service)
+		return checkAndRun(ctx, SvcPing, input, input.Post.Service, input.Post.Service)
 	// media.go
 	case "plex":
-		return testPlex(ctx, input.Post.Plex)
+		return Plex(ctx, input.Post.Plex)
 	case "tautulli":
-		return testTautulli(ctx, input.Post.Tautulli)
+		return Tautulli(ctx, input.Post.Tautulli)
 	default:
 		return "Unknown Check Type Requested! (" + input.Type + ")", http.StatusNotImplemented
 	}

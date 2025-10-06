@@ -41,8 +41,11 @@ export function age(milliseconds: number | Date, includeSeconds = false): string
   if (typeof milliseconds !== 'number')
     milliseconds = new Date().getTime() - new Date(milliseconds).getTime()
   const t = get(_) // translate function
+
+  if (milliseconds < 1000) return t('words.clock.short.ms', { values: { milliseconds } })
   let seconds = Math.floor(milliseconds / 1000)
   if (!seconds) return t('words.clock.short.s', { values: { seconds: 0 } })
+
   const weeks = Math.floor(seconds / 604800)
   const days = Math.floor((seconds - weeks * 604800) / 86400)
   const hours = Math.floor((seconds - weeks * 604800 - days * 86400) / 3600)

@@ -136,7 +136,11 @@
   {/if}
 {/snippet}
 
-<Header {page} />
+<Header {page}>
+  <ul>
+    <li><go-to page="TestAllInstances"><T id="TestAllInstances.title" /></go-to></li>
+  </ul>
+</Header>
 
 <CardBody>
   {#if response}

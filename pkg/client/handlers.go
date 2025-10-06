@@ -86,6 +86,7 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/integrations", c.handleIntegrations).Methods("GET")
 	gui.HandleFunc("/tunnel/ping", c.pingTunnels).Methods("GET")
 	gui.HandleFunc("/tunnel/save", c.saveTunnels).Methods("POST")
+	gui.HandleFunc("/checkAllInstances", c.handleCheckAll).Methods("GET")
 	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
 	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
 	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")

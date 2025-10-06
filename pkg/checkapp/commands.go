@@ -9,7 +9,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
-func testCommand(ctx context.Context, input *Input) (string, int) {
+func Command(ctx context.Context, input *Input) (string, int) {
 	action := &common.ActionInput{Type: website.EventGUI}
 	for _, arg := range input.Args {
 		action.Args = append(action.Args, arg...)

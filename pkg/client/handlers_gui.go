@@ -368,9 +368,9 @@ func (c *Client) handlePing(response http.ResponseWriter, _ *http.Request) {
 //	@Description	Starts or stops all service checks.
 //	@Tags			Integrations
 //	@Produce		text/plain
-//	@Param			action	path		string						true	"Action to perform"	Enums(stop, start)
-//	@Success		200		{string}	string						"Service Checks Stopped or Service Checks Started"
-//	@Failure		400		{string}	string						"invalid action"
+//	@Param			action	path		string	true	"Action to perform"	Enums(stop, start)
+//	@Success		200		{string}	string	"Service Checks Stopped or Service Checks Started"
+//	@Failure		400		{string}	string	"invalid action"
 //	@Router			/services/{action} [get]
 func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http.Request) {
 	user, _ := c.getUserName(req)
@@ -493,6 +493,43 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 	checkapp.Test(c.Config, response, request)
 }
 
+// handleCheckAll checks all the starr, media and downloader apps and returns the results.
+//
+//	@Summary		Check all instances
+//	@Description	Checks all the starr, media and downloader apps and returns the results.
+//	@Tags			Integrations
+//	@Produce		application/json
+//	@Success		200	{object}	checkapp.CheckAllOutput	"all check results"
+//	@Router			/checkAllInstances [get]
+func (c *Client) handleCheckAll(response http.ResponseWriter, request *http.Request) {
+	input := &checkapp.CheckAllInput{
+		Sonarr:       c.Config.Sonarr,
+		Radarr:       c.Config.Radarr,
+		Readarr:      c.Config.Readarr,
+		Lidarr:       c.Config.Lidarr,
+		Prowlarr:     c.Config.Prowlarr,
+		NZBGet:       c.Config.NZBGet,
+		Deluge:       c.Config.Deluge,
+		Qbit:         c.Config.Qbit,
+		Rtorrent:     c.Config.Rtorrent,
+		Transmission: c.Config.Transmission,
+		SabNZB:       c.Config.SabNZB,
+	}
+
+	if c.Config.Plex.URL != "" && c.Config.Plex.Token != "" {
+		input.Plex = []apps.PlexConfig{c.Config.Plex}
+	}
+
+	if c.Config.Tautulli.URL != "" && c.Config.Tautulli.APIKey != "" {
+		input.Tautulli = []apps.TautulliConfig{c.Config.Tautulli}
+	}
+
+	output := checkapp.CheckAll(request.Context(), input)
+	if err := json.NewEncoder(response).Encode(output); err != nil {
+		logs.Log.Errorf("Encoding check all instances: %v", err)
+	}
+}
+
 // handleFileBrowser returns a list of files and folders in a path.
 // part of the file browser javascript code.
 //
@@ -500,7 +537,7 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 //	@Description	Returns a list of files and folders in the specified directory path.
 //	@Tags			Files
 //	@Produce		json
-//	@Param			dir	query		string	false	"Directory path to browse"
+//	@Param			dir	query		string									false	"Directory path to browse"
 //	@Success		200	{object}	object{dirs=[]string,files=[]string}	"directory contents"
 //	@Failure		406	{string}	string									"error reading directory"
 //	@Router			/browse [get]
@@ -551,7 +588,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 //	@Description	Returns execution statistics for a specific command.
 //	@Tags			Integrations
 //	@Produce		json
-//	@Param			path	path		string	true	"Command path identifier" Enums(cmdstats, cmdargs)
+//	@Param			path	path		string	true	"Command path identifier"	Enums(cmdstats, cmdargs)
 //	@Param			hash	path		string	true	"Command hash"
 //	@Success		200		{object}	any		"command statistics"
 //	@Failure		400		{string}	string	"invalid command hash"
@@ -743,10 +780,10 @@ func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.
 //	@Tags			Integrations
 //	@Accept			application/x-www-form-urlencoded
 //	@Produce		text/plain
-//	@Param			hash	path		string					true	"Command hash"
-//	@Param			args	formData	[]string				false	"Command arguments"	collectionFormat(multi)
-//	@Success		200		{string}	string					"success message"
-//	@Failure		400		{string}	string					"invalid command hash"
+//	@Param			hash	path		string		true	"Command hash"
+//	@Param			args	formData	[]string	false	"Command arguments"	collectionFormat(multi)
+//	@Success		200		{string}	string		"success message"
+//	@Failure		400		{string}	string		"invalid command hash"
 //	@Router			/runCommand/{hash} [post]
 func (c *Client) handleRunCommand(response http.ResponseWriter, request *http.Request) {
 	cmd := c.triggers.Commands.GetByHash(mux.Vars(request)["hash"])
@@ -869,7 +906,7 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 //	@Tags			System
 //	@Accept			json
 //	@Produce		text/plain
-//	@Param			noreload	query		string	false	"set to 'true' to skip reload"
+//	@Param			noreload	query		string				false	"set to 'true' to skip reload"
 //	@Param			config		body		configfile.Config	true	"Configuration data"
 //	@Success		200			{string}	string				"success message"
 //	@Failure		400			{string}	string				"invalid request or config"
