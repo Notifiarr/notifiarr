@@ -557,7 +557,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	case err != nil:
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 		return
-	case output.Path == "/", output.Path == "":
+	case output.Path == "/", output.Path == "", output.Path == `\`:
 		if runtime.GOOS == mnd.Windows {
 			partitions, err := disk.PartitionsWithContext(request.Context(), false)
 			if err != nil {
@@ -568,7 +568,12 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 				output.Dirs = append(output.Dirs, partition.Mountpoint)
 			}
 
+			output.Mom = ""
 			break
+		}
+
+		if output.Path == "" || output.Path == `\` {
+			output.Path = "/"
 		}
 
 		fallthrough

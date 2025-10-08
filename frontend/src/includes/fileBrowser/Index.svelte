@@ -8,10 +8,11 @@
     InputGroup,
     InputGroupText,
     Input,
+    Tooltip,
   } from '@sveltestrap/sveltestrap'
   import { getUi } from '../../api/fetch'
   import type { BrowseDir } from '../../api/notifiarrConfig'
-  import { rtrim } from '../util'
+  import { rtrim, success } from '../util'
   import Fa from '../Fa.svelte'
   import { faArrowUpToArc } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import T, { _ } from '../Translate.svelte'
@@ -53,16 +54,35 @@
   let selected = $state(value || '/')
   let respErr = $state('')
   let loading = $state(false)
+  let input = $derived(wd.path)
 
   const cd = (e: Event, to: string, direct = false) => {
     e.preventDefault()
     selected = direct ? to : rtrim(wd.path, wd.sep) + wd.sep + to
+    respErr = ''
   }
 
   const select = (e: Event, file: string, dir = false) => {
     e.preventDefault()
     value = (dir ? '' : rtrim(wd.path, wd.sep) + wd.sep) + file
     close()
+  }
+
+  const create = async (path: string, dir = false) => {
+    const resp = await getUi('create?dir=' + dir + '&path=' + path, true)
+    if (!resp.ok) {
+      respErr = resp.body
+      return
+    }
+
+    success($_('FileBrowser.Created', { values: { path } }))
+    wd = resp.body as BrowseDir
+    respErr = ''
+    // Select the file they just created, and close the picker.
+    if (!dir) {
+      value = path
+      close()
+    }
   }
 
   const getFiles = async () => {
@@ -84,14 +104,14 @@
   }
 
   $effect(() => {
-    if (selected) getFiles()
+    if (selected != ' ') getFiles()
   })
 </script>
 
 <Card style="height: {height};min-height: 280px;">
   <CardHeader>
     <!-- Path title (input group). -->
-    <form onsubmit={e => cd(e, wd.path, true)}>
+    <form onsubmit={e => cd(e, input, true)}>
       <InputGroup>
         <Button
           outline
@@ -107,21 +127,23 @@
           {/if}
         </Button>
         <InputGroupText><T id="LogFiles.titles.Path" /></InputGroupText>
-        <Input bind:value={wd.path} />
+        <Input bind:value={input} />
         <!-- Go button. -->
-        {#if wd.path !== selected}
+        {#if input !== wd.path}
           <Button type="submit" color="primary" outline><T id="FileBrowser.Go" /></Button>
         {/if}
-        <!-- Select folder button. -->
+        <!-- Select path button. -->
         {#if !file}
           <Button
-            title={$_('FileBrowser.SelectFolder', { values: { path: wd.path } })}
+            id="fBut"
             color="success"
             outline
             type="button"
-            onclick={e => select(e, wd.path, true)}>
+            onclick={e => select(e, input, true)}>
             <Fa i={faCheck} c1="limegreen" d1="green" scale={1.5} />
           </Button>
+          <Tooltip target="fBut">
+            <T id="FileBrowser.SelectPath" path={wd.path} /></Tooltip>
         {/if}
       </InputGroup>
     </form>

@@ -1676,9 +1676,10 @@
   },
   "FileBrowser": {
     "Go": "Go",
-    "SelectFolder": "Select Folder: {path}",
+    "SelectPath": "Select Path: {path}",
     "Files": "Files: {count}",
     "Folders": "Folders: {count}",
-    "Selected": "Selected: <code>{path}</code>"
+    "Selected": "Selected: <code>{path}</code>",
+    "Created": "Created: {path}"
   }
 }

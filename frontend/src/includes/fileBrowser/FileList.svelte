@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { BrowseDir } from '../../api/notifiarrConfig'
-
   type Pick = (e: MouseEvent, dir: string) => void
   type Props = { wd: BrowseDir; dir: boolean; cd: Pick; select: Pick }
   const { wd, dir, cd, select }: Props = $props()

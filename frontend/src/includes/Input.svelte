@@ -15,7 +15,10 @@
     faEyeSlash,
     faArrowUpFromBracket,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import {
+    faFolderOpen,
+    faQuestionCircle,
+  } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { _ } from './Translate.svelte'
   import { type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
@@ -166,7 +169,7 @@
         <Badge color="secondary" style="margin-left: 0.5rem;">{badge}</Badge>
       {/if}
     </Label>
-    <InputGroup class="has-validation">
+    <InputGroup>
       {#if tooltip != id + '.tooltip'}
         <Button
           color="secondary"

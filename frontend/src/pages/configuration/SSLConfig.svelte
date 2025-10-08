@@ -4,6 +4,7 @@
   import T, { _ } from '../../includes/Translate.svelte'
   import type { Config } from '../../api/notifiarrConfig'
   import BrowserModal from '../../includes/fileBrowser/BModal.svelte'
+  import BButton from '../../includes/fileBrowser/BButton.svelte'
 
   type Props = { config: Config; original: Config }
   const { config = $bindable(), original }: Props = $props()
@@ -18,15 +19,17 @@
     <Input
       id="config.sslKeyFile"
       bind:value={config.sslKeyFile}
-      original={original.sslKeyFile}
-      onclick={() => (keyModal = true)} />
+      original={original.sslKeyFile}>
+      {#snippet post()}<BButton bind:isOpen={keyModal} />{/snippet}
+    </Input>
   </Col>
   <Col md={6}>
     <Input
       id="config.sslCertFile"
       bind:value={config.sslCertFile}
-      original={original.sslCertFile}
-      onclick={() => (certModal = true)} />
+      original={original.sslCertFile}>
+      {#snippet post()}<BButton bind:isOpen={certModal} />{/snippet}
+    </Input>
   </Col>
 </Row>
 

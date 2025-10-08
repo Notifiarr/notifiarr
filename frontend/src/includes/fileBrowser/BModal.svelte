@@ -1,7 +1,6 @@
 <script lang="ts">
   import Nodal from '../Nodal.svelte'
   import Browser from './Index.svelte'
-  import type { Snippet } from 'svelte'
 
   let {
     title = 'File Browser',

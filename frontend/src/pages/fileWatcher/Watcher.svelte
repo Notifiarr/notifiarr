@@ -5,6 +5,8 @@
   import type { WatchFile } from '../../api/notifiarrConfig'
   import type { ChildProps } from '../../includes/Instances.svelte'
   import BrowserModal from '../../includes/fileBrowser/BModal.svelte'
+  import BButton from '../../includes/fileBrowser/BButton.svelte'
+
   let {
     form = $bindable(),
     original,
@@ -23,8 +25,9 @@
         id={app.id + '.path'}
         bind:value={form.path}
         original={original?.path}
-        {validate}
-        onclick={() => (pathModal = true)} />
+        {validate}>
+        {#snippet post()}<BButton bind:isOpen={pathModal} />{/snippet}
+      </Input>
     </Col>
     <Col md={3}>
       <Input

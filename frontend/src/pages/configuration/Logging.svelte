@@ -4,6 +4,7 @@
   import T, { _ } from '../../includes/Translate.svelte'
   import type { Config } from '../../api/notifiarrConfig'
   import BrowserModal from '../../includes/fileBrowser/BModal.svelte'
+  import BButton from '../../includes/fileBrowser/BButton.svelte'
 
   type Props = { config: Config; original: Config }
   const { config = $bindable(), original }: Props = $props()
@@ -18,32 +19,27 @@
 <h4>{$_('config.titles.Logging')}</h4>
 <Row>
   <Col md={6}>
-    <Input
-      id="config.logFile"
-      bind:value={config.logFile}
-      original={original.logFile}
-      onclick={() => (logFileModal = true)} />
+    <Input id="config.logFile" bind:value={config.logFile} original={original.logFile}>
+      {#snippet post()}<BButton bind:isOpen={logFileModal} />{/snippet}
+    </Input>
   </Col>
   <Col md={6}>
     <Input
       id="config.services.logFile"
       bind:value={config.services!.logFile}
-      original={original.services?.logFile}
-      onclick={() => (servicesLogModal = true)} />
+      original={original.services?.logFile}>
+      {#snippet post()}<BButton bind:isOpen={servicesLogModal} />{/snippet}
+    </Input>
   </Col>
   <Col md={6}>
-    <Input
-      id="config.httpLog"
-      bind:value={config.httpLog}
-      original={original.httpLog}
-      onclick={() => (httpLogModal = true)} />
+    <Input id="config.httpLog" bind:value={config.httpLog} original={original.httpLog}>
+      {#snippet post()}<BButton bind:isOpen={httpLogModal} />{/snippet}
+    </Input>
   </Col>
   <Col md={6}>
-    <Input
-      id="config.debugLog"
-      bind:value={config.debugLog}
-      original={original.debugLog}
-      onclick={() => (debugLogModal = true)} />
+    <Input id="config.debugLog" bind:value={config.debugLog} original={original.debugLog}>
+      {#snippet post()}<BButton bind:isOpen={debugLogModal} />{/snippet}
+    </Input>
   </Col>
 </Row>
 <Row>
