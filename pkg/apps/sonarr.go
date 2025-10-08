@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -842,12 +843,18 @@ func sonarrSearchSeries(req *http.Request) (int, interface{}) {
 }
 
 func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
-	if strings.Contains(strings.ToLower(title), strings.ToLower(query)) {
+	// Remove all non-alphanumeric characters.
+	reg := regexp.MustCompile("[`~!@#$%^&*()_+={}[]:\"<>?,./;']+")
+	title = strings.ToLower(reg.ReplaceAllString(title, ""))
+	query = strings.ToLower(reg.ReplaceAllString(query, ""))
+
+	if strings.Contains(title, query) {
 		return true
 	}
 
 	for _, t := range alts {
-		if strings.Contains(strings.ToLower(t.Title), strings.ToLower(query)) {
+		title = strings.ToLower(reg.ReplaceAllString(t.Title, ""))
+		if strings.Contains(title, query) {
 			return true
 		}
 	}

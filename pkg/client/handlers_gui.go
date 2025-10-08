@@ -530,6 +530,14 @@ func (c *Client) handleCheckAll(response http.ResponseWriter, request *http.Requ
 	}
 }
 
+type BrowseDir struct {
+	Sep   string   `json:"sep"`   // Filepath separator.
+	Path  string   `json:"path"`  // Current directory path.
+	Mom   string   `json:"mom"`   // Parent directory path.
+	Dirs  []string `json:"dirs"`  // Directories in the current directory.
+	Files []string `json:"files"` // Files in the current directory.
+}
+
 // handleFileBrowser returns a list of files and folders in a path.
 // part of the file browser javascript code.
 //
@@ -537,23 +545,37 @@ func (c *Client) handleCheckAll(response http.ResponseWriter, request *http.Requ
 //	@Description	Returns a list of files and folders in the specified directory path.
 //	@Tags			Files
 //	@Produce		json
-//	@Param			dir	query		string									false	"Directory path to browse"
-//	@Success		200	{object}	object{dirs=[]string,files=[]string}	"directory contents"
-//	@Failure		406	{string}	string									"error reading directory"
+//	@Param			dir	query		string    false	"Directory path to browse"
+//	@Success		200	{object}	BrowseDir "directory contents"
+//	@Failure		406	{string}	string    "error reading directory"
 //	@Router			/browse [get]
+//
+//nolint:cyclop
 func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.Request) {
-	type dir struct {
-		Dirs  []string `json:"dirs"`
-		Files []string `json:"files"`
-	}
+	output, err := c.getBrowsedDir(mux.Vars(request)["dir"])
+	switch {
+	case err != nil:
+		http.Error(response, err.Error(), http.StatusNotAcceptable)
+		return
+	case output.Path == "/", output.Path == "":
+		if runtime.GOOS == mnd.Windows {
+			partitions, err := disk.PartitionsWithContext(request.Context(), false)
+			if err != nil {
+				logs.Log.Errorf("Getting disk partitions: %v", err)
+			}
 
-	output := dir{Dirs: []string{}, Files: []string{}}
+			for _, partition := range partitions {
+				output.Dirs = append(output.Dirs, partition.Mountpoint)
+			}
 
-	switch dirPath := mux.Vars(request)["dir"]; {
-	case dirPath != "":
-		dir, err := os.ReadDir(filepath.Join(dirPath, "/"))
+			break
+		}
+
+		fallthrough
+	default:
+		dir, err := os.ReadDir(filepath.Join(output.Path, string(filepath.Separator)))
 		if err != nil {
-			http.Error(response, err.Error(), http.StatusNotAcceptable)
+			http.Error(response, "Unable to read content of provided path: "+err.Error(), http.StatusNotAcceptable)
 			return
 		}
 
@@ -564,22 +586,31 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 				output.Files = append(output.Files, file.Name())
 			}
 		}
-	case runtime.GOOS == mnd.Windows:
-		partitions, err := disk.PartitionsWithContext(request.Context(), false)
-		if err != nil {
-			logs.Log.Errorf("Getting disk partitions: %v", err)
-		}
-		// this runs anyway.
-		for _, partition := range partitions {
-			output.Dirs = append(output.Dirs, partition.Mountpoint)
-		}
-	default:
-		output.Dirs = []string{"/"}
 	}
 
 	if err := json.NewEncoder(response).Encode(&output); err != nil {
 		logs.Log.Errorf("Encoding file browser directory: %v", err)
 	}
+}
+
+func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
+	output := &BrowseDir{Path: dir, Dirs: []string{}, Files: []string{}, Sep: string(filepath.Separator)}
+	if dir == "" {
+		return output, nil
+	}
+
+	dirStat, err := os.Stat(dir)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read provided path: %w", err)
+	}
+
+	if !dirStat.IsDir() {
+		output.Path = filepath.Dir(dir)
+	}
+
+	output.Mom = filepath.Dir(output.Path)
+
+	return output, nil
 }
 
 // handleCommandStats is for js getCmdStats.

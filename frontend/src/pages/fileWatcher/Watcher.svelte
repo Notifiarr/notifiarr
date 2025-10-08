@@ -1,10 +1,10 @@
 <script lang="ts">
   import Input from '../../includes/Input.svelte'
   import { Col, Row } from '@sveltestrap/sveltestrap'
-  import { _ } from '../../includes/Translate.svelte'
+  import T, { _ } from '../../includes/Translate.svelte'
   import type { WatchFile } from '../../api/notifiarrConfig'
   import type { ChildProps } from '../../includes/Instances.svelte'
-
+  import BrowserModal from '../../includes/fileBrowser/BModal.svelte'
   let {
     form = $bindable(),
     original,
@@ -12,6 +12,8 @@
     index, // unused but matches our ChildProps interface.
     validate,
   }: ChildProps<WatchFile> = $props()
+
+  let pathModal = $state(false)
 </script>
 
 <div class="watcher">
@@ -21,7 +23,8 @@
         id={app.id + '.path'}
         bind:value={form.path}
         original={original?.path}
-        {validate} />
+        {validate}
+        onclick={() => (pathModal = true)} />
     </Col>
     <Col md={3}>
       <Input
@@ -81,3 +84,11 @@
     </Col>
   </Row>
 </div>
+
+<BrowserModal
+  file
+  bind:isOpen={pathModal}
+  bind:value={form.path}
+  title="FileWatcher.path.label">
+  <T id="FileWatcher.path.description" />
+</BrowserModal>

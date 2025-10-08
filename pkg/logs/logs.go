@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime/debug"
 	"sync"
@@ -272,6 +273,11 @@ func CustomLog(filePath, logName string) *Logger {
 
 	if f, err := filepath.Abs(filePath); err == nil {
 		filePath = f
+	}
+
+	// If a directory was provided, append a file name.
+	if stat, _ := os.Stat(filePath); stat != nil && stat.IsDir() {
+		filePath = filepath.Join(filePath, mnd.Title+"."+logName+defExt)
 	}
 
 	logger := &Logger{}
