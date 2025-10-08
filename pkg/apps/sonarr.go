@@ -12,6 +12,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"golang.org/x/time/rate"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
@@ -844,17 +845,17 @@ func sonarrSearchSeries(req *http.Request) (int, interface{}) {
 
 func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
 	// Remove all non-alphanumeric characters.
-	reg := regexp.MustCompile("[`~!@#$%^&*()_+={}[]:\"<>?,./;']+")
+	reg := regexp.MustCompile(`[^\p{L}\p{N}]+`) // Keep Unicode letters and numbers.
 	title = strings.ToLower(reg.ReplaceAllString(title, ""))
 	query = strings.ToLower(reg.ReplaceAllString(query, ""))
 
-	if strings.Contains(title, query) {
+	if fuzzy.Match(query, title) {
 		return true
 	}
 
 	for _, t := range alts {
 		title = strings.ToLower(reg.ReplaceAllString(t.Title, ""))
-		if strings.Contains(title, query) {
+		if fuzzy.Match(query, title) {
 			return true
 		}
 	}
