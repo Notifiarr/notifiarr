@@ -3,7 +3,7 @@
 # https://github.com/golift/application-builder
 #
 
-FROM golang:1.25.1-alpine AS builder
+FROM golang:1.25.2-alpine AS builder
 
 # Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
