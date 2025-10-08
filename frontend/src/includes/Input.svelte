@@ -15,10 +15,7 @@
     faEyeSlash,
     faArrowUpFromBracket,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import {
-    faFolderOpen,
-    faQuestionCircle,
-  } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { _ } from './Translate.svelte'
   import { type Snippet } from 'svelte'
   import Fa from './Fa.svelte'

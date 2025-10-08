@@ -10,15 +10,14 @@
     Input,
     Tooltip,
   } from '@sveltestrap/sveltestrap'
-  import { getUi } from '../../api/fetch'
-  import type { BrowseDir } from '../../api/notifiarrConfig'
-  import { rtrim, success } from '../util'
   import Fa from '../Fa.svelte'
   import { faArrowUpToArc } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import T, { _ } from '../Translate.svelte'
-  import { tick, type Snippet } from 'svelte'
+  import T from '../Translate.svelte'
+  import { type Snippet } from 'svelte'
   import FileList from './FileList.svelte'
   import { faCheck, faSpinner } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import { FileBrowser } from './browser.svelte'
+  import ActionBar from './ActionBar.svelte'
 
   type Props = {
     /**
@@ -34,10 +33,10 @@
     file?: boolean
     /** The height of the card. */
     height?: string
-    /** When set to true, shows a cancel button. */
-    showCancel?: boolean
     /** Children to render in the card header. */
     children?: Snippet
+    /** Children to render in the card footer. */
+    footer?: Snippet
   }
 
   let {
@@ -46,79 +45,25 @@
     dir = false,
     file = false,
     height = '100%',
-    showCancel = false,
     children,
+    footer,
   }: Props = $props()
 
-  let wd: BrowseDir = $state({ path: value, files: [], dirs: [], sep: '/', mom: '' })
-  let selected = $state(value || '/')
-  let respErr = $state('')
-  let loading = $state(false)
-  let input = $derived(wd.path)
-
-  const cd = (e: Event, to: string, direct = false) => {
-    e.preventDefault()
-    selected = direct ? to : rtrim(wd.path, wd.sep) + wd.sep + to
-    respErr = ''
-  }
-
-  const select = (e: Event, file: string, dir = false) => {
-    e.preventDefault()
-    value = (dir ? '' : rtrim(wd.path, wd.sep) + wd.sep) + file
-    close()
-  }
-
-  const create = async (path: string, dir = false) => {
-    const resp = await getUi('create?dir=' + dir + '&path=' + path, true)
-    if (!resp.ok) {
-      respErr = resp.body
-      return
-    }
-
-    success($_('FileBrowser.Created', { values: { path } }))
-    wd = resp.body as BrowseDir
-    respErr = ''
-    // Select the file they just created, and close the picker.
-    if (!dir) {
-      value = path
-      close()
-    }
-  }
-
-  const getFiles = async () => {
-    loading = true
-    const resp = await getUi('browse?dir=' + selected, true)
-    if (resp.ok) {
-      wd = resp.body as BrowseDir
-      respErr = ''
-    } else {
-      // Set the path to the selected path, and clear the files and directories.
-      // Makes navigating out of an error state easier.
-      wd.mom = wd.path
-      wd.path = selected
-      wd.dirs = wd.files = undefined
-      await tick()
-      respErr = resp.body
-    }
-    loading = false
-  }
-
-  $effect(() => {
-    if (selected != ' ') getFiles()
-  })
+  const fb = new FileBrowser(value, v => ((value = v), close()))
+  let filter = $state('')
 </script>
 
-<Card style="height: {height};min-height: 280px;">
+<Card style="height: {height};min-height: 400px;">
   <CardHeader>
     <!-- Path title (input group). -->
-    <form onsubmit={e => cd(e, input, true)}>
+    <form onsubmit={e => fb.cd(e, fb.input, true)}>
       <InputGroup>
         <Button
           outline
-          onclick={e => cd(e, wd.mom || wd.sep, true)}
-          disabled={loading}
+          onclick={e => fb.cd(e, fb.wd.mom || fb.wd.sep, true)}
+          disabled={fb.loading}
           type="button">
-          {#if loading}
+          {#if fb.loading}
             <!-- Loading spinner. -->
             <Fa i={faSpinner} c1="steelblue" d2="firebrick" scale={1.5} spin />
           {:else}
@@ -127,9 +72,9 @@
           {/if}
         </Button>
         <InputGroupText><T id="LogFiles.titles.Path" /></InputGroupText>
-        <Input bind:value={input} />
+        <Input bind:value={fb.input} />
         <!-- Go button. -->
-        {#if input !== wd.path}
+        {#if fb.input !== fb.wd.path}
           <Button type="submit" color="primary" outline><T id="FileBrowser.Go" /></Button>
         {/if}
         <!-- Select path button. -->
@@ -139,11 +84,11 @@
             color="success"
             outline
             type="button"
-            onclick={e => select(e, input, true)}>
+            onclick={e => fb.select(e, fb.input, true)}>
             <Fa i={faCheck} c1="limegreen" d1="green" scale={1.5} />
           </Button>
           <Tooltip target="fBut">
-            <T id="FileBrowser.SelectPath" path={wd.path} /></Tooltip>
+            <T id="FileBrowser.SelectPath" path={fb.wd.path} /></Tooltip>
         {/if}
       </InputGroup>
     </form>
@@ -154,23 +99,19 @@
 
   <CardBody class="overflow-auto h-100 p-0">
     <!-- Error message. -->
-    {#if respErr}
-      <Card outline color="danger" class="m-2 text-center" body>{respErr}</Card>
+    {#if fb.respErr}
+      <Card outline color="danger" class="m-2 text-center" body>{fb.respErr}</Card>
     {/if}
-    <FileList {wd} {dir} {cd} {select} />
+    <FileList {fb} {dir} {filter} />
   </CardBody>
 
   <CardFooter class="clearfix">
+    <ActionBar bind:filter {fb} />
     <ul class="d-inline-block mb-0 ps-2">
-      <li><T id="FileBrowser.Folders" count={wd.dirs?.length ?? 0} /></li>
-      <li><T id="FileBrowser.Files" count={wd.files?.length ?? 0} /></li>
+      <li><T id="FileBrowser.Folders" count={fb.wd.dirs?.length ?? 0} /></li>
+      <li><T id="FileBrowser.Files" count={fb.wd.files?.length ?? 0} /></li>
       {#if value}<li><T id="FileBrowser.Selected" path={value} /></li>{/if}
     </ul>
-
-    {#if showCancel}
-      <!-- Cancel button. -->
-      <Button color="secondary" outline onclick={close} class="float-end mx-2">
-        <T id="buttons.Cancel" /></Button>
-    {/if}
+    {@render footer?.()}
   </CardFooter>
 </Card>

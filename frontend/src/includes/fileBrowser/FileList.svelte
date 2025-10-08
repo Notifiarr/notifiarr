@@ -1,23 +1,24 @@
 <script lang="ts">
-  import type { BrowseDir } from '../../api/notifiarrConfig'
-  type Pick = (e: MouseEvent, dir: string) => void
-  type Props = { wd: BrowseDir; dir: boolean; cd: Pick; select: Pick }
-  const { wd, dir, cd, select }: Props = $props()
+  import type { FileBrowser } from './browser.svelte'
+  type Props = { fb: FileBrowser; dir: boolean; filter?: string }
+  const { fb, dir, filter }: Props = $props()
+  const filt = $derived(filter?.toLowerCase() ?? '')
 </script>
 
 <!-- Directory list. -->
 <ul class="p-0">
-  {#each wd.dirs || [] as dir}
+  {#each fb.wd.dirs?.filter(d => d.toLowerCase().includes(filt)) || [] as dir}
     <li class="px-2">
-      <a href="#{wd.path}{wd.sep}{dir}" onclick={e => cd(e, dir)}>{dir}</a><span
-        class="text-muted">{wd.sep}</span>
+      <a href="#{fb.wd.path}{fb.wd.sep}{dir}" onclick={e => fb.cd(e, dir)}>{dir}</a><span
+        class="text-muted">{fb.wd.sep}</span>
     </li>
   {/each}
   <!-- File list. -->
   {#if !dir}
-    {#each wd.files || [] as file}
+    {#each fb.wd.files?.filter(f => f.toLowerCase().includes(filt)) || [] as file}
       <li class="px-2">
-        <a href="#{wd.path}{wd.sep}{file}" onclick={e => select(e, file)}> {file}</a>
+        <a href="#{fb.wd.path}{fb.wd.sep}{file}" onclick={e => fb.select(e, file)}>
+          {file}</a>
       </li>
     {/each}
   {/if}

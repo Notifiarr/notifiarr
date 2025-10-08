@@ -73,6 +73,7 @@
     "Login": "Login",
     "Confirm": "Confirm",
     "Cancel": "Cancel",
+    "Create": "Create",
     "Save": "Save",
     "Close": "Close",
     "SaveChanges": "Save Changes",
@@ -1675,11 +1676,15 @@
     "footer": "Use this troubleshooting tool to verify that all your instances are reachable and configured correctly. The timeout is hard coded to 15 seconds, which is close to how long the website will wait for a response."
   },
   "FileBrowser": {
+    "CreateFileIn": "The file will be created in the path: <code>{path}</code>",
+    "CreateFolderIn": "The folder will be created in the path: <code>{path}</code>",
     "Go": "Go",
     "SelectPath": "Select Path: {path}",
     "Files": "Files: {count}",
     "Folders": "Folders: {count}",
     "Selected": "Selected: <code>{path}</code>",
-    "Created": "Created: {path}"
+    "Created": "Created: {path}",
+    "CreateFolder": "Create Folder",
+    "CreateFile": "Create File"
   }
 }
