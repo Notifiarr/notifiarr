@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -545,60 +544,67 @@ type BrowseDir struct {
 //	@Description	Returns a list of files and folders in the specified directory path.
 //	@Tags			Files
 //	@Produce		json
-//	@Param			dir	query		string    false	"Directory path to browse"
-//	@Success		200	{object}	BrowseDir "directory contents"
-//	@Failure		406	{string}	string    "error reading directory"
+//	@Param			dir	query		string		false	"Directory path to browse"
+//	@Success		200	{object}	BrowseDir	"directory contents"
+//	@Failure		406	{string}	string		"error reading directory"
 //	@Router			/browse [get]
-//
-//nolint:cyclop
 func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.Request) {
-	output, err := c.getBrowsedDir(mux.Vars(request)["dir"])
-	switch {
-	case err != nil:
+	output, err := c.getFileBrowserOutput(request.Context(), mux.Vars(request)["dir"])
+	if err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
-		return
-	case output.Path == "/", output.Path == "", output.Path == `\`:
-		if runtime.GOOS == mnd.Windows {
-			partitions, err := disk.PartitionsWithContext(request.Context(), false)
-			if err != nil {
-				logs.Log.Errorf("Getting disk partitions: %v", err)
-			}
-
-			for _, partition := range partitions {
-				output.Dirs = append(output.Dirs, partition.Mountpoint)
-			}
-
-			output.Mom = ""
-			break
-		}
-
-		if output.Path == "" || output.Path == `\` {
-			output.Path = "/"
-		}
-
-		fallthrough
-	default:
-		dir, err := os.ReadDir(filepath.Join(output.Path, string(filepath.Separator)))
-		if err != nil {
-			http.Error(response, "Unable to read content of provided path: "+err.Error(), http.StatusNotAcceptable)
-			return
-		}
-
-		for _, file := range dir {
-			if file.IsDir() {
-				output.Dirs = append(output.Dirs, file.Name())
-			} else {
-				output.Files = append(output.Files, file.Name())
-			}
-		}
-	}
-
-	if err := json.NewEncoder(response).Encode(&output); err != nil {
+	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
 		logs.Log.Errorf("Encoding file browser directory: %v", err)
 	}
 }
 
+//nolint:cyclop
+func (c *Client) getFileBrowserOutput(ctx context.Context, dirPath string) (*BrowseDir, error) {
+	output, err := c.getBrowsedDir(dirPath)
+	if err != nil {
+		return nil, err
+	}
+
+	if (output.Path == "/" || output.Path == "" || output.Path == `\`) && mnd.IsWindows {
+		partitions, err := disk.PartitionsWithContext(ctx, false)
+		if err != nil {
+			logs.Log.Errorf("Getting disk partitions: %v", err)
+		}
+
+		for _, partition := range partitions {
+			output.Dirs = append(output.Dirs, partition.Mountpoint)
+		}
+
+		output.Mom = ``
+		output.Path = ``
+
+		return output, nil
+	}
+
+	if output.Path == "" || output.Path == `\` {
+		output.Path = "/"
+	}
+
+	dir, err := os.ReadDir(filepath.Join(output.Path, string(filepath.Separator)))
+	if err != nil {
+		return nil, fmt.Errorf("unable to read content of provided path: %w", err)
+	}
+
+	for _, file := range dir {
+		if file.IsDir() {
+			output.Dirs = append(output.Dirs, file.Name())
+		} else {
+			output.Files = append(output.Files, file.Name())
+		}
+	}
+
+	return output, nil
+}
+
 func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
+	if !mnd.IsWindows {
+		dir = configfile.ExpandHomedir(dir)
+	}
+
 	output := &BrowseDir{Path: dir, Dirs: []string{}, Files: []string{}, Sep: string(filepath.Separator)}
 	if dir == "" {
 		return output, nil
@@ -614,8 +620,74 @@ func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
 	}
 
 	output.Mom = filepath.Dir(output.Path)
+	// weird windows thing when at drive root.
+	if (output.Mom == output.Path+"." || output.Mom == output.Path) && output.Path != "/" {
+		output.Mom = ""
+	}
 
 	return output, nil
+}
+
+// handleNewFile creates a new file at the specified path.
+// part of the file browser javascript code.
+//
+//	@Summary		Create file
+//	@Description	Creates a new file at the specified path.
+//	@Tags			Files
+//	@Produce		json
+//	@Param			file	query		string		true	"File path to create"
+//	@Param			new		query		string		true	"Must be true to create a file"
+//	@Success		200		{object}	BrowseDir	"directory contents where file was created"
+//	@Failure		406		{string}	string		"error reading directory"
+//	@Failure		500		{string}	string		"error creating file"
+//	@Router			/browse [get]
+func (c *Client) handleNewFile(response http.ResponseWriter, request *http.Request) {
+	filePath := mux.Vars(request)["file"]
+	logs.Log.Printf("[user requested] Creating file: %s", filePath)
+
+	f, err := os.Create(filePath)
+	if err != nil {
+		http.Error(response, "unable to create file: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	f.Close()
+
+	output, err := c.getFileBrowserOutput(request.Context(), filepath.Dir(filePath))
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusNotAcceptable)
+	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
+		logs.Log.Errorf("Encoding file browser directory: %v", err)
+	}
+}
+
+// handleNewFolder creates a new folder at the specified path.
+// part of the file browser javascript code.
+//
+//	@Summary		Create folder
+//	@Description	Creates a new folder at the specified path.
+//	@Tags			Files
+//	@Produce		json
+//	@Param			dir	query		string		true	"Folder path to create"
+//	@Param			new	query		string		true	"Must be true to create a folder"
+//	@Success		200	{object}	BrowseDir	"directory contents where file was created"
+//	@Failure		406	{string}	string		"error reading directory"
+//	@Failure		500	{string}	string		"error creating folder"
+//	@Router			/browse [get]
+func (c *Client) handleNewFolder(response http.ResponseWriter, request *http.Request) {
+	dirPath := mux.Vars(request)["dir"]
+	logs.Log.Printf("[user requested] Creating folder: %s", dirPath)
+
+	if err := os.MkdirAll(dirPath, mnd.Mode0750); err != nil {
+		http.Error(response, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	output, err := c.getFileBrowserOutput(request.Context(), dirPath)
+	if err != nil {
+		http.Error(response, err.Error(), http.StatusNotAcceptable)
+	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
+		logs.Log.Errorf("Encoding file browser directory: %v", err)
+	}
 }
 
 // handleCommandStats is for js getCmdStats.

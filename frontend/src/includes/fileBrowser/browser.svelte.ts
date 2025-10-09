@@ -26,6 +26,7 @@ export class FileBrowser {
 
   public readonly cd = (e: Event, to: string, direct = false) => {
     e.preventDefault()
+    if (!this.wd.path && this.wd.sep === '\\') direct = true
     this.selected = direct ? to : rtrim(this.wd.path, this.wd.sep) + this.wd.sep + to
     this.respErr = ''
     this.getFiles()
@@ -38,7 +39,11 @@ export class FileBrowser {
   }
 
   public readonly create = async (path: string, dir = false) => {
-    const resp = await getUi('create?dir=' + dir + '&path=' + path, true)
+    this.loading = true
+    path = rtrim(this.wd.path, this.wd.sep) + this.wd.sep + path
+    const resp = await getUi(`browse?new=true&${dir ? 'dir' : 'file'}=${path}`, true)
+    this.loading = false
+
     if (!resp.ok) {
       this.respErr = resp.body
       return

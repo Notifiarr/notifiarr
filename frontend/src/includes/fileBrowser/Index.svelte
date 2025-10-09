@@ -49,8 +49,13 @@
     footer,
   }: Props = $props()
 
-  const fb = new FileBrowser(value, v => ((value = v), close()))
   let filter = $state('')
+  const fb = new FileBrowser(value, v => ((value = v), close()))
+  const filt = $derived(filter.toLowerCase())
+  const dirs = $derived(fb.wd.dirs?.filter(d => d.toLowerCase().includes(filt)) || [])
+  const files = $derived(fb.wd.files?.filter(f => f.toLowerCase().includes(filt)) || [])
+  const dirsCount = $derived(fb.wd.dirs?.length ?? 0)
+  const fileCount = $derived(fb.wd.files?.length ?? 0)
 </script>
 
 <Card style="height: {height};min-height: 400px;">
@@ -102,14 +107,23 @@
     {#if fb.respErr}
       <Card outline color="danger" class="m-2 text-center" body>{fb.respErr}</Card>
     {/if}
-    <FileList {fb} {dir} {filter} />
+    <FileList {fb} {dir} {dirs} {files} />
   </CardBody>
 
-  <CardFooter class="clearfix">
+  <CardFooter>
     <ActionBar bind:filter {fb} />
     <ul class="d-inline-block mb-0 ps-2">
-      <li><T id="FileBrowser.Folders" count={fb.wd.dirs?.length ?? 0} /></li>
-      <li><T id="FileBrowser.Files" count={fb.wd.files?.length ?? 0} /></li>
+      {#if !filt}
+        <li><T id="FileBrowser.Folders" count={dirsCount} /></li>
+        <li><T id="FileBrowser.Files" count={fileCount} /></li>
+      {:else}
+        <li>
+          <T id="FileBrowser.FoldersFiltered" count={dirsCount} filtered={dirs.length} />
+        </li>
+        <li>
+          <T id="FileBrowser.FilesFiltered" count={fileCount} filtered={files.length} />
+        </li>
+      {/if}
       {#if value}<li><T id="FileBrowser.Selected" path={value} /></li>{/if}
     </ul>
     {@render footer?.()}

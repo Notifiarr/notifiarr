@@ -1,13 +1,12 @@
 <script lang="ts">
   import type { FileBrowser } from './browser.svelte'
-  type Props = { fb: FileBrowser; dir: boolean; filter?: string }
-  const { fb, dir, filter }: Props = $props()
-  const filt = $derived(filter?.toLowerCase() ?? '')
+  type Props = { fb: FileBrowser; dir: boolean; dirs: string[]; files: string[] }
+  const { fb, dir, dirs, files }: Props = $props()
 </script>
 
 <!-- Directory list. -->
 <ul class="p-0">
-  {#each fb.wd.dirs?.filter(d => d.toLowerCase().includes(filt)) || [] as dir}
+  {#each dirs as dir}
     <li class="px-2">
       <a href="#{fb.wd.path}{fb.wd.sep}{dir}" onclick={e => fb.cd(e, dir)}>{dir}</a><span
         class="text-muted">{fb.wd.sep}</span>
@@ -15,7 +14,7 @@
   {/each}
   <!-- File list. -->
   {#if !dir}
-    {#each fb.wd.files?.filter(f => f.toLowerCase().includes(filt)) || [] as file}
+    {#each files as file}
       <li class="px-2">
         <a href="#{fb.wd.path}{fb.wd.sep}{file}" onclick={e => fb.select(e, file)}>
           {file}</a>

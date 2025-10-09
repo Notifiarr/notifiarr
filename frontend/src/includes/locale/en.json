@@ -1682,9 +1682,12 @@
     "SelectPath": "Select Path: {path}",
     "Files": "Files: {count}",
     "Folders": "Folders: {count}",
+    "FilesFiltered": "Files: {count}, filtered: {filtered}",
+    "FoldersFiltered": "Folders: {count}, filtered: {filtered}",
     "Selected": "Selected: <code>{path}</code>",
     "Created": "Created: {path}",
     "CreateFolder": "Create Folder",
-    "CreateFile": "Create File"
+    "CreateFile": "Create File",
+    "Creating": "Creating..."
   }
 }
