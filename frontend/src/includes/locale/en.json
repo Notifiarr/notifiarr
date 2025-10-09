@@ -1685,6 +1685,7 @@
     "Selected": "Selected: <code>{path}</code>",
     "Created": "Created: {path}",
     "CreateFolder": "Create Folder",
-    "CreateFile": "Create File"
+    "CreateFile": "Create File",
+    "Creating": "Creating..."
   }
 }
