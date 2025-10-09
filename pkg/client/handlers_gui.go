@@ -555,9 +555,6 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
 		logs.Log.Errorf("Encoding file browser directory: %v", err)
 	}
-
-	b, _ := json.Marshal(output)
-	logs.Log.Printf("File browser directory: %s", string(b))
 }
 
 //nolint:cyclop
