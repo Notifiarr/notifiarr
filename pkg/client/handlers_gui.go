@@ -11,7 +11,6 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -556,6 +555,9 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
 		logs.Log.Errorf("Encoding file browser directory: %v", err)
 	}
+
+	b, _ := json.Marshal(output)
+	logs.Log.Printf("File browser directory: %s", string(b))
 }
 
 //nolint:cyclop
@@ -565,7 +567,7 @@ func (c *Client) getFileBrowserOutput(ctx context.Context, dirPath string) (*Bro
 		return nil, err
 	}
 
-	if (output.Path == "/" || output.Path == "" || output.Path == `\`) && runtime.GOOS == mnd.Windows {
+	if (output.Path == "/" || output.Path == "" || output.Path == `\`) && mnd.IsWindows {
 		partitions, err := disk.PartitionsWithContext(ctx, false)
 		if err != nil {
 			logs.Log.Errorf("Getting disk partitions: %v", err)
@@ -576,6 +578,8 @@ func (c *Client) getFileBrowserOutput(ctx context.Context, dirPath string) (*Bro
 		}
 
 		output.Mom = ``
+		output.Path = ``
+
 		return output, nil
 	}
 
@@ -600,7 +604,9 @@ func (c *Client) getFileBrowserOutput(ctx context.Context, dirPath string) (*Bro
 }
 
 func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
-	dir = configfile.ExpandHomedir(dir)
+	if !mnd.IsWindows {
+		dir = configfile.ExpandHomedir(dir)
+	}
 
 	output := &BrowseDir{Path: dir, Dirs: []string{}, Files: []string{}, Sep: string(filepath.Separator)}
 	if dir == "" {
@@ -617,6 +623,10 @@ func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
 	}
 
 	output.Mom = filepath.Dir(output.Path)
+	// weird windows thing when at drive root.
+	if (output.Mom == output.Path+"." || output.Mom == output.Path) && output.Path != "/" {
+		output.Mom = ""
+	}
 
 	return output, nil
 }

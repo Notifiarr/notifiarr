@@ -26,6 +26,7 @@ export class FileBrowser {
 
   public readonly cd = (e: Event, to: string, direct = false) => {
     e.preventDefault()
+    if (!this.wd.path && this.wd.sep === '\\') direct = true
     this.selected = direct ? to : rtrim(this.wd.path, this.wd.sep) + this.wd.sep + to
     this.respErr = ''
     this.getFiles()
