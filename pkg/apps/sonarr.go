@@ -838,52 +838,81 @@ func sonarrSearchSeries(req *http.Request) (int, interface{}) {
 		return apiError(http.StatusServiceUnavailable, "getting series", err)
 	}
 
-	query := strings.TrimSpace(mux.Vars(req)["query"]) // in
-	resp := seriesSearch(series, query)                // out
-
-	return http.StatusOK, resp
+	return http.StatusOK, seriesSearch(series, mux.Vars(req)["query"])
 }
 
 func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchOutput {
-	resp := make([]SeriesSearchOutput, 0)
-	titles := make([]string, 0)
-
 	const (
 		minLength  = 2 // Too short to search.
 		maxResults = 10
 		minScore   = 40
 	)
 
-	if len(wuzzy.Cleanse(query, false)) < minLength {
-		return resp
+	cleanedQuery := wuzzy.Cleanse(query, false)
+	if len(cleanedQuery) < minLength {
+		return []SeriesSearchOutput{}
 	}
 
-	// Build the titles list.
-	for _, item := range series {
-		titles = append(titles, item.Title)
-		for _, alt := range item.AlternateTitles {
-			titles = append(titles, alt.Title)
-		}
-	}
+	titles, resp, series := buildTitlesList(series, cleanedQuery)
+	mnd.Log.Printf("[sonarr search] Found %d Sonarr titles to search from %d series", len(titles), len(series))
 
 	// Find fuzzy matches.
-	matches, err := wuzzy.Extract(query, titles, maxResults, wuzzy.UQRatio, minScore)
+	matches, err := wuzzy.Extract(query, titles, len(resp)-maxResults, wuzzy.UQRatio, minScore)
 	if err != nil {
-		mnd.Log.Errorf("Finding fuzzy matches: %s", err)
+		mnd.Log.Errorf("[sonarr search] Finding fuzzy matches: %s", err)
 	}
 
+	have := map[int]bool{}
 	// Now go back through the matches, and find the series that matches by name.
 	for _, match := range matches {
-		if idxs := seriesMatches(match, series); len(idxs) > 0 {
-			for _, idx := range idxs {
+		if len(resp) >= maxResults {
+			break
+		}
+
+		for _, idx := range seriesMatches(match, series) {
+			if !have[idx] {
+				mnd.Log.Printf("[sonarr search] Fuzzy match (score: %d): %q (matched: %q)",
+					match.Score, series[idx].Title, match.Match)
 				resp = append(resp, convertToSeriesSearchOutput(series[idx], match.Score))
-				// Remove the series from the list to avoid duplicates.
-				series = append(series[:idx], series[idx+1:]...)
+				have[idx] = true
 			}
 		}
 	}
 
 	return resp
+}
+
+func buildTitlesList(series []*sonarr.Series, query string) ([]string, []SeriesSearchOutput, []*sonarr.Series) {
+	titles := make([]string, 0)
+	resp := make([]SeriesSearchOutput, 0)
+
+	const (
+		prefixScore = 91
+		exactScore  = 100
+	)
+
+	// Build the titles list.
+	for idx, item := range series {
+		switch cleanedTitle := wuzzy.Cleanse(item.Title, false); {
+		case cleanedTitle == query:
+			mnd.Log.Printf("[sonarr search] Found exact match: %q", item.Title)
+			resp = append(resp, convertToSeriesSearchOutput(series[idx], exactScore))
+			// Remove the series from the list to avoid duplicates.
+			series = append(series[:idx], series[idx+1:]...)
+		case strings.HasPrefix(cleanedTitle, query):
+			mnd.Log.Printf("[sonarr search] Found prefix match: %q", item.Title)
+			resp = append(resp, convertToSeriesSearchOutput(series[idx], prefixScore))
+			// Remove the series from the list to avoid duplicates.
+			series = append(series[:idx], series[idx+1:]...)
+		default:
+			titles = append(titles, item.Title)
+			for _, alt := range item.AlternateTitles {
+				titles = append(titles, alt.Title)
+			}
+		}
+	}
+
+	return titles, resp, series
 }
 
 func seriesMatches(wuzz *wuzzy.MatchPair, series []*sonarr.Series) []int {
