@@ -12371,7 +12371,7 @@
                                         "message": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/apps.sonarrSearchSeries.seriesData"
+                                                "$ref": "#/definitions/apps.SeriesSearchOutput"
                                             }
                                         }
                                     }
@@ -14404,6 +14404,68 @@
                 }
             }
         },
+        "apps.SeriesSearchOutput": {
+            "type": "object",
+            "properties": {
+                "added": {
+                    "type": "string"
+                },
+                "exists": {
+                    "type": "boolean"
+                },
+                "first": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "languageProfileId": {
+                    "type": "integer"
+                },
+                "monitored": {
+                    "type": "boolean"
+                },
+                "next": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "prev": {
+                    "type": "string"
+                },
+                "qualityId": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "seasonFolder": {
+                    "type": "boolean"
+                },
+                "seasons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sonarr.Season"
+                    }
+                },
+                "seriesType": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tvdbId": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
         "apps.deleteResponse": {
             "type": "object",
             "properties": {
@@ -14563,62 +14625,6 @@
                 "title": {
                     "description": "Book Title",
                     "type": "string"
-                }
-            }
-        },
-        "apps.sonarrSearchSeries.seriesData": {
-            "type": "object",
-            "properties": {
-                "added": {
-                    "type": "string"
-                },
-                "exists": {
-                    "type": "boolean"
-                },
-                "first": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "languageProfileId": {
-                    "type": "integer"
-                },
-                "monitored": {
-                    "type": "boolean"
-                },
-                "next": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "prev": {
-                    "type": "string"
-                },
-                "qualityId": {
-                    "type": "integer"
-                },
-                "seasonFolder": {
-                    "type": "boolean"
-                },
-                "seasons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/sonarr.Season"
-                    }
-                },
-                "seriesType": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "tvdbId": {
-                    "type": "integer"
                 }
             }
         },

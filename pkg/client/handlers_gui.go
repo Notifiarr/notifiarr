@@ -601,8 +601,12 @@ func (c *Client) getFileBrowserOutput(ctx context.Context, dirPath string) (*Bro
 }
 
 func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
-	if !mnd.IsWindows {
-		dir = configfile.ExpandHomedir(dir)
+	if dir = configfile.ExpandHomedir(dir); dir == "~" {
+		if mnd.IsWindows {
+			dir = ""
+		} else {
+			dir = "/"
+		}
 	}
 
 	output := &BrowseDir{Path: dir, Dirs: []string{}, Files: []string{}, Sep: string(filepath.Separator)}

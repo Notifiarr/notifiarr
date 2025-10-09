@@ -16,7 +16,7 @@ export class FileBrowser {
   constructor(value: string, close: (value: string) => void) {
     this.value = value
     this.wd = $state({ path: this.value, files: [], dirs: [], sep: '/', mom: '' })
-    this.selected = $state(value || '/')
+    this.selected = $state(value || '~') // Default to home folder.
     this.respErr = $state('')
     this.loading = $state(false)
     this.input = $derived(this.wd.path)
@@ -24,12 +24,13 @@ export class FileBrowser {
     this.getFiles()
   }
 
-  public readonly cd = (e: Event, to: string, direct = false) => {
+  public readonly cd = async (e: Event, to: string, direct = false) => {
     e.preventDefault()
+    // This happens when at the top on Windows. Do not produce: \D:
     if (!this.wd.path && this.wd.sep === '\\') direct = true
     this.selected = direct ? to : rtrim(this.wd.path, this.wd.sep) + this.wd.sep + to
     this.respErr = ''
-    this.getFiles()
+    await this.getFiles()
   }
 
   public readonly select = (e: Event, file: string, dir = false) => {
