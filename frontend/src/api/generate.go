@@ -78,6 +78,7 @@ func main() {
 		commands.Stats{},
 		apps.ApiResponse{},
 		checkapp.CheckAllOutput{},
+		client.BrowseDir{},
 	)
 
 	log.Println("==> splitting packages")

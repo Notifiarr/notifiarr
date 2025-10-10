@@ -90,6 +90,8 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/checkInstance/{type}/{index}", c.handleInstanceCheck).Methods("POST")
 	gui.HandleFunc("/stopFileWatch/{index}", c.handleStopFileWatcher).Methods("GET")
 	gui.HandleFunc("/startFileWatch/{index}", c.handleStartFileWatcher).Methods("GET")
+	gui.HandleFunc("/browse", c.handleNewFolder).Queries("dir", "{dir}", "new", "true").Methods("GET")
+	gui.HandleFunc("/browse", c.handleNewFile).Queries("file", "{file}", "new", "true").Methods("GET")
 	gui.HandleFunc("/browse", c.handleFileBrowser).Queries("dir", "{dir}").Methods("GET")
 	gui.HandleFunc("/ajax/{path:cmdstats|cmdargs}/{hash}", c.handleCommandStats).Methods("GET")
 	gui.HandleFunc("/runCommand/{hash}", c.handleRunCommand).Methods("POST")

@@ -97,7 +97,6 @@ func (l *Logger) SetupLogging(config LogConfig) {
 	logFiles = config.LogFiles
 	logFileMb = config.LogFileMb
 	l.LogConfig = config
-	config.Quiet = !hasConsoleWindow() || config.Quiet
 
 	l.setDefaultLogPaths()
 	l.setAppLogPath()

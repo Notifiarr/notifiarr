@@ -166,7 +166,7 @@
         <Badge color="secondary" style="margin-left: 0.5rem;">{badge}</Badge>
       {/if}
     </Label>
-    <InputGroup class="has-validation">
+    <InputGroup>
       {#if tooltip != id + '.tooltip'}
         <Button
           color="secondary"

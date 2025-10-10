@@ -220,6 +220,8 @@ func (c *Config) fixConfig() {
 		_ = c.UIPassword.Set(DefaultUsername + ":" + c.APIKey)
 	}
 
+	// Windows has no stdout, so turn it off.
+	c.LogConfig.Quiet = mnd.IsWindows || c.LogConfig.Quiet
 	c.Services.Plugins = &c.Snapshot.Plugins
 }
 

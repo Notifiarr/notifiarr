@@ -36,7 +36,3 @@ func getFileOwner(fileInfo os.FileInfo) string {
 
 	return uid + ":" + gid
 }
-
-func hasConsoleWindow() bool {
-	return true
-}
