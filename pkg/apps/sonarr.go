@@ -856,7 +856,7 @@ func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchItem {
 		len(titles), len(series), query, cleanedQuery)
 
 	// Find fuzzy matches.
-	matches, err := wuzzy.Extract(query, titles, len(resp)-maxResults, matcher, minScore)
+	matches, err := wuzzy.Extract(query, titles, -1, matcher, minScore)
 	if err != nil {
 		mnd.Log.Errorf("[sonarr search] Finding fuzzy matches: %s", err)
 	}

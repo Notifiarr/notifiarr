@@ -47,24 +47,21 @@ export class FileBrowser {
   }
 
   public readonly create = async (path: string, dir = false) => {
+    if (path.includes('/') || path.includes('\\'))
+      return (this.respErr = get(_)('FileBrowser.InvalidPath'))
+
     this.loading = true
     path = rtrim(this.wd.path, this.wd.sep) + this.wd.sep + path
     const resp = await getUi(`browse?new=true&${dir ? 'dir' : 'file'}=${path}`, true)
     this.loading = false
 
-    if (!resp.ok) {
-      this.respErr = resp.body
-      return
-    }
+    if (!resp.ok) return (this.respErr = resp.body)
 
     success(get(_)('FileBrowser.Created', { values: { path } }))
     this.wd = resp.body as BrowseDir
     this.respErr = ''
     // Select the file they just created, and close the picker.
-    if (!dir) {
-      this.value = path
-      this.close(this.value)
-    }
+    if (!dir) this.close((this.value = path))
   }
 
   private readonly getFiles = async () => {

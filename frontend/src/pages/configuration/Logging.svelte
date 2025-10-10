@@ -106,7 +106,7 @@
   bind:isOpen={logFileModal}
   bind:value={config.logFile}
   title="config.logFile.label"
-  description={$_('config.logFile.description')}>
+  description="config.logFile.description">
   <T id="config.logFile.tooltip" />
 </BrowserModal>
 
@@ -114,7 +114,7 @@
   bind:isOpen={debugLogModal}
   bind:value={config.debugLog}
   title="config.debugLog.label"
-  description={$_('config.debugLog.description')}>
+  description="config.debugLog.description">
   <T id="config.debugLog.tooltip" />
 </BrowserModal>
 
@@ -122,7 +122,7 @@
   bind:isOpen={httpLogModal}
   bind:value={config.httpLog}
   title="config.httpLog.label"
-  description={$_('config.httpLog.description')}>
+  description="config.httpLog.description">
   <T id="config.httpLog.tooltip" />
 </BrowserModal>
 
@@ -130,6 +130,6 @@
   bind:isOpen={servicesLogModal}
   bind:value={config.services!.logFile}
   title="config.services.logFile.label"
-  description={$_('config.services.logFile.description')}>
+  description="config.services.logFile.description">
   <T id="config.services.logFile.tooltip" />
 </BrowserModal>

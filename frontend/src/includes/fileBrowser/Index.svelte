@@ -26,7 +26,7 @@
      * If a value is set, the path will be set to the parent directory of the value.
      */
     value: string
-    /** A description of the file browser. */
+    /** A description of the file browser. Translation key. */
     description: string
     /** This is called when the user clicks a close button. It should destroy this component. */
     close: () => void
@@ -81,15 +81,19 @@
             <Fa i={faArrowUpToArc} c1="steelblue" d2="firebrick" scale={1.5} />
           {/if}
         </Button>
-        <Tooltip target="upBut"><T id="FileBrowser.GoUpToParent" /></Tooltip>
+        <Tooltip target="upBut"><T id="FileBrowser.tooltip.Up" /></Tooltip>
         <InputGroupText><T id="LogFiles.titles.Path" /></InputGroupText>
         <Input bind:value={fb.input} />
-        <!-- Go button. -->
         {#if fb.input !== fb.wd.path}
-          <Button type="submit" color="primary" outline><T id="FileBrowser.Go" /></Button>
+          <!-- Go button. -->
+          <Button id="goBut" type="submit" color="primary" outline>
+            <T id="buttons.Go" /></Button>
+          <Tooltip target="goBut">
+            <T id="FileBrowser.tooltip.Go" path={fb.input} /></Tooltip>
         {/if}
-        <!-- Select path button. -->
-        {#if !file}
+
+        {#if !file || fb.input !== fb.wd.path}
+          <!-- Select path button. -->
           <Button
             id="fBut"
             color="success"
@@ -99,13 +103,13 @@
             <Fa i={faCheck} c1="limegreen" d1="green" scale={1.5} />
           </Button>
           <Tooltip target="fBut">
-            <T id="FileBrowser.SelectPath" path={fb.input} /></Tooltip>
+            <T id="FileBrowser.tooltip.SelectPath" path={fb.input} /></Tooltip>
         {/if}
       </InputGroup>
     </form>
-    {description}
+    <T id={description} />
     <ActionBar bind:filter {fb}>
-      <!-- Children (a description of the file browser). -->
+      <!-- Children (a longer description of the file browser). -->
       {@render children?.()}
     </ActionBar>
   </CardHeader>

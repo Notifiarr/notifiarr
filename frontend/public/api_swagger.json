@@ -14443,12 +14443,6 @@
                 "seasonFolder": {
                     "type": "boolean"
                 },
-                "seasons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/sonarr.Season"
-                    }
-                },
                 "seriesType": {
                     "type": "string"
                 },

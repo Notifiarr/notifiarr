@@ -54,8 +54,10 @@
       <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
     {/if}
   </Button>
+
   <InputGroupText><T id="FileBrowser.FilterFiles" /></InputGroupText>
   <Input bind:value={filter} />
+
   {#if fb.wd.path}
     <Dropdown group>
       <DropdownToggle
@@ -64,13 +66,13 @@
         caret
         class="rounded-0 rounded-end"
         disabled={!fb.wd.path}>
-        <T id="FileBrowser.Menu" />
+        <T id="buttons.Menu" />
       </DropdownToggle>
       <DropdownMenu>
         <DropdownItem onclick={() => open('CreateFolder')}>
-          <T id="FileBrowser.CreateFolder" /></DropdownItem>
+          <T id="buttons.CreateFolder" /></DropdownItem>
         <DropdownItem onclick={() => open('CreateFile')}>
-          <T id="FileBrowser.CreateFile" /></DropdownItem>
+          <T id="buttons.CreateFile" /></DropdownItem>
       </DropdownMenu>
     </Dropdown>
   {/if}
@@ -83,14 +85,12 @@
     </Card>
   </div>
 {:else}
-  <div transition:slide>
-    {@render children?.()}
-  </div>
+  <div transition:slide>{@render children?.()}</div>
 {/if}
 
 <!-- New folder / file modal. Path input. -->
-<Modal bind:isOpen theme={$theme} centered contentClassName="border-warning-subtle">
-  <ModalHeader toggle={cancel}><T id="FileBrowser.{newType}" /></ModalHeader>
+<Modal bind:isOpen theme={$theme} contentClassName="border-warning-subtle">
+  <ModalHeader toggle={cancel}><T id="buttons.{newType}" /></ModalHeader>
   <ModalBody>
     <T id="FileBrowser.{newType}In" path={fb.wd.path} />
     <form onsubmit={e => create(e, newPath, newType == 'CreateFolder')}>

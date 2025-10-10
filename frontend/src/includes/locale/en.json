@@ -86,7 +86,11 @@
     "ShowMenu": "Show Menu",
     "ShowOutput": "Show Output",
     "HideOutput": "Hide Output",
-    "RefreshOutput": "Refresh Output"
+    "RefreshOutput": "Refresh Output",
+    "Go": "Go",
+    "Menu": "Menu",
+    "CreateFolder": "Create Folder",
+    "CreateFile": "Create File"
   },
   "RegexTester": {
     "RegularExpressionTester": "Regular Expression Tester",
@@ -1676,22 +1680,22 @@
     "footer": "Use this troubleshooting tool to verify that all your instances are reachable and configured correctly. The timeout is hard coded to 15 seconds, which is close to how long the website will wait for a response."
   },
   "FileBrowser": {
+    "tooltip": {
+      "Go": "<code>cd {path}</code><br />Change directory to provided path.",
+      "SelectPath": "Select Path: <code>{path}</code>",
+      "Up": "<code>cd ..</code><br />Change directory to parent folder."
+    },
+    "FilterFiles": "Filter Files",
     "CreateFileIn": "The file will be created in the path: <code>{path}</code>",
     "CreateFolderIn": "The folder will be created in the path: <code>{path}</code>",
-    "Go": "Go",
-    "SelectPath": "Select Path: {path}",
     "Files": "Files: {count}",
     "Folders": "Folders: {count}",
     "FilesFiltered": "Files: {count}, filtered: {filtered}",
     "FoldersFiltered": "Folders: {count}, filtered: {filtered}",
     "Selected": "Selected: <code>{path}</code>",
     "Created": "Created: {path}",
-    "CreateFolder": "Create Folder",
-    "CreateFile": "Create File",
     "Creating": "Creating...",
-    "FilterFiles": "Filter Files",
-    "Menu": "Menu",
-    "GoUpToParent": "<code>cd ..</code><br />Change directory to parent folder.",
-    "FilterFilesDesc": "Use the file filter to quickly search the list of displayed files. Useful on folders with a lot of files. Use the <code>Menu</code> button to create a new folder or file. To select a file that does not exist, type it into the <code>Path</code> bar and click the green check button, or if you don't have that button, use the <code>Create File</code> menu item to create it."
+    "InvalidPath": "Invalid path provided. Do not include slashes (<code>/</code> or <code>\\</code>).",
+    "FilterFilesDesc": "Use the file filter to quickly search the list of displayed files. Useful on folders with a lot of files. Use the <code>Menu</code> button to create a new folder or file. To select a file that does not exist, type it into the <code>Path</code> bar and click the green check button. Alternatively, use the <code>Create File</code> menu item to create it."
   }
 }
