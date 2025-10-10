@@ -15,7 +15,14 @@ export class FileBrowser {
 
   constructor(value: string, close: (value: string) => void) {
     this.value = value
-    this.wd = $state({ path: this.value, files: [], dirs: [], sep: '/', mom: '' })
+    this.wd = $state({
+      path: this.value,
+      files: [],
+      dirs: [],
+      sep: '/',
+      mom: '',
+      error: '',
+    })
     this.selected = $state(value || '~') // Default to home folder.
     this.respErr = $state('')
     this.loading = $state(false)
@@ -67,7 +74,7 @@ export class FileBrowser {
 
     if (resp.ok) {
       this.wd = resp.body as BrowseDir
-      this.respErr = ''
+      this.respErr = this.wd.error
       return
     }
     // Set the path to the selected path, and clear the files and directories.

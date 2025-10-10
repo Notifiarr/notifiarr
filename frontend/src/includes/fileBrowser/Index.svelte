@@ -18,6 +18,7 @@
   import { faCheck, faSpinner } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { FileBrowser } from './browser.svelte'
   import ActionBar from './ActionBar.svelte'
+  import { slide } from 'svelte/transition'
 
   type Props = {
     /**
@@ -25,6 +26,8 @@
      * If a value is set, the path will be set to the parent directory of the value.
      */
     value: string
+    /** A description of the file browser. */
+    description: string
     /** This is called when the user clicks a close button. It should destroy this component. */
     close: () => void
     /** When set to true, disallows files from being selected, and won't even show them. */
@@ -42,6 +45,7 @@
   let {
     value = $bindable(),
     close,
+    description,
     dir = false,
     file = false,
     height = '100%',
@@ -64,6 +68,7 @@
     <form onsubmit={e => fb.cd(e, fb.input, true)}>
       <InputGroup>
         <Button
+          id="upBut"
           outline
           onclick={e => fb.cd(e, fb.wd.mom || fb.wd.sep, true)}
           disabled={fb.loading}
@@ -76,6 +81,7 @@
             <Fa i={faArrowUpToArc} c1="steelblue" d2="firebrick" scale={1.5} />
           {/if}
         </Button>
+        <Tooltip target="upBut"><T id="FileBrowser.GoUpToParent" /></Tooltip>
         <InputGroupText><T id="LogFiles.titles.Path" /></InputGroupText>
         <Input bind:value={fb.input} />
         <!-- Go button. -->
@@ -93,25 +99,28 @@
             <Fa i={faCheck} c1="limegreen" d1="green" scale={1.5} />
           </Button>
           <Tooltip target="fBut">
-            <T id="FileBrowser.SelectPath" path={fb.wd.path} /></Tooltip>
+            <T id="FileBrowser.SelectPath" path={fb.input} /></Tooltip>
         {/if}
       </InputGroup>
     </form>
-
-    <!-- Children (a description of the file browser). -->
-    {@render children?.()}
+    {description}
+    <ActionBar bind:filter {fb}>
+      <!-- Children (a description of the file browser). -->
+      {@render children?.()}
+    </ActionBar>
   </CardHeader>
 
   <CardBody class="overflow-auto h-100 p-0">
     <!-- Error message. -->
     {#if fb.respErr}
-      <Card outline color="danger" class="m-2 text-center" body>{fb.respErr}</Card>
+      <div transition:slide>
+        <Card outline color="danger" class="m-2 text-center" body>{fb.respErr}</Card>
+      </div>
     {/if}
     <FileList {fb} {dir} {dirs} {files} />
   </CardBody>
 
   <CardFooter>
-    <ActionBar bind:filter {fb} />
     <ul class="d-inline-block mb-0 ps-2">
       {#if !filt}
         <li><T id="FileBrowser.Folders" count={dirsCount} /></li>

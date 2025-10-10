@@ -6,8 +6,15 @@
     title = 'File Browser',
     isOpen = $bindable(false),
     value = $bindable(''),
+    description = '',
     ...rest
-  }: { isOpen: boolean; value: string; title: string; [key: string]: any } = $props()
+  }: {
+    isOpen: boolean
+    value: string
+    title: string
+    description: string
+    [key: string]: any
+  } = $props()
 
   const close = () => (isOpen = false)
   let fullscreen = $state(false)
@@ -16,5 +23,5 @@
 </script>
 
 <Nodal bind:isOpen size="lg" bind:fullscreen {title}>
-  <Browser bind:value height="{height};{maxHeight}" {close} {...rest} />
+  <Browser bind:value height="{height};{maxHeight}" {close} {description} {...rest} />
 </Nodal>

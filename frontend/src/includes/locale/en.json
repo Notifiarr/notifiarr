@@ -1688,6 +1688,10 @@
     "Created": "Created: {path}",
     "CreateFolder": "Create Folder",
     "CreateFile": "Create File",
-    "Creating": "Creating..."
+    "Creating": "Creating...",
+    "FilterFiles": "Filter Files",
+    "Menu": "Menu",
+    "GoUpToParent": "<code>cd ..</code><br />Change directory to parent folder.",
+    "FilterFilesDesc": "Use the file filter to quickly search the list of displayed files. Useful on folders with a lot of files. Use the <code>Menu</code> button to create a new folder or file. To select a file that does not exist, type it into the <code>Path</code> bar and click the green check button, or if you don't have that button, use the <code>Create File</code> menu item to create it."
   }
 }

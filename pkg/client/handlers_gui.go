@@ -535,6 +535,7 @@ type BrowseDir struct {
 	Mom   string   `json:"mom"`   // Parent directory path.
 	Dirs  []string `json:"dirs"`  // Directories in the current directory.
 	Files []string `json:"files"` // Files in the current directory.
+	Error string   `json:"error"` // Error message.
 }
 
 // handleFileBrowser returns a list of files and folders in a path.
@@ -609,18 +610,33 @@ func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
 		}
 	}
 
-	output := &BrowseDir{Path: dir, Dirs: []string{}, Files: []string{}, Sep: string(filepath.Separator)}
+	output := &BrowseDir{
+		Path:  dir,
+		Dirs:  []string{},
+		Files: []string{},
+		Sep:   string(filepath.Separator),
+		Mom:   filepath.Dir(dir),
+	}
+
 	if dir == "" {
+		output.Mom = ""
 		return output, nil
 	}
 
 	dirStat, err := os.Stat(dir)
 	if err != nil {
-		return nil, fmt.Errorf("unable to read provided path: %w", err)
+		output.Error = "unable to read provided path: " + err.Error()
+		output.Path = filepath.Dir(dir)
+		output.Mom = filepath.Dir(output.Path)
+
+		if dirStat, err = os.Stat(output.Path); err != nil {
+			return nil, fmt.Errorf("unable to read provided path: %w", err)
+		}
 	}
 
 	if !dirStat.IsDir() {
 		output.Path = filepath.Dir(dir)
+		output.Mom = filepath.Dir(output.Path)
 	}
 
 	output.Mom = filepath.Dir(output.Path)
