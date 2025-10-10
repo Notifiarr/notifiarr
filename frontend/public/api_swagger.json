@@ -12371,7 +12371,7 @@
                                         "message": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/apps.SeriesSearchOutput"
+                                                "$ref": "#/definitions/apps.SeriesSearchItem"
                                             }
                                         }
                                     }
@@ -14404,7 +14404,7 @@
                 }
             }
         },
-        "apps.SeriesSearchOutput": {
+        "apps.SeriesSearchItem": {
             "type": "object",
             "properties": {
                 "added": {

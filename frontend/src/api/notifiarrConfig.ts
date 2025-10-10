@@ -2127,6 +2127,7 @@ export interface BrowseDir {
   mom: string;
   dirs?: string[];
   files?: string[];
+  error: string;
 };
 
 // Packages parsed:

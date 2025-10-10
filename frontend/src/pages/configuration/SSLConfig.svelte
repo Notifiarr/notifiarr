@@ -37,8 +37,8 @@
   file
   bind:isOpen={keyModal}
   bind:value={config.sslKeyFile}
-  title="config.sslKeyFile.label">
-  <p><T id="config.sslKeyFile.description" /></p>
+  title="config.sslKeyFile.label"
+  description={$_('config.sslKeyFile.description')}>
   <T id="config.sslKeyFile.tooltip" />
 </BrowserModal>
 
@@ -46,7 +46,7 @@
   file
   bind:isOpen={certModal}
   bind:value={config.sslCertFile}
-  title="config.sslCertFile.label">
-  <p><T id="config.sslCertFile.description" /></p>
+  title="config.sslCertFile.label"
+  description={$_('config.sslCertFile.description')}>
   <T id="config.sslCertFile.tooltip" />
 </BrowserModal>

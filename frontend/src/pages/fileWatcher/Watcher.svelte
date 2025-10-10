@@ -92,6 +92,5 @@
   file
   bind:isOpen={pathModal}
   bind:value={form.path}
-  title="FileWatcher.path.label">
-  <T id="FileWatcher.path.description" />
-</BrowserModal>
+  title="FileWatcher.path.label"
+  description={$_('FileWatcher.path.description')} />

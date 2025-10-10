@@ -105,31 +105,31 @@
 <BrowserModal
   bind:isOpen={logFileModal}
   bind:value={config.logFile}
-  title="config.logFile.label">
-  <p><T id="config.logFile.description" /></p>
+  title="config.logFile.label"
+  description={$_('config.logFile.description')}>
   <T id="config.logFile.tooltip" />
 </BrowserModal>
 
 <BrowserModal
   bind:isOpen={debugLogModal}
   bind:value={config.debugLog}
-  title="config.debugLog.label">
-  <p><T id="config.debugLog.description" /></p>
+  title="config.debugLog.label"
+  description={$_('config.debugLog.description')}>
   <T id="config.debugLog.tooltip" />
 </BrowserModal>
 
 <BrowserModal
   bind:isOpen={httpLogModal}
   bind:value={config.httpLog}
-  title="config.httpLog.label">
-  <p><T id="config.httpLog.description" /></p>
+  title="config.httpLog.label"
+  description={$_('config.httpLog.description')}>
   <T id="config.httpLog.tooltip" />
 </BrowserModal>
 
 <BrowserModal
   bind:isOpen={servicesLogModal}
   bind:value={config.services!.logFile}
-  title="config.services.logFile.label">
-  <p><T id="config.services.logFile.description" /></p>
+  title="config.services.logFile.label"
+  description={$_('config.services.logFile.description')}>
   <T id="config.services.logFile.tooltip" />
 </BrowserModal>

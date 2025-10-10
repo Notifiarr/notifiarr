@@ -774,29 +774,28 @@ func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
 	return http.StatusOK, output.ID
 }
 
-type SeriesSearchOutput struct {
-	ID                int64            `json:"id"`
-	Title             string           `json:"title"`
-	First             time.Time        `json:"first"`
-	Next              time.Time        `json:"next"`
-	Previous          time.Time        `json:"prev"`
-	Added             time.Time        `json:"added"`
-	Status            string           `json:"status"`
-	Path              string           `json:"path"`
-	TvDBID            int64            `json:"tvdbId"`
-	Monitored         bool             `json:"monitored"`
-	QualityProfileID  int64            `json:"qualityId"`
-	SeasonFolder      bool             `json:"seasonFolder"`
-	SeriesType        string           `json:"seriesType"`
-	LanguageProfileID int64            `json:"languageProfileId"`
-	Seasons           []*sonarr.Season `json:"seasons"`
-	Exists            bool             `json:"exists"`
-	Year              int              `json:"year"`
-	Score             int              `json:"score"`
+type SeriesSearchItem struct {
+	ID                int64     `json:"id"`
+	Title             string    `json:"title"`
+	First             time.Time `json:"first"`
+	Next              time.Time `json:"next"`
+	Previous          time.Time `json:"prev"`
+	Added             time.Time `json:"added"`
+	Status            string    `json:"status"`
+	Path              string    `json:"path"`
+	TvDBID            int64     `json:"tvdbId"`
+	Monitored         bool      `json:"monitored"`
+	QualityProfileID  int64     `json:"qualityId"`
+	SeasonFolder      bool      `json:"seasonFolder"`
+	SeriesType        string    `json:"seriesType"`
+	LanguageProfileID int64     `json:"languageProfileId"`
+	Exists            bool      `json:"exists"`
+	Year              int       `json:"year"`
+	Score             int       `json:"score"`
 }
 
-func convertToSeriesSearchOutput(item *sonarr.Series, score int) SeriesSearchOutput {
-	return SeriesSearchOutput{
+func convertToSeriesSearchOutput(item *sonarr.Series, score int) SeriesSearchItem {
+	return SeriesSearchItem{
 		ID:                item.ID,
 		Title:             item.Title,
 		First:             item.FirstAired,
@@ -811,7 +810,6 @@ func convertToSeriesSearchOutput(item *sonarr.Series, score int) SeriesSearchOut
 		SeasonFolder:      item.SeasonFolder,
 		SeriesType:        item.SeriesType,
 		LanguageProfileID: item.LanguageProfileID,
-		Seasons:           item.Seasons,
 		Exists:            item.Statistics != nil && item.Statistics.SizeOnDisk > 0,
 		Year:              item.Year,
 		Score:             score,
@@ -824,7 +822,7 @@ func convertToSeriesSearchOutput(item *sonarr.Series, score int) SeriesSearchOut
 // @Produce		json
 // @Param			query		path		string												true	"title search string"
 // @Param			instance	path		int64												true	"instance ID"
-// @Success		200			{object}	apps.ApiResponse{message=[]apps.SeriesSearchOutput}	"minimal series data"
+// @Success		200			{object}	apps.ApiResponse{message=[]apps.SeriesSearchItem}	"minimal series data"
 // @Failure		503			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/sonarr/{instance}/search/{query} [get]
@@ -841,23 +839,24 @@ func sonarrSearchSeries(req *http.Request) (int, interface{}) {
 	return http.StatusOK, seriesSearch(series, mux.Vars(req)["query"])
 }
 
-func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchOutput {
+func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchItem {
 	const (
 		minLength  = 2 // Too short to search.
 		maxResults = 10
-		minScore   = 40
+		minScore   = 56
 	)
 
 	cleanedQuery := wuzzy.Cleanse(query, false)
 	if len(cleanedQuery) < minLength {
-		return []SeriesSearchOutput{}
+		return []SeriesSearchItem{}
 	}
 
-	titles, resp, series := buildTitlesList(series, cleanedQuery)
-	mnd.Log.Printf("[sonarr search] Found %d Sonarr titles to search from %d series", len(titles), len(series))
+	titles, resp := buildTitlesList(series)
+	mnd.Log.Printf("[sonarr search] Found %d Sonarr titles from %d series for query %q (cleaned %q)",
+		len(titles), len(series), query, cleanedQuery)
 
 	// Find fuzzy matches.
-	matches, err := wuzzy.Extract(query, titles, len(resp)-maxResults, wuzzy.UQRatio, minScore)
+	matches, err := wuzzy.Extract(query, titles, len(resp)-maxResults, matcher, minScore)
 	if err != nil {
 		mnd.Log.Errorf("[sonarr search] Finding fuzzy matches: %s", err)
 	}
@@ -882,37 +881,47 @@ func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchOutput {
 	return resp
 }
 
-func buildTitlesList(series []*sonarr.Series, query string) ([]string, []SeriesSearchOutput, []*sonarr.Series) {
+const (
+	suffixScore = 81
+	prefixScore = 91
+	exactScore  = 100
+)
+
+func matcher(query, title string) int {
+	cleanedQuery := strings.TrimSuffix(strings.TrimPrefix(wuzzy.Cleanse(query, false), "the "), "s")
+	cleanedTitle := strings.TrimPrefix(wuzzy.Cleanse(title, false), "the ")
+
+	wuzz := wuzzy.UWRatio(query, title)
+	if wuzz >= suffixScore {
+		return wuzz
+	}
+
+	if cleanedTitle == query || cleanedTitle == cleanedQuery+"s" || cleanedTitle == cleanedQuery {
+		return exactScore
+	}
+
+	if strings.HasPrefix(cleanedTitle, cleanedQuery) {
+		return prefixScore
+	}
+
+	if strings.HasSuffix(cleanedTitle, cleanedQuery) || strings.HasSuffix(cleanedTitle, cleanedQuery+"s") {
+		return suffixScore
+	}
+
+	return wuzz
+}
+
+func buildTitlesList(series []*sonarr.Series) ([]string, []SeriesSearchItem) {
 	titles := make([]string, 0)
-	resp := make([]SeriesSearchOutput, 0)
-
-	const (
-		prefixScore = 91
-		exactScore  = 100
-	)
-
 	// Build the titles list.
-	for idx, item := range series {
-		switch cleanedTitle := wuzzy.Cleanse(item.Title, false); {
-		case cleanedTitle == query:
-			mnd.Log.Printf("[sonarr search] Found exact match: %q", item.Title)
-			resp = append(resp, convertToSeriesSearchOutput(series[idx], exactScore))
-			// Remove the series from the list to avoid duplicates.
-			series = append(series[:idx], series[idx+1:]...)
-		case strings.HasPrefix(cleanedTitle, query):
-			mnd.Log.Printf("[sonarr search] Found prefix match: %q", item.Title)
-			resp = append(resp, convertToSeriesSearchOutput(series[idx], prefixScore))
-			// Remove the series from the list to avoid duplicates.
-			series = append(series[:idx], series[idx+1:]...)
-		default:
-			titles = append(titles, item.Title)
-			for _, alt := range item.AlternateTitles {
-				titles = append(titles, alt.Title)
-			}
+	for idx := range series {
+		titles = append(titles, series[idx].Title)
+		for _, alt := range series[idx].AlternateTitles {
+			titles = append(titles, alt.Title)
 		}
 	}
 
-	return titles, resp, series
+	return titles, make([]SeriesSearchItem, 0)
 }
 
 func seriesMatches(wuzz *wuzzy.MatchPair, series []*sonarr.Series) []int {

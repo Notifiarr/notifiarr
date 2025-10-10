@@ -11,19 +11,25 @@
     ModalBody,
     Button,
     ModalHeader,
+    Card,
   } from '@sveltestrap/sveltestrap'
   import Fa from '../Fa.svelte'
   import { faArrowUpFromBracket } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import T from '../Translate.svelte'
+  import T, { _ } from '../Translate.svelte'
   import type { FileBrowser } from './browser.svelte'
   import { theme } from '../theme.svelte'
-  import { faSpinner } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import {
+    faSpinner,
+    faQuestionCircle,
+  } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import { slide } from 'svelte/transition'
 
-  type Props = { filter: string; fb: FileBrowser }
-  let { filter = $bindable(), fb }: Props = $props()
+  type Props = { filter: string; fb: FileBrowser; children: () => any }
+  let { filter = $bindable(), fb, children }: Props = $props()
   let newPath = $state('')
   let newType = $state('')
   let isOpen = $state(false)
+  let showTooltip = $state(false)
 
   const cancel = () => ((newPath = ''), (isOpen = false))
   const open = (type: string) => ((newType = type), (isOpen = true))
@@ -35,13 +41,30 @@
   }
 </script>
 
-<InputGroup class="mb-2">
-  <InputGroupText><T id="Actions.titles.Filter" /></InputGroupText>
+<InputGroup class="my-2">
+  <Button
+    color="secondary"
+    onclick={() => (showTooltip = !showTooltip)}
+    outline
+    style="width:44px;"
+    title={$_('phrases.ShowMore')}>
+    {#if showTooltip}
+      <Fa i={faArrowUpFromBracket} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+    {:else}
+      <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+    {/if}
+  </Button>
+  <InputGroupText><T id="FileBrowser.FilterFiles" /></InputGroupText>
   <Input bind:value={filter} />
   {#if fb.wd.path}
-    <Dropdown group dropup>
-      <DropdownToggle outline class="rounded-0 rounded-end" disabled={!fb.wd.path}>
-        <Fa i={faArrowUpFromBracket} c1="gray" d1="gainsboro" c2="orange" scale={1.5} />
+    <Dropdown group>
+      <DropdownToggle
+        color="warning"
+        outline
+        caret
+        class="rounded-0 rounded-end"
+        disabled={!fb.wd.path}>
+        <T id="FileBrowser.Menu" />
       </DropdownToggle>
       <DropdownMenu>
         <DropdownItem onclick={() => open('CreateFolder')}>
@@ -52,6 +75,18 @@
     </Dropdown>
   {/if}
 </InputGroup>
+
+{#if showTooltip}
+  <div transition:slide>
+    <Card body class="mt-1" color="warning" outline>
+      <p class="mb-0">{@html $_('FileBrowser.FilterFilesDesc')}</p>
+    </Card>
+  </div>
+{:else}
+  <div transition:slide>
+    {@render children?.()}
+  </div>
+{/if}
 
 <!-- New folder / file modal. Path input. -->
 <Modal bind:isOpen theme={$theme} centered contentClassName="border-warning-subtle">
