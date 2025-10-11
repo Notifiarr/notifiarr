@@ -891,7 +891,7 @@ func matcher(query, title string) int {
 	cleanedQuery := strings.TrimSuffix(strings.TrimPrefix(wuzzy.Cleanse(query, false), "the "), "s")
 	cleanedTitle := strings.TrimPrefix(wuzzy.Cleanse(title, false), "the ")
 
-	wuzz := wuzzy.UWRatio(query, title)
+	wuzz := wuzzy.UQRatio(query, title)
 	if wuzz >= suffixScore {
 		return wuzz
 	}

@@ -54,7 +54,6 @@ export class FileBrowser {
     path = rtrim(this.wd.path, this.wd.sep) + this.wd.sep + path
     const resp = await getUi(`browse?new=true&${dir ? 'dir' : 'file'}=${path}`, true)
     this.loading = false
-
     if (!resp.ok) return (this.respErr = resp.body)
 
     success(get(_)('FileBrowser.Created', { values: { path } }))
