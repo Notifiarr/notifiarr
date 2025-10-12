@@ -26,6 +26,7 @@ require (
 	github.com/mrobinsn/go-rtorrent v1.8.0
 	github.com/ncruces/zenity v0.10.14
 	github.com/nxadm/tail v1.4.11
+	github.com/paul-mannino/go-fuzzywuzzy v0.0.0-20241117160931-a1769aeb6b21
 	github.com/prometheus-community/pro-bing v0.7.0
 	github.com/shirou/gopsutil/v4 v4.25.9
 	github.com/spf13/pflag v1.0.10

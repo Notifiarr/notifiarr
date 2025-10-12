@@ -2118,6 +2118,18 @@ export interface TestResult {
   config: ExtraConfig;
 };
 
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.BrowseDir>
+ */
+export interface BrowseDir {
+  sep: string;
+  path: string;
+  mom: string;
+  dirs?: string[];
+  files?: string[];
+  error: string;
+};
+
 // Packages parsed:
 //   1. database/sql
 //   2. github.com/Notifiarr/notifiarr/frontend

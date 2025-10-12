@@ -12371,7 +12371,7 @@
                                         "message": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/apps.sonarrSearchSeries.seriesData"
+                                                "$ref": "#/definitions/apps.SeriesSearchItem"
                                             }
                                         }
                                     }
@@ -14404,6 +14404,62 @@
                 }
             }
         },
+        "apps.SeriesSearchItem": {
+            "type": "object",
+            "properties": {
+                "added": {
+                    "type": "string"
+                },
+                "exists": {
+                    "type": "boolean"
+                },
+                "first": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "languageProfileId": {
+                    "type": "integer"
+                },
+                "monitored": {
+                    "type": "boolean"
+                },
+                "next": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "prev": {
+                    "type": "string"
+                },
+                "qualityId": {
+                    "type": "integer"
+                },
+                "score": {
+                    "type": "integer"
+                },
+                "seasonFolder": {
+                    "type": "boolean"
+                },
+                "seriesType": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "tvdbId": {
+                    "type": "integer"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
         "apps.deleteResponse": {
             "type": "object",
             "properties": {
@@ -14563,62 +14619,6 @@
                 "title": {
                     "description": "Book Title",
                     "type": "string"
-                }
-            }
-        },
-        "apps.sonarrSearchSeries.seriesData": {
-            "type": "object",
-            "properties": {
-                "added": {
-                    "type": "string"
-                },
-                "exists": {
-                    "type": "boolean"
-                },
-                "first": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "languageProfileId": {
-                    "type": "integer"
-                },
-                "monitored": {
-                    "type": "boolean"
-                },
-                "next": {
-                    "type": "string"
-                },
-                "path": {
-                    "type": "string"
-                },
-                "prev": {
-                    "type": "string"
-                },
-                "qualityId": {
-                    "type": "integer"
-                },
-                "seasonFolder": {
-                    "type": "boolean"
-                },
-                "seasons": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/sonarr.Season"
-                    }
-                },
-                "seriesType": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "tvdbId": {
-                    "type": "integer"
                 }
             }
         },
@@ -15239,8 +15239,6 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -15257,8 +15255,6 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",

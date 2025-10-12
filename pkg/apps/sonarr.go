@@ -11,6 +11,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/gorilla/mux"
+	wuzzy "github.com/paul-mannino/go-fuzzywuzzy"
 	"golang.org/x/time/rate"
 	"golift.io/starr"
 	"golift.io/starr/debuglog"
@@ -773,15 +774,57 @@ func sonarrUpdateNaming(req *http.Request) (int, interface{}) {
 	return http.StatusOK, output.ID
 }
 
+type SeriesSearchItem struct {
+	ID                int64     `json:"id"`
+	Title             string    `json:"title"`
+	First             time.Time `json:"first"`
+	Next              time.Time `json:"next"`
+	Previous          time.Time `json:"prev"`
+	Added             time.Time `json:"added"`
+	Status            string    `json:"status"`
+	Path              string    `json:"path"`
+	TvDBID            int64     `json:"tvdbId"`
+	Monitored         bool      `json:"monitored"`
+	QualityProfileID  int64     `json:"qualityId"`
+	SeasonFolder      bool      `json:"seasonFolder"`
+	SeriesType        string    `json:"seriesType"`
+	LanguageProfileID int64     `json:"languageProfileId"`
+	Exists            bool      `json:"exists"`
+	Year              int       `json:"year"`
+	Score             int       `json:"score"`
+}
+
+func convertToSeriesSearchOutput(item *sonarr.Series, score int) SeriesSearchItem {
+	return SeriesSearchItem{
+		ID:                item.ID,
+		Title:             item.Title,
+		First:             item.FirstAired,
+		Next:              item.NextAiring,
+		Previous:          item.PreviousAiring,
+		Added:             item.Added,
+		Status:            item.Status,
+		Path:              item.Path,
+		TvDBID:            item.TvdbID,
+		Monitored:         item.Monitored,
+		QualityProfileID:  item.QualityProfileID,
+		SeasonFolder:      item.SeasonFolder,
+		SeriesType:        item.SeriesType,
+		LanguageProfileID: item.LanguageProfileID,
+		Exists:            item.Statistics != nil && item.Statistics.SizeOnDisk > 0,
+		Year:              item.Year,
+		Score:             score,
+	}
+}
+
 // @Description	Searches all Sonarr Series Titles for the search term provided. Returns a minimal amount of data for each found item.
 // @Summary		Search for Sonarr Series
 // @Tags			Sonarr
 // @Produce		json
-// @Param			query		path		string															true	"title search string"
-// @Param			instance	path		int64															true	"instance ID"
-// @Success		200			{object}	apps.ApiResponse{message=[]apps.sonarrSearchSeries.seriesData}	"minimal series data"
-// @Failure		503			{object}	apps.ApiResponse{message=string}								"instance error"
-// @Failure		404			{object}	string															"bad token or api key"
+// @Param			query		path		string												true	"title search string"
+// @Param			instance	path		int64												true	"instance ID"
+// @Success		200			{object}	apps.ApiResponse{message=[]apps.SeriesSearchItem}	"minimal series data"
+// @Failure		503			{object}	apps.ApiResponse{message=string}					"instance error"
+// @Failure		404			{object}	string												"bad token or api key"
 // @Router			/sonarr/{instance}/search/{query} [get]
 // @Security		ApiKeyAuth
 //
@@ -793,66 +836,117 @@ func sonarrSearchSeries(req *http.Request) (int, interface{}) {
 		return apiError(http.StatusServiceUnavailable, "getting series", err)
 	}
 
-	type seriesData struct {
-		ID                int64            `json:"id"`
-		Title             string           `json:"title"`
-		First             time.Time        `json:"first"`
-		Next              time.Time        `json:"next"`
-		Previous          time.Time        `json:"prev"`
-		Added             time.Time        `json:"added"`
-		Status            string           `json:"status"`
-		Path              string           `json:"path"`
-		TvDBID            int64            `json:"tvdbId"`
-		Monitored         bool             `json:"monitored"`
-		QualityProfileID  int64            `json:"qualityId"`
-		SeasonFolder      bool             `json:"seasonFolder"`
-		SeriesType        string           `json:"seriesType"`
-		LanguageProfileID int64            `json:"languageProfileId"`
-		Seasons           []*sonarr.Season `json:"seasons"`
-		Exists            bool             `json:"exists"`
-	}
-
-	query := strings.TrimSpace(mux.Vars(req)["query"]) // in
-	resp := make([]*seriesData, 0)                     // out
-
-	for _, item := range series {
-		if seriesSearch(query, item.Title, item.AlternateTitles) {
-			resp = append(resp, &seriesData{
-				ID:                item.ID,
-				Title:             item.Title,
-				First:             item.FirstAired,
-				Next:              item.NextAiring,
-				Previous:          item.PreviousAiring,
-				Added:             item.Added,
-				Status:            item.Status,
-				Path:              item.Path,
-				TvDBID:            item.TvdbID,
-				Monitored:         item.Monitored,
-				QualityProfileID:  item.QualityProfileID,
-				SeasonFolder:      item.SeasonFolder,
-				SeriesType:        item.SeriesType,
-				LanguageProfileID: item.LanguageProfileID,
-				Seasons:           item.Seasons,
-				Exists:            item.Statistics != nil && item.Statistics.SizeOnDisk > 0,
-			})
-		}
-	}
-
-	return http.StatusOK, resp
+	return http.StatusOK, seriesSearch(series, mux.Vars(req)["query"])
 }
 
-func seriesSearch(query, title string, alts []*sonarr.AlternateTitle) bool {
-	if strings.Contains(strings.ToLower(title), strings.ToLower(query)) {
-		return true
+func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchItem {
+	const (
+		minLength  = 2 // Too short to search.
+		maxResults = 10
+		minScore   = 56
+	)
+
+	cleanedQuery := wuzzy.Cleanse(query, false)
+	if len(cleanedQuery) < minLength {
+		return []SeriesSearchItem{}
 	}
 
-	for _, t := range alts {
-		if strings.Contains(strings.ToLower(t.Title), strings.ToLower(query)) {
-			return true
+	titles, resp := buildTitlesList(series)
+	mnd.Log.Printf("[sonarr search] Found %d Sonarr titles from %d series for query %q (cleaned %q)",
+		len(titles), len(series), query, cleanedQuery)
+
+	// Find fuzzy matches.
+	matches, err := wuzzy.Extract(query, titles, -1, matcher, minScore)
+	if err != nil {
+		mnd.Log.Errorf("[sonarr search] Finding fuzzy matches: %s", err)
+	}
+
+	have := map[int]bool{}
+	// Now go back through the matches, and find the series that matches by name.
+	for _, match := range matches {
+		if len(resp) >= maxResults {
+			break
+		}
+
+		for _, idx := range seriesMatches(match, series) {
+			if !have[idx] {
+				mnd.Log.Printf("[sonarr search] Fuzzy match (score: %d): %q (matched: %q)",
+					match.Score, series[idx].Title, match.Match)
+				resp = append(resp, convertToSeriesSearchOutput(series[idx], match.Score))
+				have[idx] = true
+			}
 		}
 	}
 
-	return false
+	return resp
+}
+
+const (
+	suffixScore = 81
+	prefixScore = 91
+	exactScore  = 100
+)
+
+func max(i, j int) int {
+	if i > j {
+		return i
+	}
+
+	return j
+}
+
+func matcher(query, title string) int {
+	trimmedQuery := wuzzy.Cleanse(query, false)
+	trimmedTitle := wuzzy.Cleanse(title, false)
+	wuzz := wuzzy.Ratio(trimmedQuery, trimmedTitle)
+	cleanedQuery := strings.TrimSuffix(strings.TrimPrefix(trimmedQuery, "the "), "s")
+	cleanedTitle := strings.TrimPrefix(trimmedTitle, "the ")
+
+	if cleanedTitle == query || cleanedTitle == cleanedQuery+"s" || cleanedTitle == cleanedQuery {
+		return max(wuzz, exactScore)
+	}
+
+	if strings.HasPrefix(cleanedTitle, cleanedQuery) {
+		return max(wuzz, prefixScore)
+	}
+
+	if strings.HasSuffix(cleanedTitle, cleanedQuery) ||
+		strings.HasSuffix(cleanedTitle, cleanedQuery+"s") ||
+		strings.Contains(cleanedTitle, " "+cleanedQuery) {
+		return max(wuzz, suffixScore)
+	}
+
+	return wuzz
+}
+
+func buildTitlesList(series []*sonarr.Series) ([]string, []SeriesSearchItem) {
+	titles := make([]string, 0)
+	// Build the titles list.
+	for idx := range series {
+		titles = append(titles, series[idx].Title)
+		for _, alt := range series[idx].AlternateTitles {
+			titles = append(titles, alt.Title)
+		}
+	}
+
+	return titles, make([]SeriesSearchItem, 0)
+}
+
+func seriesMatches(wuzz *wuzzy.MatchPair, series []*sonarr.Series) []int {
+	matches := []int{}
+	for idx, show := range series {
+		if wuzz.Match == show.Title {
+			matches = append(matches, idx)
+		}
+
+		for _, alt := range show.AlternateTitles {
+			if wuzz.Match == alt.Title {
+				matches = append(matches, idx)
+			}
+		}
+	}
+
+	return matches
 }
 
 // @Description	Returns all Sonarr Tags.

@@ -73,6 +73,7 @@
     "Login": "Login",
     "Confirm": "Confirm",
     "Cancel": "Cancel",
+    "Create": "Create",
     "Save": "Save",
     "Close": "Close",
     "SaveChanges": "Save Changes",
@@ -85,7 +86,11 @@
     "ShowMenu": "Show Menu",
     "ShowOutput": "Show Output",
     "HideOutput": "Hide Output",
-    "RefreshOutput": "Refresh Output"
+    "RefreshOutput": "Refresh Output",
+    "Go": "Go",
+    "Menu": "Menu",
+    "CreateFolder": "Create Folder",
+    "CreateFile": "Create File"
   },
   "RegexTester": {
     "RegularExpressionTester": "Regular Expression Tester",
@@ -245,13 +250,13 @@
     },
     "sslKeyFile": {
       "label": "SSL Key File",
-      "description": "Path to SSL key file",
+      "description": "Path to SSL key file.",
       "placeholder": "/path/to/ssl-key.pem",
       "tooltip": "This application can serve HTTPS. Enable that by specifying a certificate file path and key file path."
     },
     "sslCertFile": {
       "label": "SSL Certificate File",
-      "description": "Path to SSL certificate file",
+      "description": "Path to SSL certificate file.",
       "placeholder": "/path/to/ssl-cert.pem",
       "tooltip": "This application can serve HTTPS. Enable that by specifying a certificate file path and key file path."
     },
@@ -267,20 +272,21 @@
     },
     "logFile": {
       "label": "Application Log File",
-      "description": "Path to the application log file.",
-      "placeholder": "/path/to/notifiarr.log"
+      "description": "Path to the application log file or folder.",
+      "placeholder": "/path/to/notifiarr.log",
+      "tooltip": "If you set a folder without a file name, the application will create a file named Notifiarr.log in the folder."
     },
     "httpLog": {
       "label": "HTTP Log File",
-      "description": "Path to the HTTP log file.",
+      "description": "Path to the HTTP log file or folder.",
       "placeholder": "/path/to/http-notifiarr.log",
-      "tooltip": "Setting a log file path here will make the application write the HTTP logs to a dedicated file. The file format is in apache log. Highly recommended."
+      "tooltip": "Setting a log file path here will make the application write the HTTP logs to a dedicated file. The file format is in apache log. Highly recommended. If you set a folder without a file name, the application will create a file named Notifiarr.http.log in the folder."
     },
     "debugLog": {
       "label": "Debug Log File",
-      "description": "Path to the debug log file.",
+      "description": "Path to the debug log file or folder.",
       "placeholder": "/path/to/debug-notifiarr.log",
-      "tooltip": "Setting a log file path here will make the application write the debug logs to a dedicated file. Debug logs are written to the application log file when this is unset."
+      "tooltip": "Setting a log file path here will make the application write the debug logs to a dedicated file. Debug logs are written to the application log file when this is unset. If you set a folder without a file name, the application will create a file named Notifiarr.debug.log in the folder."
     },
     "maxBody": {
       "label": "Max Body Size",
@@ -323,8 +329,8 @@
       },
       "logFile": {
         "label": "Services Log File",
-        "description": "Path to the services log file.",
-        "tooltip": "The log file is used to store the service check results. If left unset, the service check output is written to the application log file.",
+        "description": "Path to the services log file or folder.",
+        "tooltip": "The log file is used to store the service check results. If left unset, the service check output is written to the application log file. If you set a folder without a file name, the application will create a file named Notifiarr.services.log in the folder.",
         "placeholder": "/path/to/services-notifiarr.log"
       }
     },
@@ -1674,5 +1680,24 @@
     "Tested": "<b>Instances Tested</b>: <code>{testCount}</code>",
     "clickRefresh": "Click the refresh button in the top-right to test again.",
     "footer": "Use this troubleshooting tool to verify that all your instances are reachable and configured correctly. The timeout is hard coded to 15 seconds, which is close to how long the website will wait for a response."
+  },
+  "FileBrowser": {
+    "tooltip": {
+      "Go": "<code>cd {path}</code><br />Change directory to provided path.",
+      "SelectPath": "Select Path: <code>{path}</code>",
+      "Up": "<code>cd ..</code><br />Change directory to parent folder."
+    },
+    "FilterFiles": "Filter Files",
+    "CreateFileIn": "The file will be created in the path: <code>{path}</code>",
+    "CreateFolderIn": "The folder will be created in the path: <code>{path}</code>",
+    "Files": "Files: {count}",
+    "Folders": "Folders: {count}",
+    "FilesFiltered": "Files: {count}, filtered: {filtered}",
+    "FoldersFiltered": "Folders: {count}, filtered: {filtered}",
+    "Selected": "Selected: <code>{path}</code>",
+    "Created": "Created: {path}",
+    "Creating": "Creating...",
+    "InvalidPath": "Invalid path provided. Do not include slashes (<code>/</code> or <code>\\</code>).",
+    "FilterFilesDesc": "Use the file filter to quickly search the list of displayed files. Useful on folders with a lot of files. Use the <code>Menu</code> button to create a new folder or file. To select a file that does not exist, type it into the <code>Path</code> bar and click the green check button. Alternatively, use the <code>Create File</code> menu item to create it."
   }
 }

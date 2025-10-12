@@ -52,6 +52,8 @@
     isOpen?: boolean
     /** Whether the modal is full screen height.  */
     full?: boolean
+    /** Whether the modal takes up the whole screen. Bindable because the user can toggle it. */
+    fullscreen?: boolean
     /** Optional function to call when the modal is closed. */
     follow?: () => void
     /** Whether the modal is closable. */
@@ -68,6 +70,7 @@
     footer,
     isOpen = $bindable(false),
     full = false,
+    fullscreen = $bindable(false),
     esc = false,
     follow,
     disabled = false,
@@ -76,11 +79,10 @@
 
   let loading = $state(false)
   let resp = $state<BackendResponse>()
-  let fullscreen = $state(false)
   let showRaw = $state(false)
   let ok = $state(false) // we use ok to keep the refresh from running away
 
-  const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 125px)')
+  const height = $derived('calc(100vh - ' + (footer ? '195' : '125') + 'px)')
   const modalClassName = $derived(rest.modalClassName + (isOpen ? ' show' : ''))
 
   export const close = async (e?: Event) => {
@@ -195,7 +197,8 @@
   </ModalHeader>
 
   <form onsubmit={e => e.preventDefault()}>
-    <ModalBody style="max-height: {full ? height : 'auto'}; overflow: auto;">
+    <ModalBody
+      style="max-height: {full && !fullscreen ? height : 'auto'}; overflow: auto;">
       {#if loading && !resp}
         <T id="phrases.Loading" />
       {:else if resp && resp.ok && showRaw}
