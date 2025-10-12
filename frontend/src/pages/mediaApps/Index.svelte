@@ -29,6 +29,7 @@
     name: 'Plex',
     id: page.id + '.Plex',
     logo: plexLogo,
+    envPrefix: 'PLEX',
     hidden: ['deletes'],
     disabled: ['name'],
     merge: (index: number, form: PlexConfig) => ({
@@ -48,6 +49,7 @@
     name: 'Tautulli',
     id: page.id + '.Tautulli',
     logo: tautulliLogo,
+    envPrefix: 'TAUTULLI',
     hidden: ['deletes'],
     merge: (index: number, form: TautulliConfig) => ({
       ...({} as Config),
@@ -85,6 +87,7 @@
   <InstanceHeader flt={iv.Plex} />
   <Instance
     index={0}
+    indexed={false}
     reset={() => iv.Plex.resetForm(0)}
     validate={(id, value) => iv.Plex.validate(id, value, 0)}
     bind:form={iv.Plex.instances[0]}
@@ -93,6 +96,7 @@
   <InstanceHeader flt={iv.Tautulli} />
   <Instance
     index={0}
+    indexed={false}
     reset={() => iv.Tautulli.resetForm(0)}
     validate={(id, value) => iv.Tautulli.validate(id, value, 0)}
     bind:form={iv.Tautulli.instances[0]}

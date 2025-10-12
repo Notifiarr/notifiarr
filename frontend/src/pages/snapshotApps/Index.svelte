@@ -30,6 +30,7 @@
   const mysqlApp: App<MySQLConfig> = {
     name: 'MySQL',
     id: page.id + '.MySQL',
+    envPrefix: 'SNAPSHOT_MYSQL',
     logo: mysqlLogo,
     hidden: ['deletes'],
     empty: {
@@ -56,6 +57,7 @@
     name: 'Nvidia',
     id: page.id + '.Nvidia',
     logo: nvidiaLogo,
+    envPrefix: 'SNAPSHOT_NVIDIA',
     hidden: ['deletes'],
     empty: { busIDs: [''], smiPath: '', disabled: false },
     merge: (index: number, form: NvidiaConfig) => {
@@ -100,6 +102,7 @@
   <InstanceHeader flt={flt.Nvidia} />
   <Instance
     index={0}
+    indexed={false}
     bind:form={flt.Nvidia.instances[0]}
     original={flt.Nvidia.original[0]}
     app={nvidiaApp} />

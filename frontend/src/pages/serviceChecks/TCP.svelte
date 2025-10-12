@@ -34,6 +34,7 @@
 <Col md={12}>
   <CheckedInput
     id="value"
+    envVar={`${app.envPrefix}_${index}_VALUE`}
     app={{ ...app, name: 'tcp' }}
     {index}
     bind:form

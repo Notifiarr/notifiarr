@@ -30,6 +30,7 @@
   <Col md={6}>
     <Input
       id="config.services.logFile"
+      envVar="SERVICES_LOG_FILE"
       bind:value={config.services!.logFile}
       original={original.services?.logFile}>
       {#snippet post()}<BButton bind:isOpen={servicesLogModal} />{/snippet}
@@ -58,6 +59,7 @@
   <Col md={4}>
     <Input
       id="config.debug"
+      envVar="DEBUG"
       type="select"
       bind:value={config.debug}
       original={original.debug} />
@@ -65,6 +67,7 @@
   <Col md={4}>
     <Input
       id="config.quiet"
+      envVar="QUIET"
       type="select"
       bind:value={config.quiet}
       original={original.quiet} />
@@ -72,6 +75,7 @@
   <Col md={4}>
     <Input
       id="config.noUploads"
+      envVar="NO_UPLOADS"
       type="select"
       bind:value={config.noUploads}
       original={original.noUploads} />
@@ -80,6 +84,7 @@
 <Row>
   <Col md={4}>
     <Input
+      envVar="MAX_BODY"
       id="config.maxBody"
       type="number"
       bind:value={config.maxBody}
@@ -93,6 +98,7 @@
   </Col>
   <Col md={4}>
     <Input
+      envVar="LOG_FILE_MB"
       id="config.logFileMb"
       type="number"
       min={1}
@@ -106,6 +112,7 @@
   </Col>
   <Col md={4}>
     <Input
+      envVar="LOG_FILES"
       id="config.logFiles"
       type="number"
       min={0}

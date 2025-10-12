@@ -62,6 +62,7 @@
   const app: App<ServiceConfig> = {
     name: 'Checks',
     id: 'ServiceChecks',
+    envPrefix: 'SERVICE',
     logo: faStaffSnake,
     iconProps: { c1: 'coral', c2: 'lightcoral' },
     disabled: [],

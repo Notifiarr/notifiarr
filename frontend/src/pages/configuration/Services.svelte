@@ -14,6 +14,7 @@
   <Col md={4}>
     <Input
       id="config.services.disabled"
+      envVar="SERVICES_DISABLED"
       type="select"
       bind:value={config.services!.disabled}
       original={original.services?.disabled} />
@@ -21,6 +22,7 @@
   <Col md={4}>
     <Input
       id="config.services.parallel"
+      envVar="SERVICES_PARALLEL"
       type="select"
       options={[
         { value: 1, name: '1' },
@@ -35,6 +37,7 @@
   <Col md={4}>
     <Input
       id="config.services.interval"
+      envVar="SERVICES_INTERVAL"
       type="select"
       bind:value={config.services!.interval}
       options={[

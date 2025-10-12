@@ -23,6 +23,7 @@
     <Col md={9}>
       <Input
         id={app.id + '.path'}
+        envVar={`${app.envPrefix}_${index}_PATH`}
         bind:value={form.path}
         original={original?.path}
         {validate}>
@@ -33,6 +34,7 @@
       <Input
         type="select"
         id={app.id + '.disabled'}
+        envVar={`${app.envPrefix}_${index}_DISABLED`}
         bind:value={form.disabled}
         original={original?.disabled}
         {validate} />
@@ -41,6 +43,7 @@
       <Input
         type="textarea"
         id={app.id + '.regex'}
+        envVar={`${app.envPrefix}_${index}_REGEX`}
         bind:value={form.regex}
         original={original?.regex}
         {validate} />
@@ -49,6 +52,7 @@
       <Input
         type="textarea"
         id={app.id + '.skip'}
+        envVar={`${app.envPrefix}_${index}_SKIP`}
         bind:value={form.skip}
         original={original?.skip}
         {validate} />
@@ -57,6 +61,7 @@
       <Input
         type="select"
         id={app.id + '.poll'}
+        envVar={`${app.envPrefix}_${index}_POLL`}
         bind:value={form.poll}
         original={original?.poll}
         {validate} />
@@ -65,6 +70,7 @@
       <Input
         type="select"
         id={app.id + '.pipe'}
+        envVar={`${app.envPrefix}_${index}_PIPE`}
         bind:value={form.pipe}
         original={original?.pipe}
         {validate} />
@@ -73,6 +79,7 @@
       <Input
         type="select"
         id={app.id + '.mustExist'}
+        envVar={`${app.envPrefix}_${index}_MUST_EXIST`}
         bind:value={form.mustExist}
         original={original?.mustExist}
         {validate} />
@@ -81,6 +88,7 @@
       <Input
         type="select"
         id={app.id + '.logMatch'}
+        envVar={`${app.envPrefix}_${index}_LOG_MATCH`}
         bind:value={form.logMatch}
         original={original?.logMatch}
         {validate} />

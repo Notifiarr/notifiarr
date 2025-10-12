@@ -15,12 +15,16 @@
     faEyeSlash,
     faArrowUpFromBracket,
   } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import { _ } from './Translate.svelte'
+  import {
+    faQuestionCircle,
+    faExclamationCircle,
+  } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import T, { _ } from './Translate.svelte'
   import { type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
+  import { profile } from '../api/profile.svelte'
 
   interface Props {
     /** Must be unique. Identifies this component. */
@@ -57,6 +61,8 @@
     inner?: any
     /** When type is "timeout" this controls if -1 / disabled is an option. */
     noDisable?: boolean
+    /** If this env var is set a notice is provided to the user as such. */
+    envVar?: string
     /** Optional other attributes to apply to the input. */
     [key: string]: any
   }
@@ -79,6 +85,7 @@
     msg,
     inner = $bindable(),
     noDisable = false,
+    envVar,
     ...rest
   }: Props = $props()
 
@@ -90,6 +97,8 @@
   let passIcon = $derived(currType === 'password' ? faEyeSlash : faEye)
   let feedback = $state('')
   const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
+  const env = $derived('DN_' + envVar?.toUpperCase())
+  const hasEnv = $derived(!rest.disabled && !!envVar && !!$profile.environment?.[env])
 
   $effect(() => {
     placeholder = placeholder == id + '.placeholder' ? '' : placeholder
@@ -167,7 +176,7 @@
       {/if}
     </Label>
     <InputGroup>
-      {#if tooltip != id + '.tooltip'}
+      {#if tooltip != id + '.tooltip' || (envVar && !rest.disabled)}
         <Button
           color="secondary"
           onclick={toggleTooltip}
@@ -177,12 +186,18 @@
           {#if showTooltip}
             <Fa
               i={faArrowUpFromBracket}
-              c1="gray"
+              c1="dimgray"
               d1="gainsboro"
               c2="orange"
               scale="1.5x" />
           {:else}
-            <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+            <Fa
+              i={hasEnv ? faExclamationCircle : faQuestionCircle}
+              c1="dimgray"
+              d1="gainsboro"
+              c2={hasEnv ? 'red' : 'orange'}
+              d2={hasEnv ? 'mediumvioletred' : 'orange'}
+              scale="1.5x" />
           {/if}
         </Button>
       {/if}
@@ -254,14 +269,20 @@
     {#if showTooltip}
       <div transition:slide>
         <Card body class="mt-1" color="warning" outline>
-          <p class="mb-0">{@html tooltip}</p>
+          {#if !rest.disabled}
+            <ul class="mb-0">
+              <li><T id="phrases.EnvironmentVariable" variableName={env} /></li>
+            </ul>
+            {#if hasEnv}
+              <p class="mt-2 mb-0"><T id="phrases.VariableDescription" /></p>
+            {/if}
+          {/if}
+          {#if tooltip != id + '.tooltip'}<p class="mt-2 mb-0">{@html tooltip}</p>{/if}
         </Card>
       </div>
     {/if}
 
-    {#if description}
-      <small class="text-muted">{@html description}</small>
-    {/if}
+    {#if description}<small class="text-muted">{@html description}</small>{/if}
     {@render msg?.()}
   </FormGroup>
 </div>

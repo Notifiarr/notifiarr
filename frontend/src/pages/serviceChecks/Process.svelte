@@ -77,6 +77,7 @@
 <Col md={12}>
   <CheckedInput
     id="value"
+    envVar={app.envPrefix + '_' + index + '_VALUE'}
     app={{ ...app, name: 'process' }}
     {index}
     bind:form
@@ -92,6 +93,7 @@
   <Input
     type="select"
     id={app.id + '.process.running'}
+    envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.running}
     original={originalProc.running}
     validate={updateExpect} />
@@ -102,6 +104,7 @@
     disabled={procCheck.running}
     type="select"
     id={app.id + '.process.restarts'}
+    envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.restarts}
     original={originalProc.restarts}
     validate={updateExpect} />
@@ -113,6 +116,7 @@
     type="number"
     min={1}
     id={app.id + '.process.minimum'}
+    envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.minimum}
     original={originalProc.minimum}
     validate={updateExpect} />
@@ -123,6 +127,7 @@
     disabled={procCheck.running}
     type="number"
     id={app.id + '.process.maximum'}
+    envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.maximum}
     original={originalProc.maximum}
     validate={updateExpect} />

@@ -66,6 +66,7 @@
 <Col md={12}>
   <CheckedInput
     id="value"
+    envVar={`${app.envPrefix}_${index}_VALUE`}
     app={{ ...app, name: 'ping' }}
     {index}
     bind:form
@@ -81,6 +82,7 @@
   <Input
     type="number"
     min={1}
+    envVar={`${app.envPrefix}_${index}_EXPECT`}
     id={app.id + '.ping.count'}
     bind:value={pingCheck.count}
     original={originalPing.count}
@@ -91,6 +93,7 @@
   <Input
     type="number"
     min={1}
+    envVar={`${app.envPrefix}_${index}_EXPECT`}
     id={app.id + '.ping.minimum'}
     bind:value={pingCheck.minimum}
     original={originalPing.minimum}
@@ -100,6 +103,7 @@
 <Col md={4}>
   <Input
     type="select"
+    envVar={`${app.envPrefix}_${index}_EXPECT`}
     id={app.id + '.ping.interval'}
     bind:value={pingCheck.interval}
     original={originalPing.interval}

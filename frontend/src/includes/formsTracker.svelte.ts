@@ -25,6 +25,9 @@ export type App<T> = {
   hidden?: string[]
   /** The empty version of the form of the app. */
   empty?: T
+  /** The environment prefix for this integration. */
+  envPrefix: string
+
   /** The merge function of the app.
    * This is used when checking (testing) an instance.
    * The check function calls this to merge the instance with the original config.

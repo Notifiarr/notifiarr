@@ -15,6 +15,7 @@
   <Col md={4}>
     <Input
       id="config.serial"
+      envVar="SERIAL"
       type="select"
       bind:value={config.serial}
       original={original.serial} />
@@ -23,6 +24,7 @@
     <Col md={$profile.clientInfo?.user.devAllowed ? 4 : 8}>
       <Input
         id="config.autoUpdate"
+        envVar="AUTO_UPDATE"
         type="select"
         bind:value={config.autoUpdate}
         original={original.autoUpdate}
@@ -38,6 +40,7 @@
       <Col md={4}>
         <Input
           id="config.unstableCh"
+          envVar="UNSTABLE_CH"
           type="select"
           bind:value={config.unstableCh}
           original={original.unstableCh} />
@@ -46,6 +49,7 @@
   {:else}
     <Col md={4}>
       <Input
+        envVar="FILE_MODE"
         type="select"
         id="config.fileMode"
         bind:value={config.fileMode}
@@ -62,6 +66,7 @@
     <Col md={4}>
       <Input
         id="config.apt"
+        envVar="APT"
         type="select"
         bind:value={config.apt}
         original={original.apt} />

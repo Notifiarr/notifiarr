@@ -27,12 +27,21 @@
      * The secondary color of the icon in dark mode.
      */
     d2?: string
+    /** Every other prop. */
+    [key: string]: any
   }
 
   const { d, c1, c2, d1 = c1, d2 = c2, ...rest }: Props = $props()
   const primaryColor = $derived(theme.isDark ? d1 : c1)
   const secondaryColor = $derived(theme.isDark ? d2 : c2)
   const icon = $derived(theme.isDark && d ? d : rest.i)
+  const onclick = $derived((e: Event) => (e.preventDefault(), rest.onclick()))
 </script>
 
-<Fa {...rest} {icon} {primaryColor} {secondaryColor} id={'fa-icon' + rest.id} />
+{#if rest.onclick || rest.href}
+  <a href={rest.href ?? '#anotherPage'} {onclick}>
+    <Fa {...rest} {icon} {primaryColor} {secondaryColor} id={'fa-icon' + rest.id} />
+  </a>
+{:else}
+  <Fa {...rest} {icon} {primaryColor} {secondaryColor} id={'fa-icon' + rest.id} />
+{/if}

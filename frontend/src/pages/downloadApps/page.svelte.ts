@@ -66,6 +66,7 @@ export class Downloaders {
     name: 'Qbittorrent',
     id: page.id + '.Qbittorrent',
     logo: qbitLogo,
+    envPrefix: 'QBIT',
     hidden: ['apiKey', 'deletes'],
     empty: downloadConfig as QbitConfig,
     merge: (index: number, form: QbitConfig) => {
@@ -81,6 +82,7 @@ export class Downloaders {
     name: 'Rtorrent',
     id: page.id + '.Rtorrent',
     logo: rtorrentLogo,
+    envPrefix: 'RTORRENT',
     hidden: ['apiKey', 'deletes'],
     empty: downloadConfig as RtorrentConfig,
     merge: (index: number, form: RtorrentConfig) => {
@@ -96,6 +98,7 @@ export class Downloaders {
     name: 'Transmission',
     id: page.id + '.Transmission',
     logo: xmissionLogo,
+    envPrefix: 'TRANSMISSION',
     hidden: ['apiKey', 'deletes'],
     empty: downloadConfig as XmissionConfig,
     merge: (index: number, form: XmissionConfig) => {
@@ -111,6 +114,7 @@ export class Downloaders {
     name: 'Deluge',
     id: page.id + '.Deluge',
     logo: delugeLogo,
+    envPrefix: 'DELUGE',
     hidden: ['username', 'apiKey', 'deletes'],
     empty: downloadConfig as DelugeConfig,
     merge: (index: number, form: DelugeConfig) => {
@@ -126,6 +130,7 @@ export class Downloaders {
     name: 'SabNZB',
     id: page.id + '.SabNZB',
     logo: sabnzbLogo,
+    envPrefix: 'SABNZBD',
     hidden: ['username', 'password', 'deletes'],
     empty: downloadConfig as SabNZBConfig,
     merge: (index: number, form: SabNZBConfig) => {
@@ -141,6 +146,7 @@ export class Downloaders {
     name: 'NZBGet',
     id: page.id + '.NZBGet',
     logo: nzbgetLogo,
+    envPrefix: 'NZBGET',
     hidden: ['apiKey', 'deletes'],
     empty: downloadConfig as NZBGetConfig,
     merge: (index: number, form: NZBGetConfig) => {

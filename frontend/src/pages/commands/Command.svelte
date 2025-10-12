@@ -69,6 +69,7 @@
     <Col sm={7}>
       <Input
         id={app.id + '.name'}
+        envVar={`${app.envPrefix}_${index}_NAME`}
         bind:value={form.name}
         original={original?.name}
         {validate} />
@@ -77,6 +78,7 @@
       <Input
         type="select"
         id={app.id + '.notify'}
+        envVar={`${app.envPrefix}_${index}_NOTIFY`}
         bind:value={form.notify}
         original={original?.notify}
         {validate} />
@@ -84,6 +86,7 @@
     <Col md={12}>
       <CheckedInput
         id="command"
+        envVar={`${app.envPrefix}_${index}_COMMAND`}
         params={getCommandArgs}
         {app}
         {index}
@@ -98,6 +101,7 @@
       <Input
         type="select"
         id={app.id + '.log'}
+        envVar={`${app.envPrefix}_${index}_LOG`}
         bind:value={form.log}
         original={original?.log}
         {validate} />
@@ -106,6 +110,7 @@
       <Input
         type="timeout"
         id={app.id + '.timeout'}
+        envVar={`${app.envPrefix}_${index}_TIMEOUT`}
         bind:value={form.timeout}
         original={original?.timeout}
         noDisable
