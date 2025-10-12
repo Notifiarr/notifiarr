@@ -80,7 +80,7 @@
   let showRaw = $state(false)
   let ok = $state(false) // we use ok to keep the refresh from running away
 
-  const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 110px)')
+  const height = $derived(footer ? 'calc(100vh - 180px)' : 'calc(100vh - 125px)')
   const modalClassName = $derived(rest.modalClassName + (isOpen ? ' show' : ''))
 
   export const close = async (e?: Event) => {

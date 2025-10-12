@@ -24,6 +24,7 @@
   import Network from './Network.svelte'
   import { deepEqual } from '../../includes/util'
   import { nav } from '../../navigation/nav.svelte'
+  import Nodal from '../../includes/Nodal.svelte'
 
   // Local state that syncs with profile store.
   let config = $state($profile.config)
@@ -52,9 +53,13 @@
       !deepEqual($profile.config, config) ||
       extraKeys !== ($profile.config.extraKeys?.join('\n') ?? '')
   })
+
+  let isOpen = $state(false)
 </script>
 
-<Header {page} badge={$_('phrases.Version', { values: { version: config.version } })} />
+<Header
+  page={{ ...page, href: '#rawConfig', onclick: () => (isOpen = true) }}
+  badge={$_('phrases.Version', { values: { version: config.version } })} />
 
 <CardBody class="pt-0 mt-0">
   <!-- General Section -->
@@ -91,3 +96,7 @@
 </CardBody>
 
 <Footer {submit} saveDisabled={!nav.formChanged} />
+
+<Nodal bind:isOpen title="Raw Configuration" size="xl" full>
+  <pre>{JSON.stringify($profile.config, null, 2)}</pre>
+</Nodal>
