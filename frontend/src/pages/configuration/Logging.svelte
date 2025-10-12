@@ -19,7 +19,11 @@
 <h4>{$_('config.titles.Logging')}</h4>
 <Row>
   <Col md={6}>
-    <Input id="config.logFile" bind:value={config.logFile} original={original.logFile}>
+    <Input
+      id="config.logFile"
+      envVar="LOG_FILE"
+      bind:value={config.logFile}
+      original={original.logFile}>
       {#snippet post()}<BButton bind:isOpen={logFileModal} />{/snippet}
     </Input>
   </Col>
@@ -32,12 +36,20 @@
     </Input>
   </Col>
   <Col md={6}>
-    <Input id="config.httpLog" bind:value={config.httpLog} original={original.httpLog}>
+    <Input
+      id="config.httpLog"
+      envVar="HTTP_LOG"
+      bind:value={config.httpLog}
+      original={original.httpLog}>
       {#snippet post()}<BButton bind:isOpen={httpLogModal} />{/snippet}
     </Input>
   </Col>
   <Col md={6}>
-    <Input id="config.debugLog" bind:value={config.debugLog} original={original.debugLog}>
+    <Input
+      id="config.debugLog"
+      envVar="DEBUG_LOG"
+      bind:value={config.debugLog}
+      original={original.debugLog}>
       {#snippet post()}<BButton bind:isOpen={debugLogModal} />{/snippet}
     </Input>
   </Col>
