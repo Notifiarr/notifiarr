@@ -76,7 +76,7 @@ func New(config *Config) {
 			Client:  &http.Client{},
 		},
 		hostInfo:     nil, // must start nil
-		sendData:     make(chan *Request, mnd.Base10),
+		sendData:     make(chan *Request, mnd.Bits32),
 		stopSendData: make(chan struct{}),
 	}
 }

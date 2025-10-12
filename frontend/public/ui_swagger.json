@@ -61,45 +61,45 @@
         },
         "/browse": {
             "get": {
-                "description": "Returns a list of files and folders in the specified directory path.",
+                "description": "Creates a new folder at the specified path.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Files"
                 ],
-                "summary": "Browse file system",
+                "summary": "Create folder",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Directory path to browse",
+                        "description": "Folder path to create",
                         "name": "dir",
-                        "in": "query"
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Must be true to create a folder",
+                        "name": "new",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "directory contents",
+                        "description": "directory contents where file was created",
                         "schema": {
-                            "type": "object",
-                            "properties": {
-                                "dirs": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                },
-                                "files": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
+                            "$ref": "#/definitions/client.BrowseDir"
                         }
                     },
                     "406": {
                         "description": "error reading directory",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "error creating folder",
                         "schema": {
                             "type": "string"
                         }
@@ -1549,6 +1549,41 @@
                 },
                 "status": {
                     "type": "integer"
+                }
+            }
+        },
+        "client.BrowseDir": {
+            "type": "object",
+            "properties": {
+                "dirs": {
+                    "description": "Directories in the current directory.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "error": {
+                    "description": "Error message.",
+                    "type": "string"
+                },
+                "files": {
+                    "description": "Files in the current directory.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "mom": {
+                    "description": "Parent directory path.",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "Current directory path.",
+                    "type": "string"
+                },
+                "sep": {
+                    "description": "Filepath separator.",
+                    "type": "string"
                 }
             }
         },
