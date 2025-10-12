@@ -51,6 +51,7 @@ const validator = (
 export const app: App<Command> = {
   name: 'Commands',
   id: 'Commands',
+  envPrefix: 'COMMANDS',
   logo: faCommand,
   iconProps: { c1: 'darksalmon', d1: 'salmon', d2: 'tomato' },
   disabled: [],

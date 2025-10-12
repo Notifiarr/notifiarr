@@ -35,6 +35,7 @@
     original,
     app,
     index = 0,
+    indexed = true,
     validate,
     reset,
   }: ChildProps<any> = $props()
@@ -55,6 +56,8 @@
       !app.hidden?.includes('token') &&
       !app.hidden?.includes('apiKey'),
   )
+
+  const envPrefix = $derived(indexed ? `${app.envPrefix}_${index}` : app.envPrefix)
 </script>
 
 <div class="instance">
@@ -68,6 +71,7 @@
           bind:value={form.name}
           original={original?.name}
           disabled={app.disabled?.includes('name')}
+          envVar={`${envPrefix}_NAME`}
           {validate} />
       </Col>
     {/if}
@@ -78,6 +82,7 @@
           bind:original
           bind:form
           disabled={app.disabled?.includes('url')}
+          envVar={envPrefix + '_URL'}
           {app}
           {index}
           {validate} />
@@ -91,6 +96,7 @@
           id="host"
           bind:original
           bind:form
+          envVar={envPrefix + '_HOST'}
           disabled={app.disabled?.includes('host')}
           {app}
           {index}
@@ -104,6 +110,7 @@
           type="password"
           bind:value={form.apiKey}
           original={original?.apiKey}
+          envVar={envPrefix + '_API_KEY'}
           disabled={app.disabled?.includes('apiKey')}
           {validate} />
       </Col>
@@ -116,6 +123,7 @@
           type="password"
           bind:value={form.token}
           original={original?.token}
+          envVar={envPrefix + '_TOKEN'}
           disabled={app.disabled?.includes('token')}
           {validate} />
       </Col>
@@ -130,6 +138,7 @@
           id={app.id + '.username'}
           bind:value={form.username}
           original={original?.username}
+          envVar={envPrefix + '_USERNAME'}
           disabled={app.disabled?.includes('username')}
           {validate} />
       </Col>
@@ -142,6 +151,7 @@
           type="password"
           bind:value={form.password}
           original={original?.password}
+          envVar={envPrefix + '_PASSWORD'}
           disabled={app.disabled?.includes('password')}
           {validate} />
       </Col>
@@ -159,6 +169,7 @@
           type="timeout"
           bind:value={form.timeout}
           original={original?.timeout}
+          envVar={envPrefix + '_TIMEOUT'}
           disabled={app.disabled?.includes('timeout')}
           {validate} />
       </Col>
@@ -172,6 +183,7 @@
           type="interval"
           bind:value={form.interval}
           original={original?.interval}
+          envVar={envPrefix + '_INTERVAL'}
           disabled={app.disabled?.includes('interval')}
           {validate} />
       </Col>
@@ -188,6 +200,7 @@
           type="select"
           bind:value={form.deletes}
           original={original?.deletes}
+          envVar={envPrefix + '_DELETES'}
           disabled={app.disabled?.includes('deletes')}
           {validate}>
           <option value={0}>{get(_)('words.select-option.Disabled')}</option>
@@ -212,6 +225,7 @@
           type="select"
           bind:value={form.disabled}
           original={original?.disabled}
+          envVar={envPrefix + '_DISABLED'}
           disabled={app.disabled?.includes('disabled')}
           {validate} />
       </Col>
@@ -222,6 +236,7 @@
           id="smiPath"
           bind:original
           bind:form
+          envVar={envPrefix + '_SMI_PATH'}
           disabled={app.disabled?.includes('smiPath')}
           {app}
           {index}
@@ -234,6 +249,7 @@
           {rows}
           bind:value={busIds}
           original={original?.busIDs?.join('\n') ?? ''}
+          envVar={envPrefix + '_BUS_IDS'}
           disabled={app.disabled?.includes('busIds')}
           {validate} />
       </Col>

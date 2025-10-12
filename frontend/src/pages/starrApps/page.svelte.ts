@@ -51,6 +51,7 @@ export class Starr {
   static readonly Sonarr: App<StarrConfig> = {
     name: 'Sonarr',
     id: page.id + '.Sonarr',
+    envPrefix: 'SONARR',
     logo: sonarrLogo,
     empty: starrConfig,
     merge: (index: number, form: StarrConfig) => {
@@ -65,6 +66,7 @@ export class Starr {
   static readonly Radarr: App<StarrConfig> = {
     name: 'Radarr',
     id: page.id + '.Radarr',
+    envPrefix: 'RADARR',
     logo: radarrLogo,
     empty: starrConfig,
     merge: (index: number, form: StarrConfig) => {
@@ -80,6 +82,7 @@ export class Starr {
     name: 'Readarr',
     id: page.id + '.Readarr',
     logo: readarrLogo,
+    envPrefix: 'READARR',
     empty: starrConfig,
     merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)
@@ -94,6 +97,7 @@ export class Starr {
     name: 'Lidarr',
     id: page.id + '.Lidarr',
     logo: lidarrLogo,
+    envPrefix: 'LIDARR',
     empty: starrConfig,
     merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)
@@ -108,6 +112,7 @@ export class Starr {
     name: 'Prowlarr',
     id: page.id + '.Prowlarr',
     logo: prowlarrLogo,
+    envPrefix: 'PROWLARR',
     empty: starrConfig,
     merge: (index: number, form: StarrConfig) => {
       const c = deepCopy(get(profile).config)

@@ -50,6 +50,7 @@ const validator = (id: string, value: any): string => {
 export const app: App<WatchFile> = {
   id: 'FileWatcher',
   name: 'FileWatcher',
+  envPrefix: 'WATCH_FILE',
   logo: faEyeEvil,
   iconProps: { c1: 'purple', c2: 'firebrick', d1: 'thistle', d2: 'violet' },
   disabled: [],

@@ -7,6 +7,7 @@
     app: App<T>
     validate?: (id: string, value: any) => string | undefined
     index: number
+    indexed?: boolean
     reset?: () => void
     active?: boolean
   }

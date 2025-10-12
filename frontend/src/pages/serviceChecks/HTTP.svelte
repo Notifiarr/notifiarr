@@ -88,6 +88,7 @@
 <Col lg={6}>
   <CheckedInput
     id="url"
+    envVar={`${app.envPrefix}_${index}_VALUE`}
     app={{ ...app, merge, name: 'http' }}
     {index}
     bind:form={httpCheck}
@@ -100,6 +101,7 @@
     type="textarea"
     rows={Math.min(httpCheck.headers.split('\n').length ?? 1, 15)}
     id={app.id + '.http.headers'}
+    envVar={`${app.envPrefix}_${index}_VALUE`}
     bind:value={httpCheck.headers}
     original={originalHttp.headers}
     validate={updateValue}

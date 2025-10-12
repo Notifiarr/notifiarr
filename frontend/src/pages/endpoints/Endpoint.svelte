@@ -80,6 +80,7 @@
     <Col md={12}>
       <Input
         id={app.id + '.name'}
+        envVar={`${app.envPrefix}_${index}_NAME`}
         bind:value={form.name}
         original={original?.name}
         {validate} />
@@ -87,6 +88,7 @@
     <Col md={6}>
       <Input
         id={app.id + '.template'}
+        envVar={`${app.envPrefix}_${index}_TEMPLATE`}
         bind:value={form.template}
         original={original?.template}
         {validate}>
@@ -106,6 +108,7 @@
       <Input
         type="timeout"
         id={app.id + '.timeout'}
+        envVar={`${app.envPrefix}_${index}_TIMEOUT`}
         bind:value={form.timeout}
         original={original?.timeout}
         noDisable
@@ -115,6 +118,7 @@
       <Input
         type="select"
         id={app.id + '.method'}
+        envVar={`${app.envPrefix}_${index}_METHOD`}
         bind:value={form.method}
         original={original?.method}
         {validate}
@@ -124,13 +128,21 @@
         }))} />
     </Col>
     <Col md={10}>
-      <CheckedInput id="url" {app} {index} bind:form bind:original {validate} />
+      <CheckedInput
+        id="url"
+        {app}
+        {index}
+        envVar={`${app.envPrefix}_${index}_URL`}
+        bind:form
+        bind:original
+        {validate} />
     </Col>
     <Col lg={12}>
       <Input
         rows={Math.min(form.body?.split('\n').length ?? 1, 15)}
         type="textarea"
         id={app.id + '.body'}
+        envVar={`${app.envPrefix}_${index}_BODY`}
         bind:value={form.body}
         original={original?.body}
         badge={$_(app.id + '.badge.body', { values: { count: form.body?.length ?? 0 } })}
@@ -141,6 +153,7 @@
         rows={Math.min(query.split('\n').length, 15)}
         type="textarea"
         id={app.id + '.query'}
+        envVar={`${app.envPrefix}_${index}_QUERY`}
         bind:value={query}
         original={originalQuery}
         badge={$_(app.id + '.badge.query', {
@@ -154,6 +167,7 @@
         rows={Math.min(header.split('\n').length, 15)}
         type="textarea"
         id={app.id + '.header'}
+        envVar={`${app.envPrefix}_${index}_HEADER`}
         bind:value={header}
         original={originalHeader}
         badge={$_(app.id + '.badge.header', {

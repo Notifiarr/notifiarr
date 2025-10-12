@@ -25,6 +25,7 @@
     /** Disable the check button.*/
     disabled?: boolean
     params?: () => Promise<URLSearchParams>
+    envVar: string
     [key: string]: any
   }
   let {
@@ -35,6 +36,7 @@
     original = $bindable(),
     disabled = false,
     params = undefined,
+    envVar,
     ...rest
   }: Props<any> = $props()
 
@@ -101,6 +103,7 @@
     description={id === 'url' && form[id]?.toString()?.startsWith('https://')
       ? get(_)('words.instance-options.validSsl.description')
       : rest.description}
+    {envVar}
     {...rest}>
     <!-- This is a "checked" input, so add a check button for the instance. -->
     {#snippet pre()}

@@ -62,16 +62,19 @@
   <Input
     id="config.apiKey"
     type="password"
+    envVar="API_KEY"
     bind:value={config.apiKey}
     original={$profile.config.apiKey} />
   <Input
     id="config.extraKeys"
     type="textarea"
+    envVar="EXTRA_KEYS"
     bind:value={extraKeys}
     {rows}
     original={$profile.config.extraKeys?.join('\n') ?? ''} />
   <Input
     id="config.hostId"
+    envVar="HOST_ID"
     bind:value={config.hostId}
     original={$profile.config.hostId} />
 

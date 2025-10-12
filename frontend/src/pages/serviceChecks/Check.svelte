@@ -45,6 +45,7 @@
     <Col md={6}>
       <Input
         id={app.id + '.name'}
+        envVar={`${app.envPrefix}_${index}_NAME`}
         bind:value={form.name}
         original={original.name}
         {validate} />
@@ -53,6 +54,7 @@
       <Input
         type="select"
         id={app.id + '.type'}
+        envVar={`${app.envPrefix}_${index}_TYPE`}
         bind:value={form.type}
         original={original?.type}
         {onchange}
@@ -92,6 +94,7 @@
       <Input
         id={app.id + '.timeout'}
         type="timeout"
+        envVar={`${app.envPrefix}_${index}_TIMEOUT`}
         bind:value={form.timeout}
         original={original?.timeout}
         {validate} />
@@ -100,6 +103,7 @@
       <Input
         id={app.id + '.interval'}
         type="interval"
+        envVar={`${app.envPrefix}_${index}_INTERVAL`}
         bind:value={form.interval}
         original={original?.interval}
         {validate} />

@@ -71,6 +71,7 @@ const validator = (
 export const app: App<Endpoint> = {
   name: 'Endpoints',
   id: 'Endpoints',
+  envPrefix: 'ENDPOINT',
   logo: faLinkSimple,
   iconProps: { c1: 'orange', c2: 'violet' },
   disabled: [],

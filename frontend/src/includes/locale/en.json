@@ -106,6 +106,8 @@
     "NoMatch": "No Match"
   },
   "phrases": {
+    "EnvironmentVariable": "Environment Variable Name: <code>{variableName}</code>",
+    "VariableDescription": "<span class=\"text-warning\">Notice:</span> This configuration value is derived from an environment variable. Changing the value here will cause the new value to write to the config file, but it will not take affect. The next time you click save it will be replaced. Change the value here by changing the environment variable value, or by removing the variable from the environment.",
     "ERROR": "ERROR",
     "LoggingIn": "Logging in...",
     "LoggedIn": "Logged in!",
@@ -297,7 +299,7 @@
     },
     "noUploads": {
       "label": "Deny Uploads",
-      "description": "<b>Disabled</b> allows Notifiarr.com administrators to make this client upload log files to the website. <b>Enabled</b> prevents log file uploads..",
+      "description": "<b>Disabled</b> allows Notifiarr.com administrators to make this client upload log files to the website. <b>Enabled</b> prevents log file uploads.",
       "tooltip": "This setting controls the Notifiarr.com website and Notifiarr administrators' ability to trigger this client to upload log files to the website. Sometimes we need to see log entries while diagnosing problems and this trigger allows us to make the client upload the app and debug log files."
     },
     "snapshot": {

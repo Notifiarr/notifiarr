@@ -14,12 +14,14 @@
   <Col md={6}>
     <Input
       id="config.sslKeyFile"
+      envVar="SSL_KEY_FILE"
       bind:value={config.sslKeyFile}
       original={original.sslKeyFile} />
   </Col>
   <Col md={6}>
     <Input
       id="config.sslCertFile"
+      envVar="SSL_CERT_FILE"
       bind:value={config.sslCertFile}
       original={original.sslCertFile} />
   </Col>

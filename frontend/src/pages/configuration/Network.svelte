@@ -14,11 +14,16 @@
   <Col md={6}>
     <Input
       id="config.bindAddr"
+      envVar="BIND_ADDR"
       bind:value={config.bindAddr}
       original={original.bindAddr} />
   </Col>
   <Col md={6}>
-    <Input id="config.urlbase" bind:value={config.urlbase} original={original.urlbase} />
+    <Input
+      id="config.urlbase"
+      envVar="URLBASE"
+      bind:value={config.urlbase}
+      original={original.urlbase} />
   </Col>
 </Row>
 
@@ -26,6 +31,7 @@
   <Col md={6}>
     <Input
       id="config.timeout"
+      envVar="TIMEOUT"
       type="select"
       bind:value={config.timeout}
       options={[
@@ -40,6 +46,7 @@
   <Col md={6}>
     <Input
       id="config.retries"
+      envVar="RETRIES"
       type="number"
       bind:value={config.retries}
       min={0}
