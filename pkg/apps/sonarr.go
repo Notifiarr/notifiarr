@@ -887,25 +887,33 @@ const (
 	exactScore  = 100
 )
 
-func matcher(query, title string) int {
-	cleanedQuery := strings.TrimSuffix(strings.TrimPrefix(wuzzy.Cleanse(query, false), "the "), "s")
-	cleanedTitle := strings.TrimPrefix(wuzzy.Cleanse(title, false), "the ")
-
-	wuzz := wuzzy.UQRatio(query, title)
-	if wuzz >= suffixScore {
-		return wuzz
+func max(i, j int) int {
+	if i > j {
+		return i
 	}
 
+	return j
+}
+
+func matcher(query, title string) int {
+	trimmedQuery := wuzzy.Cleanse(query, false)
+	trimmedTitle := wuzzy.Cleanse(title, false)
+	wuzz := wuzzy.Ratio(trimmedQuery, trimmedTitle)
+	cleanedQuery := strings.TrimSuffix(strings.TrimPrefix(trimmedQuery, "the "), "s")
+	cleanedTitle := strings.TrimPrefix(trimmedTitle, "the ")
+
 	if cleanedTitle == query || cleanedTitle == cleanedQuery+"s" || cleanedTitle == cleanedQuery {
-		return exactScore
+		return max(wuzz, exactScore)
 	}
 
 	if strings.HasPrefix(cleanedTitle, cleanedQuery) {
-		return prefixScore
+		return max(wuzz, prefixScore)
 	}
 
-	if strings.HasSuffix(cleanedTitle, cleanedQuery) || strings.HasSuffix(cleanedTitle, cleanedQuery+"s") {
-		return suffixScore
+	if strings.HasSuffix(cleanedTitle, cleanedQuery) ||
+		strings.HasSuffix(cleanedTitle, cleanedQuery+"s") ||
+		strings.Contains(cleanedTitle, " "+cleanedQuery) {
+		return max(wuzz, suffixScore)
 	}
 
 	return wuzz
