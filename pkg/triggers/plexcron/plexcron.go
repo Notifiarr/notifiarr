@@ -32,7 +32,10 @@ type cmd struct {
 	sync.Mutex
 }
 
-const TrigPlexSessions common.TriggerName = "Gathering and sending Plex Sessions."
+const (
+	TrigPlexSessions      common.TriggerName = "Gathering and sending Plex Sessions."
+	TrigPlexSessionsCheck common.TriggerName = "Checking Plex for completed sessions."
+)
 
 // Statuses for an item being played on Plex.
 const (
@@ -95,7 +98,7 @@ func (c *cmd) run() {
 
 		c.Add(&common.Action{
 			Key:  "TrigPlexSessionsCheck",
-			Name: "Checking Plex for completed sessions.",
+			Name: TrigPlexSessionsCheck,
 			Hide: true, // do not log this one.
 			Fn:   c.checkForFinishedItems,
 			D: cnfg.Duration{Duration: time.Minute +

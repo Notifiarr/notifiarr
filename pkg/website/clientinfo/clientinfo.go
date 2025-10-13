@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
@@ -39,14 +40,14 @@ type ClientInfo struct {
 		Mulery []*MuleryServer `json:"mulery"`
 	} `json:"user"`
 	Actions struct {
-		Plex      PlexConfig      `json:"plex"`      // Site Config for Plex.
-		Apps      AllAppConfigs   `json:"apps"`      // Site Config for Starr.
-		Dashboard DashConfig      `json:"dashboard"` // Site Config for Dashboard.
-		Sync      SyncConfig      `json:"sync"`      // Site Config for TRaSH Sync.
-		Mdblist   MdbListConfig   `json:"mdblist"`   // Site Config for MDB List.
-		Gaps      GapsConfig      `json:"gaps"`      // Site Config for Radarr Gaps.
-		Custom    []*CronConfig   `json:"custom"`    // Site config for Custom Crons.
-		Snapshot  snapshot.Config `json:"snapshot"`  // Site Config for System Snapshot.
+		Plex      plex.WebsiteConfig `json:"plex"`      // Site Config for Plex.
+		Apps      AllAppConfigs      `json:"apps"`      // Site Config for Starr.
+		Dashboard DashConfig         `json:"dashboard"` // Site Config for Dashboard.
+		Sync      SyncConfig         `json:"sync"`      // Site Config for TRaSH Sync.
+		Mdblist   MdbListConfig      `json:"mdblist"`   // Site Config for MDB List.
+		Gaps      GapsConfig         `json:"gaps"`      // Site Config for Radarr Gaps.
+		Custom    []*CronConfig      `json:"custom"`    // Site config for Custom Crons.
+		Snapshot  snapshot.Config    `json:"snapshot"`  // Site Config for System Snapshot.
 	} `json:"actions"`
 	IntegrityCheck bool `json:"integrityCheck"`
 }
@@ -122,18 +123,6 @@ type AllAppConfigs struct {
 	Radarr   InstanceConfig `json:"radarr"`
 	Readarr  InstanceConfig `json:"readarr"`
 	Sonarr   InstanceConfig `json:"sonarr"`
-}
-
-// PlexConfig is the website-derived configuration for Plex.
-type PlexConfig struct {
-	Interval   cnfg.Duration `json:"interval"`
-	TrackSess  bool          `json:"trackSessions"`
-	AccountMap string        `json:"accountMap"`
-	NoActivity bool          `json:"noActivity"`
-	Delay      cnfg.Duration `json:"activityDelay"`
-	Cooldown   cnfg.Duration `json:"cooldown"`
-	SeriesPC   uint          `json:"seriesPc"`
-	MoviesPC   uint          `json:"moviesPc"`
 }
 
 // GapsConfig is the configuration returned from the notifiarr website for Radarr Collection Gaps.

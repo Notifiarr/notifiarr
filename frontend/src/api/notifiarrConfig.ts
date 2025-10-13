@@ -1767,7 +1767,7 @@ export interface ClientInfo {
     mulery?: MuleryServer[];
   };
   actions: {
-    plex: ClientinfoPlexConfig;
+    plex: WebsiteConfig;
     apps: AllAppConfigs;
     dashboard: DashConfig;
     sync: SyncConfig;
@@ -1799,10 +1799,10 @@ export interface MuleryServer {
 };
 
 /**
- * PlexConfig is the website-derived configuration for Plex.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.PlexConfig>
+ * WebsiteConfig is the website-derived configuration for Plex.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.WebsiteConfig>
  */
-export interface ClientinfoPlexConfig {
+export interface WebsiteConfig {
   interval: string;
   trackSessions: boolean;
   accountMap: string;

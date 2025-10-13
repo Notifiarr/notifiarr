@@ -21,7 +21,7 @@ import (
 	"golift.io/version"
 )
 
-// Config is the data needed to send and retrieve client info.
+// Config is the data needed to send and retrieve client info. This data is sent to the website.
 type Config struct {
 	// Actions *triggers.Actions
 	*apps.Apps

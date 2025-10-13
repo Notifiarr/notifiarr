@@ -200,12 +200,8 @@ func (w *WatchFile) setup(ignored ignored) error {
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
 func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.Ticker) {
-	mnd.Log.Printf("==> Temp DEBUG: collectFileTails (Lock-before)")
-
 	c.awMutex.Lock()
 	defer c.awMutex.Unlock()
-
-	mnd.Log.Printf("==> Temp DEBUG: collectFileTails (Lock-after)")
 
 	c.addWatcher = make(chan *WatchFile, len(tails)+1) // DATA RACE 101
 	c.stopWatcher = make(chan struct{})
@@ -232,8 +228,6 @@ func (c *cmd) collectFileTails(tails []*WatchFile) ([]reflect.SelectCase, *time.
 			mnd.FileWatcher.Add(item.Path+Matched, 0)
 		}
 	}
-
-	mnd.Log.Printf("==> Temp DEBUG: collectFileTails (Return-before)")
 
 	return cases, ticker
 }
@@ -314,7 +308,7 @@ func (c *cmd) fileWatcherTicker(died bool) bool {
 		mnd.FileWatcher.Add(item.Path+" Retries", 1)
 
 		// move this back to debug.
-		mnd.Log.Printf("==> Temp DEBUG: Restarting File Watcher (retries: %d/%d): %s", item.retries, maxRetries, item.Path)
+		mnd.Log.Debugf("==> Restarting File Watcher (retries: %d/%d): %s", item.retries, maxRetries, item.Path)
 
 		if err := c.addFileWatcher(item); err != nil {
 			mnd.Log.Errorf("Restarting File Watcher (retries: %d/%d): %s: %v", item.retries, maxRetries, item.Path, err)
@@ -359,7 +353,6 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		return // rate limited.
 	}
 
-	mnd.Log.Printf("==> Temp DEBUG: Sending file watcher match: %s", tail.Path)
 	website.Site.SendData(&website.Request{
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
@@ -367,7 +360,6 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		LogMsg:     fmt.Sprintf("Watched-File Line Match: %s: %s", tail.Path, match.Line),
 		Payload:    match,
 	})
-	mnd.Log.Printf("==> Temp DEBUG: Sent file watcher match: %s", tail.Path)
 }
 
 func (a *Action) AddFileWatcher(file *WatchFile) error {
@@ -375,12 +367,8 @@ func (a *Action) AddFileWatcher(file *WatchFile) error {
 }
 
 func (c *cmd) addFileWatcher(file *WatchFile) error {
-	mnd.Log.Printf("==> Temp DEBUG: addFileWatcher (RLock-before)")
-
 	c.awMutex.RLock()
 	defer c.awMutex.RUnlock()
-
-	mnd.Log.Printf("==> Temp DEBUG: addFileWatcher (RLock-after)")
 
 	if c.addWatcher == nil {
 		return common.ErrNoChannel
@@ -394,11 +382,7 @@ func (c *cmd) addFileWatcher(file *WatchFile) error {
 	mnd.Log.Printf("Watching File: %s, regexp: '%s' skip: '%s' poll:%v pipe:%v must:%v log:%v",
 		file.Path, file.Regexp, file.Skip, file.Poll, file.Pipe, file.MustExist, file.LogMatch)
 
-	mnd.Log.Printf("==> Temp DEBUG: addFileWatcher (Send-before)")
-
 	c.addWatcher <- file
-
-	mnd.Log.Printf("==> Temp DEBUG: addFileWatcher (Send-after)")
 
 	return nil
 }
@@ -414,12 +398,8 @@ func (w *WatchFile) Stop() error {
 }
 
 func (c *cmd) stop() {
-	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (Lock-before)")
-
 	c.awMutex.Lock()
 	defer c.awMutex.Unlock()
-
-	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (Lock-after)")
 
 	for _, tail := range c.files {
 		if err := tail.Stop(); err != nil {
@@ -427,15 +407,11 @@ func (c *cmd) stop() {
 		}
 	}
 
-	mnd.Log.Printf("==> Temp DEBUG: File watchers stopped")
-
 	// The following code might wait for all the watchers to die before returning.
 	close(c.addWatcher) // DATA RACE 101
 	<-c.stopWatcher
 	c.addWatcher = nil
 	c.stopWatcher = nil
-
-	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop finished")
 }
 
 // this runs when a channel dies from the main go routine loop.
@@ -449,33 +425,21 @@ func (w *WatchFile) deactivate() error {
 
 // Active returns true if the tail channel is still open.
 func (w *WatchFile) Active() bool {
-	mnd.Log.Printf("==> Temp DEBUG: File watcher Active (RLock-before): %s", w.Path)
-
 	w.mu.RLock()
 	defer w.mu.RUnlock()
-
-	mnd.Log.Printf("==> Temp DEBUG: File watcher Active (RLock-after): %s", w.Path)
-
 	return w.tail != nil
 }
 
 // stop stops a file watcher.
 func (w *WatchFile) stop() error {
-	mnd.Log.Printf("==> Temp DEBUG: File watcher Stop called (Lock-before): %s", w.Path)
-
 	w.mu.Lock()
 	defer w.mu.Unlock()
-
-	// XXX: this is a debug log, remove it.
-	mnd.Log.Printf("==> Temp DEBUG: Stopping file watcher (Lock-after): %s", w.Path)
 
 	if err := w.tail.Stop(); err != nil {
 		return fmt.Errorf("stop failed: %w", err)
 	}
 
 	w.tail = nil
-	// XXX: this is a debug log, remove it.
-	mnd.Log.Printf("==> Temp DEBUG: Stopped file watcher: %s", w.Path)
 
 	return nil
 }

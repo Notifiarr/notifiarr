@@ -149,7 +149,7 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 
 	defer func() {
 		mnd.Log.CapturePanic()
-		c.stopTimerLoop(actions)
+		c.stopTimerLoop(ctx, actions)
 		_ = c.Scheduler.Shutdown()
 	}()
 
@@ -197,9 +197,13 @@ func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action 
 // stopTimerLoop is deferred by runTimerLoop.
 // This procedure closes all the timer channels and stops the tickers.
 // These cannot be restarted and must be fully initialized again.
-func (c *Config) stopTimerLoop(actions []*Action) {
-	defer close(c.stop.C) // signal that we're done.
+func (c *Config) stopTimerLoop(ctx context.Context, actions []*Action) {
+	defer func() {
+		close(c.stop.C) // signal that we're done.
+		c.sharedCtx <- ctx
+	}()
 
+	c.sharedCtx = make(chan context.Context, 1)
 	mnd.Log.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
 	for _, action := range actions {
