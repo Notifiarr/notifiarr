@@ -821,7 +821,7 @@
                 "label": "Host e Porta",
                 "description": "",
                 "placeholder": "127.0.0.1:22",
-                "tooltip": "",
+                "tooltip": "In genere si consiglia di utilizzare un indirizzo IP. Se desideri testare anche il DNS, utilizza un nome host. Il formato è <code>host:port</code>. Non devono essere presenti spazi o caratteri aggiuntivi.",
                 "required": "È necessario specificare un host e una porta separati da due punti."
             }
         },
@@ -830,7 +830,7 @@
                 "label": "Host o IP",
                 "description": "",
                 "placeholder": "127.0.0.1",
-                "tooltip": "",
+                "tooltip": "In genere si consiglia di utilizzare un indirizzo IP. Se desideri testare anche il DNS, utilizza un nome host. Il formato è <code>host</code> o <code>10.11.12.13</code>. Non devono essere presenti spazi o caratteri aggiuntivi. Per consentire il funzionamento dei controlli UDP su Linux, è necessario abilitarli con questo comando: <code>sudo sysctl -w net.ipv4.ping_group_range=“0 2147483647”</code>. Per consentire i controlli ICMP in Linux, è necessario assegnare le funzionalità binarie a notifiarr con questo comando: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Il modo più semplice per far funzionare entrambi in Docker è abilitare la modalità privilegiata, ma è anche possibile impostare le funzionalità.",
                 "required": "Un host o un indirizzo IP è richiesto."
             },
             "count": {
