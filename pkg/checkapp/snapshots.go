@@ -56,7 +56,7 @@ func Nvidia(ctx context.Context, config snapshot.NvidiaConfig) (string, int) {
 
 	switch len(snaptest.Nvidia) {
 	case 0:
-		msg += "s."
+		return "SMI: No graphics devices found.", http.StatusFailedDependency
 	case 1:
 		msg += ":"
 	default:

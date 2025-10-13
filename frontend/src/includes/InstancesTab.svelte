@@ -19,9 +19,14 @@
   import Instances from './Instances.svelte'
   import type { FormListTracker } from './formsTracker.svelte'
   import Instance from './Instance.svelte'
+  import InstanceHeader from './InstanceHeader.svelte'
 
-  type Props<T> = { flt: FormListTracker<T>; titles: Record<string, string> }
-  let { flt = $bindable(), titles }: Props<any> = $props()
+  type Props<T> = {
+    flt: FormListTracker<T>
+    titles: Record<string, string>
+    one?: boolean
+  }
+  let { flt = $bindable(), titles, one = false }: Props<any> = $props()
 </script>
 
 {#key tab}
@@ -29,7 +34,7 @@
     <div class="title" slot="tab">
       <h5 class="title {flt.invalid ? 'text-danger' : ''}">
         {titles[flt.app.name]}
-        {#if flt.instances.length > 0}
+        {#if flt.instances.length > 0 && (!one || !flt.instances[0].disabled)}
           <Badge class="tab-badge" color="success">{flt.instances.length}</Badge>
         {/if}
         {#if flt.invalid}
@@ -40,14 +45,24 @@
       </h5>
     </div>
 
-    <Instances bind:flt Child={Instance}>
-      {#snippet headerActive(index)}
-        {index + 1}. {flt.original[index]?.name}
-      {/snippet}
-      {#snippet headerCollapsed(index)}
-        {flt.original[index]?.url}
-      {/snippet}
-    </Instances>
+    {#if one}
+      <InstanceHeader {flt} />
+      <Instance
+        index={0}
+        indexed={false}
+        bind:form={flt.instances[0]}
+        original={flt.original[0]}
+        app={flt.app} />
+    {:else}
+      <Instances bind:flt Child={Instance}>
+        {#snippet headerActive(index)}
+          {index + 1}. {flt.original[index]?.name}
+        {/snippet}
+        {#snippet headerCollapsed(index)}
+          {flt.original[index]?.url}
+        {/snippet}
+      </Instances>
+    {/if}
   </TabPane>
 {/key}
 
