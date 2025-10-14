@@ -623,13 +623,13 @@
             "description": "À quelle fréquence vérifier le service."
         },
         "name": {
-            "label": "Vérifier le nom",
+            "label": "Vérification de nom",
             "description": "Nom unique du service surveillé.",
             "placeholder": "nom personnalisé pour les notifications",
             "tooltip": "Nom du service surveillé. Il permet d'identifier le service dans les notifications. Chaque service doit avoir un nom unique."
         },
         "type": {
-            "label": "Type de chèque",
+            "label": "Type de vérification",
             "description": "Le type de contrôle à effectuer.",
             "tooltip": "Le type de vérification de processus vous permet de surveiller l'exécution d'un processus. Le type de vérification d'URL HTTP vous permet de surveiller l'accessibilité d'une URL. Le type de vérification de port TCP vous permet de surveiller la connectivité d'un port TCP. Les deux types de vérification Ping permettent de surveiller l'accessibilité d'une adresse IP ou d'un hôte.",
             "options": {
@@ -1112,7 +1112,7 @@
             "empty": "Aucun observateur de fichiers configuré."
         },
         "apps": {
-            "title": "Demandes de candidature",
+            "title": "Requêtes d'application",
             "description": "Statistiques des demandes d'application. Ces compteurs n'incluent pas les contrôles de service.",
             "empty": "Aucune demande de candidature n'a encore été formulée."
         }
@@ -1120,7 +1120,7 @@
     "SnapshotApps": {
         "Nvidia": {
             "busIds": {
-                "label": "identifiants de bus",
+                "label": "Identifiants de bus",
                 "description": "Liste séparée par des virgules des identifiants de bus à capturer en instantané.",
                 "placeholder": "0000:00:00.0,0000:00:00.1",
                 "tooltip": "Il s'agit de l'identifiant de bus du GPU. Vous pouvez le trouver en exécutant <code>nvidia-smi</code> et en consultant la colonne <code>Bus Id</code>. Les cartes avec d'autres identifiants de bus sont ignorées dans l'instantané. En général, laissez ce champ vide. Ajoutez-en plusieurs avec des sauts de ligne."
@@ -1242,7 +1242,7 @@
         "BuildInformation": {
             "title": "Informations sur la construction",
             "Branch": "Branche",
-            "BuildUser": "Créer un utilisateur",
+            "BuildUser": "Utilisateur de fabrication",
             "BuildDate": "Date de construction",
             "GoVersion": "Version Go",
             "Integrity": "Intégrité"
@@ -1342,7 +1342,7 @@
                 "button": "Télécharger le journal maintenant",
                 "success": "Fichier journal téléchargé sur le site Web.",
                 "options": {
-                    "choose": "Choisissez un fichier à télécharger.",
+                    "choose": "Choisissez un fichier à téléverser.",
                     "app": "Fichier journal d'application.",
                     "debug": "Fichier journal de débogage.",
                     "http": "Fichier journal HTTP."
@@ -1354,7 +1354,7 @@
                 "success": "Sessions Plex collectées."
             },
             "TrigPlexSessionsCheck": {
-                "label": "Vérifiez les sessions Plex terminées"
+                "label": "Vérification des sessions Plex terminées"
             },
             "TrigDashboard": {
                 "label": "Mise à jour du tableau de bord",
@@ -1382,7 +1382,7 @@
                 "success": "Synchronisation du profil et du format Radarr lancée."
             },
             "TrigStop": {
-                "label": "Rechargements clients",
+                "label": "Rechargement du client",
                 "button": "Recharger le client"
             },
             "TrigSnapshot": {
@@ -1392,12 +1392,12 @@
             },
             "TrigProwlarrCorrupt": {
                 "label": "Corruption de la base de données Prowlarr",
-                "button": "Vérifiez Prowlarr",
+                "button": "Vérification de Prowlarr",
                 "success": "Vérification de corruption de la base de données Prowlarr lancée."
             },
             "TrigLidarrCorrupt": {
                 "label": "Corruption de la base de données Lidarr",
-                "button": "Vérifiez Lidarr",
+                "button": "Vérification de Lidarr",
                 "success": "Vérification de la corruption de la base de données Lidarr lancée."
             },
             "TrigRadarrCorrupt": {
@@ -1422,7 +1422,7 @@
             },
             "TrigLidarrBackup": {
                 "label": "Sauvegardes de la base de données Lidarr",
-                "button": "Vérifiez Lidarr",
+                "button": "Vérification de Lidarr",
                 "success": "Vérification des sauvegardes de la base de données Lidarr lancée."
             },
             "TrigRadarrBackup": {
@@ -1484,7 +1484,7 @@
             },
             "TrigStuckItems": {
                 "label": "Vérification des éléments bloqués",
-                "button": "Vérifiez les éléments coincés",
+                "button": "Vérification des éléments coincés",
                 "success": "Vérification des éléments bloqués lancée."
             },
             "TrigPollSite": {

@@ -75,7 +75,7 @@
             "General": "Generale",
             "Network": "Rete",
             "System": "Sistema",
-            "WatchFile": "",
+            "WatchFile": "Osserva File",
             "Endpoint": "",
             "Command": "Comando",
             "SSLConfiguration": "Configurazione SSL",
@@ -158,7 +158,7 @@
             "tooltip": ""
         },
         "debugLog": {
-            "label": "",
+            "label": "File Log Debug",
             "description": "",
             "placeholder": "/path/to/debug-notifiarr.log",
             "tooltip": ""
@@ -215,7 +215,7 @@
         "watchFile": {
             "path": {
                 "label": "Percorso File",
-                "description": ""
+                "description": "Percorso del file da osservare."
             }
         },
         "endpoint": {
@@ -238,7 +238,7 @@
             }
         },
         "urlbase": {
-            "label": "",
+            "label": "URL Base",
             "description": "",
             "placeholder": "/notifiarr/",
             "tooltip": "Esempio: /notifiarr/"
@@ -256,7 +256,7 @@
         "retries": {
             "label": "",
             "description": "",
-            "tooltip": ""
+            "tooltip": "Predefinito: 4 (impostando 0 utilizzerà il predefinito di 4)"
         },
         "apt": {
             "label": "",
@@ -323,7 +323,7 @@
             "ConfigFile": "File di Configurazione",
             "EnvironmentPrefix": "",
             "ExtraConfigFiles": "",
-            "CustomAssets": "",
+            "CustomAssets": "Asset Personalizzati",
             "UserID": "ID Utente",
             "GroupID": "",
             "IPAddress": "Indirizzo IP"
@@ -776,7 +776,7 @@
         "DeleteCheck": "",
         "addInstance": "",
         "description": "",
-        "processListLink": "",
+        "processListLink": "Visualizza la lista dei processi in esecuzione qui.",
         "interval": {
             "label": "Controlla Intervallo",
             "description": "Quanto spesso controllare il servizio."
@@ -821,7 +821,7 @@
                 "label": "Host e Porta",
                 "description": "",
                 "placeholder": "127.0.0.1:22",
-                "tooltip": "",
+                "tooltip": "In genere si consiglia di utilizzare un indirizzo IP. Se desideri testare anche il DNS, utilizza un nome host. Il formato è <code>host:port</code>. Non devono essere presenti spazi o caratteri aggiuntivi.",
                 "required": "È necessario specificare un host e una porta separati da due punti."
             }
         },
@@ -830,7 +830,7 @@
                 "label": "Host o IP",
                 "description": "",
                 "placeholder": "127.0.0.1",
-                "tooltip": "",
+                "tooltip": "In genere si consiglia di utilizzare un indirizzo IP. Se desideri testare anche il DNS, utilizza un nome host. Il formato è <code>host</code> o <code>10.11.12.13</code>. Non devono essere presenti spazi o caratteri aggiuntivi. Per consentire il funzionamento dei controlli UDP su Linux, è necessario abilitarli con questo comando: <code>sudo sysctl -w net.ipv4.ping_group_range=“0 2147483647”</code>. Per consentire i controlli ICMP in Linux, è necessario assegnare le funzionalità binarie a notifiarr con questo comando: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Il modo più semplice per far funzionare entrambi in Docker è abilitare la modalità privilegiata, ma è anche possibile impostare le funzionalità.",
                 "required": "Un host o un indirizzo IP è richiesto."
             },
             "count": {
@@ -897,7 +897,7 @@
                 "options": {
                     "choose": "Scegli un file da caricare",
                     "app": "",
-                    "debug": "",
+                    "debug": "File log debug.",
                     "http": "File log HTTP."
                 }
             },
@@ -910,9 +910,9 @@
                 "label": ""
             },
             "TrigDashboard": {
-                "label": "",
+                "label": "Aggiornamento Dashboard",
                 "button": "Aggiorna dashboard",
-                "success": ""
+                "success": "Aggiornamento Dashboard iniziato."
             },
             "TrigMDBListSync": {
                 "label": "Sincronizzazione lista MDB",
@@ -1004,7 +1004,7 @@
             "TrigCustomCommand": {
                 "label": "Comando personalizzato: {name}",
                 "button": "Esegui Comando",
-                "success": ""
+                "success": "Comando personalizzato inizializzato."
             },
             "TrigAutoUpdate": {
                 "label": ""
@@ -1021,7 +1021,7 @@
                 "success": ""
             },
             "TrigDownloadingItems": {
-                "label": ""
+                "label": "Elementi in scaricamento / terminati"
             },
             "TrigLidarrQueue": {
                 "label": ""
@@ -1051,12 +1051,16 @@
         },
         "titles": {
             "Triggers": "",
-            "Timers": "",
+            "Timers": "Timer",
             "Schedules": "Programmi",
             "SiteCrons": "",
             "Counter": "",
             "Interval": "Intervallo",
-            "Schedule": "Programma"
+            "Schedule": "Programma",
+            "Filter": "Filtro",
+            "Timer": "Timer",
+            "Type": "Tipo",
+            "When": "Quando"
         },
         "descriptions": {
             "Triggers": "",
@@ -1081,10 +1085,11 @@
         "ShowMenu": "Mostra Menu",
         "ShowOutput": "",
         "HideOutput": "",
-        "RefreshOutput": ""
+        "RefreshOutput": "",
+        "Menu": "Menu"
     },
     "RegexTester": {
-        "RegularExpressionTester": "",
+        "RegularExpressionTester": "Tester Espressione Regolare",
         "testPattern": {
             "label": "",
             "description": "",
@@ -1160,7 +1165,7 @@
             "Downloaders": "",
             "MediaApps": "",
             "SnapshotApps": "",
-            "FileWatcher": "",
+            "FileWatcher": "Osservatore File",
             "Endpoints": "",
             "Commands": "Comandi",
             "Services": "Servizi",
@@ -1187,7 +1192,7 @@
             "Services": "",
             "Actions": "",
             "Integrations": "",
-            "Monitoring": "",
+            "Monitoring": "Visualizza la salute dei servizi e della rete.",
             "Metrics": "",
             "LogFiles": "",
             "System": "",
@@ -1206,7 +1211,7 @@
             "HeaderOnlyUsed": "",
             "AuthTypeChange": "",
             "ProfileUpdated": "",
-            "EnterCurrentPassword": "",
+            "EnterCurrentPassword": "Inserisci la tua password attuale per effettuare le modifiche.",
             "ProxyAuthDisabled": "",
             "Addit": "Aggiungilo.",
             "SeeWikiForAuthProxyHelp": "Vedi <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">la wiki</a> per le istruzioni per impostare un proxy di autenticazione.",
@@ -1241,7 +1246,7 @@
         "username": {
             "label": "Username",
             "description": "Il tuo username di login",
-            "placeholder": ""
+            "placeholder": "Predefinito: admin"
         },
         "password": {
             "label": "Password Attuale",
@@ -1272,7 +1277,7 @@
                 "label": "Token",
                 "description": "Token per il server di Plex.",
                 "placeholder": "",
-                "tooltip": ""
+                "tooltip": "Puoi trovare le istruzioni per individuare il tuo token Plex in <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">questo articolo Plex</a>."
             }
         },
         "Tautulli": {
@@ -1370,20 +1375,20 @@
         }
     },
     "FileWatcher": {
-        "title": "",
+        "title": "File osservati",
         "description": "",
-        "addInstance": "",
-        "DeleteWatcher": "",
+        "addInstance": "Osserva un altro file",
+        "DeleteWatcher": "Elimina Osservatore",
         "badges": {
-            "CurrentlyWatching": "",
-            "WatcherStopped": ""
+            "CurrentlyWatching": "Attualmente in osservazione",
+            "WatcherStopped": "Osservatori fermati"
         },
         "buttons": {
-            "StopWatcher": "",
-            "StartWatcher": ""
+            "StopWatcher": "Ferma Osservatore",
+            "StartWatcher": "Avvia Osservatore"
         },
         "titles": {
-            "RegularExpressionTester": "",
+            "RegularExpressionTester": "Tester Espressione Regolare",
             "Expression": "Espressione",
             "TestString": "Prova Stringa"
         },
@@ -1394,18 +1399,18 @@
             "required": "Percorso è richiesto"
         },
         "disabled": {
-            "label": "",
-            "description": ""
+            "label": "Attivo",
+            "description": "Disattiva questo osservatore."
         },
         "regex": {
-            "label": "",
+            "label": "Espressione Regolare",
             "description": "",
             "tooltip": "",
             "placeholder": "",
             "required": ""
         },
         "skip": {
-            "label": "",
+            "label": "Salta Espressioni",
             "description": "Qualsiasi elemento corrispondente a questa espressione viene ignorato.",
             "placeholder": ""
         },
@@ -1420,8 +1425,8 @@
             "tooltip": ""
         },
         "mustExist": {
-            "label": "",
-            "description": "",
+            "label": "Il File Deve Esistere",
+            "description": "Salta osservazione del file se questo è mancante.",
             "tooltip": ""
         },
         "logMatch": {
@@ -1485,9 +1490,9 @@
             "empty": ""
         },
         "fileWatcher": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Osservatore File",
+            "description": "Statistiche osservatori file.",
+            "empty": "Nessun osservatore file configurato."
         },
         "apps": {
             "title": "",
@@ -1553,7 +1558,9 @@
                 "MemoryUsed": "Memoria Utilizzata",
                 "Processes": "Processi",
                 "Synology": "Synology",
-                "MySQLServers": "Server MySQL"
+                "MySQLServers": "Server MySQL",
+                "ZFSPools": "Pool ZFS",
+                "DiskUsage": "Utilizzo Dischi"
             },
             "Latest": "Ultimo Snapshot"
         },
@@ -1594,6 +1601,16 @@
             "Title": "Titolo",
             "Complete": "Completo",
             "PlexPass": "Pass Plex"
+        },
+        "plexSessions": {
+            "title": "Sessione Attuale Plex Media Server"
         }
+    },
+    "TestAllInstances": {
+        "Message": "Messaggio"
+    },
+    "FileBrowser": {
+        "FilterFiles": "Filtro File",
+        "Creating": "Creando..."
     }
 }
