@@ -116,7 +116,10 @@
         "APIKeyMustBeCountCharacters": "De API-sleutel moet minimaal {count} tekens lang zijn.",
         "TokenMustBeCountCharacters": "Het token moet minimaal {count} tekens lang zijn.",
         "LeavePage": "Wilt u deze pagina echt verlaten?",
-        "ShowMore": "Meer informatie weergeven"
+        "ShowMore": "Meer informatie weergeven",
+        "VariableDescription": "<span class=\"text-warning\">Opmerking:</span> Deze configuratiewaarde is afgeleid van een omgevingsvariabele. Als u de waarde hier wijzigt, wordt de nieuwe waarde naar het configuratiebestand geschreven, maar deze wordt niet toegepast. De volgende keer dat u op Opslaan klikt, wordt deze vervangen. Wijzig de waarde hierdoor de waarde van de omgevingsvariabele te wijzigen of door de variabele uit de omgeving te verwijderen.",
+        "EnvironmentVariable": "Omgevingsvariabele naam: <code>{variableName}</code>",
+        "EveryDuration": "Elke {timeDuration}"
     },
     "navigation": {
         "pageDescription": {
@@ -198,7 +201,12 @@
         "HideOutput": "Uitvoer verbergen",
         "RefreshOutput": "Uitvoer vernieuwen",
         "NoStayHere": "Nee! Blijf hier",
-        "YesDeleteMyChanges": "Ja! Verwijder mijn wijzigingen"
+        "YesDeleteMyChanges": "Ja! Verwijder mijn wijzigingen",
+        "Create": "Maken",
+        "CreateFile": "Bestand aanmaken",
+        "CreateFolder": "Map aanmaken",
+        "Go": "Ga",
+        "Menu": "Menu"
     },
     "profile": {
         "phrase": {
@@ -283,8 +291,9 @@
         },
         "logFile": {
             "label": "Toepassings log bestand",
-            "description": "Pad naar het toepassings logbestand.",
-            "placeholder": "/pad/naar/notifiarr.log"
+            "description": "Pad naar het logbestand of de map van de toepassing.",
+            "placeholder": "/pad/naar/notifiarr.log",
+            "tooltip": "Als u een map zonder bestandsnaam instelt, maakt de toepassing een bestand met de naam Notifiarr.log in de map aan."
         },
         "quiet": {
             "description": "Stille logging in- of uitschakelen.",
@@ -342,12 +351,12 @@
         },
         "debugLog": {
             "label": "Debug log bestand",
-            "description": "Pad naar het debug logbestand.",
+            "description": "Pad naar het debug logbestand of de debug logmap.",
             "placeholder": "/pad/naar/debug-notifiarr.log",
-            "tooltip": "Door hier een logbestands pad in te stellen, schrijft de toepassing de debug logs naar een speciaal bestand. Debug logs worden naar het logbestand van de toepassing geschreven als dit niet is ingesteld."
+            "tooltip": "Als u hier een pad voor het logbestand instelt, schrijft de applicatie de foutopsporings logboeken naar een speciaal bestand. Als dit niet is ingesteld, worden foutopsporings logboeken naar het logbestand van de applicatie geschreven. Als u een map zonder bestandsnaam instelt, maakt de applicatie een bestand met de naam Notifiarr.debug.log in de map."
         },
         "noUploads": {
-            "description": "Met <b>Uitgeschakeld</b> kunnen beheerders van Notifiarr.com deze client logbestanden naar de website laten uploaden. Met <b>Ingeschakeld</b> worden het uploaden van logbestanden voorkomen.",
+            "description": "<b>Uitgeschakeld</b> stelt beheerders van Notifiarr.com in staat om deze client logbestanden naar de website te laten uploaden. <b>Ingeschakeld</b> voorkomt het uploaden van logbestanden.",
             "label": "Uploads weigeren",
             "tooltip": "Deze instelling bepaalt of de website Notifiarr.com en de beheerders van Notifiarr deze client kunnen activeren om logbestanden naar de website te uploaden. Soms moeten we logboekvermeldingen bekijken tijdens het diagnosticeren van problemen en met deze trigger kunnen we de client de app en debug logbestanden laten uploaden."
         },
@@ -358,10 +367,10 @@
                 "label": "Service controles"
             },
             "logFile": {
-                "tooltip": "Het logbestand wordt gebruikt om de resultaten van de service controle op te slaan. Als dit niet is ingesteld, wordt de uitvoer van de service controle naar het applicatie logbestand geschreven.",
+                "tooltip": "Het logbestand wordt gebruikt om de resultaten van de service controle op te slaan. Als dit niet is ingesteld, wordt de uitvoer van de service controle naar het applicatie logbestand geschreven. Als u een map zonder bestandsnaam instelt, maakt de applicatie een bestand met de naam Notifiarr.services.log in de map aan.",
                 "placeholder": "/pad/naar/services-notifiarr.log",
                 "label": "Services Log Bestand",
-                "description": "Pad naar het service logbestand."
+                "description": "Pad naar het logbestand of de map van de services."
             },
             "interval": {
                 "label": "Update interval",
@@ -414,9 +423,9 @@
         },
         "httpLog": {
             "label": "HTTP logbestand",
-            "description": "Pad naar het HTTP logbestand.",
+            "description": "Pad naar het HTTP logbestand of de HTTP logmap.",
             "placeholder": "/pad/naar/http-notifiarr.log",
-            "tooltip": "Door hier een logbestands pad in te stellen, schrijft de applicatie de HTTP logs naar een speciaal bestand. Het bestandsformaat is apache log. Sterk aanbevolen."
+            "tooltip": "Als u hier een pad voor het logbestand instelt, schrijft de applicatie de HTTP logs naar een speciaal daarvoor bestemd bestand. Het bestandsformaat is apache log. Dit wordt ten zeerste aanbevolen. Als u een map zonder bestandsnaam instelt, maakt de applicatie een bestand met de naam Notifiarr.http.log in de map aan."
         },
         "logFiles": {
             "label": "Aantal logbestanden",
@@ -425,7 +434,7 @@
         },
         "sslCertFile": {
             "label": "SSL Certificaat Bestand",
-            "description": "Pad naar SSL certificaat bestand",
+            "description": "Pad naar SSL certificaat bestand.",
             "placeholder": "/pad/naar/ssl-cert.pem",
             "tooltip": "Deze applicatie kan HTTPS ondersteunen. Schakel dit in door het pad naar het certificaatbestand en het pad naar het sleutelbestand op te geven."
         },
@@ -452,7 +461,7 @@
         },
         "sslKeyFile": {
             "label": "SSL sleutel bestand",
-            "description": "Pad naar SSL sleutelbestand",
+            "description": "Pad naar SSL sleutelbestand.",
             "placeholder": "/pad/naar/ssl-key.pem",
             "tooltip": "Deze applicatie kan HTTPS ondersteunen. Schakel dit in door het pad naar het certificaat bestand en het pad naar het sleutelbestand op te geven."
         },
@@ -544,7 +553,8 @@
             "name": {
                 "label": "Server naam",
                 "description": "Naam van de Plex server.",
-                "placeholder": "Automatisch door server ingesteld"
+                "placeholder": "Automatisch door server ingesteld",
+                "tooltip": "De naam van de Plex Media Server wordt gebruikt in meldingen, log boeken en service controles. Deze wordt automatisch ingesteld door de Plex server."
             },
             "token": {
                 "label": "Token",
@@ -565,7 +575,7 @@
                 "description": "URL van de Tautulli service."
             },
             "title": "Tautulli",
-            "description": "Tautulli biedt een functie waarmee je je Plex gebruikers aangepaste gebruikersnamen kunt geven. Door de Notifiarr client te integreren met Tautulli, worden deze aangepaste gebruikersnamen weergegeven in de meldingen van je chatserver. Als deze functie niet is ingeschakeld, worden in plaats daarvan Plex gebruikersnamen of emailadressen gebruikt. Dit is volledig optioneel. De Notifiarr website biedt ook deze functie en kunt u Plex gebruikers in kaart te brengen om aangepaste namen. Je kunt hier ook een Tuaitulli instantie toevoegen om deze te controleren met service checks.",
+            "description": "Tautulli biedt een functie waarmee u uw Plex-gebruikers aangepaste gebruikersnamen kunt geven. Door de Notifiarr-client te integreren met Tautulli, worden die aangepaste gebruikersnamen weergegeven in de meldingen van uw chatserver. Als deze functie niet is ingeschakeld, worden in plaats daarvan Plex-gebruikersnamen of e-mailadressen gebruikt. Dit is volledig optioneel. De Notifiarr-website biedt dezelfde functie en stelt u in staat om Plex-gebruikers aan aangepaste namen te koppelen. U kunt hier ook een Tautulli-instantie toevoegen om deze eenvoudig te controleren met service ontroles.",
             "name": {
                 "label": "Tautulli Naam",
                 "description": "Naam van de Tautulli service."
@@ -783,7 +793,7 @@
                 "description": "Minimum aantal pakketten dat moet worden ontvangen."
             },
             "value": {
-                "tooltip": "Een IP adres wordt over het algemeen aanbevolen. Als u ook DNS wilt testen, gebruik dan een hostnaam. De notatie is <code>host</code> of <code>10.11.12.13</code>. Er mogen geen spaties of extra tekens in staan. Om UDP controles op Linux te laten werken, moet u ze inschakelen met de volgende opdracht: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Om ICMP controles op Linux toe te staan, moet u de binaire notifiarr functionaliteiten opgeven met de volgende opdracht: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. De eenvoudigste manier om beide in Docker te laten werken, is door de privileged mode in te schakelen, maar u kunt ook andere functionaliteiten instellen.",
+                "tooltip": "Over het algemeen wordt een IP-adres aanbevolen. Als u ook DNS wilt testen, gebruik dan een hostnaam. Het formaat is <code>host</code> of <code>10.11.12.13</code>. Er mogen geen spaties of extra tekens in staan. Om UDP-controles op Linux te laten werken, moet u ze inschakelen met deze opdracht: <code>sudo sysctl -w net.ipv4.ping_group_range=“0 2147483647”</code>. Om ICMP-controles in Linux toe te staan, moet u de binaire mogelijkheden van notifiarr toekennen met deze opdracht: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. De eenvoudigste manier om beide in Docker te laten werken, is door de bevoorrechte modus in te schakelen, maar u kunt ook mogelijkheden instellen.",
                 "description": "Voer host of IP in om connectiviteit te controleren.",
                 "placeholder": "127.0.0.1",
                 "required": "Er is een host- of IP adres vereist.",
@@ -1430,7 +1440,14 @@
             "Timers": "Timers",
             "Schedules": "Schema's",
             "SiteCrons": "Website Timers",
-            "Schedule": "Schema"
+            "Schedule": "Schema",
+            "Filter": "Filter",
+            "Action": "Actie",
+            "Never": "Nooit",
+            "Timer": "Timer",
+            "Trigger": "Trigger",
+            "Type": "Type",
+            "When": "Wanneer"
         },
         "descriptions": {
             "Triggers": "Deze acties hebben geen timer en geen schema.",
@@ -1526,7 +1543,7 @@
             "download": "Downloaden",
             "reload": "Herladen",
             "upload": "Uploaden",
-            "tooltip": "Met de knop <b>Downloaden</b> downloadt u het bestand naar uw computer. Met de knop <b>Uploaden</b> uploadt u het bestand naar de Notifiarr.com server. Alleen beheerders kunnen de geüploade bestanden zien. Met de knop <b>Verwijderen</b> verwijdert u het bestand van uw harde schijf. Bestanden die in gebruik zijn, kunnen niet worden verwijderd. 'In gebruik' betekent dat deze applicatie momenteel log gegevens naar de applicatie schrijft."
+            "tooltip": "Met de knop <b>Downloaden</b> wordt het bestand naar uw computer gedownload. Met de knop <b>Uploaden</b> wordt het bestand naar de server van Notifiarr.com geüpload. Alleen beheerders kunnen geüploade bestanden zien. Met de knop <b>Verwijderen</b> wordt het bestand van uw harde schijf verwijderd. Bestanden die in gebruik zijn, kunnen niet worden verwijderd. In gebruik betekent dat deze toepassing momenteel logboekvermeldingen naar het bestand schrijft."
         },
         "AddMoreLines": "Meer regels toevoegen",
         "deleteConfirm": "Weet u zeker dat u dit bestand wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
@@ -1566,8 +1583,10 @@
     "Nodal": {
         "button": {
             "refresh": "Pagina gegevens vernieuwen",
-            "fullscreen": "Volledig scherm in-/uitschakelen"
-        }
+            "fullscreen": "Schakel volledig scherm in/uit",
+            "raw": "Raw gegevens in-/uitschakelen"
+        },
+        "noResponse": "Geen respons gegevens."
     },
     "Integrations": {
         "titles": {
@@ -1756,5 +1775,49 @@
         "menuTitle": "Taalhulp",
         "title": "Lokalisatie ondersteuning",
         "body": "Deze applicatie is beschikbaar in meerdere talen. Je kunt de taal wijzigen door op de taal kiezer in het profiel menu te klikken. Sommige talen hebben geen actieve vertalers, dus sommige vertalingen kunnen onvolledig zijn. Als je wilt helpen met het vertalen van de applicatie, bezoek ons dan op Discord. Ga naar het kanaal <code>#role-request</code> en typ <code>!roleTranslate</code>. Je krijgt dan toegang tot het kanaal <code>#translate</code>. Word daar lid en laat je interesse blijken."
+    },
+    "ApiDocs": {
+        "Choose": "Kies een API om te bekijken",
+        "Contrast": "Meld eventuele contrast problemen met deze pagina.",
+        "api": {
+            "title": "Privé API ({basePath})",
+            "body": "Dit is de API specificatie voor de website Notifiarr.com. De website gebruikt deze API om te communiceren met de client."
+        },
+        "BasePath": "<b>Basispad</b>: <code>{basePath}</code>",
+        "ui": {
+            "body": "Deze specificatie betreft de methoden die door de Notifiarr Client frontend worden gebruikt om te communiceren met de backend. U gebruikt momenteel de frontend.",
+            "title": "Web UI ({basePath})"
+        }
+    },
+    "TestAllInstances": {
+        "Tested": "<b>Geteste gevallen</b>: <code>{testCount}</code>",
+        "Message": "Bericht",
+        "Concurrency": "<b>Concurrency</b>: <code>{workerCount}</code>",
+        "clickRefresh": "Klik op de vernieuwings knop rechtsboven om opnieuw te testen.",
+        "Instance": "Instantie",
+        "Status": "Status",
+        "title": "Test alle instanties",
+        "footer": "Gebruik deze tool voor probleemoplossing om te controleren of al uw instanties bereikbaar zijn en correct zijn geconfigureerd. De time-out is vast ingesteld op 15 seconden, wat ongeveer overeenkomt met de tijd die de website wacht op een reactie.",
+        "TestElapsed": "<b>Test verstreken</b>: <code>{timeDuration}</code>",
+        "Updated": "<b>Test bijgewerkt</b>: <code>{timeDuration}</code>"
+    },
+    "FileBrowser": {
+        "FilesFiltered": "Bestanden: {aantal}, gefilterd: {gefilterd}",
+        "InvalidPath": "Ongeldig pad opgegeven. Gebruik geen schuine strepen (<code>/</code> of <code>\\</code>).",
+        "FilterFilesDesc": "Gebruik het bestandsfilter om snel in de lijst met weergegeven bestanden te zoeken. Handig bij mappen met veel bestanden. Gebruik de knop <code>Menu</code> om een nieuwe map of een nieuw bestand aan te maken. Om een bestand te selecteren dat niet bestaat, typt u het in de balk <code>Pad</code> en klikt u op de groene vink knop. U kunt ook het menu-item <code>Bestand aanmaken</code> gebruiken om het aan te maken.",
+        "tooltip": {
+            "Up": "<code>cd ..</code><br />Ga naar de bovenliggende map.",
+            "Go": "<code>cd {pad}</code><br />Ga naar het opgegeven pad.",
+            "SelectPath": "Selecteer pad: <code>{pad}</code>"
+        },
+        "Created": "Aangemaakt: {pad}",
+        "Creating": "Bezig met maken...",
+        "Files": "Bestanden: {count}",
+        "FilterFiles": "Bestanden filteren",
+        "Folders": "Mappen: {count}",
+        "FoldersFiltered": "Mappen: {count}, gefilterd: {filtered}",
+        "Selected": "Geselecteerd: <code>{pad}</code>",
+        "CreateFileIn": "Het bestand wordt aangemaakt in het pad: <code>{pad}</code>",
+        "CreateFolderIn": "De map wordt aangemaakt in het pad: <code>{pad}</code>"
     }
 }
