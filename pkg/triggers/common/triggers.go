@@ -31,7 +31,8 @@ type Config struct {
 	Snapshot  *snapshot.Config
 	Apps      *apps.Apps
 	Scheduler gocron.Scheduler
-	stop      *Action        // Triggered by calling Stop()
+	stop      *Action // Triggered by calling Stop()
+	sharedCtx chan context.Context
 	list      []*Action      // List of action triggers
 	Services                 // for running service checks.
 	reloadCh  chan os.Signal // so triggers can reload the app.
@@ -111,7 +112,7 @@ type Services interface {
 	RunChecks(et website.EventType)
 }
 
-// Exec runs a trigger. This is abstraction method is used in a bunch of places.
+// Exec runs a trigger. This abstraction method is used in a bunch of places.
 func (c *Config) Exec(input *ActionInput, name TriggerName) bool {
 	trig := c.Get(name)
 	if c.stop == nil || trig == nil || trig.C == nil {
@@ -150,7 +151,9 @@ func (c *Config) Add(action ...*Action) {
 }
 
 // Stop shuts down the loop/goroutine that handles all triggers and timers.
-func (c *Config) Stop(event website.EventType) {
+func (c *Config) Stop(event website.EventType) context.Context {
+	defer func() { close(c.sharedCtx) }()
+
 	// Neither of these if statements should ever fire. That's a bug somewhere else.
 	if c == nil {
 		panic("Config is nil, cannot stop a nil config!!")
@@ -163,6 +166,8 @@ func (c *Config) Stop(event website.EventType) {
 	c.stop.C <- &ActionInput{Type: event}
 	<-c.stop.C // wait for done signal.
 	c.stop = nil
+
+	return <-c.sharedCtx
 }
 
 // Rand returns a cryptographically-insecure random number generator.

@@ -4,6 +4,8 @@ package plex
 import (
 	"fmt"
 	"time"
+
+	"golift.io/cnfg"
 )
 
 /* This file contains all the types for Plex Sessions API response. */
@@ -279,4 +281,16 @@ type Similar struct {
 	ID     string `json:"id"`
 	Tag    string `json:"tag"`
 	Count  string `json:"count,omitempty"`
+}
+
+// WebsiteConfig is the website-derived configuration for Plex.
+type WebsiteConfig struct {
+	Interval   cnfg.Duration `json:"interval"`
+	TrackSess  bool          `json:"trackSessions"`
+	AccountMap string        `json:"accountMap"`
+	NoActivity bool          `json:"noActivity"`
+	Delay      cnfg.Duration `json:"activityDelay"`
+	Cooldown   cnfg.Duration `json:"cooldown"`
+	SeriesPC   uint          `json:"seriesPc"`
+	MoviesPC   uint          `json:"moviesPc"`
 }

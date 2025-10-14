@@ -3277,6 +3277,67 @@
                 }
             }
         },
+        "/plex/1/reconfig": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Allows reconfiguring Plex integration from website settings.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Plex"
+                ],
+                "summary": "Reconfigure Plex.",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Input error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/plex/1/sessions": {
             "get": {
                 "security": [
@@ -15239,6 +15300,8 @@
                         1000000000,
                         60000000000,
                         3600000000000,
+                        -9223372036854775808,
+                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -15255,6 +15318,8 @@
                         "Second",
                         "Minute",
                         "Hour",
+                        "minDuration",
+                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",

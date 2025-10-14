@@ -31,7 +31,7 @@
     <Input
       id="config.services.logFile"
       envVar="SERVICES_LOG_FILE"
-      bind:value={config.services!.logFile}
+      bind:value={config.services.logFile}
       original={original.services?.logFile}>
       {#snippet post()}<BButton bind:isOpen={servicesLogModal} />{/snippet}
     </Input>
@@ -147,7 +147,7 @@
 
 <BrowserModal
   bind:isOpen={servicesLogModal}
-  bind:value={config.services!.logFile}
+  bind:value={config.services.logFile}
   title="config.services.logFile.label"
   description="config.services.logFile.description">
   <T id="config.services.logFile.tooltip" />

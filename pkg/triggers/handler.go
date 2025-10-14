@@ -2,6 +2,7 @@ package triggers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"path"
@@ -9,20 +10,24 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
+	"github.com/hako/durafmt"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"golift.io/starr"
 )
 
 // APIHandler is passed into the webserver so triggers can be executed from the API.
-func (a *Actions) APIHandler(req *http.Request) (int, interface{}) {
+func (a *Actions) APIHandler(req *http.Request) (int, any) {
 	return a.handleTrigger(req, website.EventAPI)
 }
 
@@ -67,7 +72,7 @@ type triggerOutput struct {
 // @Failure		404	{object}	string												"bad token or api key"
 // @Router			/triggers [get]
 // @Security		ApiKeyAuth
-func (a *Actions) HandleGetTriggers(_ *http.Request) (int, interface{}) {
+func (a *Actions) HandleGetTriggers(_ *http.Request) (int, any) {
 	triggers, timers, schedules := a.GatherTriggerInfo()
 	cronTimers := a.CronTimer.List()
 	reply := &triggerOutput{
@@ -543,4 +548,37 @@ func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string
 	}
 
 	return http.StatusOK, fmt.Sprintf("Uploading %s log file.", file)
+}
+
+// HandleReconfig allows reconfiguring Plex from website settings.
+//
+//	@Description	Allows reconfiguring Plex integration from website settings.
+//	@Summary		Reconfigure Plex.
+//	@Tags			Plex
+//	@Produce		json
+//	@Success		200	{object}	apps.ApiResponse{message=string}	"success"
+//	@Failure		400	{object}	apps.ApiResponse{message=string}	"Input error"
+//	@Failure		404	{object}	string								"bad token or api key"
+//	@Router			/plex/1/reconfig [post]
+//	@Security		ApiKeyAuth
+func (a *Actions) HandleReconfig(r *http.Request) (int, any) {
+	var conf plex.WebsiteConfig
+	if err := json.NewDecoder(r.Body).Decode(&conf); err != nil {
+		return http.StatusBadRequest, fmt.Errorf("decoding plex config: %w", err)
+	}
+
+	current := clientinfo.Get()
+	if current == nil {
+		return http.StatusBadRequest, "client info not found"
+	}
+
+	start := time.Now()
+	current.Actions.Plex = conf
+	data.Save("clientInfo", current)
+	mnd.Log.Printf("==> Reconfiguring Plex from website settings.")
+	a.Start(a.Stop(website.EventHook), nil, nil)
+	mnd.Log.Printf("==> Reconfigured Plex from website settings. Done in %s.",
+		durafmt.Parse(time.Since(start)).LimitFirstN(2).Format(mnd.DurafmtUnits)) //nolint:mnd
+
+	return http.StatusOK, "success"
 }

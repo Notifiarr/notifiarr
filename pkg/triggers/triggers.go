@@ -103,8 +103,13 @@ func New(config *Config) *Actions {
 
 // Start creates all the triggers and runs the timers.
 func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
-	a.SetReloadCh(reloadCh)
-	a.SetStopCh(stopCh)
+	if reloadCh != nil {
+		a.SetReloadCh(reloadCh)
+	}
+
+	if stopCh != nil {
+		a.SetStopCh(stopCh)
+	}
 
 	defer a.Run(ctx)
 
@@ -126,8 +131,8 @@ func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
 }
 
 // Stop all internal cron timers and Triggers.
-func (a *Actions) Stop(event website.EventType) {
-	a.Config.Stop(event)
+func (a *Actions) Stop(event website.EventType) context.Context {
+	ctx := a.Config.Stop(event)
 
 	actions := reflect.ValueOf(a).Elem()
 	// Stop them in reverse order they were started.
@@ -140,4 +145,6 @@ func (a *Actions) Stop(event website.EventType) {
 			action.Stop()
 		}
 	}
+
+	return ctx
 }
