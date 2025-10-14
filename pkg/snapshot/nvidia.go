@@ -43,7 +43,7 @@ func (n *NvidiaConfig) HasID(busID string) bool {
 		}
 	}
 
-	return len(n.BusIDs) == 0
+	return len(n.BusIDs) == 0 || n.BusIDs[0] == ""
 }
 
 // GetNvidia requires nvidia-smi executable and Nvidia drivers.
@@ -64,16 +64,17 @@ func (s *Snapshot) GetNvidia(ctx context.Context, config NvidiaConfig) error {
 	}
 
 	cmd := exec.CommandContext(ctx, cmdPath, "--format=csv,noheader", "--query-gpu="+
-		"name,"+ // 0
-		"driver_version,"+ // 1
-		"pstate,"+ // 2
-		"vbios_version,"+ // 3
-		"pci.bus_id,"+ // 4
-		"temperature.gpu,"+ // 5
-		"utilization.gpu,"+ // 6
-		"memory.total,"+ // 7
-		"memory.free", // 8
-	)
+		strings.Join([]string{
+			"name",            // 0
+			"driver_version",  // 1
+			"pstate",          // 2
+			"vbios_version",   // 3
+			"pci.bus_id",      // 4
+			"temperature.gpu", // 5
+			"utilization.gpu", // 6
+			"memory.total",    // 7
+			"memory.free",     // 8
+		}, ","))
 	SysCallSettings(cmd)
 
 	var stdout, stderr bytes.Buffer
@@ -95,6 +96,7 @@ func (s *Snapshot) scanNvidiaSMIOutput(scanner *bufio.Scanner, config *NvidiaCon
 	// Output (1 card per line):
 	// NVIDIA GeForce GTX 1060 3GB, 465.19.01, P0, 86.06.3C.40.17, 00000000:04:00.0, 63, 2 %, 3017 MiB, 3017 MiB
 	// GeForce GTX 1660 Ti, 456.71, P2, 90.16.20.00.89, 00000000:01:00.0, 50, 0 %, 6144 MiB, 4292 MiB
+	// NVIDIA GeForce GTX 1660 Ti, 550.163.01, P8, 90.16.29.00.2E, 00000000:27:00.0, 34, 0 %, 6144 MiB, 5926 MiB
 	for scanner.Scan() {
 		item := strings.Split(scanner.Text(), ", ")
 		if len(item) != reflect.TypeOf(NvidiaOutput{}).NumField() || !config.HasID(item[4]) {
