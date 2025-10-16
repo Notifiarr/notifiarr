@@ -35,7 +35,7 @@ class Navigator {
     // Fix the url in the browser if it doesn't match a page.
     if (page === '') window.history.replaceState({ uri: '' }, '', get(urlbase))
     // Otherwise, update the url in the browser to the current page.
-    // else window.history.replaceState({ uri: page }, '', get(urlbase) + page)
+    else window.history.replaceState({ uri: page }, '', get(urlbase) + page)
   }
 
   /** Update the URI of the current page. Useful for tab navigation. */

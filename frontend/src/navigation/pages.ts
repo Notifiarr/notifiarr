@@ -22,6 +22,7 @@ import ClientInfo, { page as ClientInfoPage } from '../pages/stubs/ClientInfo.sv
 import ApiDocs, { page as ApiDocsPage } from '../pages/stubs/ApiDocs.svelte'
 import Languages, { page as LanguagesPage } from '../pages/stubs/Languages.svelte'
 import TestAll, { page as TestAllPage } from '../pages/stubs/TestAllInstances.svelte'
+import Plex, { page as PlexPage } from '../pages/mediaApps/Plex.svelte'
 
 // Page structure for navigation with icons
 // 'id' (from page) is used for navigation AND translations.
@@ -57,6 +58,7 @@ export const others: Page[] = [
   { component: ApiDocs, ...ApiDocsPage },
   { component: Languages, ...LanguagesPage },
   { component: TestAll, ...TestAllPage },
+  { component: Plex, ...PlexPage },
 ]
 
 export const allPages: Page[] = [...settings, ...insights, ...others]

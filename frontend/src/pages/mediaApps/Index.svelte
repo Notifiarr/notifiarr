@@ -84,7 +84,7 @@
 
 <!-- We use the zero index because we only support once of each of these apps. -->
 <CardBody class="pt-0 mt-0">
-  <InstanceHeader flt={iv.Plex} />
+  <InstanceHeader flt={iv.Plex} page="plex" />
   <Instance
     index={0}
     indexed={false}

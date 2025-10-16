@@ -164,6 +164,7 @@
   },
   "navigation": {
     "titles": {
+      "Plex": "Plex Webhooks",
       "Settings": "Settings",
       "Insights": "Insights",
       "Configuration": "Configuration",
@@ -188,6 +189,7 @@
       "ApiDocs": "Client API Documentation"
     },
     "pageDescription": {
+      "Plex": "Troubleshoot Plex webhooks.",
       "Configuration": "Configure your Notifiarr client settings here.",
       "SiteTunnel": "This client keeps a persistent websocket connection to notifiarr.com using a <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery tunnel</a>. This tunnel allows the website to make requests to your client without the need for opening a port, or having a static IP. This page allows you to select your primary tunnel and which tunnel you wish to use as backup in case the primary becomes inaccessible.",
       "StarrApps": "Setup Starr integrations.",
@@ -1699,5 +1701,12 @@
     "Creating": "Creating...",
     "InvalidPath": "Invalid path provided. Do not include slashes (<code>/</code> or <code>\\</code>).",
     "FilterFilesDesc": "Use the file filter to quickly search the list of displayed files. Useful on folders with a lot of files. Use the <code>Menu</code> button to create a new folder or file. To select a file that does not exist, type it into the <code>Path</code> bar and click the green check button. Alternatively, use the <code>Create File</code> menu item to create it."
+  },
+  "Plex": {
+    "URLNotConfigured": "Plex URL is not configured. Configure that <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
+    "TokenNotConfigured": "Plex Token is not configured. Configure that <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
+    "Disabled": "Plex is administratively disabled. Enable it <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
+    "WaitingForWebhooks": "Waiting for Plex webhooks...",
+    "WebhooksReceived": "Webhooks Received: <code>{count}</code>"
   }
 }
