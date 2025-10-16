@@ -255,11 +255,11 @@
         },
         "retries": {
             "label": "",
-            "description": "",
+            "description": "A volte le connessioni a Notifiarr.com falliscono. Questa opzione controlla il numero di tentativi di ogni richiesta in caso di errore.",
             "tooltip": "Predefinito: 4 (impostando 0 utilizzerà il predefinito di 4)"
         },
         "apt": {
-            "label": "",
+            "label": "Hook APT",
             "description": "",
             "tooltip": ""
         },
@@ -332,7 +332,7 @@
             "title": "Informazioni Utente",
             "Patron": "Patron",
             "Subscriber": "",
-            "AbsoluteBadAss": "",
+            "AbsoluteBadAss": "Cattivo assoluto",
             "YesYesYouAre": "Sì, sì lo sei! 💚",
             "HellaAwesome": "",
             "YoureSoGifted": "Sei così generoso, e noi ti amiamo! 💜",
@@ -673,7 +673,7 @@
     },
     "Endpoints": {
         "title": "",
-        "addInstance": "",
+        "addInstance": "Aggiungi URL di inoltro",
         "DeleteEndpoint": "Elimina URL",
         "badge": {
             "header": "",
@@ -709,7 +709,7 @@
             "label": "Header HTTP",
             "description": "",
             "placeholder": "Content-Type: application/json",
-            "tooltip": ""
+            "tooltip": "Gli header delle richieste HTTP vengono inviate all'URL così come sono. Il formato deve essere <code>chiave: valore</code> per riga. Lo spazio e i due punti sono obbligatori. I valori non validi vengono ignorati e gli spazi extra vengono eliminati."
         },
         "query": {
             "label": "",
@@ -861,12 +861,12 @@
             },
             "running": {
                 "label": "In esecuzione",
-                "description": "",
+                "description": "Invia un avviso se il processo è in esecuzione.",
                 "tooltip": ""
             },
             "restarts": {
                 "label": "Riavvii",
-                "description": "",
+                "description": "Invia un avviso se il processo è stato riavviato.",
                 "tooltip": ""
             },
             "minimum": {
@@ -1017,7 +1017,7 @@
             },
             "TrigCustomCronTimer": {
                 "label": "",
-                "button": "",
+                "button": "Avvia il Timer Ora",
                 "success": ""
             },
             "TrigDownloadingItems": {
@@ -1060,7 +1060,8 @@
             "Filter": "Filtro",
             "Timer": "Timer",
             "Type": "Tipo",
-            "When": "Quando"
+            "When": "Quando",
+            "Action": "Azione"
         },
         "descriptions": {
             "Triggers": "",
@@ -1220,7 +1221,7 @@
         },
         "authType": {
             "label": "Modalità Autenticazione",
-            "description": "",
+            "description": "Seleziona come autenticarti con il client",
             "options": {
                 "password": "Password: Username Locale",
                 "header": "",
@@ -1228,8 +1229,8 @@
             },
             "option_desc": {
                 "password": "",
-                "header": "",
-                "noauth": ""
+                "header": "Selezionare questa opzione per accedere all'applicazione utilizzando un header HTTP che contiene un username. Questa procedura è comunemente nota come autenticazione proxy. Abbiamo <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">una pagina wiki</a> che fornisce istruzioni per configurare Nginx per questa funzione. Quando si seleziona questa opzione, è necessario selezionare anche un header per il proxy di autenticazione. Se non vengono visualizzate header, significa che il proxy upstream non ha fornito intestazioni valide.",
+                "noauth": "Questa configurazione non è consigliata. Il tipo di autenticazione Senza password consente qualsiasi richiesta proveniente da qualsiasi <code>IP upstream</code> configurato. Funziona anche con un proxy di autenticazione per impostare il nome utente. Se nell'header fornito non è presente alcun username, il valore predefinito è admin."
             }
         },
         "upstreams": {
@@ -1240,8 +1241,8 @@
         },
         "header": {
             "label": "",
-            "description": "",
-            "tooltip": ""
+            "description": "Seleziona l'header contenente il tuo username",
+            "tooltip": "Visualizza gli header forniti dal client o dall'upstream che possono essere utilizzate per l'autenticazione proxy. Questa selezione viene utilizzata se il tipo di autenticazione è impostato su Header o Nessuna password. Scegliere l'header che visualizza l'username corretto. Quando si utilizza Nessuna password, l'header viene utilizzata per impostare l'username ma non è obbligatoria."
         },
         "username": {
             "label": "Username",
@@ -1358,7 +1359,7 @@
             "BackupTunnel": "",
             "Ping": "",
             "Pinging": "",
-            "ActiveTunnel": "",
+            "ActiveTunnel": "Tunnel attivo: {tunnel}",
             "TunnelStats": "",
             "Disconnects": "",
             "ConnectionPoolSize": "",
@@ -1369,9 +1370,9 @@
             "LastActiveCheck": "",
             "SocketURLActive": "URL Socket (attivo)",
             "SocketURLInactive": "URL Socket (inattivo)",
-            "SelectTunnel": "",
+            "SelectTunnel": "Seleziona un tunnel",
             "TunnelsSaved": "",
-            "TunnelStatsStale": ""
+            "TunnelStatsStale": "I dati sopra riportati sono sempre obsoleti. Per aggiornarli, clicca sul link per aggiornare il backend nell'intestazione della pagina."
         }
     },
     "FileWatcher": {
@@ -1536,7 +1537,8 @@
         "Reload": "Ricarica file log"
     },
     "ProcessList": {
-        "footer": "{count} processi trovati."
+        "footer": "{count} processi trovati.",
+        "title": "Lista Processi in Esecuzione"
     },
     "Integrations": {
         "titles": {
@@ -1611,6 +1613,10 @@
     },
     "FileBrowser": {
         "FilterFiles": "Filtro File",
-        "Creating": "Creando..."
+        "Creating": "Creando...",
+        "tooltip": {
+            "SelectPath": "Seleziona Percorso: <code>{path}</code>"
+        },
+        "Selected": "Selezionato: <code>{path}</code>"
     }
 }
