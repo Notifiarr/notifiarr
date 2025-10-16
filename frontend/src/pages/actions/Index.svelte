@@ -28,6 +28,7 @@
   import T, { _ } from '../../includes/Translate.svelte'
   import type { TriggerInfo } from '../../api/notifiarrConfig'
   import { val } from './run'
+  import { slide } from 'svelte/transition'
 
   const toggleCards = () =>
     Cookies.set('showActionCards', (showCards = !showCards).toString())
@@ -60,16 +61,20 @@
 </Header>
 
 {#if showCards}
-  <CardBody class="py-0">
-    <Triggers type="Timers" rows={sift($profile.timers)} />
-    <Triggers type="Schedules" rows={sift($profile.schedules)} />
-    <Triggers type="Triggers" rows={sift($profile.triggers)} />
-  </CardBody>
+  <div transition:slide>
+    <CardBody class="py-0">
+      <Triggers type="Timers" rows={sift($profile.timers)} />
+      <Triggers type="Schedules" rows={sift($profile.schedules)} />
+      <Triggers type="Triggers" rows={sift($profile.triggers)} />
+    </CardBody>
+  </div>
 {:else}
-  <TableView
-    rows={[
-      sift($profile.timers),
-      sift($profile.schedules),
-      sift($profile.triggers),
-    ].flat()} />
+  <div transition:slide>
+    <TableView
+      rows={[
+        sift($profile.timers),
+        sift($profile.schedules),
+        sift($profile.triggers),
+      ].flat()} />
+  </div>
 {/if}

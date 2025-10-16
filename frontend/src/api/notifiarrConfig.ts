@@ -1312,6 +1312,7 @@ export interface Profile {
   schedules?: TriggerInfo[];
   siteCrons?: Timer[];
   plexInfo?: PMSInfo;
+  plexAge: Date;
   /**
    * LoggedIn is only used by the front end. Backend does not set or use it.
    */

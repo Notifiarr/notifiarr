@@ -189,7 +189,7 @@
       "ApiDocs": "Client API Documentation"
     },
     "pageDescription": {
-      "Plex": "Troubleshoot Plex webhooks.",
+      "Plex": "Information for troubleshooting Plex webhooks.",
       "Configuration": "Configure your Notifiarr client settings here.",
       "SiteTunnel": "This client keeps a persistent websocket connection to notifiarr.com using a <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery tunnel</a>. This tunnel allows the website to make requests to your client without the need for opening a port, or having a static IP. This page allows you to select your primary tunnel and which tunnel you wish to use as backup in case the primary becomes inaccessible.",
       "StarrApps": "Setup Starr integrations.",
@@ -1707,6 +1707,7 @@
     "TokenNotConfigured": "Plex Token is not configured. Configure that <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
     "Disabled": "Plex is administratively disabled. Enable it <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
     "WaitingForWebhooks": "Waiting for Plex webhooks...",
-    "WebhooksReceived": "Webhooks Received: <code>{count}</code>"
+    "WebhooksReceived": "Webhooks Received: <code>{count}</code>",
+    "NoStatus": "There is no Plex Media Server information cached. This could mean the Plex URL or Token is invalid, or the timeout is too short. Check the <go-to page=\"logFiles\">application logs</go-to> for more information."
   }
 }
