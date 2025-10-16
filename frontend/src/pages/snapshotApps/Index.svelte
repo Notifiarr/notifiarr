@@ -34,6 +34,9 @@
   setTab(App.tabs) // this sets the initial tab.
 </script>
 
+<!-- update the tab when the user navigates back -->
+<svelte:window on:popstate={() => setTab(App.tabs)} />
+
 <Header {page} />
 
 <CardBody>

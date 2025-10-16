@@ -9,7 +9,7 @@
   }
   /** Goto is a shortcut to nav.goto when the tab changes. */
   export const goto = (e: CustomEvent<string | number>, pid: string) =>
-    tab != e.detail && nav.updateURI(pid, [e.detail.toString()])
+    tab != e.detail && nav.updateURI(pid, [(tab = e.detail.toString())])
 </script>
 
 <script lang="ts">
@@ -30,7 +30,7 @@
 </script>
 
 {#key tab}
-  <TabPane tabId={flt.app.name.toLowerCase()} active={tab === flt.app.name.toLowerCase()}>
+  <TabPane tabId={flt.app.name.toLowerCase()} active={tab == flt.app.name.toLowerCase()}>
     <div class="title" slot="tab">
       <h5 class="title {flt.invalid ? 'text-danger' : ''}">
         {titles[flt.app.name]}

@@ -10,8 +10,22 @@
   import { faVideo } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Nodal from '../../includes/Nodal.svelte'
 
-  type Props = { status?: PMSInfo; sessions?: Sessions; plexAge: Date; sessionsAge: Date }
-  const { status, sessions, plexAge, sessionsAge }: Props = $props()
+  type Props = {
+    status?: PMSInfo
+    sessions?: Sessions
+    plexAge?: Date
+    sessionsAge?: Date
+    showSessions?: boolean
+    showOwner?: boolean
+  }
+  const {
+    status,
+    sessions,
+    plexAge,
+    sessionsAge,
+    showSessions = true,
+    showOwner = true,
+  }: Props = $props()
 
   let statusModal: Modal | null = $state(null)
   let sessionsModal: Nodal | null = $state(null)
@@ -48,7 +62,8 @@
                 <T id="Integrations.titles.StatusAge" /></a>
               <Modal pageId="plexStatus" data={status} bind:this={statusModal} />
             </td>
-            <td class="text-break">{age(profile.now - new Date(plexAge).getTime())}</td>
+            <td class="text-break">
+              {age(profile.now - new Date(plexAge ?? 0).getTime())}</td>
           </tr>
           <tr>
             <td class="text-nowrap"><T id="Integrations.titles.Version" /></td>
@@ -58,16 +73,18 @@
             <td class="text-nowrap"><T id="Integrations.mediaTitles.PlexPass" /></td>
             <td class="text-break">{status.myPlexSubscription}</td>
           </tr>
-          <tr>
-            <td class="text-nowrap"><T id="Integrations.mediaTitles.ServerOwner" /></td>
-            <td class="text-break">{status.myPlexUsername}</td>
-          </tr>
+          {#if showOwner}
+            <tr>
+              <td class="text-nowrap"><T id="Integrations.mediaTitles.ServerOwner" /></td>
+              <td class="text-break">{status.myPlexUsername}</td>
+            </tr>
+          {/if}
           <tr>
             <td class="text-nowrap"><T id="system.OperatingSystem.Platform" /></td>
             <td class="text-break">{status.platform}</td>
           </tr>
         {/if}
-        {#if sessions?.sessions?.length}
+        {#if showSessions && sessions?.sessions?.length}
           <tr><td colspan="2"></td></tr>
           <tr>
             <td class="text-nowrap">
@@ -77,7 +94,7 @@
               <Modal pageId="plexSessionsJson" data={sessions} bind:this={sessionsJson} />
             </td>
             <td class="text-break">
-              {age(profile.now - new Date(sessionsAge).getTime())}</td>
+              {age(profile.now - new Date(sessionsAge ?? 0).getTime())}</td>
           </tr>
           <tr>
             <td class="text-nowrap"><T id="Integrations.mediaTitles.Sessions" /></td>
@@ -86,7 +103,7 @@
                 {sessions.sessions.length}</a>
             </td>
           </tr>
-        {:else}
+        {:else if showSessions}
           <tr>
             <td colspan="2"><T id="Integrations.phrases.NoCachedSessions" /></td>
           </tr>

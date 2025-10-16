@@ -11,6 +11,6 @@
   export const toggle = (e?: Event) => (e?.preventDefault?.(), (isOpen = !isOpen))
 </script>
 
-<Nodal title={'Integrations.' + pageId} fa={{ i: icon }} bind:isOpen>
+<Nodal title={'Integrations.' + pageId} fa={{ i: icon }} bind:isOpen size="xl">
   <pre style="overflow: visible;">{JSON.stringify(data, null, 2)}</pre>
 </Nodal>

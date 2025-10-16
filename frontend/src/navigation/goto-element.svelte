@@ -5,11 +5,14 @@
   import { urlbase } from '../api/fetch'
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
-  let { page = 'landing' } = $props()
+  let { page = 'landing', subPage = '' } = $props()
   const darkMode = $derived($theme.includes('dark'))
 </script>
 
-<a href={$urlbase + page} onclick={e => nav.goto(e, page)} class:darkMode>
+<a
+  href={$urlbase + page + (subPage ? '/' + subPage : '')}
+  onclick={e => nav.goto(e, page, subPage.split('/'))}
+  class:darkMode>
   <slot />
 </a>
 

@@ -54,6 +54,7 @@ type Profile struct {
 	Schedules       []common.TriggerInfo   `json:"schedules"`
 	SiteCrons       []*crontimer.Timer     `json:"siteCrons"`
 	PlexInfo        *plex.PMSInfo          `json:"plexInfo"`
+	PlexAge         time.Time              `json:"plexAge"`
 	// LoggedIn is only used by the front end. Backend does not set or use it.
 	LoggedIn        bool                           `json:"loggedIn"`
 	Updated         time.Time                      `json:"updated"`
@@ -125,7 +126,9 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	triggers, timers, schedules := c.triggers.GatherTriggerInfo()
 
 	plexInfo := &plex.PMSInfo{}
+	plexAge := time.Time{}
 	if ps := data.Get("plexStatus"); ps != nil {
+		plexAge = ps.Time
 		plexInfo, _ = ps.Data.(*plex.PMSInfo)
 	}
 
@@ -141,6 +144,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 
 	if err := json.NewEncoder(resp).Encode(&Profile{
 		PlexInfo:        plexInfo,
+		PlexAge:         plexAge,
 		Triggers:        triggers,
 		Timers:          timers,
 		Schedules:       schedules,
