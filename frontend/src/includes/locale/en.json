@@ -111,6 +111,7 @@
     "NoMatch": "No Match"
   },
   "phrases": {
+    "ToggleSpoilerVisibility": "Click to toggle spoiler visibility.",
     "EnvironmentVariable": "Environment Variable Name: <code>{variableName}</code>",
     "VariableDescription": "<span class=\"text-warning\">Notice:</span> This configuration value is derived from an environment variable. Changing the value here will cause the new value to write to the config file, but it will not take affect. The next time you click save it will be replaced. Change the value here by changing the environment variable value, or by removing the variable from the environment.",
     "ERROR": "ERROR",
