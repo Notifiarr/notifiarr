@@ -4,5 +4,6 @@ import '/src/assets/app.css'
 import '/src/includes/locale/locale.svelte.ts'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '/src/navigation/goto-element.svelte'
+import '/src/includes/spoiler-element.svelte'
 
 export default mount(Index, { target: document.getElementById('app')! })

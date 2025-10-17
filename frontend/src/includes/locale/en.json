@@ -1633,6 +1633,8 @@
     },
     "plexSessionsJson": { "title": "Raw Plex Media Server Sessions" },
     "mediaTitles": {
+      "Country": "Country",
+      "PushNotifications": "Push Notifications",
       "PlexPass": "Plex Pass",
       "ServerOwner": "Server Owner",
       "Sessions": "Sessions",
@@ -1703,11 +1705,20 @@
     "FilterFilesDesc": "Use the file filter to quickly search the list of displayed files. Useful on folders with a lot of files. Use the <code>Menu</code> button to create a new folder or file. To select a file that does not exist, type it into the <code>Path</code> bar and click the green check button. Alternatively, use the <code>Create File</code> menu item to create it."
   },
   "Plex": {
-    "URLNotConfigured": "Plex URL is not configured. Configure that <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
-    "TokenNotConfigured": "Plex Token is not configured. Configure that <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
-    "Disabled": "Plex is administratively disabled. Enable it <go-to page=\"mediaApps\" subPage=\"plex\">here</go-to>.",
+    "URLNotConfigured": "Plex URL is not configured. <go-to page=\"mediaApps\" subPage=\"plex\">Configure that here</go-to>.",
+    "TokenNotConfigured": "Plex Token is not configured. <go-to page=\"mediaApps\" subPage=\"plex\">Configure that here</go-to>.",
+    "Disabled": "Plex is administratively disabled. <go-to page=\"mediaApps\" subPage=\"plex\">Enable it here</go-to>.",
     "WaitingForWebhooks": "Waiting for Plex webhooks...",
     "WebhooksReceived": "Webhooks Received: <code>{count}</code>",
-    "NoStatus": "There is no Plex Media Server information cached. This could mean the Plex URL or Token is invalid, or the timeout is too short. Check the <go-to page=\"logFiles\">application logs</go-to> for more information."
+    "NoStatus": "There is no Plex Media Server information cached. This could mean the Plex URL or Token is invalid, or the timeout is too short. Check the <go-to page=\"logFiles\">application logs</go-to> for more information.",
+    "WebhookNote": "<p>Did you already <a href=\"https://notifiarr.wiki/pages/client/setup/#plex\" target=\"_blank\">configure the Plex Webhook</a>?</p><p>If the webhook counter is not incrementing when you pause and play a show, try restarting Plex Media Server. If that does not work, check the <go-to page=\"logFiles\">http logs</go-to> for invalid requests. If you don't see any, it may mean you have the wrong webhook URL configured in Plex. It should look like this: <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle> but this may not be accurate and depends on your server configuration.</p> Some web providers block access to the <code>{urlbase}plex</code> URI, so this application also accepts a Plex webhook at the <code>{urlbase}</code> URI and at <code>{urlbase}api/plex/post</code>. We offer versitility to ensure stable notifications.",
+    "WebsiteSettings": "Website Settings",
+    "AccountMap": "Account Map",
+    "ActivityDelay": "Activity Delay",
+    "WebhookCoolDown": "Webhook Cool Down",
+    "SessionsInterval": "Sessions Interval",
+    "MoviesFinished": "Movies Finished",
+    "SeriesFinished": "Series Finished",
+    "NoActivity": "No Activity"
   }
 }
