@@ -34,7 +34,7 @@
 </script>
 
 <Card outline color={color(app)}>
-  <CardHeader>
+  <CardHeader tag="div">
     <h5 class="m-0">
       <img
         src={getLogo(app)}
@@ -73,6 +73,11 @@
             <td class="text-nowrap"><T id="Integrations.mediaTitles.PlexPass" /></td>
             <td class="text-break">{status.myPlexSubscription}</td>
           </tr>
+          <tr>
+            <td class="text-nowrap">
+              <T id="Integrations.mediaTitles.PushNotifications" /></td>
+            <td class="text-break">{status.pushNotifications}</td>
+          </tr>
           {#if showOwner}
             <tr>
               <td class="text-nowrap"><T id="Integrations.mediaTitles.ServerOwner" /></td>
@@ -80,8 +85,12 @@
             </tr>
           {/if}
           <tr>
+            <td class="text-nowrap"><T id="Integrations.mediaTitles.Country" /></td>
+            <td class="text-break">{status.countryCode}</td>
+          </tr>
+          <tr>
             <td class="text-nowrap"><T id="system.OperatingSystem.Platform" /></td>
-            <td class="text-break">{status.platform}</td>
+            <td class="text-break">{status.platform} {status.platformVersion}</td>
           </tr>
         {/if}
         {#if showSessions && sessions?.sessions?.length}

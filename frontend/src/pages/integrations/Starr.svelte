@@ -55,7 +55,7 @@
 </script>
 
 <Card outline color={color(app)}>
-  <CardHeader>
+  <CardHeader tag="div">
     <h5 class="m-0">
       <img
         src={getLogo(app)}
