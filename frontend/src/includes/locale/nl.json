@@ -119,7 +119,8 @@
         "ShowMore": "Meer informatie weergeven",
         "VariableDescription": "<span class=\"text-warning\">Opmerking:</span> Deze configuratiewaarde is afgeleid van een omgevingsvariabele. Als u de waarde hier wijzigt, wordt de nieuwe waarde naar het configuratiebestand geschreven, maar deze wordt niet toegepast. De volgende keer dat u op Opslaan klikt, wordt deze vervangen. Wijzig de waarde hierdoor de waarde van de omgevingsvariabele te wijzigen of door de variabele uit de omgeving te verwijderen.",
         "EnvironmentVariable": "Omgevingsvariabele naam: <code>{variableName}</code>",
-        "EveryDuration": "Elke {timeDuration}"
+        "EveryDuration": "Elke {timeDuration}",
+        "ToggleSpoilerVisibility": "Klik om spoiler zichtbaarheid te wijzigen."
     },
     "navigation": {
         "pageDescription": {
@@ -140,7 +141,8 @@
             "Actions": "Hier vindt u interne Notifiarr-clientacties. Deze worden uitgevoerd door timers, schema's en gebeurtenissen van de website of een chatserver. Hoewel ze normaal gesproken alleen voor probleemoplossing worden gebruikt, kunt u ze in deze interface handmatig activeren.",
             "TrustProfile": "Configureer hoe u zich aanmeldt bij deze Notifiarr clienttoepassing.",
             "System": "Systeem- en klantgegevens bekijken en.",
-            "Landing": "Dit is de mooiste plek op aarde!"
+            "Landing": "Dit is de mooiste plek op aarde!",
+            "Plex": "Informatie voor het oplossen van problemen met Plex webhooks."
         },
         "titles": {
             "LogFiles": "Logbestanden",
@@ -164,7 +166,8 @@
             "Metrics": "Metrieken",
             "Services": "Diensten",
             "Actions": "Acties",
-            "ApiDocs": "Client-API Documentatie"
+            "ApiDocs": "Client-API Documentatie",
+            "Plex": "Plex Webhooks"
         }
     },
     "RegexTester": {
@@ -1687,7 +1690,9 @@
             "Users": "Gebruikers",
             "PlexUsername": "Plex gebruikersnaam",
             "Session": "Sessie",
-            "Title": "Titel"
+            "Title": "Titel",
+            "Country": "Land",
+            "PushNotifications": "Push meldingen"
         },
         "plexSessions": {
             "title": "Huidige sessies van Plex Media Server",
@@ -1819,5 +1824,22 @@
         "Selected": "Geselecteerd: <code>{pad}</code>",
         "CreateFileIn": "Het bestand wordt aangemaakt in het pad: <code>{pad}</code>",
         "CreateFolderIn": "De map wordt aangemaakt in het pad: <code>{pad}</code>"
+    },
+    "Plex": {
+        "WebhookNote": "<p>Heb je de Plex Webhook al <a href=\"https://notifiarr.wiki/pages/client/setup/#plex\" target=\"_blank\">geconfigureerd</a>?</p><p>Als de webhook-teller niet omhoog gaat wanneer je een programma pauzeert en afspeelt, start dan Plex Media Server opnieuw op. Als dat niet werkt, controleer dan de <go-to page=\"logFiles\">http-logs</go-to> op ongeldige verzoeken. Als u geen ongeldige verzoeken ziet, kan dit betekenen dat u de verkeerde webhook-URL in Plex hebt geconfigureerd. Deze moet er als volgt uitzien: <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>, maar dit is mogelijk niet nauwkeurig en hangt af van uw serverconfiguratie. </p> Sommige internetproviders blokkeren de toegang tot de <code>{urlbase}plex</code> URI, dus deze applicatie accepteert ook een Plex-webhook op de <code>{urlbase}</code> URI en op <code>{urlbase}api/plex/post</code>. We bieden veelzijdigheid om stabiele meldingen te garanderen.",
+        "TokenNotConfigured": "Plex Token is niet geconfigureerd. <go-to page=\"mediaApps\" subPage=\"plex\">Configureer dat hier</go-to>.",
+        "URLNotConfigured": "Plex URL is niet geconfigureerd. <go-to page=\"mediaApps\" subPage=\"plex\">Configureer dat hier</go-to>.",
+        "AccountMap": "Account kaart",
+        "ActivityDelay": "Activiteit vertraging",
+        "MoviesFinished": "Films voltooid",
+        "NoActivity": "Geen activiteit",
+        "Disabled": "Plex is administratief uitgeschakeld. <go-to page=\"mediaApps\" subPage=\"plex\">Schakel het hier in</go-to>.",
+        "SeriesFinished": "Serie voltooid",
+        "SessionsInterval": "Sessie interval",
+        "NoStatus": "Er is geen Plex Media Server-informatie in de cache opgeslagen. Dit kan betekenen dat de Plex-URL of het token ongeldig is, of dat de time out te kort is. Raadpleeg de <go-to page=\"logFiles\">applicatie logboeken</go-to> voor meer informatie.",
+        "WaitingForWebhooks": "Wachten op Plex webhooks...",
+        "WebhookCoolDown": "Webhook afkoeling",
+        "WebhooksReceived": "Ontvangen webhooks: <code>{count}</code>",
+        "WebsiteSettings": "Website instellingen"
     }
 }
