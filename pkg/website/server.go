@@ -2,16 +2,13 @@ package website
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/Notifiarr/notifiarr/pkg/private"
 	"github.com/shirou/gopsutil/v4/host"
 	"golift.io/cnfg"
 )
@@ -42,7 +39,6 @@ var (
 type Config struct {
 	Apps     *apps.Apps
 	Retries  int
-	BaseURL  string
 	Timeout  cnfg.Duration
 	HostID   string
 	BindAddr string
@@ -50,146 +46,89 @@ type Config struct {
 
 // Server is what you get for providing a Config to New().
 type Server struct {
-	Config *Config
+	config *Config
 	// Internal cruft.
-	sdMutex      sync.RWMutex // senddata/queuedata
-	client       *httpClient
-	hostInfo     *host.InfoStat
-	sendData     chan *Request
-	stopSendData chan struct{}
+	client    *httpClient
+	hostInfo  *host.InfoStat
+	sendData  chan *Request // in (buffered)
+	reconfig  chan *Config  // in+out (unbuffered bidirectional)
+	getConfig chan struct{} // in (buffered)
 }
 
-func New(config *Config) {
-	config.BaseURL = BaseURL
-
+func New(ctx context.Context, config *Config) {
 	if config.Retries < 0 {
 		config.Retries = 0
 	} else if config.Retries == 0 {
 		config.Retries = DefaultRetries
 	}
 
+	if Site != nil {
+		Site.reconfig <- config
+		return
+	}
+
 	Site = &Server{
-		Config: config,
-		// clientInfo:   &ClientInfo{},
+		config: config,
 		client: &httpClient{
 			Retries: config.Retries,
 			Client:  &http.Client{},
 		},
-		hostInfo:     nil, // must start nil
-		sendData:     make(chan *Request, mnd.Bits32),
-		stopSendData: make(chan struct{}),
+		hostInfo:  nil, // must start nil
+		sendData:  make(chan *Request, mnd.Base8),
+		reconfig:  make(chan *Config), // do not buffer.
+		getConfig: make(chan struct{}, 1),
 	}
+
+	go Site.watchSendDataChan(ctx)
 }
 
-// Start runs the website go routine.
-func (s *Server) Start(ctx context.Context) {
-	go s.watchSendDataChan(ctx)
-}
-
-// Stop stops the website go routine.
-func (s *Server) Stop() {
-	s.sdMutex.Lock()
-	defer s.sdMutex.Unlock()
-
-	if s.sendData != nil {
-		close(s.sendData)
-		<-s.stopSendData // wait for done signal.
-		s.stopSendData = nil
-		s.sendData = nil
-	}
+// SendData puts a POST request to notifiarr.com into a channel queue.
+func (s *Server) SendData(req *Request) {
+	s.sendData <- req
 }
 
 // GetData sends data to a notifiarr URL as JSON and returns a response.
 func (s *Server) GetData(req *Request) (*Response, error) {
-	s.sdMutex.RLock()
-	defer s.sdMutex.RUnlock()
-
-	if s.sendData == nil {
-		return nil, ErrNoChannel
-	}
-
 	req.respChan = make(chan *chResponse)
 	defer close(req.respChan)
 
 	s.sendData <- req
-
 	resp := <-req.respChan
 
 	return resp.Response, resp.Error
 }
 
-// RawGetData sends a request to the website without using a channel.
-// Avoid this method.
-func (s *Server) RawGetData(ctx context.Context, req *Request) (*Response, time.Duration, error) {
-	return s.sendRequest(ctx, req)
+// GetConfig returns the current website config.
+func GetConfig() *Config {
+	Site.getConfig <- struct{}{}
+	return <-Site.reconfig
 }
 
-func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
-	data, err := json.Marshal(payload)
-	if err == nil {
-		var torn map[string]any
-		if err := json.Unmarshal(data, &torn); err == nil {
-			if torn["host"], err = s.GetHostInfo(ctx); err != nil {
-				mnd.Log.Errorf("Host Info Unknown: %v", err)
-			}
+// RawGetData sends a request to the website without using a channel.
+// Avoid this method, it can trigger data races. Use it only in cli.go.
+func RawGetData(ctx context.Context, req *Request) (*Response, time.Duration, error) {
+	return Site.sendRequest(ctx, req)
+}
 
-			torn["private"] = private.Info()
-			payload = torn
+func (s *Server) watchSendDataChan(ctx context.Context) {
+	for {
+		select {
+		case config := <-s.reconfig:
+			s.client.Retries = config.Retries
+			s.config = config
+		case <-s.getConfig:
+			s.reconfig <- s.config
+		case data := <-s.sendData:
+			s.sendAndLogRequest(ctx, data)
 		}
 	}
-
-	var post []byte
-
-	if log {
-		post, err = json.MarshalIndent(payload, "", " ")
-	} else {
-		post, err = json.Marshal(payload)
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, s.getTimeout())
-	defer cancel()
-
-	code, body, err := s.sendJSON(ctx, s.Config.BaseURL+uri, post, log)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := unmarshalResponse(s.Config.BaseURL+uri, code, body)
-	if resp != nil {
-		resp.sent = len(post)
-	}
-
-	return resp, err
 }
 
-func (s *Server) getTimeout() time.Duration {
-	timeout := s.Config.Timeout.Duration
-	if timeout > MaxTimeout {
-		timeout = MaxTimeout
-	} else if timeout < MinTimeout {
-		timeout = MinTimeout
+// ValidAPIKey checks if the API key is valid.
+func ValidAPIKey() error {
+	if len(GetConfig().Apps.APIKey) != APIKeyLength {
+		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
 	}
 
-	const multiplier = 0.92
-
-	// As the channel fills up, we reduce the timeout proportionally to avoid long waits.
-	channelUtilization := float64(len(s.sendData)) / float64(cap(s.sendData))
-	// Minimum timeout is 8% of original, maximum is 100% of original
-	timeoutMultiplier := 1.0 - (channelUtilization * multiplier)
-
-	return time.Duration(float64(timeout) * timeoutMultiplier)
-}
-
-// SendData puts a send-data request to notifiarr.com into a channel queue.
-func (s *Server) SendData(req *Request) {
-	s.sdMutex.RLock()
-	defer s.sdMutex.RUnlock()
-
-	if s.sendData != nil {
-		s.sendData <- req
-	}
+	return nil
 }

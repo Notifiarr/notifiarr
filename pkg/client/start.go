@@ -195,7 +195,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	defer cancel()
 
 	c.Config.APIKey, _, _ = ui.Entry("Enter 'All' API Key from notifiarr.com", "api-key-from-notifiarr.com")
-	if website.Site.ValidAPIKey() != nil {
+	if website.ValidAPIKey() != nil {
 		c.Config.APIKey = "api-key-from-notifiarr.com"
 	}
 
@@ -245,7 +245,7 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	}
 
 	// Parse the config file and environment variables.
-	result, err := c.getConfig()
+	result, err := c.getConfig(ctx)
 	if err != nil {
 		return output, newPassword, err
 	}
@@ -286,8 +286,6 @@ func (c *Client) configureServices(ctx context.Context) (*clientinfo.ClientInfo,
 	// Cancelling this context should stop most of the things.
 	// It's just a backup, because they all have Stop methods.
 	ctx, reload := context.WithCancel(ctx)
-	// Website starts a routine that's require to send requests to notifiarr.com. Start it early.
-	website.Site.Start(ctx)
 	// Load the site config (this connects to Tautulli and notifiarr.com)
 	clientInfo := c.loadSiteConfig(ctx)
 	if clientInfo != nil && !clientInfo.User.StopLogs {
@@ -365,13 +363,13 @@ func (c *Client) Exit(ctx context.Context, reload func()) error {
 }
 
 // getConfig is the piece shared between loadConfiguration and reloadConfiguration.
-func (c *Client) getConfig() (*configfile.SetupResult, error) {
+func (c *Client) getConfig(ctx context.Context) (*configfile.SetupResult, error) {
 	err := c.Config.Get(c.Flags)
 	if err != nil {
 		return nil, fmt.Errorf("getting config: %w", err)
 	}
 
-	result, err := c.Config.Setup(c.Flags)
+	result, err := c.Config.Setup(ctx, c.Flags)
 	if err != nil {
 		return nil, fmt.Errorf("setting config: %w", err)
 	}
@@ -398,7 +396,7 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 	// start over.
 	c.Config = configfile.NewConfig()
 
-	result, err := c.getConfig()
+	result, err := c.getConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -450,7 +448,6 @@ func (c *Client) stop(ctx context.Context, event website.EventType) error {
 		defer logs.Log.CapturePanic()
 		c.triggers.Stop(event)
 		c.Services.Stop()
-		website.Site.Stop()
 		logs.Log.Printf("==> All systems powered down!")
 	}()
 

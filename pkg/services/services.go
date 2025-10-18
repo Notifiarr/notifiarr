@@ -86,7 +86,7 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	}
 
 	s.applyLocalOverrides(plexName)
-	s.loadServiceStates(ctx)
+	s.loadServiceStates()
 	for range s.Parallel {
 		go func() {
 			defer mnd.Log.CapturePanic()
@@ -142,7 +142,7 @@ func (s *Services) applyLocalOverrides(plexName string) {
 
 // loadServiceStates brings service states from the website into the fold.
 // In other words, states are stored in the website's database.
-func (s *Services) loadServiceStates(ctx context.Context) {
+func (s *Services) loadServiceStates() {
 	names := []string{}
 	for name := range s.services {
 		names = append(names, valuePrefix+name)
@@ -152,7 +152,7 @@ func (s *Services) loadServiceStates(ctx context.Context) {
 		return
 	}
 
-	values, err := website.Site.GetState(ctx, names...)
+	values, err := website.GetState(names...)
 	if err != nil {
 		s.log.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return

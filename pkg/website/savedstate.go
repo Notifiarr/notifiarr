@@ -1,7 +1,6 @@
 package website
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -9,19 +8,19 @@ import (
 )
 
 // SetState sets a value stored in the website database.
-func (s *Server) SetState(ctx context.Context, key string, value []byte) error {
-	return s.SetStates(ctx, map[string][]byte{key: value})
+func SetState(key string, value []byte) error {
+	return SetStates(map[string][]byte{key: value})
 }
 
 // SetStates sets values stored in the website database.
-func (s *Server) SetStates(_ context.Context, values map[string][]byte) error {
+func SetStates(values map[string][]byte) error {
 	for key, val := range values {
 		if val != nil { // ignore nil byte slices.
 			values[key] = []byte(base64.StdEncoding.EncodeToString(val))
 		}
 	}
 
-	resp, err := s.GetData(&Request{
+	resp, err := Site.GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventSet,
 		Payload:    map[string]interface{}{"fields": values},
@@ -35,13 +34,13 @@ func (s *Server) SetStates(_ context.Context, values map[string][]byte) error {
 }
 
 // DelState deletes a value stored in the website database.
-func (s *Server) DelState(_ context.Context, keys ...string) error {
+func DelState(keys ...string) error {
 	values := make(map[string]interface{})
 	for _, key := range keys {
 		values[key] = nil
 	}
 
-	resp, err := s.GetData(&Request{
+	resp, err := Site.GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventSet,
 		Payload:    map[string]interface{}{"fields": values},
@@ -55,8 +54,8 @@ func (s *Server) DelState(_ context.Context, keys ...string) error {
 }
 
 // GetState gets a value stored in the website database.
-func (s *Server) GetState(_ context.Context, keys ...string) (map[string][]byte, error) {
-	resp, err := s.GetData(&Request{
+func GetState(keys ...string) (map[string][]byte, error) {
+	resp, err := Site.GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventGet,
 		Payload:    map[string][]string{"fields": keys},

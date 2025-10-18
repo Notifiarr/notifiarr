@@ -30,12 +30,12 @@ const (
 func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.ClientInfo) {
 	if clientInfo != nil {
 		logs.Log.Printf("==> %s", clientInfo)
-		c.printVersionChangeInfo(ctx)
+		c.printVersionChangeInfo()
 	} else {
 		clientInfo = &clientinfo.ClientInfo{}
 	}
 
-	switch host, err := website.Site.GetHostInfo(ctx); {
+	switch host, err := website.GetHostInfo(ctx); {
 	case err != nil:
 		logs.Log.Errorf("=> Unknown Host Info (this is bad): %v", err)
 	case c.Config.HostID == "":
@@ -81,10 +81,10 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 	c.printLogFileInfo()
 }
 
-func (c *Client) printVersionChangeInfo(ctx context.Context) {
+func (c *Client) printVersionChangeInfo() {
 	const clientVersion = "clientVersion"
 
-	values, err := website.Site.GetState(ctx, clientVersion)
+	values, err := website.GetState(clientVersion)
 	if err != nil {
 		logs.Log.Errorf("XX> Getting version from database: %v", err)
 	}
@@ -103,7 +103,7 @@ func (c *Client) printVersionChangeInfo(ctx context.Context) {
 		logs.Log.Printf("==> Detected application version change! %s => %s", previousVersion, currentVersion)
 	}
 
-	err = website.Site.SetState(ctx, clientVersion, []byte(currentVersion))
+	err = website.SetState(clientVersion, []byte(currentVersion))
 	if err != nil {
 		logs.Log.Errorf("Updating version in database: %v", err)
 	}

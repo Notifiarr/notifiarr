@@ -73,7 +73,7 @@ func (c *Client) startTunnel(ctx context.Context) {
 
 func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 	hostname, _ := os.Hostname()
-	if hostInfo, err := website.Site.GetHostInfo(ctx); err != nil {
+	if hostInfo, err := website.GetHostInfo(ctx); err != nil {
 		hostname = hostInfo.Hostname
 	}
 

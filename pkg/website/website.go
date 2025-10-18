@@ -2,17 +2,16 @@ package website
 
 import (
 	"bytes"
-	"compress/gzip"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/private"
 	"golift.io/datacounter"
 	"golift.io/version"
 )
@@ -23,174 +22,7 @@ var Site *Server
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
 	Retries int
-	*http.Client
-}
-
-// ValidAPIKey checks if the API key is valid.
-func (s *Server) ValidAPIKey() error {
-	if len(s.Config.Apps.APIKey) != APIKeyLength {
-		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
-	}
-
-	return nil
-}
-
-// unmarshalResponse attempts to turn the reply from the website into structured data.
-func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, error) {
-	var (
-		buf     bytes.Buffer
-		resp    Response
-		counter = datacounter.NewReaderCounter(body)
-	)
-
-	defer func() {
-		body.Close()
-
-		resp.size = int64(counter.Count())
-		mnd.Website.Add("POST"+mnd.BytesReceived, resp.size)
-	}()
-
-	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
-	if code < http.StatusOK || code > http.StatusIMUsed {
-		if err != nil {
-			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v), body: %s",
-				ErrNon200, url, code, http.StatusText(code), err, buf.String()) //nolint:errorlint
-		}
-
-		return &resp, fmt.Errorf("%w: %s: %d %s", ErrNon200, url, code, http.StatusText(code))
-	}
-
-	if err != nil {
-		return nil, fmt.Errorf("converting json response: %w, body: %s", err, buf.String())
-	}
-
-	return &resp, nil
-}
-
-// sendJSON posts a JSON payload to a URL. Returns the response body or an error.
-func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
-	if err != nil {
-		return 0, nil, fmt.Errorf("creating http request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", mnd.ContentTypeJSON)
-	req.Header.Set("X-Api-Key", s.Config.Apps.APIKey)
-
-	start := time.Now()
-
-	resp, err := s.client.Do(req)
-	if err != nil {
-		s.debughttplog(nil, url, start, string(data), nil)
-		return 0, nil, fmt.Errorf("making http request: %w", err)
-	}
-
-	if !mnd.Log.DebugEnabled() { // no debug, just return the body.
-		return resp.StatusCode, resp.Body, nil
-	}
-
-	return resp.StatusCode, s.debugLogResponseBody(start, resp, url, data, log), nil
-}
-
-func (s *Server) debugLogResponseBody(
-	start time.Time,
-	resp *http.Response,
-	url string,
-	data []byte,
-	log bool,
-) io.ReadCloser {
-	var buf bytes.Buffer
-	tee := io.TeeReader(resp.Body, &buf)
-
-	defer resp.Body.Close() // close this since we return a fake one after logging.
-
-	if log {
-		defer s.debughttplog(resp, url, start, string(data), tee)
-	} else {
-		defer s.debughttplog(resp, url, start, fmt.Sprintf("<data not logged, length:%d>", len(data)), tee)
-	}
-
-	return io.NopCloser(&buf)
-}
-
-func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*Response, error) {
-	form, contentType, err := s.createFileUpload(file)
-	if err != nil {
-		return nil, err
-	}
-
-	sent := form.Len()
-	url := s.Config.BaseURL + uri
-
-	// Send the request
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, form)
-	if err != nil {
-		return nil, fmt.Errorf("creating http request: %w", err)
-	}
-
-	req.Header.Set("Content-Type", contentType)
-	req.Header.Set("X-Api-Key", s.Config.Apps.APIKey)
-
-	start := time.Now()
-	msg := fmt.Sprintf("Upload %s, %d bytes", file.FileName, sent)
-
-	resp, err := s.client.Do(req)
-	if err != nil {
-		s.debughttplog(nil, url, start, msg, nil)
-		return nil, fmt.Errorf("making http request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	reader := resp.Body
-
-	if mnd.Log.DebugEnabled() {
-		reader = s.debugLogResponseBody(start, resp, url, []byte(msg), true)
-	}
-
-	response, err := unmarshalResponse(url, resp.StatusCode, reader)
-	if response != nil {
-		response.sent = sent
-	}
-
-	return response, err
-}
-
-func (s *Server) createFileUpload(file *UploadFile) (*bytes.Buffer, string, error) {
-	// Create a new multipart writer with the buffer
-	var buf bytes.Buffer
-	writer := multipart.NewWriter(&buf)
-
-	if host := s.hostInfoNoError(); host != nil {
-		// Since we can't send the normal hostInfo json payload,
-		// we have to shove some things into the form fields.
-		if err := writer.WriteField("hostname", host.Hostname); err != nil {
-			return nil, "", fmt.Errorf("adding variable to form buffer: %w", err)
-		}
-
-		_ = writer.WriteField("hostId", host.HostID)
-		_ = writer.WriteField("os", host.OS)
-	}
-
-	// Create a new form field
-	fw, err := writer.CreateFormFile("file", file.FileName+".gz")
-	if err != nil {
-		return nil, "", fmt.Errorf("creating form buffer: %w", err)
-	}
-
-	compress := gzip.NewWriter(fw)
-	compress.Header.Name = file.FileName
-
-	// Copy the contents of the file to the form field with compression.
-	if _, err := io.Copy(compress, file); err != nil {
-		return nil, "", fmt.Errorf("filling form buffer: %w", err)
-	}
-
-	// Close the compressor and multipart writer to finalize the request.
-	compress.Close()
-	writer.Close()
-	file.Close() // Close the file too.
-
-	return &buf, writer.FormDataContentType(), nil
+	Client  *http.Client
 }
 
 // Do performs an http Request with retries and logging!
@@ -199,7 +31,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 
 	deadline, ok := req.Context().Deadline()
 	if !ok {
-		deadline = time.Now().Add(h.Timeout)
+		deadline = time.Now().Add(h.Client.Timeout)
 	}
 
 	timeout := time.Until(deadline).Round(time.Millisecond)
@@ -247,91 +79,13 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 	}
 }
 
-func (s *Server) debughttplog(resp *http.Response, url string, start time.Time, data string, body io.Reader) {
-	headers := ""
-	status := "0"
-
-	if resp != nil {
-		status = resp.Status
-
-		for k, vs := range resp.Header {
-			for _, v := range vs {
-				headers += k + ": " + v + "\n"
-			}
-		}
-	}
-
-	if s.Config.Apps.MaxBody > 0 && len(data) > s.Config.Apps.MaxBody {
-		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:s.Config.Apps.MaxBody], s.Config.Apps.MaxBody)
-	}
-
-	if data == "" {
-		truncatedBody, bodySize := readBodyForLog(body, int64(s.Config.Apps.MaxBody))
-		mnd.Log.Debugf("Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), mnd.FormatBytes(bodySize), status, headers, truncatedBody)
-	} else {
-		truncatedBody, bodySize := readBodyForLog(body, int64(s.Config.Apps.MaxBody))
-		mnd.Log.Debugf("Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
-			mnd.FormatBytes(len(data)), url, time.Since(start).Round(time.Microsecond),
-			data, mnd.FormatBytes(bodySize), status, headers, truncatedBody)
-	}
-}
-
-// readBodyForLog truncates the response body, or not, for the debug log. errors are ignored.
-func readBodyForLog(body io.Reader, max int64) (string, int64) {
-	if body == nil {
-		return "", 0
-	}
-
-	if max > 0 {
-		limitReader := io.LimitReader(body, max)
-		bodyBytes, _ := io.ReadAll(limitReader)
-		remaining, _ := io.Copy(io.Discard, body) // finish reading to the end.
-		total := remaining + int64(len(bodyBytes))
-
-		if remaining > 0 {
-			return fmt.Sprintf("%s <body truncated, max: %d>", string(bodyBytes), max), total
-		}
-
-		return string(bodyBytes), total
-	}
-
-	bodyBytes, _ := io.ReadAll(body)
-
-	return string(bodyBytes), int64(len(bodyBytes))
-}
-
-func (s *Server) watchSendDataChan(ctx context.Context) {
-	defer func() {
-		defer mnd.Log.CapturePanic()
-		close(s.stopSendData)
-		mnd.Log.Printf("==> Website notifier shutting down. No more ->website requests may be sent!")
-	}()
-
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case data, ok := <-s.sendData:
-			if !ok {
-				return
-			}
-
-			s.actionDataChan(ctx, data)
-		}
-	}
-}
-
-// actionDataChan sends a request to the website and logs the result.
-func (s *Server) actionDataChan(ctx context.Context, data *Request) {
+// sendAndLogRequest sends a request to the website and logs the result.
+func (s *Server) sendAndLogRequest(ctx context.Context, data *Request) {
 	switch resp, elapsed, err := s.sendRequest(ctx, data); {
 	case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 		return
-	case errors.Is(err, ErrNon200):
-		mnd.Log.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
-			data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 	case err != nil:
-		mnd.Log.Errorf("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+		mnd.Log.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
 			data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 	case !data.ErrorsOnly:
 		mnd.Log.Printf("[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
@@ -339,8 +93,10 @@ func (s *Server) actionDataChan(ctx context.Context, data *Request) {
 	}
 }
 
+// sendRequest sends a request to the website and returns the result.
 func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, time.Duration, error) {
-	if err := s.ValidAPIKey(); err != nil {
+	if len(s.config.Apps.APIKey) != APIKeyLength {
+		err := fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
 		if data.respChan != nil {
 			data.respChan <- &chResponse{
 				Response: nil,
@@ -383,4 +139,121 @@ func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, tim
 	}
 
 	return resp, elapsed, err
+}
+
+// sendPayload sends a JSON payload to the website and returns the result.
+func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
+	data, err := json.Marshal(payload)
+	if err == nil {
+		var torn map[string]any
+		if err := json.Unmarshal(data, &torn); err == nil {
+			if torn["host"], err = GetHostInfo(ctx); err != nil {
+				mnd.Log.Errorf("Host Info Unknown: %v", err)
+			}
+
+			torn["private"] = private.Info()
+			payload = torn
+		}
+	}
+
+	var post []byte
+
+	if log {
+		post, err = json.MarshalIndent(payload, "", " ")
+	} else {
+		post, err = json.Marshal(payload)
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, s.getTimeout())
+	defer cancel()
+
+	code, body, err := s.sendJSON(ctx, BaseURL+uri, post, log)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := unmarshalResponse(BaseURL+uri, code, body)
+	if resp != nil {
+		resp.sent = len(post)
+	}
+
+	return resp, err
+}
+
+// sendJSON posts a JSON payload to a URL. Returns the response body or an error.
+func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
+	if err != nil {
+		return 0, nil, fmt.Errorf("creating http request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", mnd.ContentTypeJSON)
+	req.Header.Set("X-Api-Key", s.config.Apps.APIKey)
+
+	start := time.Now()
+
+	resp, err := s.client.Do(req)
+	if err != nil {
+		s.debughttplog(nil, url, start, string(data), nil)
+		return 0, nil, fmt.Errorf("making http request: %w", err)
+	}
+
+	if !mnd.Log.DebugEnabled() { // no debug, just return the body.
+		return resp.StatusCode, resp.Body, nil
+	}
+
+	return resp.StatusCode, s.debugLogResponseBody(start, resp, url, data, log), nil
+}
+
+func (s *Server) getTimeout() time.Duration {
+	timeout := s.config.Timeout.Duration
+	if timeout > MaxTimeout {
+		timeout = MaxTimeout
+	} else if timeout < MinTimeout {
+		timeout = MinTimeout
+	}
+
+	const multiplier = 0.92
+
+	// As the channel fills up, we reduce the timeout proportionally to avoid long waits.
+	channelUtilization := float64(len(s.sendData)) / float64(cap(s.sendData))
+	// Minimum timeout is 8% of original, maximum is 100% of original
+	timeoutMultiplier := 1.0 - (channelUtilization * multiplier)
+
+	return time.Duration(float64(timeout) * timeoutMultiplier)
+}
+
+// unmarshalResponse attempts to turn the reply from the website into structured data.
+func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, error) {
+	var (
+		buf     bytes.Buffer
+		resp    Response
+		counter = datacounter.NewReaderCounter(body)
+	)
+
+	defer func() {
+		resp.size = int64(counter.Count())
+		mnd.Website.Add("POST"+mnd.BytesReceived, resp.size)
+		body.Close()
+	}()
+
+	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
+	if code < http.StatusOK || code > http.StatusIMUsed {
+		if err != nil {
+			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v), body: %s",
+				ErrNon200, url, code, http.StatusText(code), err, buf.String()) //nolint:errorlint
+		}
+
+		return &resp, fmt.Errorf("%w: %s: %d %s", ErrNon200, url, code, http.StatusText(code))
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("converting json response: %w, body: %s", err, buf.String())
+	}
+
+	return &resp, nil
 }

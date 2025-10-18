@@ -158,7 +158,7 @@ type SetupResult struct {
 	Apps     *apps.Apps
 }
 
-func (c *Config) Setup(flag *Flags) (*SetupResult, error) {
+func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 	output, err := cnfgfile.Parse(c, &cnfgfile.Opts{
 		Name:          mnd.Title,
 		TransformPath: ExpandHomedir,
@@ -195,9 +195,8 @@ func (c *Config) Setup(flag *Flags) (*SetupResult, error) {
 
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
-	website.New(&website.Config{
+	website.New(ctx, &website.Config{
 		Apps:     result.Apps,
-		BaseURL:  website.BaseURL,
 		Timeout:  c.Timeout,
 		Retries:  c.Retries,
 		HostID:   c.HostID,

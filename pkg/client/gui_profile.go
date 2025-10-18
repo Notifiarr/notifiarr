@@ -120,7 +120,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	outboundIP := clientinfo.GetOutboundIP(req.Context())
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	ifName, netmask := getIfNameAndNetmask(outboundIP)
-	hostInfo, _ := website.Site.GetHostInfo(req.Context())
+	hostInfo, _ := website.GetHostInfo(req.Context())
 	activeTunnel := ""
 	poolStats := map[string]*mulery.PoolSize{}
 	triggers, timers, schedules := c.triggers.GatherTriggerInfo()
