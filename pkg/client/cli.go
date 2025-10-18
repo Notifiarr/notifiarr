@@ -212,7 +212,7 @@ func (c *Client) handleAptHook(ctx context.Context) error { //nolint:cyclop
 		} //nolint:wsl
 	}
 
-	resp, _, err := website.Site.RawGetData(ctx, &website.Request{
+	resp, _, err := website.RawGetData(ctx, &website.Request{
 		Route:   website.PkgRoute,
 		Event:   "apt",
 		Payload: output,

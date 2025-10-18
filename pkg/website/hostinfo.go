@@ -34,12 +34,9 @@ func (s *Server) hostInfoNoError() *host.InfoStat {
 }
 
 // GetHostInfo attempts to make a unique machine identifier...
-func (s *Server) GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
-	if s == nil {
-		panic("website.Server is nil")
-	}
-	if s.hostInfo != nil {
-		return s.hostInfoNoError(), nil
+func GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
+	if Site.hostInfo != nil {
+		return Site.hostInfoNoError(), nil
 	}
 
 	hostInfo, err := host.InfoWithContext(ctx)
@@ -70,12 +67,12 @@ func (s *Server) GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //no
 		}
 	}
 
-	if s.Config.HostID != "" {
-		hostInfo.HostID = s.Config.HostID
+	if hid := Site.config.HostID; hid != "" {
+		hostInfo.HostID = hid
 	}
 
 	// This only happens once.
-	s.hostInfo = hostInfo
+	Site.hostInfo = hostInfo
 
-	return s.hostInfoNoError(), nil // return a copy.
+	return Site.hostInfoNoError(), nil // return a copy.
 }

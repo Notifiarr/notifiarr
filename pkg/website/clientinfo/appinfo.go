@@ -122,12 +122,13 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 		numTautulli = 1
 	}
 
-	host, err := website.Site.GetHostInfo(ctx)
+	host, err := website.GetHostInfo(ctx)
 	if err == nil {
 		err = errors.New("") //nolint:err113
 	}
 
-	split := strings.Split(website.Site.Config.BindAddr, ":")
+	webconf := website.GetConfig()
+	split := strings.Split(webconf.BindAddr, ":")
 
 	port := split[0]
 	if len(split) > 1 {
@@ -166,8 +167,8 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
 			"sonarr":       len(c.Apps.Sonarr),
 		},
 		Config: AppInfoConfig{
-			WebsiteTimeout: website.Site.Config.Timeout.String(),
-			Retries:        website.Site.Config.Retries,
+			WebsiteTimeout: webconf.Timeout.String(),
+			Retries:        webconf.Retries,
 			Apps:           c.getAppConfigs(ctx, startup),
 		},
 		Commands:  c.CmdList,

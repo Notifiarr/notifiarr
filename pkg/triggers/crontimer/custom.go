@@ -109,7 +109,7 @@ var (
 // Run fires in a go routine. Wait a minute or two then tell the website we're up.
 // If app reloads in first checkWait duration, this throws an error. That's ok.
 func (a *Action) Run(ctx context.Context) {
-	if website.Site.ValidAPIKey() == nil {
+	if website.ValidAPIKey() == nil {
 		timer := time.NewTimer(checkWait)
 		select {
 		case <-timer.C:
@@ -172,7 +172,7 @@ func (c *cmd) create() {
 }
 
 func (c *cmd) startWebsitePoller() {
-	if website.Site.ValidAPIKey() != nil {
+	if website.ValidAPIKey() != nil {
 		return // only poll if the api key length is valid.
 	}
 
