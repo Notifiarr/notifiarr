@@ -20,7 +20,7 @@ func SetStates(values map[string][]byte) error {
 		}
 	}
 
-	resp, err := Site.GetData(&Request{
+	resp, err := GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventSet,
 		Payload:    map[string]interface{}{"fields": values},
@@ -40,7 +40,7 @@ func DelState(keys ...string) error {
 		values[key] = nil
 	}
 
-	resp, err := Site.GetData(&Request{
+	resp, err := GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventSet,
 		Payload:    map[string]interface{}{"fields": values},
@@ -55,7 +55,7 @@ func DelState(keys ...string) error {
 
 // GetState gets a value stored in the website database.
 func GetState(keys ...string) (map[string][]byte, error) {
-	resp, err := Site.GetData(&Request{
+	resp, err := GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventGet,
 		Payload:    map[string][]string{"fields": keys},

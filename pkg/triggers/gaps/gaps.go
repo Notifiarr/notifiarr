@@ -89,7 +89,7 @@ func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 			continue
 		}
 
-		website.Site.SendData(&website.Request{
+		website.SendData(&website.Request{
 			Route:      website.GapsRoute,
 			Event:      input.Type,
 			LogPayload: true,

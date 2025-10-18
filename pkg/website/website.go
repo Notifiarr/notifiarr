@@ -16,8 +16,8 @@ import (
 	"golift.io/version"
 )
 
-// Site can be used to call the website APIs.
-var Site *Server
+// site can be used to call the website APIs.
+var site *server
 
 // httpClient is our custom http client to wrap Do and provide retries.
 type httpClient struct {
@@ -80,7 +80,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 }
 
 // sendAndLogRequest sends a request to the website and logs the result.
-func (s *Server) sendAndLogRequest(ctx context.Context, data *Request) {
+func (s *server) sendAndLogRequest(ctx context.Context, data *Request) {
 	switch resp, elapsed, err := s.sendRequest(ctx, data); {
 	case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 		return
@@ -94,7 +94,7 @@ func (s *Server) sendAndLogRequest(ctx context.Context, data *Request) {
 }
 
 // sendRequest sends a request to the website and returns the result.
-func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, time.Duration, error) {
+func (s *server) sendRequest(ctx context.Context, data *Request) (*Response, time.Duration, error) {
 	if len(s.config.Apps.APIKey) != APIKeyLength {
 		err := fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
 		if data.respChan != nil {
@@ -142,7 +142,7 @@ func (s *Server) sendRequest(ctx context.Context, data *Request) (*Response, tim
 }
 
 // sendPayload sends a JSON payload to the website and returns the result.
-func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
+func (s *server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
 	data, err := json.Marshal(payload)
 	if err == nil {
 		var torn map[string]any
@@ -185,7 +185,7 @@ func (s *Server) sendPayload(ctx context.Context, uri string, payload any, log b
 }
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
-func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
+func (s *server) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return 0, nil, fmt.Errorf("creating http request: %w", err)
@@ -209,7 +209,7 @@ func (s *Server) sendJSON(ctx context.Context, url string, data []byte, log bool
 	return resp.StatusCode, s.debugLogResponseBody(start, resp, url, data, log), nil
 }
 
-func (s *Server) getTimeout() time.Duration {
+func (s *server) getTimeout() time.Duration {
 	timeout := s.config.Timeout.Duration
 	if timeout > MaxTimeout {
 		timeout = MaxTimeout

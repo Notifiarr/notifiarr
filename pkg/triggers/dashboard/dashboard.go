@@ -156,7 +156,7 @@ func (c *Cmd) sendDashboardState(ctx context.Context, input *common.ActionInput)
 	)
 
 	data.Save("dashboard", states)
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.DashRoute,
 		Event:      input.Type,
 		LogPayload: true,

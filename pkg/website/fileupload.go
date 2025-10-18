@@ -13,7 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*Response, error) {
+func (s *server) sendFile(ctx context.Context, uri string, file *UploadFile) (*Response, error) {
 	form, contentType, err := s.createFileUpload(file)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (s *Server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 	return response, err
 }
 
-func (s *Server) createFileUpload(file *UploadFile) (*bytes.Buffer, string, error) {
+func (s *server) createFileUpload(file *UploadFile) (*bytes.Buffer, string, error) {
 	// Create a new multipart writer with the buffer
 	var buf bytes.Buffer
 	writer := multipart.NewWriter(&buf)

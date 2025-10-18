@@ -44,8 +44,8 @@ type Config struct {
 	BindAddr string
 }
 
-// Server is what you get for providing a Config to New().
-type Server struct {
+// server is what you get for providing a Config to New().
+type server struct {
 	config *Config
 	// Internal cruft.
 	client    *httpClient
@@ -62,12 +62,12 @@ func New(ctx context.Context, config *Config) {
 		config.Retries = DefaultRetries
 	}
 
-	if Site != nil {
-		Site.reconfig <- config
+	if site != nil {
+		site.reconfig <- config
 		return
 	}
 
-	Site = &Server{
+	site = &server{
 		config: config,
 		client: &httpClient{
 			Retries: config.Retries,
@@ -79,20 +79,20 @@ func New(ctx context.Context, config *Config) {
 		getConfig: make(chan struct{}, 1),
 	}
 
-	go Site.watchSendDataChan(ctx)
+	go site.watchSendDataChan(ctx)
 }
 
 // SendData puts a POST request to notifiarr.com into a channel queue.
-func (s *Server) SendData(req *Request) {
-	s.sendData <- req
+func SendData(req *Request) {
+	site.sendData <- req
 }
 
 // GetData sends data to a notifiarr URL as JSON and returns a response.
-func (s *Server) GetData(req *Request) (*Response, error) {
+func GetData(req *Request) (*Response, error) {
 	req.respChan = make(chan *chResponse)
 	defer close(req.respChan)
 
-	s.sendData <- req
+	site.sendData <- req
 	resp := <-req.respChan
 
 	return resp.Response, resp.Error
@@ -100,17 +100,26 @@ func (s *Server) GetData(req *Request) (*Response, error) {
 
 // GetConfig returns the current website config.
 func GetConfig() *Config {
-	Site.getConfig <- struct{}{}
-	return <-Site.reconfig
+	site.getConfig <- struct{}{}
+	return <-site.reconfig
 }
 
 // RawGetData sends a request to the website without using a channel.
 // Avoid this method, it can trigger data races. Use it only in cli.go.
 func RawGetData(ctx context.Context, req *Request) (*Response, time.Duration, error) {
-	return Site.sendRequest(ctx, req)
+	return site.sendRequest(ctx, req)
 }
 
-func (s *Server) watchSendDataChan(ctx context.Context) {
+// ValidAPIKey checks if the API key is valid.
+func ValidAPIKey() error {
+	if len(GetConfig().Apps.APIKey) != APIKeyLength {
+		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
+	}
+
+	return nil
+}
+
+func (s *server) watchSendDataChan(ctx context.Context) {
 	for {
 		select {
 		case config := <-s.reconfig:
@@ -122,13 +131,4 @@ func (s *Server) watchSendDataChan(ctx context.Context) {
 			s.sendAndLogRequest(ctx, data)
 		}
 	}
-}
-
-// ValidAPIKey checks if the API key is valid.
-func ValidAPIKey() error {
-	if len(GetConfig().Apps.APIKey) != APIKeyLength {
-		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
-	}
-
-	return nil
 }

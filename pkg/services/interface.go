@@ -115,7 +115,7 @@ func (s *Service) copyResults() *CheckResult {
 func (s *Services) SendResults(results *Results) {
 	results.Interval = s.Interval.Seconds()
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.SvcRoute,
 		Event:      results.What,
 		LogPayload: true,

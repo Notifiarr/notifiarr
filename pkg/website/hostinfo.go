@@ -12,7 +12,7 @@ import (
 )
 
 // hostInfoNoError will return nil if there is an error, otherwise a copy of the host info.
-func (s *Server) hostInfoNoError() *host.InfoStat {
+func (s *server) hostInfoNoError() *host.InfoStat {
 	if s.hostInfo == nil {
 		return nil
 	}
@@ -35,8 +35,8 @@ func (s *Server) hostInfoNoError() *host.InfoStat {
 
 // GetHostInfo attempts to make a unique machine identifier...
 func GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
-	if Site.hostInfo != nil {
-		return Site.hostInfoNoError(), nil
+	if site.hostInfo != nil {
+		return site.hostInfoNoError(), nil
 	}
 
 	hostInfo, err := host.InfoWithContext(ctx)
@@ -67,12 +67,12 @@ func GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
 		}
 	}
 
-	if hid := Site.config.HostID; hid != "" {
+	if hid := site.config.HostID; hid != "" {
 		hostInfo.HostID = hid
 	}
 
 	// This only happens once.
-	Site.hostInfo = hostInfo
+	site.hostInfo = hostInfo
 
-	return Site.hostInfoNoError(), nil // return a copy.
+	return site.hostInfoNoError(), nil // return a copy.
 }

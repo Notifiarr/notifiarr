@@ -111,7 +111,7 @@ func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
 	}
 
 	data.Save("snapshot", snapshot)
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.SnapRoute,
 		Event:      input.Type,
 		LogPayload: true,

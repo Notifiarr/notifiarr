@@ -10,7 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-func (s *Server) debughttplog(resp *http.Response, url string, start time.Time, data string, body io.Reader) {
+func (s *server) debughttplog(resp *http.Response, url string, start time.Time, data string, body io.Reader) {
 	headers := ""
 	status := "0"
 
@@ -64,7 +64,7 @@ func readBodyForLog(body io.Reader, max int64) (string, int64) {
 	return string(bodyBytes), int64(len(bodyBytes))
 }
 
-func (s *Server) debugLogResponseBody(
+func (s *server) debugLogResponseBody(
 	start time.Time,
 	resp *http.Response,
 	url string,

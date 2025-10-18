@@ -48,7 +48,7 @@ func Log(msg string) {
 		return
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Payload:    &Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,

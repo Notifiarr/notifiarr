@@ -262,7 +262,7 @@ func (c *cmd) sendBackups(ctx context.Context, input *genericInstance) {
 		Files: fileList,
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.BackupRoute,
 		Event:      input.event,
 		LogPayload: true,

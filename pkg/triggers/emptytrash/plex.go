@@ -65,7 +65,7 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 	}
 
 	if len(status) > 0 {
-		website.Site.SendData(&website.Request{
+		website.SendData(&website.Request{
 			Route:      website.PlexRoute,
 			Event:      input.Type,
 			Params:     []string{"emptylibrary=true"},

@@ -353,7 +353,7 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 		return // rate limited.
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
 		LogPayload: tail.LogMatch,

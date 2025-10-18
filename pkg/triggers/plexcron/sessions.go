@@ -21,7 +21,7 @@ func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 		mnd.Log.Errorf("Getting Plex sessions: %v", err)
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.PlexRoute,
 		Event:      input.Type,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Plex: sessions},

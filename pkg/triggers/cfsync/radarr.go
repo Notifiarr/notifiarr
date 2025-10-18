@@ -74,7 +74,7 @@ func (c *radarrApp) syncRadarr(ctx context.Context, input *common.ActionInput) {
 	start := time.Now()
 	payload := c.cmd.getRadarrProfiles(ctx, input.Type, c.idx+1)
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.CFSyncRoute,
 		Event:      input.Type,
 		Params:     []string{"app=radarr"},

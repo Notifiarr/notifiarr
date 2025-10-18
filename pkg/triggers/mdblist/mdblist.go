@@ -76,7 +76,7 @@ type libraryData struct {
 }
 
 func (c *cmd) sendMDBList(ctx context.Context, input *common.ActionInput) {
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.MdbListRoute,
 		Event:      input.Type,
 		LogPayload: true,

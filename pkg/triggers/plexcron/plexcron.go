@@ -133,7 +133,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second) //nolint:mnd // wait max 5 seconds for system info.
 	defer cancel()
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.PlexRoute,
 		Event:      website.EventHook,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Load: hook, Plex: sessions},

@@ -386,7 +386,7 @@ func (c *Client) getConfig(ctx context.Context) (*configfile.SetupResult, error)
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(ctx context.Context, event website.EventType, source string) (func(), error) {
-	logs.Log.Printf("==> Reloading Configuration (%s): %s", event, source)
+	logs.Log.Printf("%s> Reloading Configuration (%s): %s", mnd.TodaysEmoji(), event, source)
 
 	err := c.stop(ctx, event)
 	if err != nil {

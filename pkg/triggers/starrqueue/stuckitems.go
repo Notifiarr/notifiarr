@@ -34,7 +34,7 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 		return
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.StuckRoute,
 		Event:      input.Type,
 		LogPayload: true,

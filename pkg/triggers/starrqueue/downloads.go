@@ -68,7 +68,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 		c.empty = false
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.DownloadRoute,
 		Event:      input.Type,
 		LogPayload: true,

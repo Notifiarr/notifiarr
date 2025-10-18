@@ -88,7 +88,7 @@ func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string
 		return statusError + ": " + err.Error()
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route: website.PlexRoute,
 		Event: website.EventType(session.Type),
 		Payload: &website.Payload{

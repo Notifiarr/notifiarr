@@ -129,7 +129,7 @@ func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 		return // template is false, do not send anything to website.
 	}
 
-	website.Site.SendData(&website.Request{
+	website.SendData(&website.Request{
 		Route:      website.EndpointRoute,
 		Event:      input.Type,
 		LogPayload: true,
