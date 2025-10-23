@@ -307,8 +307,8 @@ func (c *cmd) checkBackupFileCorruption(
 ) (*Info, error) {
 	folder, err := os.MkdirTemp("", "notifiarr_tmp_dir")
 	if err != nil {
-		const moreInfo = "click here for help with this: https://notifiarr.wiki/pages/client/troubleshooting/?h=tmp#tmp-not-found"
-		return nil, fmt.Errorf("creating temporary folder: %w - %s", err, moreInfo)
+		return nil, fmt.Errorf("creating temporary folder: %w - %s", err,
+			"click here for help with this: https://notifiarr.wiki/pages/client/troubleshooting/#tmp-folder-not-found")
 	}
 
 	defer os.RemoveAll(folder) // clean up when we're done.
