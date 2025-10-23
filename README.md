@@ -1,4 +1,4 @@
-<img src="https://gh.notifiarr.com/img/repo-logo.png">
+<img src="https://gh.notifiarr.com/img/notifiarr-client-repo-logo-2025.png" alt="Notifiarr Client Logo">
 
 This is the unified client for [Notifiarr.com](https://notifiarr.com).
 Written in Go & Svelte; works on most operating systems.
