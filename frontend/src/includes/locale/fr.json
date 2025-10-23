@@ -49,7 +49,7 @@
                 "label": "URL"
             },
             "apiKey": {
-                "label": "Clé API",
+                "label": "Clef API",
                 "description": "Clé API pour l'instance Radarr.",
                 "placeholder": "clé-api-radarr"
             },
