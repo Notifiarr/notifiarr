@@ -1,13 +1,13 @@
 <img src="https://gh.notifiarr.com/img/repo-logo.png">
 
 This is the unified client for [Notifiarr.com](https://notifiarr.com).
-The client enables content requests from Media Bot in your Discord Server
-and also provides reports for Plex usage and system health among many other features.
+Written in Go & Svelte; works on most operating systems.
 
 ## Features
 
 - **Secure.** Built with the safety of your data as top priority.
-  - Because we use it too.
+    - Because we use it too.
+- Beautiful and intuitive user interface.
 - Service and network health checks and notifications.
 - Trigger scripts and commands from Discord.
 - Media requests from Discord.
@@ -26,18 +26,21 @@ and also provides reports for Plex usage and system health among many other feat
 
 ## Installation
 
-We maintain a wiki with the install instructions:
-https://notifiarr.wiki/pages/client/install/
+We [maintain](https://github.com/Notifiarr/mkdocs-wiki) a wiki with the install instructions.
+
+- https://notifiarr.wiki/pages/client/install/
 
 ## Configuration Information
 
-The data that was once in this section is no longer super relevant, but can be found here:
-https://notifiarr.wiki/pages/client/configuration/
+The data that was once in this section is no longer super relevant, but can also be found in the wiki.
+
+- https://notifiarr.wiki/pages/client/configuration/
 
 ## Troubleshooting
 
-We have a client troubleshooting section in the wiki too:
-https://notifiarr.wiki/pages/client/troubleshooting/
+We have a client troubleshooting section in the wiki too.
+
+- https://notifiarr.wiki/pages/client/troubleshooting/
 
 ## Contributing
 
