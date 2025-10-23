@@ -820,7 +820,7 @@
         "Changed": "Modifié",
         "New": "Nouveau",
         "ERROR": "ERREUR",
-        "LoginHelpBody": "Si vous avez oublié votre mot de passe, veuillez consulter la page wiki <a href=\"https://notifiarr.wiki/pages/client/gui/#forgotten-passwords\" target=\"_blank\">mots de passe oubliés</a>. Si c'est votre première connexion, vous trouverez votre mot de passe dans le fichier journal du client. Si vous avez fourni une clé API au client avant de le démarrer pour la première fois, votre mot de passe est la clé API.",
+        "LoginHelpBody": "Si vous avez oublié votre mot de passe, veuillez consulter la page wiki <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">mots de passe oubliés</a>. Si c'est votre première connexion, vous trouverez votre mot de passe dans le fichier journal du client. Si vous avez fourni une clé API au client avant de le démarrer pour la première fois, votre mot de passe est la clé API.",
         "Loading": "Chargement...",
         "BackEndUpdated": "Back-end mis à jour il y a {timeDuration}.",
         "ShowMore": "Afficher plus d'informations"
@@ -1006,8 +1006,8 @@
                 "noauth": "Pas de mot de passe (danger)"
             },
             "option_desc": {
-                "password": " Il s'agit du type d'authentification par défaut. Sélectionnez l'option Mot de passe pour vous connecter à cette application avec un nom d'utilisateur et un mot de passe configurés. Un seul nom d'utilisateur et mot de passe sont acceptés. Lorsque vous sélectionnez cette option, vous devez renseigner les champs Nom d'utilisateur et Nouveau mot de passe. S'il s'agit du type d'authentification actuel, vous devez également renseigner le champ Mot de passe actuel pour effectuer des modifications.",
-                "header": "Sélectionnez cette option pour vous connecter à cette application à l'aide d'un en-tête HTTP contenant un nom d'utilisateur. Cette authentification est communément appelée authentification par proxy. Une page wiki explique comment configurer Nginx pour cette fonctionnalité. Lorsque vous sélectionnez cette option, vous devez également sélectionner un en-tête pour le proxy d'authentification. Si aucun en-tête n'est affiché, cela signifie qu'aucun en-tête valide n'a été fourni par le proxy en amont.",
+                "password": "Il s'agit du type d'authentification par défaut. Sélectionnez l'option Mot de passe pour vous connecter à cette application avec un nom d'utilisateur et un mot de passe configurés. Un seul nom d'utilisateur et mot de passe sont acceptés. Lorsque vous sélectionnez cette option, vous devez renseigner les champs Nom d'utilisateur et Nouveau mot de passe. S'il s'agit du type d'authentification actuel, vous devez également renseigner le champ Mot de passe actuel pour effectuer des modifications.",
+                "header": "Sélectionnez cette option pour vous connecter à cette application à l'aide d'un en-tête HTTP contenant un nom d'utilisateur. Cette authentification est communément appelée authentification par proxy. <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">Une page wiki</a> explique comment configurer Nginx pour cette fonctionnalité. Lorsque vous sélectionnez cette option, vous devez également sélectionner un en-tête pour le proxy d'authentification. Si aucun en-tête n'est affiché, cela signifie qu'aucun en-tête valide n'a été fourni par le proxy en amont.",
                 "noauth": "Cette configuration n'est pas recommandée. L'authentification sans mot de passe autorise toute requête provenant de n'importe quelle adresse IP en amont configurée. Elle fonctionne également avec un proxy d'authentification pour définir le nom d'utilisateur. Si aucun nom d'utilisateur n'est indiqué dans l'en-tête fourni, la valeur par défaut est admin."
             }
         },
