@@ -49,4 +49,6 @@ We have a client troubleshooting section in the wiki too.
 ## License
 
 [MIT](https://github.com/Notifiarr/notifiarr/blob/main/LICENSE) - Copyright (c) 2020-2025 Go Lift
-<img src="https://docs.golift.io/integrations/golift.png" alt="Go Lift Logo" align="right">
+<a href="https://golift.io">
+  <img src="https://docs.golift.io/integrations/golift.png" alt="Go Lift Logo" align="right">
+</a>
