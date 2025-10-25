@@ -149,6 +149,7 @@ systemctl --user stop notifiarr 2>/dev/null >/dev/null
 gunzip -c "${HOME}/notifiarr/${FILE}" > "${HOME}/notifiarr/notifiarr"
 rm "${HOME}/notifiarr/${FILE}"
 chmod 0755 "${HOME}/notifiarr/notifiarr"
+echo >> "${HOME}/notifiarr/notifiarr.conf"
 
 # Create systemd service unit file.
 if [ -n "${API_KEY}" ]; then
