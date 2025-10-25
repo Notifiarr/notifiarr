@@ -24,6 +24,22 @@ echo "<-------------------------------------------------->"
 
 PACKAGE=notifiarr
 
+if [ "$1" == "remove" ] || [ "$1" == "uninstall" ]; then
+  [ -n "${HOME}" ] || (echo "${P} [ERROR] HOME environment variable is not set. Cannot continue!" && exit 1)
+  echo "${P} Uninstalling notifiarr client..."
+  systemctl --user stop notifiarr
+  systemctl --user disable notifiarr
+  tar -jcf "${HOME}/notifiarr-backup-$(date +%Y%m%d).tar.bz2" \
+    "${HOME}/notifiarr" \
+    "${HOME}/.config/systemd/user/notifiarr.service" \
+    "${HOME}/.apps/nginx/proxy.d/notifiarr.conf" \
+    >/dev/null 2>&1
+  echo "${P} Backup created: ${HOME}/notifiarr-backup-$(date +%Y%m%d).tar.bz2"
+  rm -rf "${HOME}/notifiarr" "${HOME}/.config/systemd/user/notifiarr.service" "${HOME}/.apps/nginx/proxy.d/notifiarr.conf"
+  echo "${P} Backed up, stopped and removed notifiarr client, service unit file, and nginx proxy configuration."
+  exit 0
+fi
+
 # $ARCH is passed into egrep to find the right file.
 if [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "amd64" ]; then
   ARCH="x86_64|amd64"
