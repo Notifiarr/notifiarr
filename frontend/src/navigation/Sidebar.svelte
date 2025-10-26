@@ -7,7 +7,7 @@
   import { slide as slyde } from 'svelte/transition'
 
   // This is how many pixels we need to display the entire sidebar.
-  // If you add elements, you may need to increase this.
+  // If you add elements to pages.ts, you may need to increase this.
   const h: number = 900
   // The slide parameters have to match the parent element, so it's passed in.
   let { slide = { duration: 600, axis: 'x' }, height = h } = $props()
@@ -16,7 +16,7 @@
 </script>
 
 <div class="sidebar-card-wrapper" transition:slyde={slide} {style}>
-  <Card body class="sidebar-card pb-2" theme={$theme} {style}>
+  <Card body class="sidebar-card pb-2" theme={$theme}>
     <!-- Settings -->
     <Section title="Settings" pages={settings} />
     <div class="section-divider"></div>

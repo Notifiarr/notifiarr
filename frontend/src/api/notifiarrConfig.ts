@@ -2084,8 +2084,6 @@ export interface ApiResponse {
 };
 
 /**
- * CheckAllOutput is the output from a check all instances test.
- * The JSON keys are used for human display, so ya.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/checkapp.CheckAllOutput>
  */
 export interface CheckAllOutput {
@@ -2109,7 +2107,6 @@ export interface CheckAllOutput {
 };
 
 /**
- * TestResult is the result from an instance test.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/checkapp.TestResult>
  */
 export interface TestResult {
