@@ -204,7 +204,7 @@
           disabled={app.disabled?.includes('deletes')}
           {validate}>
           <option value={0}>{get(_)('words.select-option.Disabled')}</option>
-          {#each ['1', '2', '5', '7', '10', '15', '20', '50', '100', '200'] as count}
+          {#each [1, 2, 5, 7, 10, 15, 20, 50, 100, 200] as count}
             <option value={count}>
               {get(_)('words.instance-options.deletes.countPerHour', {
                 values: { count },
