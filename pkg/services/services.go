@@ -77,7 +77,8 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 
 	s.checks = make(chan *Service, DefaultBuffer)
 	s.done = make(chan bool)
-	s.stopChan = make(chan struct{})
+	s.actionChan = make(chan action)
+	s.replyChan = make(chan bool)
 	s.triggerChan = make(chan website.EventType)
 	s.checkChan = make(chan triggerCheck)
 
@@ -183,32 +184,58 @@ func (s *Services) loadServiceStates() {
 	}
 }
 
-func (s *Services) runServiceChecker() { //nolint:cyclop
+// action is what we use to send actions to the service checker for loop.
+type action int
+
+const (
+	actionStop   action = iota // happens on reload.
+	actionPause                // user controlled pause.
+	actionResume               // user controlled resume.
+	actionCheck                // check if service checks are running.
+)
+
+func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
+	checker := time.NewTicker(time.Second)
+	running := true
+
 	defer func() {
 		defer s.log.CapturePanic()
+		checker.Stop()
 		s.log.Printf("==> Service Checker Stopped!")
-		s.stopChan <- struct{}{} // signal we're finished.
+		s.actionChan <- actionStop // signal we're finished.
 	}()
 
-	checker := &time.Ticker{C: make(<-chan time.Time)}
-
 	if !s.Disabled {
-		checker = time.NewTicker(time.Second)
-		defer checker.Stop()
-
 		s.runChecks(true, version.Started)
 		s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()})
+	} else {
+		running = false
+		checker.Stop()
 	}
 
 	for {
 		select {
-		case <-s.stopChan:
-			for range s.Parallel {
-				s.checks <- nil
-				<-s.done
-			}
+		case action := <-s.actionChan:
+			switch action {
+			case actionCheck:
+				s.replyChan <- running
+			case actionResume:
+				s.log.Printf("==> Service Checker Resumed!")
+				checker.Reset(time.Second)
+				running = true
+			case actionPause:
+				s.log.Printf("==> Service Checker Paused!")
+				checker.Stop()
+				running = false
+			case actionStop:
+				// Stop all the checkers.
+				for range s.Parallel {
+					s.checks <- nil
+					<-s.done
+				}
 
-			return
+				return
+			}
 		case event := <-s.checkChan:
 			s.log.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
 				event.Service.Name, event.Source, len(s.checks), cap(s.checks))
@@ -244,21 +271,45 @@ func (s *Services) Running() bool {
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
-	return s.stopChan != nil
+	s.actionChan <- actionCheck
+	return <-s.replyChan
+}
+
+func (s *Services) Pause() {
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
+
+	if s.actionChan != nil {
+		s.actionChan <- actionPause
+	}
+}
+
+func (s *Services) Resume() {
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
+
+	if s.actionChan != nil {
+		s.actionChan <- actionResume
+	}
 }
 
 // Stop sends current states to the website and ends all service checker routines.
 func (s *Services) Stop() {
+	defer func() {
+		logs.Log.CapturePanic()
+		logs.Log.Printf("==> Service Checker Stopped!")
+	}()
+
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
-	if s.stopChan == nil {
+	if s.actionChan == nil {
 		return
 	}
 
-	defer close(s.stopChan)
-	s.stopChan <- struct{}{}
-	<-s.stopChan // wait for all go routines to die off.
+	defer close(s.actionChan)
+	s.actionChan <- actionStop
+	<-s.actionChan // wait for all go routines to die off.
 
 	close(s.triggerChan)
 	close(s.checkChan)
@@ -269,7 +320,7 @@ func (s *Services) Stop() {
 	s.checkChan = nil
 	s.checks = nil
 	s.done = nil
-	s.stopChan = nil
+	s.actionChan = nil
 }
 
 // SvcCount returns the count of services being monitored.

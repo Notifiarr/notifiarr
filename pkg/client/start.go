@@ -43,6 +43,7 @@ type Client struct {
 	Flags      *configfile.Flags
 	Config     *configfile.Config
 	server     *http.Server
+	mux        *http.ServeMux
 	sigkil     chan os.Signal
 	sighup     chan os.Signal
 	reload     chan customReload
