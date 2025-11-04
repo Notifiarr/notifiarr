@@ -745,14 +745,14 @@
         },
         "/services/{action}": {
             "get": {
-                "description": "Starts or stops all service checks.",
+                "description": "Pauses or resumes all service checks.",
                 "produces": [
                     "text/plain"
                 ],
                 "tags": [
                     "Integrations"
                 ],
-                "summary": "Start/stop service checks",
+                "summary": "Pause/resume service checks",
                 "parameters": [
                     {
                         "enum": [
@@ -768,7 +768,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Service Checks Stopped or Service Checks Started",
+                        "description": "Service Checks Paused or Service Checks Resumed",
                         "schema": {
                             "type": "string"
                         }
@@ -2471,8 +2471,6 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -2489,8 +2487,6 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",

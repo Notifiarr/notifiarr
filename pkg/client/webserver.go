@@ -21,8 +21,12 @@ func (c *Client) SetupWebServer() {
 	c.Lock()
 	defer c.Unlock()
 
-	//nolint:lll // Create an apache-style logger.
-	apache, _ := apachelog.New(`%{X-Forwarded-For}i - %{X-NotiClient-Username}i %t "%m %{X-Redacted-URI}i %H" %>s %b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	// Create an apache-style logger.
+	apache, err := apachelog.New(`%{X-Forwarded-For}i - %{X-NotiClient-Username}i %t "%m %{X-Redacted-URI}i %H" %>s ` +
+		`%b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+	if err != nil {
+		panic(fmt.Sprintf("Creating Apache Logger: %v", err))
+	}
 
 	// Create a request router.
 	c.apps.Router = mux.NewRouter()
@@ -32,23 +36,10 @@ func (c *Client) SetupWebServer() {
 	c.webauth = c.Config.UIPassword.Webauth() // this needs to be locked since password can be changed without reloading.
 	c.noauth = c.Config.UIPassword.Noauth()
 	c.authHeader = c.Config.UIPassword.Header()
-
 	// Make a multiplexer because websockets can't use apache log.
-	smx := http.NewServeMux()
-	smx.Handle("/", c.stripSecrets(apache.Wrap(c.apps.Router, logs.Log.HTTPLog.Writer())))
-	smx.Handle(path.Join(c.apps.URLBase, "ui", "ws"), c.apps.Router) // websockets cannot go through the apache logger.
-
-	// Create a server.
-	c.server = &http.Server{
-		Handler:           smx,
-		Addr:              c.Config.BindAddr,
-		IdleTimeout:       mnd.DefaultTimeout,
-		WriteTimeout:      c.Config.Timeout.Duration,
-		ReadTimeout:       c.Config.Timeout.Duration,
-		ReadHeaderTimeout: c.Config.Timeout.Duration,
-		ErrorLog:          logs.Log.ErrorLog,
-	}
-
+	c.mux = http.NewServeMux()
+	c.mux.Handle("/", c.stripSecrets(apache.Wrap(c.apps.Router, logs.Log.HTTPLog.Writer())))
+	c.mux.Handle(path.Join(c.apps.URLBase, "ui", "ws"), c.apps.Router) // websockets cannot go through the apache logger.
 	// Initialize all the application API paths.
 	c.apps.InitHandlers()
 	c.httpHandlers()
@@ -58,7 +49,16 @@ func (c *Client) SetupWebServer() {
 func (c *Client) RunWebServer() {
 	defer logs.Log.CapturePanic()
 
-	var err error
+	// Create a server.
+	c.server = &http.Server{
+		Handler:           c.mux,
+		Addr:              c.Config.BindAddr,
+		IdleTimeout:       mnd.DefaultTimeout,
+		WriteTimeout:      c.Config.Timeout.Duration,
+		ReadTimeout:       c.Config.Timeout.Duration,
+		ReadHeaderTimeout: c.Config.Timeout.Duration,
+		ErrorLog:          logs.Log.ErrorLog,
+	}
 
 	if menu["stat"] != nil {
 		menu["stat"].Enable()
@@ -66,6 +66,7 @@ func (c *Client) RunWebServer() {
 		menu["stat"].SetTooltip("web server running, uncheck to pause")
 	}
 
+	var err error
 	if c.Config.SSLCrtFile != "" && c.Config.SSLKeyFile != "" {
 		err = c.server.ListenAndServeTLS(c.Config.SSLCrtFile, c.Config.SSLKeyFile)
 	} else {
@@ -101,6 +102,8 @@ func (c *Client) StopWebServer(ctx context.Context) error {
 	if err := c.server.Shutdown(ctx); err != nil {
 		return fmt.Errorf("shutting down web server: %w", err)
 	}
+
+	logs.Log.Printf("==> Web Server Stopped!")
 
 	return nil
 }

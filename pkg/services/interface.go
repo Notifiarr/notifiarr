@@ -18,7 +18,7 @@ func (s *Services) RunChecks(source website.EventType) {
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
-	if s.triggerChan == nil || s.stopChan == nil {
+	if s.triggerChan == nil || s.actionChan == nil {
 		mnd.Log.Errorf("Cannot run service checks. Go routine is not running.")
 		return
 	}
@@ -31,7 +31,7 @@ func (s *Services) RunCheck(source website.EventType, name string) error {
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
-	if s.triggerChan == nil || s.stopChan == nil {
+	if s.triggerChan == nil || s.actionChan == nil {
 		return fmt.Errorf("cannot check service, %w", ErrSvcsStopped)
 	}
 

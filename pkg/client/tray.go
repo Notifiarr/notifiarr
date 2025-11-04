@@ -180,12 +180,14 @@ func (c *Client) configMenu(ctx context.Context) {
 	menu["svcs"].Click(func() {
 		if menu["svcs"].Checked() {
 			menu["svcs"].Uncheck()
-			c.Services.Stop()
-			ui.Toast(ctx, "Stopped checking services!")
+			logs.Log.Printf("[user requested] Pausing service checks.")
+			c.Services.Pause()
+			ui.Toast(ctx, "Paused checking services!")
 		} else {
+			logs.Log.Printf("[user requested] Resuming service checks.")
 			menu["svcs"].Check()
-			c.Services.Start(ctx, c.apps.Plex.Name())
-			ui.Toast(ctx, "Service checks started!")
+			c.Services.Resume()
+			ui.Toast(ctx, "Resumed checking services!")
 		}
 	})
 

@@ -53,7 +53,8 @@ type data struct {
 	services    map[string]*Service
 	checks      chan *Service
 	done        chan bool
-	stopChan    chan struct{}
+	actionChan  chan action
+	replyChan   chan bool
 	triggerChan chan website.EventType
 	checkChan   chan triggerCheck
 	stopLock    sync.Mutex

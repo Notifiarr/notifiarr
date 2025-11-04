@@ -363,12 +363,12 @@ func (c *Client) handlePing(response http.ResponseWriter, _ *http.Request) {
 
 // handleServicesStopStart stops or starts service checks.
 //
-//	@Summary		Start/stop service checks
-//	@Description	Starts or stops all service checks.
+//	@Summary		Pause/resume service checks
+//	@Description	Pauses or resumes all service checks.
 //	@Tags			Integrations
 //	@Produce		text/plain
 //	@Param			action	path		string	true	"Action to perform"	Enums(stop, start)
-//	@Success		200		{string}	string	"Service Checks Stopped or Service Checks Started"
+//	@Success		200		{string}	string	"Service Checks Paused or Service Checks Resumed"
 //	@Failure		400		{string}	string	"invalid action"
 //	@Router			/services/{action} [get]
 func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http.Request) {
@@ -376,13 +376,21 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":
-		c.Services.Stop()
-		logs.Log.Printf("[gui '%s' requested] Service Checks Stopped", user)
-		http.Error(response, "Service Checks Stopped", http.StatusOK)
+		c.Services.Pause()
+		logs.Log.Printf("[gui '%s' requested] Service Checks Paused", user)
+		http.Error(response, "Service Checks Paused", http.StatusOK)
+
+		if menu["svcs"] != nil {
+			menu["svcs"].Uncheck()
+		}
 	case "start":
-		c.Services.Start(req.Context(), c.apps.Plex.Name())
-		logs.Log.Printf("[gui '%s' requested] Service Checks Started", user)
-		http.Error(response, "Service Checks Started", http.StatusOK)
+		c.Services.Resume()
+		logs.Log.Printf("[gui '%s' requested] Service Checks Resumed", user)
+		http.Error(response, "Service Checks Resumed", http.StatusOK)
+
+		if menu["svcs"] != nil {
+			menu["svcs"].Check()
+		}
 	default:
 		http.Error(response, "invalid action: "+action, http.StatusBadRequest)
 	}
