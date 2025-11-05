@@ -200,10 +200,10 @@
       "FileWatcher": "Watch for file changes and trigger actions! This Notifiarr client can watch (log) files for lines matching a regular expression. This is similar to <code>tail -f file | grep string</code> and allows you to send notifications when, for instance, a log file has a new line written that matches a regular expression.",
       "Endpoints": "Configure relay endpoint URLs and their schedules.",
       "Commands": "Set up and execute custom commands and scripts.",
-      "Services": "The Notifiarr client application is capable of monitoring services via HTTP checks, TCP port checks or process running (and not running) checks. <b>The client service checks work with the Notifiarr.com Network Integration.</b>",
+      "Services": "The Notifiarr client application is capable of monitoring services via HTTP checks, TCP port checks or process running (and not running) checks. <b>The client health checks work with the Notifiarr.com Network Integration.</b>",
       "Actions": "Find internal Notifiarr client actions here. These are executed by timers, schedules, and events from the website or a chat server. While usually reserved for troubleshooting, you may trigger them manually in this interface.",
       "Integrations": "This page displays data that this client application has cached in memory for the various configured integrations.",
-      "Monitoring": "View service and network health.",
+      "Monitoring": "View service and network health check results.",
       "Metrics": "View metric totals for client configurations.",
       "LogFiles": "View, follow, download and upload client log files.",
       "System": "View system and client information and.",
@@ -316,24 +316,24 @@
     },
     "services": {
       "disabled": {
-        "label": "Service Checks",
-        "description": "Enable or disable service checks.",
-        "tooltip": "Disable or enable monitoring all network and service checks right here."
+        "label": "Health Checks",
+        "description": "Enable or disable health checks.",
+        "tooltip": "Disable or enable monitoring for all health checks right here."
       },
       "parallel": {
-        "label": "Parallel Checks",
-        "description": "Number of parallel service checks.",
-        "tooltip": "Normally running service checks 1 at a time is fine, but if you have more than 30 or 40, you may want to increase this."
+        "label": "Concurrent Checks",
+        "description": "Number of health checks that may run concurrently.",
+        "tooltip": "Normally, running health checks one at a time is fine, but if you have more than 30 or 40, you may want to increase this."
       },
       "interval": {
         "label": "Update Interval",
-        "description": "Update interval for service checks.",
-        "tooltip": "Subscribers can update more often."
+        "description": "Update interval for health checks.",
+        "tooltip": "This controls how often aggregated health check results are sent to Notifiarr.com. If a health check state changes, it's always sent immediately."
       },
       "logFile": {
         "label": "Services Log File",
         "description": "Path to the services log file or folder.",
-        "tooltip": "The log file is used to store the service check results. If left unset, the service check output is written to the application log file. If you set a folder without a file name, the application will create a file named Notifiarr.services.log in the folder.",
+        "tooltip": "The log file is used to store the health check results. If left unset, the health check output is written to the application log file. If you set a folder without a file name, the application will create a file named Notifiarr.services.log in the folder.",
         "placeholder": "/path/to/services-notifiarr.log"
       }
     },
@@ -528,7 +528,7 @@
         "label": "Server Name",
         "description": "Name of the Plex server.",
         "placeholder": "Set automatically by server",
-        "tooltip": "The name of the Plex Media Server is used in notifications, logs and service checks. It is set automatically by the Plex server."
+        "tooltip": "The name of the Plex Media Server is used in notifications, logs and health checks. It is set automatically by the Plex server."
       },
       "url": {
         "label": "URL",
@@ -544,7 +544,7 @@
     },
     "Tautulli": {
       "title": "Tautulli",
-      "description": "Tautulli provides a feature that allows you to give your Plex users custom usernames. By integrating Notifiarr client with Tautulli, those custom usernames will be displayed in your chat server notifications. When not enabled, Plex usernames or email addresses are used instead. This is entirely optional. The Notifiarr website also provides this same feature and allows you to map Plex users to custom names. You may also add a Tautulli instance here simply to monitor it with service checks.",
+      "description": "Tautulli provides a feature that allows you to give your Plex users custom usernames. By integrating Notifiarr client with Tautulli, those custom usernames will be displayed in your chat server notifications. When not enabled, Plex usernames or email addresses are used instead. This is entirely optional. The Notifiarr website also provides this same feature and allows you to map Plex users to custom names. You may also add a Tautulli instance here simply to monitor it with health checks.",
       "name": {
         "label": "Tautulli Name",
         "description": "Name of the Tautulli service."
@@ -1130,7 +1130,7 @@
     },
     "apps": {
       "title": "Application Requests",
-      "description": "Application request statistics. These counters do not include service checks.",
+      "description": "Application request statistics. These counters do not include health checks.",
       "empty": "No application requests yet."
     },
     "timerEvents": {
@@ -1140,16 +1140,16 @@
     }
   },
   "monitoring": {
-    "ConfigureServices": "Service checks for configured integrations are enabled by giving them a check interval on their respective configuration pages. Some of these checks are from the <go-to page=\"starrapps\">Starr Apps</go-to> page, or the <go-to page=\"downloaders\">Download Apps</go-to> page, or the <go-to page=\"mediaapps\">Media Apps</go-to> page. The rest of the service checks displayed can be found on the <go-to page=\"services\">Services page</go-to>.",
-    "ChecksDisabled": "Service Checks: Disabled",
-    "ChecksStopped": "Service Checks: Stopped",
-    "EnableOnConfig": "Enable service checks on the <go-to page=\"configuration\">Configuration</go-to> page.",
-    "StartChecks": "Start Service Checks",
-    "StopChecks": "Stop Service Checks",
-    "stopFailed": "Failed to stop service checks.",
-    "startFailed": "Failed to start service checks.",
-    "recheckFailed": "Failed to recheck service.",
-    "checkInitiated": "Service check initiated.",
+    "ConfigureServices": "Health checks for configured integrations are enabled by giving them a check interval on their respective configuration pages. Some of these checks are from the <go-to page=\"starrapps\">Starr Apps</go-to> page, or the <go-to page=\"downloaders\">Download Apps</go-to> page, or the <go-to page=\"mediaapps\">Media Apps</go-to> page. The rest of the health checks displayed can be found on the <go-to page=\"services\">Services page</go-to>.",
+    "ChecksDisabled": "Health Checks: Disabled",
+    "ChecksStopped": "Health Checks: Paused",
+    "EnableOnConfig": "Enable health checks on the <go-to page=\"configuration\">Configuration</go-to> page.",
+    "StartChecks": "Resume Health Checks",
+    "StopChecks": "Pause Health Checks",
+    "stopFailed": "Failed to pause health checks.",
+    "startFailed": "Failed to resume health checks.",
+    "recheckFailed": "Failed to recheck health check.",
+    "checkInitiated": "Health check initiated.",
     "nextRefresh": "Next refresh in {timeDuration}.",
     "refreshInterval": "Refresh Interval",
     "cardsView": "Cards View",
@@ -1184,7 +1184,7 @@
     "title": "Health Checks",
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
-    "description": "Use this form to configure service checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
+    "description": "Use this form to configure health checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",

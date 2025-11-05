@@ -66,7 +66,7 @@ func (s *Services) runChecks(forceAll bool, now time.Time) bool {
 	changes := false
 
 	for svc := range s.services {
-		if forceAll || s.services[svc].Due(now) {
+		if s.services[svc].Interval.Duration > 0 && (forceAll || s.services[svc].Due(now)) {
 			count++
 			s.checks <- s.services[svc]
 		}

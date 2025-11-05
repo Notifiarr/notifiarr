@@ -9,7 +9,7 @@
     Popover,
     ButtonGroup,
   } from '@sveltestrap/sveltestrap'
-  import { _, datetime } from '../../includes/Translate.svelte'
+  import T, { _, datetime } from '../../includes/Translate.svelte'
   import { age, since } from '../../includes/util'
   import { profile } from '../../api/profile.svelte'
   import { Monitor as chk } from './page.svelte'
@@ -136,7 +136,7 @@
               {#if result.interval > 0}
                 <td>{age(result.interval * 1000)}</td>
               {:else}
-                <td>Disabled</td>
+                <td><T id="words.select-option.Disabled" /></td>
               {/if}
             </tr>
           </tbody>
