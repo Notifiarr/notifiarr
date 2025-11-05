@@ -74,9 +74,7 @@ func (s *ServiceConfig) Validate() error { //nolint:cyclop
 		s.Timeout.Duration = MinimumTimeout
 	}
 
-	if s.Interval.Duration == 0 {
-		s.Interval.Duration = DefaultCheckInterval
-	} else if s.Interval.Duration < MinimumCheckInterval {
+	if s.Interval.Duration != 0 && s.Interval.Duration < MinimumCheckInterval {
 		s.Interval.Duration = MinimumCheckInterval
 	}
 
@@ -293,5 +291,5 @@ func (s *Service) Due(now time.Time) bool {
 	s.RLock()
 	defer s.RUnlock()
 
-	return now.Sub(s.LastCheck) > s.Interval.Duration
+	return s.Interval.Duration > 0 && now.Sub(s.LastCheck) > s.Interval.Duration
 }

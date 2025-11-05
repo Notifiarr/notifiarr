@@ -48,13 +48,13 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 
 func collectLidarrApps(svcs []*Service, lidarr []apps.Lidarr) []*Service {
 	for _, app := range lidarr {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -77,13 +77,13 @@ func collectLidarrApps(svcs []*Service, lidarr []apps.Lidarr) []*Service {
 
 func collectProwlarrApps(svcs []*Service, prowlarr []apps.Prowlarr) []*Service {
 	for _, app := range prowlarr {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -106,13 +106,13 @@ func collectProwlarrApps(svcs []*Service, prowlarr []apps.Prowlarr) []*Service {
 
 func collectRadarrApps(svcs []*Service, radarr []apps.Radarr) []*Service {
 	for _, app := range radarr {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -135,13 +135,13 @@ func collectRadarrApps(svcs []*Service, radarr []apps.Radarr) []*Service {
 
 func collectReadarrApps(svcs []*Service, readarr []apps.Readarr) []*Service {
 	for _, app := range readarr {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -164,13 +164,13 @@ func collectReadarrApps(svcs []*Service, readarr []apps.Readarr) []*Service {
 
 func collectSonarrApps(svcs []*Service, sonarr []apps.Sonarr) []*Service {
 	for _, app := range sonarr {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -194,13 +194,13 @@ func collectSonarrApps(svcs []*Service, sonarr []apps.Sonarr) []*Service {
 func collectDelugeApps(svcs []*Service, deluge []apps.Deluge) []*Service {
 	// Deluge instanceapp.
 	for _, app := range deluge {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -224,13 +224,13 @@ func collectDelugeApps(svcs []*Service, deluge []apps.Deluge) []*Service {
 func collectNZBGetApps(svcs []*Service, nzbget []apps.NZBGet) []*Service {
 	// NZBGet instances.
 	for _, app := range nzbget {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() || app.Name == "" {
 			continue
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		prefix := "" // add auth to the url here. woo, hacky, but it works!
@@ -268,8 +268,8 @@ func collectQbittorrentApps(svcs []*Service, qbit []apps.Qbit) []*Service {
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -298,8 +298,8 @@ func collectRtorrentApps(svcs []*Service, rtorrent []apps.Rtorrent) []*Service {
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -328,8 +328,8 @@ func collectSabNZBApps(svcs []*Service, sabnzb []apps.SabNZB) []*Service {
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		if app.Name != "" {
@@ -358,8 +358,8 @@ func collectXmissionApps(svcs []*Service, xmission []apps.Xmission) []*Service {
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		expect := "401"
@@ -392,8 +392,8 @@ func collectTautulliApps(svcs []*Service, app apps.Tautulli) []*Service {
 	}
 
 	interval := app.Interval
-	if interval.Duration == 0 {
-		interval.Duration = DefaultCheckInterval
+	if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+		interval.Duration = MinimumCheckInterval
 	}
 
 	svcs = append(svcs, &Service{
@@ -417,8 +417,8 @@ func collectPlexApps(svcs []*Service, app *apps.Plex) []*Service {
 	}
 
 	interval := app.Interval
-	if interval.Duration == 0 {
-		interval.Duration = DefaultCheckInterval
+	if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+		interval.Duration = MinimumCheckInterval
 	}
 
 	svcs = append(svcs, &Service{
@@ -442,7 +442,7 @@ func collectMySQLApps(svcs []*Service, mysql []snapshot.MySQLConfig) []*Service 
 	}
 
 	for _, app := range mysql {
-		if app.Host == "" || app.Timeout.Duration < 0 || app.Interval.Duration < 0 {
+		if app.Host == "" || app.Timeout.Duration < 0 {
 			continue
 		}
 
@@ -451,8 +451,8 @@ func collectMySQLApps(svcs []*Service, mysql []snapshot.MySQLConfig) []*Service 
 		}
 
 		interval := app.Interval
-		if interval.Duration == 0 {
-			interval.Duration = DefaultCheckInterval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
 		}
 
 		host := strings.TrimLeft(strings.TrimRight(app.Host, ")"), "@tcp(")

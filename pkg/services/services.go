@@ -67,11 +67,6 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 		s.log = logs.CustomLog(s.LogFile, "Services")
 	}
 
-	if len(s.services) == 0 {
-		s.log.Printf("==> Service Checker Disabled! No services to check.")
-		return
-	}
-
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
@@ -108,7 +103,7 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	go s.runServiceChecker()
 
 	word := "Started"
-	if s.Disabled {
+	if s.Disabled || len(s.services) == 0 {
 		word = "Disabled"
 	}
 

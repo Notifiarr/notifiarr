@@ -133,7 +133,11 @@
                   {$_('monitoring.check.interval.short')}
                 </a>
               </th>
-              <td>{age(result.interval * 1000)}</td>
+              {#if result.interval > 0}
+                <td>{age(result.interval * 1000)}</td>
+              {:else}
+                <td>Disabled</td>
+              {/if}
             </tr>
           </tbody>
         </Table>

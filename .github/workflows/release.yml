@@ -141,6 +141,7 @@ jobs:
           name: ${{ matrix.files }}
       - name: Upload files to unstable.golift.io
         run: >-
+          set -euo pipefail;
           for file in *.{zip,dmg,gz}; do
             [ -f "$file" ] || continue;
             echo "Uploading: ${file}";
