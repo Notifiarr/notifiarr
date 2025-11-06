@@ -49,7 +49,7 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
     -X \"golift.io/version.Revision=${ITERATION}\" \
     -X \"golift.io/version.Version=${VERSION}\""
 
-FROM nvidia/cuda:13.0.1-base-ubuntu22.04
+FROM nvidia/cuda:13.0.2-base-ubuntu22.04
 
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
