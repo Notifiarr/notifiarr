@@ -18,7 +18,6 @@ import (
 const (
 	DefaultSendInterval  = 10 * time.Minute
 	MinimumSendInterval  = DefaultSendInterval / 2
-	DefaultCheckInterval = MinimumSendInterval
 	MinimumCheckInterval = 10 * time.Second
 	MinimumTimeout       = time.Second
 	DefaultTimeout       = 10 * MinimumTimeout

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Table, Popover } from '@sveltestrap/sveltestrap'
-  import { _, datetime } from '../../includes/Translate.svelte'
+  import T, { _, datetime } from '../../includes/Translate.svelte'
   import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { faRedo } from '@fortawesome/sharp-duotone-solid-svg-icons'
   import Fa from '../../includes/Fa.svelte'
@@ -125,7 +125,11 @@
           </span>
         </td>
 
-        <td>{age(result.interval * 1000)}</td>
+        {#if result.interval > 0}
+          <td>{age(result.interval * 1000)}</td>
+        {:else}
+          <td><T id="words.select-option.Disabled" /></td>
+        {/if}
         <td>{result.output?.toString() ?? ''}</td>
       </tr>
     {/each}
