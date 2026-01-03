@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -92,13 +93,7 @@ func (i ignored) isIgnored(filePath string) bool {
 		filePath = abs
 	}
 
-	for _, name := range i {
-		if filePath == name {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(i, filePath)
 }
 
 type ignored []string

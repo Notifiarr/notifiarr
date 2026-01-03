@@ -363,11 +363,11 @@ func logCounter(filename string, writer io.Writer) io.Writer {
 	counter := datacounter.NewWriterCounter(writer)
 
 	mnd.LogFiles.Set("Lines Written: "+filename, expvar.Func(
-		func() interface{} { return int64(counter.Writes()) },
+		func() any { return int64(counter.Writes()) },
 	))
 
 	mnd.LogFiles.Set("Bytes Written: "+filename, expvar.Func(
-		func() interface{} { return int64(counter.Count()) },
+		func() any { return int64(counter.Count()) },
 	))
 
 	return counter

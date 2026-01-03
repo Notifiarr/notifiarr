@@ -20,7 +20,7 @@ func HasGUI() bool {
 	return hasGUI
 }
 
-func Toast(_ context.Context, msg string, v ...interface{}) error {
+func Toast(_ context.Context, msg string, v ...any) error {
 	if !hasGUI {
 		return nil
 	}

@@ -1,4 +1,4 @@
-// package commands provides the interfaces and structures to trigger and run shell commands.
+// Package commands provides the interfaces and structures to trigger and run shell commands.
 package commands
 
 import (
@@ -37,7 +37,7 @@ func (c *Command) Setup() {
 
 	if len(c.Hash) != hashLen {
 		hash := sha256.New()
-		hash.Write([]byte(fmt.Sprint(time.Now(), c.Name, c.Command, c.Timeout)))
+		hash.Write(fmt.Append(nil, time.Now(), c.Name, c.Command, c.Timeout))
 		c.Hash = hex.EncodeToString(hash.Sum(nil))
 	}
 
@@ -143,11 +143,11 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, elapse
 	c.output = oStr
 	c.lastArg = input.Args
 
-	extra := ""
+	var extra strings.Builder
 	if len(c.lastArg) > 0 {
-		extra = ", args:"
+		extra.WriteString(", args:")
 		for idx, arg := range c.lastArg {
-			extra += fmt.Sprintf(" %d: %q", idx+1, arg)
+			extra.WriteString(fmt.Sprintf(" %d: %q", idx+1, arg))
 		}
 	}
 

@@ -10,7 +10,7 @@ import (
 	"golift.io/cnfg"
 )
 
-// This name is hard coded as the service name for Plex.
+// PlexServerName is hard coded as the service name for Plex.
 const PlexServerName = "Plex Server"
 
 const (

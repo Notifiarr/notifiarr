@@ -1,4 +1,4 @@
-// Pcakage triggers provides a simple interface to setup all sub-module triggers.
+// Package triggers provides a simple interface to setup all sub-module triggers.
 // Adding a new trigger here should be two new lines of code and a new import.
 package triggers
 

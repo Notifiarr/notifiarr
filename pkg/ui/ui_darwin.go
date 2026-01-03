@@ -21,7 +21,7 @@ func HasGUI() bool {
 	return hasGUI
 }
 
-func Toast(ctx context.Context, msg string, vars ...interface{}) error {
+func Toast(ctx context.Context, msg string, vars ...any) error {
 	if !hasGUI {
 		return nil
 	}

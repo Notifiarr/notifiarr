@@ -20,7 +20,7 @@ import (
 // APIHandler is our custom handler function for APIs.
 // The powers the middleware procedure that stores the app interface in a request context.
 // And the procedures to save and fetch an app interface into/from a request content.
-type APIHandler func(r *http.Request) (int, interface{})
+type APIHandler func(r *http.Request) (int, any)
 
 // HandleAPIpath makes adding APIKey authenticated API paths a little cleaner.
 // An empty App may be passed in, but URI, API and at least one method are required.
@@ -45,7 +45,7 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop
 	return func(resp http.ResponseWriter, r *http.Request) { //nolint:varnamelen
 		var (
-			msg     interface{}
+			msg     any
 			ctx     = r.Context()
 			code    = http.StatusUnprocessableEntity
 			aID, _  = strconv.Atoi(mux.Vars(r)["id"])
@@ -130,11 +130,11 @@ type ApiResponse struct {
 	// The status always matches the HTTP response.
 	Status string `json:"status"`
 	// This message contains the request-specific response payload.
-	Msg interface{} `json:"message"`
+	Msg any `json:"message"`
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs. Returns size of data sent.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg interface{}) int64 { //nolint:varnamelen
+func (a *Apps) Respond(w http.ResponseWriter, stat int, msg any) int64 { //nolint:varnamelen
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||

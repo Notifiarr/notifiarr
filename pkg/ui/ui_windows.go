@@ -24,7 +24,7 @@ func HasGUI() bool {
 	return true
 }
 
-func Toast(_ context.Context, msg string, v ...interface{}) error {
+func Toast(_ context.Context, msg string, v ...any) error {
 	err := zenity.Notify(fmt.Sprintf(msg, v...), zenity.Title(mnd.Title), zenity.Icon(GetPNG()))
 	if err != nil {
 		return fmt.Errorf("ui element failed: %w", err)

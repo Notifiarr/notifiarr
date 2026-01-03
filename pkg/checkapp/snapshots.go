@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 )
@@ -25,11 +26,12 @@ func MySQL(ctx context.Context, config snapshot.MySQLConfig) (string, int) {
 	errs := snaptest.GetMySQL(ctx, []snapshot.MySQLConfig{config}, 1)
 	if len(errs) > 0 {
 		msg := fmt.Sprintf("%d errors encountered: ", len(errs))
+		var msgSb28 strings.Builder
 		for _, err := range errs {
-			msg += err.Error()
+			msgSb28.WriteString(err.Error())
 		}
 
-		return msg, http.StatusBadGateway
+		return msg + msgSb28.String(), http.StatusBadGateway
 	}
 
 	return "Connection Successful! Processes: " +
@@ -63,13 +65,15 @@ func Nvidia(ctx context.Context, config snapshot.NvidiaConfig) (string, int) {
 		msg += "s:"
 	}
 
+	var msgSb66 strings.Builder
 	for idx, adapter := range snaptest.Nvidia {
 		if idx != 0 {
-			msg += ", "
+			msgSb66.WriteString(", ")
 		}
 
-		msg += adapter.BusID
+		msgSb66.WriteString(adapter.BusID)
 	}
+	msg += msgSb66.String()
 
 	return msg, http.StatusOK
 }

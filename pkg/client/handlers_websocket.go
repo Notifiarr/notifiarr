@@ -23,9 +23,9 @@ var upgrader = websocket.Upgrader{
 
 // Websockets cannot use our apachelog package, so we have to produce our own log line for those reqs.
 func (c *Client) socketLog(code int, r *http.Request) {
-	_, _ = logs.Log.HTTPLog.Writer().Write([]byte(fmt.Sprintf(`%s - - [%s] "%s %s %s" %d 0 "%s" "%s"`+"\n",
+	_, _ = logs.Log.HTTPLog.Writer().Write(fmt.Appendf(nil, `%s - - [%s] "%s %s %s" %d 0 "%s" "%s"`+"\n",
 		r.Header.Get("X-Forwarded-For"), time.Now().Format("02/Jan/2006:15:04:05 -0700"),
-		r.Method, r.RequestURI, r.Proto, code, r.Header.Get("Referer"), r.Header.Get("User-Agent"))))
+		r.Method, r.RequestURI, r.Proto, code, r.Header.Get("Referer"), r.Header.Get("User-Agent")))
 }
 
 // handleWebSockets establishes a WebSocket connection for real-time log file streaming.

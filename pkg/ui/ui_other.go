@@ -25,7 +25,7 @@ func HasGUI() bool {
 }
 
 // Toast does not do anything on this OS.
-func Toast(_ context.Context, _ string, _ ...interface{}) error {
+func Toast(_ context.Context, _ string, _ ...any) error {
 	return nil
 }
 

@@ -57,7 +57,7 @@ func New(config *common.Config) *Action {
 	return &Action{cmd: &cmd{Config: config}}
 }
 
-// Run initializes the library.
+// Create initializes the library.
 func (a *Action) Create() {
 	lidarr := a.cmd.setupLidarr()
 	radarr := a.cmd.setupRadarr()
@@ -89,9 +89,9 @@ func (a *Action) Create() {
 
 // listItem is data formatted for sending a json payload to the website.
 type listItem struct {
-	Name  string      `json:"name"`
-	Queue interface{} `json:"queue"`
-	Total int         `json:"total"`
+	Name  string `json:"name"`
+	Queue any    `json:"queue"`
+	Total int    `json:"total"`
 }
 
 // itemList stores an instance->queue map.

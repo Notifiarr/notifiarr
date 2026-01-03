@@ -63,7 +63,7 @@ type Info struct {
 	Rows   int       `json:"rows,omitempty"`
 	Size   int64     `json:"bytes,omitempty"`
 	Tables int64     `json:"tables,omitempty"`
-	Date   time.Time `json:"date,omitempty"`
+	Date   time.Time `json:"date"`
 }
 
 // genericInstance is used to abstract all starr apps to reusable methods.

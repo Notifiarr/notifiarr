@@ -119,7 +119,7 @@ func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
 // @Failure		404	{object}	string									"bad token or api key"
 // @Router			/lidarr/{instance}/add [post]
 // @Security		ApiKeyAuth
-func lidarrAddAlbum(req *http.Request) (int, interface{}) {
+func lidarrAddAlbum(req *http.Request) (int, any) {
 	var payload lidarr.AddAlbumInput
 
 	err := json.NewDecoder(req.Body).Decode(&payload)
@@ -156,7 +156,7 @@ func lidarrAddAlbum(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/lidarr/{instance}/artist/{artistID} [get]
 // @Security		ApiKeyAuth
-func lidarrGetArtist(req *http.Request) (int, interface{}) {
+func lidarrGetArtist(req *http.Request) (int, any) {
 	artistID, _ := strconv.ParseInt(mux.Vars(req)["artistid"], mnd.Base10, mnd.Bits64)
 
 	artist, err := getLidarr(req).GetArtistByIDContext(req.Context(), artistID)
@@ -167,13 +167,13 @@ func lidarrGetArtist(req *http.Request) (int, interface{}) {
 	return http.StatusOK, artist
 }
 
-func lidarrData(album *lidarr.Album) map[string]interface{} {
+func lidarrData(album *lidarr.Album) map[string]any {
 	hasFile := false
 	if album.Statistics != nil {
 		hasFile = album.Statistics.SizeOnDisk > 0
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"id":        album.ID,
 		"hasFile":   hasFile,
 		"monitored": album.Monitored,
@@ -193,7 +193,7 @@ func lidarrData(album *lidarr.Album) map[string]interface{} {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/check/{mbid} [get]
 // @Security		ApiKeyAuth
-func lidarrCheckAlbum(req *http.Request) (int, interface{}) {
+func lidarrCheckAlbum(req *http.Request) (int, any) {
 	id := mux.Vars(req)["mbid"]
 
 	m, err := getLidarr(req).GetAlbumContext(req.Context(), id)
@@ -217,7 +217,7 @@ func lidarrCheckAlbum(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/lidarr/{instance}/get/{albumID} [get]
 // @Security		ApiKeyAuth
-func lidarrGetAlbum(req *http.Request) (int, interface{}) {
+func lidarrGetAlbum(req *http.Request) (int, any) {
 	albumID, _ := strconv.ParseInt(mux.Vars(req)["albumid"], mnd.Base10, mnd.Bits64)
 
 	album, err := getLidarr(req).GetAlbumByIDContext(req.Context(), albumID)
@@ -239,7 +239,7 @@ func lidarrGetAlbum(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/command/search/{albumID} [get]
 // @Security		ApiKeyAuth
-func lidarrTriggerSearchAlbum(req *http.Request) (int, interface{}) {
+func lidarrTriggerSearchAlbum(req *http.Request) (int, any) {
 	albumID, _ := strconv.ParseInt(mux.Vars(req)["albumid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getLidarr(req).SendCommandContext(req.Context(), &lidarr.CommandRequest{
@@ -263,7 +263,7 @@ func lidarrTriggerSearchAlbum(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/lidarr/{instance}/metadataProfiles [get]
 // @Security		ApiKeyAuth
-func lidarrMetadata(req *http.Request) (int, interface{}) {
+func lidarrMetadata(req *http.Request) (int, any) {
 	profiles, err := getLidarr(req).GetMetadataProfilesContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting profiles", err)
@@ -288,7 +288,7 @@ func lidarrMetadata(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/lidarr/{instance}/naming [get]
 // @Security		ApiKeyAuth
-func lidarrGetNaming(req *http.Request) (int, interface{}) {
+func lidarrGetNaming(req *http.Request) (int, any) {
 	naming, err := getLidarr(req).GetNamingContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting naming", err)
@@ -309,7 +309,7 @@ func lidarrGetNaming(req *http.Request) (int, interface{}) {
 // @Failure		404	{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/naming [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateNaming(req *http.Request) (int, interface{}) {
+func lidarrUpdateNaming(req *http.Request) (int, any) {
 	var naming lidarr.Naming
 
 	err := json.NewDecoder(req.Body).Decode(&naming)
@@ -338,7 +338,7 @@ func lidarrUpdateNaming(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/lidarr/{instance}/customformats [post]
 // @Security		ApiKeyAuth
-func lidarrAddCustomFormat(req *http.Request) (int, interface{}) {
+func lidarrAddCustomFormat(req *http.Request) (int, any) {
 	var cusform lidarr.CustomFormatInput
 
 	err := json.NewDecoder(req.Body).Decode(&cusform)
@@ -364,7 +364,7 @@ func lidarrAddCustomFormat(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/lidarr/{instance}/customformats [get]
 // @Security		ApiKeyAuth
-func lidarrGetCustomFormats(req *http.Request) (int, interface{}) {
+func lidarrGetCustomFormats(req *http.Request) (int, any) {
 	cusform, err := getLidarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting custom formats", err)
@@ -386,7 +386,7 @@ func lidarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/lidarr/{instance}/customformats/{formatID} [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
+func lidarrUpdateCustomFormat(req *http.Request) (int, any) {
 	var cusform lidarr.CustomFormatInput
 	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
@@ -411,7 +411,7 @@ func lidarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/customformats/{formatID} [delete]
 // @Security		ApiKeyAuth
-func lidarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
+func lidarrDeleteCustomFormat(req *http.Request) (int, any) {
 	cfID, _ := strconv.ParseInt(mux.Vars(req)["cfid"], mnd.Base10, mnd.Bits64)
 
 	err := getLidarr(req).DeleteCustomFormatContext(req.Context(), cfID)
@@ -432,7 +432,7 @@ func lidarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string											"bad token or api key"
 // @Router			/lidarr/{instance}/customformats/all [delete]
 // @Security		ApiKeyAuth
-func lidarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
+func lidarrDeleteAllCustomFormats(req *http.Request) (int, any) {
 	formats, err := getLidarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting custom formats", err)
@@ -473,7 +473,7 @@ func lidarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/lidarr/{instance}/qualitydefinition [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
+func lidarrUpdateQualityDefinition(req *http.Request) (int, any) {
 	var input []*lidarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
@@ -497,7 +497,7 @@ func lidarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/lidarr/{instance}/qualityDefinitions [get]
 // @Security		ApiKeyAuth
-func lidarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
+func lidarrGetQualityDefinitions(req *http.Request) (int, any) {
 	// Get the profiles from lidarr.
 	definitions, err := getLidarr(req).GetQualityDefinitionsContext(req.Context())
 	if err != nil {
@@ -523,7 +523,7 @@ func lidarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/lidarr/{instance}/qualityProfiles [get]
 // @Security		ApiKeyAuth
-func lidarrQualityProfiles(req *http.Request) (int, interface{}) {
+func lidarrQualityProfiles(req *http.Request) (int, any) {
 	// Get the profiles from lidarr.
 	profiles, err := getLidarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -549,7 +549,7 @@ func lidarrQualityProfiles(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/lidarr/{instance}/qualityProfile [get]
 // @Security		ApiKeyAuth
-func lidarrGetQualityProfile(req *http.Request) (int, interface{}) {
+func lidarrGetQualityProfile(req *http.Request) (int, any) {
 	// Get the profiles from lidarr.
 	profiles, err := getLidarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -572,7 +572,7 @@ func lidarrGetQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/qualityProfile [post]
 // @Security		ApiKeyAuth
-func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
+func lidarrAddQualityProfile(req *http.Request) (int, any) {
 	var profile lidarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
@@ -605,7 +605,7 @@ func lidarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/qualityProfile/{profileID} [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
+func lidarrUpdateQualityProfile(req *http.Request) (int, any) {
 	var profile lidarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
@@ -638,7 +638,7 @@ func lidarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/lidarr/{instance}/rootFolder [get]
 // @Security		ApiKeyAuth
-func lidarrRootFolders(req *http.Request) (int, interface{}) {
+func lidarrRootFolders(req *http.Request) (int, any) {
 	// Get folder list from Lidarr.
 	folders, err := getLidarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
@@ -665,7 +665,7 @@ func lidarrRootFolders(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string															"bad token or api key"
 // @Router			/lidarr/{instance}/search/{query} [get]
 // @Security		ApiKeyAuth
-func lidarrSearchAlbum(req *http.Request) (int, interface{}) {
+func lidarrSearchAlbum(req *http.Request) (int, any) {
 	albums, err := getLidarr(req).GetAlbumContext(req.Context(), "")
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting albums", err)
@@ -739,7 +739,7 @@ func albumSearch(query, title string, releases []*lidarr.Release) bool {
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/lidarr/{instance}/tag [get]
 // @Security		ApiKeyAuth
-func lidarrGetTags(req *http.Request) (int, interface{}) {
+func lidarrGetTags(req *http.Request) (int, any) {
 	tags, err := getLidarr(req).GetTagsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting tags", err)
@@ -760,7 +760,7 @@ func lidarrGetTags(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/tag/{tagID}/{label} [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateTag(req *http.Request) (int, interface{}) {
+func lidarrUpdateTag(req *http.Request) (int, any) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
 	tag, err := getLidarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
@@ -782,7 +782,7 @@ func lidarrUpdateTag(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/tag/{label} [put]
 // @Security		ApiKeyAuth
-func lidarrSetTag(req *http.Request) (int, interface{}) {
+func lidarrSetTag(req *http.Request) (int, any) {
 	tag, err := getLidarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "setting tag", err)
@@ -805,7 +805,7 @@ func lidarrSetTag(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/update [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
+func lidarrUpdateAlbum(req *http.Request) (int, any) {
 	var album lidarr.Album
 
 	err := json.NewDecoder(req.Body).Decode(&album)
@@ -836,7 +836,7 @@ func lidarrUpdateAlbum(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/updateartist [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
+func lidarrUpdateArtist(req *http.Request) (int, any) {
 	var artist lidarr.Artist
 
 	err := json.NewDecoder(req.Body).Decode(&artist)
@@ -862,7 +862,7 @@ func lidarrUpdateArtist(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/lidarr/{instance}/notifications [get]
 // @Security		ApiKeyAuth
-func lidarrGetNotifications(req *http.Request) (int, interface{}) {
+func lidarrGetNotifications(req *http.Request) (int, any) {
 	notifs, err := getLidarr(req).GetNotificationsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting notifications", err)
@@ -895,7 +895,7 @@ func lidarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Failure		423					{object}	string								"rate limit reached"
 // @Router			/lidarr/{instance}/queue/{queueID} [delete]
 // @Security		ApiKeyAuth
-func lidarrDeleteQueue(req *http.Request) (int, interface{}) {
+func lidarrDeleteQueue(req *http.Request) (int, any) {
 	idString := mux.Vars(req)["queueID"]
 	queueID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True
@@ -927,7 +927,7 @@ func lidarrDeleteQueue(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/notification [put]
 // @Security		ApiKeyAuth
-func lidarrUpdateNotification(req *http.Request) (int, interface{}) {
+func lidarrUpdateNotification(req *http.Request) (int, any) {
 	var notif lidarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
@@ -956,7 +956,7 @@ func lidarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/lidarr/{instance}/notification [post]
 // @Security		ApiKeyAuth
-func lidarrAddNotification(req *http.Request) (int, interface{}) {
+func lidarrAddNotification(req *http.Request) (int, any) {
 	var notif lidarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)

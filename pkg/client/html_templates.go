@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"maps"
 	"net"
 	"os"
 	"strings"
@@ -183,13 +184,9 @@ func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 	zfspools, _ := snapshot.GetZFSPoolData(ctx, c.Config.Snapshot.ZFSPools)
 	output := make(map[string]*snapshot.Partition)
 
-	for k, v := range disks {
-		output[k] = v
-	}
+	maps.Copy(output, disks)
 
-	for k, v := range zfspools {
-		output[k] = v
-	}
+	maps.Copy(output, zfspools)
 
 	return output
 }

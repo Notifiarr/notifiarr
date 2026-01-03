@@ -58,12 +58,12 @@ func New(config *common.Config, plex *apps.Plex) *Action {
 	}
 }
 
-// SendPlexSessions sends plex sessions in a go routine through a channel.
+// Send sends plex sessions in a go routine through a channel.
 func (a *Action) Send(event website.EventType) {
 	a.cmd.Exec(&common.ActionInput{Type: event}, TrigPlexSessions)
 }
 
-// Run initializes the library.
+// Create initializes the library.
 func (a *Action) Create() {
 	a.cmd.run()
 }

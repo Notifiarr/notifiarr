@@ -187,7 +187,7 @@ func (s *Server) GetPlexSectionKey(keyPath string) (*MediaSection, error) {
 	return s.GetPlexSectionKeyWithContext(context.Background(), keyPath)
 }
 
-// GetPlexSectionKey gets a section key from Plex based on a key path.
+// GetPlexSectionKeyWithContext gets a section key from Plex based on a key path.
 func (s *Server) GetPlexSectionKeyWithContext(ctx context.Context, keyPath string) (*MediaSection, error) {
 	url := s.Config.URL + keyPath
 
@@ -232,7 +232,7 @@ func (s *Server) GetDirectoryWithContext(ctx context.Context) (*SectionDirectory
 	return output.MediaContainer, nil
 }
 
-// GetDirectoryWithContext returns data about all the library sections.
+// GetDirectoryTrashSizeWithContext returns data about all the library sections.
 func (s *Server) GetDirectoryTrashSizeWithContext(ctx context.Context, key string) (int, error) {
 	uri := s.Config.URL + path.Join("/library", "sections", key, "all")
 	params := make(url.Values)

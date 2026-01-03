@@ -23,15 +23,15 @@ var (
 )
 
 type AllData struct {
-	LogFiles      map[string]interface{}            `json:"logFiles"`
-	APIHits       map[string]interface{}            `json:"apiHits"`
-	HTTPRequests  map[string]interface{}            `json:"httpRequests"`
-	TimerEvents   map[string]map[string]interface{} `json:"timerEvents"`
-	TimerCounts   map[string]interface{}            `json:"timerCounts"`
-	Website       map[string]interface{}            `json:"website"`
-	ServiceChecks map[string]map[string]interface{} `json:"serviceChecks"`
-	Apps          map[string]map[string]interface{} `json:"apps"`
-	FileWatcher   map[string]interface{}            `json:"fileWatcher"`
+	LogFiles      map[string]any            `json:"logFiles"`
+	APIHits       map[string]any            `json:"apiHits"`
+	HTTPRequests  map[string]any            `json:"httpRequests"`
+	TimerEvents   map[string]map[string]any `json:"timerEvents"`
+	TimerCounts   map[string]any            `json:"timerCounts"`
+	Website       map[string]any            `json:"website"`
+	ServiceChecks map[string]map[string]any `json:"serviceChecks"`
+	Apps          map[string]map[string]any `json:"apps"`
+	FileWatcher   map[string]any            `json:"fileWatcher"`
 }
 
 func GetAllData() AllData {
@@ -60,8 +60,8 @@ func GetMap(name string) *expvar.Map {
 	return newMap
 }
 
-func GetKeys(mapName *expvar.Map) map[string]interface{} {
-	output := make(map[string]interface{})
+func GetKeys(mapName *expvar.Map) map[string]any {
+	output := make(map[string]any)
 
 	mapName.Do(func(keyval expvar.KeyValue) {
 		switch v := keyval.Value.(type) {
@@ -78,8 +78,8 @@ func GetKeys(mapName *expvar.Map) map[string]interface{} {
 }
 
 //nolint:mnd
-func GetSplitKeys(mapName *expvar.Map) map[string]map[string]interface{} {
-	output := make(map[string]map[string]interface{})
+func GetSplitKeys(mapName *expvar.Map) map[string]map[string]any {
+	output := make(map[string]map[string]any)
 
 	mapName.Do(func(keyval expvar.KeyValue) {
 		keys := strings.SplitN(keyval.Key, "&&", 2)
@@ -88,7 +88,7 @@ func GetSplitKeys(mapName *expvar.Map) map[string]map[string]interface{} {
 		}
 
 		if output[keys[0]] == nil {
-			output[keys[0]] = make(map[string]interface{})
+			output[keys[0]] = make(map[string]any)
 		}
 
 		switch v := keyval.Value.(type) {

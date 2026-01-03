@@ -42,7 +42,7 @@ func main() {
 		Docs: docs,
 		Overrides: goty.Overrides{
 			cnfg.Duration{}:                 {Type: "string"},
-			reflect.TypeOf(time.Weekday(0)): {Comment: "The day of the week."},
+			reflect.TypeFor[time.Weekday](): {Comment: "The day of the week."},
 		},
 	})
 

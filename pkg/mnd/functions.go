@@ -15,7 +15,7 @@ import (
 
 // FormatBytes converts a byte counter into a pretty UI string.
 // The input val must be int, int64, uint64 or float64.
-func FormatBytes(size interface{}) string { //nolint:cyclop
+func FormatBytes(size any) string { //nolint:cyclop
 	var val float64
 
 	switch valtype := size.(type) {

@@ -70,7 +70,7 @@ func (a *AppsConfig) setupProwlarr() ([]Prowlarr, error) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/prowlarr/{instance}/notifications [get]
 // @Security		ApiKeyAuth
-func prowlarrGetNotifications(req *http.Request) (int, interface{}) {
+func prowlarrGetNotifications(req *http.Request) (int, any) {
 	notifs, err := getProwlarr(req).GetNotificationsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting notifications", err)
@@ -100,7 +100,7 @@ func prowlarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/prowlarr/{instance}/notification [put]
 // @Security		ApiKeyAuth
-func prowlarrUpdateNotification(req *http.Request) (int, interface{}) {
+func prowlarrUpdateNotification(req *http.Request) (int, any) {
 	var notif prowlarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
@@ -129,7 +129,7 @@ func prowlarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/prowlarr/{instance}/notification [post]
 // @Security		ApiKeyAuth
-func prowlarrAddNotification(req *http.Request) (int, interface{}) {
+func prowlarrAddNotification(req *http.Request) (int, any) {
 	var notif prowlarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
