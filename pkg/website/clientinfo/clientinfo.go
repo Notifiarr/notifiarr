@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"slices"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -136,13 +137,7 @@ type IntList []int
 
 // Has returns true if the list has an instance ID.
 func (l IntList) Has(instance int) bool {
-	for _, i := range l {
-		if instance == i {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(l, instance)
 }
 
 // String returns the message text for a client info response.

@@ -40,8 +40,7 @@ func (s *ServiceConfig) checkProcValues() error {
 func (s *ServiceConfig) fillExpect() error {
 	s.proc = &procExpect{}
 
-	splitStr := strings.Split(s.Expect, ",")
-	for _, str := range splitStr {
+	for str := range strings.SplitSeq(s.Expect, ",") {
 		switch {
 		case strings.HasPrefix(str, "count:"): // "count:min:max" .. ie.  "count:1:3"
 			if err := s.fillExpectCounts(str); err != nil {

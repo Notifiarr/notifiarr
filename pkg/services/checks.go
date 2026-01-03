@@ -47,7 +47,7 @@ func (s *ServiceConfig) Validate() error { //nolint:cyclop
 			s.Expect = "200"
 		}
 
-		for _, code := range strings.Split(s.Expect, expectdelim) {
+		for code := range strings.SplitSeq(s.Expect, expectdelim) {
 			if strings.EqualFold(code, sslstring) {
 				s.validSSL = true
 			}
@@ -220,7 +220,7 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 		return res
 	}
 
-	for _, code := range strings.Split(s.Expect, expectdelim) {
+	for code := range strings.SplitSeq(s.Expect, expectdelim) {
 		if strconv.Itoa(resp.StatusCode) == strings.TrimSpace(code) {
 			res.state = StateOK
 			res.output = &Output{str: resp.Status}

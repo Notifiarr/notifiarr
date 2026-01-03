@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"os"
 	"path"
@@ -230,9 +231,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 
 	go func() {
 		for data := range inCh {
-			for k, v := range data {
-				list[k] = v
-			}
+			maps.Copy(list, data)
 
 			wait.Done()
 		}

@@ -32,7 +32,7 @@ func New(config Config, client *http.Client) *Tautulli {
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func (t *Tautulli) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
+func (t *Tautulli) GetURLInto(ctx context.Context, params url.Values, into any) error {
 	err := func() error {
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, t.URL+"/api/v2", nil)
 		if err != nil {

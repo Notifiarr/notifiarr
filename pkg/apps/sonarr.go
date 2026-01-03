@@ -887,14 +887,6 @@ const (
 	exactScore  = 100
 )
 
-func max(i, j int) int {
-	if i > j {
-		return i
-	}
-
-	return j
-}
-
 func matcher(query, title string) int {
 	trimmedQuery := wuzzy.Cleanse(query, false)
 	trimmedTitle := wuzzy.Cleanse(title, false)

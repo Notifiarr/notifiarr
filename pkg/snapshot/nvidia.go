@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"reflect"
 	"runtime"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -37,10 +38,8 @@ type NvidiaOutput struct {
 
 // HasID returns true if the ID is requested, or no IDs are filtered.
 func (n *NvidiaConfig) HasID(busID string) bool {
-	for _, id := range n.BusIDs {
-		if id == busID {
-			return true
-		}
+	if slices.Contains(n.BusIDs, busID) {
+		return true
 	}
 
 	return len(n.BusIDs) == 0 || n.BusIDs[0] == ""
@@ -99,7 +98,7 @@ func (s *Snapshot) scanNvidiaSMIOutput(scanner *bufio.Scanner, config *NvidiaCon
 	// NVIDIA GeForce GTX 1660 Ti, 550.163.01, P8, 90.16.29.00.2E, 00000000:27:00.0, 34, 0 %, 6144 MiB, 5926 MiB
 	for scanner.Scan() {
 		item := strings.Split(scanner.Text(), ", ")
-		if len(item) != reflect.TypeOf(NvidiaOutput{}).NumField() || !config.HasID(item[4]) {
+		if len(item) != reflect.TypeFor[NvidiaOutput]().NumField() || !config.HasID(item[4]) {
 			continue // line has wrong item count, or ID not in list of allowed Bus IDs.
 		}
 

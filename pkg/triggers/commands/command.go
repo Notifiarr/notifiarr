@@ -37,7 +37,7 @@ func (c *Command) Setup() {
 
 	if len(c.Hash) != hashLen {
 		hash := sha256.New()
-		hash.Write([]byte(fmt.Sprint(time.Now(), c.Name, c.Command, c.Timeout)))
+		hash.Write(fmt.Append(nil, time.Now(), c.Name, c.Command, c.Timeout))
 		c.Hash = hex.EncodeToString(hash.Sum(nil))
 	}
 

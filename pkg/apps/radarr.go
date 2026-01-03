@@ -766,7 +766,7 @@ func radarrDelExclusions(req *http.Request) (int, any) {
 	ids := mux.Vars(req)["eid"]
 	exclusions := []int64{}
 
-	for _, s := range strings.Split(ids, ",") {
+	for s := range strings.SplitSeq(ids, ",") {
 		if i, err := strconv.ParseInt(s, mnd.Base10, mnd.Bits64); err == nil {
 			exclusions = append(exclusions, i)
 		}
