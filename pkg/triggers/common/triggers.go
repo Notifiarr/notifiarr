@@ -69,7 +69,7 @@ func (c *Config) ReloadApp(reason string) {
 	c.reloadCh <- &update.Signal{Text: reason}
 }
 
-// SetReloadCh is used to set the stop channel for triggers.
+// SetStopCh is used to set the stop channel for triggers.
 // This is an exported method because the channel is not always
 // available when triggers are initialized.
 func (c *Config) SetStopCh(stopCh chan os.Signal) {

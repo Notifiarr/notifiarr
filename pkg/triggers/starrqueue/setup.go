@@ -57,7 +57,7 @@ func New(config *common.Config) *Action {
 	return &Action{cmd: &cmd{Config: config}}
 }
 
-// Run initializes the library.
+// Create initializes the library.
 func (a *Action) Create() {
 	lidarr := a.cmd.setupLidarr()
 	radarr := a.cmd.setupRadarr()

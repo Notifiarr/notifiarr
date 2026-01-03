@@ -92,7 +92,8 @@ func (c *Client) displayConfig() string { //nolint: funlen,cyclop
 
 	if count := len(c.Config.Readarr); count == 1 {
 		out.WriteString(fmt.Sprintf("\n- Readarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
-			c.Config.Readarr[0].URL, c.Config.Readarr[0].APIKey != "", c.Config.Readarr[0].Timeout, c.Config.Readarr[0].ValidSSL))
+			c.Config.Readarr[0].URL, c.Config.Readarr[0].APIKey != "", c.Config.Readarr[0].Timeout,
+			c.Config.Readarr[0].ValidSSL))
 	} else {
 		for _, f := range c.Config.Readarr {
 			out.WriteString(fmt.Sprintf("\n- Readarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",

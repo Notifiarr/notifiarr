@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// The logger is created here to avoid an import cycle between website and logs.
+// Log is created here to avoid an import cycle between website and logs.
 var Log Logger
 
 // Logger is an interface for our logs package. We use this to avoid an import cycle.

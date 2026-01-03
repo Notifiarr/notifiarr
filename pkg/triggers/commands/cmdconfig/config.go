@@ -1,4 +1,4 @@
-// cmdconfig contains the input config for commands.
+// Package cmdconfig contains the input config for commands.
 // This is in its own package to avoid an import cycle with the clientinfo package.
 package cmdconfig
 

@@ -1,4 +1,4 @@
-// package commands provides the interfaces and structures to trigger and run shell commands.
+// Package commands provides the interfaces and structures to trigger and run shell commands.
 package commands
 
 import (

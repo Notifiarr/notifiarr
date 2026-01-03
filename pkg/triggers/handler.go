@@ -64,6 +64,7 @@ type triggerOutput struct {
 	Timers []*timer `json:"timers"`
 }
 
+// HandleGetTriggers handles the GET request to get the list of triggers and website timers.
 // @Description	Returns a list of triggers and website timers with their intervals, if configured.
 // @Summary		Get trigger list
 // @Tags			Triggers

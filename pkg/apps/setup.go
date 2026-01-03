@@ -19,7 +19,7 @@ import (
 	"golift.io/starr"
 )
 
-// Apps is the input configuration to relay requests to Starr apps.
+// AppsConfig is the input configuration to relay requests to Starr apps.
 //
 //nolint:lll
 type AppsConfig struct {
@@ -35,7 +35,7 @@ type AppsConfig struct {
 	SabNZB       []SabNZBConfig   `json:"sabnzbd,omitempty"      toml:"sabnzbd"      xml:"sabnzbd"      yaml:"sabnzbd,omitempty"`
 	NZBGet       []NZBGetConfig   `json:"nzbget,omitempty"       toml:"nzbget"       xml:"nzbget"       yaml:"nzbget,omitempty"`
 	Transmission []XmissionConfig `json:"transmission,omitempty" toml:"transmission" xml:"transmission" yaml:"transmission,omitempty"`
-	Tautulli     TautulliConfig   `json:"tautulli,omitempty"     toml:"tautulli"     xml:"tautulli"     yaml:"tautulli,omitempty"`
+	Tautulli     TautulliConfig   `json:"tautulli"               toml:"tautulli"     xml:"tautulli"     yaml:"tautulli"`
 	Plex         PlexConfig       `json:"plex"                   toml:"plex"         xml:"plex"         yaml:"plex"`
 }
 

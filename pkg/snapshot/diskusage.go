@@ -147,7 +147,7 @@ func (s *Snapshot) getZFSPoolData(ctx context.Context, pools []string) error {
 	return nil
 }
 
-// Does not work on windows at all. Linux and Solaris only.
+// GetZFSPoolData does not work on windows at all. Linux and Solaris only.
 func GetZFSPoolData(ctx context.Context, pools []string) (map[string]*Partition, error) {
 	output := make(map[string]*Partition)
 
