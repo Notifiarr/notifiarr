@@ -143,11 +143,11 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, elapse
 	c.output = oStr
 	c.lastArg = input.Args
 
-	extra := ""
+	var extra strings.Builder
 	if len(c.lastArg) > 0 {
-		extra = ", args:"
+		extra.WriteString(", args:")
 		for idx, arg := range c.lastArg {
-			extra += fmt.Sprintf(" %d: %q", idx+1, arg)
+			extra.WriteString(fmt.Sprintf(" %d: %q", idx+1, arg))
 		}
 	}
 

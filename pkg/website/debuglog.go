@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 func (s *server) debughttplog(resp *http.Response, url string, start time.Time, data string, body io.Reader) {
-	headers := ""
+	var headers strings.Builder
 	status := "0"
 
 	if resp != nil {
@@ -19,7 +20,7 @@ func (s *server) debughttplog(resp *http.Response, url string, start time.Time, 
 
 		for k, vs := range resp.Header {
 			for _, v := range vs {
-				headers += k + ": " + v + "\n"
+				headers.WriteString(k + ": " + v + "\n")
 			}
 		}
 	}

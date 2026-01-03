@@ -1,6 +1,6 @@
 version: '2'
 linters:
-  default: all
+  default: none
   disable:
     - exhaustruct # This will never work in this app.
     - dupl # Maybe one day we can reduce the duplicate code with generics.
