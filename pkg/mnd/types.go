@@ -9,13 +9,13 @@ var Log Logger
 
 // Logger is an interface for our logs package. We use this to avoid an import cycle.
 type Logger interface {
-	Print(v ...interface{})
-	Printf(msg string, v ...interface{})
-	Error(v ...interface{})
-	Errorf(msg string, v ...interface{})
-	ErrorfNoShare(msg string, v ...interface{})
-	Debug(v ...interface{})
-	Debugf(msg string, v ...interface{})
+	Print(v ...any)
+	Printf(msg string, v ...any)
+	Error(v ...any)
+	Errorf(msg string, v ...any)
+	ErrorfNoShare(msg string, v ...any)
+	Debug(v ...any)
+	Debugf(msg string, v ...any)
 	DebugEnabled() bool
 	CapturePanic()
 }

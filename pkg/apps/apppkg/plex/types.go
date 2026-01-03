@@ -85,9 +85,9 @@ type User struct {
 
 // Rating is part of Plex metadata.
 type Rating struct {
-	Image string      `json:"image"`
-	Value interface{} `json:"value"`
-	Type  string      `json:"type"`
+	Image string `json:"image"`
+	Value any    `json:"value"`
+	Type  string `json:"type"`
 }
 
 // Player is part of a Plex Session.

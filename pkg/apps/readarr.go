@@ -103,7 +103,7 @@ func (a *AppsConfig) setupReadarr() ([]Readarr, error) {
 // @Failure		404	{object}	string									"bad token or api key"
 // @Router			/readarr/{instance}/add [post]
 // @Security		ApiKeyAuth
-func readarrAddBook(req *http.Request) (int, interface{}) {
+func readarrAddBook(req *http.Request) (int, any) {
 	payload := &readarr.AddBookInput{}
 	// Extract payload and check for GRID ID.
 	switch err := json.NewDecoder(req.Body).Decode(payload); {
@@ -144,7 +144,7 @@ func readarrAddBook(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/readarr/{instance}/author/{authorID} [get]
 // @Security		ApiKeyAuth
-func readarrGetAuthor(req *http.Request) (int, interface{}) {
+func readarrGetAuthor(req *http.Request) (int, any) {
 	authorID, _ := strconv.ParseInt(mux.Vars(req)["authorid"], mnd.Base10, mnd.Bits64)
 
 	author, err := getReadarr(req).GetAuthorByIDContext(req.Context(), authorID)
@@ -155,13 +155,13 @@ func readarrGetAuthor(req *http.Request) (int, interface{}) {
 	return http.StatusOK, author
 }
 
-func readarrData(book *readarr.Book) map[string]interface{} {
+func readarrData(book *readarr.Book) map[string]any {
 	hasFile := false
 	if book.Statistics != nil {
 		hasFile = book.Statistics.SizeOnDisk > 0
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"id":        book.ID,
 		"hasFile":   hasFile,
 		"monitored": book.Monitored,
@@ -183,7 +183,7 @@ func readarrData(book *readarr.Book) map[string]interface{} {
 //	@Failure		404			{object}	string								"bad token or api key"
 //	@Router			/readarr/{instance}/check/{gridID} [get]
 //	@Security		ApiKeyAuth
-func readarrCheckBook(req *http.Request) (int, interface{}) {
+func readarrCheckBook(req *http.Request) (int, any) {
 	grid := mux.Vars(req)["grid"]
 
 	m, err := getReadarr(req).GetBookContext(req.Context(), grid)
@@ -207,7 +207,7 @@ func readarrCheckBook(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/get/{bookID} [get]
 // @Security		ApiKeyAuth
-func readarrGetBook(req *http.Request) (int, interface{}) {
+func readarrGetBook(req *http.Request) (int, any) {
 	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
 	book, err := getReadarr(req).GetBookByIDContext(req.Context(), bookID)
@@ -218,7 +218,7 @@ func readarrGetBook(req *http.Request) (int, interface{}) {
 	return http.StatusOK, book
 }
 
-func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
+func readarrTriggerSearchBook(req *http.Request) (int, any) {
 	bookID, _ := strconv.ParseInt(mux.Vars(req)["bookid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getReadarr(req).SendCommandContext(req.Context(), &readarr.CommandRequest{
@@ -244,7 +244,7 @@ func readarrTriggerSearchBook(req *http.Request) (int, interface{}) {
 //	@Failure		404			{object}	string										"bad token or api key"
 //	@Router			/readarr/{instance}/metadataProfiles [get]
 //	@Security		ApiKeyAuth
-func readarrMetaProfiles(req *http.Request) (int, interface{}) {
+func readarrMetaProfiles(req *http.Request) (int, any) {
 	profiles, err := getReadarr(req).GetMetadataProfilesContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting profiles", err)
@@ -271,7 +271,7 @@ func readarrMetaProfiles(req *http.Request) (int, interface{}) {
 //	@Failure		404			{object}	string										"bad token or api key"
 //	@Router			/readarr/{instance}/qualityProfiles [get]
 //	@Security		ApiKeyAuth
-func readarrQualityProfiles(req *http.Request) (int, interface{}) {
+func readarrQualityProfiles(req *http.Request) (int, any) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting profiles", err)
@@ -298,7 +298,7 @@ func readarrQualityProfiles(req *http.Request) (int, interface{}) {
 //	@Failure		404			{object}	string												"bad token or api key"
 //	@Router			/readarr/{instance}/qualityProfile [get]
 //	@Security		ApiKeyAuth
-func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
+func readarrGetQualityProfile(req *http.Request) (int, any) {
 	profiles, err := getReadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting profiles", err)
@@ -320,7 +320,7 @@ func readarrGetQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/qualityProfile [post]
 // @Security		ApiKeyAuth
-func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
+func readarrAddQualityProfile(req *http.Request) (int, any) {
 	var profile readarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
@@ -353,7 +353,7 @@ func readarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/qualityProfile/{profileID} [put]
 // @Security		ApiKeyAuth
-func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
+func readarrUpdateQualityProfile(req *http.Request) (int, any) {
 	var profile readarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
@@ -388,7 +388,7 @@ func readarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 //	@Failure		404			{object}	string										"bad token or api key"
 //	@Router			/readarr/{instance}/rootFolder [get]
 //	@Security		ApiKeyAuth
-func readarrRootFolders(req *http.Request) (int, interface{}) {
+func readarrRootFolders(req *http.Request) (int, any) {
 	folders, err := getReadarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting folders", err)
@@ -414,7 +414,7 @@ func readarrRootFolders(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string														"bad token or api key"
 // @Router			/readarr/{instance}/search/{query} [get]
 // @Security		ApiKeyAuth
-func readarrSearchBook(req *http.Request) (int, interface{}) {
+func readarrSearchBook(req *http.Request) (int, any) {
 	books, err := getReadarr(req).GetBookContext(req.Context(), "")
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting books", err)
@@ -495,7 +495,7 @@ func bookSearch(query, title string, editions []*readarr.Edition) bool {
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/readarr/{instance}/tag [get]
 // @Security		ApiKeyAuth
-func readarrGetTags(req *http.Request) (int, interface{}) {
+func readarrGetTags(req *http.Request) (int, any) {
 	tags, err := getReadarr(req).GetTagsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting tags", err)
@@ -516,7 +516,7 @@ func readarrGetTags(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/tag/{tagID}/{label} [put]
 // @Security		ApiKeyAuth
-func readarrUpdateTag(req *http.Request) (int, interface{}) {
+func readarrUpdateTag(req *http.Request) (int, any) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
 	tag, err := getReadarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
@@ -538,7 +538,7 @@ func readarrUpdateTag(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/tag/{label} [put]
 // @Security		ApiKeyAuth
-func readarrSetTag(req *http.Request) (int, interface{}) {
+func readarrSetTag(req *http.Request) (int, any) {
 	tag, err := getReadarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "setting tag", err)
@@ -561,7 +561,7 @@ func readarrSetTag(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/update [put]
 // @Security		ApiKeyAuth
-func readarrUpdateBook(req *http.Request) (int, interface{}) {
+func readarrUpdateBook(req *http.Request) (int, any) {
 	var book readarr.Book
 
 	err := json.NewDecoder(req.Body).Decode(&book)
@@ -592,7 +592,7 @@ func readarrUpdateBook(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/updateauthor [put]
 // @Security		ApiKeyAuth
-func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
+func readarrUpdateAuthor(req *http.Request) (int, any) {
 	var author readarr.Author
 
 	err := json.NewDecoder(req.Body).Decode(&author)
@@ -618,7 +618,7 @@ func readarrUpdateAuthor(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/readarr/{instance}/notifications [get]
 // @Security		ApiKeyAuth
-func readarrGetNotifications(req *http.Request) (int, interface{}) {
+func readarrGetNotifications(req *http.Request) (int, any) {
 	notifs, err := getReadarr(req).GetNotificationsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting notifications", err)
@@ -648,7 +648,7 @@ func readarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/notification [put]
 // @Security		ApiKeyAuth
-func readarrUpdateNotification(req *http.Request) (int, interface{}) {
+func readarrUpdateNotification(req *http.Request) (int, any) {
 	var notif readarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
@@ -677,7 +677,7 @@ func readarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/readarr/{instance}/notification [post]
 // @Security		ApiKeyAuth
-func readarrAddNotification(req *http.Request) (int, interface{}) {
+func readarrAddNotification(req *http.Request) (int, any) {
 	var notif readarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
@@ -709,7 +709,7 @@ func readarrAddNotification(req *http.Request) (int, interface{}) {
 // @Failure		423					{object}	string								"rate limit reached"
 // @Router			/readarr/{instance}/queue/{queueID} [delete]
 // @Security		ApiKeyAuth
-func readarrDeleteQueue(req *http.Request) (int, interface{}) {
+func readarrDeleteQueue(req *http.Request) (int, any) {
 	idString := mux.Vars(req)["queueID"]
 	queueID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True

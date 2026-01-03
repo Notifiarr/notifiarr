@@ -112,7 +112,7 @@ type AppStatuses struct {
 //	@Security		ApiKeyAuth
 //
 //nolint:lll
-func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
+func (c *Config) InfoHandler(r *http.Request) (int, any) {
 	return http.StatusOK, c.Info(r.Context(), false)
 }
 
@@ -126,7 +126,7 @@ func (c *Config) InfoHandler(r *http.Request) (int, interface{}) {
 //	@Failure		404	{object}	string								"bad token or api key"
 //	@Router			/version [get]
 //	@Security		ApiKeyAuth
-func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
+func (c *Config) VersionHandler(r *http.Request) (int, any) {
 	output := c.Info(r.Context(), false)
 	output.AppsStatus = c.appStatsForVersion(r.Context())
 
@@ -146,7 +146,7 @@ func (c *Config) VersionHandler(r *http.Request) (int, interface{}) {
 //	@Failure		404			{object}	string								"bad token or api key"
 //	@Router			/version/{app}/{instance} [get]
 //	@Security		ApiKeyAuth
-func (c *Config) VersionHandlerInstance(r *http.Request) (int, interface{}) {
+func (c *Config) VersionHandlerInstance(r *http.Request) (int, any) {
 	output := c.Info(r.Context(), false)
 	instance, _ := strconv.Atoi(mux.Vars(r)["instance"])
 	output.AppsStatus = c.appStatsForVersionInstance(r.Context(), mux.Vars(r)["app"], instance)

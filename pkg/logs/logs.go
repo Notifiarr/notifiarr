@@ -191,37 +191,37 @@ func (l *Logger) CapturePanic() {
 }
 
 // Debug writes log lines... to stdout and/or a file.
-func (l *Logger) Debug(v ...interface{}) {
+func (l *Logger) Debug(v ...any) {
 	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, dbugStr, false)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
-func (l *Logger) Debugf(msg string, v ...interface{}) {
+func (l *Logger) Debugf(msg string, v ...any) {
 	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, dbugStr, false)
 }
 
 // Print writes log lines... to stdout and/or a file.
-func (l *Logger) Print(v ...interface{}) {
+func (l *Logger) Print(v ...any) {
 	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, infoStr, false)
 }
 
 // Printf writes log lines... to stdout and/or a file.
-func (l *Logger) Printf(msg string, v ...interface{}) {
+func (l *Logger) Printf(msg string, v ...any) {
 	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, infoStr, false)
 }
 
 // Error writes log lines... to stdout and/or a file.
-func (l *Logger) Error(v ...interface{}) {
+func (l *Logger) Error(v ...any) {
 	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, errStr, true)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
-func (l *Logger) Errorf(msg string, v ...interface{}) {
+func (l *Logger) Errorf(msg string, v ...any) {
 	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, true)
 }
 
 // ErrorfNoShare writes log lines... to stdout and/or a file.
-func (l *Logger) ErrorfNoShare(msg string, v ...interface{}) {
+func (l *Logger) ErrorfNoShare(msg string, v ...any) {
 	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, false)
 }
 

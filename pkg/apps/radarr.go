@@ -127,7 +127,7 @@ func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
 // @Failure		404	{object}	string									"bad token or api key"
 // @Router			/radarr/{instance}/add [post]
 // @Security		ApiKeyAuth
-func radarrAddMovie(req *http.Request) (int, interface{}) {
+func radarrAddMovie(req *http.Request) (int, any) {
 	var payload radarr.AddMovieInput
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&payload)
@@ -163,8 +163,8 @@ func radarrAddMovie(req *http.Request) (int, interface{}) {
 	return http.StatusCreated, movie
 }
 
-func radarrData(movie *radarr.Movie) map[string]interface{} {
-	return map[string]interface{}{
+func radarrData(movie *radarr.Movie) map[string]any {
+	return map[string]any{
 		"id":        movie.ID,
 		"hasFile":   movie.HasFile,
 		"monitored": movie.Monitored,
@@ -184,7 +184,7 @@ func radarrData(movie *radarr.Movie) map[string]interface{} {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/check/{tmdbid} [get]
 // @Security		ApiKeyAuth
-func radarrCheckMovie(req *http.Request) (int, interface{}) {
+func radarrCheckMovie(req *http.Request) (int, any) {
 	tmdbID, _ := strconv.ParseInt(mux.Vars(req)["tmdbid"], mnd.Base10, mnd.Bits64)
 	// Check for existing movie.
 	m, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{TMDBID: tmdbID})
@@ -208,7 +208,7 @@ func radarrCheckMovie(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/radarr/{instance}/get/{movieID} [get]
 // @Security		ApiKeyAuth
-func radarrGetMovie(req *http.Request) (int, interface{}) {
+func radarrGetMovie(req *http.Request) (int, any) {
 	movieID, _ := strconv.ParseInt(mux.Vars(req)["movieid"], mnd.Base10, mnd.Bits64)
 
 	movie, err := getRadarr(req).GetMovieByIDContext(req.Context(), movieID)
@@ -230,7 +230,7 @@ func radarrGetMovie(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/command/search/{movieID} [get]
 // @Security		ApiKeyAuth
-func radarrTriggerSearchMovie(req *http.Request) (int, interface{}) {
+func radarrTriggerSearchMovie(req *http.Request) (int, any) {
 	movieID, _ := strconv.ParseInt(mux.Vars(req)["movieid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getRadarr(req).SendCommandContext(req.Context(), &radarr.CommandRequest{
@@ -254,7 +254,7 @@ func radarrTriggerSearchMovie(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/radarr/{instance}/get [get]
 // @Security		ApiKeyAuth
-func radarrGetAllMovies(req *http.Request) (int, interface{}) {
+func radarrGetAllMovies(req *http.Request) (int, any) {
 	movies, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{ExcludeLocalCovers: true})
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "checking movie", err)
@@ -273,7 +273,7 @@ func radarrGetAllMovies(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/radarr/{instance}/qualityProfile [get]
 // @Security		ApiKeyAuth
-func radarrQualityProfile(req *http.Request) (int, interface{}) {
+func radarrQualityProfile(req *http.Request) (int, any) {
 	// Get the profiles from radarr.
 	profiles, err := getRadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -293,7 +293,7 @@ func radarrQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/radarr/{instance}/qualityProfiles [get]
 // @Security		ApiKeyAuth
-func radarrQualityProfiles(req *http.Request) (int, interface{}) {
+func radarrQualityProfiles(req *http.Request) (int, any) {
 	// Get the profiles from radarr.
 	profiles, err := getRadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -322,7 +322,7 @@ func radarrQualityProfiles(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/qualityProfile [post]
 // @Security		ApiKeyAuth
-func radarrAddQualityProfile(req *http.Request) (int, interface{}) {
+func radarrAddQualityProfile(req *http.Request) (int, any) {
 	var profile radarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
@@ -355,7 +355,7 @@ func radarrAddQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/qualityProfile/{profileID} [put]
 // @Security		ApiKeyAuth
-func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
+func radarrUpdateQualityProfile(req *http.Request) (int, any) {
 	var profile radarr.QualityProfile
 
 	// Extract payload and check for TMDB ID.
@@ -390,7 +390,7 @@ func radarrUpdateQualityProfile(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/qualityProfile/{profileID} [delete]
 // @Security		ApiKeyAuth
-func radarrDeleteQualityProfile(req *http.Request) (int, interface{}) {
+func radarrDeleteQualityProfile(req *http.Request) (int, any) {
 	profileID, _ := strconv.ParseInt(mux.Vars(req)["profileID"], mnd.Base10, mnd.Bits64)
 	if profileID == 0 {
 		return http.StatusBadRequest, ErrNonZeroID
@@ -424,7 +424,7 @@ type deleteResponse struct {
 // @Failure		404			{object}	string											"bad token or api key"
 // @Router			/radarr/{instance}/qualityProfiles/all [delete]
 // @Security		ApiKeyAuth
-func radarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
+func radarrDeleteAllQualityProfiles(req *http.Request) (int, any) {
 	// Get all the profiles from radarr.
 	profiles, err := getRadarr(req).GetQualityProfilesContext(req.Context())
 	if err != nil {
@@ -463,7 +463,7 @@ func radarrDeleteAllQualityProfiles(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string										"bad token or api key"
 // @Router			/radarr/{instance}/rootFolder [get]
 // @Security		ApiKeyAuth
-func radarrRootFolders(req *http.Request) (int, interface{}) {
+func radarrRootFolders(req *http.Request) (int, any) {
 	// Get folder list from Radarr.
 	folders, err := getRadarr(req).GetRootFoldersContext(req.Context())
 	if err != nil {
@@ -489,7 +489,7 @@ func radarrRootFolders(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/radarr/{instance}/naming [get]
 // @Security		ApiKeyAuth
-func radarrGetNaming(req *http.Request) (int, interface{}) {
+func radarrGetNaming(req *http.Request) (int, any) {
 	naming, err := getRadarr(req).GetNamingContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting naming", err)
@@ -510,7 +510,7 @@ func radarrGetNaming(req *http.Request) (int, interface{}) {
 // @Failure		404	{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/naming [put]
 // @Security		ApiKeyAuth
-func radarrUpdateNaming(req *http.Request) (int, interface{}) {
+func radarrUpdateNaming(req *http.Request) (int, any) {
 	var naming radarr.Naming
 
 	err := json.NewDecoder(req.Body).Decode(&naming)
@@ -539,7 +539,7 @@ func radarrUpdateNaming(req *http.Request) (int, interface{}) {
 // @Security		ApiKeyAuth
 //
 //nolint:lll
-func radarrSearchMovie(req *http.Request) (int, interface{}) {
+func radarrSearchMovie(req *http.Request) (int, any) {
 	// Get all movies
 	movies, err := getRadarr(req).GetMovieContext(req.Context(), &radarr.GetMovie{ExcludeLocalCovers: true})
 	if err != nil {
@@ -617,7 +617,7 @@ func movieSearch(query string, titles []string, alts []*radarr.AlternativeTitle)
 // @Failure		404			{object}	string									"bad token or api key"
 // @Router			/radarr/{instance}/tag [get]
 // @Security		ApiKeyAuth
-func radarrGetTags(req *http.Request) (int, interface{}) {
+func radarrGetTags(req *http.Request) (int, any) {
 	tags, err := getRadarr(req).GetTagsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting tags", err)
@@ -638,7 +638,7 @@ func radarrGetTags(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/tag/{tagID}/{label} [put]
 // @Security		ApiKeyAuth
-func radarrUpdateTag(req *http.Request) (int, interface{}) {
+func radarrUpdateTag(req *http.Request) (int, any) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
 
 	tag, err := getRadarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
@@ -660,7 +660,7 @@ func radarrUpdateTag(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/tag/{label} [put]
 // @Security		ApiKeyAuth
-func radarrSetTag(req *http.Request) (int, interface{}) {
+func radarrSetTag(req *http.Request) (int, any) {
 	tag, err := getRadarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "setting tag", err)
@@ -683,7 +683,7 @@ func radarrSetTag(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/update [put]
 // @Security		ApiKeyAuth
-func radarrUpdateMovie(req *http.Request) (int, interface{}) {
+func radarrUpdateMovie(req *http.Request) (int, any) {
 	var movie radarr.Movie
 	// Extract payload and check for TMDB ID.
 	err := json.NewDecoder(req.Body).Decode(&movie)
@@ -715,7 +715,7 @@ func radarrUpdateMovie(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/exclusions [post]
 // @Security		ApiKeyAuth
-func radarrAddExclusions(req *http.Request) (int, interface{}) {
+func radarrAddExclusions(req *http.Request) (int, any) {
 	var exclusions []*radarr.Exclusion
 
 	err := json.NewDecoder(req.Body).Decode(&exclusions)
@@ -742,7 +742,7 @@ func radarrAddExclusions(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string											"bad token or api key"
 // @Router			/radarr/{instance}/exclusions [get]
 // @Security		ApiKeyAuth
-func radarrGetExclusions(req *http.Request) (int, interface{}) {
+func radarrGetExclusions(req *http.Request) (int, any) {
 	exclusions, err := getRadarr(req).GetExclusionsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting exclusions", err)
@@ -762,7 +762,7 @@ func radarrGetExclusions(req *http.Request) (int, interface{}) {
 // @Failure		404				{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/exclusions/{exclusionIDs} [delete]
 // @Security		ApiKeyAuth
-func radarrDelExclusions(req *http.Request) (int, interface{}) {
+func radarrDelExclusions(req *http.Request) (int, any) {
 	ids := mux.Vars(req)["eid"]
 	exclusions := []int64{}
 
@@ -793,7 +793,7 @@ func radarrDelExclusions(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/radarr/{instance}/customformats [post]
 // @Security		ApiKeyAuth
-func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
+func radarrAddCustomFormat(req *http.Request) (int, any) {
 	var cusform radarr.CustomFormatInput
 
 	err := json.NewDecoder(req.Body).Decode(&cusform)
@@ -819,7 +819,7 @@ func radarrAddCustomFormat(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/radarr/{instance}/customformats [get]
 // @Security		ApiKeyAuth
-func radarrGetCustomFormats(req *http.Request) (int, interface{}) {
+func radarrGetCustomFormats(req *http.Request) (int, any) {
 	cusform, err := getRadarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting custom formats", err)
@@ -841,7 +841,7 @@ func radarrGetCustomFormats(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/radarr/{instance}/customformats/{formatID} [put]
 // @Security		ApiKeyAuth
-func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
+func radarrUpdateCustomFormat(req *http.Request) (int, any) {
 	var cusform radarr.CustomFormatInput
 	if err := json.NewDecoder(req.Body).Decode(&cusform); err != nil {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
@@ -866,7 +866,7 @@ func radarrUpdateCustomFormat(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/customformats/{formatID} [delete]
 // @Security		ApiKeyAuth
-func radarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
+func radarrDeleteCustomFormat(req *http.Request) (int, any) {
 	cfID, _ := strconv.ParseInt(mux.Vars(req)["cfid"], mnd.Base10, mnd.Bits64)
 
 	err := getRadarr(req).DeleteCustomFormatContext(req.Context(), cfID)
@@ -887,7 +887,7 @@ func radarrDeleteCustomFormat(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string											"bad token or api key"
 // @Router			/radarr/{instance}/customformats/all [delete]
 // @Security		ApiKeyAuth
-func radarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
+func radarrDeleteAllCustomFormats(req *http.Request) (int, any) {
 	formats, err := getRadarr(req).GetCustomFormatsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting custom formats", err)
@@ -925,7 +925,7 @@ func radarrDeleteAllCustomFormats(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/radarr/{instance}/importlist [get]
 // @Security		ApiKeyAuth
-func radarrGetImportLists(req *http.Request) (int, interface{}) {
+func radarrGetImportLists(req *http.Request) (int, any) {
 	ilist, err := getRadarr(req).GetImportListsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting import lists", err)
@@ -948,7 +948,7 @@ func radarrGetImportLists(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/radarr/{instance}/importlist/{listID} [put]
 // @Security		ApiKeyAuth
-func radarrUpdateImportList(req *http.Request) (int, interface{}) {
+func radarrUpdateImportList(req *http.Request) (int, any) {
 	var ilist radarr.ImportListInput
 	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
@@ -977,7 +977,7 @@ func radarrUpdateImportList(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/radarr/{instance}/importlist [post]
 // @Security		ApiKeyAuth
-func radarrAddImportList(req *http.Request) (int, interface{}) {
+func radarrAddImportList(req *http.Request) (int, any) {
 	var ilist radarr.ImportListInput
 	if err := json.NewDecoder(req.Body).Decode(&ilist); err != nil {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
@@ -1001,7 +1001,7 @@ func radarrAddImportList(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/radarr/{instance}/qualitydefinition [get]
 // @Security		ApiKeyAuth
-func radarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
+func radarrGetQualityDefinitions(req *http.Request) (int, any) {
 	output, err := getRadarr(req).GetQualityDefinitionsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusInternalServerError, "getting quality definitions", err)
@@ -1023,7 +1023,7 @@ func radarrGetQualityDefinitions(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/radarr/{instance}/qualitydefinition [put]
 // @Security		ApiKeyAuth
-func radarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
+func radarrUpdateQualityDefinition(req *http.Request) (int, any) {
 	var input []*radarr.QualityDefinition
 	if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
@@ -1047,7 +1047,7 @@ func radarrUpdateQualityDefinition(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/radarr/{instance}/notifications [get]
 // @Security		ApiKeyAuth
-func radarrGetNotifications(req *http.Request) (int, interface{}) {
+func radarrGetNotifications(req *http.Request) (int, any) {
 	notifs, err := getRadarr(req).GetNotificationsContext(req.Context())
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "getting notifications", err)
@@ -1077,7 +1077,7 @@ func radarrGetNotifications(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/notification [put]
 // @Security		ApiKeyAuth
-func radarrUpdateNotification(req *http.Request) (int, interface{}) {
+func radarrUpdateNotification(req *http.Request) (int, any) {
 	var notif radarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
@@ -1106,7 +1106,7 @@ func radarrUpdateNotification(req *http.Request) (int, interface{}) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/notification [post]
 // @Security		ApiKeyAuth
-func radarrAddNotification(req *http.Request) (int, interface{}) {
+func radarrAddNotification(req *http.Request) (int, any) {
 	var notif radarr.NotificationInput
 
 	err := json.NewDecoder(req.Body).Decode(&notif)
@@ -1138,7 +1138,7 @@ func radarrAddNotification(req *http.Request) (int, interface{}) {
 // @Failure		423					{object}	string								"rate limit reached"
 // @Router			/radarr/{instance}/queue/{queueID} [delete]
 // @Security		ApiKeyAuth
-func radarrDeleteQueue(req *http.Request) (int, interface{}) {
+func radarrDeleteQueue(req *http.Request) (int, any) {
 	idString := mux.Vars(req)["queueID"]
 	queueID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 	removeFromClient := req.URL.Query().Get("removeFromClient") == mnd.True
@@ -1169,7 +1169,7 @@ func radarrDeleteQueue(req *http.Request) (int, interface{}) {
 // @Failure		423			{object}	string								"rate limit reached"
 // @Router			/radarr/{instance}/delete/{movieID} [post]
 // @Security		ApiKeyAuth
-func radarrDeleteMovie(req *http.Request) (int, interface{}) {
+func radarrDeleteMovie(req *http.Request) (int, any) {
 	idString := mux.Vars(req)["movieID"]
 	movieID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 	deleteFiles := req.PostFormValue("deleteFiles")
@@ -1199,7 +1199,7 @@ func radarrDeleteMovie(req *http.Request) (int, interface{}) {
 // @Failure		423			{object}	string								"rate limit reached"
 // @Router			/radarr/{instance}/delete/{movieFileID} [delete]
 // @Security		ApiKeyAuth
-func radarrDeleteContent(req *http.Request) (int, interface{}) {
+func radarrDeleteContent(req *http.Request) (int, any) {
 	idString := mux.Vars(req)["movieFileID"]
 	movieFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 

@@ -22,7 +22,7 @@ import (
 //	@Failure		404	{object}	string								"bad token or api key"
 //	@Router			/plex/1/sessions [get]
 //	@Security		ApiKeyAuth
-func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
+func (s *Server) HandleSessions(r *http.Request) (int, any) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
 	sessions, err := s.GetSessionsWithContext(r.Context())
@@ -65,7 +65,7 @@ func (s *Server) HandleSessions(r *http.Request) (int, interface{}) {
 //	@Failure		404			{object}	string								"bad token or api key"
 //	@Router			/plex/1/kill [get]
 //	@Security		ApiKeyAuth
-func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
+func (s *Server) HandleKillSession(r *http.Request) (int, any) {
 	var (
 		ctx       = r.Context()
 		plexID, _ = ctx.Value(starr.Plex).(int)
@@ -93,7 +93,7 @@ func (s *Server) HandleKillSession(r *http.Request) (int, interface{}) {
 //	@Failure		404	{object}	string										"bad token or api key"
 //	@Router			/plex/1/directory [get]
 //	@Security		ApiKeyAuth
-func (s *Server) HandleDirectory(req *http.Request) (int, interface{}) {
+func (s *Server) HandleDirectory(req *http.Request) (int, any) {
 	plexID, _ := req.Context().Value(starr.Plex).(int)
 
 	directory, err := s.GetDirectoryWithContext(req.Context())
@@ -124,7 +124,7 @@ func (s *Server) HandleDirectory(req *http.Request) (int, interface{}) {
 //	@Failure		404			{object}	string								"bad token or api key"
 //	@Router			/plex/1/emptytrash/{libraryKey} [get]
 //	@Security		ApiKeyAuth
-func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
+func (s *Server) HandleEmptyTrash(r *http.Request) (int, any) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
 	body, err := s.EmptyTrashWithContext(r.Context(), mux.Vars(r)["key"])
@@ -148,7 +148,7 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, interface{}) {
 //	@Failure		404		{object}	string								"bad token or api key"
 //	@Router			/plex/1/markwatched/{itemKey} [get]
 //	@Security		ApiKeyAuth
-func (s *Server) HandleMarkWatched(r *http.Request) (int, interface{}) {
+func (s *Server) HandleMarkWatched(r *http.Request) (int, any) {
 	plexID, _ := r.Context().Value(starr.Plex).(int)
 
 	body, err := s.MarkPlayedWithContext(r.Context(), mux.Vars(r)["key"])

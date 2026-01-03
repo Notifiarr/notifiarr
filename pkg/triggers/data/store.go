@@ -19,7 +19,7 @@ var store = cache.New(cache.Config{
 })
 
 // Save a piece of data in the cache.
-func Save(key string, data interface{}) {
+func Save(key string, data any) {
 	store.Save(key, data, cache.Options{})
 }
 
@@ -29,7 +29,7 @@ func Get(key string) *cache.Item {
 }
 
 // SaveWithID saves data to the cache, and appends the key to an id.
-func SaveWithID(key string, id int, data interface{}) {
+func SaveWithID(key string, id int, data any) {
 	store.Save(key+strconv.Itoa(id), data, cache.Options{Prune: true})
 }
 

@@ -114,11 +114,11 @@ type HistorySlots struct {
 	PostprocTime int64       `json:"postproc_time"`
 	StageLog     []*StageLog `json:"stage_log"`
 	Downloaded   int64       `json:"downloaded"`
-	Completeness interface{} `json:"completeness"`
+	Completeness any         `json:"completeness"`
 	FailMessage  string      `json:"fail_message"`
 	URLInfo      string      `json:"url_info"`
 	Bytes        int64       `json:"bytes"`
-	Meta         interface{} `json:"meta"`
+	Meta         any         `json:"meta"`
 	Series       string      `json:"series"`
 	Md5Sum       string      `json:"md5sum"`
 	Password     string      `json:"password"`
@@ -165,7 +165,7 @@ type Queue struct {
 	Speedlimit        float64      `json:"speedlimit,string"`
 	SpeedlimitAbs     string       `json:"speedlimit_abs"`
 	HaveWarnings      string       `json:"have_warnings"`
-	Finishaction      interface{}  `json:"finishaction"`
+	Finishaction      any          `json:"finishaction"`
 	Quota             string       `json:"quota"`
 	LeftQuota         string       `json:"left_quota"`
 	CacheArt          string       `json:"cache_art"`
@@ -244,7 +244,7 @@ func (s *SabNZB) GetQueue(ctx context.Context) (*Queue, error) {
 }
 
 // GetURLInto gets a url and unmarshals the contents into the provided interface pointer.
-func (s *SabNZB) GetURLInto(ctx context.Context, params url.Values, into interface{}) error {
+func (s *SabNZB) GetURLInto(ctx context.Context, params url.Values, into any) error {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, s.URL+"/api", nil)
 	if err != nil {
 		return fmt.Errorf("creating request: %w", err)

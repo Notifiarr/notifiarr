@@ -139,7 +139,7 @@ type RtorrentTorrent struct {
 }
 
 func rTorrentTorrents(rTorrent *apps.Rtorrent) ([]*RtorrentTorrent, error) {
-	args := []interface{}{
+	args := []any{
 		"",
 		string(rtorrent.ViewMain),
 		rtorrent.DName.Query(),
@@ -160,11 +160,11 @@ func rTorrentTorrents(rTorrent *apps.Rtorrent) ([]*RtorrentTorrent, error) {
 
 	var torrents []*RtorrentTorrent
 
-	resInt, _ := results.([]interface{})
+	resInt, _ := results.([]any)
 	for _, outerResult := range resInt {
-		resOut, _ := outerResult.([]interface{})
+		resOut, _ := outerResult.([]any)
 		for _, innerResult := range resOut {
-			torrentData, ok := innerResult.([]interface{})
+			torrentData, ok := innerResult.([]any)
 			if !ok {
 				return nil, fmt.Errorf("%w: data returned from query is unusable", ErrInvalidResponse)
 			}
@@ -194,7 +194,7 @@ func rTorrentDownTotal(rTorrent *apps.Rtorrent) (int, error) {
 		return 0, fmt.Errorf("%w: throttle.global_down.total XMLRPC call failed", err)
 	}
 
-	if totals, ok := result.([]interface{}); ok {
+	if totals, ok := result.([]any); ok {
 		result = totals[0]
 	}
 
@@ -212,7 +212,7 @@ func rTorrentUpTotal(rTorrent *apps.Rtorrent) (int, error) {
 		return 0, fmt.Errorf("%w: throttle.global_up.total XMLRPC call failed", err)
 	}
 
-	if totals, ok := result.([]interface{}); ok {
+	if totals, ok := result.([]any); ok {
 		result = totals[0]
 	}
 

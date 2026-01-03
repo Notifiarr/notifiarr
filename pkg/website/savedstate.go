@@ -23,7 +23,7 @@ func SetStates(values map[string][]byte) error {
 	resp, err := GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventSet,
-		Payload:    map[string]interface{}{"fields": values},
+		Payload:    map[string]any{"fields": values},
 		LogPayload: true,
 	})
 	if err != nil {
@@ -35,7 +35,7 @@ func SetStates(values map[string][]byte) error {
 
 // DelState deletes a value stored in the website database.
 func DelState(keys ...string) error {
-	values := make(map[string]interface{})
+	values := make(map[string]any)
 	for _, key := range keys {
 		values[key] = nil
 	}
@@ -43,7 +43,7 @@ func DelState(keys ...string) error {
 	resp, err := GetData(&Request{
 		Route:      ClientRoute,
 		Event:      EventSet,
-		Payload:    map[string]interface{}{"fields": values},
+		Payload:    map[string]any{"fields": values},
 		LogPayload: true,
 	})
 	if err != nil {

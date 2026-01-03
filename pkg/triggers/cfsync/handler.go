@@ -55,7 +55,7 @@ func _() {}
 //	@Failure		404		{object}	string											"bad token or api key"
 //	@Router			/trash/sonarr [post]
 //	@Security		ApiKeyAuth
-func (a *Action) Handler(req *http.Request) (int, interface{}) {
+func (a *Action) Handler(req *http.Request) (int, any) {
 	return a.cmd.aggregateTrash(req)
 }
 
@@ -64,7 +64,7 @@ type TrashAggInput struct {
 	Instances clientinfo.IntList `json:"instances"`
 }
 
-func (c *cmd) aggregateTrash(req *http.Request) (int, interface{}) {
+func (c *cmd) aggregateTrash(req *http.Request) (int, any) {
 	var wait sync.WaitGroup
 	defer wait.Wait()
 

@@ -45,7 +45,7 @@ type NullString struct {
 	sql.NullString
 }
 
-type MySQLStatus map[string]interface{}
+type MySQLStatus map[string]any
 
 type MySQLServerData struct {
 	Name      string         `json:"name"`

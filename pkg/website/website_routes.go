@@ -46,7 +46,7 @@ type Request struct {
 	Route      Route
 	Event      EventType
 	Params     []string    // optional.
-	Payload    interface{} // data to send.
+	Payload    any         // data to send.
 	UploadFile *UploadFile // file to send (instead of payload).
 	LogMsg     string      // if empty, nothing is logged.
 	LogPayload bool        // debug log the sent payload.

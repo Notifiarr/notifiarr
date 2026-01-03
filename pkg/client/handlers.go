@@ -273,7 +273,7 @@ func _() {}
 // @Failure		404	{object}	string												"bad token or api key"
 // @Router			/ping [get]
 // @Security		ApiKeyAuth
-func (c *Client) handleInstancePing(req *http.Request) (int, interface{}) { //nolint:cyclop
+func (c *Client) handleInstancePing(req *http.Request) (int, any) { //nolint:cyclop
 	apps := strings.Split(mux.Vars(req)["app"], ",")
 	instance, _ := strconv.Atoi(mux.Vars(req)["instance"])
 	output := make(map[string]map[int]bool)

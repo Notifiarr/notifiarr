@@ -21,7 +21,7 @@ var (
 
 // Funcs returns our template functions.
 func Funcs() template.FuncMap {
-	return map[string]interface{}{
+	return map[string]any{
 		"os":    func() string { return runtime.GOOS },
 		"force": func() bool { return ForceAllTmpl },
 		"toml": func(v string) string {

@@ -118,7 +118,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 			website.SendData(&website.Request{
 				Route:      website.TunnelRoute,
 				Event:      website.EventSignal,
-				Payload:    map[string]interface{}{"socket": socket, "previous": data.Get("activeTunnel")},
+				Payload:    map[string]any{"socket": socket, "previous": data.Get("activeTunnel")},
 				LogMsg:     fmt.Sprintf("Update Tunnel Target (%s)", socket),
 				LogPayload: true,
 			})
@@ -183,12 +183,12 @@ type tunnelLogger struct {
 }
 
 // Debugf prints a message with DEBUG prefixed.
-func (l *tunnelLogger) Debugf(format string, v ...interface{}) {
+func (l *tunnelLogger) Debugf(format string, v ...any) {
 	mnd.Log.Debugf(format, v...)
 }
 
 // Errorf prints a message with ERROR prefixed.
-func (l *tunnelLogger) Errorf(format string, v ...interface{}) {
+func (l *tunnelLogger) Errorf(format string, v ...any) {
 	// this is why we dont just pass the interface in as-is.
 	if l.sendSiteErrors {
 		mnd.Log.Errorf(format, v...)
@@ -198,7 +198,7 @@ func (l *tunnelLogger) Errorf(format string, v ...interface{}) {
 }
 
 // Printf prints a message with INFO prefixed.
-func (l *tunnelLogger) Printf(format string, v ...interface{}) {
+func (l *tunnelLogger) Printf(format string, v ...any) {
 	mnd.Log.Printf(format, v...)
 }
 

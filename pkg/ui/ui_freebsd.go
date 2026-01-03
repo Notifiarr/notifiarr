@@ -21,7 +21,7 @@ func HasGUI() bool {
 }
 
 // Toast may not work properly on FreeBSD because we cross compile it without dbus. :(
-func Toast(_ context.Context, msg string, v ...interface{}) error {
+func Toast(_ context.Context, msg string, v ...any) error {
 	if !hasGUI {
 		return nil
 	}
