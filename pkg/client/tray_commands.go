@@ -209,7 +209,10 @@ func (c *Client) updatePassword(ctx context.Context) {
 
 	logs.Log.Printf("[user requested] Updating Web UI password.")
 
-	if err := c.Config.UIPassword.Set(configfile.DefaultUsername + ":" + pass); err != nil {
+	c.Lock()
+	defer c.Unlock()
+
+	if err := c.Config.UIPassword.Set(configfile.DefaultUsername, pass); err != nil {
 		logs.Log.Errorf("Updating Web UI Password: %v", err)
 		ui.Error("Updating Web UI Password: " + err.Error())
 	}

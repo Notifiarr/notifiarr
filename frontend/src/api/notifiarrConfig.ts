@@ -1578,7 +1578,7 @@ export interface LogConfig {
 };
 
 /**
- * Apps is the input configuration to relay requests to Starr apps.
+ * AppsConfig is the input configuration to relay requests to Starr apps.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.AppsConfig>
  */
 export interface AppsConfig extends BaseConfig {
@@ -1593,7 +1593,7 @@ export interface AppsConfig extends BaseConfig {
   sabnzbd?: SabNZBConfig[];
   nzbget?: NZBGetConfig[];
   transmission?: XmissionConfig[];
-  tautulli?: TautulliConfig;
+  tautulli: TautulliConfig;
   plex: PlexConfig;
 };
 
@@ -1757,6 +1757,9 @@ export interface PlexConfig0 {
 export interface ClientInfo {
   user: {
     id?: any;
+    username: string;
+    email: string;
+    password: string;
     welcome: string;
     subscriber: boolean;
     patron: boolean;

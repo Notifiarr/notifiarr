@@ -216,7 +216,7 @@ func (c *Config) fixConfig() {
 	}
 
 	if c.UIPassword.Val() == "" && len(c.APIKey) == website.APIKeyLength {
-		_ = c.UIPassword.Set(DefaultUsername + ":" + c.APIKey)
+		_ = c.UIPassword.Set(DefaultUsername, c.APIKey)
 	}
 
 	// Windows has no stdout, so turn it off.

@@ -58,8 +58,9 @@ func (c *Client) resetAdminPassword(ctx context.Context) error {
 	c.Config.SSLCrtFile = ""
 	c.Config.SSLKeyFile = ""
 
-	password := configfile.DefaultUsername + ":" + configfile.GeneratePassword()
-	if err := c.Config.UIPassword.Set(password); err != nil {
+	password := configfile.GeneratePassword()
+	err := c.Config.UIPassword.Set(configfile.DefaultUsername, password)
+	if err != nil {
 		return fmt.Errorf("setting password failed: %w", err)
 	}
 
