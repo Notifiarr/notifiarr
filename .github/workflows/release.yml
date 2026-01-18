@@ -51,7 +51,7 @@ jobs:
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make signdmg
       - name: Upload DMG Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: dmg-release
           path: release
@@ -104,12 +104,12 @@ jobs:
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make release
       - name: Upload Release Artifacts v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: release
           path: release
       - name: upload sha512sums.txt
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: sha512sums.txt
           path: release/sha512sums.txt
@@ -136,7 +136,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 'Download files: ${{ matrix.files }}'
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{ matrix.files }}
       - name: Upload files to unstable.golift.io
@@ -159,7 +159,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: release
       - uses: golift/upload-packagecloud@v1
@@ -179,7 +179,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download release files
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: release
       - uses: golift/upload-packagecloud@v1
@@ -205,7 +205,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download ${{ matrix.files }} Files
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{ matrix.files }}
       - name: Publish ${{ matrix.files }} artifacts to github
@@ -234,7 +234,7 @@ jobs:
         with:
           fetch-depth: '0'
       - name: Download SHA files from build
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: sha512sums.txt
       - name: Deploy Aurch AUR
