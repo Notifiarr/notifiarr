@@ -20,7 +20,7 @@ require (
 	github.com/jackpal/gateway v1.1.1
 	github.com/jaypipes/ghw v0.21.2
 	github.com/jxeng/shortcut v1.0.2
-	github.com/klauspost/compress v1.18.2
+	github.com/klauspost/compress v1.18.3
 	github.com/lestrrat-go/apache-logformat/v2 v2.0.6
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mrobinsn/go-rtorrent v1.8.0
