@@ -164,7 +164,7 @@
     "ShowMore": "Show more information",
     "APIKey": {
       "title": "Provide API Key",
-      "placeholder": "All API key from notifiarr.com",
+      "placeholder": "Global API key from notifiarr.com",
       "setMsg": "API key set successfully!",
       "Setting": "Setting API key...",
       "description": "The Notifiarr client requires a valid API key to function. This key is used to authenticate with the Notifiarr website to receive updates and to send notifications. The client will not work without it, so please enter your API key below."

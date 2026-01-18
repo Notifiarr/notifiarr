@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -148,7 +147,10 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 	case c.Flags.Restart:
 		return nil
 	default:
-		c.makeNewConfigFile(ctx)
+		if website.ValidAPIKey() == nil {
+			_ = ui.OpenURL(ctx, "http://127.0.0.1:5454")
+		}
+
 		return c.start(ctx, msgs)
 	}
 }
@@ -177,41 +179,6 @@ func (c *Client) start(ctx context.Context, msgs []string) error {
 	}
 
 	return c.Exit(ctx, reload)
-}
-
-func (c *Client) makeNewConfigFile(ctx context.Context) {
-	if website.ValidAPIKey() == nil {
-		// API key is already valid, so we don't need to do anything here.
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
-	defer cancel()
-
-	c.Config.APIKey, _, _ = ui.Entry("Provide 'All' API Key from notifiarr.com", mnd.FakeAPIKey)
-	if website.ValidAPIKey() != nil {
-		c.Config.APIKey = mnd.FakeAPIKey
-		return
-	}
-
-	// write new config file to temporary path.
-	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig")
-	if _, err := c.Config.Write(ctx, destFile, true); err != nil { // write our config file template.
-		logs.Log.Errorf("writing new (temporary) config file: %v", err)
-		return
-	}
-
-	// move new config file to existing config file.
-	if err := os.Rename(destFile, c.Flags.ConfigFile); err != nil {
-		logs.Log.Errorf("renaming temporary config file: %v", err)
-	}
-
-	go func() {
-		open, _ := ui.Question("http://127.0.0.1:5454 - Open Notifiarr Client Web UI?\n", false)
-		if open {
-			_ = ui.OpenURL(ctx, "http://127.0.0.1:5454")
-		}
-	}()
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running configuration.
