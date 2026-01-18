@@ -116,11 +116,12 @@ api/v1/user/trash?app=...
 const (
 	BaseURL = "https://notifiarr.com"
 
-	userRoute1   Route = "/api/v1/user"
-	CFSyncRoute  Route = userRoute1 + "/trash"
-	GapsRoute    Route = userRoute1 + "/gaps"
-	MdbListRoute Route = userRoute1 + "/mdblist"
-	TunnelRoute  Route = userRoute1 + "/tunnel"
+	userRoute1    Route = "/api/v1/user"
+	CFSyncRoute   Route = userRoute1 + "/trash"
+	GapsRoute     Route = userRoute1 + "/gaps"
+	MdbListRoute  Route = userRoute1 + "/mdblist"
+	TunnelRoute   Route = userRoute1 + "/tunnel"
+	ValidateRoute Route = userRoute1 + "/validate"
 
 	userRoute2  Route = "/api/v2/user"
 	ClientRoute Route = userRoute2 + "/client"

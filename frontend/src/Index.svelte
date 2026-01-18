@@ -6,16 +6,7 @@
   All other components are rendered in the main element.
 -->
 <script lang="ts">
-  import {
-    Card,
-    CardBody,
-    CardHeader,
-    CardTitle,
-    Col,
-    Container,
-    Row,
-    Spinner,
-  } from '@sveltestrap/sveltestrap'
+  import { Card, CardBody, Col, Container, Row, Spinner } from '@sveltestrap/sveltestrap'
   import logo from './assets/notifiarr.svg?inline'
   import { profile } from './api/profile.svelte'
   import Navigation from './navigation/Index.svelte'
@@ -24,6 +15,7 @@
   import { theme } from './includes/theme.svelte'
   import MainHeader from './header/Index.svelte'
   import Login from './Login.svelte'
+  import APIKey from './APIKey.svelte'
 </script>
 
 <svelte:head>
@@ -57,14 +49,22 @@
           </Col>
         {:then error}
           {#if $profile.loggedIn}
-            <!-- This is the main page, after logging in. -->
-            <Navigation />
+            {#if $profile.config.apiKey.length !== 36}
+              <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
+                <!-- This is the api key page, before the login page. -->
+                <Card outline theme={$theme} color="notifiarr">
+                  <APIKey />
+                </Card>
+              </Col>
+            {:else}
+              <!-- This is the main page, after logging in. -->
+              <Navigation />
+            {/if}
           {:else}
             <Col xs={{ size: 8, offset: 2 }} md={{ size: 4, offset: 4 }}>
               <!-- This is the login page, before logging in. -->
               <Card outline theme={$theme} class="mt-2" color="notifiarr">
-                <CardHeader><CardTitle>{$_('buttons.Login')}</CardTitle></CardHeader>
-                <Login error={error.match(/GET .+profile failed: 0 : $/) ? '' : error} />
+                <Login error={error.match(/profile failed: 0 : $/) ? '' : error} />
               </Card>
             </Col>
           {/if}

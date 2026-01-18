@@ -206,6 +206,18 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// handleProfileNoAPIKey handles a minimal profile response for the UI when no API key is set.
+func (c *Client) handleProfileNoAPIKey(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
+	profile := &Profile{Updated: time.Now().UTC()}
+	profile.Config.APIKey = c.Config.APIKey
+	profile.Config.URLBase = c.Config.URLBase
+
+	if err := json.NewEncoder(resp).Encode(profile); err != nil {
+		logs.Log.Errorf("Writing HTTP Response: %v", err)
+	}
+}
+
 // handleProfilePost handles profile updates including authentication settings and upstream configuration.
 //
 //	@Summary		Update user profile
@@ -230,7 +242,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	currUser, dynamic := c.getUserName(request)
 	if !dynamic {
 		// If the auth is currently using a password, check the password.
-		if !c.Config.UIPassword.Valid(currUser, post.Password) {
+		if !c.Config.UIPassword.Valid(currUser, post.Password) && !clientinfo.CheckPassword(currUser, post.Password) {
 			logs.Log.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return

@@ -123,7 +123,7 @@ func Start() error {
 }
 
 func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
-	msgs, newPassword, err := c.loadConfiguration(ctx)
+	msgs, err := c.loadConfiguration(ctx)
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -153,14 +153,16 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 		return fmt.Errorf("messages: %q, error: %w", msgs, err)
 	case c.Flags.Restart:
 		return nil
-	case c.Config.APIKey == "":
-		return fmt.Errorf("messages: %q, %w %s_API_KEY", msgs, ErrNilAPIKey, c.Flags.EnvPrefix)
 	default:
-		return c.start(ctx, msgs, newPassword)
+		if len(c.Config.APIKey) != website.APIKeyLength {
+			c.makeNewConfigFile(ctx)
+		}
+
+		return c.start(ctx, msgs)
 	}
 }
 
-func (c *Client) start(ctx context.Context, msgs []string, newPassword string) error {
+func (c *Client) start(ctx context.Context, msgs []string) error {
 	logs.Log.SetupLogging(c.Config.LogConfig)
 	logs.Log.Printf(" %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
 		mnd.TodaysEmoji(), mnd.Title, version.Version, version.Revision,
@@ -175,11 +177,6 @@ func (c *Client) start(ctx context.Context, msgs []string, newPassword string) e
 		go ui.Toast(ctx, "%s updated to v%s-%s", mnd.Title, version.Version, version.Revision) //nolint:errcheck
 	}
 
-	if newPassword != "" {
-		// If newPassword is set it means we need to write out a new config file for a new installation. Do that now.
-		c.makeNewConfigFile(ctx, newPassword)
-	}
-
 	clientInfo, reload := c.configureServices(ctx)
 
 	if ui.HasGUI() {
@@ -191,19 +188,21 @@ func (c *Client) start(ctx context.Context, msgs []string, newPassword string) e
 	return c.Exit(ctx, reload)
 }
 
-func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
+func (c *Client) makeNewConfigFile(ctx context.Context) {
 	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 	defer cancel()
 
-	c.Config.APIKey, _, _ = ui.Entry("Enter 'All' API Key from notifiarr.com", "api-key-from-notifiarr.com")
+	c.Config.APIKey, _, _ = ui.Entry("Provide 'All' API Key from notifiarr.com", mnd.FakeAPIKey)
 	if website.ValidAPIKey() != nil {
-		c.Config.APIKey = "api-key-from-notifiarr.com"
+		c.Config.APIKey = mnd.FakeAPIKey
+		return
 	}
 
 	// write new config file to temporary path.
 	destFile := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "_tmpConfig")
 	if _, err := c.Config.Write(ctx, destFile, true); err != nil { // write our config file template.
 		logs.Log.Errorf("writing new (temporary) config file: %v", err)
+		return
 	}
 
 	// move new config file to existing config file.
@@ -212,8 +211,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 	}
 
 	go func() {
-		open, _ := ui.Question("http://127.0.0/1:5454 - Your Web UI password was set to "+newPassword+
-			" and was also printed in the log file:"+c.Config.LogFile+"\n\nOpen Web UI?\n", false)
+		open, _ := ui.Question("http://127.0.0/1:5454 - Open Notifiarr Client Web UI?\n", false)
 		if open {
 			_ = ui.OpenURL(ctx, "http://127.0.0.1:5454")
 		}
@@ -221,16 +219,15 @@ func (c *Client) makeNewConfigFile(ctx context.Context, newPassword string) {
 }
 
 // loadConfiguration brings in, and sometimes creates, the initial running configuration.
-func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error) {
+func (c *Client) loadConfiguration(ctx context.Context) ([]string, error) {
 	var (
-		msg, newPassword string
-		err              error
+		msg string
+		err error
 	)
 	// Find or write a config file. This does not parse it.
 	// A config file is only written when none is found on Windows, macOS (GUI App only), or Docker.
 	// And in the case of Docker, only if `/config` is a mounted volume.
-	write := (!c.Flags.Restart && ui.HasGUI()) || mnd.IsDocker
-	c.Flags.ConfigFile, newPassword, msg = c.Config.FindAndReturn(ctx, c.Flags.ConfigFile, write)
+	c.Flags.ConfigFile, msg = c.Config.FindAndReturn(ctx, c.Flags.ConfigFile)
 	output := []string{msg}
 
 	if c.Flags.Restart {
@@ -239,7 +236,7 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 			executablePath = os.Args[0]
 		}
 
-		return output, newPassword, update.Restart(ctx, &update.Command{ //nolint:wrapcheck
+		return output, update.Restart(ctx, &update.Command{ //nolint:wrapcheck
 			Path: executablePath,
 			Args: []string{"--updated", "--config", c.Flags.ConfigFile},
 		}, os.Getppid())
@@ -248,14 +245,14 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, string, error
 	// Parse the config file and environment variables.
 	result, err := c.getConfig(ctx)
 	if err != nil {
-		return output, newPassword, err
+		return output, err
 	}
 
 	for file, path := range result.Output {
 		output = append(output, fmt.Sprintf("Extra Config File: %s => %s", file, path))
 	}
 
-	return output, newPassword, nil
+	return output, nil
 }
 
 // Load configuration from the website.
@@ -320,7 +317,9 @@ func (c *Client) configureServicesPlex(ctx context.Context) {
 	}
 }
 
+// triggerConfigReload triggers a configuration reload. You should usually call c.Lock() before calling this.
 func (c *Client) triggerConfigReload(event website.EventType, source string) {
+	c.reloading = true
 	c.reload <- customReload{event: event, msg: source}
 }
 

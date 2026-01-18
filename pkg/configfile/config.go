@@ -41,8 +41,7 @@ import (
 const (
 	MsgNoConfigFile = "Using env variables only. Config file not found."
 	MsgConfigFailed = "Using env variables only. Could not create config file: "
-	MsgConfigCreate = "Created new config file '%s'. Your Web UI '%s' user password is '%s' " +
-		"and will not be printed again. Log in, and change it."
+	MsgConfigCreate = "Created new config file '%s'."
 	MsgConfigFound  = "Using Config File: "
 	DefaultUsername = "admin"
 	DefaultHeader   = "X-Webauth-User"
@@ -215,10 +214,6 @@ func (c *Config) fixConfig() {
 		c.Retries = website.DefaultRetries
 	}
 
-	if c.UIPassword.Val() == "" && len(c.APIKey) == website.APIKeyLength {
-		_ = c.UIPassword.Set(DefaultUsername, c.APIKey)
-	}
-
 	// Windows has no stdout, so turn it off.
 	c.LogConfig.Quiet = mnd.IsWindows || c.LogConfig.Quiet
 	c.Services.Plugins = &c.Snapshot.Plugins
@@ -261,7 +256,7 @@ func (c *Config) setup(flag *Flags, svc *services.Services, apps *apps.Apps) *tr
 }
 
 // FindAndReturn return a config file. Write one if requested.
-func (c *Config) FindAndReturn(ctx context.Context, configFile string, write bool) (string, string, string) {
+func (c *Config) FindAndReturn(ctx context.Context, configFile string) (string, string) {
 	var (
 		confFile string
 		stat     os.FileInfo
@@ -282,40 +277,32 @@ func (c *Config) FindAndReturn(ctx context.Context, configFile string, write boo
 
 	if configFile = ""; confFile != "" {
 		configFile, _ = filepath.Abs(confFile)
-		return configFile, "", MsgConfigFound + configFile + mnd.DurationAge(stat.ModTime())
+		return configFile, MsgConfigFound + configFile + mnd.DurationAge(stat.ModTime())
 	}
 
-	if defaultConfigFile != "" && write {
+	if defaultConfigFile != "" {
+		// If we get to this point, we have not found a config file, but we have a "path" for a default, so write it there.
 		return c.writeDefaultConfigFile(ctx, defaultConfigFile, confFile)
 	}
 
-	return configFile, "", MsgNoConfigFile
+	return configFile, MsgNoConfigFile
 }
 
-func (c *Config) writeDefaultConfigFile(ctx context.Context, defaultFile, configFile string) (string, string, string) {
-	// If we are writing a config file, set a password.
-	newPassword := c.APIKey
-	if len(newPassword) != website.APIKeyLength {
-		newPassword = GeneratePassword()
-	}
-
-	// Save the original password as plain text.
-	c.UIPassword = CryptPass(DefaultUsername + ":" + newPassword)
-
+func (c *Config) writeDefaultConfigFile(ctx context.Context, defaultFile, configFile string) (string, string) {
 	findFile, err := c.Write(ctx, defaultFile, false)
 	if err != nil {
-		return configFile, newPassword, MsgConfigFailed + err.Error()
+		return configFile, MsgConfigFailed + err.Error()
 	} else if findFile == "" {
-		return configFile, "", MsgNoConfigFile
+		return configFile, MsgNoConfigFile
 	}
 
-	msg := fmt.Sprintf(MsgConfigCreate, findFile, DefaultUsername, newPassword)
+	msg := fmt.Sprintf(MsgConfigCreate, findFile)
 
 	if err := cnfgfile.Unmarshal(c, findFile); err != nil {
-		return findFile, newPassword, msg + ": " + err.Error()
+		return findFile, msg + ": " + err.Error()
 	}
 
-	return findFile, newPassword, msg
+	return findFile, msg
 }
 
 // Write config to a file.

@@ -40,6 +40,7 @@ const (
 	IsFreeBSD       = runtime.GOOS == "freebsd"
 	IsDarwin        = runtime.GOOS == "darwin"
 	ContentTypeJSON = "application/json; charset=utf-8"
+	FakeAPIKey      = "api-key-from-notifiarr.com"
 )
 
 // Application Defaults.

@@ -137,6 +137,10 @@ func (p CryptPass) Val() string {
 // Valid checks if a password is valid.
 func (p CryptPass) Valid(username, password string) bool {
 	storedHash := []byte(strings.TrimPrefix(p.Val(), authPassword))
+	// just make sure it's not empty, or short enough to be something else.
+	if len(storedHash) <= bcrypt.DefaultCost {
+		return false
+	}
 
 	if p.Webauth() {
 		return false
