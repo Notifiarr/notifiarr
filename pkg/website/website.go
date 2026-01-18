@@ -260,6 +260,10 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 
 // TestApiKey tests if the API key is valid.
 func TestApiKey(ctx context.Context, apiKey string) error {
+	if site == nil {
+		return ErrNoChannel // this will never happen, but we'll be safe.
+	}
+
 	path := BaseURL + ValidateRoute.Path(EventUser)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, path, nil)

@@ -211,7 +211,7 @@ func (c *Client) makeNewConfigFile(ctx context.Context) {
 	}
 
 	go func() {
-		open, _ := ui.Question("http://127.0.0/1:5454 - Open Notifiarr Client Web UI?\n", false)
+		open, _ := ui.Question("http://127.0.0.1:5454 - Open Notifiarr Client Web UI?\n", false)
 		if open {
 			_ = ui.OpenURL(ctx, "http://127.0.0.1:5454")
 		}

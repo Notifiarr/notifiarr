@@ -1237,7 +1237,4 @@ func (c *Client) handleAPIKey(respond http.ResponseWriter, request *http.Request
 	// respond.
 	logs.Log.Printf("[gui '%s' requested] Updated Configuration. Reloading in 5 seconds...", username)
 	http.Error(respond, "Config Saved. Reloading in 5 seconds...", http.StatusOK)
-
-	respond.WriteHeader(http.StatusOK)
-	_, _ = respond.Write([]byte("API key set successfully, reloading!"))
 }
