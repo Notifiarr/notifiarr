@@ -33,15 +33,15 @@ const (
 
 func (c *Config) setupPassword() error {
 	pass := c.UIPassword.Val()
-	if pass == "" || c.UIPassword.Webauth() {
+	if pass == "" || c.UIPassword.IsCrypted() {
 		return nil
 	}
 
-	if !c.UIPassword.IsCrypted() && !strings.Contains(pass, ":") {
-		pass = DefaultUsername + ":" + pass
+	if spl := strings.SplitN(pass, ":", 2); len(spl) == 2 { //nolint:mnd
+		return c.UIPassword.Set(spl[0], spl[1])
 	}
 
-	return c.UIPassword.Set(pass)
+	return c.UIPassword.Set(DefaultUsername, pass)
 }
 
 func (t AuthType) Type() string {
@@ -61,12 +61,17 @@ func (t AuthType) String() string {
 }
 
 // Set sets an encrypted password.
-func (p *CryptPass) Set(pass string) error {
-	if strings.HasPrefix(pass, authPassword) ||
-		strings.HasPrefix(pass, authHeader+":") ||
-		strings.HasPrefix(pass, authNone+":") ||
-		pass == "" {
-		*p = CryptPass(pass)
+func (p *CryptPass) Set(username, password string) error {
+	pass := username + ":" + password
+	if username == "" {
+		pass = password
+	}
+
+	if strings.HasPrefix(pass, authPassword) || // it's encrypted
+		username == authHeader || // it's a header auth
+		username == authNone || // auth disabled
+		pass == "" { // it's empty
+		*p = CryptPass(pass) // set the password
 		return nil
 	}
 
@@ -81,7 +86,7 @@ func (p *CryptPass) Set(pass string) error {
 }
 
 func (p *CryptPass) SetNoAuth(header string) error {
-	return p.Set(authNone + ":" + header)
+	return p.Set(authNone, header)
 }
 
 func (p *CryptPass) SetHeader(header string) error {
@@ -89,7 +94,7 @@ func (p *CryptPass) SetHeader(header string) error {
 		return ErrEmptyHeader
 	}
 
-	return p.Set(authHeader + ":" + header)
+	return p.Set(authHeader, header)
 }
 
 // Type returns the authentication type configured.
@@ -130,9 +135,18 @@ func (p CryptPass) Val() string {
 }
 
 // Valid checks if a password is valid.
-func (p CryptPass) Valid(pass string) bool {
-	hash := []byte(strings.TrimPrefix(p.Val(), authPassword))
-	return !p.Webauth() && bcrypt.CompareHashAndPassword(hash, []byte(pass)) == nil
+func (p CryptPass) Valid(username, password string) bool {
+	storedHash := []byte(strings.TrimPrefix(p.Val(), authPassword))
+
+	if p.Webauth() {
+		return false
+	}
+
+	if bcrypt.CompareHashAndPassword(storedHash, []byte(username+":"+password)) == nil {
+		return true
+	}
+
+	return false
 }
 
 // IsCrypted checks if a password string is already encrypted.

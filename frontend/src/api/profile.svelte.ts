@@ -5,6 +5,7 @@ import type { Config, Profile, ProfilePost } from './notifiarrConfig'
 import { _ } from '../includes/Translate.svelte'
 import { delay, failure, success } from '../includes/util'
 import { urlbase } from './fetch'
+import CryptoJS from 'crypto-js'
 
 class ConfigProfile {
   private profile: Writable<Profile>
@@ -20,7 +21,7 @@ class ConfigProfile {
   /** Display an error message (form feedback) to the user after calling one of the update methods. */
   public formError = $state('')
 
-  constructor() {
+  constructor () {
     this.profile = writable<Profile>({} as Profile)
     setInterval(() => (this.now = Date.now()), 1234)
   }
@@ -70,8 +71,8 @@ class ConfigProfile {
       await (this.error == ''
         ? (this.updated = new Date())
         : (this.error = get(_)('phrases.FailedToReload', {
-            values: { error: this.error },
-          })))
+          values: { error: this.error },
+        })))
     } catch (e) {
       this.error = `${e}`
       failure(this.error)
@@ -85,6 +86,8 @@ class ConfigProfile {
     this.status = get(_)('phrases.SavingConfiguration')
     this.error = ''
     this.updated = null
+    form.password = CryptoJS.MD5(form.password).toString()
+    form.newPass = CryptoJS.MD5(form.newPass).toString()
 
     const { ok, body } = await postUi('profile', JSON.stringify(form), false)
 
@@ -126,10 +129,11 @@ class ConfigProfile {
 
   public async login(name: string, password: string): Promise<string | null> {
     try {
+      const sha = CryptoJS.MD5(password).toString()
       const response = await fetchWithTimeout('?login=true', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ name, password }),
+        body: new URLSearchParams({ name, password, sha }),
       })
 
       if (!response.ok)

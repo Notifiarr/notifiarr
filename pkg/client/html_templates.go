@@ -37,7 +37,7 @@ func (c *Client) setUserPass(ctx context.Context, authType configfile.AuthType, 
 
 	switch authType {
 	case configfile.AuthPassword:
-		err = c.Config.UIPassword.Set(username + ":" + password)
+		err = c.Config.UIPassword.Set(username, password)
 	case configfile.AuthHeader:
 		err = c.Config.UIPassword.SetHeader(username)
 	case configfile.AuthNone:
@@ -185,7 +185,6 @@ func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
 	output := make(map[string]*snapshot.Partition)
 
 	maps.Copy(output, disks)
-
 	maps.Copy(output, zfspools)
 
 	return output

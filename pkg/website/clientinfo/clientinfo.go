@@ -19,6 +19,12 @@ type ClientInfo struct {
 	User struct {
 		// user id from notifiarr db.
 		ID any `json:"id"`
+		// Username is the username of the user's account on notifiarr.com. Sometimes it's empty.
+		Username string `json:"username"`
+		// Email is the md5 hashed email address of the user's account on notifiarr.com.
+		Email string `json:"email"`
+		// Password is the md5+bcrypt hashed password of the user's account on notifiarr.com.
+		Password string `json:"password"`
 		// This is printed on startup and on the UI landing page.
 		WelcomeMSG string `json:"welcome"`
 		// Is the user a subscriber?

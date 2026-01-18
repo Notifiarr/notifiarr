@@ -2185,6 +2185,10 @@
                             "description": "Is the user allowed to use non-production website apis?",
                             "type": "boolean"
                         },
+                        "email": {
+                            "description": "Email is the md5 hashed email address of the user's account on notifiarr.com.",
+                            "type": "string"
+                        },
                         "id": {
                             "description": "user id from notifiarr db."
                         },
@@ -2194,6 +2198,10 @@
                             "items": {
                                 "$ref": "#/definitions/clientinfo.MuleryServer"
                             }
+                        },
+                        "password": {
+                            "description": "Password is the md5+bcrypt hashed password of the user's account on notifiarr.com.",
+                            "type": "string"
                         },
                         "patron": {
                             "description": "Is the user a patron?",
@@ -2217,6 +2225,10 @@
                             "items": {
                                 "type": "string"
                             }
+                        },
+                        "username": {
+                            "description": "Username is the username of the user's account on notifiarr.com. Sometimes it's empty.",
+                            "type": "string"
                         },
                         "welcome": {
                             "description": "This is printed on startup and on the UI landing page.",
@@ -2474,9 +2486,7 @@
                         1,
                         1000,
                         1000000,
-                        1000000000,
-                        60000000000,
-                        3600000000000
+                        1000000000
                     ],
                     "x-enum-varnames": [
                         "minDuration",
@@ -2490,9 +2500,7 @@
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
-                        "Second",
-                        "Minute",
-                        "Hour"
+                        "Second"
                     ]
                 }
             }
@@ -3529,20 +3537,9 @@
                 524288,
                 2401763328,
                 511,
-                2147483648,
-                1073741824,
-                536870912,
-                268435456,
-                134217728,
-                67108864,
-                33554432,
-                16777216,
                 8388608,
                 4194304,
-                2097152,
                 1048576,
-                524288,
-                2401763328,
                 511,
                 2147483648,
                 1073741824,
@@ -3677,48 +3674,48 @@
             "properties": {
                 "apiHits": {
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {}
                 },
                 "apps": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": {}
                     }
                 },
                 "fileWatcher": {
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {}
                 },
                 "httpRequests": {
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {}
                 },
                 "logFiles": {
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {}
                 },
                 "serviceChecks": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": {}
                     }
                 },
                 "timerCounts": {
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {}
                 },
                 "timerEvents": {
                     "type": "object",
                     "additionalProperties": {
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": {}
                     }
                 },
                 "website": {
                     "type": "object",
-                    "additionalProperties": true
+                    "additionalProperties": {}
                 }
             }
         },
@@ -5617,7 +5614,7 @@
         },
         "snapshot.MySQLStatus": {
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": {}
         },
         "snapshot.NullString": {
             "type": "object",

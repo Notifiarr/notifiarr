@@ -2,7 +2,6 @@ package client
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -231,7 +230,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	currUser, dynamic := c.getUserName(request)
 	if !dynamic {
 		// If the auth is currently using a password, check the password.
-		if !c.checkUserPass(currUser, post.Password) {
+		if !c.Config.UIPassword.Valid(currUser, post.Password) {
 			logs.Log.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return
@@ -285,13 +284,6 @@ func (c *Client) handleProfilePostPassword(
 	newUser, newPassw string,
 ) {
 	currUser, _ := c.getUserName(request)
-
-	if len(newPassw) < minPasswordLen {
-		logs.Log.Errorf("[gui '%s' requested] New password must be at least %d characters.", currUser, minPasswordLen)
-		http.Error(response, fmt.Sprintf("New password must be at least %d characters.",
-			minPasswordLen), http.StatusBadRequest)
-		return
-	}
 
 	if err := c.setUserPass(request.Context(), configfile.AuthPassword, newUser, newPassw); err != nil {
 		logs.Log.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
