@@ -47,6 +47,11 @@ func (c *Client) httpHandlers() {
 		c.apps.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
 	}
 
+	// If api key is set to "disabled", then the Web UI gets turned off.
+	if c.Config.UIPassword == "disabled" {
+		return
+	}
+
 	c.apps.Router.PathPrefix(path.Join(base, "/assets/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), gzip(frontend.IndexHandler)))
 	c.apps.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")

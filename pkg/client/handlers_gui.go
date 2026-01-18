@@ -131,6 +131,8 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	providedUsername := request.FormValue("name")
 
 	switch {
+	case c.Config.UIPassword == "disabled":
+		http.Error(response, "Web UI is disabled.", http.StatusForbidden)
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
 	case request.Method != http.MethodPost: // dont handle login without POST

@@ -136,17 +136,11 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 			return fmt.Errorf("cannot reset admin password, got error reading configuration file: %w", err)
 		}
 
-		ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
-		defer cancel()
-
 		return c.resetAdminPassword(ctx)
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
 		for _, msg := range msgs {
 			logs.Log.Printf("==> %s", msg)
 		}
-
-		ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
-		defer cancel()
 
 		return c.forceWriteWithExit(ctx, c.Flags.Write)
 	case err != nil:
@@ -154,10 +148,7 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 	case c.Flags.Restart:
 		return nil
 	default:
-		if len(c.Config.APIKey) != website.APIKeyLength {
-			c.makeNewConfigFile(ctx)
-		}
-
+		c.makeNewConfigFile(ctx)
 		return c.start(ctx, msgs)
 	}
 }
@@ -189,6 +180,11 @@ func (c *Client) start(ctx context.Context, msgs []string) error {
 }
 
 func (c *Client) makeNewConfigFile(ctx context.Context) {
+	if website.ValidAPIKey() == nil {
+		// API key is already valid, so we don't need to do anything here.
+		return
+	}
+
 	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 	defer cancel()
 
