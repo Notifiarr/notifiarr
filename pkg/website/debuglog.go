@@ -32,12 +32,12 @@ func (s *server) debughttplog(resp *http.Response, url string, start time.Time, 
 	if data == "" {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.config.Apps.MaxBody))
 		mnd.Log.Debugf("Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
-			url, time.Since(start).Round(time.Microsecond), mnd.FormatBytes(bodySize), status, headers, truncatedBody)
+			url, time.Since(start).Round(time.Microsecond), mnd.FormatBytes(bodySize), status, headers.String(), truncatedBody)
 	} else {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.config.Apps.MaxBody))
 		mnd.Log.Debugf("Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
 			mnd.FormatBytes(len(data)), url, time.Since(start).Round(time.Microsecond),
-			data, mnd.FormatBytes(bodySize), status, headers, truncatedBody)
+			data, mnd.FormatBytes(bodySize), status, headers.String(), truncatedBody)
 	}
 }
 

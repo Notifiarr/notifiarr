@@ -3,7 +3,15 @@
   import { delay } from './includes/util'
   import { _ } from './includes/Translate.svelte'
   import { profile } from './api/profile.svelte'
-  import { Button, Spinner, CardBody, CardFooter, Input } from '@sveltestrap/sveltestrap'
+  import {
+    Button,
+    Spinner,
+    CardBody,
+    CardFooter,
+    Input,
+    CardHeader,
+    CardTitle,
+  } from '@sveltestrap/sveltestrap'
   import Nodal from './includes/Nodal.svelte'
 
   let username = $state('')
@@ -39,6 +47,7 @@
   {@html $_('phrases.LoginHelpBody')}
 </Nodal>
 
+<CardHeader><CardTitle>{$_('buttons.Login')}</CardTitle></CardHeader>
 <CardBody>
   <form {onsubmit}>
     <Input

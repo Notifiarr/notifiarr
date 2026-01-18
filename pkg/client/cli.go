@@ -44,6 +44,9 @@ func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error 
 		configfile.ForceAllTmpl = true
 	}
 
+	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
+	defer cancel()
+
 	f, err := c.Config.Write(ctx, fileName, false)
 	if err != nil {
 		return fmt.Errorf("writing config: %w", err)
@@ -66,6 +69,9 @@ func (c *Client) resetAdminPassword(ctx context.Context) error {
 
 	logs.Log.Printf("New '%s' user password: %s", configfile.DefaultUsername, password)
 	logs.Log.Printf("Writing Config File: %s", c.Flags.ConfigFile)
+
+	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
+	defer cancel()
 
 	return c.saveNewConfig(ctx, c.Config)
 }

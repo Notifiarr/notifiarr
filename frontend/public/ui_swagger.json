@@ -2189,6 +2189,10 @@
                             "description": "Email is the md5 hashed email address of the user's account on notifiarr.com.",
                             "type": "string"
                         },
+                        "hash": {
+                            "description": "Password is the md5+bcrypt hashed password of the user's account on notifiarr.com.",
+                            "type": "string"
+                        },
                         "id": {
                             "description": "user id from notifiarr db."
                         },
@@ -2198,10 +2202,6 @@
                             "items": {
                                 "$ref": "#/definitions/clientinfo.MuleryServer"
                             }
-                        },
-                        "password": {
-                            "description": "Password is the md5+bcrypt hashed password of the user's account on notifiarr.com.",
-                            "type": "string"
                         },
                         "patron": {
                             "description": "Is the user a patron?",
@@ -2483,10 +2483,14 @@
                         1000000000,
                         60000000000,
                         3600000000000,
+                        -9223372036854775808,
+                        9223372036854775807,
                         1,
                         1000,
                         1000000,
-                        1000000000
+                        1000000000,
+                        60000000000,
+                        3600000000000
                     ],
                     "x-enum-varnames": [
                         "minDuration",
@@ -2497,10 +2501,14 @@
                         "Second",
                         "Minute",
                         "Hour",
+                        "minDuration",
+                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
-                        "Second"
+                        "Second",
+                        "Minute",
+                        "Hour"
                     ]
                 }
             }
@@ -3537,10 +3545,6 @@
                 524288,
                 2401763328,
                 511,
-                8388608,
-                4194304,
-                1048576,
-                511,
                 2147483648,
                 1073741824,
                 536870912,
@@ -3556,9 +3560,20 @@
                 524288,
                 2401763328,
                 511,
+                2147483648,
+                1073741824,
+                536870912,
+                268435456,
+                134217728,
+                67108864,
+                33554432,
+                16777216,
                 8388608,
                 4194304,
+                2097152,
                 1048576,
+                524288,
+                2401763328,
                 511
             ],
             "x-enum-comments": {
@@ -3592,10 +3607,6 @@
                 "t: sticky",
                 "?: non-regular file; nothing else is known about this file",
                 "",
-                "Unix permission bits, 0o777",
-                "u: setuid",
-                "g: setgid",
-                "t: sticky",
                 "Unix permission bits, 0o777"
             ],
             "x-enum-varnames": [
@@ -3613,10 +3624,6 @@
                 "ModeSticky",
                 "ModeIrregular",
                 "ModeType",
-                "ModePerm",
-                "ModeSetuid",
-                "ModeSetgid",
-                "ModeSticky",
                 "ModePerm"
             ]
         },

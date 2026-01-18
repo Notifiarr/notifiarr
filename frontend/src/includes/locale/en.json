@@ -142,7 +142,7 @@
     "ShutdownSuccess": "Shutdown successful! Client stopped.",
     "FailedToShutdown": "Failed to shutdown: {error} - Try reloading the page.",
     "LoginHelp": "Login Help",
-    "LoginHelpBody": "If you've forgotten your password, please see the <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">forgotten passwords</a> wiki page. If this is your first time logging in you can find your password in the client log file. If you provided an API key to the client before starting it for the first time, then your password is the API key.",
+    "LoginHelpBody": "If this is your first time logging in, use your email address and password from notifiarr.com to login. You can set a local password after logging in. If you've forgotten your local password, please see the <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">forgotten passwords</a> wiki page.",
     "Changed": "Changed",
     "New": "New",
     "Invalid": "Invalid",
@@ -161,7 +161,14 @@
       "SelectASection": "Select a section from the navigation menu to get started.",
       "Welcome": "Welcome, {username}!"
     },
-    "ShowMore": "Show more information"
+    "ShowMore": "Show more information",
+    "APIKey": {
+      "title": "Provide API Key",
+      "placeholder": "Global API key from notifiarr.com",
+      "setMsg": "API key set successfully!",
+      "Setting": "Setting API key...",
+      "description": "The Notifiarr client requires a valid API key to function. This key is used to authenticate with the Notifiarr website to receive updates and to send notifications. The client will not work without it, so please enter your API key below."
+    }
   },
   "navigation": {
     "titles": {
@@ -213,6 +220,7 @@
   },
   "config": {
     "errors": {
+      "SetAPIKeyFailed": "Failed to set API key: {error}",
       "InvalidCreds": "Invalid username or password.",
       "LoginRequestTimedOut": "Login request timed out",
       "LoginFailed": "Login failed: {error}",

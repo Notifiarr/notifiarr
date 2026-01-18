@@ -2,6 +2,8 @@ package clientinfo
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"slices"
@@ -11,6 +13,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"golang.org/x/crypto/bcrypt"
 	"golift.io/cnfg"
 )
 
@@ -24,7 +27,7 @@ type ClientInfo struct {
 		// Email is the md5 hashed email address of the user's account on notifiarr.com.
 		Email string `json:"email"`
 		// Password is the md5+bcrypt hashed password of the user's account on notifiarr.com.
-		Password string `json:"password"`
+		Password string `json:"hash"`
 		// This is printed on startup and on the UI landing page.
 		WelcomeMSG string `json:"welcome"`
 		// Is the user a subscriber?
@@ -237,4 +240,20 @@ func (i InstanceConfig) Corrupt(instance int) string {
 	}
 
 	return mnd.Disabled
+}
+
+// CheckPassword checks if a password is valid for a given username, using website credentials.
+func CheckPassword(username, password string) bool {
+	ci := Get() //nolint:varnamelen
+	if ci == nil {
+		return false
+	}
+
+	// The email address comes from the website as an md5 string.
+	md5user := md5.Sum([]byte(username))
+	if hex.EncodeToString(md5user[:]) != ci.User.Email && ci.User.Username != username {
+		return false
+	}
+
+	return bcrypt.CompareHashAndPassword([]byte(ci.User.Password), []byte(password)) == nil
 }

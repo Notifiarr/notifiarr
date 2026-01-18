@@ -1759,7 +1759,7 @@ export interface ClientInfo {
     id?: any;
     username: string;
     email: string;
-    password: string;
+    hash: string;
     welcome: string;
     subscriber: boolean;
     patron: boolean;

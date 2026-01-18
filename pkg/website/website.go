@@ -257,3 +257,33 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 
 	return &resp, nil
 }
+
+// TestApiKey tests if the API key is valid.
+func TestApiKey(ctx context.Context, apiKey string) error {
+	if site == nil {
+		return ErrNoChannel // this will never happen, but we'll be safe.
+	}
+
+	path := BaseURL + ValidateRoute.Path(EventUser)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, path, nil)
+	if err != nil {
+		return fmt.Errorf("creating notifiarr.com request: %w", err)
+	}
+
+	req.Header.Set("X-Api-Key", apiKey)
+
+	resp, err := site.client.Do(req)
+	if err != nil {
+		return fmt.Errorf("making notifiarr.com request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	_, _ = io.Copy(io.Discard, resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("%w: %s", ErrInvalidAPIKey, resp.Status)
+	}
+
+	return nil
+}

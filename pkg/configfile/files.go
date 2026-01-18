@@ -29,11 +29,9 @@ func defaultLocactions() (string, []string) { //nolint:cyclop
 
 	switch runtime.GOOS {
 	case mnd.Windows:
-		return `C:\ProgramData\notifiarr\notifiarr.conf`, []string{
-			`~\.dnclient\dnclient.conf`,
+		return `.\notifiarr.conf`, []string{
 			`~\.notifiarr\notifiarr.conf`,
 			`C:\ProgramData\notifiarr\notifiarr.conf`,
-			`C:\ProgramData\discordnotifier-client\dnclient.conf`,
 			`.\notifiarr.conf`,
 		}
 	case "darwin":
