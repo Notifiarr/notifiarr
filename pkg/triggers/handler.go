@@ -2,6 +2,7 @@ package triggers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"path"
@@ -15,6 +16,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -103,11 +105,11 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	_ = req.ParseForm()
 	input.Args = req.PostForm["args"]
 
-	return a.runTrigger(req.Context(), input, trigger, content)
+	return a.runTrigger(req, input, trigger, content)
 }
 
 //nolint:cyclop,funlen,gocyclo
-func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, trigger, content string) (int, string) {
+func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigger, content string) (int, string) {
 	switch trigger {
 	case "custom", "TrigCustomCronTimer":
 		return a.customTimer(input, content)
@@ -162,7 +164,7 @@ func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, tri
 	case "reload", "TrigStop":
 		return a.handleConfigReload()
 	case "notification":
-		return a.notification(ctx, content)
+		return a.notification(req.Context(), content)
 	case "emptyplextrash", "TrigPlexEmptyTrash":
 		return a.emptyplextrash(input, content)
 	case "mdblist", "TrigMDBListSync":
@@ -170,7 +172,7 @@ func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, tri
 	case "uploadlog", "TrigUploadFile":
 		return a.uploadlog(input, content)
 	case "reconfig", "TrigReconfig":
-		return a.reconfig(input)
+		return a.reconfig(req, input)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
@@ -556,8 +558,18 @@ func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string
 // @Failure		404		{object}	string								"bad token or api key"
 // @Router			/trigger/reconfig [get]
 // @Security		ApiKeyAuth
-func (a *Actions) reconfig(input *common.ActionInput) (int, string) {
+func (a *Actions) reconfig(req *http.Request, input *common.ActionInput) (int, string) {
+	var actions *clientinfo.Actions
+
+	if req.Method == http.MethodPost {
+		actions = new(clientinfo.Actions)
+		if err := json.NewDecoder(req.Body).Decode(actions); err != nil {
+			return http.StatusBadRequest, "decoding client info actions: " + err.Error()
+		}
+	}
+
 	mnd.Log.Printf("[%s requested] Reconfiguring Actions from website settings.", input.Type)
-	a.inCh <- input.Type
+	a.inCh <- inChData{EventType: input.Type, Actions: actions}
+
 	return http.StatusOK, <-a.outCh
 }

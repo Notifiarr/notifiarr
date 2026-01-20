@@ -17,6 +17,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/crontimer"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/emptytrash"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
@@ -66,7 +67,7 @@ type Actions struct {
 	PlexCron   *plexcron.Action
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
-	inCh       chan website.EventType
+	inCh       chan inChData
 	outCh      chan string
 }
 
@@ -98,7 +99,7 @@ func New(ctx context.Context, config *Config) *Actions {
 		PlexCron:   plex,
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
-		inCh:       make(chan website.EventType),
+		inCh:       make(chan inChData),
 		outCh:      make(chan string),
 	}
 
@@ -158,17 +159,35 @@ func (a *Actions) Stop(event website.EventType) context.Context {
 	return ctx
 }
 
+type inChData struct {
+	website.EventType
+	*clientinfo.Actions
+}
+
+// watchChan watches the inCh channel for new events from the website.
+// This is what the website uses to reconfigure actions, instead of reloading the app.
 func (a *Actions) watchChan(ctx context.Context) {
 	for event := range a.inCh {
-		a.outCh <- "Actions reconfiguration triggered"
-		_, err := a.Config.CI.SaveClientInfo(ctx, false)
-		if err != nil {
-			logs.Log.ErrorfNoShare("Error reconfiguring: %v", err)
+		a.outCh <- "Actions reconfiguration triggered."
+
+		if event.Actions != nil {
+			// Handle POSTed actions data.
+			clientInfo := clientinfo.Get()
+			if clientInfo == nil {
+				logs.Log.ErrorfNoShare("[%s requested] Client info not found", event.EventType)
+				continue
+			}
+
+			clientInfo.Actions = *event.Actions
+			data.Save("clientInfo", clientInfo)
+		} else if _, err := a.Config.CI.SaveClientInfo(ctx, false); err != nil {
+			// ^ Go fetch the actions data from the website.
+			logs.Log.ErrorfNoShare("[%s requested] Error reconfiguring: %v", event.EventType, err)
 			continue
 		}
 
-		logs.Log.Printf("[%s requested]  reconfiguration: restarting actions.", event)
-		a.Stop(event)
+		logs.Log.Printf("[%s requested] Actions reconfiguration: restarting actions.", event.EventType)
+		a.Stop(event.EventType)
 		a.Start(ctx, nil, nil)
 	}
 }
