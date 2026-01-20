@@ -127,6 +127,19 @@ class ConfigProfile {
     return true
   }
 
+  public async setApiKey(apiKey: string): Promise<string | null> {
+    try {
+      const response = await fetchWithTimeout('?setApiKey=true', {
+        method: 'PUT',
+        headers: { 'X-Api-Key': apiKey },
+      }, 15000)
+      if (!response.ok) return `${await response.text()}`
+      return null
+    } catch (err) {
+      return `${err}`
+    }
+  }
+
   public async login(name: string, password: string): Promise<string | null> {
     try {
       const sha = CryptoJS.MD5(password).toString()

@@ -12,6 +12,7 @@ import (
 	"github.com/CAFxX/httpcompression"
 	"github.com/Notifiarr/notifiarr/frontend"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"golift.io/starr"
 )
@@ -46,14 +47,27 @@ func (c *Client) httpHandlers() {
 		c.apps.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
 	}
 
-	if c.Config.UIPassword == "" {
+	// If api key is set to "disabled", then the Web UI gets turned off.
+	if c.Config.UIPassword == "disabled" {
 		return
 	}
 
 	c.apps.Router.PathPrefix(path.Join(base, "/assets/")).
 		Handler(http.StripPrefix(strings.TrimSuffix(base, "/"), gzip(frontend.IndexHandler)))
 	c.apps.Router.Handle(path.Join(base, "/logout"), gzip(c.logoutHandler)).Methods("GET", "POST")
-	c.httpGuiHandlers(base, compress)
+
+	// If there is no API key set, allow the user to set it from the GUI, and that's all they can do.
+	if len(c.Config.APIKey) != website.APIKeyLength {
+		gui := c.apps.Router.PathPrefix(path.Join(base, "/ui")).Subrouter()
+		gui.Use(compress)
+		gui.HandleFunc("/profile", c.handleProfileNoAPIKey).Methods("GET")
+		gui.HandleFunc("/shutdown", c.handleShutdown).Methods("GET")
+		gui.HandleFunc("/reload", c.handleReload).Methods("GET")
+		c.apps.Router.NewRoute().Methods("PUT").Queries("setApiKey", "true").
+			Headers("X-API-Key", "").HandlerFunc(c.handleAPIKey)
+	} else {
+		c.httpGuiHandlers(base, compress)
+	}
 }
 
 func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler) http.Handler) {

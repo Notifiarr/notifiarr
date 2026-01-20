@@ -30,6 +30,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/update"
 	"github.com/Notifiarr/notifiarr/pkg/website"
+	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
 	"github.com/shirou/gopsutil/v4/disk"
 	"golift.io/cnfgfile"
@@ -130,21 +131,35 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 	providedUsername := request.FormValue("name")
 
 	switch {
+	case c.Config.UIPassword == "disabled":
+		http.Error(response, "Web UI is disabled.", http.StatusForbidden)
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
-	case request.Method == http.MethodGet: // dont handle login without POST
+	case request.Method != http.MethodPost: // dont handle login without POST
 		c.indexPage(request.Context(), response, request)
 	case c.webauth:
 		c.indexPage(request.Context(), response, request)
 	case c.Config.UIPassword.Valid(providedUsername, request.FormValue("password")):
 		c.updateToNewPasswordMD5(request.Context(), loggedinUsername, providedUsername, request.FormValue("sha"))
+		logs.Log.Printf("[gui '%s' requested] Updated config with new password format.", providedUsername)
 		fallthrough
 	case c.Config.UIPassword.Valid(providedUsername, request.FormValue("sha")):
 		request = c.setSession(providedUsername, response, request)
-		mnd.HTTPRequests.Add("GUI Logins", 1)
 		c.handleProfile(response, request)
+		mnd.HTTPRequests.Add("GUI Logins", 1)
+		logs.Log.Printf("[gui '%s' requested] Authenticated with local credentials", providedUsername)
+	case clientinfo.CheckPassword(providedUsername, request.FormValue("sha")):
+		providedUsername = clientinfo.Get().User.Username
+		if providedUsername == "" {
+			providedUsername = "admin"
+		}
+
+		request = c.setSession(providedUsername, response, request)
+		c.handleProfile(response, request)
+		mnd.HTTPRequests.Add("GUI Logins", 1)
+		logs.Log.Printf("[gui '%s' requested] Authenticated with website credentials", providedUsername)
 	default: // Start over.
-		c.indexPage(request.Context(), response, request)
+		http.Error(response, "Unauthorized", http.StatusUnauthorized)
 	}
 }
 
@@ -341,9 +356,7 @@ func (c *Client) handleReload(response http.ResponseWriter, _ *http.Request) {
 
 func (c *Client) reloadAppNow() {
 	c.Lock()
-	c.reloading = true
-	c.Unlock()
-
+	defer c.Unlock()
 	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
 }
 
@@ -1194,4 +1207,36 @@ func (c *Client) indexPage(_ context.Context, response http.ResponseWriter, requ
 	}
 
 	frontend.IndexHandler(response, request)
+}
+
+// handleAPIKey allows updating the API key from the GUI without a password.
+// This method is only enabled if the API Key is not 36 characters long.
+func (c *Client) handleAPIKey(respond http.ResponseWriter, request *http.Request) {
+	err := website.TestApiKey(request.Context(), request.Header.Get("X-Api-Key"))
+	if err != nil {
+		http.Error(respond, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	c.Lock()
+	defer c.Unlock()
+
+	c.Config.APIKey = request.Header.Get("X-Api-Key")
+
+	err = c.saveNewConfig(request.Context(), c.Config)
+	if err != nil {
+		http.Error(respond, "Failed Writing Config File: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	defer c.triggerConfigReload(website.EventGUI, "GUI Requested")
+
+	username, _ := c.getUserName(request)
+	if username == "" {
+		username = "user"
+	}
+
+	// respond.
+	logs.Log.Printf("[gui '%s' requested] Updated Configuration. Reloading in 5 seconds...", username)
+	http.Error(respond, "Config Saved. Reloading in 5 seconds...", http.StatusOK)
 }
