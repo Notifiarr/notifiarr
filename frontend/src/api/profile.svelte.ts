@@ -65,18 +65,15 @@ class ConfigProfile {
     try {
       success(get(_)('phrases.ConfigurationSavedReloading'))
       this.status = get(_)('phrases.Reloading')
-      await checkReloaded()
+      await checkReloaded() // ping until up.
       this.status = get(_)('phrases.UpdatingBackEnd')
-      this.error = await this.fetch()
-      await (this.error == ''
-        ? (this.updated = new Date())
-        : (this.error = get(_)('phrases.FailedToReload', {
-          values: { error: this.error },
-        })))
-    } catch (e) {
-      this.error = `${e}`
-      failure(this.error)
+      await this.refresh() // reload the profile data from backend.
+    } catch (err) {
+      const error = (err instanceof Error ? err.message : err) as string
+      this.error = get(_)('phrases.FailedToReload', { values: { error } })
+      failure(this.error) // toast the error to the user.
     } finally {
+      await delay(789) // wait a bit before clearing the top-status message.
       this.status = ''
     }
   }
