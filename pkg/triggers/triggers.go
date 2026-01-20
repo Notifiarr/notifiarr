@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
@@ -65,10 +66,12 @@ type Actions struct {
 	PlexCron   *plexcron.Action
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
+	inCh       chan website.EventType
+	outCh      chan string
 }
 
 // New turns a populated Config into a pile of Actions.
-func New(config *Config) *Actions {
+func New(ctx context.Context, config *Config) *Actions {
 	common := &common.Config{
 		Snapshot: config.Snapshot,
 		Apps:     config.Apps,
@@ -78,7 +81,7 @@ func New(config *Config) *Actions {
 	common.Scheduler, _ = gocron.NewScheduler()
 	plex := plexcron.New(common, &config.Apps.Plex)
 
-	return &Actions{
+	actions := &Actions{
 		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
 		Backups:    backups.New(common),
 		CFSync:     cfsync.New(common),
@@ -95,7 +98,13 @@ func New(config *Config) *Actions {
 		PlexCron:   plex,
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
+		inCh:       make(chan website.EventType),
+		outCh:      make(chan string),
 	}
+
+	go actions.watchChan(ctx)
+
+	return actions
 }
 
 // These methods use reflection so they never really need to be updated.
@@ -147,4 +156,19 @@ func (a *Actions) Stop(event website.EventType) context.Context {
 	}
 
 	return ctx
+}
+
+func (a *Actions) watchChan(ctx context.Context) {
+	for event := range a.inCh {
+		a.outCh <- "Actions reconfiguration triggered"
+		_, err := a.Config.CI.SaveClientInfo(ctx, false)
+		if err != nil {
+			logs.Log.ErrorfNoShare("Error reconfiguring: %v", err)
+			continue
+		}
+
+		logs.Log.Printf("[%s requested]  reconfiguration: restarting actions.", event)
+		a.Stop(event)
+		a.Start(ctx, nil, nil)
+	}
 }
