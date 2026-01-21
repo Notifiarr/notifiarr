@@ -109,76 +109,83 @@ type Profile struct {
 func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	logs.Log.Printf("handleProfile 1 - these are temporary debug messages")
 	profile := &Profile{
-		Config:          *c.Config,
-		ClientInfo:      clientinfo.Get(),
-		IsWindows:       mnd.IsWindows,
-		IsLinux:         mnd.IsLinux,
-		IsDarwin:        mnd.IsDarwin,
-		IsFreeBSD:       mnd.IsFreeBSD,
-		IsDocker:        mnd.IsDocker,
-		IsUnstable:      mnd.IsUnstable,
-		IsSynology:      mnd.IsSynology,
-		Headers:         c.getProfileHeaders(req),
-		Fortune:         Fortune(),
-		UpstreamAllowed: c.allow.Contains(req.RemoteAddr),
-		UpstreamHeader:  c.Config.UIPassword.Header(),
-		UpstreamType:    c.Config.UIPassword.Type(),
-		Updated:         time.Now().UTC(),
-		Languages:       frontend.Translations(),
-		ProxyAllow:      c.allow.Contains(req.RemoteAddr),
-		Flags:           c.Flags,
-		Webauth:         c.webauth,
-		LogFiles:        logs.Log.GetAllLogFilePaths(),
-		CheckResults:    c.Services.GetResults(),
-		CheckRunning:    c.Services.Running(),
-		CheckDisabled:   c.Services.Disabled,
-		SiteCrons:       c.triggers.CronTimer.List(),
-		Expvar:          mnd.GetAllData(),
-		Started:         version.Started.Round(time.Second),
-		CmdList:         c.triggers.Commands.List(),
-		Program:         c.Flags.Name(),
-		Version:         version.Version,
-		Revision:        version.Revision,
-		Branch:          version.Branch,
-		BuildUser:       version.BuildUser,
-		BuildDate:       version.BuildDate,
-		GoVersion:       version.GoVersion,
-		OS:              runtime.GOOS,
-		Arch:            runtime.GOARCH,
-		Environment:     environ(),
-		Docker:          mnd.IsDocker,
-		UID:             os.Getuid(),
-		GID:             os.Getgid(),
-		Gateway:         getGateway(),
-		MD5:             private.MD5(),
+		Config:     *c.Config,
+		IsWindows:  mnd.IsWindows,
+		IsLinux:    mnd.IsLinux,
+		IsDarwin:   mnd.IsDarwin,
+		IsFreeBSD:  mnd.IsFreeBSD,
+		IsDocker:   mnd.IsDocker,
+		IsUnstable: mnd.IsUnstable,
+		IsSynology: mnd.IsSynology,
+		Flags:      c.Flags,
+		Webauth:    c.webauth,
+		Version:    version.Version,
+		Revision:   version.Revision,
+		Branch:     version.Branch,
+		BuildUser:  version.BuildUser,
+		BuildDate:  version.BuildDate,
+		GoVersion:  version.GoVersion,
+		OS:         runtime.GOOS,
+		Arch:       runtime.GOARCH,
+		Docker:     mnd.IsDocker,
 	}
 
+	profile.ClientInfo = clientinfo.Get()
 	if profile.ClientInfo == nil {
 		profile.ClientInfo = &clientinfo.ClientInfo{}
 	}
-
 	logs.Log.Printf("handleProfile 2")
+	profile.UpstreamAllowed = c.allow.Contains(req.RemoteAddr)
+	profile.UpstreamHeader = c.Config.UIPassword.Header()
+	profile.UpstreamType = c.Config.UIPassword.Type()
 
+	logs.Log.Printf("handleProfile 3")
+	profile.Updated = time.Now().UTC()
+	profile.Languages = frontend.Translations()
+	profile.ProxyAllow = c.allow.Contains(req.RemoteAddr)
+
+	logs.Log.Printf("handleProfile 4")
+	profile.Headers = c.getProfileHeaders(req)
+	profile.Environment = environ()
+
+	logs.Log.Printf("handleProfile 5")
+	profile.Fortune = Fortune()
+
+	logs.Log.Printf("handleProfile 6")
 	profile.Username, profile.Dynamic = c.getUserName(req)
 	profile.UpstreamIP = strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]")
 	profile.Binary, _ = os.Executable()
-	logs.Log.Printf("handleProfile 3")
 
-	outboundIP := clientinfo.GetOutboundIP(req.Context())
-	logs.Log.Printf("handleProfile 4")
+	logs.Log.Printf("handleProfile 7")
+	profile.IP = clientinfo.GetOutboundIP(req.Context())
+	profile.IfName, profile.Netmask = getIfNameAndNetmask(profile.IP)
 
+	logs.Log.Printf("handleProfile 8")
+	profile.LogFiles = logs.Log.GetAllLogFilePaths()
+
+	logs.Log.Printf("handleProfile 9")
+	profile.CheckResults = c.Services.GetResults()
+	profile.CheckRunning = c.Services.Running()
+	profile.CheckDisabled = c.Services.Disabled
+
+	logs.Log.Printf("handleProfile 10")
+	profile.SiteCrons = c.triggers.CronTimer.List()
+	profile.Expvar = mnd.GetAllData()
+	profile.Started = version.Started.Round(time.Second)
+	profile.CmdList = c.triggers.Commands.List()
+	profile.Program = c.Flags.Name()
+
+	logs.Log.Printf("handleProfile 11")
+	profile.UID = os.Getuid()
+	profile.GID = os.Getgid()
+	profile.Gateway = getGateway()
+	profile.MD5 = private.MD5()
+
+	logs.Log.Printf("handleProfile 12")
 	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
 	profile.ConfigFiles = logs.GetFilePaths(c.Flags.ConfigFile, backupPath)
-	logs.Log.Printf("handleProfile 5")
-
-	profile.IfName, profile.Netmask = getIfNameAndNetmask(outboundIP)
-	logs.Log.Printf("handleProfile 6")
-
 	profile.HostInfo, _ = website.GetHostInfo(req.Context())
-	logs.Log.Printf("handleProfile 7")
-
 	profile.Triggers, profile.Timers, profile.Schedules = c.triggers.GatherTriggerInfo()
-	logs.Log.Printf("handleProfile 8")
 
 	profile.PlexInfo = &plex.PMSInfo{}
 	profile.PlexAge = time.Time{}
@@ -186,30 +193,24 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		profile.PlexAge = ps.Time
 		profile.PlexInfo, _ = ps.Data.(*plex.PMSInfo)
 	}
-	logs.Log.Printf("handleProfile 9")
 
 	if at := data.Get("activeTunnel"); at != nil {
 		profile.ActiveTunnel, _ = at.Data.(string)
 	}
-
-	logs.Log.Printf("handleProfile 10")
 
 	if c.tunnel != nil {
 		profile.TunnelPoolStats = c.tunnel.PoolStats()
 	}
 
 	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
-	logs.Log.Printf("handleProfile 11")
 
-	logs.Log.Printf("handleProfile 12")
 	profile.Disks = c.getDisks(req.Context())
-	logs.Log.Printf("handleProfile 13")
 
 	if err := json.NewEncoder(resp).Encode(profile); err != nil {
 		logs.Log.Errorf("Writing HTTP Response: %v", err)
 	}
 
-	logs.Log.Printf("handleProfile 14")
+	logs.Log.Printf("handleProfile end")
 }
 
 // handleProfileNoAPIKey handles a minimal profile response for the UI when no API key is set.
