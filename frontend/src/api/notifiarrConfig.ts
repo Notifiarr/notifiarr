@@ -1330,9 +1330,6 @@ export interface Profile {
   proxyAllow: boolean;
   started: Date;
   cmdList?: CmdconfigConfig[];
-  checkResults?: CheckResult[];
-  checkRunning: boolean;
-  checkDisabled: boolean;
   program: string;
   version: string;
   revision: string;
@@ -2014,6 +2011,31 @@ export interface AllData {
 };
 
 /**
+ * PoolSize represent the number of open connections per status.
+ * @see golang: <golift.io/mulery/client.PoolSize>
+ */
+export interface PoolSize {
+  disconnects: number;
+  connecting: number;
+  idle: number;
+  running: number;
+  total: number;
+  lastConn: Date;
+  lastTry: Date;
+  active: boolean;
+};
+
+/**
+ * ServicesConfig is the data returned by the services/config GET endpoint.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.ServicesConfig>
+ */
+export interface ClientServicesConfig {
+  results?: CheckResult[];
+  running: boolean;
+  disabled: boolean;
+};
+
+/**
  * CheckResult represents the status of a service.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.CheckResult>
  */
@@ -2032,21 +2054,6 @@ export interface CheckResult {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Output>
  */
 export interface Output {};
-
-/**
- * PoolSize represent the number of open connections per status.
- * @see golang: <golift.io/mulery/client.PoolSize>
- */
-export interface PoolSize {
-  disconnects: number;
-  connecting: number;
-  idle: number;
-  running: number;
-  total: number;
-  lastConn: Date;
-  lastTry: Date;
-  active: boolean;
-};
 
 /**
  * ProfilePost is the data sent to the profile POST endpoint when updating the trust profile.

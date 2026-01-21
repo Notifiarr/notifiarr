@@ -69,9 +69,6 @@ type Profile struct {
 	ProxyAllow      bool                           `json:"proxyAllow"`
 	Started         time.Time                      `json:"started"`
 	CmdList         []*cmdconfig.Config            `json:"cmdList"`
-	CheckResults    []*services.CheckResult        `json:"checkResults"`
-	CheckRunning    bool                           `json:"checkRunning"`
-	CheckDisabled   bool                           `json:"checkDisabled"`
 	Program         string                         `json:"program"`
 	Version         string                         `json:"version"`
 	Revision        string                         `json:"revision"`
@@ -107,85 +104,62 @@ type Profile struct {
 //
 //nolint:funlen
 func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
-	logs.Log.Printf("handleProfile 1 - these are temporary debug messages")
 	profile := &Profile{
-		Config:        *c.Config,
-		IsWindows:     mnd.IsWindows,
-		IsLinux:       mnd.IsLinux,
-		IsDarwin:      mnd.IsDarwin,
-		IsFreeBSD:     mnd.IsFreeBSD,
-		IsDocker:      mnd.IsDocker,
-		IsUnstable:    mnd.IsUnstable,
-		IsSynology:    mnd.IsSynology,
-		Flags:         c.Flags,
-		Webauth:       c.webauth,
-		CheckDisabled: c.Services.Disabled,
-		Version:       version.Version,
-		Revision:      version.Revision,
-		Branch:        version.Branch,
-		BuildUser:     version.BuildUser,
-		BuildDate:     version.BuildDate,
-		GoVersion:     version.GoVersion,
-		OS:            runtime.GOOS,
-		Arch:          runtime.GOARCH,
-		Docker:        mnd.IsDocker,
+		Config:     *c.Config,
+		IsWindows:  mnd.IsWindows,
+		IsLinux:    mnd.IsLinux,
+		IsDarwin:   mnd.IsDarwin,
+		IsFreeBSD:  mnd.IsFreeBSD,
+		IsDocker:   mnd.IsDocker,
+		IsUnstable: mnd.IsUnstable,
+		IsSynology: mnd.IsSynology,
+		Flags:      c.Flags,
+		Webauth:    c.webauth,
+		UpstreamIP: strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]"),
+		Version:    version.Version,
+		Revision:   version.Revision,
+		Branch:     version.Branch,
+		BuildUser:  version.BuildUser,
+		BuildDate:  version.BuildDate,
+		GoVersion:  version.GoVersion,
+		OS:         runtime.GOOS,
+		Arch:       runtime.GOARCH,
+		Docker:     mnd.IsDocker,
 	}
 
-	profile.ClientInfo = clientinfo.Get()
-	if profile.ClientInfo == nil {
-		profile.ClientInfo = &clientinfo.ClientInfo{}
-	}
-	logs.Log.Printf("handleProfile 2")
 	profile.UpstreamAllowed = c.allow.Contains(req.RemoteAddr)
 	profile.UpstreamHeader = c.Config.UIPassword.Header()
 	profile.UpstreamType = c.Config.UIPassword.Type()
-
-	logs.Log.Printf("handleProfile 3")
 	profile.Updated = time.Now().UTC()
 	profile.Languages = frontend.Translations()
 	profile.ProxyAllow = c.allow.Contains(req.RemoteAddr)
-
-	logs.Log.Printf("handleProfile 4")
 	profile.Headers = c.getProfileHeaders(req)
 	profile.Environment = environ()
-
-	logs.Log.Printf("handleProfile 5")
 	profile.Fortune = Fortune()
-
-	logs.Log.Printf("handleProfile 6")
 	profile.Username, profile.Dynamic = c.getUserName(req)
-	profile.UpstreamIP = strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]")
 	profile.Binary, _ = os.Executable()
-
-	logs.Log.Printf("handleProfile 7")
 	profile.IP = clientinfo.GetOutboundIP(req.Context())
 	profile.IfName, profile.Netmask = getIfNameAndNetmask(profile.IP)
-
-	logs.Log.Printf("handleProfile 8")
 	profile.LogFiles = logs.Log.GetAllLogFilePaths()
-
-	logs.Log.Printf("handleProfile 9")
-	profile.CheckResults = c.Services.GetResults()
-	profile.CheckRunning = c.Services.Running()
-
-	logs.Log.Printf("handleProfile 10")
 	profile.SiteCrons = c.triggers.CronTimer.List()
 	profile.Expvar = mnd.GetAllData()
 	profile.Started = version.Started.Round(time.Second)
 	profile.CmdList = c.triggers.Commands.List()
 	profile.Program = c.Flags.Name()
-
-	logs.Log.Printf("handleProfile 11")
 	profile.UID = os.Getuid()
 	profile.GID = os.Getgid()
 	profile.Gateway = getGateway()
 	profile.MD5 = private.MD5()
-
-	logs.Log.Printf("handleProfile 12")
-	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
-	profile.ConfigFiles = logs.GetFilePaths(c.Flags.ConfigFile, backupPath)
+	profile.ConfigFiles = logs.GetFilePaths(c.Flags.ConfigFile,
+		filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile)))
 	profile.HostInfo, _ = website.GetHostInfo(req.Context())
 	profile.Triggers, profile.Timers, profile.Schedules = c.triggers.GatherTriggerInfo()
+	profile.Disks = c.getDisks(req.Context())
+
+	profile.ClientInfo = clientinfo.Get()
+	if profile.ClientInfo == nil {
+		profile.ClientInfo = &clientinfo.ClientInfo{}
+	}
 
 	profile.PlexInfo = &plex.PMSInfo{}
 	profile.PlexAge = time.Time{}
@@ -204,13 +178,9 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 
 	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
 
-	profile.Disks = c.getDisks(req.Context())
-
 	if err := json.NewEncoder(resp).Encode(profile); err != nil {
 		logs.Log.Errorf("Writing HTTP Response: %v", err)
 	}
-
-	logs.Log.Printf("handleProfile end")
 }
 
 // handleProfileNoAPIKey handles a minimal profile response for the UI when no API key is set.
@@ -389,4 +359,33 @@ func (c *Client) getProfileHeaders(req *http.Request) http.Header {
 	}
 
 	return headers
+}
+
+// ServicesConfig is the data returned by the services/config GET endpoint.
+type ServicesConfig struct {
+	Results  []*services.CheckResult `json:"results"`
+	Running  bool                    `json:"running"`
+	Disabled bool                    `json:"disabled"`
+}
+
+// handleServicesConfig returns the services config information including results and running status.
+//
+//	@Summary		Get services config
+//	@Description	Returns services config information including results and running status.
+//	@Tags			System
+//	@Produce		json
+//	@Success		200	{object}	ServicesConfig	"services config data"
+//	@Failure		401	{string}	string	"unauthorized"
+//	@Router			/services/config [get]
+func (c *Client) handleServicesConfig(resp http.ResponseWriter, req *http.Request) {
+	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
+
+	err := json.NewEncoder(resp).Encode(&ServicesConfig{
+		Results:  c.Services.GetResults(),
+		Running:  c.Services.Running(),
+		Disabled: c.Services.Disabled,
+	})
+	if err != nil {
+		logs.Log.Errorf("Writing HTTP Response: %v", err)
+	}
 }

@@ -743,6 +743,32 @@
                 }
             }
         },
+        "/services/config": {
+            "get": {
+                "description": "Returns services config information including results and running status.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get services config",
+                "responses": {
+                    "200": {
+                        "description": "services config data",
+                        "schema": {
+                            "$ref": "#/definitions/client.ServicesConfig"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/services/{action}": {
             "get": {
                 "description": "Pauses or resumes all service checks.",
@@ -1811,18 +1837,6 @@
                 "buildUser": {
                     "type": "string"
                 },
-                "checkDisabled": {
-                    "type": "boolean"
-                },
-                "checkResults": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/services.CheckResult"
-                    }
-                },
-                "checkRunning": {
-                    "type": "boolean"
-                },
                 "clientInfo": {
                     "$ref": "#/definitions/clientinfo.ClientInfo"
                 },
@@ -2026,6 +2040,23 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "client.ServicesConfig": {
+            "type": "object",
+            "properties": {
+                "disabled": {
+                    "type": "boolean"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.CheckResult"
+                    }
+                },
+                "running": {
+                    "type": "boolean"
                 }
             }
         },
@@ -2480,14 +2511,11 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
                         1000000000,
-                        60000000000,
-                        3600000000000
+                        60000000000
                     ],
                     "x-enum-varnames": [
                         "minDuration",
@@ -2498,14 +2526,11 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
                         "Second",
-                        "Minute",
-                        "Hour"
+                        "Minute"
                     ]
                 }
             }

@@ -57,7 +57,7 @@
   </thead>
 
   <tbody>
-    {#each $profile.checkResults ?? [] as result}
+    {#each chk.config?.results ?? [] as result}
       {@const id = btoa(result.name + 'table').replace(/=/g, '')}
       <tr>
         <td class="fw-bold">

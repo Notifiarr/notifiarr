@@ -28,7 +28,7 @@ func (c *Client) httpHandlers() {
 
 	defer func() {
 		// SPA gets all the requests so it can handle its own page router.
-		c.apps.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
+		c.apps.Router.PathPrefix("/").Handler(gzip(c.loginDelayHandler)).Methods("POST").Queries("login", "{login}")
 		c.apps.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
 		c.apps.Router.PathPrefix("/").Handler(gzip(c.notFound))
 		// 404 (or redirect to base path) everything else
@@ -39,12 +39,12 @@ func (c *Client) httpHandlers() {
 	frontend.URLBase = base
 
 	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")
-	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginHandler)).Methods("POST")
+	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginDelayHandler)).Methods("POST")
 
 	// Handle the same URLs as above on the different base URL too.
 	if !strings.EqualFold(base, "/") {
 		c.apps.Router.Handle(base, gzip(c.slash)).Methods("GET")
-		c.apps.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
+		c.apps.Router.Handle(base, gzip(c.loginDelayHandler)).Methods("POST")
 	}
 
 	// If api key is set to "disabled", then the Web UI gets turned off.
@@ -86,6 +86,7 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET").Queries("sort", "{sort}")
 	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET")
 	gui.HandleFunc("/profile", c.handleProfilePost).Methods("POST")
+	gui.HandleFunc("/services/config", c.handleServicesConfig).Methods("GET")
 	gui.HandleFunc("/ps", c.handleProcessList).Methods("GET")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST").Queries("noreload", "{noreload}")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")

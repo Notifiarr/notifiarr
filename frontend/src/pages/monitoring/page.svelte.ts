@@ -3,7 +3,7 @@ import { getUi } from '../../api/fetch'
 import { delay, success, warning } from '../../includes/util'
 import { get } from 'svelte/store'
 import { _ } from 'svelte-i18n'
-import { profile } from '../../api/profile.svelte'
+import type { ClientServicesConfig as ServicesConfig } from '../../api/notifiarrConfig'
 
 export const page = {
   id: 'Monitoring',
@@ -31,11 +31,15 @@ class Mon {
     3: 'info',
   }
 
+  public config = $state<ServicesConfig | null>(null)
+
   public updateBackend = async (e: Event) => {
     this.refresh = true
     e.preventDefault()
     try {
-      await profile.refresh()
+      const resp = await getUi('services/config')
+      if (!resp.ok) throw new Error('Failed to get services config')
+      this.config = resp.body as ServicesConfig
     } catch (error) {
       warning(`${error}`)
     } finally {

@@ -28,7 +28,7 @@
 </script>
 
 <div class="row cards-page">
-  {#each $profile.checkResults?.sort( (a, b) => a.name.localeCompare(b.name), ) ?? [] as result}
+  {#each chk.config?.results?.sort( (a, b) => a.name.localeCompare(b.name), ) ?? [] as result}
     {@const id = btoa(result.name + 'card').replace(/=/g, '')}
     {@const icon = showOutput[id] ? faArrowUpFromBracket : faArrowDownToBracket}
 
