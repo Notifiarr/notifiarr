@@ -263,10 +263,13 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 }
 
 func (s *Services) Running() bool {
+	mnd.Log.Printf("debug: Running 1, await lock")
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
+	mnd.Log.Printf("debug: Running 2, locked")
 
 	s.actionChan <- actionCheck
+	mnd.Log.Printf("debug: Running 3, sent action")
 	return <-s.replyChan
 }
 

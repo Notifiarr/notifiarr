@@ -133,8 +133,8 @@ func (s *Service) update(res *result) bool {
 	mnd.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
 	//	mnd.ServiceChecks.Add("Total Checks Run", 1)
 
-	s.Lock()
-	defer s.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if s.LastCheck = time.Now().Round(time.Microsecond); s.Since.IsZero() {
 		s.Since = s.LastCheck
@@ -288,8 +288,8 @@ func (s *ServiceConfig) checkTCP(ctx context.Context) *result {
 }
 
 func (s *Service) Due(now time.Time) bool {
-	s.RLock()
-	defer s.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return s.Interval.Duration > 0 && now.Sub(s.LastCheck) > s.Interval.Duration
 }

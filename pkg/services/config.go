@@ -132,12 +132,12 @@ type ServiceConfig struct {
 }
 
 type Service struct {
-	Output       *Output    `json:"output"`
-	State        CheckState `json:"state"`
-	Since        time.Time  `json:"since"`
-	LastCheck    time.Time  `json:"lastCheck"`
-	log          mnd.Logger
-	sync.RWMutex `json:"-"`
+	Output    *Output    `json:"output"`
+	State     CheckState `json:"state"`
+	Since     time.Time  `json:"since"`
+	LastCheck time.Time  `json:"lastCheck"`
+	log       mnd.Logger
+	mu        sync.RWMutex `json:"-"`
 	*ServiceConfig
 }
 

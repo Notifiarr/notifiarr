@@ -109,25 +109,26 @@ type Profile struct {
 func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	logs.Log.Printf("handleProfile 1 - these are temporary debug messages")
 	profile := &Profile{
-		Config:     *c.Config,
-		IsWindows:  mnd.IsWindows,
-		IsLinux:    mnd.IsLinux,
-		IsDarwin:   mnd.IsDarwin,
-		IsFreeBSD:  mnd.IsFreeBSD,
-		IsDocker:   mnd.IsDocker,
-		IsUnstable: mnd.IsUnstable,
-		IsSynology: mnd.IsSynology,
-		Flags:      c.Flags,
-		Webauth:    c.webauth,
-		Version:    version.Version,
-		Revision:   version.Revision,
-		Branch:     version.Branch,
-		BuildUser:  version.BuildUser,
-		BuildDate:  version.BuildDate,
-		GoVersion:  version.GoVersion,
-		OS:         runtime.GOOS,
-		Arch:       runtime.GOARCH,
-		Docker:     mnd.IsDocker,
+		Config:        *c.Config,
+		IsWindows:     mnd.IsWindows,
+		IsLinux:       mnd.IsLinux,
+		IsDarwin:      mnd.IsDarwin,
+		IsFreeBSD:     mnd.IsFreeBSD,
+		IsDocker:      mnd.IsDocker,
+		IsUnstable:    mnd.IsUnstable,
+		IsSynology:    mnd.IsSynology,
+		Flags:         c.Flags,
+		Webauth:       c.webauth,
+		CheckDisabled: c.Services.Disabled,
+		Version:       version.Version,
+		Revision:      version.Revision,
+		Branch:        version.Branch,
+		BuildUser:     version.BuildUser,
+		BuildDate:     version.BuildDate,
+		GoVersion:     version.GoVersion,
+		OS:            runtime.GOOS,
+		Arch:          runtime.GOARCH,
+		Docker:        mnd.IsDocker,
 	}
 
 	profile.ClientInfo = clientinfo.Get()
@@ -166,7 +167,6 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	logs.Log.Printf("handleProfile 9")
 	profile.CheckResults = c.Services.GetResults()
 	profile.CheckRunning = c.Services.Running()
-	profile.CheckDisabled = c.Services.Disabled
 
 	logs.Log.Printf("handleProfile 10")
 	profile.SiteCrons = c.triggers.CronTimer.List()

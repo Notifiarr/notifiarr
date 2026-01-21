@@ -84,17 +84,21 @@ func (s *Services) GetResults() []*CheckResult {
 	svcs := make([]*CheckResult, len(s.services))
 	count := 0
 
+	mnd.Log.Printf("debug: GetResults 1, copying %d services", len(s.services))
+
 	for _, svc := range s.services {
 		svcs[count] = svc.copyResults()
 		count++
 	}
 
+	mnd.Log.Printf("debug: GetResults 2")
+
 	return svcs
 }
 
 func (s *Service) copyResults() *CheckResult {
-	s.RLock()
-	defer s.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return &CheckResult{
 		Interval:    s.Interval.Duration.Seconds(),
