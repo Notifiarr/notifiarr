@@ -67,7 +67,6 @@ type Profile struct {
 	HostInfo        *host.InfoStat                 `json:"hostInfo"`
 	Disks           map[string]*snapshot.Partition `json:"disks"`
 	ProxyAllow      bool                           `json:"proxyAllow"`
-	PoolStats       map[string]*mulery.PoolSize    `json:"poolStats"`
 	Started         time.Time                      `json:"started"`
 	CmdList         []*cmdconfig.Config            `json:"cmdList"`
 	CheckResults    []*services.CheckResult        `json:"checkResults"`
@@ -108,48 +107,10 @@ type Profile struct {
 //
 //nolint:funlen
 func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
-	clientInfo := clientinfo.Get()
-	if clientInfo == nil {
-		clientInfo = &clientinfo.ClientInfo{}
-	}
-
-	username, dynamic := c.getUserName(req)
-	upstreamIP := strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]")
-	binary, _ := os.Executable()
-	outboundIP := clientinfo.GetOutboundIP(req.Context())
-	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
-	ifName, netmask := getIfNameAndNetmask(outboundIP)
-	hostInfo, _ := website.GetHostInfo(req.Context())
-	activeTunnel := ""
-	poolStats := map[string]*mulery.PoolSize{}
-	triggers, timers, schedules := c.triggers.GatherTriggerInfo()
-
-	plexInfo := &plex.PMSInfo{}
-	plexAge := time.Time{}
-	if ps := data.Get("plexStatus"); ps != nil {
-		plexAge = ps.Time
-		plexInfo, _ = ps.Data.(*plex.PMSInfo)
-	}
-
-	if at := data.Get("activeTunnel"); at != nil {
-		activeTunnel, _ = at.Data.(string)
-	}
-
-	if c.tunnel != nil {
-		poolStats = c.tunnel.PoolStats()
-	}
-
-	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
-
-	if err := json.NewEncoder(resp).Encode(&Profile{
-		PlexInfo:        plexInfo,
-		PlexAge:         plexAge,
-		Triggers:        triggers,
-		Timers:          timers,
-		Schedules:       schedules,
-		Username:        username,
+	logs.Log.Printf("handleProfile 1 - these are temporary debug messages")
+	profile := &Profile{
 		Config:          *c.Config,
-		ClientInfo:      clientInfo,
+		ClientInfo:      clientinfo.Get(),
 		IsWindows:       mnd.IsWindows,
 		IsLinux:         mnd.IsLinux,
 		IsDarwin:        mnd.IsDarwin,
@@ -159,7 +120,6 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		IsSynology:      mnd.IsSynology,
 		Headers:         c.getProfileHeaders(req),
 		Fortune:         Fortune(),
-		UpstreamIP:      upstreamIP,
 		UpstreamAllowed: c.allow.Contains(req.RemoteAddr),
 		UpstreamHeader:  c.Config.UIPassword.Header(),
 		UpstreamType:    c.Config.UIPassword.Type(),
@@ -167,17 +127,13 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		Languages:       frontend.Translations(),
 		ProxyAllow:      c.allow.Contains(req.RemoteAddr),
 		Flags:           c.Flags,
-		Dynamic:         dynamic,
 		Webauth:         c.webauth,
 		LogFiles:        logs.Log.GetAllLogFilePaths(),
-		ConfigFiles:     logs.GetFilePaths(c.Flags.ConfigFile, backupPath),
 		CheckResults:    c.Services.GetResults(),
 		CheckRunning:    c.Services.Running(),
 		CheckDisabled:   c.Services.Disabled,
 		SiteCrons:       c.triggers.CronTimer.List(),
-		Disks:           c.getDisks(req.Context()),
 		Expvar:          mnd.GetAllData(),
-		HostInfo:        hostInfo,
 		Started:         version.Started.Round(time.Second),
 		CmdList:         c.triggers.Commands.List(),
 		Program:         c.Flags.Name(),
@@ -189,21 +145,71 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		GoVersion:       version.GoVersion,
 		OS:              runtime.GOOS,
 		Arch:            runtime.GOARCH,
-		Binary:          binary,
 		Environment:     environ(),
 		Docker:          mnd.IsDocker,
 		UID:             os.Getuid(),
 		GID:             os.Getgid(),
-		IP:              outboundIP,
 		Gateway:         getGateway(),
-		IfName:          ifName,
-		Netmask:         netmask,
 		MD5:             private.MD5(),
-		ActiveTunnel:    activeTunnel,
-		TunnelPoolStats: poolStats,
-	}); err != nil {
+	}
+
+	if profile.ClientInfo == nil {
+		profile.ClientInfo = &clientinfo.ClientInfo{}
+	}
+
+	logs.Log.Printf("handleProfile 2")
+
+	profile.Username, profile.Dynamic = c.getUserName(req)
+	profile.UpstreamIP = strings.Trim(req.RemoteAddr[:strings.LastIndex(req.RemoteAddr, ":")], "[]")
+	profile.Binary, _ = os.Executable()
+	logs.Log.Printf("handleProfile 3")
+
+	outboundIP := clientinfo.GetOutboundIP(req.Context())
+	logs.Log.Printf("handleProfile 4")
+
+	backupPath := filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile))
+	profile.ConfigFiles = logs.GetFilePaths(c.Flags.ConfigFile, backupPath)
+	logs.Log.Printf("handleProfile 5")
+
+	profile.IfName, profile.Netmask = getIfNameAndNetmask(outboundIP)
+	logs.Log.Printf("handleProfile 6")
+
+	profile.HostInfo, _ = website.GetHostInfo(req.Context())
+	logs.Log.Printf("handleProfile 7")
+
+	profile.Triggers, profile.Timers, profile.Schedules = c.triggers.GatherTriggerInfo()
+	logs.Log.Printf("handleProfile 8")
+
+	profile.PlexInfo = &plex.PMSInfo{}
+	profile.PlexAge = time.Time{}
+	if ps := data.Get("plexStatus"); ps != nil {
+		profile.PlexAge = ps.Time
+		profile.PlexInfo, _ = ps.Data.(*plex.PMSInfo)
+	}
+	logs.Log.Printf("handleProfile 9")
+
+	if at := data.Get("activeTunnel"); at != nil {
+		profile.ActiveTunnel, _ = at.Data.(string)
+	}
+
+	logs.Log.Printf("handleProfile 10")
+
+	if c.tunnel != nil {
+		profile.TunnelPoolStats = c.tunnel.PoolStats()
+	}
+
+	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
+	logs.Log.Printf("handleProfile 11")
+
+	logs.Log.Printf("handleProfile 12")
+	profile.Disks = c.getDisks(req.Context())
+	logs.Log.Printf("handleProfile 13")
+
+	if err := json.NewEncoder(resp).Encode(profile); err != nil {
 		logs.Log.Errorf("Writing HTTP Response: %v", err)
 	}
+
+	logs.Log.Printf("handleProfile 14")
 }
 
 // handleProfileNoAPIKey handles a minimal profile response for the UI when no API key is set.
