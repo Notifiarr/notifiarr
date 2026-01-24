@@ -41,7 +41,6 @@ type Services struct {
 // Config for this Services plugin comes from a config file.
 type Config struct {
 	Interval cnfg.Duration     `json:"interval" toml:"interval" xml:"interval"`
-	Parallel uint              `json:"parallel" toml:"parallel" xml:"parallel"`
 	Disabled bool              `json:"disabled" toml:"disabled" xml:"disabled"`
 	LogFile  string            `json:"logFile"  toml:"log_file" xml:"log_file"`
 	Plugins  *snapshot.Plugins `json:"-"        toml:"-"` // pass this in so we can service-check mysql
@@ -58,6 +57,7 @@ type data struct {
 	checkChan   chan triggerCheck
 	stopLock    sync.Mutex
 	log         mnd.Logger
+	parallel    uint
 }
 
 // CheckType locks us into a few specific types of checks.

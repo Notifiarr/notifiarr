@@ -9,7 +9,7 @@
 </script>
 
 <!-- Services Section -->
-<h4>{$_('config.titles.Services')}</h4>
+<h4>{$_('config.titles.Configuration')}</h4>
 <Row>
   <Col md={4}>
     <Input
@@ -18,21 +18,6 @@
       type="select"
       bind:value={config.services!.disabled}
       original={original.services?.disabled} />
-  </Col>
-  <Col md={4}>
-    <Input
-      id="config.services.parallel"
-      envVar="SERVICES_PARALLEL"
-      type="select"
-      options={[
-        { value: 1, name: '1' },
-        { value: 2, name: '2' },
-        { value: 3, name: '3' },
-        { value: 4, name: '4' },
-        { value: 5, name: '5' },
-      ]}
-      bind:value={config.services!.parallel}
-      original={original.services?.parallel} />
   </Col>
   <Col md={4}>
     <Input

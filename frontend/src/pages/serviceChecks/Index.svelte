@@ -28,9 +28,14 @@
   import { validator as pingValidator } from './Ping.svelte'
   import { validator as tcpValidator } from './TCP.svelte'
   import Fa from '../../includes/Fa.svelte'
+  import Configuration from './Configuration.svelte'
+  import { deepEqual } from '../../includes/util'
+
+  // Local state that syncs with profile store.
+  let config = $state($profile.config)
 
   const submit = async () => {
-    await profile.writeConfig({ ...$profile.config, service: flt.instances })
+    await profile.writeConfig({ ...config, service: flt.instances })
     if (!profile.error) flt.resetAll() // clears the delete counters.
   }
 
@@ -75,7 +80,7 @@
   let flt = $derived(new FormListTracker($profile.config.service ?? [], app))
 
   $effect(() => {
-    nav.formChanged = flt.formChanged
+    nav.formChanged = !deepEqual($profile.config, config) || flt.formChanged
   })
 
   // Shown next to the check name in each accordion header.
@@ -91,6 +96,7 @@
 <Header {page} />
 
 <CardBody>
+  <!-- Services Section -->
   <Instances {flt} Child={Check} deleteButton={app.id + '.DeleteCheck'}>
     {#snippet headerActive(index)}
       <Fa
@@ -109,9 +115,10 @@
       {flt.original?.[index]?.value.split('|')[0]}
     {/snippet}
   </Instances>
+  <Configuration bind:config original={$profile.config} />
 </CardBody>
 
-<Footer {submit} saveDisabled={!flt.formChanged || flt.invalid} />
+<Footer {submit} saveDisabled={!nav.formChanged || flt.invalid} />
 
 <style>
   :global(.header-icon) {

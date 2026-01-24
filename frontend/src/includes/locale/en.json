@@ -328,11 +328,6 @@
         "description": "Enable or disable health checks.",
         "tooltip": "Disable or enable monitoring for all health checks right here."
       },
-      "parallel": {
-        "label": "Concurrent Checks",
-        "description": "Number of health checks that may run concurrently.",
-        "tooltip": "Normally, running health checks one at a time is fine, but if you have more than 30 or 40, you may want to increase this."
-      },
       "interval": {
         "label": "Update Interval",
         "description": "Update interval for health checks.",

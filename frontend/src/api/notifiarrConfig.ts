@@ -1440,7 +1440,6 @@ export interface MySQLConfig {
  */
 export interface ServicesConfig {
   interval: string;
-  parallel: number;
   disabled: boolean;
   logFile: string;
 };

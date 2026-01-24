@@ -2514,8 +2514,7 @@
                         1,
                         1000,
                         1000000,
-                        1000000000,
-                        60000000000
+                        1000000000
                     ],
                     "x-enum-varnames": [
                         "minDuration",
@@ -2529,8 +2528,7 @@
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
-                        "Second",
-                        "Minute"
+                        "Second"
                     ]
                 }
             }
@@ -5255,9 +5253,6 @@
                 },
                 "logFile": {
                     "type": "string"
-                },
-                "parallel": {
-                    "type": "integer"
                 }
             }
         },

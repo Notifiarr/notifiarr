@@ -492,7 +492,6 @@ version = {{.Version}}
 
 [services]
   disabled = {{.Services.Disabled}} # Setting this to true disables all service checking routines.
-  parallel = {{.Services.Parallel}}     # How many services to check concurrently. 1 should be enough.
   interval = "{{.Services.Interval}}" # How often to send service states to Notifiarr.com. Minimum = 5m.
   log_file = '{{.Services.LogFile}}'    # Service Check logs go to the app log by default. Change that by setting a services.log file here.
 
