@@ -36,7 +36,9 @@
 
   const submit = async () => {
     await profile.writeConfig({ ...config, service: flt.instances })
-    if (!profile.error) flt.resetAll() // clears the delete counters.
+    if (profile.error) return
+    config = $profile.config
+    flt.resetAll() // clears the delete counters.
   }
 
   const validator = (id: string, val: any, idx: number, c: ServiceConfig[]): string => {

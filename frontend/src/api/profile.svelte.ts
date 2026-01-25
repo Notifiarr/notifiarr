@@ -38,19 +38,18 @@ class ConfigProfile {
   public async refresh() {
     const { ok, body } = await getUi('profile')
     if (!ok) throw new Error(body)
-    body.loggedIn = true
-    this.set(body)
+    else this.set({ ...body, loggedIn: true })
   }
 
   /** Use fetch to set initial profile data when logging in. */
   public async fetch(): Promise<string> {
     const { ok, body } = await getUi('profile')
     if (!ok) {
-      this.set({} as Profile)
+      this.set({} as Profile) // logs out the user.
       return body // error message
     }
-    body.loggedIn = true
-    this.set(body)
+
+    this.set({ ...body, loggedIn: true })
     return ''
   }
 
@@ -88,13 +87,9 @@ class ConfigProfile {
 
     const { ok, body } = await postUi('profile', JSON.stringify(form), false)
 
-    if (!ok) {
-      this.formError = this.error = body
-      this.status = ''
-    } else {
-      await this.waitForReload()
-      this.status = ''
-    }
+    if (!ok) this.formError = this.error = body
+    else await this.waitForReload()
+    this.status = ''
   }
 
   /** Use writeConfig to update a partial configuration on the backend and reload. */
