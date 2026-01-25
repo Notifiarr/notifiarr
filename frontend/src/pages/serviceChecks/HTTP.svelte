@@ -4,11 +4,8 @@
 
   export const validator = (id: string, value: any): string => {
     /* HTTP */
-    if (id == 'url') {
-      return value.match(/^http:\/\/../) || value.match(/^https:\/\/../)
-        ? ''
-        : get(_)('phrases.URLMustBeginWithHttp')
-    }
+    if (id == 'url' && !value.match(/^http:\/\/../) && !value.match(/^https:\/\/../))
+      return get(_)('phrases.URLMustBeginWithHttp')
     if (id === 'codes' && (!value || value.length === 0))
       return get(_)('ServiceChecks.http.codes.required')
 
