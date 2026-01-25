@@ -202,7 +202,7 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 		BindAddr: c.BindAddr,
 	})
 
-	result.Triggers = c.setup(flag, result.Services, result.Apps)
+	result.Triggers = c.setup(ctx, flag, result.Services, result.Apps)
 
 	return result, err
 }
@@ -219,7 +219,7 @@ func (c *Config) fixConfig() {
 	c.Services.Plugins = &c.Snapshot.Plugins
 }
 
-func (c *Config) setup(flag *Flags, svc *services.Services, apps *apps.Apps) *triggers.Actions {
+func (c *Config) setup(ctx context.Context, flag *Flags, svc *services.Services, apps *apps.Apps) *triggers.Actions {
 	c.URLBase = strings.TrimSuffix(path.Join("/", c.URLBase), "/") + "/"
 
 	if c.Timeout.Duration == 0 {
@@ -237,7 +237,7 @@ func (c *Config) setup(flag *Flags, svc *services.Services, apps *apps.Apps) *tr
 		Apps:      apps,
 		Endpoints: c.Endpoints,
 	}
-	triggers := triggers.New(&triggers.Config{
+	triggers := triggers.New(ctx, &triggers.Config{
 		Apps:       apps,
 		Snapshot:   &c.Snapshot,
 		WatchFiles: c.WatchFiles,

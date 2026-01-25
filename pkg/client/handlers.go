@@ -130,7 +130,6 @@ func (c *Client) httpAPIHandlers() {
 	c.apps.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
 
 	if c.Config.Plex.Enabled() {
-		c.apps.HandleAPIpath(starr.Plex, "reconfig", c.triggers.HandleReconfig, "POST")
 		c.apps.HandleAPIpath(starr.Plex, "sessions", c.apps.Plex.HandleSessions, "GET")
 		c.apps.HandleAPIpath(starr.Plex, "directory", c.apps.Plex.HandleDirectory, "GET")
 		c.apps.HandleAPIpath(starr.Plex, "emptytrash/{key}", c.apps.Plex.HandleEmptyTrash, "GET")

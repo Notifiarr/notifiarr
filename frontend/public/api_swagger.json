@@ -3277,67 +3277,6 @@
                 }
             }
         },
-        "/plex/1/reconfig": {
-            "post": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Allows reconfiguring Plex integration from website settings.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Plex"
-                ],
-                "summary": "Reconfigure Plex.",
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "400": {
-                        "description": "Input error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "bad token or api key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/plex/1/sessions": {
             "get": {
                 "security": [
@@ -13898,6 +13837,49 @@
                     },
                     "400": {
                         "description": "no content",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/trigger/reconfig": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Reconfigures actions based on website settings.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Triggers"
+                ],
+                "summary": "Reconfigure Actions",
+                "responses": {
+                    "200": {
+                        "description": "success",
                         "schema": {
                             "allOf": [
                                 {

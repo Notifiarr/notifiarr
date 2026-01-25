@@ -8,6 +8,7 @@ import (
 	"reflect"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
@@ -16,6 +17,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/crontimer"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/dashboard"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/emptytrash"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig"
@@ -65,10 +67,12 @@ type Actions struct {
 	PlexCron   *plexcron.Action
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
+	inCh       chan inChData
+	outCh      chan string
 }
 
 // New turns a populated Config into a pile of Actions.
-func New(config *Config) *Actions {
+func New(ctx context.Context, config *Config) *Actions {
 	common := &common.Config{
 		Snapshot: config.Snapshot,
 		Apps:     config.Apps,
@@ -78,7 +82,7 @@ func New(config *Config) *Actions {
 	common.Scheduler, _ = gocron.NewScheduler()
 	plex := plexcron.New(common, &config.Apps.Plex)
 
-	return &Actions{
+	actions := &Actions{
 		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
 		Backups:    backups.New(common),
 		CFSync:     cfsync.New(common),
@@ -95,7 +99,13 @@ func New(config *Config) *Actions {
 		PlexCron:   plex,
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
+		inCh:       make(chan inChData),
+		outCh:      make(chan string),
 	}
+
+	go actions.watchChan(ctx)
+
+	return actions
 }
 
 // These methods use reflection so they never really need to be updated.
@@ -147,4 +157,37 @@ func (a *Actions) Stop(event website.EventType) context.Context {
 	}
 
 	return ctx
+}
+
+type inChData struct {
+	website.EventType
+	*clientinfo.Actions
+}
+
+// watchChan watches the inCh channel for new events from the website.
+// This is what the website uses to reconfigure actions, instead of reloading the app.
+func (a *Actions) watchChan(ctx context.Context) {
+	for event := range a.inCh {
+		a.outCh <- "Actions reconfiguration triggered."
+
+		if event.Actions != nil {
+			// Handle POSTed actions data.
+			clientInfo := clientinfo.Get()
+			if clientInfo == nil {
+				logs.Log.ErrorfNoShare("[%s requested] Client info not found", event.EventType)
+				continue
+			}
+
+			clientInfo.Actions = *event.Actions
+			data.Save("clientInfo", clientInfo)
+		} else if _, err := a.Config.CI.SaveClientInfo(ctx, false); err != nil {
+			// ^ Go fetch the actions data from the website.
+			logs.Log.ErrorfNoShare("[%s requested] Error reconfiguring: %v", event.EventType, err)
+			continue
+		}
+
+		logs.Log.Printf("[%s requested] Actions reconfiguration: restarting actions.", event.EventType)
+		a.Stop(event.EventType)
+		a.Start(ctx, nil, nil)
+	}
 }

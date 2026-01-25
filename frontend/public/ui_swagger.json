@@ -2035,6 +2035,74 @@
                 }
             }
         },
+        "clientinfo.Actions": {
+            "type": "object",
+            "properties": {
+                "apps": {
+                    "description": "Site Config for Starr.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/clientinfo.AllAppConfigs"
+                        }
+                    ]
+                },
+                "custom": {
+                    "description": "Site config for Custom Crons.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/clientinfo.CronConfig"
+                    }
+                },
+                "dashboard": {
+                    "description": "Site Config for Dashboard.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/clientinfo.DashConfig"
+                        }
+                    ]
+                },
+                "gaps": {
+                    "description": "Site Config for Radarr Gaps.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/clientinfo.GapsConfig"
+                        }
+                    ]
+                },
+                "mdblist": {
+                    "description": "Site Config for MDB List.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/clientinfo.MdbListConfig"
+                        }
+                    ]
+                },
+                "plex": {
+                    "description": "Site Config for Plex.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/plex.WebsiteConfig"
+                        }
+                    ]
+                },
+                "snapshot": {
+                    "description": "Site Config for System Snapshot.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/snapshot.Config"
+                        }
+                    ]
+                },
+                "sync": {
+                    "description": "Site Config for TRaSH Sync.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/clientinfo.SyncConfig"
+                        }
+                    ]
+                }
+            }
+        },
         "clientinfo.AllAppConfigs": {
             "type": "object",
             "properties": {
@@ -2100,72 +2168,7 @@
             "type": "object",
             "properties": {
                 "actions": {
-                    "type": "object",
-                    "properties": {
-                        "apps": {
-                            "description": "Site Config for Starr.",
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/clientinfo.AllAppConfigs"
-                                }
-                            ]
-                        },
-                        "custom": {
-                            "description": "Site config for Custom Crons.",
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/clientinfo.CronConfig"
-                            }
-                        },
-                        "dashboard": {
-                            "description": "Site Config for Dashboard.",
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/clientinfo.DashConfig"
-                                }
-                            ]
-                        },
-                        "gaps": {
-                            "description": "Site Config for Radarr Gaps.",
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/clientinfo.GapsConfig"
-                                }
-                            ]
-                        },
-                        "mdblist": {
-                            "description": "Site Config for MDB List.",
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/clientinfo.MdbListConfig"
-                                }
-                            ]
-                        },
-                        "plex": {
-                            "description": "Site Config for Plex.",
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/plex.WebsiteConfig"
-                                }
-                            ]
-                        },
-                        "snapshot": {
-                            "description": "Site Config for System Snapshot.",
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/snapshot.Config"
-                                }
-                            ]
-                        },
-                        "sync": {
-                            "description": "Site Config for TRaSH Sync.",
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/clientinfo.SyncConfig"
-                                }
-                            ]
-                        }
-                    }
+                    "$ref": "#/definitions/clientinfo.Actions"
                 },
                 "integrityCheck": {
                     "type": "boolean"
@@ -3574,6 +3577,21 @@
                 1048576,
                 524288,
                 2401763328,
+                511,
+                2147483648,
+                1073741824,
+                536870912,
+                268435456,
+                134217728,
+                67108864,
+                33554432,
+                16777216,
+                8388608,
+                4194304,
+                2097152,
+                1048576,
+                524288,
+                2401763328,
                 511
             ],
             "x-enum-comments": {
@@ -3607,9 +3625,39 @@
                 "t: sticky",
                 "?: non-regular file; nothing else is known about this file",
                 "",
+                "Unix permission bits, 0o777",
+                "d: is a directory",
+                "a: append-only",
+                "l: exclusive use",
+                "T: temporary file; Plan 9 only",
+                "L: symbolic link",
+                "D: device file",
+                "p: named pipe (FIFO)",
+                "S: Unix domain socket",
+                "u: setuid",
+                "g: setgid",
+                "c: Unix character device, when ModeDevice is set",
+                "t: sticky",
+                "?: non-regular file; nothing else is known about this file",
+                "",
                 "Unix permission bits, 0o777"
             ],
             "x-enum-varnames": [
+                "ModeDir",
+                "ModeAppend",
+                "ModeExclusive",
+                "ModeTemporary",
+                "ModeSymlink",
+                "ModeDevice",
+                "ModeNamedPipe",
+                "ModeSocket",
+                "ModeSetuid",
+                "ModeSetgid",
+                "ModeCharDevice",
+                "ModeSticky",
+                "ModeIrregular",
+                "ModeType",
+                "ModePerm",
                 "ModeDir",
                 "ModeAppend",
                 "ModeExclusive",

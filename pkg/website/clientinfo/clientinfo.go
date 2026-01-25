@@ -49,17 +49,8 @@ type ClientInfo struct {
 		// Any of these may be used.
 		Mulery []*MuleryServer `json:"mulery"`
 	} `json:"user"`
-	Actions struct {
-		Plex      plex.WebsiteConfig `json:"plex"`      // Site Config for Plex.
-		Apps      AllAppConfigs      `json:"apps"`      // Site Config for Starr.
-		Dashboard DashConfig         `json:"dashboard"` // Site Config for Dashboard.
-		Sync      SyncConfig         `json:"sync"`      // Site Config for TRaSH Sync.
-		Mdblist   MdbListConfig      `json:"mdblist"`   // Site Config for MDB List.
-		Gaps      GapsConfig         `json:"gaps"`      // Site Config for Radarr Gaps.
-		Custom    []*CronConfig      `json:"custom"`    // Site config for Custom Crons.
-		Snapshot  snapshot.Config    `json:"snapshot"`  // Site Config for System Snapshot.
-	} `json:"actions"`
-	IntegrityCheck bool `json:"integrityCheck"`
+	Actions        Actions `json:"actions"`
+	IntegrityCheck bool    `json:"integrityCheck"`
 }
 
 // MuleryServer is data from the website. It's a tunnel's https and wss urls.
@@ -67,6 +58,17 @@ type MuleryServer struct {
 	Tunnel   string `json:"tunnel"`   // ex: "https://africa.notifiarr.com/"
 	Socket   string `json:"socket"`   // ex: "wss://africa.notifiarr.com/register"
 	Location string `json:"location"` // ex: "Nairobi, Kenya, Africa"
+}
+
+type Actions struct {
+	Plex      plex.WebsiteConfig `json:"plex"`      // Site Config for Plex.
+	Apps      AllAppConfigs      `json:"apps"`      // Site Config for Starr.
+	Dashboard DashConfig         `json:"dashboard"` // Site Config for Dashboard.
+	Sync      SyncConfig         `json:"sync"`      // Site Config for TRaSH Sync.
+	Mdblist   MdbListConfig      `json:"mdblist"`   // Site Config for MDB List.
+	Gaps      GapsConfig         `json:"gaps"`      // Site Config for Radarr Gaps.
+	Custom    []*CronConfig      `json:"custom"`    // Site config for Custom Crons.
+	Snapshot  snapshot.Config    `json:"snapshot"`  // Site Config for System Snapshot.
 }
 
 // CronConfig defines a custom GET timer from the website.
@@ -170,9 +172,14 @@ func (c *ClientInfo) IsPatron() bool {
 
 // SaveClientInfo returns an error if the API key is wrong. Caches and returns client info otherwise.
 func (c *Config) SaveClientInfo(ctx context.Context, startup bool) (*ClientInfo, error) {
+	event := website.EventSignal
+	if startup {
+		event = website.EventStart
+	}
+
 	body, err := website.GetData(&website.Request{
 		Route:      website.ClientRoute,
-		Event:      website.EventStart,
+		Event:      event,
 		Payload:    c.Info(ctx, startup),
 		LogPayload: true,
 	})

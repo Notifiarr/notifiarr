@@ -10,17 +10,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
-	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/gorilla/mux"
-	"github.com/hako/durafmt"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"golift.io/starr"
@@ -108,11 +105,11 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	_ = req.ParseForm()
 	input.Args = req.PostForm["args"]
 
-	return a.runTrigger(req.Context(), input, trigger, content)
+	return a.runTrigger(req, input, trigger, content)
 }
 
 //nolint:cyclop,funlen,gocyclo
-func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, trigger, content string) (int, string) {
+func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigger, content string) (int, string) {
 	switch trigger {
 	case "custom", "TrigCustomCronTimer":
 		return a.customTimer(input, content)
@@ -167,13 +164,15 @@ func (a *Actions) runTrigger(ctx context.Context, input *common.ActionInput, tri
 	case "reload", "TrigStop":
 		return a.handleConfigReload()
 	case "notification":
-		return a.notification(ctx, content)
+		return a.notification(req.Context(), content)
 	case "emptyplextrash", "TrigPlexEmptyTrash":
 		return a.emptyplextrash(input, content)
 	case "mdblist", "TrigMDBListSync":
 		return a.mdblist(input)
 	case "uploadlog", "TrigUploadFile":
 		return a.uploadlog(input, content)
+	case "reconfig", "TrigReconfig":
+		return a.reconfig(req, input)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
@@ -551,35 +550,26 @@ func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string
 	return http.StatusOK, fmt.Sprintf("Uploading %s log file.", file)
 }
 
-// HandleReconfig allows reconfiguring Plex from website settings.
-//
-//	@Description	Allows reconfiguring Plex integration from website settings.
-//	@Summary		Reconfigure Plex.
-//	@Tags			Plex
-//	@Produce		json
-//	@Success		200	{object}	apps.ApiResponse{message=string}	"success"
-//	@Failure		400	{object}	apps.ApiResponse{message=string}	"Input error"
-//	@Failure		404	{object}	string								"bad token or api key"
-//	@Router			/plex/1/reconfig [post]
-//	@Security		ApiKeyAuth
-func (a *Actions) HandleReconfig(r *http.Request) (int, any) {
-	var conf plex.WebsiteConfig
-	if err := json.NewDecoder(r.Body).Decode(&conf); err != nil {
-		return http.StatusBadRequest, fmt.Errorf("decoding plex config: %w", err)
+// @Description	Reconfigures actions based on website settings.
+// @Summary		Reconfigure Actions
+// @Tags			Triggers
+// @Produce		json
+// @Success		200		{object}	apps.ApiResponse{message=string}	"success"
+// @Failure		404		{object}	string								"bad token or api key"
+// @Router			/trigger/reconfig [get]
+// @Security		ApiKeyAuth
+func (a *Actions) reconfig(req *http.Request, input *common.ActionInput) (int, string) {
+	var actions *clientinfo.Actions
+
+	if req.Method == http.MethodPost {
+		actions = new(clientinfo.Actions)
+		if err := json.NewDecoder(req.Body).Decode(actions); err != nil {
+			return http.StatusBadRequest, "decoding client info actions: " + err.Error()
+		}
 	}
 
-	current := clientinfo.Get()
-	if current == nil {
-		return http.StatusBadRequest, "client info not found"
-	}
+	mnd.Log.Printf("[%s requested] Reconfiguring Actions from website settings.", input.Type)
+	a.inCh <- inChData{EventType: input.Type, Actions: actions}
 
-	start := time.Now()
-	current.Actions.Plex = conf
-	data.Save("clientInfo", current)
-	mnd.Log.Printf("==> Reconfiguring Plex from website settings.")
-	a.Start(a.Stop(website.EventHook), nil, nil)
-	mnd.Log.Printf("==> Reconfigured Plex from website settings. Done in %s.",
-		durafmt.Parse(time.Since(start)).LimitFirstN(2).Format(mnd.DurafmtUnits)) //nolint:mnd
-
-	return http.StatusOK, "success"
+	return http.StatusOK, <-a.outCh
 }

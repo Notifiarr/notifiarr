@@ -1770,16 +1770,7 @@ export interface ClientInfo {
     tunnels?: string[];
     mulery?: MuleryServer[];
   };
-  actions: {
-    plex: WebsiteConfig;
-    apps: AllAppConfigs;
-    dashboard: DashConfig;
-    sync: SyncConfig;
-    mdblist: MdbListConfig;
-    gaps: GapsConfig;
-    custom?: CronConfig[];
-    snapshot: SnapshotConfig;
-  };
+  actions: Actions;
   integrityCheck: boolean;
 };
 
@@ -1800,6 +1791,20 @@ export interface MuleryServer {
   tunnel: string;
   socket: string;
   location: string;
+};
+
+/**
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.Actions>
+ */
+export interface Actions {
+  plex: WebsiteConfig;
+  apps: AllAppConfigs;
+  dashboard: DashConfig;
+  sync: SyncConfig;
+  mdblist: MdbListConfig;
+  gaps: GapsConfig;
+  custom?: CronConfig[];
+  snapshot: SnapshotConfig;
 };
 
 /**
