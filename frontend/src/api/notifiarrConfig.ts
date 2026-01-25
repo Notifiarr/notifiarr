@@ -1439,7 +1439,6 @@ export interface MySQLConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Config>
  */
 export interface ServicesConfig {
-  interval: string;
   disabled: boolean;
   logFile: string;
 };

@@ -17,6 +17,7 @@ export const page = {
 class Mon {
   public refresh = $state(false)
   public checking = $state<Record<string, boolean>>({})
+  public config = $state<ServicesConfig>({ results: [], running: true, disabled: false })
 
   public states: Record<number, string> = {
     0: 'OK',
@@ -31,11 +32,9 @@ class Mon {
     3: 'info',
   }
 
-  public config = $state<ServicesConfig | null>(null)
-
   public updateBackend = async (e: Event) => {
     this.refresh = true
-    e.preventDefault()
+    e?.preventDefault?.()
     try {
       const resp = await getUi('services/config')
       if (!resp.ok) throw new Error('Failed to get services config')
@@ -48,7 +47,7 @@ class Mon {
   }
 
   public check = async (e: Event, name: string) => {
-    e.preventDefault()
+    e?.preventDefault?.()
     if (this.checking[name]) return
     this.checking[name] = true
     const resp = await getUi('services/check/' + name, false)

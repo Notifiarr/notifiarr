@@ -22,14 +22,6 @@ const (
 	maxParallel   = 10
 )
 
-func (c *Config) Fix() {
-	if c.Interval.Duration == 0 {
-		c.Interval.Duration = DefaultSendInterval
-	} else if c.Interval.Duration < MinimumSendInterval {
-		c.Interval.Duration = MinimumSendInterval
-	}
-}
-
 func (s *Services) Add(services []ServiceConfig) error {
 	for _, svc := range services {
 		if !svc.validated {
@@ -99,12 +91,12 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 		word = "Disabled"
 	}
 
-	mnd.Log.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
-		word, len(s.services), s.Interval, s.parallel)
+	mnd.Log.Printf("==> Service Checker %s! %d services, parallel: %d",
+		word, len(s.services), s.parallel)
 
 	if s.log != mnd.Log {
-		s.log.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
-			word, len(s.services), s.Interval, s.parallel)
+		s.log.Printf("==> Service Checker %s! %d services, parallel: %d",
+			word, len(s.services), s.parallel)
 	}
 }
 
@@ -254,7 +246,7 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				continue
 			}
 
-			data, err := json.MarshalIndent(&Results{Svcs: s.GetResults(), Interval: s.Interval.Seconds()}, "", " ")
+			data, err := json.MarshalIndent(&Results{Svcs: s.GetResults()}, "", " ")
 			if err != nil {
 				s.log.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
 				continue

@@ -113,8 +113,6 @@ func (s *Service) copyResults() *CheckResult {
 
 // SendResults sends a set of Results to Notifiarr.
 func (s *Services) SendResults(results *Results) {
-	results.Interval = s.Interval.Seconds()
-
 	website.SendData(&website.Request{
 		Route:      website.SvcRoute,
 		Event:      results.What,

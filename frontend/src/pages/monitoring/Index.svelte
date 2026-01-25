@@ -70,8 +70,7 @@
   }
 
   let refreshInterval = $state(Number(Cookies.get('refreshInterval')) ?? 0)
-  // svelte-ignore state_referenced_locally
-  let nextRefresh = $state(refreshInterval ? profile.now + refreshInterval : 0)
+  let nextRefresh = $state(0)
 
   $effect(() => {
     if (nextRefresh && profile.now >= nextRefresh) {
@@ -82,6 +81,7 @@
 
   onMount(async () => {
     await chk.updateBackend(new Event('mount'))
+    nextRefresh = refreshInterval ? profile.now + refreshInterval : 0
   })
 </script>
 

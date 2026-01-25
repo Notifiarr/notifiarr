@@ -38,7 +38,7 @@
   let { file, tail }: { file: LogFileInfo; tail?: boolean } = $props()
 
   // Form variables.
-  // svelte-ignore non_reactive_update
+  // svelte-ignore non_reactive_update,state_referenced_locally
   let lineCount = tail ? 50 : 500
   let offset = lineCount
   let desc = $state(true) // false == ascending (backward)
@@ -47,6 +47,7 @@
   let showTooltip = $state(false)
   let resp = $state<BackendResponse | FileTail>()
   let adding = $state(false)
+  // svelte-ignore state_referenced_locally
   let loaded = $state(file.id)
   let wrap = $state(false)
 

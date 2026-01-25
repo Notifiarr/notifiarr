@@ -536,7 +536,7 @@
     },
     "monitoring": {
         "ConfigureServices": "Configurez les contrôles de service affichés sur la <go-to page=\"services\">page Services</go-to>.",
-        "EnableOnConfig": "Activez les contrôles de service sur la page <go-to page=\"configuration\">Configuration</go-to>.",
+        "EnableOnConfig": "Activez les contrôles de service sur la page <go-to page=\"services\">Services</go-to>.",
         "check": {
             "state": {
                 "title": "Compteurs de contrôle de service",

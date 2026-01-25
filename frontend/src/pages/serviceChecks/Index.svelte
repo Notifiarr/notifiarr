@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { CardBody, Col, Row } from '@sveltestrap/sveltestrap'
   import { _ } from '../../includes/Translate.svelte'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
@@ -28,8 +28,8 @@
   import { validator as pingValidator } from './Ping.svelte'
   import { validator as tcpValidator } from './TCP.svelte'
   import Fa from '../../includes/Fa.svelte'
-  import Configuration from './Configuration.svelte'
   import { deepEqual } from '../../includes/util'
+  import Input from '../../includes/Input.svelte'
 
   // Local state that syncs with profile store.
   let config = $state($profile.config)
@@ -95,7 +95,25 @@
   }
 </script>
 
-<Header {page} />
+<Header {page}>
+  {#snippet description()}
+    <Row>
+      <Col xxl={9} xl={8} md={7} sm={6} xs={12}>
+        {@html $_('navigation.pageDescription.' + page.id)}
+      </Col>
+      <Col xxl={3} xl={4} md={5} sm={6} xs={12}>
+        <div class="d-block d-sm-none"><hr /></div>
+        <Input
+          class="mb-0"
+          id="config.services.disabled"
+          envVar="SERVICES_DISABLED"
+          type="select"
+          bind:value={config.services!.disabled}
+          original={$profile.config.services?.disabled} />
+      </Col>
+    </Row>
+  {/snippet}
+</Header>
 
 <CardBody>
   <!-- Services Section -->
@@ -117,7 +135,6 @@
       {flt.original?.[index]?.value.split('|')[0]}
     {/snippet}
   </Instances>
-  <Configuration bind:config original={$profile.config} />
 </CardBody>
 
 <Footer {submit} saveDisabled={!nav.formChanged || flt.invalid} />
