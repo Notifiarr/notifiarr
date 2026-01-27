@@ -229,9 +229,10 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 		}
 	}
 
-	// Reduce the size of the string before processing it to speed things up on large body outputs.
-	if len(res.output.str) > maxOutput+maxOutput {
-		res.output.str = res.output.str[:maxOutput+maxOutput]
+	// Reduce the size of the body before processing it to speed things up on large body outputs.
+	// This avoids expensive string operations (EscapeString, Fields, Join) on large responses.
+	if len(body) > maxOutput+maxOutput {
+		body = body[:maxOutput+maxOutput]
 	}
 
 	res.state = StateCritical
