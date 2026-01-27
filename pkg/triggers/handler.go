@@ -349,7 +349,7 @@ func (a *Actions) services(input *common.ActionInput) (int, string) {
 // @Router			/trigger/sessions [get]
 // @Security		ApiKeyAuth
 func (a *Actions) sessions(input *common.ActionInput) (int, string) {
-	if !a.Apps.Plex.Enabled() {
+	if len(a.Apps.Plex) == 0 {
 		return http.StatusNotImplemented, "Plex Sessions are not enabled."
 	}
 
@@ -504,7 +504,7 @@ func (a *Actions) notification(ctx context.Context, content string) (int, string
 // @Router			/trigger/emptyplextrash/{libraryKeys} [get]
 // @Security		ApiKeyAuth
 func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int, string) {
-	if !a.Apps.Plex.Enabled() {
+	if len(a.Apps.Plex) == 0 {
 		return http.StatusNotImplemented, "Plex is not enabled."
 	}
 

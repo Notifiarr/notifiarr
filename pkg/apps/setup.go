@@ -37,6 +37,7 @@ type AppsConfig struct {
 	Transmission []XmissionConfig `json:"transmission,omitempty" toml:"transmission" xml:"transmission" yaml:"transmission,omitempty"`
 	Tautulli     TautulliConfig   `json:"tautulli"               toml:"tautulli"     xml:"tautulli"     yaml:"tautulli"`
 	Plex         PlexConfig       `json:"plex"                   toml:"plex"         xml:"plex"         yaml:"plex"`
+	PlexServer   []PlexConfig     `json:"plexServer,omitempty"   toml:"plex_server"  xml:"plex_server"  yaml:"plexServer,omitempty"`
 }
 
 type BaseConfig struct {
@@ -61,7 +62,7 @@ type Apps struct {
 	SabNZB       []SabNZB
 	Transmission []Xmission
 	Tautulli     Tautulli
-	Plex         Plex
+	Plex         []Plex
 	Router       *mux.Router
 	keys         map[string]struct{} // for fast key lookup.
 	compress     func(h http.Handler) http.HandlerFunc
@@ -178,8 +179,16 @@ func CheckURLs(config *AppsConfig) error { //nolint:cyclop,gocognit,funlen
 		}
 	}
 
+	// Check primary Plex config (backward compat).
 	if config.Plex.URL != "" {
 		if err := checkUrl(config.Plex.URL, "Plex", 0); err != nil {
+			return err
+		}
+	}
+
+	// Check additional Plex servers.
+	for idx, app := range config.PlexServer {
+		if err := checkUrl(app.URL, "Plex", idx+1); err != nil {
 			return err
 		}
 	}
@@ -255,9 +264,28 @@ func New(config *AppsConfig) (*Apps, error) { //nolint:cyclop,funlen
 	}
 
 	apps.Tautulli = config.Tautulli.Setup(apps.MaxBody)
-	apps.Plex = config.Plex.Setup(apps.MaxBody)
+	apps.Plex = config.setupPlex()
 
 	return apps, nil
+}
+
+// setupPlex merges the primary Plex config with any additional plex_server configs.
+func (a *AppsConfig) setupPlex() []Plex {
+	var instances []Plex
+
+	// Add primary Plex instance if configured (backward compat).
+	if a.Plex.Enabled() {
+		instances = append(instances, a.Plex.Setup(a.MaxBody))
+	}
+
+	// Add additional Plex servers.
+	for _, cfg := range a.PlexServer {
+		if cfg.Enabled() {
+			instances = append(instances, cfg.Setup(a.MaxBody))
+		}
+	}
+
+	return instances
 }
 
 // InitHandlers activates all our handlers. This is part of the web server init.

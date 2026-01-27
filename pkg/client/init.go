@@ -146,17 +146,27 @@ func (c *Client) printLogFileInfo() { //nolint:cyclop
 
 // printPlex is called on startup to print info about configured Plex instance(s).
 func (c *Client) printPlex() {
-	if !c.apps.Plex.Enabled() {
+	if len(c.apps.Plex) == 0 {
 		return
 	}
 
-	name := c.apps.Plex.Server.Name()
-	if name == "" {
-		name = "<connection error?>"
+	s := servers
+	if len(c.apps.Plex) == 1 {
+		s = server
 	}
 
-	logs.Log.Printf(" => Plex Config: 1 server: %s @ %s (enables incoming APIs and webhook) timeout:%v check_interval:%s ",
-		name, c.apps.Plex.Server.URL, c.apps.Plex.Timeout, c.apps.Plex.Interval)
+	logs.Log.Printf(" => Plex Config: %d %s (enables incoming APIs and webhook)", len(c.apps.Plex), s)
+
+	for idx := range c.apps.Plex {
+		plex := &c.apps.Plex[idx]
+		name := plex.Server.Name()
+		if name == "" {
+			name = "<connection error?>"
+		}
+
+		logs.Log.Printf(" =>    Server %d: %s @ %s timeout:%v check_interval:%s",
+			idx+1, name, plex.Server.URL, plex.Timeout, plex.Interval)
+	}
 }
 
 // printLidarr is called on startup to print info about each configured server.

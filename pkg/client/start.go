@@ -252,10 +252,10 @@ func (c *Client) configureServices(ctx context.Context) (*clientinfo.ClientInfo,
 	if clientInfo != nil && !clientInfo.User.StopLogs {
 		share.Enable()
 	}
-	// Get the Plex server name.
+	// Get the Plex server names.
 	c.configureServicesPlex(ctx)
 	// Start the service checks, which needs the Plex server name.
-	c.Services.Start(ctx, c.apps.Plex.Name())
+	c.Services.Start(ctx, c.plexName())
 	// Validate the snapshot configuration settings (data from website clientinfo).
 	c.Config.Snapshot.Validate()
 	// Print the startup configuration info.
@@ -266,17 +266,21 @@ func (c *Client) configureServices(ctx context.Context) (*clientinfo.ClientInfo,
 	return clientInfo, reload
 }
 
-// configureServicesPlex is called on startup to set the Plex server name.
+// configureServicesPlex is called on startup to set the Plex server names.
 func (c *Client) configureServicesPlex(ctx context.Context) {
-	if !c.Config.Plex.Enabled() {
-		return
-	}
+	for idx := range c.apps.Plex {
+		plex := &c.apps.Plex[idx]
+		if !plex.Enabled() {
+			continue
+		}
 
-	ctx, cancel := context.WithTimeout(ctx, c.Config.Plex.Timeout.Duration)
-	defer cancel()
+		plexCtx, cancel := context.WithTimeout(ctx, plex.Timeout.Duration)
 
-	if _, err := c.apps.Plex.GetInfo(ctx); err != nil {
-		logs.Log.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
+		if _, err := plex.GetInfo(plexCtx); err != nil {
+			logs.Log.Errorf("=> Getting Plex Media Server info (%d, check url and token): %v", idx+1, err)
+		}
+
+		cancel()
 	}
 }
 
