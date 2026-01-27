@@ -129,15 +129,17 @@ func (c *Client) httpAPIHandlers() {
 	// Aggregate handlers. Non-app specific.
 	c.apps.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
 
-	if c.Config.Plex.Enabled() {
-		c.apps.HandleAPIpath(starr.Plex, "sessions", c.apps.Plex.HandleSessions, "GET")
-		c.apps.HandleAPIpath(starr.Plex, "directory", c.apps.Plex.HandleDirectory, "GET")
-		c.apps.HandleAPIpath(starr.Plex, "emptytrash/{key}", c.apps.Plex.HandleEmptyTrash, "GET")
-		c.apps.HandleAPIpath(starr.Plex, "markwatched/{key}", c.apps.Plex.HandleMarkWatched, "GET")
-		c.apps.HandleAPIpath(starr.Plex, "kill", c.apps.Plex.HandleKillSession, "GET").
+	if c.plexEnabled() {
+		// Use first Plex instance for API handlers.
+		plex := &c.apps.Plex[0]
+		c.apps.HandleAPIpath(starr.Plex, "sessions", plex.HandleSessions, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "directory", plex.HandleDirectory, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "emptytrash/{key}", plex.HandleEmptyTrash, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "markwatched/{key}", plex.HandleMarkWatched, "GET")
+		c.apps.HandleAPIpath(starr.Plex, "kill", plex.HandleKillSession, "GET").
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:.*}")
 
-		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.AppsConfig.APIKey)
+		tokens := c.plexTokenPattern()
 		c.apps.Router.HandleFunc("/plex", c.PlexHandler).Methods("POST").Queries("token", tokens)
 		c.apps.Router.HandleFunc("/", c.PlexHandler).Methods("POST").Queries("token", tokens)
 		// Give it an api path to get around some proxies that block /plex.

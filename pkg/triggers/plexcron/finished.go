@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -18,15 +19,21 @@ import (
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
 func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) {
-	sessionCtx, cancel := context.WithTimeout(ctx, c.Plex.Timeout.Duration)
+	for idx := range c.Plex {
+		c.checkFinishedForServer(ctx, &c.Plex[idx])
+	}
+}
+
+func (c *cmd) checkFinishedForServer(ctx context.Context, server *apps.Plex) {
+	sessionCtx, cancel := context.WithTimeout(ctx, server.Timeout.Duration)
 	defer cancel()
 
-	sessions, err := c.getSessions(sessionCtx, time.Second)
+	sessions, err := c.getSessionsForServer(sessionCtx, server, time.Second)
 	if err != nil {
-		logs.Log.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.Server.URL, err)
+		logs.Log.Errorf("[PLEX] Getting Sessions from %s: %v", server.Server.URL, err)
 		return
 	} else if len(sessions.Sessions) == 0 {
-		logs.Log.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.Server.URL)
+		logs.Log.Debugf("[PLEX] No Sessions Collected from %s", server.Server.URL)
 		return
 	}
 
@@ -38,7 +45,7 @@ func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) 
 
 		// Make sure we didn't already send this session.
 		if _, ok := c.sent[session.Session.ID+session.SessionKey]; !ok {
-			msg = c.checkSessionDone(ctx, session, pct)
+			msg = c.checkSessionDone(ctx, server, session, pct)
 		}
 
 		//nolint:lll
@@ -46,18 +53,18 @@ func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) 
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
 		if strings.HasPrefix(msg, statusSending) || strings.HasPrefix(msg, statusError) {
 			logs.Log.Printf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
-				c.Plex.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
+				server.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
 				session.Type, session.Title, session.Player.State, pct, msg)
 		} else {
 			logs.Log.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
-				c.Plex.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
+				server.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
 				session.Type, session.Title, session.Player.State, pct, msg)
 		}
 	}
 }
 
 // checkSessionDone checks a session's data to see if it is considered finished.
-func (c *cmd) checkSessionDone(ctx context.Context, session *plex.Session, pct float64) string {
+func (c *cmd) checkSessionDone(ctx context.Context, server *apps.Plex, session *plex.Session, pct float64) string {
 	ci := clientinfo.Get()
 
 	switch cfg := ci.Actions.Plex; {
@@ -70,21 +77,21 @@ func (c *cmd) checkSessionDone(ctx context.Context, session *plex.Session, pct f
 			return statusWatching
 		}
 
-		return c.sendSessionDone(ctx, session)
+		return c.sendSessionDone(ctx, server, session)
 	case cfg.SeriesPC > 0 && website.EventType(session.Type) == website.EventEpisode:
 		if pct < float64(cfg.SeriesPC) {
 			return statusWatching
 		}
 
-		return c.sendSessionDone(ctx, session)
+		return c.sendSessionDone(ctx, server, session)
 	default:
 		return statusIgnoring
 	}
 }
 
 // sendSessionDone is the last method to run that sends a finished session to the website.
-func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string {
-	if err := c.checkPlexAgent(ctx, session); err != nil {
+func (c *cmd) sendSessionDone(ctx context.Context, server *apps.Plex, session *plex.Session) string {
+	if err := c.checkPlexAgent(ctx, server, session); err != nil {
 		return statusError + ": " + err.Error()
 	}
 
@@ -93,7 +100,7 @@ func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string
 		Event: website.EventType(session.Type),
 		Payload: &website.Payload{
 			Snap: c.getMetaSnap(ctx),
-			Plex: &plex.Sessions{Name: c.Plex.Server.Name(), Sessions: []*plex.Session{session}},
+			Plex: &plex.Sessions{Name: server.Server.Name(), Sessions: []*plex.Session{session}},
 		},
 		LogMsg:     "Plex Completed Sessions",
 		LogPayload: true,
@@ -107,12 +114,12 @@ func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string
 
 // checkPlexAgent checks the plex agent and makes another request to find the section key.
 // This is because Plex servers using the Plex Agent do not provide the show Title in the session.
-func (c *cmd) checkPlexAgent(ctx context.Context, session *plex.Session) error {
+func (c *cmd) checkPlexAgent(ctx context.Context, server *apps.Plex, session *plex.Session) error {
 	if !strings.Contains(session.GUID, "plex://") || session.Key == "" {
 		return nil
 	}
 
-	sections, err := c.Plex.GetPlexSectionKeyWithContext(ctx, session.Key)
+	sections, err := server.GetPlexSectionKeyWithContext(ctx, session.Key)
 	if err != nil {
 		return fmt.Errorf("getting plex key %s: %w", session.Key, err)
 	}

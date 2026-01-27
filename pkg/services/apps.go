@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 	"time"
@@ -33,7 +34,7 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	svcs = collectSabNZBApps(svcs, apps.SabNZB)
 	svcs = collectXmissionApps(svcs, apps.Transmission)
 	svcs = collectTautulliApps(svcs, apps.Tautulli)
-	svcs = collectPlexApps(svcs, &apps.Plex)
+	svcs = collectPlexApps(svcs, apps.Plex)
 	svcs = collectMySQLApps(svcs, mysql)
 	now := time.Now()
 
@@ -411,27 +412,35 @@ func collectTautulliApps(svcs []*Service, app apps.Tautulli) []*Service {
 	return svcs
 }
 
-func collectPlexApps(svcs []*Service, app *apps.Plex) []*Service {
-	if !app.Enabled() || app.Interval.Duration < 0 {
-		return svcs
-	}
+func collectPlexApps(svcs []*Service, plexServers []apps.Plex) []*Service {
+	for idx := range plexServers {
+		app := &plexServers[idx]
+		if !app.Enabled() || app.Interval.Duration < 0 {
+			continue
+		}
 
-	interval := app.Interval
-	if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-		interval.Duration = MinimumCheckInterval
-	}
+		interval := app.Interval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
+		}
 
-	svcs = append(svcs, &Service{
-		ServiceConfig: &ServiceConfig{
-			validSSL: app.ValidSSL,
-			Name:     PlexServerName,
-			Type:     CheckHTTP,
-			Value:    app.Server.URL + "|X-Plex-Token:" + app.Server.Token,
-			Expect:   "200",
-			Timeout:  app.Timeout,
-			Interval: interval,
-		},
-	})
+		name := PlexServerName
+		if len(plexServers) > 1 {
+			name = fmt.Sprintf("%s %d", PlexServerName, idx+1)
+		}
+
+		svcs = append(svcs, &Service{
+			ServiceConfig: &ServiceConfig{
+				validSSL: app.ValidSSL,
+				Name:     name,
+				Type:     CheckHTTP,
+				Value:    app.Server.URL + "|X-Plex-Token:" + app.Server.Token,
+				Expect:   "200",
+				Timeout:  app.Timeout,
+				Interval: interval,
+			},
+		})
+	}
 
 	return svcs
 }

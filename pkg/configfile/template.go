@@ -419,6 +419,22 @@ version = {{.Version}}
 #token   = "" # your plex token; get this from a web inspector
 {{- end }}
 
+## Additional Plex Servers (optional)
+## Copy and uncomment this block for each additional Plex server you want to monitor.
+{{if .PlexServer}}{{range .PlexServer}}
+[[plex_server]]
+  url     = '''{{.URL}}'''
+  token   = '''{{.Token}}'''
+  interval = "{{.Interval}}"
+  timeout = "{{.Timeout}}"
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
+{{end}}{{else}}#[[plex_server]]
+#url     = "http://localhost:32401/" # Additional Plex URL
+#token   = "" # plex token for this server
+{{- end }}
+
 #####################
 # Tautulli Settings #
 #####################
