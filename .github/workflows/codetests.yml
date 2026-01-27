@@ -1,5 +1,10 @@
 name: test-and-lint
-on: push
+on:
+  pull_request:
+    branches:
+      - main
+      - unstable
+      - development
 permissions:
   contents: read
 jobs:
