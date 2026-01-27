@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/collectors"
 )
 
 // Additional Prometheus counters for specific operations.
@@ -150,9 +149,8 @@ func getExpvarValue(v expvar.Var) float64 {
 }
 
 func init() {
+	// Go and Process collectors are registered by default.
 	prometheus.MustRegister(
-		collectors.NewGoCollector(),
-		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
 		newExpvarCollector(),
 		SnapshotRuns,
 		QueuePolls,
