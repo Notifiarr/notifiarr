@@ -96,6 +96,7 @@ func (c *cmd) printLog() {
 }
 
 func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
+	mnd.SnapshotRuns.Inc()
 	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx)
 	for _, err := range errs {
 		if err != nil {
