@@ -117,9 +117,10 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 	app *apps.Lidarr,
 	records []*lidarr.QueueRecord,
 ) []*lidarrRecord {
-	lidarrQueue := []*lidarrRecord{}
+	// Pre-allocate with capacity based on max payload size to reduce allocations.
+	lidarrQueue := make([]*lidarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
-	repeatStomper := make(map[string]struct{})
+	repeatStomper := make(map[string]struct{}, maxQueuePayloadSize)
 
 	for _, item := range records {
 		if len(lidarrQueue) >= maxQueuePayloadSize {
@@ -197,9 +198,10 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 	app *apps.Radarr,
 	records []*radarr.QueueRecord,
 ) []*radarrRecord {
-	radarrQueue := []*radarrRecord{}
+	// Pre-allocate with capacity based on max payload size to reduce allocations.
+	radarrQueue := make([]*radarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
-	repeatStomper := make(map[string]struct{})
+	repeatStomper := make(map[string]struct{}, maxQueuePayloadSize)
 
 	for _, item := range records {
 		if len(radarrQueue) >= maxQueuePayloadSize {
@@ -275,9 +277,10 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 	app *apps.Readarr,
 	records []*readarr.QueueRecord,
 ) []*readarrRecord {
-	readarrQueue := []*readarrRecord{}
+	// Pre-allocate with capacity based on max payload size to reduce allocations.
+	readarrQueue := make([]*readarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
-	repeatStomper := make(map[string]struct{})
+	repeatStomper := make(map[string]struct{}, maxQueuePayloadSize)
 
 	for _, item := range records {
 		if len(readarrQueue) >= maxQueuePayloadSize {
@@ -355,9 +358,10 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 	app *apps.Sonarr,
 	records []*sonarr.QueueRecord,
 ) []*sonarrRecord {
-	sonarrQueue := []*sonarrRecord{}
+	// Pre-allocate with capacity based on max payload size to reduce allocations.
+	sonarrQueue := make([]*sonarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
-	repeatStomper := make(map[string]struct{})
+	repeatStomper := make(map[string]struct{}, maxQueuePayloadSize)
 
 	for _, item := range records {
 		if len(sonarrQueue) >= maxQueuePayloadSize {
