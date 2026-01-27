@@ -11,7 +11,7 @@ import ServiceChecks, { page as ServicesP } from '../pages/serviceChecks/Index.s
 import Actions, { page as ActionsP } from '../pages/actions/Index.svelte'
 import Integrations, { page as IntegrationsP } from '../pages/integrations/Index.svelte'
 import Monitoring, { page as MonitoringP } from '../pages/monitoring/Index.svelte'
-import Metrics, { page as MetricsP } from '../pages/metrics/Index.svelte'
+import Stats, { page as StatsP } from '../pages/stats/Index.svelte'
 import LogFiles, { page as LogFilesP } from '../pages/logFiles/Index.svelte'
 import System, { page as SystemP } from '../pages/system/Index.svelte'
 import Profile, { page as ProfilePage } from '../pages/profile/Index.svelte'
@@ -45,7 +45,7 @@ export const insights: Page[] = [
   { component: Actions, ...ActionsP },
   { component: Integrations, ...IntegrationsP },
   { component: Monitoring, ...MonitoringP },
-  { component: Metrics, ...MetricsP },
+  { component: Stats, ...StatsP },
   { component: LogFiles, ...LogFilesP },
   { component: System, ...SystemP },
 ]

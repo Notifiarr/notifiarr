@@ -188,7 +188,7 @@
       "Actions": "Actions",
       "Integrations": "Integrations",
       "Monitoring": "Monitoring",
-      "Metrics": "Metrics",
+      "Stats": "Stats",
       "LogFiles": "Log Files",
       "System": "System",
       "TrustProfile": "Trust Profile",
@@ -211,7 +211,7 @@
       "Actions": "Find internal Notifiarr client actions here. These are executed by timers, schedules, and events from the website or a chat server. While usually reserved for troubleshooting, you may trigger them manually in this interface.",
       "Integrations": "This page displays data that this client application has cached in memory for the various configured integrations.",
       "Monitoring": "View service and network health check results.",
-      "Metrics": "View metric totals for client configurations.",
+      "Stats": "View metric totals for client configurations.",
       "LogFiles": "View, follow, download and upload client log files.",
       "System": "View system and client information and.",
       "TrustProfile": "Configure how you log into this Notifiarr client application.",
@@ -1108,7 +1108,7 @@
       "placeholder": "{\"message\": \"Hello, world!\"}"
     }
   },
-  "metrics": {
+  "stats": {
     "CountersReset": "The counters on this page reset when the application exits.",
     "ApplicationUptime": "Application Uptime: &nbsp;<b>{timeDuration}</b>",
     "logFiles": {
