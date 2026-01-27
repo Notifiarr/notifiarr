@@ -17,11 +17,11 @@
     {#each pages as page}
       <NavItem>
         <NavLink
-          href={$urlbase + page.id}
+          href={$urlbase + (page.path ?? page.id)}
           class="nav-link-custom"
-          active={nav.active(page.id)}
-          disabled={nav.active(page.id)}
-          onclick={e => nav.goto(e, page.id)}>
+          active={nav.active(page.path ?? page.id)}
+          disabled={nav.active(page.path ?? page.id)}
+          onclick={e => nav.goto(e, page.path ?? page.id)}>
           <span class="nav-icon">
             <Fa {...page} scale="1.4x" />
           </span>
