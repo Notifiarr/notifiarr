@@ -65,9 +65,10 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 
 		queue, _ := item.Data.(*lidarr.Queue)
 		instance := idx + 1
-		appqueue := []*lidarrRecord{}
+		// Pre-allocate with capacity to reduce allocations during append.
+		appqueue := make([]*lidarrRecord, 0, len(queue.Records))
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]struct{})
+		repeatStomper := make(map[string]struct{}, len(queue.Records))
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
@@ -105,9 +106,10 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 
 		queue, _ := item.Data.(*radarr.Queue)
 		instance := idx + 1
-		appqueue := []*radarrRecord{}
+		// Pre-allocate with capacity to reduce allocations during append.
+		appqueue := make([]*radarrRecord, 0, len(queue.Records))
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]struct{})
+		repeatStomper := make(map[string]struct{}, len(queue.Records))
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
@@ -145,9 +147,10 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 
 		queue, _ := item.Data.(*readarr.Queue)
 		instance := idx + 1
-		appqueue := []*readarrRecord{}
+		// Pre-allocate with capacity to reduce allocations during append.
+		appqueue := make([]*readarrRecord, 0, len(queue.Records))
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]struct{})
+		repeatStomper := make(map[string]struct{}, len(queue.Records))
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
@@ -185,9 +188,10 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
 		instance := idx + 1
-		appqueue := []*sonarrRecord{}
+		// Pre-allocate with capacity to reduce allocations during append.
+		appqueue := make([]*sonarrRecord, 0, len(queue.Records))
 		// repeatStomper is used to collapse duplicate download IDs.
-		repeatStomper := make(map[string]struct{})
+		repeatStomper := make(map[string]struct{}, len(queue.Records))
 
 		for _, item := range queue.Records {
 			if s := strings.ToLower(item.Status); s != completed && s != warning &&
