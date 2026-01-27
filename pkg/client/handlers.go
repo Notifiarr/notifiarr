@@ -129,6 +129,8 @@ func (c *Client) httpAPIHandlers() {
 	// Prometheus metrics endpoint, protected by API key.
 	c.apps.Router.Handle(path.Join(c.Config.URLBase, "api", "stats"),
 		c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
+	c.apps.Router.Handle(path.Join(c.Config.URLBase, "metrics"),
+		c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
 
 	// Aggregate handlers. Non-app specific.
 	c.apps.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
