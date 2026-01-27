@@ -45,6 +45,7 @@ type BaseConfig struct {
 	URLBase string   `json:"urlbase"   toml:"urlbase"    xml:"urlbase"    yaml:"urlbase"`
 	MaxBody int      `json:"maxBody"   toml:"max_body"   xml:"max_body"   yaml:"maxBody"`
 	Serial  bool     `json:"serial"    toml:"serial"     xml:"serial"     yaml:"serial"`
+	Pooling int      `json:"pooling"   toml:"pooling"    xml:"pooling"    yaml:"pooling"`
 }
 
 type Apps struct {
@@ -198,6 +199,10 @@ func New(config *AppsConfig) (*Apps, error) { //nolint:cyclop,funlen
 
 	apps.APIKey = strings.TrimSpace(apps.APIKey)
 	apps.compress = gzhttp.GzipHandler
+
+	// Initialize connection pooling if configured.
+	// Pooling > 0 enables connection reuse across Starr API calls.
+	InitPooledTransport(config.Pooling)
 
 	apps.Lidarr, err = config.setupLidarr()
 	if err != nil {

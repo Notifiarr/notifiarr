@@ -91,6 +91,9 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 				Caller:  metricMakerCallback(string(starr.Sonarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
+		} else if PoolingEnabled() {
+			app.Config.Client = PooledClient(app.Timeout.Duration, app.ValidSSL)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Sonarr.String(), app.Config.Client.Transport)
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Sonarr.String(), app.Config.Client.Transport)

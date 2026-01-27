@@ -153,6 +153,11 @@ apt = {{.EnableApt}}
 ## This spreads CPU usage out and uses a bit less memory.
 serial = {{.Serial}}
 
+## Connection pooling reuses HTTP connections for Starr API calls.
+## Set to a positive integer (e.g. 10) to enable. 0 = disabled (default).
+## Reduces TCP overhead and latency, especially for multi-app setups.
+pooling = {{.Pooling}}
+
 ## Retries controls how many times to retry requests to notifiarr.com.
 ## Sometimes cloudflare returns a 521, and this mitigates those problems.
 ## Setting this to 0 will take the default of 4. Use 1 to disable retrying.

@@ -76,13 +76,6 @@ func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
 			return nil, err
 		}
 
-		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
-			MaxBody: a.MaxBody,
-			Debugf:  mnd.Log.Debugf,
-			Caller:  metricMakerCallback(string(starr.Radarr)),
-			Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
-		})
-
 		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
@@ -90,6 +83,9 @@ func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
 				Caller:  metricMakerCallback(string(starr.Radarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
+		} else if PoolingEnabled() {
+			app.Config.Client = PooledClient(app.Timeout.Duration, app.ValidSSL)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Radarr.String(), app.Config.Client.Transport)
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Radarr.String(), app.Config.Client.Transport)

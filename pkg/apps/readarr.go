@@ -66,6 +66,9 @@ func (a *AppsConfig) setupReadarr() ([]Readarr, error) {
 				Caller:  metricMakerCallback(string(starr.Readarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
+		} else if PoolingEnabled() {
+			app.Config.Client = PooledClient(app.Timeout.Duration, app.ValidSSL)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), app.Config.Client.Transport)
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
 			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), app.Config.Client.Transport)

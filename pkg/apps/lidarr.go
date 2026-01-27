@@ -82,9 +82,12 @@ func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
 				Caller:  metricMakerCallback(string(starr.Lidarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
+		} else if PoolingEnabled() {
+			app.Config.Client = PooledClient(app.Timeout.Duration, app.ValidSSL)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Lidarr.String(), app.Config.Client.Transport)
 		} else {
 			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Lidarr.String(), nil)
+			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Lidarr.String(), app.Config.Client.Transport)
 		}
 
 		app.URL = strings.TrimRight(app.URL, "/")
