@@ -79,9 +79,7 @@ func NewConfig() *Config {
 				URLBase: "/",
 			},
 		},
-		Services: services.Config{
-			Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
-		},
+		Services: services.Config{},
 		BindAddr: mnd.DefaultBindAddr,
 		Snapshot: snapshot.Config{
 			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
@@ -174,7 +172,6 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 	}
 
 	c.fixConfig()
-	c.Services.Fix()
 
 	result.Services = services.New(&c.Services)
 	if err := result.Services.Add(c.Service); err != nil {

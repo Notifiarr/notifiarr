@@ -18,7 +18,6 @@
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import Logging from './Logging.svelte'
-  import Services from './Services.svelte'
   import SslConfig from './SSLConfig.svelte'
   import System from './System.svelte'
   import Network from './Network.svelte'
@@ -89,8 +88,6 @@
   <System bind:config original={$profile.config} />
   <!-- SSL Section -->
   <SslConfig bind:config original={$profile.config} />
-  <!-- Services Section -->
-  <Services bind:config original={$profile.config} />
   <!-- Logging Section -->
   <Logging bind:config original={$profile.config} />
 </CardBody>

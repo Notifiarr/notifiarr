@@ -587,7 +587,7 @@
     },
     "monitoring": {
         "ConfigureServices": "Service controles voor geconfigureerde integraties worden ingeschakeld door ze een controle-interval te geven op de betreffende configuratie pagina's. Sommige van deze controles zijn afkomstig van de pagina <go-to page=\"starr apps\">Starr Apps</go-to>, de pagina <go-to page=\"downloaders\">Download Apps</go-to> of de pagina <go-to page=\"media apps\">Media Apps</go-to>. De overige weergegeven service controles zijn te vinden op de pagina <go-to page=\"services\">Services</go-to>.",
-        "EnableOnConfig": "Schakel service controles in op de pagina <go-to page=\"configuration\">Configuratie</go-to>.",
+        "EnableOnConfig": "Schakel service controles in op de pagina <go-to page=\"services\">Services</go-to>.",
         "cardsView": "Kaart weergave",
         "check": {
             "interval": {

@@ -147,7 +147,7 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 	case c.Flags.Restart:
 		return nil
 	default:
-		if website.ValidAPIKey() == nil {
+		if website.ValidAPIKey() != nil {
 			_ = ui.OpenURL(ctx, "http://127.0.0.1:5454")
 		}
 

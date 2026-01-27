@@ -3,9 +3,19 @@
   import Fa, { type Props as FaProps } from './Fa.svelte'
   import { _ } from './Translate.svelte'
   import { get } from 'svelte/store'
-  type Props = { badge?: string; page: FaProps; children?: any }
-  let { badge = undefined, page, children }: Props = $props()
-  const description: string = $derived(get(_)('navigation.pageDescription.' + page.id))
+  import type { Snippet } from 'svelte'
+  type Props = {
+    badge?: string
+    page: FaProps
+    children?: any
+    description?: string | Snippet
+  }
+  let {
+    badge = undefined,
+    page,
+    children,
+    description = get(_)('navigation.pageDescription.' + page.id),
+  }: Props = $props()
 </script>
 
 <CardHeader>
@@ -14,8 +24,10 @@
     {#if badge}<Badge color="notifiarr">{badge}</Badge>{/if}
     <Fa {...page} />
   </h2>
-  {#if description != 'navigation.pageDescription.' + page.id}
+  {#if typeof description === 'string' && description != 'navigation.pageDescription.' + page.id}
     {@html description}
+  {:else if typeof description !== 'string' && description !== undefined}
+    {@render description()}
   {/if}
   {#if children}
     <hr />

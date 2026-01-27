@@ -24,11 +24,10 @@
 
   type Props = { showOutput: Record<string, boolean> }
   const { showOutput = $bindable() }: Props = $props()
-  const toggleOutput = (id: string) => (showOutput[id] = !showOutput[id])
 </script>
 
 <div class="row cards-page">
-  {#each $profile.checkResults?.sort( (a, b) => a.name.localeCompare(b.name), ) ?? [] as result}
+  {#each chk.config?.results?.toSorted( (a, b) => a.name.localeCompare(b.name), ) ?? [] as result}
     {@const id = btoa(result.name + 'card').replace(/=/g, '')}
     {@const icon = showOutput[id] ? faArrowUpFromBracket : faArrowDownToBracket}
 
@@ -59,7 +58,7 @@
               color="primary"
               outline
               style="width: 2rem;"
-              onclick={() => toggleOutput(id)}>
+              onclick={() => (showOutput[id] = !showOutput[id])}>
               <Fa i={icon} c1="blue" d1="slateblue" scale="1.4" />
             </Button>
             <Button
@@ -151,6 +150,7 @@
             </CardFooter>
           </div>
         {:else if showOutput[id] === undefined}
+          <!-- set this so the parent module can unset it with the toggle-all button -->
           {(showOutput[id] = false) || ''}
         {/if}
       </Card>

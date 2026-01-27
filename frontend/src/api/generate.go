@@ -74,6 +74,7 @@ func main() {
 	goat.Parse(
 		client.Integrations{},
 		client.Profile{},
+		client.ServicesConfig{},
 		client.ProfilePost{},
 		commands.Stats{},
 		apps.ApiResponse{},

@@ -31,13 +31,12 @@ const (
 	// This only fires when:
 	// 1. the client isn't reachable from the website.
 	// 2. the client didn't get a valid response to clientInfo.
-	pollDur = 4 * time.Minute
+	pollInterval = 4 * time.Minute
 	// This just tells the website the client is up.
-	upCheckDur = 14*time.Minute + 57*time.Second
+	upCheckInterval = 14*time.Minute + 57*time.Second
 	// How long to be up before sending first up check.
-	checkWait          = 1*time.Minute + 23*time.Second
-	randomMilliseconds = 5000
-	randomSeconds      = 30
+	checkWait     = 1*time.Minute + 23*time.Second
+	randomSeconds = 30
 )
 
 // Action contains the exported methods for this package.
@@ -135,12 +134,12 @@ func (c *cmd) create() {
 		return
 	}
 
-	mnd.Log.Printf("==> Started Notifiarr Website Up-Checker, interval: %s", durafmt.Parse(upCheckDur))
+	mnd.Log.Printf("==> Started Notifiarr Website Up-Checker, interval: %s", durafmt.Parse(upCheckInterval))
 	c.Add(&common.Action{
 		Key:  "TrigUpCheck",
 		Name: TrigUpCheck,
 		Fn:   c.PollUpCheck,
-		D:    cnfg.Duration{Duration: upCheckDur},
+		D:    cnfg.Duration{Duration: upCheckInterval},
 	})
 
 	for _, custom := range info.Actions.Custom {
@@ -176,12 +175,12 @@ func (c *cmd) startWebsitePoller() {
 		return // only poll if the api key length is valid.
 	}
 
-	mnd.Log.Printf("==> Started Notifiarr Website Poller, interval: %s", durafmt.Parse(pollDur))
+	mnd.Log.Printf("==> Started Notifiarr Website Poller, interval: %s", durafmt.Parse(pollInterval))
 	c.Add(&common.Action{
 		Key:  "TrigPollSite",
 		Name: TrigPollSite,
 		Fn:   c.PollForReload,
-		D:    cnfg.Duration{Duration: pollDur + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},
+		D:    cnfg.Duration{Duration: pollInterval + time.Duration(c.Config.Rand().Intn(randomSeconds))*time.Second},
 	})
 }
 

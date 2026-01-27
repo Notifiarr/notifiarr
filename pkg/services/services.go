@@ -17,19 +17,10 @@ import (
 	"golift.io/version"
 )
 
-func (c *Config) Fix() {
-	if c.Parallel > MaximumParallel {
-		c.Parallel = MaximumParallel
-	} else if c.Parallel == 0 {
-		c.Parallel = 1
-	}
-
-	if c.Interval.Duration == 0 {
-		c.Interval.Duration = DefaultSendInterval
-	} else if c.Interval.Duration < MinimumSendInterval {
-		c.Interval.Duration = MinimumSendInterval
-	}
-}
+const (
+	svcsPerThread = 10
+	maxParallel   = 10
+)
 
 func (s *Services) Add(services []ServiceConfig) error {
 	for _, svc := range services {
@@ -62,11 +53,6 @@ func (s *Services) add(svc *ServiceConfig) {
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
 func (s *Services) Start(ctx context.Context, plexName string) {
-	s.log = mnd.Log
-	if s.LogFile != "" {
-		s.log = logs.CustomLog(s.LogFile, "Services")
-	}
-
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
@@ -77,27 +63,25 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	s.triggerChan = make(chan website.EventType)
 	s.checkChan = make(chan triggerCheck)
 
+	if s.parallel = uint(len(s.services) / svcsPerThread); s.parallel < 1 {
+		s.parallel = 1
+	} else if s.parallel > maxParallel {
+		s.parallel = maxParallel
+	}
+
+	if s.log = mnd.Log; s.LogFile != "" {
+		s.log = logs.CustomLog(s.LogFile, "Services")
+	}
+
 	for name := range s.services {
 		s.services[name].log = s.log
 	}
 
 	s.applyLocalOverrides(plexName)
 	s.loadServiceStates()
-	for range s.Parallel {
-		go func() {
-			defer mnd.Log.CapturePanic()
 
-			for check := range s.checks {
-				if s.done == nil {
-					return
-				} else if check == nil {
-					s.done <- false
-					return
-				}
-
-				s.done <- check.check(ctx)
-			}
-		}()
+	for range s.parallel {
+		go s.watchServiceChan(ctx)
 	}
 
 	go s.runServiceChecker()
@@ -107,12 +91,27 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 		word = "Disabled"
 	}
 
-	mnd.Log.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
-		word, len(s.services), s.Interval, s.Parallel)
+	mnd.Log.Printf("==> Service Checker %s! %d services, parallel: %d",
+		word, len(s.services), s.parallel)
 
 	if s.log != mnd.Log {
-		s.log.Printf("==> Service Checker %s! %d services, interval: %s, parallel: %d",
-			word, len(s.services), s.Interval, s.Parallel)
+		s.log.Printf("==> Service Checker %s! %d services, parallel: %d",
+			word, len(s.services), s.parallel)
+	}
+}
+
+func (s *Services) watchServiceChan(ctx context.Context) {
+	defer mnd.Log.CapturePanic()
+
+	for check := range s.checks {
+		if s.done == nil {
+			return
+		} else if check == nil {
+			s.done <- false
+			return
+		}
+
+		s.done <- check.check(ctx)
 	}
 }
 
@@ -224,7 +223,7 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				running = false
 			case actionStop:
 				// Stop all the checkers.
-				for range s.Parallel {
+				for range s.parallel {
 					s.checks <- nil
 					<-s.done
 				}
@@ -247,7 +246,7 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				continue
 			}
 
-			data, err := json.MarshalIndent(&Results{Svcs: s.GetResults(), Interval: s.Interval.Seconds()}, "", " ")
+			data, err := json.MarshalIndent(&Results{Svcs: s.GetResults()}, "", " ")
 			if err != nil {
 				s.log.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
 				continue

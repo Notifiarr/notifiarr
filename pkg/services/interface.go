@@ -93,8 +93,8 @@ func (s *Services) GetResults() []*CheckResult {
 }
 
 func (s *Service) copyResults() *CheckResult {
-	s.RLock()
-	defer s.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return &CheckResult{
 		Interval:    s.Interval.Duration.Seconds(),
@@ -113,8 +113,6 @@ func (s *Service) copyResults() *CheckResult {
 
 // SendResults sends a set of Results to Notifiarr.
 func (s *Services) SendResults(results *Results) {
-	results.Interval = s.Interval.Seconds()
-
 	website.SendData(&website.Request{
 		Route:      website.SvcRoute,
 		Event:      results.What,

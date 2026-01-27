@@ -328,11 +328,6 @@
         "description": "Enable or disable health checks.",
         "tooltip": "Disable or enable monitoring for all health checks right here."
       },
-      "parallel": {
-        "label": "Concurrent Checks",
-        "description": "Number of health checks that may run concurrently.",
-        "tooltip": "Normally, running health checks one at a time is fine, but if you have more than 30 or 40, you may want to increase this."
-      },
       "interval": {
         "label": "Update Interval",
         "description": "Update interval for health checks.",
@@ -1151,7 +1146,7 @@
     "ConfigureServices": "Health checks for configured integrations are enabled by giving them a check interval on their respective configuration pages. Some of these checks are from the <go-to page=\"starrapps\">Starr Apps</go-to> page, or the <go-to page=\"downloaders\">Download Apps</go-to> page, or the <go-to page=\"mediaapps\">Media Apps</go-to> page. The rest of the health checks displayed can be found on the <go-to page=\"services\">Services page</go-to>.",
     "ChecksDisabled": "Health Checks: Disabled",
     "ChecksStopped": "Health Checks: Paused",
-    "EnableOnConfig": "Enable health checks on the <go-to page=\"configuration\">Configuration</go-to> page.",
+    "EnableOnConfig": "Enable health checks on the <go-to page=\"services\">Services</go-to> page.",
     "StartChecks": "Resume Health Checks",
     "StopChecks": "Pause Health Checks",
     "stopFailed": "Failed to pause health checks.",
@@ -1192,7 +1187,7 @@
     "title": "Health Checks",
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
-    "description": "Use this form to configure health checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
+    "description": "Use this form to configure health checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",

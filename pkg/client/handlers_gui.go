@@ -126,19 +126,37 @@ func (c *Client) setSession(userName string, response http.ResponseWriter, reque
 	return request.WithContext(context.WithValue(request.Context(), userNameStr, []any{userName, true}))
 }
 
-func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) {
+// loginDelayHandler delays the login handler by up to 3s if the login is unsuccessful.
+func (c *Client) loginDelayHandler(response http.ResponseWriter, request *http.Request) {
+	const delay = 3 * time.Second
+
+	start := time.Now()
+	if c.loginHandler(response, request) {
+		return
+	}
+
+	if duration := time.Since(start); duration < delay {
+		time.Sleep(delay - duration)
+	}
+}
+
+func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) bool {
 	loggedinUsername, _ := c.getUserName(request)
 	providedUsername := request.FormValue("name")
 
 	switch {
 	case c.Config.UIPassword == "disabled":
 		http.Error(response, "Web UI is disabled.", http.StatusForbidden)
+		return false
 	case loggedinUsername != "": // already logged in.
 		http.Redirect(response, request, c.Config.URLBase, http.StatusFound)
+		return true
 	case request.Method != http.MethodPost: // dont handle login without POST
 		c.indexPage(request.Context(), response, request)
+		return false
 	case c.webauth:
 		c.indexPage(request.Context(), response, request)
+		return false
 	case c.Config.UIPassword.Valid(providedUsername, request.FormValue("password")):
 		c.updateToNewPasswordMD5(request.Context(), loggedinUsername, providedUsername, request.FormValue("sha"))
 		logs.Log.Printf("[gui '%s' requested] Updated config with new password format.", providedUsername)
@@ -148,6 +166,7 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		c.handleProfile(response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
 		logs.Log.Printf("[gui '%s' requested] Authenticated with local credentials", providedUsername)
+		return true
 	case clientinfo.CheckPassword(providedUsername, request.FormValue("sha")):
 		providedUsername = clientinfo.Get().User.Username
 		if providedUsername == "" {
@@ -158,8 +177,10 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		c.handleProfile(response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
 		logs.Log.Printf("[gui '%s' requested] Authenticated with website credentials", providedUsername)
+		return true
 	default: // Start over.
 		http.Error(response, "Unauthorized", http.StatusUnauthorized)
+		return false
 	}
 }
 
