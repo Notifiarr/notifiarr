@@ -10,8 +10,8 @@
 
 <Card class="mt-3" color="secondary" outline>
   <CardHeader>
-    <h5><T id={`stats.${id}.title`} /></h5>
-    <small class="text-muted"><T id={`stats.${id}.description`} /></small>
+    <h5><T id={`metrics.${id}.title`} /></h5>
+    <small class="text-muted"><T id={`metrics.${id}.description`} /></small>
   </CardHeader>
   {#if data && Object.keys(data).length > 0}
     <Row>
@@ -20,6 +20,6 @@
       {/each}
     </Row>
   {:else}
-    <CardBody><T id={`stats.${id}.empty`} /></CardBody>
+    <CardBody><T id={`metrics.${id}.empty`} /></CardBody>
   {/if}
 </Card>

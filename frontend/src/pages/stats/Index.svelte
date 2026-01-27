@@ -1,7 +1,7 @@
 <script lang="ts" module>
   import { faChartLine } from '@fortawesome/sharp-duotone-regular-svg-icons'
   export const page = {
-    id: 'Stats',
+    id: 'Metrics',
     i: faChartLine,
     c1: 'darkgoldenrod',
     c2: 'darkorange',
@@ -45,9 +45,9 @@
 
 <Header {page} />
 <CardBody>
-  <T id="stats.CountersReset" /><br />
+  <T id="metrics.CountersReset" /><br />
   <T
-    id="stats.ApplicationUptime"
+    id="metrics.ApplicationUptime"
     timeDuration={age(profile.now - new Date($profile.started).getTime(), true)} />
   &nbsp;
   {#if refresh}

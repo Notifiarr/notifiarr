@@ -19,8 +19,8 @@
     {#if title}
       {title}
     {:else}
-      <h5><T id={`stats.${id}.title`} /></h5>
-      <small class="text-muted"><T id={`stats.${id}.description`} /></small>
+      <h5><T id={`metrics.${id}.title`} /></h5>
+      <small class="text-muted"><T id={`metrics.${id}.description`} /></small>
     {/if}
   </CardHeader>
 
@@ -39,7 +39,7 @@
       </tbody>
     </Table>
   {:else if id}
-    <CardBody><T id={`stats.${id}.empty`} /></CardBody>
+    <CardBody><T id={`metrics.${id}.empty`} /></CardBody>
   {/if}
 </Card>
 
