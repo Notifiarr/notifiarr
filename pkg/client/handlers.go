@@ -77,7 +77,6 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.Use(c.checkAuthorized) // check password or x-webauth-user header.
 	gui.Use(compress)
 	gui.Handle("/debug/vars", expvar.Handler()).Methods("GET")
-	gui.Handle("/metrics", promhttp.Handler()).Methods("GET")
 	gui.HandleFunc("/deleteFile/{source}/{id}", c.getFileDeleteHandler).Methods("GET")
 	gui.HandleFunc("/downloadFile/{source}/{id}", c.getFileDownloadHandler).Methods("GET")
 	gui.HandleFunc("/uploadFile/{source}/{id}", c.uploadFileHandler).Methods("GET")
@@ -127,6 +126,9 @@ func (c *Client) httpAPIHandlers() {
 	c.apps.HandleAPIpath("", "ping", c.handleInstancePing, "GET")
 	c.apps.HandleAPIpath("", "ping/{app:[a-z,]+}", c.handleInstancePing, "GET")
 	c.apps.HandleAPIpath("", "ping/{app:[a-z]+}/{instance:[0-9]+}", c.handleInstancePing, "GET")
+	// Prometheus metrics endpoint, protected by API key.
+	c.apps.Router.Handle(path.Join(c.Config.URLBase, "metrics"),
+		c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
 
 	// Aggregate handlers. Non-app specific.
 	c.apps.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")
