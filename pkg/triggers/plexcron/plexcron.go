@@ -65,11 +65,22 @@ func (a *Action) Enabled() bool {
 
 // First returns the first Plex instance, or nil if none configured.
 func (a *Action) First() *apps.Plex {
-	if len(a.cmd.Plex) == 0 {
+	return a.GetByIndex(0)
+}
+
+// GetByIndex returns a Plex server by index, or nil if the index is out of range.
+// Use index 0 to get the first (default) server.
+func (a *Action) GetByIndex(index int) *apps.Plex {
+	if index < 0 || index >= len(a.cmd.Plex) {
 		return nil
 	}
 
-	return &a.cmd.Plex[0]
+	return &a.cmd.Plex[index]
+}
+
+// Len returns the number of configured Plex servers.
+func (a *Action) Len() int {
+	return len(a.cmd.Plex)
 }
 
 // Send sends plex sessions in a go routine through a channel.
@@ -90,15 +101,15 @@ func (c *cmd) run() {
 
 	var dur time.Duration
 
+	// Website config controls session collection. Currently only the first server
+	// is controlled by the website. Future: per-server enable/disable support.
 	cfg := info.Actions.Plex
 	if cfg.Interval.Duration > 0 {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = cfg.Interval.Duration + randomTime
-
-		for idx := range c.Plex {
-			mnd.Log.Printf("==> Plex Sessions Collection Started (%d): %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
-				idx+1, c.Plex[idx].Server.URL, cfg.Interval, c.Plex[idx].Timeout, cfg.Cooldown, cfg.Delay)
-		}
+		// Only log for the first server (website-controlled).
+		mnd.Log.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
+			c.Plex[0].Server.URL, cfg.Interval, c.Plex[0].Timeout, cfg.Cooldown, cfg.Delay)
 	}
 
 	c.Add(&common.Action{
@@ -110,10 +121,9 @@ func (c *cmd) run() {
 	})
 
 	if cfg.MoviesPC != 0 || cfg.SeriesPC != 0 || cfg.TrackSess {
-		for idx := range c.Plex {
-			mnd.Log.Printf("==> Plex Sessions Tracker Started (%d): %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
-				idx+1, c.Plex[idx].Server.URL, c.Plex[idx].Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
-		}
+		// Only log for the first server (website-controlled).
+		mnd.Log.Printf("==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
+			c.Plex[0].Server.URL, c.Plex[0].Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
 
 		c.Add(&common.Action{
 			Key:  "TrigPlexSessionsCheck",
@@ -144,7 +154,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 		ctx, cancel := context.WithTimeout(ctx, plexServer.Timeout.Duration)
 
 		var err error
-		if sessions, err = c.getSessionsForServer(ctx, plexServer, time.Second); err != nil {
+		if sessions, err = c.getSessions(ctx, plexServer, time.Second); err != nil {
 			mnd.Log.Errorf("Getting Plex sessions: %v", err)
 		}
 

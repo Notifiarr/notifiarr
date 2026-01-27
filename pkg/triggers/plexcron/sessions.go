@@ -16,8 +16,14 @@ import (
 )
 
 // sendPlexSessions is fired by a timer if Plex Sessions feature has an interval defined.
+// This only fires for the first (website-controlled) server.
 func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
-	sessions, err := c.getAllSessions(ctx, time.Minute)
+	if len(c.Plex) == 0 {
+		return
+	}
+
+	// Website config controls only the first server for now.
+	sessions, err := c.getSessions(ctx, &c.Plex[0], time.Minute)
 	if err != nil {
 		mnd.Log.Errorf("Getting Plex sessions: %v", err)
 	}
@@ -39,14 +45,14 @@ func (c *cmd) getAllSessions(ctx context.Context, allowedAge time.Duration) (*pl
 
 	// For backward compatibility, if only one server, return its sessions directly.
 	if len(c.Plex) == 1 {
-		return c.getSessionsForServer(ctx, &c.Plex[0], allowedAge)
+		return c.getSessions(ctx, &c.Plex[0], allowedAge)
 	}
 
 	// Multiple servers: aggregate all sessions.
 	combined := &plex.Sessions{Name: "All Plex Servers"}
 
 	for idx := range c.Plex {
-		sessions, err := c.getSessionsForServer(ctx, &c.Plex[idx], allowedAge)
+		sessions, err := c.getSessions(ctx, &c.Plex[idx], allowedAge)
 		if err != nil {
 			mnd.Log.Errorf("Getting Plex sessions from %s: %v", c.Plex[idx].Server.Name(), err)
 			continue
@@ -58,9 +64,9 @@ func (c *cmd) getAllSessions(ctx context.Context, allowedAge time.Duration) (*pl
 	return combined, nil
 }
 
-// getSessionsForServer gets sessions from a specific Plex server.
+// getSessions gets sessions from a specific Plex server.
 // The Lock ensures only one request to Plex happens at once.
-func (c *cmd) getSessionsForServer(ctx context.Context, server *apps.Plex, allowedAge time.Duration) (*plex.Sessions, error) {
+func (c *cmd) getSessions(ctx context.Context, server *apps.Plex, allowedAge time.Duration) (*plex.Sessions, error) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -85,9 +91,9 @@ func (c *cmd) getSessionsForServer(ctx context.Context, server *apps.Plex, allow
 	case err != nil:
 		return &plex.Sessions{Name: server.Server.Name()}, fmt.Errorf("plex sessions: %w", err)
 	case item != nil && item.Data != nil:
-		c.plexSessionTrackerForServer(ctx, server, sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
+		c.plexSessionTracker(ctx, server, sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
 	default:
-		c.plexSessionTrackerForServer(ctx, server, sessions, nil)
+		c.plexSessionTracker(ctx, server, sessions, nil)
 	}
 
 	sessions.Name = server.Server.Name()
@@ -95,9 +101,9 @@ func (c *cmd) getSessionsForServer(ctx context.Context, server *apps.Plex, allow
 	return sessions, nil
 }
 
-// plexSessionTrackerForServer checks for state changes between the previous session pull
+// plexSessionTracker checks for state changes between the previous session pull
 // and the current session pull for a specific server. if changes are present, a timestamp is added.
-func (c *cmd) plexSessionTrackerForServer(ctx context.Context, server *apps.Plex, current, previous *plex.Sessions) {
+func (c *cmd) plexSessionTracker(ctx context.Context, server *apps.Plex, current, previous *plex.Sessions) {
 	now := time.Now()
 	info := clientinfo.Get()
 	cacheKey := "plexCurrentSessions_" + server.Server.Name()

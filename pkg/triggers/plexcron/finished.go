@@ -18,17 +18,21 @@ import (
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
+// This only fires for the first (website-controlled) server.
 func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) {
-	for idx := range c.Plex {
-		c.checkFinishedForServer(ctx, &c.Plex[idx])
+	if len(c.Plex) == 0 {
+		return
 	}
+
+	// Website config controls only the first server for now.
+	c.checkFinishedForServer(ctx, &c.Plex[0])
 }
 
 func (c *cmd) checkFinishedForServer(ctx context.Context, server *apps.Plex) {
 	sessionCtx, cancel := context.WithTimeout(ctx, server.Timeout.Duration)
 	defer cancel()
 
-	sessions, err := c.getSessionsForServer(sessionCtx, server, time.Second)
+	sessions, err := c.getSessions(sessionCtx, server, time.Second)
 	if err != nil {
 		logs.Log.Errorf("[PLEX] Getting Sessions from %s: %v", server.Server.URL, err)
 		return
