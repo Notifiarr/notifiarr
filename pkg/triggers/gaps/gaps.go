@@ -89,12 +89,56 @@ func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 			continue
 		}
 
+		// Filter to only movies with collections and strip unnecessary data.
+		// This dramatically reduces payload size while maintaining backward compatibility.
+		collectionMovies := filterAndStripMoviesForGaps(movies)
+
 		website.SendData(&website.Request{
 			Route:      website.GapsRoute,
 			Event:      input.Type,
 			LogPayload: true,
 			LogMsg:     fmt.Sprintf("Radarr Collection Gaps (%d:%s)", instance, app.URL),
-			Payload:    &radarrGapsPayload{Movies: movies, Name: app.Name, Instance: instance},
+			Payload:    &radarrGapsPayload{Movies: collectionMovies, Name: app.Name, Instance: instance},
 		})
 	}
+}
+
+// filterAndStripMoviesForGaps filters movies to only those with collections
+// and strips unnecessary fields to minimize payload size.
+// This maintains the same []*radarr.Movie type for backward compatibility.
+func filterAndStripMoviesForGaps(movies []*radarr.Movie) []*radarr.Movie {
+	result := make([]*radarr.Movie, 0, len(movies)/4) // estimate ~25% have collections
+
+	for _, movie := range movies {
+		// Skip movies without collections - they're irrelevant for gap detection.
+		if movie.Collection == nil || movie.Collection.TmdbID == 0 {
+			continue
+		}
+
+		// Create a minimal copy with only the fields needed for gap detection.
+		// This keeps the same type but dramatically reduces JSON size.
+		minimal := &radarr.Movie{
+			ID:        movie.ID,
+			Title:     movie.Title,
+			TmdbID:    movie.TmdbID,
+			Year:      movie.Year,
+			Monitored: movie.Monitored,
+			HasFile:   movie.HasFile,
+			Collection: &radarr.Collection{
+				Name:   movie.Collection.Name,
+				TmdbID: movie.Collection.TmdbID,
+				// Omit Images - not needed for gap detection
+			},
+			// Include quality profile so server knows what profile to use for adding missing movies
+			QualityProfileID: movie.QualityProfileID,
+			// Include tags for filtering/organization
+			Tags: movie.Tags,
+			// Include path for root folder detection
+			Path: movie.Path,
+		}
+
+		result = append(result, minimal)
+	}
+
+	return result
 }
