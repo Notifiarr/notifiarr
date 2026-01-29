@@ -148,6 +148,8 @@ func getExpvarValue(v expvar.Var) float64 {
 	return -1
 }
 
+//nolint:gochecknoinits
+//
 func init() {
 	// Go and Process collectors are registered by default.
 	prometheus.MustRegister(
