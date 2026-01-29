@@ -221,18 +221,18 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 
 // minimalLidarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
 // This reduces payload size by omitting progress info and metadata not relevant to stuck items.
-func minimalLidarrRecord(r *lidarr.QueueRecord) *lidarr.QueueRecord {
+func minimalLidarrRecord(record *lidarr.QueueRecord) *lidarr.QueueRecord {
 	return &lidarr.QueueRecord{
-		ID:                    r.ID,
-		ArtistID:              r.ArtistID,
-		AlbumID:               r.AlbumID,
-		Title:                 r.Title,
-		Status:                r.Status,
-		TrackedDownloadStatus: r.TrackedDownloadStatus,
-		StatusMessages:        r.StatusMessages,
-		ErrorMessage:          r.ErrorMessage,
-		DownloadID:            r.DownloadID,
-		DownloadClient:        r.DownloadClient,
+		ID:                    record.ID,
+		ArtistID:              record.ArtistID,
+		AlbumID:               record.AlbumID,
+		Title:                 record.Title,
+		Status:                record.Status,
+		TrackedDownloadStatus: record.TrackedDownloadStatus,
+		StatusMessages:        record.StatusMessages,
+		ErrorMessage:          record.ErrorMessage,
+		DownloadID:            record.DownloadID,
+		DownloadClient:        record.DownloadClient,
 		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
 		// OutputPath, Indexer, Protocol, HasPostImportCategory, DownloadForced
 	}
@@ -240,18 +240,18 @@ func minimalLidarrRecord(r *lidarr.QueueRecord) *lidarr.QueueRecord {
 
 // minimalRadarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
 // This reduces payload size by omitting progress info and metadata not relevant to stuck items.
-func minimalRadarrRecord(r *radarr.QueueRecord) *radarr.QueueRecord {
+func minimalRadarrRecord(record *radarr.QueueRecord) *radarr.QueueRecord {
 	return &radarr.QueueRecord{
-		ID:                    r.ID,
-		MovieID:               r.MovieID,
-		Title:                 r.Title,
-		Status:                r.Status,
-		TrackedDownloadStatus: r.TrackedDownloadStatus,
-		TrackedDownloadState:  r.TrackedDownloadState,
-		StatusMessages:        r.StatusMessages,
-		ErrorMessage:          r.ErrorMessage,
-		DownloadID:            r.DownloadID,
-		DownloadClient:        r.DownloadClient,
+		ID:                    record.ID,
+		MovieID:               record.MovieID,
+		Title:                 record.Title,
+		Status:                record.Status,
+		TrackedDownloadStatus: record.TrackedDownloadStatus,
+		TrackedDownloadState:  record.TrackedDownloadState,
+		StatusMessages:        record.StatusMessages,
+		ErrorMessage:          record.ErrorMessage,
+		DownloadID:            record.DownloadID,
+		DownloadClient:        record.DownloadClient,
 		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
 		// CustomFormats, Languages, OutputPath, Indexer, Protocol, HasPostImportCategory
 	}
@@ -259,19 +259,19 @@ func minimalRadarrRecord(r *radarr.QueueRecord) *radarr.QueueRecord {
 
 // minimalReadarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
 // This reduces payload size by omitting progress info and metadata not relevant to stuck items.
-func minimalReadarrRecord(r *readarr.QueueRecord) *readarr.QueueRecord {
+func minimalReadarrRecord(record *readarr.QueueRecord) *readarr.QueueRecord {
 	return &readarr.QueueRecord{
-		ID:                    r.ID,
-		AuthorID:              r.AuthorID,
-		BookID:                r.BookID,
-		Title:                 r.Title,
-		Status:                r.Status,
-		TrackedDownloadStatus: r.TrackedDownloadStatus,
-		TrackedDownloadState:  r.TrackedDownloadState,
-		StatusMessages:        r.StatusMessages,
-		ErrorMessage:          r.ErrorMessage,
-		DownloadID:            r.DownloadID,
-		DownloadClient:        r.DownloadClient,
+		ID:                    record.ID,
+		AuthorID:              record.AuthorID,
+		BookID:                record.BookID,
+		Title:                 record.Title,
+		Status:                record.Status,
+		TrackedDownloadStatus: record.TrackedDownloadStatus,
+		TrackedDownloadState:  record.TrackedDownloadState,
+		StatusMessages:        record.StatusMessages,
+		ErrorMessage:          record.ErrorMessage,
+		DownloadID:            record.DownloadID,
+		DownloadClient:        record.DownloadClient,
 		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
 		// OutputPath, Indexer, Protocol, HasPostImportCategory, DownloadForced
 	}
@@ -279,19 +279,19 @@ func minimalReadarrRecord(r *readarr.QueueRecord) *readarr.QueueRecord {
 
 // minimalSonarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
 // This reduces payload size by omitting progress info and metadata not relevant to stuck items.
-func minimalSonarrRecord(r *sonarr.QueueRecord) *sonarr.QueueRecord {
+func minimalSonarrRecord(record *sonarr.QueueRecord) *sonarr.QueueRecord {
 	return &sonarr.QueueRecord{
-		ID:                    r.ID,
-		SeriesID:              r.SeriesID,
-		EpisodeID:             r.EpisodeID,
-		Title:                 r.Title,
-		Status:                r.Status,
-		TrackedDownloadStatus: r.TrackedDownloadStatus,
-		TrackedDownloadState:  r.TrackedDownloadState,
-		StatusMessages:        r.StatusMessages,
-		ErrorMessage:          r.ErrorMessage,
-		DownloadID:            r.DownloadID,
-		DownloadClient:        r.DownloadClient,
+		ID:                    record.ID,
+		SeriesID:              record.SeriesID,
+		EpisodeID:             record.EpisodeID,
+		Title:                 record.Title,
+		Status:                record.Status,
+		TrackedDownloadStatus: record.TrackedDownloadStatus,
+		TrackedDownloadState:  record.TrackedDownloadState,
+		StatusMessages:        record.StatusMessages,
+		ErrorMessage:          record.ErrorMessage,
+		DownloadID:            record.DownloadID,
+		DownloadClient:        record.DownloadClient,
 		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
 		// Language, OutputPath, Indexer, Protocol, HasPostImportCategory
 	}

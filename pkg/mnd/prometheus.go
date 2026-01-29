@@ -8,10 +8,10 @@ import (
 )
 
 // Additional Prometheus counters for specific operations.
+// These might be the same as things in expvar already.
 //
 //nolint:gochecknoglobals
 var (
-	// These might be the same as things in expvar already.
 	SnapshotRuns = prometheus.NewCounter(prometheus.CounterOpts{
 		Namespace: "notifiarr_triggers",
 		Name:      "snapshot_runs_total",
