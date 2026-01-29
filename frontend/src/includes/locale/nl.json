@@ -120,7 +120,14 @@
         "VariableDescription": "<span class=\"text-warning\">Opmerking:</span> Deze configuratiewaarde is afgeleid van een omgevingsvariabele. Als u de waarde hier wijzigt, wordt de nieuwe waarde naar het configuratiebestand geschreven, maar deze wordt niet toegepast. De volgende keer dat u op Opslaan klikt, wordt deze vervangen. Wijzig de waarde hierdoor de waarde van de omgevingsvariabele te wijzigen of door de variabele uit de omgeving te verwijderen.",
         "EnvironmentVariable": "Omgevingsvariabele naam: <code>{variableName}</code>",
         "EveryDuration": "Elke {timeDuration}",
-        "ToggleSpoilerVisibility": "Klik om spoiler zichtbaarheid te wijzigen."
+        "ToggleSpoilerVisibility": "Klik om spoiler zichtbaarheid te wijzigen.",
+        "APIKey": {
+            "title": "",
+            "placeholder": "",
+            "setMsg": "",
+            "Setting": "",
+            "description": ""
+        }
     },
     "navigation": {
         "pageDescription": {
@@ -129,14 +136,14 @@
             "Metrics": "Bekijk metrische totalen voor client configuraties.",
             "SiteTunnel": "Deze client onderhoud een permanente websocket verbinding met notifiarr.com via een <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery-tunnel</a>. Deze tunnel stelt de website in staat om verzoeken naar uw client te sturen zonder dat er een poort hoeft te worden geopend of een statisch IP-adres hoeft te worden gebruikt. Op deze pagina kunt u uw primaire tunnel selecteren en welke tunnel u als back-up wilt gebruiken voor het geval de primaire tunnel ontoegankelijk wordt.",
             "Commands": "Aangepaste opdrachten en scripts instellen en uitvoeren.",
-            "Services": "De Notifiarr client toepassing kan services bewaken via HTTP-controles, TCP poort controles of controles op processen die wel of niet worden uitgevoerd. <b>De clientservice controles werken met de Notifiarr.com netwerkintegratie.</b>",
+            "Services": "De Notifiarr client toepassing kan services monitoren via HTTP-controles, TCP poort controles of controles van actieve (en inactieve) processen. <b>De client status controles werken met de Notifiarr.com-netwerk integratie.</b>",
             "Configuration": "Configureer hier uw Notifiarr clientinstellingen.",
             "StarrApps": "Stel Starr integraties in.",
             "Downloaders": "Beheer downloadclients.",
             "MediaApps": "Beheer mediaspelers en gerelateerde services.",
             "Endpoints": "Configureer relay eindpunt URL's en hun schema's.",
             "Integrations": "Deze pagina geeft gegevens weer die deze clienttoepassing in het geheugen heeft opgeslagen voor de verschillende geconfigureerde integraties.",
-            "Monitoring": "Bekijk de service- en netwerkstatus.",
+            "Monitoring": "Bekijk de resultaten van de service- en netwerkstatus controle.",
             "LogFiles": "Bekijk, volg, download en upload client logbestanden.",
             "Actions": "Hier vindt u interne Notifiarr-clientacties. Deze worden uitgevoerd door timers, schema's en gebeurtenissen van de website of een chatserver. Hoewel ze normaal gesproken alleen voor probleemoplossing worden gebruikt, kunt u ze in deze interface handmatig activeren.",
             "TrustProfile": "Configureer hoe u zich aanmeldt bij deze Notifiarr clienttoepassing.",
@@ -233,7 +240,7 @@
             },
             "option_desc": {
                 "header": "Selecteer deze optie om in te loggen bij deze applicatie met een HTTP header die een gebruikersnaam bevat. Dit staat algemeen bekend als proxy authenticatie. We hebben <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">een wikipagina</a> met instructies voor het configureren van Nginx voor deze functie. Wanneer u deze optie selecteert, moet u ook een header voor de auth proxy selecteren. Als er geen headers worden weergegeven, zijn er geen geldige headers door de upstream proxy verstrekt.",
-                "password": " Dit is het standaard authenticatie type. Selecteer de optie 'Wachtwoord' om in te loggen bij deze applicatie met een geconfigureerde gebruikersnaam en wachtwoord. Er wordt slechts één gebruikersnaam en wachtwoord ondersteund. Wanneer u deze optie selecteert, moet u de velden voor de gebruikersnaam en het nieuwe wachtwoord invullen. Als dit het huidige authenticatietype is, moet u ook het veld voor het huidige wachtwoord invullen om wijzigingen aan te brengen.",
+                "password": "Dit is het standaard authenticatie type. Selecteer de optie 'Wachtwoord' om in te loggen bij deze applicatie met een geconfigureerde gebruikersnaam en wachtwoord. Er wordt slechts één gebruikersnaam en wachtwoord ondersteund. Wanneer u deze optie selecteert, moet u de velden voor de gebruikersnaam en het nieuwe wachtwoord invullen. Als dit het huidige authenticatietype is, moet u ook het veld voor het huidige wachtwoord invullen om wijzigingen aan te brengen.",
                 "noauth": "Deze configuratie wordt niet aanbevolen. Het authenticatietype 'Geen wachtwoord' staat alle verzoeken toe van elk geconfigureerd <code>upstream IP</code>. Het werkt ook met een authenticatie proxy om de gebruikersnaam in te stellen. Als er geen gebruikersnaam in de opgegeven header staat, wordt standaard admin gebruikt."
             },
             "label": "Authenticatie type",
@@ -336,7 +343,8 @@
             "LoginRequestTimedOut": "Inlog verzoek is verlopen",
             "LoginFailed": "Inloggen mislukt: {error}",
             "ProfileReqTimedOut": "Profiel verzoek is verlopen",
-            "PleaseEnterBothUsernameAndPassword": "Voer zowel uw gebruikersnaam als uw wachtwoord in."
+            "PleaseEnterBothUsernameAndPassword": "Voer zowel uw gebruikersnaam als uw wachtwoord in.",
+            "SetAPIKeyFailed": ""
         },
         "titles": {
             "Command": "Commando",
@@ -365,25 +373,25 @@
         },
         "services": {
             "disabled": {
-                "tooltip": "Schakel hier de bewaking van alle netwerk- en servicecontroles in of uit.",
-                "description": "Service controles in- of uitschakelen.",
-                "label": "Service controles"
+                "tooltip": "Schakel hier de monitoring voor alle gezondheidscontroles uit of in.",
+                "description": "Gezondheidscontroles in- of uitschakelen.",
+                "label": "Gezondheidscontroles"
             },
             "logFile": {
-                "tooltip": "Het logbestand wordt gebruikt om de resultaten van de service controle op te slaan. Als dit niet is ingesteld, wordt de uitvoer van de service controle naar het applicatie logbestand geschreven. Als u een map zonder bestandsnaam instelt, maakt de applicatie een bestand met de naam Notifiarr.services.log in de map aan.",
+                "tooltip": "Het logbestand wordt gebruikt om de resultaten van de gezondheidscontrole op te slaan. Als dit niet is ingesteld, wordt de uitvoer van de gezondheidscontrole naar het logbestand van de toepassing geschreven. Als u een map zonder bestandsnaam instelt, maakt de toepassing een bestand met de naam Notifiarr.services.log in de map.",
                 "placeholder": "/pad/naar/services-notifiarr.log",
                 "label": "Services Log Bestand",
                 "description": "Pad naar het logbestand of de map van de services."
             },
             "interval": {
                 "label": "Update interval",
-                "description": "Update interval voor servicecontroles.",
-                "tooltip": "Abonnees kunnen vaker updaten."
+                "description": "Update interval voor gezondheidscontroles.",
+                "tooltip": "Hiermee bepaal je hoe vaak de verzamelde resultaten van de gezondheidscontrole naar Notifiarr.com worden gestuurd. Als de status van de gezondheidscontrole verandert, wordt dit altijd meteen doorgegeven."
             },
             "parallel": {
-                "label": "Parallelle controles",
-                "description": "Aantal parallelle servicecontroles.",
-                "tooltip": "Normaal gesproken is het voldoende om één service controle tegelijk uit te voeren, maar als u er meer dan 30 of 40 hebt, wilt u dit aantal mogelijk verhogen."
+                "label": "Gelijktijdige controles",
+                "description": "Aantal gezondheidscontroles dat gelijktijdig kan worden uitgevoerd.",
+                "tooltip": "Normaal gesproken is het prima om gezondheidscontroles één voor één uit te voeren, maar als u er meer dan 30 of 40 hebt, kunt u dit aantal beter verhogen."
             }
         },
         "command": {
@@ -557,7 +565,7 @@
                 "label": "Server naam",
                 "description": "Naam van de Plex server.",
                 "placeholder": "Automatisch door server ingesteld",
-                "tooltip": "De naam van de Plex Media Server wordt gebruikt in meldingen, log boeken en service controles. Deze wordt automatisch ingesteld door de Plex server."
+                "tooltip": "De naam van de Plex Media Server wordt gebruikt in meldingen, log boeken en statuscontroles. Deze wordt automatisch ingesteld door de Plex-server."
             },
             "token": {
                 "label": "Token",
@@ -578,7 +586,7 @@
                 "description": "URL van de Tautulli service."
             },
             "title": "Tautulli",
-            "description": "Tautulli biedt een functie waarmee u uw Plex-gebruikers aangepaste gebruikersnamen kunt geven. Door de Notifiarr-client te integreren met Tautulli, worden die aangepaste gebruikersnamen weergegeven in de meldingen van uw chatserver. Als deze functie niet is ingeschakeld, worden in plaats daarvan Plex-gebruikersnamen of e-mailadressen gebruikt. Dit is volledig optioneel. De Notifiarr-website biedt dezelfde functie en stelt u in staat om Plex-gebruikers aan aangepaste namen te koppelen. U kunt hier ook een Tautulli-instantie toevoegen om deze eenvoudig te controleren met service ontroles.",
+            "description": "Tautulli biedt een functie waarmee u uw Plex-gebruikers aangepaste gebruikersnamen kunt geven. Door de Notifiarr-client te integreren met Tautulli, worden die aangepaste gebruikersnamen weergegeven in de meldingen van uw chatserver. Als deze functie niet is ingeschakeld, worden in plaats daarvan Plex-gebruikersnamen of e-mailadressen gebruikt. Dit is volledig optioneel. De Notifiarr-website biedt dezelfde functie en stelt u in staat om Plex-gebruikers aan aangepaste namen te koppelen. U kunt hier ook een Tautulli-instantie toevoegen om deze te controleren met gezondheidscontroles.",
             "name": {
                 "label": "Tautulli Naam",
                 "description": "Naam van de Tautulli service."
@@ -586,8 +594,8 @@
         }
     },
     "monitoring": {
-        "ConfigureServices": "Service controles voor geconfigureerde integraties worden ingeschakeld door ze een controle-interval te geven op de betreffende configuratie pagina's. Sommige van deze controles zijn afkomstig van de pagina <go-to page=\"starr apps\">Starr Apps</go-to>, de pagina <go-to page=\"downloaders\">Download Apps</go-to> of de pagina <go-to page=\"media apps\">Media Apps</go-to>. De overige weergegeven service controles zijn te vinden op de pagina <go-to page=\"services\">Services</go-to>.",
-        "EnableOnConfig": "Schakel service controles in op de pagina <go-to page=\"services\">Services</go-to>.",
+        "ConfigureServices": "Gezondheidscontroles voor geconfigureerde integraties worden ingeschakeld door ze een controle-interval te geven op hun respectievelijke configuratie pagina's. Sommige van deze controles zijn afkomstig van de pagina <go-to page=\"starr apps\">Starr Apps</go-to>, de pagina <go-to page=\"downloaders\">Download Apps</go-to> of de pagina <go-to page=\"media apps\">Media Apps</go-to>. De overige weergegeven gezondheidscontroles zijn te vinden op de pagina <go-to page=\"services\">Services</go-to>.",
+        "EnableOnConfig": "Schakel gezondheidscontroles in op de pagina <go-to page=\"configuration\">Configuratie</go-to>.",
         "cardsView": "Kaart weergave",
         "check": {
             "interval": {
@@ -616,15 +624,15 @@
             "typeExpect": "Type/Verwacht"
         },
         "classicView": "Klassieke weergave",
-        "recheckFailed": "Service kon niet opnieuw worden gecontroleerd.",
-        "startFailed": "Het starten van de service controles is mislukt.",
-        "stopFailed": "Het stoppen van de service controles is mislukt.",
+        "recheckFailed": "Kan de gezondheidscontrole niet opnieuw uitvoeren.",
+        "startFailed": "Kan gezondheidscontroles niet hervatten.",
+        "stopFailed": "Het pauzeren van gezondheidscontroles is mislukt.",
         "hideAllOutputs": "Verberg alle uitvoer",
-        "ChecksDisabled": "Servicecontroles: Uitgeschakeld",
-        "ChecksStopped": "Service Checks: Gestopt",
-        "StartChecks": "Start service controles",
-        "StopChecks": "Stop Service Checks",
-        "checkInitiated": "Service controle gestart.",
+        "ChecksDisabled": "Gezondheidscontroles: Uitgeschakeld",
+        "ChecksStopped": "Gezondheidscontroles: gepauzeerd",
+        "StartChecks": "Gezondheidscontroles hervatten",
+        "StopChecks": "Gezondheidscontroles pauzeren",
+        "checkInitiated": "Gezondheidscontrole gestart.",
         "nextRefresh": "Volgende vernieuwing over {timeDuration}.",
         "refreshInterval": "Ververs interval",
         "showAllOutputs": "Alle uitgangen tonen"
@@ -893,7 +901,7 @@
             "label": "URL",
             "description": "URL van de dienst die wordt gemonitord."
         },
-        "description": "Gebruik dit formulier om service controles te configureren. Voeg hier geen starr, media, snapshot of downloader apps toe. Geef ze een controle interval op hun respectievelijke configuratie pagina's. Schakel service controles volledig in en uit op de pagina <go-to page=\"configuration\">Configuratie</go-to>. Bekijk informatie over de status van actieve services op de pagina <go-to page=\"monitoring\">Monitoring</go-to>. Bekijk de <go-to page=\"ProcessList\">lijst met actieve processen hier</go-to> en gebruik deze ter inspiratie bij het maken van procescontroles..",
+        "description": "Gebruik dit formulier om gezondheidscontroles te configureren. Voeg hier geen starr-, media-, snapshot- of downloader-apps toe. Geef ze in plaats daarvan een controle-interval op hun respectievelijke configuratie pagina's. Schakel service controles volledig uit en in op de pagina <go-to page=\"configuration\">Configuratie</go-to>. Bekijk informatie over de status van actieve services op de pagina <go-to page=\"monitoring\">Monitoring</go-to>. Bekijk hier de <go-to page=\"Process List\">lijst met actieve processen</go-to> en gebruik deze als inspiratie bij het maken van procescontroles.",
         "processListLink": "Bekijk hier de lijst met actieve processen."
     },
     "scheduler": {
@@ -1496,7 +1504,7 @@
         },
         "apps": {
             "title": "Aanvraag verzoeken",
-            "description": "Statistieken over applicatie verzoeken. Deze tellers bevatten geen servicecontroles.",
+            "description": "Statistieken over applicatie verzoeken. Deze tellers omvatten geen gezondheidscontroles.",
             "empty": "Nog geen applicatie verzoeken."
         },
         "httpRequests": {
