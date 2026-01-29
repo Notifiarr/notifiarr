@@ -379,11 +379,6 @@
                 "label": "Update interval",
                 "description": "Update interval voor servicecontroles.",
                 "tooltip": "Abonnees kunnen vaker updaten."
-            },
-            "parallel": {
-                "label": "Parallelle controles",
-                "description": "Aantal parallelle servicecontroles.",
-                "tooltip": "Normaal gesproken is het voldoende om één service controle tegelijk uit te voeren, maar als u er meer dan 30 of 40 hebt, wilt u dit aantal mogelijk verhogen."
             }
         },
         "command": {

@@ -54,11 +54,6 @@
                 "tooltip": "",
                 "placeholder": "",
                 "label": ""
-            },
-            "parallel": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
             }
         },
         "ui": {
