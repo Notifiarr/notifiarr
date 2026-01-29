@@ -10,6 +10,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
+	"golift.io/starr"
 	"golift.io/starr/lidarr"
 	"golift.io/starr/radarr"
 	"golift.io/starr/readarr"
@@ -80,7 +81,8 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 			}
 
 			repeatStomper[item.DownloadID] = struct{}{}
-			appqueue = append(appqueue, &lidarrRecord{QueueRecord: item}) //nolint:wsl
+			// Create minimal copy with only fields needed for stuck item detection.
+			appqueue = append(appqueue, &lidarrRecord{QueueRecord: minimalLidarrRecord(item)}) //nolint:wsl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
@@ -121,7 +123,8 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 			}
 
 			repeatStomper[item.DownloadID] = struct{}{}
-			appqueue = append(appqueue, &radarrRecord{QueueRecord: item}) //nolint:wsl
+			// Create minimal copy with only fields needed for stuck item detection.
+			appqueue = append(appqueue, &radarrRecord{QueueRecord: minimalRadarrRecord(item)}) //nolint:wsl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
@@ -162,7 +165,8 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 			}
 
 			repeatStomper[item.DownloadID] = struct{}{}
-			appqueue = append(appqueue, &readarrRecord{QueueRecord: item}) //nolint:wsl
+			// Create minimal copy with only fields needed for stuck item detection.
+			appqueue = append(appqueue, &readarrRecord{QueueRecord: minimalReadarrRecord(item)}) //nolint:wsl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
@@ -203,7 +207,8 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 			}
 
 			repeatStomper[item.DownloadID] = struct{}{}
-			appqueue = append(appqueue, &sonarrRecord{QueueRecord: item}) //nolint:wsl
+			// Create minimal copy with only fields needed for stuck item detection.
+			appqueue = append(appqueue, &sonarrRecord{QueueRecord: minimalSonarrRecord(item)}) //nolint:wsl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
@@ -213,3 +218,84 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 
 	return stuck
 }
+
+// minimalLidarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
+// This reduces payload size by omitting progress info and metadata not relevant to stuck items.
+func minimalLidarrRecord(r *lidarr.QueueRecord) *lidarr.QueueRecord {
+	return &lidarr.QueueRecord{
+		ID:                    r.ID,
+		ArtistID:              r.ArtistID,
+		AlbumID:               r.AlbumID,
+		Title:                 r.Title,
+		Status:                r.Status,
+		TrackedDownloadStatus: r.TrackedDownloadStatus,
+		StatusMessages:        r.StatusMessages,
+		ErrorMessage:          r.ErrorMessage,
+		DownloadID:            r.DownloadID,
+		DownloadClient:        r.DownloadClient,
+		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
+		// OutputPath, Indexer, Protocol, HasPostImportCategory, DownloadForced
+	}
+}
+
+// minimalRadarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
+// This reduces payload size by omitting progress info and metadata not relevant to stuck items.
+func minimalRadarrRecord(r *radarr.QueueRecord) *radarr.QueueRecord {
+	return &radarr.QueueRecord{
+		ID:                    r.ID,
+		MovieID:               r.MovieID,
+		Title:                 r.Title,
+		Status:                r.Status,
+		TrackedDownloadStatus: r.TrackedDownloadStatus,
+		TrackedDownloadState:  r.TrackedDownloadState,
+		StatusMessages:        r.StatusMessages,
+		ErrorMessage:          r.ErrorMessage,
+		DownloadID:            r.DownloadID,
+		DownloadClient:        r.DownloadClient,
+		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
+		// CustomFormats, Languages, OutputPath, Indexer, Protocol, HasPostImportCategory
+	}
+}
+
+// minimalReadarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
+// This reduces payload size by omitting progress info and metadata not relevant to stuck items.
+func minimalReadarrRecord(r *readarr.QueueRecord) *readarr.QueueRecord {
+	return &readarr.QueueRecord{
+		ID:                    r.ID,
+		AuthorID:              r.AuthorID,
+		BookID:                r.BookID,
+		Title:                 r.Title,
+		Status:                r.Status,
+		TrackedDownloadStatus: r.TrackedDownloadStatus,
+		TrackedDownloadState:  r.TrackedDownloadState,
+		StatusMessages:        r.StatusMessages,
+		ErrorMessage:          r.ErrorMessage,
+		DownloadID:            r.DownloadID,
+		DownloadClient:        r.DownloadClient,
+		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
+		// OutputPath, Indexer, Protocol, HasPostImportCategory, DownloadForced
+	}
+}
+
+// minimalSonarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
+// This reduces payload size by omitting progress info and metadata not relevant to stuck items.
+func minimalSonarrRecord(r *sonarr.QueueRecord) *sonarr.QueueRecord {
+	return &sonarr.QueueRecord{
+		ID:                    r.ID,
+		SeriesID:              r.SeriesID,
+		EpisodeID:             r.EpisodeID,
+		Title:                 r.Title,
+		Status:                r.Status,
+		TrackedDownloadStatus: r.TrackedDownloadStatus,
+		TrackedDownloadState:  r.TrackedDownloadState,
+		StatusMessages:        r.StatusMessages,
+		ErrorMessage:          r.ErrorMessage,
+		DownloadID:            r.DownloadID,
+		DownloadClient:        r.DownloadClient,
+		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
+		// Language, OutputPath, Indexer, Protocol, HasPostImportCategory
+	}
+}
+
+// Ensure starr import is used for StatusMessage type reference.
+var _ *starr.StatusMessage
