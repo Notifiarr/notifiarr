@@ -26,7 +26,7 @@ class Navigator {
   /** This is set to the page id if there are unsaved changes. */
   public showUnsavedAlert = $state('')
   /** This is used to force a navigation event even if there are unsaved changes. */
-  public forceEvent = { type: 'force', preventDefault: () => {} } as Event
+  public forceEvent = { type: 'force', preventDefault: () => { } } as Event
 
   /** Call this in the onMount function of the parent component to set the initial page. */
   public onMount = () => {

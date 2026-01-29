@@ -1,4 +1,3 @@
-//nolint:gochecknoglobals
 package mnd
 
 import (
@@ -9,16 +8,19 @@ import (
 )
 
 // Additional Prometheus counters for specific operations.
+//
+//nolint:gochecknoglobals
 var (
+	// These might be the same as things in expvar already.
 	SnapshotRuns = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: "notifiarr",
+		Namespace: "notifiarr_triggers",
 		Name:      "snapshot_runs_total",
 		Help:      "Total number of snapshot collection runs.",
 	})
-	QueuePolls = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: "notifiarr",
-		Name:      "queue_polls_total",
-		Help:      "Total number of starr queue poll operations.",
+	StuckItems = prometheus.NewCounter(prometheus.CounterOpts{
+		Namespace: "notifiarr_triggers",
+		Name:      "stuck_items_processed_total",
+		Help:      "Total number of times stuck items processing triggered.",
 	})
 )
 
@@ -85,50 +87,50 @@ func newExpvarCollector() *expvarCollector {
 	}
 }
 
-func (c *expvarCollector) Describe(ch chan<- *prometheus.Desc) {
-	ch <- c.logFiles
-	ch <- c.apiHits
-	ch <- c.httpRequests
-	ch <- c.timerEvents
-	ch <- c.timerCounts
-	ch <- c.website
-	ch <- c.serviceChecks
-	ch <- c.apps
-	ch <- c.fileWatcher
+func (c *expvarCollector) Describe(metrics chan<- *prometheus.Desc) {
+	metrics <- c.logFiles
+	metrics <- c.apiHits
+	metrics <- c.httpRequests
+	metrics <- c.timerEvents
+	metrics <- c.timerCounts
+	metrics <- c.website
+	metrics <- c.serviceChecks
+	metrics <- c.apps
+	metrics <- c.fileWatcher
 }
 
-func (c *expvarCollector) Collect(ch chan<- prometheus.Metric) {
-	collectMap(ch, LogFiles, c.logFiles)
-	collectMap(ch, APIHits, c.apiHits)
-	collectMap(ch, HTTPRequests, c.httpRequests)
-	collectSplitMap(ch, TimerEvents, c.timerEvents)
-	collectMap(ch, TimerCounts, c.timerCounts)
-	collectMap(ch, Website, c.website)
-	collectSplitMap(ch, ServiceChecks, c.serviceChecks)
-	collectSplitMap(ch, Apps, c.apps)
-	collectMap(ch, FileWatcher, c.fileWatcher)
+func (c *expvarCollector) Collect(metrics chan<- prometheus.Metric) {
+	collectMap(metrics, LogFiles, c.logFiles)
+	collectMap(metrics, APIHits, c.apiHits)
+	collectMap(metrics, HTTPRequests, c.httpRequests)
+	collectSplitMap(metrics, TimerEvents, c.timerEvents)
+	collectMap(metrics, TimerCounts, c.timerCounts)
+	collectMap(metrics, Website, c.website)
+	collectSplitMap(metrics, ServiceChecks, c.serviceChecks)
+	collectSplitMap(metrics, Apps, c.apps)
+	collectMap(metrics, FileWatcher, c.fileWatcher)
 }
 
-func collectMap(ch chan<- prometheus.Metric, m *expvar.Map, desc *prometheus.Desc) {
-	m.Do(func(kv expvar.KeyValue) {
-		val := getExpvarValue(kv.Value)
+func collectMap(metrics chan<- prometheus.Metric, m *expvar.Map, desc *prometheus.Desc) {
+	m.Do(func(keyval expvar.KeyValue) {
+		val := getExpvarValue(keyval.Value)
 		if val >= 0 {
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, kv.Key)
+			metrics <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, keyval.Key)
 		}
 	})
 }
 
 //nolint:mnd
-func collectSplitMap(ch chan<- prometheus.Metric, m *expvar.Map, desc *prometheus.Desc) {
-	m.Do(func(kv expvar.KeyValue) {
-		keys := strings.SplitN(kv.Key, "&&", 2)
+func collectSplitMap(metrics chan<- prometheus.Metric, m *expvar.Map, desc *prometheus.Desc) {
+	m.Do(func(keyval expvar.KeyValue) {
+		keys := strings.SplitN(keyval.Key, "&&", 2)
 		if len(keys) != 2 {
 			return
 		}
 
-		val := getExpvarValue(kv.Value)
+		val := getExpvarValue(keyval.Value)
 		if val >= 0 {
-			ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, keys[0], keys[1])
+			metrics <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, keys[0], keys[1])
 		}
 	})
 }
@@ -149,12 +151,11 @@ func getExpvarValue(v expvar.Var) float64 {
 }
 
 //nolint:gochecknoinits
-//
 func init() {
 	// Go and Process collectors are registered by default.
 	prometheus.MustRegister(
 		newExpvarCollector(),
 		SnapshotRuns,
-		QueuePolls,
+		StuckItems,
 	)
 }
