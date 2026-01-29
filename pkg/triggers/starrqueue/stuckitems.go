@@ -24,6 +24,7 @@ func (a *Action) StuckItems(event website.EventType) {
 
 // sendStuckQueues gathers the stuck queue from cache and sends them.
 func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
+	mnd.QueuePolls.Inc()
 	lidarr := c.getFinishedItemsLidarr(ctx)
 	radarr := c.getFinishedItemsRadarr(ctx)
 	readarr := c.getFinishedItemsReadarr(ctx)

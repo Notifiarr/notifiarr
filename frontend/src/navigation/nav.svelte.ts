@@ -11,6 +11,7 @@ import { modal } from './Modals.svelte'
 // Page represents the data to render a page link.
 export interface Page extends FaProps {
   id: string
+  path?: string // optional override for URL path (defaults to id)
   type?: 'modal' | 'page'
   component: Component
 }
@@ -100,9 +101,9 @@ class Navigator {
   public active = (page: string): boolean => iequals(this.activePage, page)
 
   private setActivePage = (newPage: string): string => {
-    const page = allPages.find(p => iequals(p.id, newPage))
+    const page = allPages.find(p => iequals(p.path ?? p.id, newPage))
     this.ActivePage = page?.component || Landing
-    return (this.activePage = page ? newPage : '')
+    return (this.activePage = page ? (page.path ?? page.id) : '')
   }
 
   private isModal = (page: string): Component | null => {
