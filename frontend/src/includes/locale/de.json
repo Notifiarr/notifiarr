@@ -76,11 +76,6 @@
             "tooltip": ""
         },
         "services": {
-            "parallel": {
-                "tooltip": "",
-                "label": "",
-                "description": ""
-            },
             "disabled": {
                 "label": "",
                 "description": "",

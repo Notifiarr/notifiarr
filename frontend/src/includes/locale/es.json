@@ -161,11 +161,6 @@
             "placeholder": ""
         },
         "services": {
-            "parallel": {
-                "tooltip": "",
-                "description": "",
-                "label": ""
-            },
             "disabled": {
                 "label": "",
                 "description": "",

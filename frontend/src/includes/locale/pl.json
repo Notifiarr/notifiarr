@@ -409,11 +409,6 @@
             "placeholder": ""
         },
         "services": {
-            "parallel": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
-            },
             "disabled": {
                 "label": "",
                 "description": "",

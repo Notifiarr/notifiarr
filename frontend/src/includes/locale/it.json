@@ -195,11 +195,6 @@
                 "description": "",
                 "tooltip": ""
             },
-            "parallel": {
-                "label": "Controlli Paralleli",
-                "description": "",
-                "tooltip": ""
-            },
             "interval": {
                 "label": "Intervallo di aggiornamento",
                 "description": "",
