@@ -128,6 +128,7 @@ func (c *Client) httpAPIHandlers() {
 	c.apps.HandleAPIpath("", "ping/{app:[a-z,]+}", c.handleInstancePing, "GET")
 	c.apps.HandleAPIpath("", "ping/{app:[a-z]+}/{instance:[0-9]+}", c.handleInstancePing, "GET")
 	// Prometheus metrics endpoint, protected by API key.
+	c.apps.Router.Handle("/api/metrics", c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
 	c.apps.Router.Handle("/metrics", c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
 	if c.Config.URLBase != "/" {
 		c.apps.Router.Handle(path.Join(c.Config.URLBase, "metrics"),
