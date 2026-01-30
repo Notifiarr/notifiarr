@@ -17,6 +17,7 @@ jobs:
           [
             { name: 'alpine', sfx: '' },
             { name: 'cuda', sfx: '-cuda' },
+            { name: 'ubuntu', sfx: '-ubuntu' },
           ]
     permissions:
       contents: read
@@ -62,6 +63,7 @@ jobs:
           done
 
       - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: twitchcaptain
