@@ -368,6 +368,7 @@
         "y": 25
       },
       "id": 5,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [],
@@ -390,7 +391,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(notifiarr_client_http_requests{name=~\".*Bytes.*\", instance=~\"$instance\", job=~\"$job\"}[1m])",
+          "expr": "rate(notifiarr_client_http_requests{name=~\".*Bytes.*\", instance=~\"$instance\", job=~\"$job\"}[5m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -499,6 +500,7 @@
         "y": 25
       },
       "id": 3,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [
@@ -524,7 +526,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(notifiarr_client_api_requests{name=~\".*Bytes.*\", instance=~\"$instance\", job=~\"$job\"}[1m])",
+          "expr": "rate(notifiarr_client_api_requests{name=~\".*Bytes.*\", instance=~\"$instance\", job=~\"$job\"}[5m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -604,6 +606,7 @@
         "y": 34
       },
       "id": 6,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [],
@@ -626,7 +629,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(notifiarr_client_log_files{name=~\".*Bytes.*\", instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "rate(notifiarr_client_log_files{name=~\".*Bytes.*\", instance=~\"$instance\", job=~\"$job\"}[5m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -899,6 +902,7 @@
         "y": 45
       },
       "id": 1,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [
@@ -924,7 +928,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(notifiarr_client_website{name=\"POST Bytes Received\", instance=~\"$instance\", job=~\"$job\"}[1m])",
+          "expr": "rate(notifiarr_client_website{name=\"POST Bytes Received\", instance=~\"$instance\", job=~\"$job\"}[5m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -941,7 +945,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(notifiarr_client_website{name=\"POST Bytes Sent\", instance=~\"$instance\", job=~\"$job\"}[1m])",
+          "expr": "rate(notifiarr_client_website{name=\"POST Bytes Sent\", instance=~\"$instance\", job=~\"$job\"}[5m])",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1560,6 +1564,7 @@
         "y": 98
       },
       "id": 4,
+      "interval": "1m",
       "maxPerRow": 2,
       "options": {
         "legend": {
@@ -1585,7 +1590,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(notifiarr_client_integrations{app=~\"$apps\", name=~\"POST Bytes Received|POST Bytes Sent|GET Bytes Received\", instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "rate(notifiarr_client_integrations{app=~\"$apps\", name=~\"POST Bytes Received|POST Bytes Sent|GET Bytes Received\", instance=~\"$instance\", job=~\"$job\"}[2m])",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1836,6 +1841,7 @@
         "y": 149
       },
       "id": 23,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [
@@ -1862,7 +1868,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "deriv(process_resident_memory_bytes{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "deriv(process_resident_memory_bytes{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -1881,7 +1887,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "deriv(process_virtual_memory_bytes{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "deriv(process_virtual_memory_bytes{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -2137,6 +2143,7 @@
         "y": 157
       },
       "id": 25,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [
@@ -2165,7 +2172,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "deriv(go_memstats_alloc_bytes{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "deriv(go_memstats_alloc_bytes{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "hide": true,
@@ -2185,7 +2192,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "deriv(go_memstats_stack_inuse_bytes{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "deriv(go_memstats_stack_inuse_bytes{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -2204,7 +2211,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "deriv(go_memstats_heap_inuse_bytes{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "deriv(go_memstats_heap_inuse_bytes{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "hide": false,
@@ -2431,6 +2438,7 @@
         "y": 165
       },
       "id": 27,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [
@@ -2456,7 +2464,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(go_memstats_alloc_bytes_total{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "rate(go_memstats_alloc_bytes_total{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -2475,7 +2483,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(go_memstats_mallocs_total{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "rate(go_memstats_mallocs_total{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "hide": false,
@@ -2667,6 +2675,7 @@
         "y": 173
       },
       "id": 29,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [
@@ -2693,7 +2702,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "deriv(process_open_fds{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "deriv(process_open_fds{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
@@ -2790,6 +2799,7 @@
         "y": 181
       },
       "id": 30,
+      "interval": "1m",
       "options": {
         "legend": {
           "calcs": [
@@ -2816,7 +2826,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(go_gc_duration_seconds_count{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "rate(go_gc_duration_seconds_count{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
@@ -2835,7 +2845,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(go_gc_duration_seconds_sum{instance=~\"$instance\", job=~\"$job\"}[$__rate_interval])",
+          "expr": "rate(go_gc_duration_seconds_sum{instance=~\"$instance\", job=~\"$job\"}[5m])",
           "format": "time_series",
           "fullMetaSearch": false,
           "hide": false,
@@ -2996,13 +3006,13 @@
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(notifiarr_http_requests,job)",
+        "definition": "label_values(notifiarr_client_http_requests,job)",
         "label": "Job",
         "name": "job",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(notifiarr_http_requests,job)",
+          "query": "label_values(notifiarr_client_http_requests,job)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -3035,7 +3045,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-3h",
     "to": "now"
   },
   "timepicker": {
@@ -3054,6 +3064,6 @@
   "timezone": "browser",
   "title": "Notifiarr Client",
   "uid": "afbm2635n7ny8e",
-  "version": 19,
+  "version": 21,
   "weekStart": ""
 }
