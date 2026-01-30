@@ -93,7 +93,7 @@ func collectMap(metrics chan<- prometheus.Metric, m *expvar.Map, desc *prometheu
 	m.Do(func(keyval expvar.KeyValue) {
 		val := getExpvarValue(keyval.Value)
 		if val >= 0 {
-			metrics <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, keyval.Key)
+			metrics <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, val, keyval.Key)
 		}
 	})
 }
@@ -108,7 +108,7 @@ func collectSplitMap(metrics chan<- prometheus.Metric, m *expvar.Map, desc *prom
 
 		val := getExpvarValue(keyval.Value)
 		if val >= 0 {
-			metrics <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, keys[0], keys[1])
+			metrics <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, val, keys[0], keys[1])
 		}
 	})
 }
