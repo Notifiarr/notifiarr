@@ -16,7 +16,6 @@ type expvarCollector struct {
 	apiHits       *prometheus.Desc
 	httpRequests  *prometheus.Desc
 	timerEvents   *prometheus.Desc
-	timerCounts   *prometheus.Desc
 	website       *prometheus.Desc
 	serviceChecks *prometheus.Desc
 	apps          *prometheus.Desc
@@ -26,47 +25,42 @@ type expvarCollector struct {
 func newExpvarCollector() *expvarCollector {
 	return &expvarCollector{
 		logFiles: prometheus.NewDesc(
-			"notifiarr_log_files",
+			"notifiarr_client_log_files",
 			"Log file information",
 			[]string{"name"}, nil,
 		),
 		apiHits: prometheus.NewDesc(
-			"notifiarr_api_hits",
+			"notifiarr_client_api_requests",
 			"Incoming API requests",
 			[]string{"name"}, nil,
 		),
 		httpRequests: prometheus.NewDesc(
-			"notifiarr_http_requests",
+			"notifiarr_client_http_requests",
 			"Incoming HTTP requests",
 			[]string{"name"}, nil,
 		),
 		timerEvents: prometheus.NewDesc(
-			"notifiarr_timer_events",
+			"notifiarr_client_action_counters",
 			"Triggers and timers executed",
 			[]string{"trigger", "name"}, nil,
 		),
-		timerCounts: prometheus.NewDesc(
-			"notifiarr_timer_counts",
-			"Triggers and timers counters",
-			[]string{"name"}, nil,
-		),
 		website: prometheus.NewDesc(
-			"notifiarr_website",
+			"notifiarr_client_website",
 			"Outbound requests to website",
 			[]string{"name"}, nil,
 		),
 		serviceChecks: prometheus.NewDesc(
-			"notifiarr_service_checks",
-			"Service check responses",
+			"notifiarr_client_health_checks",
+			"Health check responses",
 			[]string{"service", "name"}, nil,
 		),
 		apps: prometheus.NewDesc(
-			"notifiarr_apps",
-			"Starr app requests",
+			"notifiarr_client_integrations",
+			"Requests to integrated clients",
 			[]string{"app", "name"}, nil,
 		),
 		fileWatcher: prometheus.NewDesc(
-			"notifiarr_file_watcher",
+			"notifiarr_client_file_watcher",
 			"File watcher metrics",
 			[]string{"name"}, nil,
 		),
@@ -78,7 +72,6 @@ func (c *expvarCollector) Describe(metrics chan<- *prometheus.Desc) {
 	metrics <- c.apiHits
 	metrics <- c.httpRequests
 	metrics <- c.timerEvents
-	metrics <- c.timerCounts
 	metrics <- c.website
 	metrics <- c.serviceChecks
 	metrics <- c.apps
@@ -90,7 +83,6 @@ func (c *expvarCollector) Collect(metrics chan<- prometheus.Metric) {
 	collectMap(metrics, APIHits, c.apiHits)
 	collectMap(metrics, HTTPRequests, c.httpRequests)
 	collectSplitMap(metrics, TimerEvents, c.timerEvents)
-	collectMap(metrics, TimerCounts, c.timerCounts)
 	collectMap(metrics, Website, c.website)
 	collectSplitMap(metrics, ServiceChecks, c.serviceChecks)
 	collectSplitMap(metrics, Apps, c.apps)
