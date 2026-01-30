@@ -3,8 +3,10 @@ package mnd
 import (
 	"expvar"
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"golift.io/version"
 )
 
 //nolint:gochecknoinits
@@ -20,6 +22,7 @@ type expvarCollector struct {
 	serviceChecks *prometheus.Desc
 	apps          *prometheus.Desc
 	fileWatcher   *prometheus.Desc
+	uptime        *prometheus.Desc
 }
 
 func newExpvarCollector() *expvarCollector {
@@ -64,6 +67,11 @@ func newExpvarCollector() *expvarCollector {
 			"File watcher metrics",
 			[]string{"name"}, nil,
 		),
+		uptime: prometheus.NewDesc(
+			"notifiarr_client_uptime_seconds",
+			"Application uptime in seconds",
+			nil, nil,
+		),
 	}
 }
 
@@ -76,6 +84,7 @@ func (c *expvarCollector) Describe(metrics chan<- *prometheus.Desc) {
 	metrics <- c.serviceChecks
 	metrics <- c.apps
 	metrics <- c.fileWatcher
+	metrics <- c.uptime
 }
 
 func (c *expvarCollector) Collect(metrics chan<- prometheus.Metric) {
@@ -87,6 +96,8 @@ func (c *expvarCollector) Collect(metrics chan<- prometheus.Metric) {
 	collectSplitMap(metrics, ServiceChecks, c.serviceChecks)
 	collectSplitMap(metrics, Apps, c.apps)
 	collectMap(metrics, FileWatcher, c.fileWatcher)
+	metrics <- prometheus.MustNewConstMetric(c.uptime, prometheus.GaugeValue,
+		time.Since(version.Started).Seconds())
 }
 
 func collectMap(metrics chan<- prometheus.Metric, m *expvar.Map, desc *prometheus.Desc) {
