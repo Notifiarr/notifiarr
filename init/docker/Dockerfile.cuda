@@ -14,7 +14,7 @@ COPY main.go go.mod go.sum ./
 RUN go mod download \
     && go run github.com/swaggo/swag/cmd/swag@latest -v
 
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash \
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash \
     && apt install -y nodejs
 
 COPY pkg pkg

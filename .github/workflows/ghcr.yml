@@ -15,9 +15,8 @@ jobs:
       matrix:
         docker:
           [
-            { name: 'scratch', sfx: '' },
+            { name: 'alpine', sfx: '' },
             { name: 'cuda', sfx: '-cuda' },
-            { name: 'alpine', sfx: '-alpine' },
           ]
     permissions:
       contents: read
@@ -72,7 +71,7 @@ jobs:
           flavor: latest=false
           tags: |
             type=semver,priority=1010,pattern=latest,enable=${{ matrix.docker.sfx == '' }}
-            type=semver,priority=1010,pattern=${{ matrix.docker.name }},enable=${{ matrix.docker.sfx != '' }}
+            type=semver,priority=1010,pattern=${{ matrix.docker.name }}
             type=semver,priority=1009,pattern={{major}}${{ matrix.docker.sfx }}
             type=semver,priority=1008,pattern={{major}}.{{minor}}${{ matrix.docker.sfx }}
             type=semver,priority=1007,pattern={{version}}${{ matrix.docker.sfx }}
