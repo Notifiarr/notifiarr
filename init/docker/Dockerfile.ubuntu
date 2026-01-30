@@ -78,7 +78,7 @@ ARG AUTHOR=golift
 
 # Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
-    org.opencontainers.image.title="Notifiarr with CUDA" \
+    org.opencontainers.image.title="Notifiarr on Ubuntu" \
     org.opencontainers.image.documentation="https://notifiarr.wiki" \
     org.opencontainers.image.description="${DESC}" \
     org.opencontainers.image.url="${SOURCE_URL}" \
