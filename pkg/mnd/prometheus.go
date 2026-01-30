@@ -7,22 +7,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-// Additional Prometheus counters for specific operations.
-// These might be the same as things in expvar already.
-//
-//nolint:gochecknoglobals
-var (
-	SnapshotRuns = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: "notifiarr_triggers",
-		Name:      "snapshot_runs_total",
-		Help:      "Total number of snapshot collection runs.",
-	})
-	StuckItems = prometheus.NewCounter(prometheus.CounterOpts{
-		Namespace: "notifiarr_triggers",
-		Name:      "stuck_items_processed_total",
-		Help:      "Total number of times stuck items processing triggered.",
-	})
-)
+//nolint:gochecknoinits
+func init() { prometheus.MustRegister(newExpvarCollector()) }
 
 // Custom collector that exports all expvar metrics to Prometheus.
 type expvarCollector struct {
@@ -148,14 +134,4 @@ func getExpvarValue(v expvar.Var) float64 {
 	}
 
 	return -1
-}
-
-//nolint:gochecknoinits
-func init() {
-	// Go and Process collectors are registered by default.
-	prometheus.MustRegister(
-		newExpvarCollector(),
-		SnapshotRuns,
-		StuckItems,
-	)
 }

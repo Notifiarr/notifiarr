@@ -1,0 +1,19 @@
+##
+# The client exports metrics for Prometheus @ /metrics and /api/metrics.
+# Set a custom key in the Web UI under 'Extra Keys' on the Configuration page.
+# Use this example scrape config to store the client's metrics in Prometheus.
+# Use a scrape interval of 60s.
+##
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'notifiarr'
+    scrape_interval: 60s # It is completely wasteful and useless to scrape more often than 60s.
+    static_configs:
+      - targets: ['Notifiarr:5454']
+    http_config:
+      headers:
+        X-Api-Key: 'custom-client-api-key-here'
