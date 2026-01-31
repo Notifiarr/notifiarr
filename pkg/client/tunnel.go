@@ -37,11 +37,7 @@ func (c *Client) poolMax(info *clientinfo.ClientInfo) int {
 	poolmax := len(c.apps.Sonarr) + len(c.apps.Radarr) + len(c.apps.Lidarr) +
 		len(c.apps.Readarr) + len(c.apps.Prowlarr) + len(c.apps.Deluge) +
 		len(c.apps.Qbit) + len(c.apps.Rtorrent) + len(c.apps.SabNZB) +
-		len(c.apps.NZBGet) + 1
-
-	if c.apps.Plex.Enabled() {
-		poolmax++
-	}
+		len(c.apps.NZBGet) + len(c.apps.Plex) + 1
 
 	if c.apps.Tautulli.Enabled() {
 		poolmax++

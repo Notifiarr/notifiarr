@@ -63,6 +63,11 @@ func (c *PlexConfig) Enabled() bool {
 	return c != nil && c.Config.URL != "" && c.Config.Token != "" && c.Timeout.Duration >= 0
 }
 
+// Enabled returns true if the Plex instance is configured and usable.
+func (p *Plex) Enabled() bool {
+	return p != nil && p.PlexConfig.Enabled()
+}
+
 type TautulliConfig struct {
 	ExtraConfig
 	tautulli.Config

@@ -166,7 +166,7 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 		wait sync.WaitGroup
 	)
 
-	c.getPlexVersion(ctx, &wait, &c.Apps.Plex, &plx)
+	c.getPlexVersion(ctx, &wait, c.Apps.Plex, &plx)
 	c.getLidarrVersion(ctx, &wait, c.Apps.Lidarr, lid)
 	c.getProwlarrVersion(ctx, &wait, c.Apps.Prowlarr, prl)
 	c.getRadarrVersion(ctx, &wait, c.Apps.Radarr, rad)
@@ -252,10 +252,22 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Prowlarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
 		}}}
 	case "plex":
-		stat := &AppStatuses{Plex: c.plexVersionReply(c.Apps.Plex.GetInfo(ctx))}
-		stat.Plex[0].Name = c.Apps.Plex.Server.Name()
+		idx := instance - 1
+		if idx < 0 || idx >= len(c.Apps.Plex) {
+			return &AppStatuses{Plex: []*PlexConTest{{
+				conTest: conTest{Instance: instance, Up: false, Error: mnd.ErrDisabledInstance.Error()},
+			}}}
+		}
 
-		return stat
+		plexInstance := &c.Apps.Plex[idx]
+		if !plexInstance.Enabled() {
+			return &AppStatuses{Plex: []*PlexConTest{{
+				conTest: conTest{Instance: instance, Up: false, Name: plexInstance.Server.Name(), Error: mnd.ErrDisabledInstance.Error()},
+			}}}
+		}
+
+		stat, err := plexInstance.GetInfo(ctx)
+		return &AppStatuses{Plex: c.plexVersionReply(stat, err, plexInstance.Server.Name(), instance)}
 	case "tautulli":
 		if !c.Apps.Tautulli.Enabled() {
 			return &AppStatuses{Tautulli: []*TautulliConTest{{
@@ -382,22 +394,32 @@ func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, son
 	}
 }
 
-func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServer *apps.Plex, plx *[]*PlexConTest) {
-	if !plexServer.Enabled() {
-		return
+func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexServers []apps.Plex, plx *[]*PlexConTest) {
+	for idx := range plexServers {
+		plexInstance := &plexServers[idx]
+		if !plexInstance.Enabled() {
+			continue
+		}
+
+		wait.Add(1)
+
+		go func(idx int, plexInstance *apps.Plex) {
+			defer wait.Done()
+
+			stat, err := plexInstance.GetInfo(ctx)
+			reply := c.plexVersionReply(stat, err, plexInstance.Server.Name(), idx+1)
+			*plx = append(*plx, reply...)
+		}(idx, plexInstance)
 	}
-
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-		*plx = c.plexVersionReply(plexServer.GetInfo(ctx)) //nolint:wsl
-	}()
 }
 
-func (c *Config) plexVersionReply(stat *plex.PMSInfo, err error) []*PlexConTest {
+func (c *Config) plexVersionReply(stat *plex.PMSInfo, err error, name string, instance int) []*PlexConTest {
 	if stat == nil {
 		stat = &plex.PMSInfo{}
+	}
+
+	if name == "" {
+		name = stat.FriendlyName
 	}
 
 	return []*PlexConTest{{
@@ -412,6 +434,6 @@ func (c *Config) plexVersionReply(stat *plex.PMSInfo, err error) []*PlexConTest 
 			MyPlexSubscription: stat.MyPlexSubscription,
 			PushNotifications:  stat.PushNotifications,
 		},
-		c.getConTest("Plex", stat.FriendlyName, 1, err),
+		c.getConTest("Plex", name, instance, err),
 	}}
 }

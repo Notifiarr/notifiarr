@@ -77,7 +77,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 			Payload: &website.Payload{
 				Snap: c.triggers.PlexCron.GetMetaSnap(r.Context()),
 				Load: &hook,
-				Plex: &plex.Sessions{Name: c.apps.Plex.Name()},
+				Plex: &plex.Sessions{Name: c.plexName()},
 			},
 		})
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
@@ -117,4 +117,29 @@ func (c *Client) plexCooldown() time.Duration {
 	}
 
 	return time.Minute
+}
+
+// plexName returns the name of the first configured Plex server, or empty string.
+func (c *Client) plexName() string {
+	if len(c.apps.Plex) > 0 {
+		return c.apps.Plex[0].Server.Name()
+	}
+
+	return ""
+}
+
+// plexEnabled returns true if at least one Plex server is configured.
+func (c *Client) plexEnabled() bool {
+	return len(c.apps.Plex) > 0
+}
+
+// plexTokenPattern returns a regex pattern matching all Plex tokens and the API key.
+func (c *Client) plexTokenPattern() string {
+	tokens := []string{c.Config.AppsConfig.APIKey}
+
+	for idx := range c.apps.Plex {
+		tokens = append(tokens, c.apps.Plex[idx].Server.Token)
+	}
+
+	return fmt.Sprintf("{token:%s}", strings.Join(tokens, "|"))
 }

@@ -53,14 +53,20 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 	status := make(map[string]string)
 	errors := 0
 
-	for _, key := range input.Args {
-		if _, err := c.Apps.Plex.EmptyTrashWithContext(ctx, key); err != nil {
-			mnd.Log.ErrorfNoShare("[%s requested] Emptying Plex trash for library '%s' failed: %v", input.Type, key, err)
+	for idx := range c.Apps.Plex {
+		plex := &c.Apps.Plex[idx]
 
-			status[key] = err.Error()
-			errors++
-		} else {
-			status[key] = "ok"
+		for _, key := range input.Args {
+			statusKey := fmt.Sprintf("%s_%s", plex.Server.Name(), key)
+			if _, err := plex.EmptyTrashWithContext(ctx, key); err != nil {
+				mnd.Log.ErrorfNoShare("[%s requested] Emptying Plex trash for library '%s' on %s failed: %v",
+					input.Type, key, plex.Server.Name(), err)
+
+				status[statusKey] = err.Error()
+				errors++
+			} else {
+				status[statusKey] = "ok"
+			}
 		}
 	}
 

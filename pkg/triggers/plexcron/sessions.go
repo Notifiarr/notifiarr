@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -15,8 +16,14 @@ import (
 )
 
 // sendPlexSessions is fired by a timer if Plex Sessions feature has an interval defined.
+// This only fires for the first (website-controlled) server.
 func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
-	sessions, err := c.getSessions(ctx, time.Minute)
+	if len(c.Plex) == 0 {
+		return
+	}
+
+	// Website config controls only the first server for now.
+	sessions, err := c.getSessions(ctx, &c.Plex[0], time.Minute)
 	if err != nil {
 		mnd.Log.Errorf("Getting Plex sessions: %v", err)
 	}
@@ -30,14 +37,42 @@ func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 	})
 }
 
-// getSessions interacts with the for loop/channels in runSessionHolder().
+// getAllSessions collects sessions from all configured Plex servers.
+func (c *cmd) getAllSessions(ctx context.Context, allowedAge time.Duration) (*plex.Sessions, error) {
+	if len(c.Plex) == 0 {
+		return &plex.Sessions{}, nil
+	}
+
+	// For backward compatibility, if only one server, return its sessions directly.
+	if len(c.Plex) == 1 {
+		return c.getSessions(ctx, &c.Plex[0], allowedAge)
+	}
+
+	// Multiple servers: aggregate all sessions.
+	combined := &plex.Sessions{Name: "All Plex Servers"}
+
+	for idx := range c.Plex {
+		sessions, err := c.getSessions(ctx, &c.Plex[idx], allowedAge)
+		if err != nil {
+			mnd.Log.Errorf("Getting Plex sessions from %s: %v", c.Plex[idx].Server.Name(), err)
+			continue
+		}
+
+		combined.Sessions = append(combined.Sessions, sessions.Sessions...)
+	}
+
+	return combined, nil
+}
+
+// getSessions gets sessions from a specific Plex server.
 // The Lock ensures only one request to Plex happens at once.
-// Because of the cache two requests may get the same answer.
-func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.Sessions, error) {
+func (c *cmd) getSessions(ctx context.Context, server *apps.Plex, allowedAge time.Duration) (*plex.Sessions, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	item := data.Get("plexCurrentSessions")
+	cacheKey := "plexCurrentSessions_" + server.Server.Name()
+
+	item := data.Get(cacheKey)
 	if item != nil && time.Now().Add(-allowedAge).Before(item.Time) && item.Data != nil {
 		return item.Data.(*plex.Sessions), nil //nolint:forcetypeassert
 	}
@@ -45,35 +80,35 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 	deadline, _ := ctx.Deadline()
 	start := time.Now()
 	timeout := deadline.Sub(start)
-	sessions, err := c.Plex.GetSessionsWithContext(ctx)
+	sessions, err := server.GetSessionsWithContext(ctx)
 
 	switch {
 	case errors.Is(err, context.DeadlineExceeded):
-		return &plex.Sessions{Name: c.Plex.Server.Name()}, fmt.Errorf("plex sessions timed out after %s: %w", timeout, err)
+		return &plex.Sessions{Name: server.Server.Name()}, fmt.Errorf("plex sessions timed out after %s: %w", timeout, err)
 	case errors.Is(err, context.Canceled):
-		return &plex.Sessions{Name: c.Plex.Server.Name()},
+		return &plex.Sessions{Name: server.Server.Name()},
 			fmt.Errorf("plex sessions cancelled after %s: %w", time.Since(start), err)
 	case err != nil:
-		return &plex.Sessions{Name: c.Plex.Server.Name()}, fmt.Errorf("plex sessions: %w", err)
+		return &plex.Sessions{Name: server.Server.Name()}, fmt.Errorf("plex sessions: %w", err)
 	case item != nil && item.Data != nil:
-		c.plexSessionTracker(ctx, sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
+		c.plexSessionTracker(ctx, server, sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
 	default:
-		c.plexSessionTracker(ctx, sessions, nil)
+		c.plexSessionTracker(ctx, server, sessions, nil)
 	}
 
-	sessions.Name = c.Plex.Server.Name()
+	sessions.Name = server.Server.Name()
 
 	return sessions, nil
 }
 
 // plexSessionTracker checks for state changes between the previous session pull
-// and the current session pull. if changes are present, a timestamp is added.
-func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Sessions) {
+// and the current session pull for a specific server. if changes are present, a timestamp is added.
+func (c *cmd) plexSessionTracker(ctx context.Context, server *apps.Plex, current, previous *plex.Sessions) {
 	now := time.Now()
 	info := clientinfo.Get()
+	cacheKey := "plexCurrentSessions_" + server.Server.Name()
 
-	// data.Save("plexPreviousSessions", previous)
-	data.Save("plexCurrentSessions", current)
+	data.Save(cacheKey, current)
 
 	for _, currSess := range current.Sessions {
 		// make sure every session has a start time.
@@ -82,16 +117,16 @@ func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Se
 		switch {
 		case previous == nil:
 			continue // this only happens once.
-		case c.checkExistingSession(ctx, currSess, current, previous):
+		case c.checkExistingSession(ctx, server, currSess, current, previous):
 			continue // existing session.
 		case currSess.Player.State == playing && info.Actions.Plex.TrackSess:
 			// We are tracking sessions (no webhooks); send this brand new session to website.
-			c.sendSessionPlaying(ctx, currSess, current, mediaPlay)
+			c.sendSessionPlaying(ctx, server, currSess, current, mediaPlay)
 		}
 	}
 }
 
-func (c *cmd) checkExistingSession(ctx context.Context, currSess *plex.Session, current, previous *plex.Sessions) bool {
+func (c *cmd) checkExistingSession(ctx context.Context, server *apps.Plex, currSess *plex.Session, current, previous *plex.Sessions) bool {
 	// now check if a current session matches a previous session
 	for _, prevSess := range previous.Sessions {
 		if currSess.Session.ID != prevSess.Session.ID {
@@ -107,7 +142,7 @@ func (c *cmd) checkExistingSession(ctx context.Context, currSess *plex.Session, 
 		if ci := clientinfo.Get(); currSess.Player.State == playing &&
 			prevSess.Player.State == paused && ci.Actions.Plex.TrackSess {
 			// Check if we're tracking sessions. If yes, send this resumed session.
-			c.sendSessionPlaying(ctx, currSess, current, mediaResume)
+			c.sendSessionPlaying(ctx, server, currSess, current, mediaResume)
 		}
 
 		// we found this current session in previous session list, so go to the next one.
