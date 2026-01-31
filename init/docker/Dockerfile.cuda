@@ -1,8 +1,3 @@
-#
-# This is part of Application Builder.
-# https://github.com/golift/application-builder
-#
-
 FROM golang:1.25.6-bookworm AS builder
 
 # Build speed magic!
@@ -18,7 +13,6 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash \
     && apt install -y nodejs
 
 COPY pkg pkg
-COPY frontend frontend
 COPY frontend frontend
 RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
     mkdir -p ./frontend/dist \

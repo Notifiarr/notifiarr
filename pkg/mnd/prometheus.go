@@ -3,8 +3,10 @@ package mnd
 import (
 	"expvar"
 	"strings"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"golift.io/version"
 )
 
 //nolint:gochecknoinits
@@ -16,59 +18,59 @@ type expvarCollector struct {
 	apiHits       *prometheus.Desc
 	httpRequests  *prometheus.Desc
 	timerEvents   *prometheus.Desc
-	timerCounts   *prometheus.Desc
 	website       *prometheus.Desc
 	serviceChecks *prometheus.Desc
 	apps          *prometheus.Desc
 	fileWatcher   *prometheus.Desc
+	uptime        *prometheus.Desc
 }
 
 func newExpvarCollector() *expvarCollector {
 	return &expvarCollector{
 		logFiles: prometheus.NewDesc(
-			"notifiarr_log_files",
+			"notifiarr_client_log_files",
 			"Log file information",
 			[]string{"name"}, nil,
 		),
 		apiHits: prometheus.NewDesc(
-			"notifiarr_api_hits",
+			"notifiarr_client_api_requests",
 			"Incoming API requests",
 			[]string{"name"}, nil,
 		),
 		httpRequests: prometheus.NewDesc(
-			"notifiarr_http_requests",
+			"notifiarr_client_http_requests",
 			"Incoming HTTP requests",
 			[]string{"name"}, nil,
 		),
 		timerEvents: prometheus.NewDesc(
-			"notifiarr_timer_events",
+			"notifiarr_client_action_counters",
 			"Triggers and timers executed",
 			[]string{"trigger", "name"}, nil,
 		),
-		timerCounts: prometheus.NewDesc(
-			"notifiarr_timer_counts",
-			"Triggers and timers counters",
-			[]string{"name"}, nil,
-		),
 		website: prometheus.NewDesc(
-			"notifiarr_website",
+			"notifiarr_client_website",
 			"Outbound requests to website",
 			[]string{"name"}, nil,
 		),
 		serviceChecks: prometheus.NewDesc(
-			"notifiarr_service_checks",
-			"Service check responses",
+			"notifiarr_client_health_checks",
+			"Health check responses",
 			[]string{"service", "name"}, nil,
 		),
 		apps: prometheus.NewDesc(
-			"notifiarr_apps",
-			"Starr app requests",
+			"notifiarr_client_integrations",
+			"Requests to integrated clients",
 			[]string{"app", "name"}, nil,
 		),
 		fileWatcher: prometheus.NewDesc(
-			"notifiarr_file_watcher",
+			"notifiarr_client_file_watcher",
 			"File watcher metrics",
 			[]string{"name"}, nil,
+		),
+		uptime: prometheus.NewDesc(
+			"notifiarr_client_uptime_seconds",
+			"Application uptime in seconds",
+			nil, nil,
 		),
 	}
 }
@@ -78,11 +80,11 @@ func (c *expvarCollector) Describe(metrics chan<- *prometheus.Desc) {
 	metrics <- c.apiHits
 	metrics <- c.httpRequests
 	metrics <- c.timerEvents
-	metrics <- c.timerCounts
 	metrics <- c.website
 	metrics <- c.serviceChecks
 	metrics <- c.apps
 	metrics <- c.fileWatcher
+	metrics <- c.uptime
 }
 
 func (c *expvarCollector) Collect(metrics chan<- prometheus.Metric) {
@@ -90,18 +92,19 @@ func (c *expvarCollector) Collect(metrics chan<- prometheus.Metric) {
 	collectMap(metrics, APIHits, c.apiHits)
 	collectMap(metrics, HTTPRequests, c.httpRequests)
 	collectSplitMap(metrics, TimerEvents, c.timerEvents)
-	collectMap(metrics, TimerCounts, c.timerCounts)
 	collectMap(metrics, Website, c.website)
 	collectSplitMap(metrics, ServiceChecks, c.serviceChecks)
 	collectSplitMap(metrics, Apps, c.apps)
 	collectMap(metrics, FileWatcher, c.fileWatcher)
+	metrics <- prometheus.MustNewConstMetric(c.uptime, prometheus.GaugeValue,
+		time.Since(version.Started).Seconds())
 }
 
 func collectMap(metrics chan<- prometheus.Metric, m *expvar.Map, desc *prometheus.Desc) {
 	m.Do(func(keyval expvar.KeyValue) {
 		val := getExpvarValue(keyval.Value)
 		if val >= 0 {
-			metrics <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, keyval.Key)
+			metrics <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, val, keyval.Key)
 		}
 	})
 }
@@ -116,7 +119,7 @@ func collectSplitMap(metrics chan<- prometheus.Metric, m *expvar.Map, desc *prom
 
 		val := getExpvarValue(keyval.Value)
 		if val >= 0 {
-			metrics <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, val, keys[0], keys[1])
+			metrics <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, val, keys[0], keys[1])
 		}
 	})
 }

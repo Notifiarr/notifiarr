@@ -14,6 +14,6 @@ scrape_configs:
     scrape_interval: 60s # It is completely wasteful and useless to scrape more often than 60s.
     static_configs:
       - targets: ['Notifiarr:5454']
-    http_config:
-      headers:
-        X-Api-Key: 'custom-client-api-key-here'
+    http_headers:
+      'X-Api-Key':
+        secrets: ['custom-client-api-key-here']

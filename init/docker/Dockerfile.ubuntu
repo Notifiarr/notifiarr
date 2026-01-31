@@ -1,4 +1,4 @@
-FROM golang:1.25.6-alpine AS builder
+FROM golang:1.25.6-trixie AS builder
 
 # Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
@@ -9,7 +9,9 @@ COPY main.go go.mod go.sum ./
 RUN go mod download \
     && go run github.com/swaggo/swag/cmd/swag@latest -v
 
-RUN apk add nodejs npm
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash \
+    && apt install -y nodejs
+
 COPY pkg pkg
 COPY frontend frontend
 RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
@@ -19,6 +21,12 @@ RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOK
     && go generate ./frontend
 
 ARG TARGETARCH
+
+# Download MegaCli64 binary.
+RUN curl -sSo /notifiarr.tgz \
+    https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
+    && tar -zxf /notifiarr.tgz -C /
+
 ARG TARGETOS
 ARG BUILD_DATE
 ARG BRANCH
@@ -35,16 +43,23 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
     -X \"golift.io/version.Revision=${ITERATION}\" \
     -X \"golift.io/version.Version=${VERSION}\""
 
-FROM alpine
+FROM ubuntu:24.04
 
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
-RUN apk add ipmitool smartmontools zfs sysstat && \
-    rm -f /bin/iostat
+RUN apt update \
+    && apt install -y smartmontools ipmitool zfsutils-linux sysstat \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
+# For megacli.
+COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /
+RUN mkdir -p /usr/lib/x86_64-linux-gnu && \
+    ln -s /usr/lib/x86_64-linux-gnu/libncurses.so.6 /usr/lib/x86_64-linux-gnu/libncurses.so.5
 
 ENV TZ=UTC
 ENV PATH=/bin:/usr/bin:/sbin:/usr/sbin
 ENV USER=root
+ENV DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
 
 EXPOSE 5454
 ENTRYPOINT [ "/notifiarr" ]
@@ -63,7 +78,7 @@ ARG AUTHOR=golift
 
 # Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
-    org.opencontainers.image.title="Notifiarr on Alpine" \
+    org.opencontainers.image.title="Notifiarr on Ubuntu" \
     org.opencontainers.image.documentation="https://notifiarr.wiki" \
     org.opencontainers.image.description="${DESC}" \
     org.opencontainers.image.url="${SOURCE_URL}" \
