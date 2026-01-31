@@ -105,7 +105,7 @@ func (c *cmd) getDownloadingItemsLidarr(ctx context.Context) itemList {
 
 		queue, _ := cacheItem.Data.(*lidarr.Queue)
 		lidarrQueue := c.rangeDownloadingItemsLidarr(ctx, idx, &app, queue.Records)
-		items[instance] = listItem{Name: app.Name, Queue: lidarrQueue, Total: queue.TotalRecords}
+		items[instance] = listItem{Name: app.Name, Queue: lidarrQueue, Total: len(lidarrQueue)}
 	}
 
 	return items
@@ -186,7 +186,7 @@ func (c *cmd) getDownloadingItemsRadarr(ctx context.Context) itemList {
 
 		queue, _ := cacheItem.Data.(*radarr.Queue)
 		radarrQueue := c.rangeDownloadingItemsRadarr(ctx, idx, &app, queue.Records)
-		items[instance] = listItem{Name: app.Name, Queue: radarrQueue, Total: queue.TotalRecords}
+		items[instance] = listItem{Name: app.Name, Queue: radarrQueue, Total: len(radarrQueue)}
 	}
 
 	return items
@@ -265,7 +265,7 @@ func (c *cmd) getDownloadingItemsReadarr(ctx context.Context) itemList {
 
 		queue, _ := cacheItem.Data.(*readarr.Queue)
 		readarrQueue := c.rangeDownloadingItemsReadarr(ctx, idx, &app, queue.Records)
-		items[instance] = listItem{Name: app.Name, Queue: readarrQueue, Total: queue.TotalRecords}
+		items[instance] = listItem{Name: app.Name, Queue: readarrQueue, Total: len(readarrQueue)}
 	}
 
 	return items
@@ -346,7 +346,7 @@ func (c *cmd) getDownloadingItemsSonarr(ctx context.Context) itemList {
 
 		queue, _ := cacheItem.Data.(*sonarr.Queue)
 		sonarrQueue := c.rangeDownloadingItemsSonarr(ctx, idx, &app, queue.Records)
-		items[instance] = listItem{Name: app.Name, Queue: sonarrQueue, Total: queue.TotalRecords}
+		items[instance] = listItem{Name: app.Name, Queue: sonarrQueue, Total: len(sonarrQueue)}
 	}
 
 	return items
