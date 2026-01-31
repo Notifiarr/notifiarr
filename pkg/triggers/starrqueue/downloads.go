@@ -133,7 +133,7 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if s := strings.ToLower(item.Status); s != downloading || exists {
 			continue
 		}
 
@@ -214,7 +214,7 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if s := strings.ToLower(item.Status); s != downloading || exists {
 			continue
 		}
 
@@ -293,7 +293,7 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if s := strings.ToLower(item.Status); s != downloading || exists {
 			continue
 		}
 
@@ -374,7 +374,7 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if s := strings.ToLower(item.Status); s != downloading || exists {
 			continue
 		}
 
