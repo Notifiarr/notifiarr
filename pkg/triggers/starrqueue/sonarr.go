@@ -38,7 +38,7 @@ func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 		record.Language = nil
 	}
 
-	mnd.Log.Debugf("{trace:%s} [%s requested] Stored Sonarr Queue (%d items), instance %d %s",
+	mnd.Log.Printf("{trace:%s} [%s requested] Stored Sonarr Queue (%d items), instance %d %s",
 		input.ReqID, input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("sonarr", app.idx, queue)
 }

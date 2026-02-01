@@ -281,6 +281,11 @@
       "description": "Enable or disable quiet logging.",
       "tooltip": "Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too."
     },
+    "trace": {
+      "label": "Trace Logging",
+      "description": "Enable or disable trace logging.",
+      "tooltip": "Enabling Trace will write very verbose execution flow to the log. Use for deep debugging."
+    },
     "logFile": {
       "label": "Application Log File",
       "description": "Path to the application log file or folder.",
