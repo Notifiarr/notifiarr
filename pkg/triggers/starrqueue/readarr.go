@@ -23,8 +23,8 @@ type readarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *readarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "start: readarrApp.storeQueue", app.idx, app.app.Name, input.Type)
-	defer logs.Log.Trace(id, "end: readarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	logs.Log.Trace(input.ReqID, "start: readarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: readarrApp.storeQueue", app.idx, app.app.Name, input.Type)
 
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
@@ -36,8 +36,8 @@ func (app *readarrApp) storeQueue(ctx context.Context, input *common.ActionInput
 		record.Quality = nil
 	}
 
-	mnd.Log.Debugf("[%s requested] Stored Readarr Queue (%d items), instance %d %s",
-		input.Type, len(queue.Records), app.idx+1, app.app.Name)
+	mnd.Log.Printf("{trace:%s} [%s requested] Stored Readarr Queue (%d items), instance %d %s",
+		input.ReqID, input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("readarr", app.idx, queue)
 }
 

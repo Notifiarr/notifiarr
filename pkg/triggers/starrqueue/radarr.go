@@ -23,8 +23,8 @@ type radarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *radarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "start: radarrApp.storeQueue", app.idx, app.app.Name, input.Type)
-	defer logs.Log.Trace(id, "end: radarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	logs.Log.Trace(input.ReqID, "start: radarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: radarrApp.storeQueue", app.idx, app.app.Name, input.Type)
 
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
@@ -38,8 +38,8 @@ func (app *radarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 		item.Languages = nil
 	}
 
-	mnd.Log.Debugf("[%s requested] Stored Radarr Queue (%d items), instance %d %s",
-		input.Type, len(queue.Records), app.idx+1, app.app.Name)
+	mnd.Log.Printf("{trace:%s} [%s requested] Stored Radarr Queue (%d items), instance %d %s",
+		input.ReqID, input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("radarr", app.idx, queue)
 }
 

@@ -21,17 +21,18 @@ import (
 // StuckItems sends the stuck queues items for all apps.
 // Does not fetch fresh data first, uses cache.
 func (a *Action) StuckItems(input *common.ActionInput) {
-	id := logs.Log.Trace("", "start: Action.StuckItems", input.Type)
-	defer logs.Log.Trace(id, "end: Action.StuckItems", input.Type)
+	logs.Log.Trace(input.ReqID, "start: Action.StuckItems", input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: Action.StuckItems", input.Type)
 
 	a.cmd.Exec(input, TrigStuckItems)
 }
 
 // sendStuckQueues gathers the stuck queue from cache and sends them.
 func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "start: sendStuckQueues", input.Type)
-	defer logs.Log.Trace(id, "end: sendStuckQueues", input.Type)
+	logs.Log.Trace(input.ReqID, "start: sendStuckQueues", input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: sendStuckQueues", input.Type)
 
+	ctx = mnd.WithID(ctx, input.ReqID)
 	lidarr := c.getFinishedItemsLidarr(ctx)
 	radarr := c.getFinishedItemsRadarr(ctx)
 	readarr := c.getFinishedItemsReadarr(ctx)
@@ -58,9 +59,9 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	})
 }
 
-func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "start: getFinishedItemsLidarr")
-	defer logs.Log.Trace(id, "end: getFinishedItemsLidarr")
+func (c *cmd) getFinishedItemsLidarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsLidarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsLidarr")
 
 	stuck := make(itemList)
 
@@ -103,9 +104,9 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 	return stuck
 }
 
-func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "start: getFinishedItemsRadarr")
-	defer logs.Log.Trace(id, "end: getFinishedItemsRadarr")
+func (c *cmd) getFinishedItemsRadarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsRadarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsRadarr")
 
 	stuck := make(itemList)
 
@@ -148,9 +149,9 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 	return stuck
 }
 
-func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "start: getFinishedItemsReadarr")
-	defer logs.Log.Trace(id, "end: getFinishedItemsReadarr")
+func (c *cmd) getFinishedItemsReadarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsReadarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsReadarr")
 
 	stuck := make(itemList)
 
@@ -193,9 +194,9 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 	return stuck
 }
 
-func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "start: getFinishedItemsSonarr")
-	defer logs.Log.Trace(id, "end: getFinishedItemsSonarr")
+func (c *cmd) getFinishedItemsSonarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsSonarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsSonarr")
 
 	stuck := make(itemList)
 

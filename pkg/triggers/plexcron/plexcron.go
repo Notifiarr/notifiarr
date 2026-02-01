@@ -113,6 +113,9 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 }
 
 func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
+	mnd.Log.Trace(hook.ReqID, "start: (go) cmd.sendWebhook")
+	defer mnd.Log.Trace(hook.ReqID, "end: (go) cmd.sendWebhook")
+
 	sessions := &plex.Sessions{Name: c.Plex.Name()}
 	ci := clientinfo.Get()
 	ctx := mnd.WithID(context.Background(), hook.ReqID)

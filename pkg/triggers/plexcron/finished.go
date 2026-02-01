@@ -18,7 +18,10 @@ import (
 // This is basically a hack to "watch" Plex for when an active item gets to around 90% complete.
 // This usually means the user has finished watching the item and we can send a "done" notice.
 // Plex does not send a webhook or identify in any other way when an item is "finished".
-func (c *cmd) checkForFinishedItems(ctx context.Context, _ *common.ActionInput) {
+func (c *cmd) checkForFinishedItems(ctx context.Context, input *common.ActionInput) {
+	logs.Log.Trace(input.ReqID, "start: cmd.checkForFinishedItems")
+	defer logs.Log.Trace(input.ReqID, "end: cmd.checkForFinishedItems")
+
 	sessionCtx, cancel := context.WithTimeout(ctx, c.Plex.Timeout.Duration)
 	defer cancel()
 

@@ -27,8 +27,8 @@ type httpClient struct {
 
 // Do performs an http Request with retries and logging!
 func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cyclop
-	reqID := mnd.Log.Trace(mnd.GetID(req.Context()), "start: httpClient.Do "+req.URL.String())
-	defer mnd.Log.Trace(reqID, "end: httpClient.Do "+req.URL.String())
+	reqID := mnd.Log.Trace(mnd.GetID(req.Context()), "start: httpClient.Do", req.URL.String())
+	defer mnd.Log.Trace(reqID, "end: httpClient.Do", req.URL.String())
 
 	req.Header.Set("User-Agent", fmt.Sprintf("%s v%s-%s %s", mnd.Title, version.Version, version.Revision, version.Branch))
 
@@ -85,8 +85,8 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 
 // sendAndLogRequest sends a request to the website and logs the result.
 func (s *server) sendAndLogRequest(ctx context.Context, data *Request) {
-	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendAndLogRequest "+data.Route)
-	defer mnd.Log.Trace(reqID, "end: sendAndLogRequest "+data.Route)
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendAndLogRequest", data.Route)
+	defer mnd.Log.Trace(reqID, "end: sendAndLogRequest", data.Route)
 
 	switch resp, elapsed, err := s.sendRequest(ctx, data); {
 	case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
@@ -150,8 +150,8 @@ func (s *server) sendRequest(ctx context.Context, data *Request) (*Response, tim
 
 // sendPayload sends a JSON payload to the website and returns the result.
 func (s *server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
-	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendPayload "+uri)
-	defer mnd.Log.Trace(reqID, "end: sendPayload "+uri)
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendPayload", uri)
+	defer mnd.Log.Trace(reqID, "end: sendPayload", uri)
 
 	data, err := json.Marshal(payload)
 	if err == nil {
@@ -196,8 +196,8 @@ func (s *server) sendPayload(ctx context.Context, uri string, payload any, log b
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
 func (s *server) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
-	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendJSON "+url)
-	defer mnd.Log.Trace(reqID, "end: sendJSON "+url)
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendJSON", url)
+	defer mnd.Log.Trace(reqID, "end: sendJSON", url)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {

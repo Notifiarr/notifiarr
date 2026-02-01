@@ -55,16 +55,16 @@ type QueuesPaylod struct {
 
 // New configures the library.
 func New(config *common.Config) *Action {
-	id := logs.Log.Trace("", "start: New")
-	defer logs.Log.Trace(id, "end: New")
+	reqID := logs.Log.Trace("", "start: common.New")
+	defer logs.Log.Trace(reqID, "end: common.New")
 
 	return &Action{cmd: &cmd{Config: config}}
 }
 
 // Create initializes the library.
 func (a *Action) Create() {
-	reqID := logs.Log.Trace("", "start: Create")
-	defer logs.Log.Trace(reqID, "end: Create")
+	reqID := logs.Log.Trace("", "start: Action.Create")
+	defer logs.Log.Trace(reqID, "end: Action.Create")
 
 	lidarr := a.cmd.setupLidarr(reqID)
 	radarr := a.cmd.setupRadarr(reqID)

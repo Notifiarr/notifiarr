@@ -51,9 +51,10 @@ type readarrRecord struct {
 
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
 func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "start: sendDownloadingQueues", input.Type)
-	defer logs.Log.Trace(id, "end: sendDownloadingQueues", input.Type)
+	logs.Log.Trace(input.ReqID, "start: sendDownloadingQueues", input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: sendDownloadingQueues", input.Type)
 
+	ctx = mnd.WithID(ctx, input.ReqID)
 	lidarr := c.getDownloadingItemsLidarr(ctx)
 	radarr := c.getDownloadingItemsRadarr(ctx)
 	readarr := c.getDownloadingItemsReadarr(ctx)
@@ -62,10 +63,8 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
 		if c.empty { // We already sent an empty payload, so don't send another.
-			logs.Log.Debugf("[%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-				input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
-
-			return
+			logs.Log.Debugf("{trace:%s} [%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
+				input.ReqID, input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
 		}
 
 		c.empty = true
@@ -92,8 +91,8 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 }
 
 func (c *cmd) getDownloadingItemsLidarr(ctx context.Context) itemList {
-	id := logs.Log.Trace("", "start: getDownloadingItemsLidarr")
-	defer logs.Log.Trace(id, "end: getDownloadingItemsLidarr")
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsLidarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsLidarr")
 
 	items := make(itemList)
 
@@ -127,8 +126,8 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 	app *apps.Lidarr,
 	records []*lidarr.QueueRecord,
 ) []*lidarrRecord {
-	id := logs.Log.Trace("", "start: rangeDownloadingItemsLidarr", idx, app.Name)
-	defer logs.Log.Trace(id, "end: rangeDownloadingItemsLidarr", idx, app.Name)
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsLidarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsLidarr", idx, app.Name)
 
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	lidarrQueue := make([]*lidarrRecord, 0, maxQueuePayloadSize)
@@ -179,8 +178,8 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 }
 
 func (c *cmd) getDownloadingItemsRadarr(ctx context.Context) itemList {
-	id := logs.Log.Trace("", "start: getDownloadingItemsRadarr")
-	defer logs.Log.Trace(id, "end: getDownloadingItemsRadarr")
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsRadarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsRadarr")
 
 	items := make(itemList)
 
@@ -214,8 +213,8 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 	app *apps.Radarr,
 	records []*radarr.QueueRecord,
 ) []*radarrRecord {
-	id := logs.Log.Trace("", "start: rangeDownloadingItemsRadarr", idx, app.Name)
-	defer logs.Log.Trace(id, "end: rangeDownloadingItemsRadarr", idx, app.Name)
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsRadarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsRadarr", idx, app.Name)
 
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	radarrQueue := make([]*radarrRecord, 0, maxQueuePayloadSize)
@@ -264,8 +263,8 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 }
 
 func (c *cmd) getDownloadingItemsReadarr(ctx context.Context) itemList {
-	id := logs.Log.Trace("", "start: getDownloadingItemsReadarr")
-	defer logs.Log.Trace(id, "end: getDownloadingItemsReadarr")
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsReadarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsReadarr")
 
 	items := make(itemList)
 
@@ -299,8 +298,8 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 	app *apps.Readarr,
 	records []*readarr.QueueRecord,
 ) []*readarrRecord {
-	id := logs.Log.Trace("", "start: rangeDownloadingItemsReadarr", idx, app.Name)
-	defer logs.Log.Trace(id, "end: rangeDownloadingItemsReadarr", idx, app.Name)
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsReadarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsReadarr", idx, app.Name)
 
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	readarrQueue := make([]*readarrRecord, 0, maxQueuePayloadSize)
@@ -351,8 +350,8 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 }
 
 func (c *cmd) getDownloadingItemsSonarr(ctx context.Context) itemList {
-	id := logs.Log.Trace("", "start: getDownloadingItemsSonarr")
-	defer logs.Log.Trace(id, "end: getDownloadingItemsSonarr")
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsSonarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsSonarr")
 
 	items := make(itemList)
 
@@ -386,8 +385,8 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 	app *apps.Sonarr,
 	records []*sonarr.QueueRecord,
 ) []*sonarrRecord {
-	id := logs.Log.Trace("", "start: rangeDownloadingItemsSonarr", idx, app.Name)
-	defer logs.Log.Trace(id, "end: rangeDownloadingItemsSonarr", idx, app.Name)
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsSonarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsSonarr", idx, app.Name)
 
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	sonarrQueue := make([]*sonarrRecord, 0, maxQueuePayloadSize)

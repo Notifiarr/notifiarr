@@ -112,6 +112,7 @@ type AppInfoTautulli struct {
 
 // Info is used for JSON input for our outgoing app info.
 func (c *Config) Info(ctx context.Context, startup bool) *AppInfo { //nolint:funlen
+	ctx = mnd.SetID(ctx)
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.Info", startup)
 	defer mnd.Log.Trace(reqID, "end: Config.Info", startup)
 

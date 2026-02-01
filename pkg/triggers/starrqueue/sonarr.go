@@ -24,8 +24,8 @@ type sonarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "start: sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
-	defer logs.Log.Trace(id, "end: sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	logs.Log.Trace(input.ReqID, "start: sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
 
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
@@ -38,8 +38,8 @@ func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 		record.Language = nil
 	}
 
-	mnd.Log.Debugf("[%s requested] Stored Sonarr Queue (%d items), instance %d %s",
-		input.Type, len(queue.Records), app.idx+1, app.app.Name)
+	mnd.Log.Debugf("{trace:%s} [%s requested] Stored Sonarr Queue (%d items), instance %d %s",
+		input.ReqID, input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("sonarr", app.idx, queue)
 }
 

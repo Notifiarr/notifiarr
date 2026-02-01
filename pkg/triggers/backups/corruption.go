@@ -23,8 +23,8 @@ import (
 
 // Corruption initializes a corruption check for all instances of the provided app.
 func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
-	id := logs.Log.Trace("", "start: Corruption", input.Type, app)
-	defer logs.Log.Trace(id, "end: Corruption", input.Type, app)
+	logs.Log.Trace(input.ReqID, "start: Corruption", input.Type, app)
+	defer logs.Log.Trace(input.ReqID, "end: Corruption", input.Type, app)
 
 	switch app { //nolint:exhaustive // We only check starr apps.
 	default:
