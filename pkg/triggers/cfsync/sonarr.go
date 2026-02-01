@@ -34,13 +34,13 @@ type SonarrTrashPayload struct {
 }
 
 // SyncSonarrRP initializes a release profile sync with sonarr.
-func (a *Action) SyncSonarrRP(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCFSyncSonarr)
+func (a *Action) SyncSonarrRP(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigCFSyncSonarr)
 }
 
 // SyncSonarrInstanceRP initializes a release profile sync with a specific sonarr instance.
-func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) error {
-	if name := TrigCFSyncSonarrInt.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
+func (a *Action) SyncSonarrInstanceRP(input *common.ActionInput, instance int) error {
+	if name := TrigCFSyncSonarrInt.WithInstance(instance); !a.cmd.Exec(input, name) {
 		return fmt.Errorf("%w: Sonarr instance: %d", common.ErrInvalidApp, instance)
 	}
 
@@ -75,6 +75,7 @@ func (c *sonarrApp) syncSonarr(ctx context.Context, input *common.ActionInput) {
 	start := time.Now()
 	payload := c.cmd.getSonarrProfiles(ctx, input.Type, c.idx+1)
 	website.SendData(&website.Request{
+		ReqID:      input.ReqID,
 		Route:      website.CFSyncRoute,
 		Event:      input.Type,
 		Params:     []string{"app=sonarr"},

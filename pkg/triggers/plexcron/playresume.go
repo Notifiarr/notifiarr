@@ -27,6 +27,7 @@ func (c *cmd) sendSessionPlaying(ctx context.Context, session *plex.Session, ses
 	}
 
 	website.SendData(&website.Request{
+		ReqID: mnd.GetID(ctx),
 		Route: website.PlexRoute,
 		Event: website.EventHook,
 		Payload: &website.Payload{

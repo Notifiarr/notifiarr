@@ -80,7 +80,7 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 
 	// This apache logger is only used for client->server websocket-tunneled requests.
 	remWs, _ := apachelog.New(`%{X-Forwarded-For}i %{X-User-ID}i env:%{X-User-Environment}i %t "%r" %>s %b ` +
-		`"%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+		`"%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms id:%{X-Request-ID}i`)
 
 	//nolint:mnd // just attempting a tiny bit of splay.
 	c.tunnel = mulery.NewClient(&mulery.Config{
@@ -117,6 +117,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 			defer data.Save("activeTunnel", socket)
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
 			website.SendData(&website.Request{
+				ReqID:      mnd.ReqID(),
 				Route:      website.TunnelRoute,
 				Event:      website.EventSignal,
 				Payload:    map[string]any{"socket": socket, "previous": data.Get("activeTunnel")},
@@ -319,6 +320,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(request.Context()),
 		Route:      website.TunnelRoute,
 		Event:      website.EventGUI,
 		Payload:    map[string]any{"sockets": sockets},

@@ -10,6 +10,7 @@ require (
 	github.com/energye/systray v1.0.3
 	github.com/go-co-op/gocron/v2 v2.19.1
 	github.com/go-sql-driver/mysql v1.9.3
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
 	github.com/gorilla/securecookie v1.1.2
@@ -44,7 +45,7 @@ require (
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/goty v0.0.4
-	golift.io/mulery v0.0.10
+	golift.io/mulery v0.0.11-0.20260201083556-b0d979a4fa42
 	golift.io/nzbget v0.1.6
 	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
 	golift.io/rotatorr v0.0.0-20240723172740-cb73b9c4894c
@@ -80,7 +81,6 @@ require (
 	github.com/go-openapi/swag/typeutils v0.25.4 // indirect
 	github.com/go-openapi/swag/yamlutils v0.25.4 // indirect
 	github.com/godbus/dbus/v5 v5.2.2 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
@@ -19,12 +20,18 @@ import (
 
 // StuckItems sends the stuck queues items for all apps.
 // Does not fetch fresh data first, uses cache.
-func (a *Action) StuckItems(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigStuckItems)
+func (a *Action) StuckItems(input *common.ActionInput) {
+	id := logs.Log.Trace("", "start: Action.StuckItems", input.Type)
+	defer logs.Log.Trace(id, "end: Action.StuckItems", input.Type)
+
+	a.cmd.Exec(input, TrigStuckItems)
 }
 
 // sendStuckQueues gathers the stuck queue from cache and sends them.
 func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
+	id := logs.Log.Trace("", "start: sendStuckQueues", input.Type)
+	defer logs.Log.Trace(id, "end: sendStuckQueues", input.Type)
+
 	lidarr := c.getFinishedItemsLidarr(ctx)
 	radarr := c.getFinishedItemsRadarr(ctx)
 	readarr := c.getFinishedItemsReadarr(ctx)
@@ -36,6 +43,7 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.StuckRoute,
 		Event:      input.Type,
 		LogPayload: true,
@@ -51,6 +59,9 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 }
 
 func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "start: getFinishedItemsLidarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsLidarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Lidarr {
@@ -93,6 +104,9 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 }
 
 func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "start: getFinishedItemsRadarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsRadarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Radarr {
@@ -135,6 +149,9 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 }
 
 func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "start: getFinishedItemsReadarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsReadarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Readarr {
@@ -177,6 +194,9 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 }
 
 func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "start: getFinishedItemsSonarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsSonarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Sonarr {

@@ -240,6 +240,7 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 	for {
 		idx, data, running := reflect.Select(cases)
 		item := tails[idx]
+		reqID := mnd.ReqID()
 
 		switch {
 		case !running && idx == 0:
@@ -263,7 +264,7 @@ func (c *cmd) tailFiles(cases []reflect.SelectCase, tails []*WatchFile, ticker *
 			mnd.FileWatcher.Add(item.Path+" Lines", 1)
 
 			line, _ := data.Elem().Addr().Interface().(*tail.Line)
-			c.checkLineMatch(line, item)
+			c.checkLineMatch(reqID, line, item)
 			mnd.FileWatcher.Add(item.Path+" Bytes", int64(len(line.Text)))
 		}
 	}
@@ -323,7 +324,7 @@ func (c *cmd) fileWatcherTicker(died bool) bool {
 
 // checkLineMatch runs when a watched file has a new line written.
 // If a match is found a notification is sent.
-func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
+func (c *cmd) checkLineMatch(reqID string, line *tail.Line, tail *WatchFile) {
 	tail.retries = 0 // reset retries once we get a line from the file.
 
 	if tail.re == nil || line.Text == "" || !tail.re.MatchString(line.Text) {
@@ -349,6 +350,7 @@ func (c *cmd) checkLineMatch(line *tail.Line, tail *WatchFile) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      reqID,
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,
 		LogPayload: tail.LogMatch,

@@ -6,11 +6,15 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 )
 
 // GetInfo retrieves Plex Server Info. This also sets the friendly name, so s.Name() works.
 func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: plex.GetInfo")
+	defer mnd.Log.Trace(reqID, "end: plex.GetInfo")
+
 	pms, err := s.getPlexURL(ctx, s.Config.URL, nil)
 	if err != nil {
 		return nil, err

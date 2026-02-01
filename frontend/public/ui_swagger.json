@@ -2772,6 +2772,9 @@
                 "timeout": {
                     "$ref": "#/definitions/cnfg.Duration"
                 },
+                "trace": {
+                    "type": "boolean"
+                },
                 "transmission": {
                     "type": "array",
                     "items": {

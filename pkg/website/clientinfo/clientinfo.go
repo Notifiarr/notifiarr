@@ -178,6 +178,7 @@ func (c *Config) SaveClientInfo(ctx context.Context, startup bool) (*ClientInfo,
 	}
 
 	body, err := website.GetData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.ClientRoute,
 		Event:      event,
 		Payload:    c.Info(ctx, startup),

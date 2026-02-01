@@ -10,6 +10,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
 )
@@ -49,7 +50,7 @@ type data struct {
 	done        chan bool
 	actionChan  chan action
 	replyChan   chan bool
-	triggerChan chan website.EventType
+	triggerChan chan *common.ActionInput
 	checkChan   chan triggerCheck
 	stopLock    sync.Mutex
 	log         mnd.Logger

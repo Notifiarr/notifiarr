@@ -43,6 +43,7 @@ type Payload struct {
 
 // Request is used when sending data through a channel.
 type Request struct {
+	ReqID      string
 	Route      Route
 	Event      EventType
 	Params     []string    // optional.

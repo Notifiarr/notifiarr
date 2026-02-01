@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 // Sessions is the config input data.
@@ -19,13 +21,11 @@ type Sessions struct {
 // ErrBadStatus is returned when plex returns an invalid status code.
 var ErrBadStatus = errors.New("status code not 200")
 
-// GetSessions returns the Plex sessions in JSON format, no timeout.
-func (s *Server) GetSessions() (*Sessions, error) {
-	return s.GetSessionsWithContext(context.Background())
-}
-
 // GetSessionsWithContext returns the Plex sessions in JSON format.
 func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: plex.GetSessionsWithContext")
+	defer mnd.Log.Trace(reqID, "end: plex.GetSessionsWithContext")
+
 	var (
 		output struct {
 			//nolint:tagliatelle
@@ -52,6 +52,9 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 
 // KillSessionWithContext kills a Plex session.
 func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason string) ([]byte, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: plex.KillSessionWithContext "+sessionID)
+	defer mnd.Log.Trace(reqID, "end: plex.KillSessionWithContext "+sessionID)
+
 	params := make(url.Values)
 	params.Add("sessionId", sessionID)
 	params.Add("reason", reason)
@@ -64,13 +67,11 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 	return body, nil
 }
 
-// KillSession kills a Plex session.
-func (s *Server) KillSession(sessionID, reason string) ([]byte, error) {
-	return s.KillSessionWithContext(context.Background(), sessionID, reason)
-}
-
 // MarkPlayedWithContext marks a video as played.
 func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) ([]byte, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: plex.MarkPlayedWithContext "+key)
+	defer mnd.Log.Trace(reqID, "end: plex.MarkPlayedWithContext "+key)
+
 	params := make(url.Values)
 	params.Add("identifier", "com.plexapp.plugins.library")
 	params.Add("key", key)
@@ -83,13 +84,11 @@ func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) ([]byte,
 	return body, nil
 }
 
-// MarkPlayed marks a video as played.
-func (s *Server) MarkPlayed(key string) ([]byte, error) {
-	return s.MarkPlayedWithContext(context.Background(), key)
-}
-
 // EmptyTrashWithContext deletes (a section's) trash.
 func (s *Server) EmptyTrashWithContext(ctx context.Context, libraryKey string) ([]byte, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: plex.EmptyTrashWithContext "+libraryKey)
+	defer mnd.Log.Trace(reqID, "end: plex.EmptyTrashWithContext "+libraryKey)
+
 	// Requires PUT with no data.
 	body, err := s.putPlexURL(ctx, s.Config.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
 	if err != nil {
@@ -99,13 +98,11 @@ func (s *Server) EmptyTrashWithContext(ctx context.Context, libraryKey string) (
 	return body, nil
 }
 
-// EmptyTrash deletes (a section's) trash.
-func (s *Server) EmptyTrash(sectionKey string) ([]byte, error) {
-	return s.EmptyTrashWithContext(context.Background(), sectionKey)
-}
-
 // EmptyAllTrashWithContext deletes the trash in all sections.
 func (s *Server) EmptyAllTrashWithContext(ctx context.Context) error {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: plex.EmptyAllTrashWithContext")
+	defer mnd.Log.Trace(reqID, "end: plex.EmptyAllTrashWithContext")
+
 	directory, err := s.GetDirectoryWithContext(ctx)
 	if err != nil {
 		return err

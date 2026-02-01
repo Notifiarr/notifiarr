@@ -33,13 +33,13 @@ type RadarrTrashPayload struct {
 }
 
 // SyncRadarrCF initializes a custom format sync with radarr.
-func (a *Action) SyncRadarrCF(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCFSyncRadarr)
+func (a *Action) SyncRadarrCF(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigCFSyncRadarr)
 }
 
 // SyncRadarrInstanceCF initializes a custom format sync with a specific radarr instance.
-func (a *Action) SyncRadarrInstanceCF(event website.EventType, instance int) error {
-	if name := TrigCFSyncRadarrInt.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
+func (a *Action) SyncRadarrInstanceCF(input *common.ActionInput, instance int) error {
+	if name := TrigCFSyncRadarrInt.WithInstance(instance); !a.cmd.Exec(input, name) {
 		return fmt.Errorf("%w: Radarr instance: %d", common.ErrInvalidApp, instance)
 	}
 
@@ -75,6 +75,7 @@ func (c *radarrApp) syncRadarr(ctx context.Context, input *common.ActionInput) {
 	payload := c.cmd.getRadarrProfiles(ctx, input.Type, c.idx+1)
 
 	website.SendData(&website.Request{
+		ReqID:      input.ReqID,
 		Route:      website.CFSyncRoute,
 		Event:      input.Type,
 		Params:     []string{"app=radarr"},

@@ -130,6 +130,7 @@ func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.EndpointRoute,
 		Event:      input.Type,
 		LogPayload: true,

@@ -116,6 +116,7 @@ func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string
 	// Send the notification before the lock.
 	if c.Notify {
 		website.SendData(&website.Request{
+			ReqID: mnd.GetID(ctx),
 			Route: website.CommandRoute,
 			Event: input.Type,
 			Payload: map[string]string{

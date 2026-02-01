@@ -23,13 +23,14 @@ func (c *Client) SetupWebServer() {
 
 	// Create an apache-style logger.
 	apache, err := apachelog.New(`%{X-Forwarded-For}i - %{X-NotiClient-Username}i %t "%m %{X-Redacted-URI}i %H" %>s ` +
-		`%b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+		`%b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms id:%{X-Request-ID}i`)
 	if err != nil {
 		panic(fmt.Sprintf("Creating Apache Logger: %v", err))
 	}
 
 	// Create a request router.
 	c.apps.Router = mux.NewRouter()
+	c.apps.Router.Use(c.withReqID) // set a request ID for the request to improve logging.
 	c.apps.Router.Use(c.fixForwardedFor)
 	c.apps.Router.Use(c.countRequest)
 	c.apps.Router.Use(c.addUsernameHeader)

@@ -208,15 +208,13 @@ func (c *checkAll) workPool(workers int) func() {
 	logs.Log.Debugf("[gui requested] Checking %d instances with %d workers.", c.output.Instances, workers)
 
 	for range workers {
-		wtgrp.Add(1)
-		go func() {
-			defer wtgrp.Done()
+		wtgrp.Go(func() {
 			for work := range c.ch {
 				start = time.Now()
 				work.res.Msg, work.res.Status = work.fn()
 				work.res.Elapsed = time.Since(start).Round(time.Millisecond).String()
 			}
-		}()
+		})
 	}
 
 	return wtgrp.Wait

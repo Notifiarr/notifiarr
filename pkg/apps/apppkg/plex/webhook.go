@@ -3,6 +3,7 @@ package plex
 
 // IncomingWebhook is the incoming webhook from a Plex Media Server.
 type IncomingWebhook struct {
+	ReqID   string  `json:"reqID"` // not from Plex, but added by Notifiarr.
 	Event   string  `json:"event"`
 	User    bool    `json:"user"`
 	Owner   bool    `json:"owner"`

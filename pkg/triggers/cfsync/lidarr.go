@@ -32,20 +32,6 @@ type LidarrTrashPayload struct {
 	Error              string                       `json:"error"`
 }
 
-// SyncLidarrCF initializes a custom format sync with lidarr.
-func (a *Action) SyncLidarrCF(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCFSyncLidarr)
-}
-
-// SyncLidarrInstanceCF initializes a custom format sync with a specific lidarr instance.
-func (a *Action) SyncLidarrInstanceCF(event website.EventType, instance int) error {
-	if name := TrigCFSyncLidarrInt.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		return fmt.Errorf("%w: Lidarr instance: %d", common.ErrInvalidApp, instance)
-	}
-
-	return nil
-}
-
 // syncLidarr triggers a custom format sync for Lidarr.
 func (c *cmd) syncLidarr(ctx context.Context, input *common.ActionInput) {
 	info := clientinfo.Get()
@@ -75,6 +61,7 @@ func (c *lidarrApp) syncLidarr(ctx context.Context, input *common.ActionInput) {
 	payload := c.cmd.getLidarrProfiles(ctx, input.Type, c.idx+1)
 
 	website.SendData(&website.Request{
+		ReqID:      input.ReqID,
 		Route:      website.CFSyncRoute,
 		Event:      input.Type,
 		Params:     []string{"app=lidarr"},

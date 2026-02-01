@@ -128,6 +128,8 @@ func (s *server) watchSendDataChan(ctx context.Context) {
 		case <-s.getConfig:
 			s.reconfig <- s.config
 		case data := <-s.sendData:
+			ctx := mnd.WithID(ctx, data.ReqID)
+			data.ReqID = mnd.GetID(ctx)
 			s.sendAndLogRequest(ctx, data)
 		}
 	}

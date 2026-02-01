@@ -30,6 +30,7 @@ type result struct {
 
 // triggerCheck is used to signal the check of one service.
 type triggerCheck struct {
+	ReqID   string
 	Source  website.EventType
 	Service *Service
 }

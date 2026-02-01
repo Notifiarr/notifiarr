@@ -92,7 +92,7 @@ func (a *Actions) HandleGetTriggers(_ *http.Request) (int, any) {
 
 // handleTrigger is an abstraction to deal with API or GUI triggers (they have different handlers).
 func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int, string) {
-	input := &common.ActionInput{Type: event}
+	input := &common.ActionInput{Type: event, ReqID: mnd.GetID(req.Context())}
 	trigger := mux.Vars(req)["trigger"]
 	content := mux.Vars(req)["content"]
 
@@ -291,12 +291,12 @@ func (a *Actions) endpoint(input *common.ActionInput, content string) (int, stri
 // @Security		ApiKeyAuth
 func (a *Actions) cfsync(input *common.ActionInput, content string) (int, string) {
 	if content == "" {
-		a.CFSync.SyncRadarrCF(input.Type)
+		a.CFSync.SyncRadarrCF(input)
 		return http.StatusOK, "Radarr profile and format sync initiated."
 	}
 
 	instance, _ := strconv.Atoi(content)
-	if err := a.CFSync.SyncRadarrInstanceCF(input.Type, instance); err != nil {
+	if err := a.CFSync.SyncRadarrInstanceCF(input, instance); err != nil {
 		return http.StatusBadRequest, "Radarr profile and format sync initiated for instance " + content + ": " + err.Error()
 	}
 
@@ -314,12 +314,12 @@ func (a *Actions) cfsync(input *common.ActionInput, content string) (int, string
 // @Security		ApiKeyAuth
 func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string) {
 	if content == "" {
-		a.CFSync.SyncSonarrRP(input.Type)
+		a.CFSync.SyncSonarrRP(input)
 		return http.StatusOK, "Sonarr profile and format sync initiated."
 	}
 
 	instance, _ := strconv.Atoi(content)
-	if err := a.CFSync.SyncSonarrInstanceRP(input.Type, instance); err != nil {
+	if err := a.CFSync.SyncSonarrInstanceRP(input, instance); err != nil {
 		return http.StatusBadRequest, "Sonarr profile and format sync initiated for instance " + content + ": " + err.Error()
 	}
 
@@ -335,7 +335,7 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 // @Router			/trigger/services [get]
 // @Security		ApiKeyAuth
 func (a *Actions) services(input *common.ActionInput) (int, string) {
-	a.RunChecks(input.Type)
+	a.RunChecks(input)
 	return http.StatusOK, "All service checks rescheduled for immediate execution."
 }
 
@@ -353,7 +353,7 @@ func (a *Actions) sessions(input *common.ActionInput) (int, string) {
 		return http.StatusNotImplemented, "Plex Sessions are not enabled."
 	}
 
-	a.PlexCron.Send(input.Type)
+	a.PlexCron.Send(input)
 
 	return http.StatusOK, "Plex sessions triggered."
 }
@@ -367,7 +367,7 @@ func (a *Actions) sessions(input *common.ActionInput) (int, string) {
 // @Router			/trigger/stuckitems [get]
 // @Security		ApiKeyAuth
 func (a *Actions) stuckitems(input *common.ActionInput) (int, string) {
-	a.StarrQueue.StuckItems(input.Type)
+	a.StarrQueue.StuckItems(input)
 	return http.StatusOK, "Stuck Queue Items triggered."
 }
 
@@ -380,7 +380,7 @@ func (a *Actions) stuckitems(input *common.ActionInput) (int, string) {
 // @Router			/trigger/dashboard [get]
 // @Security		ApiKeyAuth
 func (a *Actions) dashboard(input *common.ActionInput) (int, string) {
-	a.Dashboard.Send(input.Type)
+	a.Dashboard.Send(input)
 	return http.StatusOK, "Dashboard states triggered."
 }
 
@@ -393,7 +393,7 @@ func (a *Actions) dashboard(input *common.ActionInput) (int, string) {
 // @Router			/trigger/snapshot [get]
 // @Security		ApiKeyAuth
 func (a *Actions) snapshot(input *common.ActionInput) (int, string) {
-	a.SnapCron.Send(input.Type)
+	a.SnapCron.Send(input)
 	return http.StatusOK, "System Snapshot triggered."
 }
 
@@ -406,7 +406,7 @@ func (a *Actions) snapshot(input *common.ActionInput) (int, string) {
 // @Router			/trigger/gaps [get]
 // @Security		ApiKeyAuth
 func (a *Actions) gaps(input *common.ActionInput) (int, string) {
-	a.Gaps.Send(input.Type)
+	a.Gaps.Send(input)
 	return http.StatusOK, "Radarr Collections Gaps initiated."
 }
 
@@ -508,7 +508,7 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 		return http.StatusNotImplemented, "Plex is not enabled."
 	}
 
-	a.EmptyTrash.Plex(input.Type, strings.Split(content, ","))
+	a.EmptyTrash.Plex(input, strings.Split(content, ","))
 
 	return http.StatusOK, "Emptying Plex Trash for library " + content
 }
@@ -522,7 +522,7 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 // @Router			/trigger/mdblist [get]
 // @Security		ApiKeyAuth
 func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
-	a.MDbList.Send(input.Type)
+	a.MDbList.Send(input)
 	return http.StatusOK, "MDBList library update started."
 }
 
@@ -542,7 +542,7 @@ func (a *Actions) uploadlog(input *common.ActionInput, file string) (int, string
 		return http.StatusFailedDependency, "Uploads Administratively Disabled"
 	}
 
-	err := a.FileUpload.Log(input.Type, file)
+	err := a.FileUpload.Log(input, file)
 	if err != nil {
 		return http.StatusBadRequest, fmt.Sprintf("Uploading %s log file: %v", file, err)
 	}

@@ -46,17 +46,17 @@ func (c *cmd) create() {
 }
 
 // Log uploads a specific log file to Notifiarr.com.
-func (a *Action) Log(event website.EventType, file string) error {
+func (a *Action) Log(input *common.ActionInput, file string) error {
 	filePath := logs.Log.GetLogFiles()[file]
 	if filePath == "" {
 		return ErrInvalidFile
 	}
 
-	return a.Upload(event, filePath)
+	return a.Upload(input, filePath)
 }
 
 // Upload a file or files to Notifiarr.com.
-func (a *Action) Upload(event website.EventType, filePath ...string) error {
+func (a *Action) Upload(input *common.ActionInput, filePath ...string) error {
 	// Make sure the files exist.
 	for _, file := range filePath {
 		if _, err := os.Stat(file); err != nil {
@@ -64,28 +64,30 @@ func (a *Action) Upload(event website.EventType, filePath ...string) error {
 		}
 	}
 
-	a.cmd.Exec(&common.ActionInput{Type: event, Args: filePath}, TrigUploadFile)
+	input.Args = filePath
+	a.cmd.Exec(input, TrigUploadFile)
 
 	return nil
 }
 
 func (c *cmd) uploadFiles(ctx context.Context, input *common.ActionInput) {
 	for _, fileName := range input.Args {
-		c.uploadFile(ctx, input.Type, fileName)
+		c.uploadFile(ctx, input, fileName)
 	}
 }
 
-func (c *cmd) uploadFile(_ context.Context, event website.EventType, fileName string) {
+func (c *cmd) uploadFile(ctx context.Context, input *common.ActionInput, fileName string) {
 	// Add a file to the request
 	file, err := os.Open(fileName)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Opening file '%s' for Upload failed: %v", event, fileName, err)
+		mnd.Log.Errorf("[%s requested] Opening file '%s' for Upload failed: %v", input.Type, fileName, err)
 		return
 	}
 
 	website.SendData(&website.Request{
+		ReqID:  mnd.GetID(ctx),
 		Route:  website.UploadRoute,
-		Event:  event,
+		Event:  input.Type,
 		LogMsg: "Upload file " + fileName,
 		UploadFile: &website.UploadFile{
 			FileName:   filepath.Base(fileName),
