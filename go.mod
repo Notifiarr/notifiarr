@@ -7,7 +7,7 @@ require (
 	github.com/CAFxX/httpcompression v0.0.9
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
-	github.com/energye/systray v1.0.2
+	github.com/energye/systray v1.0.3
 	github.com/go-co-op/gocron/v2 v2.19.1
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/gorilla/mux v1.8.1
