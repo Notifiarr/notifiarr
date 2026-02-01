@@ -12,11 +12,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
+	"strings"
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/google/uuid"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -37,6 +40,7 @@ type Logger struct {
 	custom    *rotatorr.Logger // must not be set when web/app/debug are set.
 	LogConfig LogConfig
 	mu        sync.RWMutex
+	trace     bool
 }
 
 // These are used for custom logs.
@@ -60,7 +64,8 @@ const (
 	httpExt   = ".http.log"
 	errStr    = "Error"
 	infoStr   = "Info"
-	dbugStr   = "Debug"
+	traceStr  = "Trace"
+	debugStr  = "Debug"
 )
 
 // LogConfig allows sending logs to rotating files.
@@ -74,11 +79,12 @@ type LogConfig struct {
 	LogFileMb int      `json:"logFileMb" toml:"log_file_mb" xml:"log_file_mb" yaml:"logFileMb"`
 	FileMode  FileMode `json:"fileMode"  toml:"file_mode"   xml:"file_mode"   yaml:"fileMode"`
 	Debug     bool     `json:"debug"     toml:"debug"       xml:"debug"       yaml:"debug"`
+	Trace     bool     `json:"trace"     toml:"trace"       xml:"trace"       yaml:"trace"`
 	Quiet     bool     `json:"quiet"     toml:"quiet"       xml:"quiet"       yaml:"quiet"`
 	NoUploads bool     `json:"noUploads" toml:"no_uploads"  xml:"no_uploads"  yaml:"noUploads"`
 }
 
-// New returns a new Logger with debug off and sends everything to stdout.
+// New returns a new Logger with debug and trace off and sends everything to stdout.
 func New() *Logger {
 	return &Logger{
 		DebugLog: log.New(discard, "[DEBUG] ", log.LstdFlags),
@@ -109,6 +115,7 @@ func (l *Logger) SetupLogging(config LogConfig) {
 		l.InfoLog.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	}
 
+	l.trace = config.Trace
 	l.ErrorLog.SetFlags(l.InfoLog.Flags())
 	l.HTTPLog.SetFlags(l.InfoLog.Flags())
 	l.DebugLog.SetFlags(l.InfoLog.Flags())
@@ -190,14 +197,39 @@ func (l *Logger) CapturePanic() {
 	}
 }
 
+// Trace writes log lines... to stdout and/or a file.
+// Use this at the top of a function and pass the return value to the defer statement.
+func (l *Logger) Trace(reqID string, msg ...any) string {
+	if !l.trace {
+		return ""
+	}
+
+	suffix := "end: "
+	if reqID == "" {
+		reqID = uuid.NewString()[:6]
+		suffix = "start: "
+	}
+
+	_, file, line, ok := runtime.Caller(1)
+	if !ok {
+		file = "unknown-file"
+	}
+
+	file = strings.TrimPrefix(file, "github.com/Notifiarr/notifiarr/pkg/")
+	data := fmt.Sprintf("{trace:%s} %s:%d: %s", reqID, file, line, suffix)
+	l.writeMsg(data+fmt.Sprintln(msg...), l.InfoLog, traceStr, false)
+
+	return reqID
+}
+
 // Debug writes log lines... to stdout and/or a file.
 func (l *Logger) Debug(v ...any) {
-	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, dbugStr, false)
+	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, debugStr, false)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
 func (l *Logger) Debugf(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, dbugStr, false)
+	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, debugStr, false)
 }
 
 // Print writes log lines... to stdout and/or a file.

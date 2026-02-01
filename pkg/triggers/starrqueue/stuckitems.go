@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
@@ -20,11 +21,17 @@ import (
 // StuckItems sends the stuck queues items for all apps.
 // Does not fetch fresh data first, uses cache.
 func (a *Action) StuckItems(event website.EventType) {
+	id := logs.Log.Trace("", "Action.StuckItems", event)
+	defer logs.Log.Trace(id, "Action.StuckItems", event)
+
 	a.cmd.Exec(&common.ActionInput{Type: event}, TrigStuckItems)
 }
 
 // sendStuckQueues gathers the stuck queue from cache and sends them.
 func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
+	id := logs.Log.Trace("", "sendStuckQueues", input.Type)
+	defer logs.Log.Trace(id, "sendStuckQueues", input.Type)
+
 	lidarr := c.getFinishedItemsLidarr(ctx)
 	radarr := c.getFinishedItemsRadarr(ctx)
 	readarr := c.getFinishedItemsReadarr(ctx)
@@ -51,6 +58,9 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 }
 
 func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "getFinishedItemsLidarr")
+	defer logs.Log.Trace(id, "getFinishedItemsLidarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Lidarr {
@@ -93,6 +103,9 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 }
 
 func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "getFinishedItemsRadarr")
+	defer logs.Log.Trace(id, "getFinishedItemsRadarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Radarr {
@@ -135,6 +148,9 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 }
 
 func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "getFinishedItemsReadarr")
+	defer logs.Log.Trace(id, "getFinishedItemsReadarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Readarr {
@@ -177,6 +193,9 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 }
 
 func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cyclop
+	id := logs.Log.Trace("", "getFinishedItemsSonarr")
+	defer logs.Log.Trace(id, "getFinishedItemsSonarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Sonarr {

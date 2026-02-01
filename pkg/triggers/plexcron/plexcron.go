@@ -159,30 +159,9 @@ func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 		wait sync.WaitGroup
 	)
 
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-
-		_ = snap.GetCPUSample(ctx)
-	}()
-
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-
-		_ = snap.GetMemoryUsage(ctx)
-	}()
-
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-
-		_ = snap.GetLocalData(ctx)
-	}()
-
+	wait.Go(func() { _ = snap.GetCPUSample(ctx) })
+	wait.Go(func() { _ = snap.GetMemoryUsage(ctx) })
+	wait.Go(func() { _ = snap.GetLocalData(ctx) })
 	wait.Wait()
 
 	return snap

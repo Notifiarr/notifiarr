@@ -387,12 +387,9 @@ func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexS
 		return
 	}
 
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
+	wait.Go(func() {
 		*plx = c.plexVersionReply(plexServer.GetInfo(ctx)) //nolint:wsl
-	}()
+	})
 }
 
 func (c *Config) plexVersionReply(stat *plex.PMSInfo, err error) []*PlexConTest {

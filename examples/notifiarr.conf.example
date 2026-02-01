@@ -35,6 +35,10 @@ quiet = false
 
 ## Debug prints more data and json payloads. This increases application memory usage.
 debug = false
+
+## Trace logs function entry/exit with request IDs. Use for debugging request flow.
+trace = false
+
 max_body = 0 # maximum body size for debug logs. 0 = no limit.
 
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
