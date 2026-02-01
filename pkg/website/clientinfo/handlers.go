@@ -156,6 +156,9 @@ func (c *Config) VersionHandlerInstance(r *http.Request) (int, any) {
 
 // appStatsForVersion loops each app and gets the version info.
 func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.appStatsForVersion")
+	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersion")
+
 	var (
 		lid  = make([]*LidarrConTest, len(c.Apps.Lidarr))
 		prl  = make([]*ProwlarrConTest, len(c.Apps.Prowlarr))
@@ -195,6 +198,9 @@ func (c *Config) getConTest(app string, name string, instance int, err error) co
 
 // appStatsForVersionInstance handles a single-app version request.
 func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, instance int) *AppStatuses { //nolint:cyclop,funlen
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.appStatsForVersionInstance", app, instance)
+	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersionInstance", app, instance)
+
 	switch idx := instance - 1; app {
 	case "lidarr":
 		if instance <= len(c.Apps.Lidarr) && c.Apps.Lidarr[idx].Enabled() {
@@ -281,16 +287,15 @@ func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lid
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Lidarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Lidarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Lidarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("lidarrStatus", idx, stat)
 
 			lid[idx] = &LidarrConTest{conTest: c.getConTest("Lidarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+		})
 	}
 }
 
@@ -303,16 +308,15 @@ func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, p
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Prowlarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Prowlarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Prowlarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("prowlarrStatus", idx, stat)
 
 			prl[idx] = &ProwlarrConTest{conTest: c.getConTest("Prowlarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+		})
 	}
 }
 
@@ -325,16 +329,15 @@ func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, rad
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Radarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Radarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Radarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("radarrStatus", idx, stat)
 
 			rad[idx] = &RadarrConTest{conTest: c.getConTest("Radarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+		})
 	}
 }
 
@@ -347,16 +350,15 @@ func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, re
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Readarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Readarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Readarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("readarrStatus", idx, stat)
 
 			read[idx] = &ReadarrConTest{conTest: c.getConTest("Readarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+		})
 	}
 }
 
@@ -369,16 +371,15 @@ func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, son
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Sonarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Sonarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Sonarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("sonarrStatus", idx, stat)
 
 			son[idx] = &SonarrConTest{conTest: c.getConTest("Sonarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+		})
 	}
 }
 

@@ -36,8 +36,8 @@ func (a *Action) Create() {
 }
 
 // Send a snapshot to the website.
-func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigSnapshot)
+func (a *Action) Send(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigSnapshot)
 }
 
 func (c *cmd) create() {
@@ -112,6 +112,7 @@ func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
 
 	data.Save("snapshot", snapshot)
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.SnapRoute,
 		Event:      input.Type,
 		LogPayload: true,

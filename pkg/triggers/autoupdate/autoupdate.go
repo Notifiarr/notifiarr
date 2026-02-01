@@ -60,7 +60,7 @@ func (a *Action) Run(ctx context.Context) {
 	defer a.cmd.Unlock()
 
 	if !a.cmd.stop { // Check for update on startup, after a short wait.
-		a.cmd.checkAndUpdate(ctx, &common.ActionInput{Type: website.EventStart})
+		a.cmd.checkAndUpdate(ctx, &common.ActionInput{Type: website.EventStart, ReqID: mnd.GetID(ctx)})
 	}
 }
 

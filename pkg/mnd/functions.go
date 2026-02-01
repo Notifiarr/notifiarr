@@ -3,12 +3,14 @@ package mnd
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"html/template"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/hako/durafmt"
 	"golift.io/version"
 )
@@ -82,4 +84,33 @@ func PrintVersionInfo(program string) string {
 	}
 
 	return strings.TrimSpace(buf.String())
+}
+
+// ReqID returns a brand new random request ID. Used for logging. Try to avoid calling this directly.
+func ReqID() string {
+	return uuid.NewString()[:6]
+}
+
+type reqIDKeyType string
+
+const reqIDKey reqIDKeyType = "reqID"
+
+// GetID returns the request ID from the context. If no ID is found, a new one is created.
+func GetID(ctx context.Context) string {
+	if id, ok := ctx.Value(reqIDKey).(string); ok {
+		return id
+	}
+
+	return ReqID()
+}
+
+// SetID sets the request ID in the context.
+func SetID(ctx context.Context) context.Context {
+	return context.WithValue(ctx, reqIDKey, GetID(ctx))
+}
+
+// WithID sets the request ID in the context.
+// Use this when you have a derived context and your ID comes from another source.
+func WithID(ctx context.Context, id string) context.Context {
+	return context.WithValue(ctx, reqIDKey, id)
 }

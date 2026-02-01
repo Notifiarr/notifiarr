@@ -27,6 +27,9 @@ type httpClient struct {
 
 // Do performs an http Request with retries and logging!
 func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cyclop
+	reqID := mnd.Log.Trace(mnd.GetID(req.Context()), "start: httpClient.Do "+req.URL.String())
+	defer mnd.Log.Trace(reqID, "end: httpClient.Do "+req.URL.String())
+
 	req.Header.Set("User-Agent", fmt.Sprintf("%s v%s-%s %s", mnd.Title, version.Version, version.Revision, version.Branch))
 
 	deadline, ok := req.Context().Deadline()
@@ -42,7 +45,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
-				mnd.Log.ErrorfNoShare("Unexpected cookie [%v/%v] returned from website: %s", i+1, len(resp.Cookies()), c.String())
+				mnd.Log.ErrorfNoShare("{trace:%s} Unexpected cookie [%v/%v] returned from website: %s", reqID, i+1, len(resp.Cookies()), c.String())
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError &&
@@ -81,15 +84,18 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 
 // sendAndLogRequest sends a request to the website and logs the result.
 func (s *server) sendAndLogRequest(ctx context.Context, data *Request) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendAndLogRequest "+data.Route)
+	defer mnd.Log.Trace(reqID, "end: sendAndLogRequest "+data.Route)
+
 	switch resp, elapsed, err := s.sendRequest(ctx, data); {
 	case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 		return
 	case err != nil:
-		mnd.Log.ErrorfNoShare("[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
-			data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
+		mnd.Log.ErrorfNoShare("{trace:%s} [%s requested]  Sending (%v, buf=%d/%d): %s: %v%s",
+			reqID, data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 	case !data.ErrorsOnly:
-		mnd.Log.Printf("[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
-			data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
+		mnd.Log.Printf("{trace:%s} [%s requested] Sent %s (%v, buf=%d/%d): %s%s",
+			reqID, data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
 	}
 }
 
@@ -143,6 +149,9 @@ func (s *server) sendRequest(ctx context.Context, data *Request) (*Response, tim
 
 // sendPayload sends a JSON payload to the website and returns the result.
 func (s *server) sendPayload(ctx context.Context, uri string, payload any, log bool) (*Response, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendPayload "+uri)
+	defer mnd.Log.Trace(reqID, "end: sendPayload "+uri)
+
 	data, err := json.Marshal(payload)
 	if err == nil {
 		var torn map[string]any
@@ -186,6 +195,9 @@ func (s *server) sendPayload(ctx context.Context, uri string, payload any, log b
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
 func (s *server) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendJSON "+url)
+	defer mnd.Log.Trace(reqID, "end: sendJSON "+url)
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return 0, nil, fmt.Errorf("creating http request: %w", err)
@@ -260,6 +272,9 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 
 // TestApiKey tests if the API key is valid.
 func TestApiKey(ctx context.Context, apiKey string) error {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: TestApiKey")
+	defer mnd.Log.Trace(reqID, "end: TestApiKey")
+
 	if site == nil {
 		return ErrNoChannel // this will never happen, but we'll be safe.
 	}

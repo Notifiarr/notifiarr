@@ -9,7 +9,7 @@ import (
 )
 
 type Website interface {
-	SendData(data *website.Request)
+	SendData(req *website.Request)
 }
 
 var (
@@ -49,6 +49,7 @@ func Log(msg string) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      "errlog",
 		Payload:    &Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,

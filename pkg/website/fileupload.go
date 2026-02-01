@@ -14,6 +14,9 @@ import (
 )
 
 func (s *server) sendFile(ctx context.Context, uri string, file *UploadFile) (*Response, error) {
+	mnd.Log.Trace(mnd.GetID(ctx), "start: sendFile")
+	defer mnd.Log.Trace(mnd.GetID(ctx), "end: sendFile")
+
 	form, contentType, err := s.createFileUpload(file)
 	if err != nil {
 		return nil, err

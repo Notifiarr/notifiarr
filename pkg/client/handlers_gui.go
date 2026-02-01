@@ -72,6 +72,14 @@ func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	})
 }
 
+func (c *Client) withReqID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
+		request = request.WithContext(mnd.SetID(request.Context()))
+		request.Header.Set("X-Request-ID", mnd.GetID(request.Context()))
+		next.ServeHTTP(response, request)
+	})
+}
+
 // getUserName returns the username and a bool if it's dynamic (not the one from the config file).
 func (c *Client) getUserName(request *http.Request) (string, bool) {
 	if userName := request.Context().Value(userNameStr); userName != nil {
@@ -277,7 +285,7 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 			continue
 		}
 
-		err := c.triggers.FileUpload.Upload(website.EventGUI, fileInfo.Path)
+		err := c.triggers.FileUpload.Upload(&common.ActionInput{Type: website.EventGUI, ReqID: mnd.GetID(req.Context())}, fileInfo.Path)
 		if err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
@@ -448,7 +456,7 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 //	@Router			/services/check/{service} [get]
 func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Request) {
 	svc := mux.Vars(req)["service"]
-	if err := c.Services.RunCheck(website.EventAPI, svc); err != nil {
+	if err := c.Services.RunCheck(req.Context(), website.EventAPI, svc); err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -971,8 +979,9 @@ func (c *Client) handleRunCommand(response http.ResponseWriter, request *http.Re
 	_ = request.ParseForm()
 
 	cmd.Run(&common.ActionInput{
-		Type: website.EventGUI,
-		Args: request.PostForm["args"],
+		Type:  website.EventGUI,
+		Args:  request.PostForm["args"],
+		ReqID: mnd.GetID(request.Context()),
 	})
 	http.Error(response, "Check command output after a few seconds.", http.StatusOK)
 }

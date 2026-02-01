@@ -9,6 +9,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
@@ -162,6 +163,7 @@ func (a *Actions) Stop(event website.EventType) context.Context {
 type inChData struct {
 	website.EventType
 	*clientinfo.Actions
+	ReqID string
 }
 
 // watchChan watches the inCh channel for new events from the website.
@@ -169,6 +171,7 @@ type inChData struct {
 func (a *Actions) watchChan(ctx context.Context) {
 	for event := range a.inCh {
 		a.outCh <- "Actions reconfiguration triggered."
+		ctx = mnd.SetID(ctx)
 
 		if event.Actions != nil {
 			// Handle POSTed actions data.

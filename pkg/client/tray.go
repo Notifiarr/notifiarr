@@ -280,46 +280,50 @@ func (c *Client) notifiarrMenu(ctx context.Context) {
 }
 
 func (c *Client) notifiarrMenuActions(ctx context.Context) {
-	menu["gaps"].Click(func() { c.triggers.Gaps.Send(website.EventUser) })
-	menu["synccf"].Click(func() { c.triggers.CFSync.SyncRadarrCF(website.EventUser) })
-	menu["syncqp"].Click(func() { c.triggers.CFSync.SyncSonarrRP(website.EventUser) })
+	menu["gaps"].Click(func() { c.triggers.Gaps.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
+	menu["synccf"].Click(func() {
+		c.triggers.CFSync.SyncRadarrCF(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["syncqp"].Click(func() {
+		c.triggers.CFSync.SyncSonarrRP(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
 	menu["svcs_prod"].Click(func() {
 		logs.Log.Printf("[user requested] Checking services and sending results to Notifiarr.")
 		ui.Toast(ctx, "Running and sending %d Service Checks.", c.Services.SvcCount())
-		c.Services.RunChecks(website.EventUser)
+		c.Services.RunChecks(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
 	})
-	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(website.EventUser) })
-	menu["snap_prod"].Click(func() { c.triggers.SnapCron.Send(website.EventUser) })
-	menu["send_dash"].Click(func() { c.triggers.Dashboard.Send(website.EventUser) })
+	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
+	menu["snap_prod"].Click(func() { c.triggers.SnapCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
+	menu["send_dash"].Click(func() { c.triggers.Dashboard.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
 	menu["corrLidarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Lidarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Lidarr)
 	})
 	menu["corrProwlarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Prowlarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Prowlarr)
 	})
 	menu["corrRadarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Radarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Radarr)
 	})
 	menu["corrReadarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Readarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Readarr)
 	})
 	menu["corrSonarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Sonarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Sonarr)
 	})
 	menu["backLidarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Lidarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Lidarr)
 	})
 	menu["backProwlarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Prowlarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Prowlarr)
 	})
 	menu["backRadarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Radarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Radarr)
 	})
 	menu["backReadarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Readarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Readarr)
 	})
 	menu["backSonarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Sonarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Sonarr)
 	})
 }
 
@@ -337,7 +341,7 @@ func (c *Client) debugMenu(ctx context.Context) {
 	menu["svcs_log"].Click(func() {
 		logs.Log.Print("[user requested] Checking services and logging results.")
 		ui.Toast(ctx, "Running and logging %d Service Checks.", c.Services.SvcCount())
-		c.Services.RunChecks("log")
+		c.Services.RunChecks(&common.ActionInput{Type: "log", ReqID: mnd.GetID(ctx)})
 	})
 
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
@@ -375,7 +379,7 @@ func (c *Client) buildDynamicTimerMenus() {
 
 		menu[name].SetTooltip(desc)
 		menu[name].Show()
-		menu[name].Click(func() { timers[idx].Run(&common.ActionInput{Type: website.EventUser}) })
+		menu[name].Click(func() { timers[idx].Run(&common.ActionInput{Type: website.EventUser, ReqID: mnd.ReqID()}) })
 	}
 }
 

@@ -1,11 +1,13 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
@@ -14,7 +16,7 @@ const valuePrefix = "serviceCheck-"
 var ErrSvcsStopped = errors.New("service check routine stopped")
 
 // RunChecks runs checks from an external package.
-func (s *Services) RunChecks(source website.EventType) {
+func (s *Services) RunChecks(input *common.ActionInput) {
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
@@ -23,11 +25,11 @@ func (s *Services) RunChecks(source website.EventType) {
 		return
 	}
 
-	s.triggerChan <- source
+	s.triggerChan <- input
 }
 
 // RunCheck runs a single check from an external package.
-func (s *Services) RunCheck(source website.EventType, name string) error {
+func (s *Services) RunCheck(ctx context.Context, source website.EventType, name string) error {
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
 
@@ -40,7 +42,7 @@ func (s *Services) RunCheck(source website.EventType, name string) error {
 		return fmt.Errorf("%w: service '%s' not found", ErrNoName, name)
 	}
 
-	s.checkChan <- triggerCheck{Source: source, Service: svc}
+	s.checkChan <- triggerCheck{ReqID: mnd.GetID(ctx), Source: source, Service: svc}
 
 	return nil
 }
@@ -112,8 +114,9 @@ func (s *Service) copyResults() *CheckResult {
 }
 
 // SendResults sends a set of Results to Notifiarr.
-func (s *Services) SendResults(results *Results) {
+func (s *Services) SendResults(results *Results, reqID string) {
 	website.SendData(&website.Request{
+		ReqID:      reqID,
 		Route:      website.SvcRoute,
 		Event:      results.What,
 		LogPayload: true,

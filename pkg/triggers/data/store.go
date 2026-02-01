@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"golift.io/cache"
 )
 
@@ -21,32 +20,20 @@ var store = cache.New(cache.Config{
 
 // Save a piece of data in the cache.
 func Save(key string, data any) {
-	logID := mnd.Log.Trace("", "data.Save", key)
-	defer mnd.Log.Trace(logID, "data.Save", key)
-
 	store.Save(key, data, cache.Options{})
 }
 
 // Get an itemfrom the cache. May be nil if non-existent.
 func Get(key string) *cache.Item {
-	logID := mnd.Log.Trace("", "data.Get", key)
-	defer mnd.Log.Trace(logID, "data.Get", key)
-
 	return store.Get(key)
 }
 
 // SaveWithID saves data to the cache, and appends the key to an id.
 func SaveWithID(key string, id int, data any) {
-	logID := mnd.Log.Trace("", "data.SaveWithID", key, id)
-	defer mnd.Log.Trace(logID, "data.SaveWithID", key, id)
-
 	store.Save(key+strconv.Itoa(id), data, cache.Options{Prune: true})
 }
 
 // GetWithID returns data from the cache using a kay appended to an id.
 func GetWithID(key string, id int) *cache.Item {
-	logID := mnd.Log.Trace("", "data.GetWithID", key, id)
-	defer mnd.Log.Trace(logID, "data.GetWithID", key, id)
-
 	return store.Get(key + strconv.Itoa(id))
 }

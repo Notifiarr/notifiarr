@@ -58,8 +58,8 @@ func (c *cmd) create() {
 }
 
 // Send radarr collection gaps to the website.
-func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCollectionGaps)
+func (a *Action) Send(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigCollectionGaps)
 }
 
 func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
@@ -90,6 +90,7 @@ func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 		}
 
 		website.SendData(&website.Request{
+			ReqID:      mnd.GetID(ctx),
 			Route:      website.GapsRoute,
 			Event:      input.Type,
 			LogPayload: true,

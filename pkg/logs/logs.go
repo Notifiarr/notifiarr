@@ -19,7 +19,6 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
-	"github.com/google/uuid"
 	homedir "github.com/mitchellh/go-homedir"
 	"golift.io/rotatorr"
 	"golift.io/rotatorr/timerotator"
@@ -200,24 +199,33 @@ func (l *Logger) CapturePanic() {
 // Trace writes log lines... to stdout and/or a file.
 // Use this at the top of a function and pass the return value to the defer statement.
 func (l *Logger) Trace(reqID string, msg ...any) string {
-	if !l.trace {
-		return ""
+	if reqID == "" {
+		reqID = mnd.ReqID()
 	}
 
-	suffix := "end: "
-	if reqID == "" {
-		reqID = uuid.NewString()[:6]
-		suffix = "start: "
+	if !l.trace {
+		return reqID // we still need to create and return an id.
 	}
+
+	// Remove any prefix up to and including "github.com/Notifiarr/notifiarr/pkg/"
+	const removePrefix = "github.com/Notifiarr/notifiarr/pkg/"
 
 	_, file, line, ok := runtime.Caller(1)
 	if !ok {
 		file = "unknown-file"
+	} else if idx := strings.Index(file, removePrefix); idx >= 0 {
+		file = file[idx+len(removePrefix):]
 	}
 
-	file = strings.TrimPrefix(file, "github.com/Notifiarr/notifiarr/pkg/")
-	data := fmt.Sprintf("{trace:%s} %s:%d: %s", reqID, file, line, suffix)
-	l.writeMsg(data+fmt.Sprintln(msg...), l.InfoLog, traceStr, false)
+	_, parentFile, parentLine, ok := runtime.Caller(2)
+	if !ok {
+		parentFile = "unknown-file"
+	} else if idx := strings.Index(parentFile, removePrefix); idx >= 0 {
+		parentFile = parentFile[idx+len(removePrefix):]
+	}
+
+	l.writeMsg(fmt.Sprintf("{trace:%s} %s:%d -> %s:%d %s",
+		reqID, parentFile, parentLine, file, line, fmt.Sprintln(msg...)), l.InfoLog, traceStr, false)
 
 	return reqID
 }

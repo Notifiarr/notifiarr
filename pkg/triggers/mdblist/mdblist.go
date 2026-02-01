@@ -57,8 +57,8 @@ func (c *cmd) create() {
 }
 
 // Send library contents to the website for MDBList.
-func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigMDBListSync)
+func (a *Action) Send(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigMDBListSync)
 }
 
 type mdbListPayload struct {
@@ -77,6 +77,7 @@ type libraryData struct {
 
 func (c *cmd) sendMDBList(ctx context.Context, input *common.ActionInput) {
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.MdbListRoute,
 		Event:      input.Type,
 		LogPayload: true,

@@ -9,23 +9,11 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
-	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 )
 
 const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
-
-// StoreLidarr fetches and stores the Lidarr queue immediately for the specified instance.
-// Does not send data to the website.
-func (a *Action) StoreLidarr(event website.EventType, instance int) {
-	id := logs.Log.Trace("", "StoreLidarr", event, instance)
-	defer logs.Log.Trace(id, "StoreLidarr", event, instance)
-
-	if name := TrigLidarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		mnd.Log.Errorf("[%s requested] Failed! %s Disabled?", event, name)
-	}
-}
 
 type lidarrApp struct {
 	app *apps.Lidarr
@@ -35,8 +23,8 @@ type lidarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *lidarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "lidarrApp.storeQueue", app.idx, app.app.Name, input.Type)
-	defer logs.Log.Trace(id, "lidarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	id := logs.Log.Trace("", "start: lidarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	defer logs.Log.Trace(id, "end: lidarrApp.storeQueue", app.idx, app.app.Name, input.Type)
 
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
@@ -53,9 +41,9 @@ func (app *lidarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 	data.SaveWithID("lidarr", app.idx, queue)
 }
 
-func (c *cmd) setupLidarr() bool {
-	id := logs.Log.Trace("", "setupLidarr")
-	defer logs.Log.Trace(id, "setupLidarr")
+func (c *cmd) setupLidarr(reqID string) bool {
+	logs.Log.Trace(reqID, "start: setupLidarr")
+	defer logs.Log.Trace(reqID, "end: setupLidarr")
 
 	var enabled bool
 

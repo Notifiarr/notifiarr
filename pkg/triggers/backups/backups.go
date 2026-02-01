@@ -263,6 +263,7 @@ func (c *cmd) sendBackups(ctx context.Context, input *genericInstance) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.BackupRoute,
 		Event:      input.event,
 		LogPayload: true,

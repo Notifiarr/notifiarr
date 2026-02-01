@@ -11,6 +11,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -22,6 +23,9 @@ import (
 
 // Corruption initializes a corruption check for all instances of the provided app.
 func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
+	id := logs.Log.Trace("", "start: Corruption", input.Type, app)
+	defer logs.Log.Trace(id, "end: Corruption", input.Type, app)
+
 	switch app { //nolint:exhaustive // We only check starr apps.
 	default:
 		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
@@ -285,6 +289,7 @@ func (c *cmd) sendAndLogAppCorruption(ctx context.Context, input *genericInstanc
 	backup.Date = fileList[0].Time.Round(time.Second)
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.CorruptRoute,
 		Event:      input.event,
 		LogPayload: true,

@@ -12,6 +12,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"golift.io/version"
@@ -60,7 +61,7 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	s.done = make(chan bool)
 	s.actionChan = make(chan action)
 	s.replyChan = make(chan bool)
-	s.triggerChan = make(chan website.EventType)
+	s.triggerChan = make(chan *common.ActionInput)
 	s.checkChan = make(chan triggerCheck)
 
 	if s.parallel = uint(len(s.services) / svcsPerThread); s.parallel < 1 {
@@ -147,7 +148,7 @@ func (s *Services) loadServiceStates() {
 		return
 	}
 
-	values, err := website.GetState(names...)
+	values, err := website.GetState("svcsup", names...)
 	if err != nil {
 		s.log.ErrorfNoShare("Getting initial service states from website: %v", err)
 		return
@@ -201,7 +202,7 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 
 	if !s.Disabled {
 		s.runChecks(true, version.Started)
-		s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()})
+		s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()}, "svcsup")
 	} else {
 		running = false
 		checker.Stop()
@@ -231,18 +232,18 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				return
 			}
 		case event := <-s.checkChan:
-			s.log.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
-				event.Service.Name, event.Source, len(s.checks), cap(s.checks))
+			s.log.Printf("{trace:%s} Running service check '%s' via event: %s, buffer: %d/%d",
+				event.ReqID, event.Service.Name, event.Source, len(s.checks), cap(s.checks))
 
 			if s.runCheck(event.Service, true, time.Now()) {
-				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()})
+				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()}, event.ReqID)
 			}
-		case event := <-s.triggerChan:
-			s.log.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(s.checks), cap(s.checks))
+		case input := <-s.triggerChan:
+			s.log.Printf("{trace:%s} Running all service checks via event: %s, buffer: %d/%d", input.ReqID, input.Type, len(s.checks), cap(s.checks))
 			s.runChecks(true, time.Now())
 
-			if event != "log" {
-				s.SendResults(&Results{What: event, Svcs: s.GetResults()})
+			if input.Type != "log" {
+				s.SendResults(&Results{What: input.Type, Svcs: s.GetResults()}, input.ReqID)
 				continue
 			}
 
@@ -252,10 +253,10 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				continue
 			}
 
-			s.log.Debug("Service Checks Payload (log only):", string(data))
+			s.log.Printf("{trace:%s} Service Checks Payload (log only):", input.ReqID, string(data))
 		case now := <-checker.C:
 			if s.runChecks(false, now) {
-				s.SendResults(&Results{What: website.EventCron, Svcs: s.GetResults()})
+				s.SendResults(&Results{What: website.EventCron, Svcs: s.GetResults()}, "svctmr")
 			}
 		}
 	}

@@ -112,6 +112,9 @@ type AppInfoTautulli struct {
 
 // Info is used for JSON input for our outgoing app info.
 func (c *Config) Info(ctx context.Context, startup bool) *AppInfo {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.Info", startup)
+	defer mnd.Log.Trace(reqID, "end: Config.Info", startup)
+
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
 	if c.Apps.Plex.Enabled() {
 		numPlex = 1
@@ -219,6 +222,9 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 }
 
 func (c *Config) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.tautulliUsers")
+	defer mnd.Log.Trace(reqID, "end: Config.tautulliUsers")
+
 	const tautulliUsersKey = "tautulliUsers"
 	cacheUsers := data.Get(tautulliUsersKey)
 

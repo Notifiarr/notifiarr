@@ -9,23 +9,11 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
-	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 )
 
 const TrigSonarrQueue common.TriggerName = "Storing Sonarr instance %d queue."
-
-// StoreSonarr fetches and stores the Sonarr queue immediately for the specified instance.
-// Does not send data to the website.
-func (a *Action) StoreSonarr(event website.EventType, instance int) {
-	id := logs.Log.Trace("", "StoreSonarr", event, instance)
-	defer logs.Log.Trace(id, "StoreSonarr", event, instance)
-
-	if name := TrigSonarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		mnd.Log.Errorf("[%s requested] Failed! %s Disabled?", event, name)
-	}
-}
 
 // sonarrApp allows us to have a trigger/timer per instance.
 type sonarrApp struct {
@@ -36,8 +24,8 @@ type sonarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
-	defer logs.Log.Trace(id, "sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	id := logs.Log.Trace("", "start: sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	defer logs.Log.Trace(id, "end: sonarrApp.storeQueue", app.idx, app.app.Name, input.Type)
 
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
@@ -55,9 +43,9 @@ func (app *sonarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 	data.SaveWithID("sonarr", app.idx, queue)
 }
 
-func (c *cmd) setupSonarr() bool {
-	id := logs.Log.Trace("", "setupSonarr")
-	defer logs.Log.Trace(id, "setupSonarr")
+func (c *cmd) setupSonarr(reqID string) bool {
+	logs.Log.Trace(reqID, "start: setupSonarr")
+	defer logs.Log.Trace(reqID, "end: setupSonarr")
 
 	var enable bool
 

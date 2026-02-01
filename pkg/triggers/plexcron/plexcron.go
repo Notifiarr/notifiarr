@@ -59,8 +59,8 @@ func New(config *common.Config, plex *apps.Plex) *Action {
 }
 
 // Send sends plex sessions in a go routine through a channel.
-func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigPlexSessions)
+func (a *Action) Send(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigPlexSessions)
 }
 
 // Create initializes the library.
@@ -115,7 +115,7 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	sessions := &plex.Sessions{Name: c.Plex.Name()}
 	ci := clientinfo.Get()
-	ctx := context.Background()
+	ctx := mnd.WithID(context.Background(), hook.ReqID)
 
 	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.
 	if ci != nil && !ci.Actions.Plex.NoActivity {
@@ -124,7 +124,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 
 		var err error
 		if sessions, err = c.getSessions(ctx, time.Second); err != nil {
-			mnd.Log.Errorf("Getting Plex sessions: %v", err)
+			mnd.Log.Errorf("{trace:%s} Getting Plex sessions: %v", hook.ReqID, err)
 		}
 
 		cancel()
@@ -134,6 +134,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	defer cancel()
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.PlexRoute,
 		Event:      website.EventHook,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Load: hook, Plex: sessions},

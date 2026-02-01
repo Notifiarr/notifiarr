@@ -22,6 +22,7 @@ func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.PlexRoute,
 		Event:      input.Type,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Plex: sessions},

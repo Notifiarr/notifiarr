@@ -1567,6 +1567,7 @@ export interface LogConfig {
   logFileMb: number;
   fileMode: number;
   debug: boolean;
+  trace: boolean;
   quiet: boolean;
   noUploads: boolean;
 };

@@ -8,6 +8,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -89,6 +90,7 @@ func (c *cmd) sendSessionDone(ctx context.Context, session *plex.Session) string
 	}
 
 	website.SendData(&website.Request{
+		ReqID: mnd.GetID(ctx),
 		Route: website.PlexRoute,
 		Event: website.EventType(session.Type),
 		Payload: &website.Payload{

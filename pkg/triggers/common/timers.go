@@ -159,12 +159,11 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 		index, val, _ := reflect.Select(cases)
 		action := actions[index]
 
-		input := &ActionInput{}
-
+		var input *ActionInput
 		if _, ok := val.Interface().(time.Time); ok {
-			input.Type = website.EventCron
+			input = &ActionInput{Type: website.EventCron, ReqID: mnd.ReqID()}
 		} else if input, ok = val.Interface().(*ActionInput); !ok {
-			input = &ActionInput{Type: "unknown"}
+			input = &ActionInput{Type: "unknown", ReqID: mnd.ReqID()}
 		}
 
 		mnd.TimerEvents.Add(string(input.Type)+"&&"+string(action.Name), 1)
@@ -174,7 +173,7 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 			return // called by c.Stop(), calls c.stopTimerLoop().
 		}
 
-		c.runEventAction(ctx, input, action)
+		c.runEventAction(mnd.WithID(ctx, input.ReqID), input, action)
 	}
 }
 
@@ -186,7 +185,7 @@ func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action 
 	}
 
 	if action.Name != "" && !action.Hide {
-		mnd.Log.Printf("[%s requested] Event Triggered: %s", input.Type, action)
+		mnd.Log.Printf("{trace:%s} [%s requested] Event Triggered: %s", input.ReqID, input.Type, action)
 	}
 
 	if action.Fn != nil {

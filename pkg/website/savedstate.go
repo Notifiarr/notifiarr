@@ -21,6 +21,7 @@ func SetStates(values map[string][]byte) error {
 	}
 
 	resp, err := GetData(&Request{
+		ReqID:      "setstate",
 		Route:      ClientRoute,
 		Event:      EventSet,
 		Payload:    map[string]any{"fields": values},
@@ -41,6 +42,7 @@ func DelState(keys ...string) error {
 	}
 
 	resp, err := GetData(&Request{
+		ReqID:      "delstate",
 		Route:      ClientRoute,
 		Event:      EventSet,
 		Payload:    map[string]any{"fields": values},
@@ -54,8 +56,9 @@ func DelState(keys ...string) error {
 }
 
 // GetState gets a value stored in the website database.
-func GetState(keys ...string) (map[string][]byte, error) {
+func GetState(reqID string, keys ...string) (map[string][]byte, error) {
 	resp, err := GetData(&Request{
+		ReqID:      reqID,
 		Route:      ClientRoute,
 		Event:      EventGet,
 		Payload:    map[string][]string{"fields": keys},

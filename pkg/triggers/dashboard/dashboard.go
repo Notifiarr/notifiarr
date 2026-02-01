@@ -144,8 +144,8 @@ func (c *Cmd) create() {
 }
 
 // Send the current states for the dashboard to the website.
-func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigDashboard)
+func (a *Action) Send(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigDashboard)
 }
 
 func (c *Cmd) sendDashboardState(ctx context.Context, input *common.ActionInput) {
@@ -157,6 +157,7 @@ func (c *Cmd) sendDashboardState(ctx context.Context, input *common.ActionInput)
 
 	data.Save("dashboard", states)
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.DashRoute,
 		Event:      input.Type,
 		LogPayload: true,

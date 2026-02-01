@@ -20,17 +20,17 @@ import (
 
 // StuckItems sends the stuck queues items for all apps.
 // Does not fetch fresh data first, uses cache.
-func (a *Action) StuckItems(event website.EventType) {
-	id := logs.Log.Trace("", "Action.StuckItems", event)
-	defer logs.Log.Trace(id, "Action.StuckItems", event)
+func (a *Action) StuckItems(input *common.ActionInput) {
+	id := logs.Log.Trace("", "start: Action.StuckItems", input.Type)
+	defer logs.Log.Trace(id, "end: Action.StuckItems", input.Type)
 
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigStuckItems)
+	a.cmd.Exec(input, TrigStuckItems)
 }
 
 // sendStuckQueues gathers the stuck queue from cache and sends them.
 func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
-	id := logs.Log.Trace("", "sendStuckQueues", input.Type)
-	defer logs.Log.Trace(id, "sendStuckQueues", input.Type)
+	id := logs.Log.Trace("", "start: sendStuckQueues", input.Type)
+	defer logs.Log.Trace(id, "end: sendStuckQueues", input.Type)
 
 	lidarr := c.getFinishedItemsLidarr(ctx)
 	radarr := c.getFinishedItemsRadarr(ctx)
@@ -43,6 +43,7 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.StuckRoute,
 		Event:      input.Type,
 		LogPayload: true,
@@ -58,8 +59,8 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 }
 
 func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "getFinishedItemsLidarr")
-	defer logs.Log.Trace(id, "getFinishedItemsLidarr")
+	id := logs.Log.Trace("", "start: getFinishedItemsLidarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsLidarr")
 
 	stuck := make(itemList)
 
@@ -103,8 +104,8 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 }
 
 func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "getFinishedItemsRadarr")
-	defer logs.Log.Trace(id, "getFinishedItemsRadarr")
+	id := logs.Log.Trace("", "start: getFinishedItemsRadarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsRadarr")
 
 	stuck := make(itemList)
 
@@ -148,8 +149,8 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 }
 
 func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "getFinishedItemsReadarr")
-	defer logs.Log.Trace(id, "getFinishedItemsReadarr")
+	id := logs.Log.Trace("", "start: getFinishedItemsReadarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsReadarr")
 
 	stuck := make(itemList)
 
@@ -193,8 +194,8 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 }
 
 func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cyclop
-	id := logs.Log.Trace("", "getFinishedItemsSonarr")
-	defer logs.Log.Trace(id, "getFinishedItemsSonarr")
+	id := logs.Log.Trace("", "start: getFinishedItemsSonarr")
+	defer logs.Log.Trace(id, "end: getFinishedItemsSonarr")
 
 	stuck := make(itemList)
 
