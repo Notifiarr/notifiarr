@@ -97,9 +97,9 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	content := mux.Vars(req)["content"]
 
 	if content != "" {
-		mnd.Log.Debugf("[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
+		mnd.Log.Printf("{trace:%s} [%s requested] Incoming Trigger: %s (%s)", input.ReqID, event, trigger, content)
 	} else {
-		mnd.Log.Debugf("[%s requested] Incoming Trigger: %s", event, trigger)
+		mnd.Log.Printf("{trace:%s} [%s requested] Incoming Trigger: %s", input.ReqID, event, trigger)
 	}
 
 	_ = req.ParseForm()
@@ -110,6 +110,9 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 
 //nolint:cyclop,funlen,gocyclo
 func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigger, content string) (int, string) {
+	mnd.Log.Trace(input.ReqID, "start: Actions.runTrigger", input.Type, trigger, content != "")
+	defer mnd.Log.Trace(input.ReqID, "end: Actions.runTrigger", input.Type, trigger, content != "")
+
 	switch trigger {
 	case "custom", "TrigCustomCronTimer":
 		return a.customTimer(input, content)
