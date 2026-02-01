@@ -65,6 +65,7 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 		if c.empty { // We already sent an empty payload, so don't send another.
 			logs.Log.Debugf("{trace:%s} [%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
 				input.ReqID, input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
+			return
 		}
 
 		c.empty = true
