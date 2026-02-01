@@ -84,7 +84,7 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 			appqueue = append(appqueue, &lidarrRecord{QueueRecord: minimalLidarrRecord(item)}) //nolint:wsl
 		}
 
-		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
 		mnd.Log.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
@@ -126,7 +126,7 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 			appqueue = append(appqueue, &radarrRecord{QueueRecord: minimalRadarrRecord(item)}) //nolint:wsl
 		}
 
-		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
 		mnd.Log.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
@@ -168,7 +168,7 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 			appqueue = append(appqueue, &readarrRecord{QueueRecord: minimalReadarrRecord(item)}) //nolint:wsl
 		}
 
-		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
 		mnd.Log.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
@@ -210,7 +210,7 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 			appqueue = append(appqueue, &sonarrRecord{QueueRecord: minimalSonarrRecord(item)}) //nolint:wsl
 		}
 
-		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: queue.TotalRecords}
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
 		mnd.Log.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
