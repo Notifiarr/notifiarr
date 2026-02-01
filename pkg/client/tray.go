@@ -280,7 +280,9 @@ func (c *Client) notifiarrMenu(ctx context.Context) {
 }
 
 func (c *Client) notifiarrMenuActions(ctx context.Context) {
-	menu["gaps"].Click(func() { c.triggers.Gaps.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
+	menu["gaps"].Click(func() {
+		c.triggers.Gaps.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
 	menu["synccf"].Click(func() {
 		c.triggers.CFSync.SyncRadarrCF(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
 	})
@@ -292,9 +294,15 @@ func (c *Client) notifiarrMenuActions(ctx context.Context) {
 		ui.Toast(ctx, "Running and sending %d Service Checks.", c.Services.SvcCount())
 		c.Services.RunChecks(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
 	})
-	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
-	menu["snap_prod"].Click(func() { c.triggers.SnapCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
-	menu["send_dash"].Click(func() { c.triggers.Dashboard.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}) })
+	menu["plex_prod"].Click(func() {
+		c.triggers.PlexCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["snap_prod"].Click(func() {
+		c.triggers.SnapCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["send_dash"].Click(func() {
+		c.triggers.Dashboard.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
 	menu["corrLidarr"].Click(func() {
 		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Lidarr)
 	})

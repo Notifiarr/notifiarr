@@ -239,7 +239,8 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()}, event.ReqID)
 			}
 		case input := <-s.triggerChan:
-			s.log.Printf("{trace:%s} Running all service checks via event: %s, buffer: %d/%d", input.ReqID, input.Type, len(s.checks), cap(s.checks))
+			s.log.Printf("{trace:%s} Running all service checks via event: %s, buffer: %d/%d",
+				input.ReqID, input.Type, len(s.checks), cap(s.checks))
 			s.runChecks(true, time.Now())
 
 			if input.Type != "log" {

@@ -45,7 +45,8 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
-				mnd.Log.ErrorfNoShare("{trace:%s} Unexpected cookie [%v/%v] returned from website: %s", reqID, i+1, len(resp.Cookies()), c.String())
+				mnd.Log.ErrorfNoShare("{trace:%s} Unexpected cookie [%v/%v] returned from website: %s",
+					reqID, i+1, len(resp.Cookies()), c.String())
 			}
 
 			if resp.StatusCode < http.StatusInternalServerError &&

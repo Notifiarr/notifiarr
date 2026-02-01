@@ -171,7 +171,7 @@ type inChData struct {
 func (a *Actions) watchChan(ctx context.Context) {
 	for event := range a.inCh {
 		a.outCh <- "Actions reconfiguration triggered."
-		ctx = mnd.SetID(ctx)
+		ctx := mnd.SetID(ctx)
 
 		if event.Actions != nil {
 			// Handle POSTed actions data.

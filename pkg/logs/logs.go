@@ -210,15 +210,15 @@ func (l *Logger) Trace(reqID string, msg ...any) string {
 	// Remove any prefix up to and including "github.com/Notifiarr/notifiarr/pkg/"
 	const removePrefix = "github.com/Notifiarr/notifiarr/pkg/"
 
-	_, file, line, ok := runtime.Caller(1)
-	if !ok {
+	_, file, line, exists := runtime.Caller(1)
+	if !exists {
 		file = "unknown-file"
 	} else if idx := strings.Index(file, removePrefix); idx >= 0 {
 		file = file[idx+len(removePrefix):]
 	}
 
-	_, parentFile, parentLine, ok := runtime.Caller(2)
-	if !ok {
+	_, parentFile, parentLine, exists := runtime.Caller(2) //nolint:mnd
+	if !exists {
 		parentFile = "unknown-file"
 	} else if idx := strings.Index(parentFile, removePrefix); idx >= 0 {
 		parentFile = parentFile[idx+len(removePrefix):]

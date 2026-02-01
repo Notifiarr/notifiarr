@@ -74,9 +74,9 @@ func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 
 func (c *Client) withReqID(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-		request = request.WithContext(mnd.SetID(request.Context()))
-		request.Header.Set("X-Request-ID", mnd.GetID(request.Context()))
-		next.ServeHTTP(response, request)
+		ctx := mnd.SetID(request.Context())
+		request.Header.Set("X-Request-ID", mnd.GetID(ctx))
+		next.ServeHTTP(response, request.WithContext(ctx))
 	})
 }
 
@@ -285,7 +285,9 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 			continue
 		}
 
-		err := c.triggers.FileUpload.Upload(&common.ActionInput{Type: website.EventGUI, ReqID: mnd.GetID(req.Context())}, fileInfo.Path)
+		input := &common.ActionInput{Type: website.EventGUI, ReqID: mnd.GetID(req.Context())}
+
+		err := c.triggers.FileUpload.Upload(input, fileInfo.Path)
 		if err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}

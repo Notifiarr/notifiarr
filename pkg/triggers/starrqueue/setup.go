@@ -63,13 +63,13 @@ func New(config *common.Config) *Action {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	id := logs.Log.Trace("", "start: Create")
-	defer logs.Log.Trace(id, "end: Create")
+	reqID := logs.Log.Trace("", "start: Create")
+	defer logs.Log.Trace(reqID, "end: Create")
 
-	lidarr := a.cmd.setupLidarr(id)
-	radarr := a.cmd.setupRadarr(id)
-	readarr := a.cmd.setupReadarr(id)
-	sonarr := a.cmd.setupSonarr(id)
+	lidarr := a.cmd.setupLidarr(reqID)
+	radarr := a.cmd.setupRadarr(reqID)
+	readarr := a.cmd.setupReadarr(reqID)
+	sonarr := a.cmd.setupSonarr(reqID)
 
 	if lidarr || radarr || readarr || sonarr {
 		a.cmd.Add(&common.Action{
