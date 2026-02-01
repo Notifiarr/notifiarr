@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -53,6 +54,7 @@ type server struct {
 	sendData  chan *Request // in (buffered)
 	reconfig  chan *Config  // in+out (unbuffered bidirectional)
 	getConfig chan struct{} // in (buffered)
+	mu        sync.RWMutex
 }
 
 func New(ctx context.Context, config *Config) {
@@ -100,8 +102,10 @@ func GetData(req *Request) (*Response, error) {
 
 // GetConfig returns the current website config.
 func GetConfig() *Config {
-	site.getConfig <- struct{}{}
-	return <-site.reconfig
+	site.mu.RLock()
+	defer site.mu.RUnlock()
+
+	return site.config
 }
 
 // RawGetData sends a request to the website without using a channel.
@@ -123,14 +127,16 @@ func (s *server) watchSendDataChan(ctx context.Context) {
 	for {
 		select {
 		case config := <-s.reconfig:
+			s.mu.Lock()
 			s.client.Retries = config.Retries
 			s.config = config
-		case <-s.getConfig:
-			s.reconfig <- s.config
+			s.mu.Unlock()
 		case data := <-s.sendData:
 			ctx := mnd.WithID(ctx, data.ReqID)
 			data.ReqID = mnd.GetID(ctx)
+			s.mu.RLock()
 			s.sendAndLogRequest(ctx, data)
+			s.mu.RUnlock()
 		}
 	}
 }

@@ -214,7 +214,7 @@ func (a *Actions) customTimer(input *common.ActionInput, content string) (int, s
 // @Failure		404		{object}	string								"bad token or api key"
 // @Router			/trigger/clientlogs/{enabled} [get]
 // @Security		ApiKeyAuth
-func (a *Actions) clientLogs(content string) (int, string) {
+func (a *Actions) clientLogs(content string) (int, string) { //nolint:unparam
 	if content == "true" || content == "on" || content == "enable" {
 		share.Enable()
 		return http.StatusOK, "Client log notifications enabled."
