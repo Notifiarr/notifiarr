@@ -91,6 +91,7 @@ type ActionInput struct {
 	Type  website.EventType
 	Args  []string
 	ReqID string
+	Raw   any
 }
 
 // TriggerName makes sure triggers have a known name.
