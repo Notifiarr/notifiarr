@@ -580,8 +580,8 @@ func (a *Actions) reconfig(req *http.Request, input *common.ActionInput) (int, s
 	return http.StatusOK, <-a.outCh
 }
 
-// @Description	Unmonitors or deletes a Plex-played item in Sonarr or Radarr.
-// @Summary		Unmonitor or delete a Plex-played item
+// @Description	Deletes or stops monitoring a Plex-played item in Sonarr or Radarr.
+// @Summary		Delete or stop monitoring a Plex-played item
 // @Tags			Triggers
 // @Produce		json
 // @Success		200		{object}	apps.ApiResponse{message=string}	"success"
