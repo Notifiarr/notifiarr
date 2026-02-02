@@ -28,7 +28,7 @@ func (app *readarrApp) storeQueue(ctx context.Context, input *common.ActionInput
 
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Getting Readarr Queue (instance %d): %v", input.Type, app.idx+1, err)
+		mnd.Log.Errorf(input.ReqID, "[%s requested] Getting Readarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -36,8 +36,8 @@ func (app *readarrApp) storeQueue(ctx context.Context, input *common.ActionInput
 		record.Quality = nil
 	}
 
-	mnd.Log.Printf("{trace:%s} [%s requested] Stored Readarr Queue (%d items), instance %d %s",
-		input.ReqID, input.Type, len(queue.Records), app.idx+1, app.app.Name)
+	mnd.Log.Printf(input.ReqID, "[%s requested] Stored Readarr Queue (%d items), instance %d %s",
+		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("readarr", app.idx, queue)
 }
 

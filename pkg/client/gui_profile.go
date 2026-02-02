@@ -179,7 +179,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
 
 	if err := json.NewEncoder(resp).Encode(profile); err != nil {
-		logs.Log.Errorf("Writing HTTP Response: %v", err)
+		logs.Log.Errorf(mnd.GetID(req.Context()), "Writing HTTP Response: %v", err)
 	}
 }
 
@@ -191,7 +191,7 @@ func (c *Client) handleProfileNoAPIKey(resp http.ResponseWriter, req *http.Reque
 	profile.Config.URLBase = c.Config.URLBase
 
 	if err := json.NewEncoder(resp).Encode(profile); err != nil {
-		logs.Log.Errorf("Writing HTTP Response: %v", err)
+		logs.Log.Errorf(mnd.GetID(req.Context()), "Writing HTTP Response: %v", err)
 	}
 }
 
@@ -220,7 +220,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	if !dynamic {
 		// If the auth is currently using a password, check the password.
 		if !c.Config.UIPassword.Valid(currUser, post.Password) && !clientinfo.CheckPassword(currUser, post.Password) {
-			logs.Log.Errorf("[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
+			logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return
 		}
@@ -243,14 +243,14 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 
 	switch err := c.setUserPass(request.Context(), post.AuthType, post.Header, ""); {
 	case err != nil:
-		logs.Log.Errorf("[gui '%s' requested] Saving Config: %v", currUser, err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Saving Config: %v", currUser, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 	case post.AuthType == configfile.AuthNone:
-		logs.Log.Printf("[gui '%s' requested] Disabled WebUI authentication.", currUser)
+		logs.Log.Printf(mnd.GetID(request.Context()), "[gui '%s' requested] Disabled WebUI authentication.", currUser)
 		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
 		c.reloadAppNow()
 	default:
-		logs.Log.Printf("[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
+		logs.Log.Printf(mnd.GetID(request.Context()), "[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
 		c.setSession(post.Username, response, request)
 		http.Error(response, "Enabled WebUI proxy authentication. Header: "+post.Header, http.StatusOK)
 		c.reloadAppNow()
@@ -275,13 +275,14 @@ func (c *Client) handleProfilePostPassword(
 	currUser, _ := c.getUserName(request)
 
 	if err := c.setUserPass(request.Context(), configfile.AuthPassword, newUser, newPassw); err != nil {
-		logs.Log.Errorf("[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Saving Trust Profile: %v", currUser, err)
 		http.Error(response, "Saving Trust Profile: "+err.Error(), http.StatusInternalServerError)
 
 		return
 	}
 
-	logs.Log.Printf("[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, newUser)
+	logs.Log.Printf(mnd.GetID(request.Context()),
+		"[gui '%s' requested] Updated Trust Profile settings, username: %s", currUser, newUser)
 	c.setSession(newUser, response, request)
 	http.Error(response, "Trust Profile saved.", http.StatusOK)
 	c.reloadAppNow()
@@ -386,6 +387,6 @@ func (c *Client) handleServicesConfig(resp http.ResponseWriter, req *http.Reques
 		Disabled: c.Services.Disabled,
 	})
 	if err != nil {
-		logs.Log.Errorf("Writing HTTP Response: %v", err)
+		logs.Log.Errorf(mnd.GetID(req.Context()), "Writing HTTP Response: %v", err)
 	}
 }

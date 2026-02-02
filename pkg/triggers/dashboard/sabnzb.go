@@ -19,12 +19,12 @@ func (c *Cmd) getSabNZBStates(ctx context.Context) []*State {
 			continue
 		}
 
-		mnd.Log.Debugf("Getting SabNZB State: %d:%s", instance+1, app.SabNZB.URL)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Getting SabNZB State: %d:%s", instance+1, app.SabNZB.URL)
 
 		state, err := c.getSabNZBState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			mnd.Log.Errorf("Getting SabNZB Data from %d:%s: %v", instance+1, app.SabNZB.URL, err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Getting SabNZB Data from %d:%s: %v", instance+1, app.SabNZB.URL, err)
 		}
 
 		states = append(states, state)

@@ -137,8 +137,9 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 
 		return c.resetAdminPassword(ctx)
 	case c.Flags.Write != "" && (err == nil || strings.Contains(err.Error(), "ip:port")):
+		ctx = mnd.SetID(ctx)
 		for _, msg := range msgs {
-			logs.Log.Printf("==> %s", msg)
+			logs.Log.Printf(mnd.GetID(ctx), "==> %s", msg)
 		}
 
 		return c.forceWriteWithExit(ctx, c.Flags.Write)
@@ -157,13 +158,13 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 
 func (c *Client) start(ctx context.Context, msgs []string) error {
 	logs.Log.SetupLogging(c.Config.LogConfig)
-	logs.Log.Printf(" %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
+	logs.Log.Printf("strtup", " %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
 		mnd.TodaysEmoji(), mnd.Title, version.Version, version.Revision,
 		os.Getpid(), os.Getuid(), os.Getgid(),
 		version.Started.Format("Mon, Jan 2, 2006 @ 3:04:05 PM MST -0700"))
 
 	for _, msg := range msgs {
-		logs.Log.Printf("==> %s", msg)
+		logs.Log.Printf("strtup", "==> %s", msg)
 	}
 
 	if c.Flags.Updated {
@@ -220,14 +221,15 @@ func (c *Client) loadConfiguration(ctx context.Context) ([]string, error) {
 
 // Load configuration from the website.
 func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
+	reqID := mnd.GetID(ctx)
 	clientInfo, err := c.triggers.CI.SaveClientInfo(ctx, true)
 	if err != nil || clientInfo == nil {
 		if errors.Is(err, website.ErrInvalidAPIKey) {
-			logs.Log.ErrorfNoShare("==> Problem validating API key: %v", err)
-			logs.Log.ErrorfNoShare(
+			logs.Log.ErrorfNoShare(reqID, "==> Problem validating API key: %v", err)
+			logs.Log.ErrorfNoShare(reqID,
 				"==> NOTICE! No Further requests will be sent to the website until you reload with a valid API Key!")
 		} else {
-			logs.Log.Printf("==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
+			logs.Log.Printf(reqID, "==> [WARNING] Problem validating API key: %v, info: %s", err, clientInfo)
 		}
 
 		return nil
@@ -276,7 +278,7 @@ func (c *Client) configureServicesPlex(ctx context.Context) {
 	defer cancel()
 
 	if _, err := c.apps.Plex.GetInfo(ctx); err != nil {
-		logs.Log.Errorf("=> Getting Plex Media Server info (check url and token): %v", err)
+		logs.Log.Errorf(mnd.GetID(ctx), "=> Getting Plex Media Server info (check url and token): %v", err)
 	}
 }
 
@@ -290,7 +292,7 @@ func (c *Client) triggerConfigReload(event website.EventType, source string) {
 func (c *Client) Exit(ctx context.Context, reload func()) error {
 	defer func() {
 		defer logs.Log.CapturePanic()
-		logs.Log.Print(" ❌ Good bye! Exiting" + mnd.DurationAge(version.Started))
+		logs.Log.Print("goodby", " ❌ Good bye! Exiting"+mnd.DurationAge(version.Started))
 	}()
 
 	// Start external webserver.
@@ -313,7 +315,8 @@ func (c *Client) Exit(ctx context.Context, reload func()) error {
 				return err
 			}
 		case sigc := <-c.sigkil:
-			logs.Log.Printf("[%s] Need help? %s\n=====> Exiting! Caught Signal: %v", c.Flags.Name(), mnd.HelpLink, sigc)
+			logs.Log.Printf("goodby", "[%s] Need help? %s\n=====> Exiting! Caught Signal: %v",
+				c.Flags.Name(), mnd.HelpLink, sigc)
 			return c.stop(ctx, website.EventSignal)
 		case sigc := <-c.sighup:
 			reload()
@@ -349,7 +352,7 @@ func (c *Client) getConfig(ctx context.Context) (*configfile.SetupResult, error)
 // Re-reads the configuration file and stops/starts all the internal routines.
 // Also closes and re-opens all log files. Any errors cause the application to exit.
 func (c *Client) reloadConfiguration(ctx context.Context, event website.EventType, source string) (func(), error) {
-	logs.Log.Printf("%s> Reloading Configuration (%s): %s", mnd.TodaysEmoji(), event, source)
+	logs.Log.Printf(mnd.GetID(ctx), "%s> Reloading Configuration (%s): %s", mnd.TodaysEmoji(), event, source)
 
 	err := c.stop(ctx, event)
 	if err != nil {
@@ -380,23 +383,23 @@ func (c *Client) reloadConfiguration(ctx context.Context, event website.EventTyp
 	uptime := mnd.DurationAge(version.Started)
 
 	if c.Flags.ConfigFile == "" {
-		logs.Log.Printf(" 🌀 %s v%s-%s Configuration Reloaded! No config file, Uptime: %s",
+		logs.Log.Printf(mnd.GetID(ctx), " 🌀 %s v%s-%s Configuration Reloaded! No config file, Uptime: %s",
 			c.Flags.Name(), version.Version, version.Revision, uptime)
 
 		if err = ui.Toast(ctx, "Configuration Reloaded! No config file."); err != nil {
-			logs.Log.Errorf("Creating Toast Notification: %v", err)
+			logs.Log.Errorf(mnd.GetID(ctx), "Creating Toast Notification: %v", err)
 		}
 	} else {
-		logs.Log.Printf(" 🌀 %s v%s-%s Configuration Reloaded! Config File: %s, Uptime: %s",
+		logs.Log.Printf(mnd.GetID(ctx), " 🌀 %s v%s-%s Configuration Reloaded! Config File: %s, Uptime: %s",
 			c.Flags.Name(), version.Version, version.Revision, c.Flags.ConfigFile, uptime)
 
 		if err = ui.Toast(ctx, "Configuration Reloaded! Config File: %s", c.Flags.ConfigFile); err != nil {
-			logs.Log.Errorf("Creating Toast Notification: %v", err)
+			logs.Log.Errorf(mnd.GetID(ctx), "Creating Toast Notification: %v", err)
 		}
 	}
 
 	for path, file := range result.Output {
-		logs.Log.Printf(" => Extra Config File: %s => %s", file, path)
+		logs.Log.Printf(mnd.GetID(ctx), " => Extra Config File: %s => %s", file, path)
 	}
 
 	// This doesn't need to lock because web server is not running.
@@ -411,7 +414,7 @@ func (c *Client) stop(ctx context.Context, event website.EventType) error {
 		defer logs.Log.CapturePanic()
 		c.triggers.Stop(event)
 		c.Services.Stop()
-		logs.Log.Printf("==> All systems powered down!")
+		logs.Log.Printf(mnd.GetID(ctx), "==> All systems powered down!")
 	}()
 
 	if c.tunnel != nil {

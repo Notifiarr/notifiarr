@@ -18,11 +18,11 @@ import (
 func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 	sessions, err := c.getSessions(ctx, time.Minute)
 	if err != nil {
-		mnd.Log.Errorf("Getting Plex sessions: %v", err)
+		mnd.Log.Errorf(input.ReqID, "Getting Plex sessions: %v", err)
 	}
 
 	website.SendData(&website.Request{
-		ReqID:      mnd.GetID(ctx),
+		ReqID:      input.ReqID,
 		Route:      website.PlexRoute,
 		Event:      input.Type,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Plex: sessions},

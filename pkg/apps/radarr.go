@@ -78,7 +78,7 @@ func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
 
 		app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 			MaxBody: a.MaxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback(string(starr.Radarr)),
 			Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 		})
@@ -86,7 +86,7 @@ func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
 		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  mnd.Log.Debugf,
+				Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 				Caller:  metricMakerCallback(string(starr.Radarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})

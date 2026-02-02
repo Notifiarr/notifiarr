@@ -32,7 +32,8 @@ func New(config *common.Config) *Action {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
 // Send a snapshot to the website.
@@ -40,7 +41,7 @@ func (a *Action) Send(input *common.ActionInput) {
 	a.cmd.Exec(input, TrigSnapshot)
 }
 
-func (c *cmd) create() {
+func (c *cmd) create(reqID string) {
 	var dur time.Duration
 
 	if c.Snapshot.Interval.Duration > 0 {
@@ -48,7 +49,7 @@ func (c *cmd) create() {
 		dur = c.Snapshot.Interval.Duration + randomTime
 	}
 
-	c.printLog()
+	c.printLog(reqID)
 	c.Add(&common.Action{
 		Key:  "TrigSnapshot",
 		Name: TrigSnapshot,
@@ -58,7 +59,7 @@ func (c *cmd) create() {
 	})
 }
 
-func (c *cmd) printLog() {
+func (c *cmd) printLog(reqID string) {
 	var enabled string
 
 	for key, val := range map[string]bool{
@@ -87,11 +88,12 @@ func (c *cmd) printLog() {
 	}
 
 	if c.Snapshot.Interval.Duration == 0 {
-		mnd.Log.Printf("==> System Snapshot Collection Disabled, timeout: %v, configured: %s", c.Snapshot.Timeout, enabled)
+		mnd.Log.Printf(reqID, "==> System Snapshot Collection Disabled, timeout: %v, configured: %s",
+			c.Snapshot.Timeout, enabled)
 		return
 	}
 
-	mnd.Log.Printf("==> System Snapshot Collection Started, interval: %v, timeout: %v, enabled: %s",
+	mnd.Log.Printf(reqID, "==> System Snapshot Collection Started, interval: %v, timeout: %v, enabled: %s",
 		c.Snapshot.Interval, c.Snapshot.Timeout, enabled)
 }
 
@@ -99,20 +101,20 @@ func (c *cmd) sendSnapshot(ctx context.Context, input *common.ActionInput) {
 	snapshot, errs, debug := c.Snapshot.GetSnapshot(ctx)
 	for _, err := range errs {
 		if err != nil {
-			mnd.Log.ErrorfNoShare("[%s requested] Snapshot: %v", input.Type, err)
+			mnd.Log.ErrorfNoShare(input.ReqID, "[%s requested] Snapshot: %v", input.Type, err)
 		}
 	}
 
 	// These debug messages are mostly just errors that we expect to have.
 	for _, err := range debug {
 		if err != nil {
-			mnd.Log.Debugf("Snapshot: %v", err)
+			mnd.Log.Debugf(input.ReqID, "Snapshot: %v", err)
 		}
 	}
 
 	data.Save("snapshot", snapshot)
 	website.SendData(&website.Request{
-		ReqID:      mnd.GetID(ctx),
+		ReqID:      input.ReqID,
 		Route:      website.SnapRoute,
 		Event:      input.Type,
 		LogPayload: true,

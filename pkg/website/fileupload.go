@@ -14,8 +14,8 @@ import (
 )
 
 func (s *server) sendFile(ctx context.Context, uri string, file *UploadFile) (*Response, error) {
-	mnd.Log.Trace(mnd.GetID(ctx), "start: sendFile")
-	defer mnd.Log.Trace(mnd.GetID(ctx), "end: sendFile")
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendFile")
+	defer mnd.Log.Trace(reqID, "end: sendFile")
 
 	form, contentType, err := s.createFileUpload(file)
 	if err != nil {
@@ -39,7 +39,7 @@ func (s *server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 
 	resp, err := s.client.Do(req)
 	if err != nil {
-		s.debughttplog(nil, url, start, msg, nil)
+		s.debughttplog(reqID, nil, url, start, msg, nil)
 		return nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
@@ -47,7 +47,7 @@ func (s *server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 	reader := resp.Body
 
 	if mnd.Log.DebugEnabled() {
-		reader = s.debugLogResponseBody(start, resp, url, []byte(msg), true)
+		reader = s.debugLogResponseBody(reqID, start, resp, url, []byte(msg), true)
 	}
 
 	response, err := unmarshalResponse(url, resp.StatusCode, reader)

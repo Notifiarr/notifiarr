@@ -70,7 +70,8 @@ func (a *Action) Create() {
 		return // Auto update only works on Windows.
 	}
 
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
 // Stop satisfies an interface.
@@ -88,7 +89,7 @@ var (
 
 // Run fires in a go routine. Wait a minute or two then tell the website we're up.
 // If app reloads in first checkWait duration, this throws an error. That's ok.
-func (c *cmd) create() {
+func (c *cmd) create(reqID string) {
 	defer mnd.Log.CapturePanic()
 
 	var dur time.Duration
@@ -118,7 +119,7 @@ func (c *cmd) create() {
 		pfx = "Unstable"
 	}
 
-	mnd.Log.Printf("==> Client auto-updater started. %s channel check interval: %s",
+	mnd.Log.Printf(reqID, "==> Client auto-updater started. %s channel check interval: %s",
 		pfx, durafmt.Parse(dur).LimitFirstN(3)) //nolint:mnd
 
 	c.Add(&common.Action{
@@ -140,24 +141,24 @@ func (c *cmd) checkAndUpdate(ctx context.Context, action *common.ActionInput) {
 	}
 
 	if c.UnstableCh {
-		mnd.Log.Debugf("[cron requested] Checking Unstable website for Update.")
+		mnd.Log.Debugf(action.ReqID, "[cron requested] Checking Unstable website for Update.")
 		data, err = update.CheckUnstable(ctx, mnd.DefaultName, version.Revision)
 	} else {
-		mnd.Log.Debugf("[cron requested] Checking GitHub for Update.")
+		mnd.Log.Debugf(action.ReqID, "[cron requested] Checking GitHub for Update.")
 		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
 	}
 
 	if err != nil {
-		mnd.Log.Errorf("Auto-Update Failed checking for update: %v", err)
+		mnd.Log.Errorf(action.ReqID, "Auto-Update Failed checking for update: %v", err)
 	} else if !data.Outdate {
-		mnd.Log.Debugf("Auto-Update Success, up to date.")
+		mnd.Log.Debugf(action.ReqID, "Auto-Update Success, up to date.")
 	} else if err = c.updateNow(ctx, data, action.Type); err != nil {
-		mnd.Log.Errorf("Auto-Update Failed applying update: %v", err)
+		mnd.Log.Errorf(action.ReqID, "Auto-Update Failed applying update: %v", err)
 	}
 }
 
 func (c *cmd) updateNow(ctx context.Context, u *update.Update, msg website.EventType) error {
-	mnd.Log.Printf("[UPDATE] Downloading and installing update! %s-%s => %s: %s",
+	mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Downloading and installing update! %s-%s => %s: %s",
 		version.Version, version.Revision, u.Current, u.CurrURL)
 
 	cmd := &update.Command{
@@ -179,7 +180,7 @@ func (c *cmd) updateNow(ctx context.Context, u *update.Update, msg website.Event
 		return fmt.Errorf("installing update: %w", err)
 	}
 
-	mnd.Log.Printf("Update installed to %s restarting! Backup: %s", cmd.Path, backupFile)
+	mnd.Log.Printf(mnd.GetID(ctx), "Update installed to %s restarting! Backup: %s", cmd.Path, backupFile)
 	// And exit, so we can restart.
 	c.StopApp("upgrade request: " + string(msg))
 

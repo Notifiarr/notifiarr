@@ -27,10 +27,10 @@ func (c *cmd) checkForFinishedItems(ctx context.Context, input *common.ActionInp
 
 	sessions, err := c.getSessions(sessionCtx, time.Second)
 	if err != nil {
-		logs.Log.Errorf("[PLEX] Getting Sessions from %s: %v", c.Plex.Server.URL, err)
+		logs.Log.Errorf(input.ReqID, "[PLEX] Getting Sessions from %s: %v", c.Plex.Server.URL, err)
 		return
 	} else if len(sessions.Sessions) == 0 {
-		logs.Log.Debugf("[PLEX] No Sessions Collected from %s", c.Plex.Server.URL)
+		logs.Log.Debugf(input.ReqID, "[PLEX] No Sessions Collected from %s", c.Plex.Server.URL)
 		return
 	}
 
@@ -49,11 +49,11 @@ func (c *cmd) checkForFinishedItems(ctx context.Context, input *common.ActionInp
 		// [DEBUG] 2021/04/03 06:05:11 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/34} username => episode: Hard Facts: Vandalism and Vulgarity (playing) 8.1%
 		// [DEBUG] 2021/04/03 06:00:39 [PLEX] https://plex.domain.com {dsm195u1jurq7w1ejlh6pmr9/33} username => movie: Come True (playing) 81.3%
 		if strings.HasPrefix(msg, statusSending) || strings.HasPrefix(msg, statusError) {
-			logs.Log.Printf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
+			logs.Log.Printf(input.ReqID, "[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
 				c.Plex.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
 				session.Type, session.Title, session.Player.State, pct, msg)
 		} else {
-			logs.Log.Debugf("[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
+			logs.Log.Debugf(input.ReqID, "[PLEX] %s {%s/%s} %s => %s: %s (%s) %.1f%% (%s)",
 				c.Plex.Server.URL, session.Session.ID, session.SessionKey, session.User.Title,
 				session.Type, session.Title, session.Player.State, pct, msg)
 		}

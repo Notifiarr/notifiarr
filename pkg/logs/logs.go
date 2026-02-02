@@ -220,51 +220,55 @@ func (l *Logger) Trace(reqID string, msg ...any) string {
 		parentFile = parentFile[idx+len(removePrefix):]
 	}
 
-	l.writeMsg(fmt.Sprintf("{trace:%s} %s:%d -> %s:%d %s",
-		reqID, parentFile, parentLine, file, line, fmt.Sprintln(msg...)), l.InfoLog, traceStr, false)
+	l.writeMsg(reqID, fmt.Sprintf("%s:%d -> %s:%d %s",
+		parentFile, parentLine, file, line, fmt.Sprintln(msg...)), l.InfoLog, traceStr, false)
 
 	return reqID
 }
 
 // Debug writes log lines... to stdout and/or a file.
-func (l *Logger) Debug(v ...any) {
-	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, debugStr, false)
+func (l *Logger) Debug(reqID string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintln(v...), l.DebugLog, debugStr, false)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
-func (l *Logger) Debugf(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, debugStr, false)
+func (l *Logger) Debugf(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.DebugLog, debugStr, false)
 }
 
 // Print writes log lines... to stdout and/or a file.
-func (l *Logger) Print(v ...any) {
-	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, infoStr, false)
+func (l *Logger) Print(reqID string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintln(v...), l.InfoLog, infoStr, false)
 }
 
 // Printf writes log lines... to stdout and/or a file.
-func (l *Logger) Printf(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, infoStr, false)
+func (l *Logger) Printf(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.InfoLog, infoStr, false)
 }
 
 // Error writes log lines... to stdout and/or a file.
-func (l *Logger) Error(v ...any) {
-	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, errStr, true)
+func (l *Logger) Error(reqID string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintln(v...), l.ErrorLog, errStr, true)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
-func (l *Logger) Errorf(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, true)
+func (l *Logger) Errorf(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.ErrorLog, errStr, true)
 }
 
 // ErrorfNoShare writes log lines... to stdout and/or a file.
-func (l *Logger) ErrorfNoShare(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, false)
+func (l *Logger) ErrorfNoShare(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.ErrorLog, errStr, false)
 }
 
-func (l *Logger) writeMsg(msg string, log *log.Logger, name string, shared bool) {
+func (l *Logger) writeMsg(reqID string, msg string, log *log.Logger, name string, shared bool) {
+	if l.trace {
+		msg = fmt.Sprintf("{trace:%s} %s", reqID, msg)
+	}
+
 	if err := log.Output(callDepth, msg); err != nil {
 		if errors.Is(err, rotatorr.ErrWriteTooLarge) {
-			l.writeSplitMsg(msg, log, name)
+			l.writeSplitMsg(reqID, msg, log, name)
 			return
 		}
 
@@ -274,20 +278,20 @@ func (l *Logger) writeMsg(msg string, log *log.Logger, name string, shared bool)
 	}
 
 	if shared { // we share errors with the website.
-		share.Log(msg)
+		share.Log(reqID, msg)
 	}
 }
 
 // writeSplitMsg splits the message in half and attempts to write each half.
 // If the message is still too large, it'll be split again, and the process continues until it works.
-func (l *Logger) writeSplitMsg(msg string, log *log.Logger, name string) {
+func (l *Logger) writeSplitMsg(reqID string, msg string, log *log.Logger, name string) {
 	half := len(msg) / 2 //nolint:mnd // split messages in half, recursively as needed.
 	part1 := msg[:half]
 	part2 := "...continuing: " + msg[half:]
 
 	mnd.LogFiles.Add(name+" Splits", 1)
-	l.writeMsg(part1, log, name, false)
-	l.writeMsg(part2, log, name, false)
+	l.writeMsg(reqID, part1, log, name, false)
+	l.writeMsg(reqID, part2, log, name, false)
 }
 
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
@@ -341,7 +345,7 @@ func (l *Logger) postRotateCounter(fileName, newFile string) {
 	}
 
 	if newFile != "" && l != nil {
-		go l.Printf("Rotated log file to: %s", newFile)
+		go l.Printf("Rotated log file to: %s", "%s", newFile)
 	}
 }
 

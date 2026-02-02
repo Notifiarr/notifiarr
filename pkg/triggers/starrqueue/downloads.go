@@ -63,9 +63,9 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
 		if c.empty { // We already sent an empty payload, so don't send another.
-			logs.Log.Debugf("{trace:%s} [%s requested] No Downloading Items found; "+
+			logs.Log.Debugf(input.ReqID, "[%s requested] No Downloading Items found; "+
 				"Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-				input.ReqID, input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
+				input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
 			return
 		}
 
@@ -157,7 +157,7 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			album, err := app.GetAlbumByIDContext(ctx, item.AlbumID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &lidarr.Album{Artist: &lidarr.Artist{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx, album)
@@ -244,7 +244,7 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			movie, err := app.GetMovieByIDContext(ctx, item.MovieID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &radarr.Movie{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("radarrMovie", item.MovieID), idx, movie)
@@ -329,7 +329,7 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			book, err := app.GetBookByIDContext(ctx, item.BookID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &readarr.Book{Author: &readarr.Author{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("readarrBook", item.BookID), idx, book)
@@ -416,7 +416,7 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			series, err := app.GetSeriesByIDContext(ctx, item.SeriesID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &sonarr.Series{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx, series)

@@ -11,7 +11,9 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
-func (s *server) debughttplog(resp *http.Response, url string, start time.Time, data string, body io.Reader) {
+func (s *server) debughttplog(
+	reqID string, resp *http.Response, url string, start time.Time, data string, body io.Reader,
+) {
 	var headers strings.Builder
 	status := "0"
 
@@ -31,11 +33,11 @@ func (s *server) debughttplog(resp *http.Response, url string, start time.Time, 
 
 	if data == "" {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.config.Apps.MaxBody))
-		mnd.Log.Debugf("Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
+		mnd.Log.Debugf(reqID, "Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
 			url, time.Since(start).Round(time.Microsecond), mnd.FormatBytes(bodySize), status, headers.String(), truncatedBody)
 	} else {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.config.Apps.MaxBody))
-		mnd.Log.Debugf("Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
+		mnd.Log.Debugf(reqID, "Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
 			mnd.FormatBytes(len(data)), url, time.Since(start).Round(time.Microsecond),
 			data, mnd.FormatBytes(bodySize), status, headers.String(), truncatedBody)
 	}
@@ -66,6 +68,7 @@ func readBodyForLog(body io.Reader, max int64) (string, int64) {
 }
 
 func (s *server) debugLogResponseBody(
+	reqID string,
 	start time.Time,
 	resp *http.Response,
 	url string,
@@ -78,9 +81,9 @@ func (s *server) debugLogResponseBody(
 	defer resp.Body.Close() // close this since we return a fake one after logging.
 
 	if log {
-		defer s.debughttplog(resp, url, start, string(data), tee)
+		defer s.debughttplog(reqID, resp, url, start, string(data), tee)
 	} else {
-		defer s.debughttplog(resp, url, start, fmt.Sprintf("<data not logged, length:%d>", len(data)), tee)
+		defer s.debughttplog(reqID, resp, url, start, fmt.Sprintf("<data not logged, length:%d>", len(data)), tee)
 	}
 
 	return io.NopCloser(&buf)

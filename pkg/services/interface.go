@@ -21,7 +21,7 @@ func (s *Services) RunChecks(input *common.ActionInput) {
 	defer s.stopLock.Unlock()
 
 	if s.triggerChan == nil || s.actionChan == nil {
-		mnd.Log.Errorf("Cannot run service checks. Go routine is not running.")
+		mnd.Log.Errorf(input.ReqID, "Cannot run service checks. Go routine is not running.")
 		return
 	}
 

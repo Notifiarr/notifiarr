@@ -52,12 +52,14 @@ func (c *Client) forceWriteWithExit(ctx context.Context, fileName string) error 
 		return fmt.Errorf("writing config: %w", err)
 	}
 
-	logs.Log.Print("Wrote Config File:", f)
+	logs.Log.Print(mnd.GetID(ctx), "Wrote Config File:", f)
 
 	return nil
 }
 
 func (c *Client) resetAdminPassword(ctx context.Context) error {
+	ctx = mnd.SetID(ctx)
+
 	c.Config.SSLCrtFile = ""
 	c.Config.SSLKeyFile = ""
 
@@ -67,8 +69,8 @@ func (c *Client) resetAdminPassword(ctx context.Context) error {
 		return fmt.Errorf("setting password failed: %w", err)
 	}
 
-	logs.Log.Printf("New '%s' user password: %s", configfile.DefaultUsername, password)
-	logs.Log.Printf("Writing Config File: %s", c.Flags.ConfigFile)
+	logs.Log.Printf(mnd.GetID(ctx), "New '%s' user password: %s", configfile.DefaultUsername, password)
+	logs.Log.Printf(mnd.GetID(ctx), "Writing Config File: %s", c.Flags.ConfigFile)
 
 	ctx, cancel := context.WithTimeout(ctx, mnd.DefaultTimeout)
 	defer cancel()

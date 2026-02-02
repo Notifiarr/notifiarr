@@ -134,9 +134,7 @@ func (s *server) watchSendDataChan(ctx context.Context) {
 		case data := <-s.sendData:
 			ctx := mnd.WithID(ctx, data.ReqID)
 			data.ReqID = mnd.GetID(ctx)
-			s.mu.RLock()
 			s.sendAndLogRequest(ctx, data)
-			s.mu.RUnlock()
 		}
 	}
 }

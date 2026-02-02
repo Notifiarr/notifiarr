@@ -7,6 +7,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 )
 
 type CheckAllInput struct {
@@ -102,7 +103,7 @@ func newCheckAll(input *CheckAllInput) *checkAll {
 
 func (c *checkAll) run(ctx context.Context) *CheckAllOutput {
 	c.output.Workers = c.output.Instances/divider + 1
-	wait := c.workPool(c.output.Workers)
+	wait := c.workPool(ctx, c.output.Workers)
 
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -199,13 +200,13 @@ type job struct {
 	fn  func() (string, int)
 }
 
-func (c *checkAll) workPool(workers int) func() {
+func (c *checkAll) workPool(ctx context.Context, workers int) func() {
 	var (
 		wtgrp sync.WaitGroup
 		start time.Time
 	)
 
-	logs.Log.Debugf("[gui requested] Checking %d instances with %d workers.", c.output.Instances, workers)
+	logs.Log.Debugf(mnd.GetID(ctx), "[gui requested] Checking %d instances with %d workers.", c.output.Instances, workers)
 
 	for range workers {
 		wtgrp.Go(func() {
