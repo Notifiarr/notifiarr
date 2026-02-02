@@ -77,12 +77,17 @@ func (c *cmd) unmonitorPlexPlayedItems(ctx context.Context, input *common.Action
 		return
 	}
 
+	event := website.EventEpisode
+	if data.App == starr.Radarr.Lower() {
+		event = website.EventMovie
+	}
+
 	response := c.unmonitorStarrContent(ctx, data)
 	// Send a report with the response to the website.
 	website.SendData(&website.Request{
 		ReqID:   mnd.GetID(ctx),
 		Route:   website.PlexRoute,
-		Event:   response.Action,
+		Event:   event,
 		Payload: response,
 	})
 }
