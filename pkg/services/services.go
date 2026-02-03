@@ -150,7 +150,7 @@ func (s *Services) loadServiceStates() {
 
 	values, err := website.GetState("svcsup", names...)
 	if err != nil {
-		s.log.ErrorfNoShare("svcsup", "Getting initial service states from website: %v", err)
+		s.log.ErrorfNoShare(mnd.ReqID(), "Getting initial service states from website: %v", err)
 		return
 	}
 
@@ -159,12 +159,12 @@ func (s *Services) loadServiceStates() {
 			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
 				var svc Service
 				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
-					s.log.ErrorfNoShare("svcsup", "Service check data for '%s' returned from site is invalid: %v", name, err)
+					s.log.ErrorfNoShare(mnd.ReqID(), "Service check data for '%s' returned from site is invalid: %v", name, err)
 					break
 				}
 
 				if time.Since(svc.LastCheck) < 2*time.Hour {
-					s.log.Printf("svcsup", "==> Set service state with website-saved data: %s, %s for %s",
+					s.log.Printf(mnd.ReqID(), "==> Set service state with website-saved data: %s, %s for %s",
 						name, svc.State, time.Since(svc.Since).Round(time.Second))
 
 					s.services[name].Output = svc.Output
@@ -294,7 +294,7 @@ func (s *Services) Resume() {
 func (s *Services) Stop() {
 	defer func() {
 		logs.Log.CapturePanic()
-		logs.Log.Printf("called", "==> Service Checker Stopped!")
+		logs.Log.Printf(mnd.ReqID(), "==> Service Checker Stopped!")
 	}()
 
 	s.stopLock.Lock()

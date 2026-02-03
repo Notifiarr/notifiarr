@@ -99,6 +99,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 		lastError  = ""
 		pingTicker = time.NewTicker(29 * time.Second) //nolint:mnd
 		writeWait  = 10 * time.Second
+		reqID      = mnd.ReqID()
 	)
 
 	defer func() {
@@ -112,7 +113,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 		select {
 		case line := <-fileTail.Lines:
 			if line == nil {
-				logs.Log.Debugf("socket", "file lines return empty, dropping websocket (did the file rotate?)")
+				logs.Log.Debugf(reqID, "file lines return empty, dropping websocket (did the file rotate?)")
 				return
 			}
 
@@ -127,7 +128,7 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 					lastError = lineErr
 					text = lineErr
 				} else {
-					logs.Log.Debugf("socket", "closing websocket due to errors: %v", lineErr)
+					logs.Log.Debugf(reqID, "closing websocket due to errors: %v", lineErr)
 					return // two errors.
 				}
 			} else {
@@ -137,14 +138,14 @@ func (c *Client) webSocketWriter(socket *websocket.Conn, fileTail *tail.Tail) {
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))
 
 			if err := socket.WriteMessage(websocket.TextMessage, []byte(text)); err != nil {
-				logs.Log.Debugf("socket", "websocket closed, write error: %v", err)
+				logs.Log.Debugf(reqID, "websocket closed, write error: %v", err)
 				return // dead sock
 			}
 		case <-pingTicker.C:
 			_ = socket.SetWriteDeadline(time.Now().Add(writeWait))
 
 			if err := socket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				logs.Log.Debugf("socket", "websocket closed, ping error: %v", err)
+				logs.Log.Debugf(reqID, "websocket closed, ping error: %v", err)
 				return
 			}
 		}

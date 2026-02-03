@@ -158,13 +158,14 @@ func (c *Client) checkFlags(ctx context.Context) error { //nolint:cyclop
 
 func (c *Client) start(ctx context.Context, msgs []string) error {
 	logs.Log.SetupLogging(c.Config.LogConfig)
-	logs.Log.Printf("strtup", " %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
+	reqID := mnd.GetID(ctx)
+	logs.Log.Printf(reqID, " %s %s v%s-%s Starting! [PID: %v, UID: %d, GID: %d] %s",
 		mnd.TodaysEmoji(), mnd.Title, version.Version, version.Revision,
 		os.Getpid(), os.Getuid(), os.Getgid(),
 		version.Started.Format("Mon, Jan 2, 2006 @ 3:04:05 PM MST -0700"))
 
 	for _, msg := range msgs {
-		logs.Log.Printf("strtup", "==> %s", msg)
+		logs.Log.Printf(reqID, "==> %s", msg)
 	}
 
 	if c.Flags.Updated {
@@ -290,9 +291,10 @@ func (c *Client) triggerConfigReload(event website.EventType, source string) {
 
 // Exit stops the web server and logs our exit messages. Start() calls this.
 func (c *Client) Exit(ctx context.Context, reload func()) error {
+	reqID := mnd.GetID(ctx)
 	defer func() {
 		defer logs.Log.CapturePanic()
-		logs.Log.Print("goodby", " ❌ Good bye! Exiting"+mnd.DurationAge(version.Started))
+		logs.Log.Print(reqID, " ❌ Good bye! Exiting"+mnd.DurationAge(version.Started))
 	}()
 
 	// Start external webserver.
@@ -315,7 +317,7 @@ func (c *Client) Exit(ctx context.Context, reload func()) error {
 				return err
 			}
 		case sigc := <-c.sigkil:
-			logs.Log.Printf("goodby", "[%s] Need help? %s\n=====> Exiting! Caught Signal: %v",
+			logs.Log.Printf(reqID, "[%s] Need help? %s\n=====> Exiting! Caught Signal: %v",
 				c.Flags.Name(), mnd.HelpLink, sigc)
 			return c.stop(ctx, website.EventSignal)
 		case sigc := <-c.sighup:
