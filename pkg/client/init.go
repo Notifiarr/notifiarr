@@ -87,7 +87,7 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 func (c *Client) printVersionChangeInfo(reqID string) {
 	const clientVersion = "clientVersion"
 
-	values, err := website.GetState("states", clientVersion)
+	values, err := website.GetState(reqID, clientVersion)
 	if err != nil {
 		logs.Log.Errorf(reqID, "XX> Getting version from database: %v", err)
 	}

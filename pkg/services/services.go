@@ -79,7 +79,7 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	}
 
 	s.applyLocalOverrides(plexName)
-	s.loadServiceStates()
+	s.loadServiceStates(mnd.GetID(ctx))
 
 	for range s.parallel {
 		go s.watchServiceChan(ctx)
@@ -138,7 +138,7 @@ func (s *Services) applyLocalOverrides(plexName string) {
 
 // loadServiceStates brings service states from the website into the fold.
 // In other words, states are stored in the website's database.
-func (s *Services) loadServiceStates() {
+func (s *Services) loadServiceStates(reqID string) {
 	names := []string{}
 	for name := range s.services {
 		names = append(names, valuePrefix+name)
@@ -148,9 +148,9 @@ func (s *Services) loadServiceStates() {
 		return
 	}
 
-	values, err := website.GetState("svcsup", names...)
+	values, err := website.GetState(reqID, names...)
 	if err != nil {
-		s.log.ErrorfNoShare("svcsup", "Getting initial service states from website: %v", err)
+		s.log.ErrorfNoShare(reqID, "Getting initial service states from website: %v", err)
 		return
 	}
 
@@ -159,12 +159,12 @@ func (s *Services) loadServiceStates() {
 			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
 				var svc Service
 				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
-					s.log.ErrorfNoShare("svcsup", "Service check data for '%s' returned from site is invalid: %v", name, err)
+					s.log.ErrorfNoShare(reqID, "Service check data for '%s' returned from site is invalid: %v", name, err)
 					break
 				}
 
 				if time.Since(svc.LastCheck) < 2*time.Hour {
-					s.log.Printf("svcsup", "==> Set service state with website-saved data: %s, %s for %s",
+					s.log.Printf(reqID, "==> Set service state with website-saved data: %s, %s for %s",
 						name, svc.State, time.Since(svc.Since).Round(time.Second))
 
 					s.services[name].Output = svc.Output

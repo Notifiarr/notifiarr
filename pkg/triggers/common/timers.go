@@ -46,6 +46,7 @@ func (c *Config) Run(ctx context.Context) {
 		}
 	}
 
+	ctx = mnd.SetID(ctx)
 	go c.runTimerLoop(ctx, combine, cases)
 	c.printStartupLog(ctx)
 }
@@ -125,16 +126,16 @@ func (c *Config) printStartupLog(ctx context.Context) {
 		len(timers), len(triggers), len(schedules))
 
 	for _, trigger := range triggers {
-		mnd.Log.Debugf(mnd.GetID(ctx), "==> Enabled Action %s: %s Trigger only.", trigger.Key, trigger.Name)
+		mnd.Log.Printf(mnd.GetID(ctx), "==> Enabled Action %s: %s Trigger only.", trigger.Key, trigger.Name)
 	}
 
 	for _, timer := range timers {
-		mnd.Log.Debugf(mnd.GetID(ctx), "==> Enabled Action %s: %s Timer, interval: %s",
+		mnd.Log.Printf(mnd.GetID(ctx), "==> Enabled Action %s: %s Timer, interval: %s",
 			timer.Key, timer.Name, time.Duration(timer.Dur*int64(time.Millisecond)).String())
 	}
 
 	for _, schedule := range schedules {
-		mnd.Log.Debugf(mnd.GetID(ctx), "==> Enabled Action %s: %s Schedule: %s",
+		mnd.Log.Printf(mnd.GetID(ctx), "==> Enabled Action %s: %s Schedule: %s",
 			schedule.Key, schedule.Name, schedule.Cron.String())
 	}
 }

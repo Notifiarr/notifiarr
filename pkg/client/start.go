@@ -248,7 +248,7 @@ func (c *Client) loadSiteConfig(ctx context.Context) *clientinfo.ClientInfo {
 func (c *Client) configureServices(ctx context.Context) (*clientinfo.ClientInfo, func()) {
 	// Cancelling this context should stop most of the things.
 	// It's just a backup, because they all have Stop methods.
-	ctx, reload := context.WithCancel(ctx)
+	ctx, reload := context.WithCancel(mnd.SetID(ctx))
 	// Load the site config (this connects to Tautulli and notifiarr.com)
 	clientInfo := c.loadSiteConfig(ctx)
 	if clientInfo != nil && !clientInfo.User.StopLogs {
