@@ -98,7 +98,7 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 		Handler:          remWs.Wrap(c.prefixURLbase(c.apps.Router), logs.Log.HTTPLog.Writer()).ServeHTTP,
 		RoundRobinConfig: c.roundRobinConfig(info),
 		Logger: &tunnelLogger{
-			ctx:            ctx,
+			ctx:            mnd.SetID(ctx),
 			sendSiteErrors: info.User.DevAllowed,
 		},
 	})
@@ -188,22 +188,22 @@ type tunnelLogger struct {
 
 // Debugf prints a message with DEBUG prefixed.
 func (l *tunnelLogger) Debugf(format string, v ...any) {
-	mnd.Log.Debugf("mulery", format, v...)
+	mnd.Log.Debugf(mnd.GetID(l.ctx), format, v...)
 }
 
 // Errorf prints a message with ERROR prefixed.
 func (l *tunnelLogger) Errorf(format string, v ...any) {
 	// this is why we dont just pass the interface in as-is.
 	if l.sendSiteErrors {
-		mnd.Log.Errorf("mulery", format, v...)
+		mnd.Log.Errorf(mnd.GetID(l.ctx), format, v...)
 	} else {
-		mnd.Log.ErrorfNoShare("mulery", format, v...)
+		mnd.Log.ErrorfNoShare(mnd.GetID(l.ctx), format, v...)
 	}
 }
 
 // Printf prints a message with INFO prefixed.
 func (l *tunnelLogger) Printf(format string, v ...any) {
-	mnd.Log.Printf("mulery", format, v...)
+	mnd.Log.Printf(mnd.GetID(l.ctx), format, v...)
 }
 
 const pingTimeout = 7 * time.Second

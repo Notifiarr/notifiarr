@@ -345,7 +345,7 @@ func (l *Logger) postRotateCounter(fileName, newFile string) {
 	}
 
 	if newFile != "" && l != nil {
-		go l.Printf("Rotated log file to: %s", "%s", newFile)
+		go l.Printf("rotate", "Rotated log file to: %s", newFile)
 	}
 }
 

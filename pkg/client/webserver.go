@@ -75,7 +75,7 @@ func (c *Client) RunWebServer() {
 	}
 
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		logs.Log.Errorf("websrv", "Web Server Failed: %v (shutting down)", err)
+		logs.Log.Errorf("failed", "Web Server Failed: %v (shutting down)", err)
 		c.sigkil <- os.Kill // stop the app.
 	}
 }

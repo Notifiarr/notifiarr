@@ -163,6 +163,7 @@ func (s *server) sendPayload(ctx context.Context, uri string, payload any, log b
 			}
 
 			torn["private"] = private.Info()
+			torn["requestId"] = mnd.GetID(ctx)
 			payload = torn
 		}
 	}
