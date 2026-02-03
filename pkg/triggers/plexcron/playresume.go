@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -20,8 +21,8 @@ const (
 // sendSessionNew is used when the end user does not have or use Plex webhooks.
 // They can enable the plex session tracker to send notifications for new sessions.
 // event is either media.play or media.resume.
-func (c *cmd) sendSessionPlaying(ctx context.Context, session *plex.Session, sessions *plex.Sessions, event string) {
-	if err := c.checkPlexAgent(ctx, session); err != nil {
+func (c *cmd) sendSessionPlaying(ctx context.Context, server *apps.Plex, session *plex.Session, sessions *plex.Sessions, event string) {
+	if err := c.checkPlexAgent(ctx, server, session); err != nil {
 		mnd.Log.Errorf("Failed Plex Request: %v", err)
 		return
 	}
@@ -35,7 +36,7 @@ func (c *cmd) sendSessionPlaying(ctx context.Context, session *plex.Session, ses
 			Load: convertSessionsToWebhook(session, event),
 		},
 		LogMsg: fmt.Sprintf("Plex New Session on %s {%s/%s} %s => %s: %s (%s)",
-			c.Plex.Server.Name(), session.Session.ID, session.SessionKey, session.User.Title,
+			server.Server.Name(), session.Session.ID, session.SessionKey, session.User.Title,
 			session.Type, session.Title, session.Player.State),
 		LogPayload: true,
 	})

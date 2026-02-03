@@ -80,7 +80,7 @@ func New(ctx context.Context, config *Config) *Actions {
 		Services: config.Services,
 	}
 	common.Scheduler, _ = gocron.NewScheduler()
-	plex := plexcron.New(common, &config.Apps.Plex)
+	plex := plexcron.New(common, config.Apps.Plex)
 
 	actions := &Actions{
 		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
