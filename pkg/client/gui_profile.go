@@ -198,7 +198,7 @@ func (c *Client) handleProfileNoAPIKey(resp http.ResponseWriter, req *http.Reque
 // handleProfilePost handles profile updates including authentication settings and upstream configuration.
 //
 //	@Summary		Update user profile
-//	@Description	Updates user profile settings including authentication type, password, header, and upstream configuration.
+//	@Description	Updates login credentials, authentication settings, and upstream trusted networks.
 //	@Tags			System
 //	@Accept			json
 //	@Produce		text/plain
@@ -208,7 +208,7 @@ func (c *Client) handleProfileNoAPIKey(resp http.ResponseWriter, req *http.Reque
 //	@Failure		500		{string}	string		"error saving config"
 //	@Router			/profile [post]
 //
-//nolint:lll
+//nolint:cyclop
 func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.Request) {
 	post := &ProfilePost{}
 	if err := json.NewDecoder(request.Body).Decode(post); err != nil {
@@ -221,7 +221,8 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		// If the auth is currently using a password, check the password.
 		if !c.Config.UIPassword.Valid(currUser, post.Password) &&
 			(c.Config.UIPassword.IsCrypted() || !clientinfo.CheckPassword(currUser, post.Password)) {
-			logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
+			logs.Log.Errorf(mnd.GetID(request.Context()),
+				"[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return
 		}
@@ -251,7 +252,8 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
 		c.reloadAppNow()
 	default:
-		logs.Log.Printf(mnd.GetID(request.Context()), "[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
+		logs.Log.Printf(mnd.GetID(request.Context()),
+			"[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
 		c.setSession(post.Username, response, request)
 		http.Error(response, "Enabled WebUI proxy authentication. Header: "+post.Header, http.StatusOK)
 		c.reloadAppNow()
