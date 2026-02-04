@@ -23,7 +23,8 @@ export enum Weekday {
 export enum AuthType {
   password = 0,
   header   = 1,
-  noauth   = 2,
+  website  = 2,
+  noauth   = 3,
 };
 
 /**

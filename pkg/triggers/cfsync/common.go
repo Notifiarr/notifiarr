@@ -40,10 +40,11 @@ type cmd struct {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
-func (c *cmd) create() {
+func (c *cmd) create(reqID string) {
 	info := clientinfo.Get()
 	c.setupRadarr(info)
 	c.setupSonarr(info)
@@ -52,17 +53,17 @@ func (c *cmd) create() {
 	// Check each instance and enable only if needed.
 	if info != nil && info.Actions.Sync.Interval.Duration > 0 {
 		if len(info.Actions.Sync.RadarrInstances) > 0 {
-			mnd.Log.Printf("==> Radarr TRaSH Sync: interval: %s, %s ",
+			mnd.Log.Printf(reqID, "==> Radarr TRaSH Sync: interval: %s, %s ",
 				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.RadarrSync, ", "))
 		}
 
 		if len(info.Actions.Sync.SonarrInstances) > 0 {
-			mnd.Log.Printf("==> Sonarr TRaSH Sync: interval: %s, %s ",
+			mnd.Log.Printf(reqID, "==> Sonarr TRaSH Sync: interval: %s, %s ",
 				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.SonarrSync, ", "))
 		}
 
 		if len(info.Actions.Sync.LidarrInstances) > 0 {
-			mnd.Log.Printf("==> Lidarr profile and format sync interval: %s, %s",
+			mnd.Log.Printf(reqID, "==> Lidarr profile and format sync interval: %s, %s",
 				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.SonarrSync, ", "))
 		}
 	}

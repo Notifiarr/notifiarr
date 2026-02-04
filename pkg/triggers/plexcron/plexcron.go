@@ -65,10 +65,11 @@ func (a *Action) Send(input *common.ActionInput) {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.run()
+	reqID := mnd.ReqID()
+	a.cmd.run(reqID)
 }
 
-func (c *cmd) run() {
+func (c *cmd) run(reqID string) {
 	info := clientinfo.Get()
 	if !c.Plex.Enabled() || info == nil {
 		return
@@ -80,7 +81,8 @@ func (c *cmd) run() {
 	if cfg.Interval.Duration > 0 {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = cfg.Interval.Duration + randomTime
-		mnd.Log.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
+		mnd.Log.Printf(reqID,
+			"==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
 			c.Plex.Server.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
 	}
 
@@ -93,7 +95,8 @@ func (c *cmd) run() {
 	})
 
 	if cfg.MoviesPC != 0 || cfg.SeriesPC != 0 || cfg.TrackSess {
-		mnd.Log.Printf("==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
+		mnd.Log.Printf(reqID,
+			"==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
 			c.Plex.Server.URL, c.Plex.Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
 
 		c.Add(&common.Action{
@@ -127,7 +130,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 
 		var err error
 		if sessions, err = c.getSessions(ctx, time.Second); err != nil {
-			mnd.Log.Errorf("{trace:%s} Getting Plex sessions: %v", hook.ReqID, err)
+			mnd.Log.Errorf(hook.ReqID, "Getting Plex sessions: %v", err)
 		}
 
 		cancel()

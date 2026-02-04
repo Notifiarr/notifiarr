@@ -90,7 +90,8 @@ func (a *Action) List() []*Timer {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
 // Stop satisfies an interface.
@@ -127,15 +128,15 @@ func (a *Action) Run(ctx context.Context) {
 	}
 }
 
-func (c *cmd) create() {
+func (c *cmd) create(reqID string) {
 	info := clientinfo.Get()
 	// This poller is sorta shoehorned in here for lack of a better place to put it.
 	if info == nil {
-		c.startWebsitePoller()
+		c.startWebsitePoller(reqID)
 		return
 	}
 
-	mnd.Log.Printf("==> Started Notifiarr Website Up-Checker, interval: %s", durafmt.Parse(upCheckInterval))
+	mnd.Log.Printf(reqID, "==> Started Notifiarr Website Up-Checker, interval: %s", durafmt.Parse(upCheckInterval))
 	c.Add(&common.Action{
 		Key:  "TrigUpCheck",
 		Name: TrigUpCheck,
@@ -151,7 +152,7 @@ func (c *cmd) create() {
 		custom.URI = "/" + strings.TrimPrefix(custom.URI, "/")
 
 		if custom.Interval.Duration < time.Minute {
-			mnd.Log.ErrorfNoShare("Website provided custom cron interval under 1 minute. Interval: %s Name: %s, URI: %s",
+			mnd.Log.ErrorfNoShare(reqID, "Website provided custom cron interval under 1 minute. Interval: %s Name: %s, URI: %s",
 				custom.Interval, custom.Name, custom.URI)
 
 			custom.Interval.Duration = time.Minute
@@ -168,15 +169,15 @@ func (c *cmd) create() {
 		})
 	}
 
-	mnd.Log.Printf("==> Custom Timers Enabled: %d timers provided", len(info.Actions.Custom))
+	mnd.Log.Printf(reqID, "==> Custom Timers Enabled: %d timers provided", len(info.Actions.Custom))
 }
 
-func (c *cmd) startWebsitePoller() {
+func (c *cmd) startWebsitePoller(reqID string) {
 	if website.ValidAPIKey() != nil {
 		return // only poll if the api key length is valid.
 	}
 
-	mnd.Log.Printf("==> Started Notifiarr Website Poller, interval: %s", durafmt.Parse(pollInterval))
+	mnd.Log.Printf(reqID, "==> Started Notifiarr Website Poller, interval: %s", durafmt.Parse(pollInterval))
 	c.Add(&common.Action{
 		Key:  "TrigPollSite",
 		Name: TrigPollSite,
@@ -208,7 +209,7 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 		LogPayload: true,
 	})
 	if err != nil {
-		mnd.Log.ErrorfNoShare("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		mnd.Log.ErrorfNoShare(mnd.GetID(ctx), "[%s requested] Polling Notifiarr: %v", input.Type, err)
 		return
 	}
 
@@ -219,12 +220,13 @@ func (c *cmd) PollForReload(ctx context.Context, input *common.ActionInput) {
 	}
 
 	if err = json.Unmarshal(body.Details.Response, &resp); err != nil {
-		mnd.Log.ErrorfNoShare("[%s requested] Polling Notifiarr: %v", input.Type, err)
+		mnd.Log.ErrorfNoShare(mnd.GetID(ctx), "[%s requested] Polling Notifiarr: %v", input.Type, err)
 		return
 	}
 
 	if ci := clientinfo.Get(); ci == nil {
-		mnd.Log.Printf("[%s requested] API Key checked out, reloading to pick up configuration from website!", input.Type)
+		mnd.Log.Printf(mnd.GetID(ctx),
+			"[%s requested] API Key checked out, reloading to pick up configuration from website!", input.Type)
 		defer c.ReloadApp("client info reload")
 	}
 }

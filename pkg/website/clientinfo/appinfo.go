@@ -213,7 +213,7 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 
 	if !startup {
 		if u, err := c.tautulliUsers(ctx); err != nil {
-			mnd.Log.Errorf("Getting Tautulli Users:", err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Getting Tautulli Users: %v", err)
 		} else {
 			apps.Tautulli = &AppInfoTautulli{Users: u.MapIDName()}
 		}

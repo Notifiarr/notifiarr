@@ -56,8 +56,8 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 
 	for _, key := range input.Args {
 		if _, err := c.Apps.Plex.EmptyTrashWithContext(ctx, key); err != nil {
-			mnd.Log.ErrorfNoShare("{trace:%s} [%s requested] Emptying Plex trash for library '%s' failed: %v",
-				input.ReqID, input.Type, key, err)
+			mnd.Log.ErrorfNoShare(input.ReqID, "[%s requested] Emptying Plex trash for library '%s' failed: %v",
+				input.Type, key, err)
 
 			status[key] = err.Error()
 			errors++
@@ -77,7 +77,7 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 			LogPayload: true,
 		})
 	} else {
-		mnd.Log.Printf("{trace:%s} [%s requested] Emptied %d Plex library trashes with %d errors.",
-			input.ReqID, input.Type, len(status), errors)
+		mnd.Log.Printf(input.ReqID, "[%s requested] Emptied %d Plex library trashes with %d errors.",
+			input.Type, len(status), errors)
 	}
 }

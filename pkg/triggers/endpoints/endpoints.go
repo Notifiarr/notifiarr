@@ -53,6 +53,7 @@ func (a *Action) List() Schedules {
 
 // Create initializes the endpoint url poller.
 func (a *Action) Create() {
+	reqID := mnd.ReqID()
 	for _, endpoint := range a.urls {
 		if endpoint.Method == "" {
 			endpoint.Method = http.MethodGet
@@ -84,7 +85,7 @@ func (a *Action) Create() {
 	}
 
 	if len(a.urls) > 0 {
-		mnd.Log.Printf("==> Endpoint URL Passthrough Enabled: %d URL(s)", len(a.urls))
+		mnd.Log.Printf(reqID, "==> Endpoint URL Passthrough Enabled: %d URL(s)", len(a.urls))
 	}
 }
 
@@ -121,7 +122,7 @@ func (s *Schedule) Run(input *common.ActionInput) {
 func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 	header, code, body, err := s.getURLBody(ctx)
 	if err != nil {
-		mnd.Log.Errorf("Endpoint URL '%s' failed: %v", s.Name, err)
+		mnd.Log.Errorf(input.ReqID, "Endpoint URL '%s' failed: %v", s.Name, err)
 		return
 	}
 
@@ -130,7 +131,7 @@ func (s *Schedule) run(ctx context.Context, input *common.ActionInput) {
 	}
 
 	website.SendData(&website.Request{
-		ReqID:      mnd.GetID(ctx),
+		ReqID:      input.ReqID,
 		Route:      website.EndpointRoute,
 		Event:      input.Type,
 		LogPayload: true,

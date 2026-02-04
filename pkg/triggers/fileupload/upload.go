@@ -80,7 +80,7 @@ func (c *cmd) uploadFile(ctx context.Context, input *common.ActionInput, fileNam
 	// Add a file to the request
 	file, err := os.Open(fileName)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Opening file '%s' for Upload failed: %v", input.Type, fileName, err)
+		mnd.Log.Errorf(input.ReqID, "[%s requested] Opening file '%s' for Upload failed: %v", input.Type, fileName, err)
 		return
 	}
 

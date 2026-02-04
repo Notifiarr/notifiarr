@@ -40,7 +40,7 @@ type Match struct {
 }
 
 // Log sends an error message to the website.
-func Log(msg string) {
+func Log(reqID string, msg string) {
 	locker.RLock()
 	defer locker.RUnlock()
 
@@ -49,7 +49,7 @@ func Log(msg string) {
 	}
 
 	website.SendData(&website.Request{
-		ReqID:      "errlog",
+		ReqID:      reqID,
 		Payload:    &Match{File: "client_error_log", Line: msg, Matches: []string{"[ERROR]"}},
 		Route:      website.LogLineRoute,
 		Event:      website.EventFile,

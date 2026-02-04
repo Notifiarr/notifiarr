@@ -120,10 +120,11 @@ func New(config *common.Config, plex *plexcron.Action) *Action {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
-func (c *Cmd) create() {
+func (c *Cmd) create(reqID string) {
 	var dur time.Duration
 
 	if ci := clientinfo.Get(); ci != nil && ci.Actions.Dashboard.Interval.Duration > 0 {
@@ -131,7 +132,7 @@ func (c *Cmd) create() {
 			ci.Actions.Dashboard.Interval.Duration
 		c.Enabled = ci.Actions.Dashboard
 
-		mnd.Log.Printf("==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
+		mnd.Log.Printf(reqID, "==> Dashboard State timer started, interval:%s", ci.Actions.Dashboard.Interval)
 	}
 
 	c.Add(&common.Action{
@@ -175,7 +176,7 @@ func (c *Cmd) getStates(ctx context.Context) *States {
 		Lidarr:   c.getLidarrStates(ctx),
 		Qbit:     c.getQbitStates(ctx),
 		NZBGet:   c.getNZBGetStates(ctx),
-		RTorrent: c.getRtorrentStates(),
+		RTorrent: c.getRtorrentStates(ctx),
 		Radarr:   c.getRadarrStates(ctx),
 		Readarr:  c.getReadarrStates(ctx),
 		Sonarr:   c.getSonarrStates(ctx),

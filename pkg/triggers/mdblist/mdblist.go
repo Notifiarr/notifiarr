@@ -32,10 +32,11 @@ func New(config *common.Config) *Action {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
-func (c *cmd) create() {
+func (c *cmd) create(reqID string) {
 	var dur time.Duration
 
 	info := clientinfo.Get()
@@ -43,7 +44,7 @@ func (c *cmd) create() {
 		(len(info.Actions.Mdblist.Radarr) > 0 || len(info.Actions.Mdblist.Sonarr) > 0) {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = info.Actions.Mdblist.Interval.Duration + randomTime
-		mnd.Log.Printf("==> MDB List Timer Enabled, interval:%s, Radarr/Sonarr: %d/%d instances",
+		mnd.Log.Printf(reqID, "==> MDB List Timer Enabled, interval:%s, Radarr/Sonarr: %d/%d instances",
 			info.Actions.Mdblist.Interval, len(info.Actions.Mdblist.Radarr), len(info.Actions.Mdblist.Sonarr))
 	}
 
@@ -96,7 +97,7 @@ func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput)
 	for idx, app := range c.Apps.Radarr {
 		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Mdblist.Radarr.Has(instance) {
-			mnd.Log.Debugf("Skipping MDBList for Radarr %d:%s, not enabled.", instance, app.URL)
+			mnd.Log.Debugf(input.ReqID, "Skipping MDBList for Radarr %d:%s, not enabled.", instance, app.URL)
 			continue
 		}
 
@@ -106,7 +107,7 @@ func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput)
 		items, err := app.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
 		if err != nil {
 			library.Error = err.Error()
-			mnd.Log.Errorf("[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting movies: %v",
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting movies: %v",
 				input.Type, instance, app.URL, library.Error)
 
 			continue
@@ -132,7 +133,7 @@ func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput)
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
 		if !app.Enabled() || !ci.Actions.Mdblist.Sonarr.Has(instance) {
-			mnd.Log.Debugf("Skipping MDBList for Sonarr %d:%s, not enabled.", instance, app.URL)
+			mnd.Log.Debugf(input.ReqID, "Skipping MDBList for Sonarr %d:%s, not enabled.", instance, app.URL)
 			continue
 		}
 
@@ -142,7 +143,7 @@ func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput)
 		items, err := app.GetSeriesContext(ctx, 0)
 		if err != nil {
 			library.Error = err.Error()
-			mnd.Log.Errorf("[%s requested] Sonarr Library (MDBList) (%d:%s) failed: getting series: %v",
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Sonarr Library (MDBList) (%d:%s) failed: getting series: %v",
 				input.Type, instance, app.URL, library.Error)
 
 			continue

@@ -98,9 +98,9 @@ func (a *Actions) handleTrigger(req *http.Request, event website.EventType) (int
 	content := mux.Vars(req)["content"]
 
 	if content != "" {
-		mnd.Log.Printf("{trace:%s} [%s requested] Incoming Trigger: %s (%s)", input.ReqID, event, trigger, content)
+		mnd.Log.Printf(input.ReqID, "[%s requested] Incoming Trigger: %s (%s)", event, trigger, content)
 	} else {
-		mnd.Log.Printf("{trace:%s} [%s requested] Incoming Trigger: %s", input.ReqID, event, trigger)
+		mnd.Log.Printf(input.ReqID, "[%s requested] Incoming Trigger: %s", event, trigger)
 	}
 
 	_ = req.ParseForm()
@@ -491,7 +491,7 @@ func (a *Actions) handleConfigReload() (int, string) {
 func (a *Actions) notification(ctx context.Context, content string) (int, string) {
 	if content != "" {
 		ui.Toast(ctx, "Notification: %s", content) //nolint:errcheck
-		mnd.Log.Printf("NOTIFICATION: %s", content)
+		mnd.Log.Printf(mnd.GetID(ctx), "NOTIFICATION: %s", content)
 
 		return http.StatusOK, "Local Nntification sent."
 	}
@@ -574,7 +574,7 @@ func (a *Actions) reconfig(req *http.Request, input *common.ActionInput) (int, s
 		}
 	}
 
-	mnd.Log.Printf("[%s requested] Reconfiguring Actions from website settings.", input.Type)
+	mnd.Log.Printf(mnd.GetID(req.Context()), "[%s requested] Reconfiguring Actions from website settings.", input.Type)
 	a.inCh <- inChData{EventType: input.Type, Actions: actions}
 
 	return http.StatusOK, <-a.outCh

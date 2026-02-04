@@ -180,7 +180,7 @@ func (a *Actions) watchChan(ctx context.Context) {
 			// Handle POSTed actions data.
 			clientInfo := clientinfo.Get()
 			if clientInfo == nil {
-				logs.Log.ErrorfNoShare("[%s requested] Client info not found", event.EventType)
+				logs.Log.ErrorfNoShare(mnd.GetID(ctx), "[%s requested] Client info not found", event.EventType)
 				continue
 			}
 
@@ -188,11 +188,11 @@ func (a *Actions) watchChan(ctx context.Context) {
 			data.Save("clientInfo", clientInfo)
 		} else if _, err := a.Config.CI.SaveClientInfo(ctx, false); err != nil {
 			// ^ Go fetch the actions data from the website.
-			logs.Log.ErrorfNoShare("[%s requested] Error reconfiguring: %v", event.EventType, err)
+			logs.Log.ErrorfNoShare(mnd.GetID(ctx), "[%s requested] Error reconfiguring: %v", event.EventType, err)
 			continue
 		}
 
-		logs.Log.Printf("[%s requested] Actions reconfiguration: restarting actions.", event.EventType)
+		logs.Log.Printf(mnd.GetID(ctx), "[%s requested] Actions reconfiguration: restarting actions.", event.EventType)
 		a.Stop(event.EventType)
 		a.Start(ctx, nil, nil)
 	}

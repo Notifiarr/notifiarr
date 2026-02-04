@@ -45,7 +45,7 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 		resp, err := h.Client.Do(req)
 		if err == nil {
 			for i, c := range resp.Cookies() {
-				mnd.Log.ErrorfNoShare("{trace:%s} Unexpected cookie [%v/%v] returned from website: %s",
+				mnd.Log.ErrorfNoShare(reqID, "Unexpected cookie [%v/%v] returned from website: %s",
 					reqID, i+1, len(resp.Cookies()), c.String())
 			}
 
@@ -77,7 +77,8 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 		case retry == h.Retries:
 			return resp, fmt.Errorf("[%d/%d] website req failed: %w", retry+1, h.Retries+1, err)
 		default:
-			mnd.Log.ErrorfNoShare("[%d/%d] website req failed, retrying in %s, error: %v", retry+1, h.Retries+1, RetryDelay, err)
+			mnd.Log.ErrorfNoShare(reqID, "[%d/%d] website req failed, retrying in %s, error: %v",
+				retry+1, h.Retries+1, RetryDelay, err)
 			time.Sleep(RetryDelay)
 		}
 	}
@@ -85,18 +86,18 @@ func (h *httpClient) Do(req *http.Request) (*http.Response, error) { //nolint:cy
 
 // sendAndLogRequest sends a request to the website and logs the result.
 func (s *server) sendAndLogRequest(ctx context.Context, data *Request) {
-	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendAndLogRequest", data.Route)
-	defer mnd.Log.Trace(reqID, "end: sendAndLogRequest", data.Route)
+	mnd.Log.Trace(data.ReqID, "start: sendAndLogRequest", data.Route)
+	defer mnd.Log.Trace(data.ReqID, "end: sendAndLogRequest", data.Route)
 
 	switch resp, elapsed, err := s.sendRequest(ctx, data); {
 	case data.LogMsg == "", errors.Is(err, ErrInvalidAPIKey):
 		return
 	case err != nil:
-		mnd.Log.ErrorfNoShare("{trace:%s} [%s requested]  Sending (%v, buf=%d/%d): %s: %v%s",
-			reqID, data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
+		mnd.Log.ErrorfNoShare(data.ReqID, "[%s requested] Sending (%v, buf=%d/%d): %s: %v%s",
+			data.Event, elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, err, resp)
 	case !data.ErrorsOnly:
-		mnd.Log.Printf("{trace:%s} [%s requested] Sent %s (%v, buf=%d/%d): %s%s",
-			reqID, data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
+		mnd.Log.Printf(data.ReqID, "[%s requested] Sent %s (%v, buf=%d/%d): %s%s",
+			data.Event, mnd.FormatBytes(resp.sent), elapsed, len(s.sendData), cap(s.sendData), data.LogMsg, resp)
 	}
 }
 
@@ -158,10 +159,11 @@ func (s *server) sendPayload(ctx context.Context, uri string, payload any, log b
 		var torn map[string]any
 		if err := json.Unmarshal(data, &torn); err == nil {
 			if torn["host"], err = GetHostInfo(ctx); err != nil {
-				mnd.Log.Errorf("Host Info Unknown: %v", err)
+				mnd.Log.Errorf(mnd.GetID(ctx), "Host Info Unknown: %v", err)
 			}
 
 			torn["private"] = private.Info()
+			torn["requestId"] = mnd.GetID(ctx)
 			payload = torn
 		}
 	}
@@ -211,7 +213,7 @@ func (s *server) sendJSON(ctx context.Context, url string, data []byte, log bool
 
 	resp, err := s.client.Do(req)
 	if err != nil {
-		s.debughttplog(nil, url, start, string(data), nil)
+		s.debughttplog(reqID, nil, url, start, string(data), nil)
 		return 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 
@@ -219,7 +221,7 @@ func (s *server) sendJSON(ctx context.Context, url string, data []byte, log bool
 		return resp.StatusCode, resp.Body, nil
 	}
 
-	return resp.StatusCode, s.debugLogResponseBody(start, resp, url, data, log), nil
+	return resp.StatusCode, s.debugLogResponseBody(reqID, start, resp, url, data, log), nil
 }
 
 func (s *server) getTimeout() time.Duration {

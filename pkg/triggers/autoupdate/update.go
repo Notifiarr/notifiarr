@@ -25,19 +25,19 @@ func (c *cmd) checkForUpdates(ctx context.Context, unstable bool) {
 	)
 
 	if unstable {
-		mnd.Log.Printf("[user requested] Unstable Update Check")
+		mnd.Log.Printf(mnd.GetID(ctx), "[user requested] Unstable Update Check")
 
 		data, err = update.CheckUnstable(ctx, mnd.Title, version.Revision)
 		where = "Unstable website"
 	} else {
-		mnd.Log.Printf("[user requested] GitHub Update Check")
+		mnd.Log.Printf(mnd.GetID(ctx), "[user requested] GitHub Update Check")
 
 		data, err = update.CheckGitHub(ctx, mnd.UserRepo, version.Version)
 	}
 
 	switch {
 	case err != nil:
-		mnd.Log.Errorf("%s Update Check: %v", where, err)
+		mnd.Log.Errorf(mnd.GetID(ctx), "%s Update Check: %v", where, err)
 		ui.Error("Checking version on " + where + ": " + err.Error())
 	case data.Outdate && runtime.GOOS == mnd.Windows:
 		c.upgradeWindows(ctx, data)
@@ -57,7 +57,7 @@ func (c *cmd) upgradeWindows(ctx context.Context, update *update.Update) {
 		"Date: "+update.RelDate.Format("Jan 2, 2006")+mnd.DurationAge(update.RelDate), false)
 	if yes {
 		if err := c.updateNow(ctx, update, "user requested"); err != nil {
-			mnd.Log.Errorf("Application Update Failed: %v", err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Application Update Failed: %v", err)
 			ui.Error("Updating Notifiarr:\n" + err.Error() + "\n")
 		}
 	}

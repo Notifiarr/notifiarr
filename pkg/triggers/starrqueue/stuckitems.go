@@ -39,7 +39,7 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	sonarr := c.getFinishedItemsSonarr(ctx)
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
-		mnd.Log.Debugf("[%s requested] No stuck items found.", input.Type)
+		mnd.Log.Debugf(input.ReqID, "[%s requested] No stuck items found.", input.Type)
 		return
 	}
 
@@ -97,7 +97,7 @@ func (c *cmd) getFinishedItemsLidarr(ctx context.Context) itemList { //nolint:cy
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
@@ -142,7 +142,7 @@ func (c *cmd) getFinishedItemsRadarr(ctx context.Context) itemList { //nolint:cy
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
@@ -187,7 +187,7 @@ func (c *cmd) getFinishedItemsReadarr(ctx context.Context) itemList { //nolint:c
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
@@ -232,7 +232,7 @@ func (c *cmd) getFinishedItemsSonarr(ctx context.Context) itemList { //nolint:cy
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 

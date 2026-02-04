@@ -1,6 +1,7 @@
 package update
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"sort"
@@ -31,7 +32,7 @@ func (f fileList) Swap(i, j int) {
 	f[i], f[j] = f[j], f[i]
 }
 
-func (u *Command) cleanOldBackups() {
+func (u *Command) cleanOldBackups(ctx context.Context) {
 	dir := filepath.Dir(u.Path)
 	pfx := strings.TrimSuffix(filepath.Base(u.Path), dotExe) + ".backup."
 
@@ -61,6 +62,7 @@ func (u *Command) cleanOldBackups() {
 		}
 
 		err := os.Remove(filepath.Join(dir, file.name))
-		mnd.Log.Printf("[UPDATE] Deleted old backup file: %s%s (error: %v)", file.name, mnd.DurationAge(file.when), err)
+		mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Deleted old backup file: %s%s (error: %v)",
+			file.name, mnd.DurationAge(file.when), err)
 	}
 }

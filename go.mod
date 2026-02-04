@@ -7,7 +7,7 @@ require (
 	github.com/CAFxX/httpcompression v0.0.9
 	github.com/akavel/rsrc v0.10.2
 	github.com/dsnet/compress v0.0.1
-	github.com/energye/systray v1.0.2
+	github.com/energye/systray v1.0.3
 	github.com/go-co-op/gocron/v2 v2.19.1
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/google/uuid v1.6.0
@@ -30,7 +30,7 @@ require (
 	github.com/paul-mannino/go-fuzzywuzzy v0.0.0-20241117160931-a1769aeb6b21
 	github.com/prometheus-community/pro-bing v0.7.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/shirou/gopsutil/v4 v4.25.12
+	github.com/shirou/gopsutil/v4 v4.26.1
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
 	github.com/swaggo/swag v1.16.6
