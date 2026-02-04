@@ -15281,23 +15281,11 @@
                         1000000,
                         1000000000,
                         60000000000,
-                        3600000000000,
-                        1,
-                        1000,
-                        1000000,
-                        1000000000,
-                        60000000000,
                         3600000000000
                     ],
                     "x-enum-varnames": [
                         "minDuration",
                         "maxDuration",
-                        "Nanosecond",
-                        "Microsecond",
-                        "Millisecond",
-                        "Second",
-                        "Minute",
-                        "Hour",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
@@ -16349,6 +16337,10 @@
                 },
                 "rating": {
                     "type": "number"
+                },
+                "reqID": {
+                    "description": "not from Plex, but added by Notifiarr.",
+                    "type": "string"
                 },
                 "user": {
                     "type": "boolean"

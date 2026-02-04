@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"sort"
@@ -13,7 +14,7 @@ import (
 
 var ErrInvalidResponse = errors.New("invalid response")
 
-func (c *Cmd) getRtorrentStates() []*State {
+func (c *Cmd) getRtorrentStates(ctx context.Context) []*State {
 	states := []*State{}
 
 	for instance, app := range c.Apps.Rtorrent {
@@ -21,12 +22,12 @@ func (c *Cmd) getRtorrentStates() []*State {
 			continue
 		}
 
-		mnd.Log.Debugf("Getting rTorrent State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Getting rTorrent State: %d:%s", instance+1, app.URL)
 
 		state, err := c.getRtorrentState(instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			mnd.Log.Errorf("Getting rTorrent Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Getting rTorrent Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)

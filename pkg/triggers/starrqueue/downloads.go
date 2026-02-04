@@ -7,6 +7,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -50,31 +51,38 @@ type readarrRecord struct {
 
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
 func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
+	logs.Log.Trace(input.ReqID, "start: sendDownloadingQueues", input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: sendDownloadingQueues", input.Type)
+
+	ctx = mnd.WithID(ctx, input.ReqID)
 	lidarr := c.getDownloadingItemsLidarr(ctx)
 	radarr := c.getDownloadingItemsRadarr(ctx)
 	readarr := c.getDownloadingItemsReadarr(ctx)
 	sonarr := c.getDownloadingItemsSonarr(ctx)
+	msg := ""
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
-		logs.Log.Debugf("[%s requested] No Downloading Items found; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-			input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
-
-		if c.empty {
+		if c.empty { // We already sent an empty payload, so don't send another.
+			logs.Log.Debugf(input.ReqID, "[%s requested] No Downloading Items found; "+
+				"Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
+				input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
 			return
 		}
 
 		c.empty = true
+		msg = " empty payload so website knows all downloads are finished:"
 	} else {
 		c.empty = false
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.DownloadRoute,
 		Event:      input.Type,
 		LogPayload: true,
 		ErrorsOnly: !logs.Log.DebugEnabled(),
-		LogMsg: fmt.Sprintf("Downloading Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
+		LogMsg: fmt.Sprintf("Downloading Items;%s Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
+			msg, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
 		Payload: &QueuesPaylod{
 			Lidarr:  lidarr,
 			Radarr:  radarr,
@@ -85,6 +93,9 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 }
 
 func (c *cmd) getDownloadingItemsLidarr(ctx context.Context) itemList {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsLidarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsLidarr")
+
 	items := make(itemList)
 
 	info := clientinfo.Get()
@@ -117,6 +128,9 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 	app *apps.Lidarr,
 	records []*lidarr.QueueRecord,
 ) []*lidarrRecord {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsLidarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsLidarr", idx, app.Name)
+
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	lidarrQueue := make([]*lidarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
@@ -133,7 +147,7 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if s := strings.ToLower(item.Status); s != downloading || exists {
 			continue
 		}
 
@@ -143,7 +157,7 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			album, err := app.GetAlbumByIDContext(ctx, item.AlbumID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &lidarr.Album{Artist: &lidarr.Artist{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("lidarrAlbum", item.AlbumID), idx, album)
@@ -166,6 +180,9 @@ func (c *cmd) rangeDownloadingItemsLidarr(
 }
 
 func (c *cmd) getDownloadingItemsRadarr(ctx context.Context) itemList {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsRadarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsRadarr")
+
 	items := make(itemList)
 
 	info := clientinfo.Get()
@@ -198,6 +215,9 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 	app *apps.Radarr,
 	records []*radarr.QueueRecord,
 ) []*radarrRecord {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsRadarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsRadarr", idx, app.Name)
+
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	radarrQueue := make([]*radarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
@@ -214,7 +234,7 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if strings.ToLower(item.Status) != downloading || exists {
 			continue
 		}
 
@@ -224,7 +244,7 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			movie, err := app.GetMovieByIDContext(ctx, item.MovieID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &radarr.Movie{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("radarrMovie", item.MovieID), idx, movie)
@@ -245,6 +265,9 @@ func (c *cmd) rangeDownloadingItemsRadarr(
 }
 
 func (c *cmd) getDownloadingItemsReadarr(ctx context.Context) itemList {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsReadarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsReadarr")
+
 	items := make(itemList)
 
 	info := clientinfo.Get()
@@ -277,6 +300,9 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 	app *apps.Readarr,
 	records []*readarr.QueueRecord,
 ) []*readarrRecord {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsReadarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsReadarr", idx, app.Name)
+
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	readarrQueue := make([]*readarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
@@ -293,7 +319,7 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if s := strings.ToLower(item.Status); s != downloading || exists {
 			continue
 		}
 
@@ -303,7 +329,7 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			book, err := app.GetBookByIDContext(ctx, item.BookID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &readarr.Book{Author: &readarr.Author{}}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("readarrBook", item.BookID), idx, book)
@@ -326,6 +352,9 @@ func (c *cmd) rangeDownloadingItemsReadarr(
 }
 
 func (c *cmd) getDownloadingItemsSonarr(ctx context.Context) itemList {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsSonarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsSonarr")
+
 	items := make(itemList)
 
 	info := clientinfo.Get()
@@ -358,6 +387,9 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 	app *apps.Sonarr,
 	records []*sonarr.QueueRecord,
 ) []*sonarrRecord {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsSonarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsSonarr", idx, app.Name)
+
 	// Pre-allocate with capacity based on max payload size to reduce allocations.
 	sonarrQueue := make([]*sonarrRecord, 0, maxQueuePayloadSize)
 	// repeatStomper is used to collapse duplicate download IDs.
@@ -374,7 +406,7 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 		}
 
 		_, exists := repeatStomper[item.DownloadID]
-		if s := strings.ToLower(item.Status); (s != downloading && s != delay) || exists {
+		if s := strings.ToLower(item.Status); s != downloading || exists {
 			continue
 		}
 
@@ -384,7 +416,7 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 		if cacheItem == nil || cacheItem.Data == nil {
 			series, err := app.GetSeriesByIDContext(ctx, item.SeriesID)
 			if err != nil {
-				logs.Log.Errorf("Getting data for downloading item: %v", err)
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
 				cacheItem = &cache.Item{Data: &sonarr.Series{}} //nolint:wsl
 			} else {
 				data.SaveWithID(fmt.Sprint("sonarrSeries", item.SeriesID), idx, series)

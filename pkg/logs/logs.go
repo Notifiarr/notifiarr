@@ -12,7 +12,9 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"runtime/debug"
+	"strings"
 	"sync"
 
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
@@ -37,6 +39,7 @@ type Logger struct {
 	custom    *rotatorr.Logger // must not be set when web/app/debug are set.
 	LogConfig LogConfig
 	mu        sync.RWMutex
+	trace     bool
 }
 
 // These are used for custom logs.
@@ -60,7 +63,8 @@ const (
 	httpExt   = ".http.log"
 	errStr    = "Error"
 	infoStr   = "Info"
-	dbugStr   = "Debug"
+	traceStr  = "Trace"
+	debugStr  = "Debug"
 )
 
 // LogConfig allows sending logs to rotating files.
@@ -74,11 +78,12 @@ type LogConfig struct {
 	LogFileMb int      `json:"logFileMb" toml:"log_file_mb" xml:"log_file_mb" yaml:"logFileMb"`
 	FileMode  FileMode `json:"fileMode"  toml:"file_mode"   xml:"file_mode"   yaml:"fileMode"`
 	Debug     bool     `json:"debug"     toml:"debug"       xml:"debug"       yaml:"debug"`
+	Trace     bool     `json:"trace"     toml:"trace"       xml:"trace"       yaml:"trace"`
 	Quiet     bool     `json:"quiet"     toml:"quiet"       xml:"quiet"       yaml:"quiet"`
 	NoUploads bool     `json:"noUploads" toml:"no_uploads"  xml:"no_uploads"  yaml:"noUploads"`
 }
 
-// New returns a new Logger with debug off and sends everything to stdout.
+// New returns a new Logger with debug and trace off and sends everything to stdout.
 func New() *Logger {
 	return &Logger{
 		DebugLog: log.New(discard, "[DEBUG] ", log.LstdFlags),
@@ -109,6 +114,7 @@ func (l *Logger) SetupLogging(config LogConfig) {
 		l.InfoLog.SetFlags(log.LstdFlags | log.Lmicroseconds)
 	}
 
+	l.trace = config.Trace
 	l.ErrorLog.SetFlags(l.InfoLog.Flags())
 	l.HTTPLog.SetFlags(l.InfoLog.Flags())
 	l.DebugLog.SetFlags(l.InfoLog.Flags())
@@ -190,45 +196,79 @@ func (l *Logger) CapturePanic() {
 	}
 }
 
+// Trace writes log lines... to stdout and/or a file.
+// Use this at the top of a function and pass the return value to the defer statement.
+func (l *Logger) Trace(reqID string, msg ...any) string {
+	if reqID == "" {
+		reqID = mnd.ReqID()
+	}
+
+	if !l.trace {
+		return reqID // we still need to create and return an id.
+	}
+
+	// Remove any prefix up to and including "github.com/Notifiarr/notifiarr/pkg/"
+	const removePrefix = "github.com/Notifiarr/notifiarr/pkg/"
+
+	_, file, line, _ := runtime.Caller(1)
+	if idx := strings.Index(file, removePrefix); idx >= 0 {
+		file = file[idx+len(removePrefix):]
+	}
+
+	_, parentFile, parentLine, _ := runtime.Caller(2) //nolint:mnd
+	if idx := strings.Index(parentFile, removePrefix); idx >= 0 {
+		parentFile = parentFile[idx+len(removePrefix):]
+	}
+
+	l.writeMsg(reqID, fmt.Sprintf("%s:%d -> %s:%d %s",
+		parentFile, parentLine, file, line, fmt.Sprintln(msg...)), l.InfoLog, traceStr, false)
+
+	return reqID
+}
+
 // Debug writes log lines... to stdout and/or a file.
-func (l *Logger) Debug(v ...any) {
-	l.writeMsg(fmt.Sprintln(v...), l.DebugLog, dbugStr, false)
+func (l *Logger) Debug(reqID string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintln(v...), l.DebugLog, debugStr, false)
 }
 
 // Debugf writes log lines... to stdout and/or a file.
-func (l *Logger) Debugf(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.DebugLog, dbugStr, false)
+func (l *Logger) Debugf(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.DebugLog, debugStr, false)
 }
 
 // Print writes log lines... to stdout and/or a file.
-func (l *Logger) Print(v ...any) {
-	l.writeMsg(fmt.Sprintln(v...), l.InfoLog, infoStr, false)
+func (l *Logger) Print(reqID string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintln(v...), l.InfoLog, infoStr, false)
 }
 
 // Printf writes log lines... to stdout and/or a file.
-func (l *Logger) Printf(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.InfoLog, infoStr, false)
+func (l *Logger) Printf(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.InfoLog, infoStr, false)
 }
 
 // Error writes log lines... to stdout and/or a file.
-func (l *Logger) Error(v ...any) {
-	l.writeMsg(fmt.Sprintln(v...), l.ErrorLog, errStr, true)
+func (l *Logger) Error(reqID string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintln(v...), l.ErrorLog, errStr, true)
 }
 
 // Errorf writes log lines... to stdout and/or a file.
-func (l *Logger) Errorf(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, true)
+func (l *Logger) Errorf(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.ErrorLog, errStr, true)
 }
 
 // ErrorfNoShare writes log lines... to stdout and/or a file.
-func (l *Logger) ErrorfNoShare(msg string, v ...any) {
-	l.writeMsg(fmt.Sprintf(msg, v...), l.ErrorLog, errStr, false)
+func (l *Logger) ErrorfNoShare(reqID string, msg string, v ...any) {
+	l.writeMsg(reqID, fmt.Sprintf(msg, v...), l.ErrorLog, errStr, false)
 }
 
-func (l *Logger) writeMsg(msg string, log *log.Logger, name string, shared bool) {
+func (l *Logger) writeMsg(reqID string, msg string, log *log.Logger, name string, shared bool) {
+	if l.trace {
+		msg = fmt.Sprintf("{trace:%s} %s", reqID, msg)
+	}
+
 	if err := log.Output(callDepth, msg); err != nil {
 		if errors.Is(err, rotatorr.ErrWriteTooLarge) {
-			l.writeSplitMsg(msg, log, name)
+			l.writeSplitMsg(reqID, msg, log, name)
 			return
 		}
 
@@ -238,20 +278,20 @@ func (l *Logger) writeMsg(msg string, log *log.Logger, name string, shared bool)
 	}
 
 	if shared { // we share errors with the website.
-		share.Log(msg)
+		share.Log(reqID, msg)
 	}
 }
 
 // writeSplitMsg splits the message in half and attempts to write each half.
 // If the message is still too large, it'll be split again, and the process continues until it works.
-func (l *Logger) writeSplitMsg(msg string, log *log.Logger, name string) {
+func (l *Logger) writeSplitMsg(reqID string, msg string, log *log.Logger, name string) {
 	half := len(msg) / 2 //nolint:mnd // split messages in half, recursively as needed.
 	part1 := msg[:half]
 	part2 := "...continuing: " + msg[half:]
 
 	mnd.LogFiles.Add(name+" Splits", 1)
-	l.writeMsg(part1, log, name, false)
-	l.writeMsg(part2, log, name, false)
+	l.writeMsg(reqID, part1, log, name, false)
+	l.writeMsg(reqID, part2, log, name, false)
 }
 
 // CustomLog allows the creation of ad-hoc rotating log files from other packages.
@@ -305,7 +345,7 @@ func (l *Logger) postRotateCounter(fileName, newFile string) {
 	}
 
 	if newFile != "" && l != nil {
-		go l.Printf("Rotated log file to: %s", newFile)
+		go l.Printf("rotate", "Rotated log file to: %s", newFile)
 	}
 }
 

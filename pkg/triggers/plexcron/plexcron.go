@@ -59,16 +59,17 @@ func New(config *common.Config, plex *apps.Plex) *Action {
 }
 
 // Send sends plex sessions in a go routine through a channel.
-func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigPlexSessions)
+func (a *Action) Send(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigPlexSessions)
 }
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.run()
+	reqID := mnd.ReqID()
+	a.cmd.run(reqID)
 }
 
-func (c *cmd) run() {
+func (c *cmd) run(reqID string) {
 	info := clientinfo.Get()
 	if !c.Plex.Enabled() || info == nil {
 		return
@@ -80,7 +81,8 @@ func (c *cmd) run() {
 	if cfg.Interval.Duration > 0 {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = cfg.Interval.Duration + randomTime
-		mnd.Log.Printf("==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
+		mnd.Log.Printf(reqID,
+			"==> Plex Sessions Collection Started, URL: %s, interval:%s timeout:%s webhook_cooldown:%v delay:%v",
 			c.Plex.Server.URL, cfg.Interval, c.Plex.Timeout, cfg.Cooldown, cfg.Delay)
 	}
 
@@ -93,7 +95,8 @@ func (c *cmd) run() {
 	})
 
 	if cfg.MoviesPC != 0 || cfg.SeriesPC != 0 || cfg.TrackSess {
-		mnd.Log.Printf("==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
+		mnd.Log.Printf(reqID,
+			"==> Plex Sessions Tracker Started, URL: %s, interval:1m timeout:%s movies:%d%% series:%d%% play:%v",
 			c.Plex.Server.URL, c.Plex.Timeout, cfg.MoviesPC, cfg.SeriesPC, cfg.TrackSess)
 
 		c.Add(&common.Action{
@@ -113,9 +116,12 @@ func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 }
 
 func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
+	mnd.Log.Trace(hook.ReqID, "start: (go) cmd.sendWebhook")
+	defer mnd.Log.Trace(hook.ReqID, "end: (go) cmd.sendWebhook")
+
 	sessions := &plex.Sessions{Name: c.Plex.Name()}
 	ci := clientinfo.Get()
-	ctx := context.Background()
+	ctx := mnd.WithID(context.Background(), hook.ReqID)
 
 	// If NoActivity=false, then grab sessions, but wait 'Delay' to make sure they're updated.
 	if ci != nil && !ci.Actions.Plex.NoActivity {
@@ -124,7 +130,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 
 		var err error
 		if sessions, err = c.getSessions(ctx, time.Second); err != nil {
-			mnd.Log.Errorf("Getting Plex sessions: %v", err)
+			mnd.Log.Errorf(hook.ReqID, "Getting Plex sessions: %v", err)
 		}
 
 		cancel()
@@ -134,6 +140,7 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 	defer cancel()
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.PlexRoute,
 		Event:      website.EventHook,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Load: hook, Plex: sessions},
@@ -159,30 +166,9 @@ func (c *cmd) getMetaSnap(ctx context.Context) *snapshot.Snapshot {
 		wait sync.WaitGroup
 	)
 
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-
-		_ = snap.GetCPUSample(ctx)
-	}()
-
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-
-		_ = snap.GetMemoryUsage(ctx)
-	}()
-
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-
-		_ = snap.GetLocalData(ctx)
-	}()
-
+	wait.Go(func() { _ = snap.GetCPUSample(ctx) })
+	wait.Go(func() { _ = snap.GetMemoryUsage(ctx) })
+	wait.Go(func() { _ = snap.GetLocalData(ctx) })
 	wait.Wait()
 
 	return snap

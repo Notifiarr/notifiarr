@@ -46,8 +46,9 @@ func (c *Config) Run(ctx context.Context) {
 		}
 	}
 
+	ctx = mnd.SetID(ctx)
 	go c.runTimerLoop(ctx, combine, cases)
-	c.printStartupLog()
+	c.printStartupLog(ctx)
 }
 
 type TriggerInfo struct {
@@ -119,22 +120,22 @@ func (c *Config) GatherTriggerInfo() (triggers, timers, schedules []TriggerInfo)
 	return triggers, timers, schedules
 }
 
-func (c *Config) printStartupLog() {
+func (c *Config) printStartupLog(ctx context.Context) {
 	triggers, timers, schedules := c.GatherTriggerInfo()
-	mnd.Log.Printf("==> Actions Started: %d Timers and %d Triggers and %d Schedules",
+	mnd.Log.Printf(mnd.GetID(ctx), "==> Actions Started: %d Timers and %d Triggers and %d Schedules",
 		len(timers), len(triggers), len(schedules))
 
 	for _, trigger := range triggers {
-		mnd.Log.Debugf("==> Enabled Action %s: %s Trigger only.", trigger.Key, trigger.Name)
+		mnd.Log.Printf(mnd.GetID(ctx), "==> Enabled Action %s: %s Trigger only.", trigger.Key, trigger.Name)
 	}
 
 	for _, timer := range timers {
-		mnd.Log.Debugf("==> Enabled Action %s: %s Timer, interval: %s",
+		mnd.Log.Printf(mnd.GetID(ctx), "==> Enabled Action %s: %s Timer, interval: %s",
 			timer.Key, timer.Name, time.Duration(timer.Dur*int64(time.Millisecond)).String())
 	}
 
 	for _, schedule := range schedules {
-		mnd.Log.Debugf("==> Enabled Action %s: %s Schedule: %s",
+		mnd.Log.Printf(mnd.GetID(ctx), "==> Enabled Action %s: %s Schedule: %s",
 			schedule.Key, schedule.Name, schedule.Cron.String())
 	}
 }
@@ -159,12 +160,11 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 		index, val, _ := reflect.Select(cases)
 		action := actions[index]
 
-		input := &ActionInput{}
-
+		var input *ActionInput
 		if _, ok := val.Interface().(time.Time); ok {
-			input.Type = website.EventCron
+			input = &ActionInput{Type: website.EventCron, ReqID: mnd.ReqID()}
 		} else if input, ok = val.Interface().(*ActionInput); !ok {
-			input = &ActionInput{Type: "unknown"}
+			input = &ActionInput{Type: "unknown", ReqID: mnd.ReqID()}
 		}
 
 		mnd.TimerEvents.Add(string(input.Type)+"&&"+string(action.Name), 1)
@@ -174,19 +174,19 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 			return // called by c.Stop(), calls c.stopTimerLoop().
 		}
 
-		c.runEventAction(ctx, input, action)
+		c.runEventAction(mnd.WithID(ctx, input.ReqID), input, action)
 	}
 }
 
 func (c *Config) runEventAction(ctx context.Context, input *ActionInput, action *Action) {
 	if input.Type == website.EventUser && action.Name != "" {
 		if err := ui.Toast(ctx, "%s", string(action.Name)); err != nil {
-			mnd.Log.Errorf("Displaying toast notification: %v", err)
+			mnd.Log.Errorf(input.ReqID, "Displaying toast notification: %v", err)
 		}
 	}
 
 	if action.Name != "" && !action.Hide {
-		mnd.Log.Printf("[%s requested] Event Triggered: %s", input.Type, action)
+		mnd.Log.Printf(input.ReqID, "[%s requested] Event Triggered: %s", input.Type, action)
 	}
 
 	if action.Fn != nil {
@@ -204,7 +204,7 @@ func (c *Config) stopTimerLoop(ctx context.Context, actions []*Action) {
 	}()
 
 	c.sharedCtx = make(chan context.Context, 1)
-	mnd.Log.Printf("!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
+	mnd.Log.Printf(mnd.GetID(ctx), "!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
 
 	for _, action := range actions {
 		if action.t != nil {

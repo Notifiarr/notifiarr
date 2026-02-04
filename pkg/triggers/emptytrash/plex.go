@@ -45,8 +45,9 @@ func (a *Action) Send(input *common.ActionInput) {
 }
 
 // Plex empties the trash for a Library in Plex.
-func (a *Action) Plex(event website.EventType, libraryKeys []string) {
-	a.cmd.Exec(&common.ActionInput{Type: event, Args: libraryKeys}, TrigPlexEmptyTrash)
+func (a *Action) Plex(input *common.ActionInput, libraryKeys []string) {
+	input.Args = libraryKeys
+	a.cmd.Exec(input, TrigPlexEmptyTrash)
 }
 
 func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
@@ -55,7 +56,8 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 
 	for _, key := range input.Args {
 		if _, err := c.Apps.Plex.EmptyTrashWithContext(ctx, key); err != nil {
-			mnd.Log.ErrorfNoShare("[%s requested] Emptying Plex trash for library '%s' failed: %v", input.Type, key, err)
+			mnd.Log.ErrorfNoShare(input.ReqID, "[%s requested] Emptying Plex trash for library '%s' failed: %v",
+				input.Type, key, err)
 
 			status[key] = err.Error()
 			errors++
@@ -66,6 +68,7 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 
 	if len(status) > 0 {
 		website.SendData(&website.Request{
+			ReqID:      input.ReqID,
 			Route:      website.PlexRoute,
 			Event:      input.Type,
 			Params:     []string{"emptylibrary=true"},
@@ -74,6 +77,7 @@ func (c *cmd) emptyPlexTrash(ctx context.Context, input *common.ActionInput) {
 			LogPayload: true,
 		})
 	} else {
-		mnd.Log.Printf("[%s requested] Emptied %d Plex library trashes with %d errors.", input.Type, len(status), errors)
+		mnd.Log.Printf(input.ReqID, "[%s requested] Emptied %d Plex library trashes with %d errors.",
+			input.Type, len(status), errors)
 	}
 }

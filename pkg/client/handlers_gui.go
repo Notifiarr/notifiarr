@@ -72,6 +72,14 @@ func (c *Client) checkAuthorized(next http.Handler) http.Handler {
 	})
 }
 
+func (c *Client) withReqID(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
+		ctx := mnd.SetID(request.Context())
+		request.Header.Set("X-Request-ID", mnd.GetID(ctx))
+		next.ServeHTTP(response, request.WithContext(ctx))
+	})
+}
+
 // getUserName returns the username and a bool if it's dynamic (not the one from the config file).
 func (c *Client) getUserName(request *http.Request) (string, bool) {
 	if userName := request.Context().Value(userNameStr); userName != nil {
@@ -140,9 +148,10 @@ func (c *Client) loginDelayHandler(response http.ResponseWriter, request *http.R
 	}
 }
 
-func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) bool {
+func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) bool { //nolint:cyclop,funlen
 	loggedinUsername, _ := c.getUserName(request)
 	providedUsername := request.FormValue("name")
+	reqID := mnd.GetID(request.Context())
 
 	switch {
 	case c.Config.UIPassword == "disabled":
@@ -159,14 +168,17 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		return false
 	case c.Config.UIPassword.Valid(providedUsername, request.FormValue("password")):
 		c.updateToNewPasswordMD5(request.Context(), loggedinUsername, providedUsername, request.FormValue("sha"))
-		logs.Log.Printf("[gui '%s' requested] Updated config with new password format.", providedUsername)
+		logs.Log.Printf(reqID, "[gui '%s' requested] Updated config with new password format.", providedUsername)
 		fallthrough
 	case c.Config.UIPassword.Valid(providedUsername, request.FormValue("sha")):
 		request = c.setSession(providedUsername, response, request)
 		c.handleProfile(response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
-		logs.Log.Printf("[gui '%s' requested] Authenticated with local credentials", providedUsername)
+		logs.Log.Printf(reqID, "[gui '%s' requested] Authenticated with local credentials", providedUsername)
 		return true
+	case c.Config.UIPassword.IsCrypted():
+		http.Error(response, "Unauthorized", http.StatusUnauthorized)
+		return false
 	case clientinfo.CheckPassword(providedUsername, request.FormValue("sha")):
 		providedUsername = clientinfo.Get().User.Username
 		if providedUsername == "" {
@@ -176,7 +188,7 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		request = c.setSession(providedUsername, response, request)
 		c.handleProfile(response, request)
 		mnd.HTTPRequests.Add("GUI Logins", 1)
-		logs.Log.Printf("[gui '%s' requested] Authenticated with website credentials", providedUsername)
+		logs.Log.Printf(reqID, "[gui '%s' requested] Authenticated with website credentials", providedUsername)
 		return true
 	default: // Start over.
 		http.Error(response, "Unauthorized", http.StatusUnauthorized)
@@ -192,11 +204,11 @@ func (c *Client) updateToNewPasswordMD5(ctx context.Context, loggedinUsername, p
 		return
 	}
 
-	logs.Log.Printf("[gui '%s' requested] Updating Trust Profile settings, username: %s",
+	logs.Log.Printf(mnd.GetID(ctx), "[gui '%s' requested] Updating Trust Profile settings, username: %s",
 		loggedinUsername, providedUsername)
 
 	if err := c.setUserPass(ctx, configfile.AuthPassword, providedUsername, password); err != nil {
-		logs.Log.Errorf("[gui '%s' requested] Setting user pass: %v", loggedinUsername, err)
+		logs.Log.Errorf(mnd.GetID(ctx), "[gui '%s' requested] Setting user pass: %v", loggedinUsername, err)
 	}
 }
 
@@ -240,13 +252,13 @@ func (c *Client) getFileDeleteHandler(response http.ResponseWriter, req *http.Re
 
 		if err := os.Remove(fileInfo.Path); err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
-			logs.Log.Errorf("[gui '%s' requested] Deleting file: %v", user, err)
+			logs.Log.Errorf(mnd.GetID(req.Context()), "[gui '%s' requested] Deleting file: %v", user, err)
 		}
 
-		logs.Log.Printf("[gui '%s' requested] Deleted file: %s", user, fileInfo.Path)
+		logs.Log.Printf(mnd.GetID(req.Context()), "[gui '%s' requested] Deleted file: %s", user, fileInfo.Path)
 
 		if _, err := response.Write([]byte("ok")); err != nil {
-			logs.Log.Errorf("Writing HTTP Response: %v", err)
+			logs.Log.Errorf(mnd.GetID(req.Context()), "Writing HTTP Response: %v", err)
 		}
 
 		return
@@ -277,16 +289,18 @@ func (c *Client) uploadFileHandler(response http.ResponseWriter, req *http.Reque
 			continue
 		}
 
-		err := c.triggers.FileUpload.Upload(website.EventGUI, fileInfo.Path)
+		input := &common.ActionInput{Type: website.EventGUI, ReqID: mnd.GetID(req.Context())}
+
+		err := c.triggers.FileUpload.Upload(input, fileInfo.Path)
 		if err != nil {
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 
 		user, _ := c.getUserName(req)
-		logs.Log.Printf("[gui '%s' requested] Uploaded file: %s", user, fileInfo.Path)
+		logs.Log.Printf(mnd.GetID(req.Context()), "[gui '%s' requested] Uploaded file: %s", user, fileInfo.Path)
 
 		if _, err := response.Write([]byte("ok")); err != nil {
-			logs.Log.Errorf("Writing HTTP Response: %v", err)
+			logs.Log.Errorf(mnd.GetID(req.Context()), "Writing HTTP Response: %v", err)
 		}
 
 		return
@@ -335,12 +349,12 @@ func (c *Client) getFileDownloadHandler(response http.ResponseWriter, req *http.
 		response.Header().Set("Content-Type", "application/zip")
 
 		if _, err := io.Copy(newZippedFile, fileOpen); err != nil {
-			logs.Log.Errorf("Sending Zipped File %s: %v", fileInfo.Path, err)
+			logs.Log.Errorf(mnd.GetID(req.Context()), "Sending Zipped File %s: %v", fileInfo.Path, err)
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		}
 
 		user, _ := c.getUserName(req)
-		logs.Log.Printf("[gui '%s' requested] Downloaded file: %s", user, fileInfo.Path)
+		logs.Log.Printf(mnd.GetID(req.Context()), "[gui '%s' requested] Downloaded file: %s", user, fileInfo.Path)
 
 		return
 	}
@@ -417,7 +431,7 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 	switch action := mux.Vars(req)["action"]; action {
 	case "stop":
 		c.Services.Pause()
-		logs.Log.Printf("[gui '%s' requested] Service Checks Paused", user)
+		logs.Log.Printf(mnd.GetID(req.Context()), "[gui '%s' requested] Service Checks Paused", user)
 		http.Error(response, "Service Checks Paused", http.StatusOK)
 
 		if menu["svcs"] != nil {
@@ -425,7 +439,7 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 		}
 	case "start":
 		c.Services.Resume()
-		logs.Log.Printf("[gui '%s' requested] Service Checks Resumed", user)
+		logs.Log.Printf(mnd.GetID(req.Context()), "[gui '%s' requested] Service Checks Resumed", user)
 		http.Error(response, "Service Checks Resumed", http.StatusOK)
 
 		if menu["svcs"] != nil {
@@ -448,13 +462,13 @@ func (c *Client) handleServicesStopStart(response http.ResponseWriter, req *http
 //	@Router			/services/check/{service} [get]
 func (c *Client) handleServicesCheck(response http.ResponseWriter, req *http.Request) {
 	svc := mux.Vars(req)["service"]
-	if err := c.Services.RunCheck(website.EventAPI, svc); err != nil {
+	if err := c.Services.RunCheck(req.Context(), website.EventAPI, svc); err != nil {
 		http.Error(response, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	user, _ := c.getUserName(req)
-	logs.Log.Printf("[gui '%s' requested] Check Service: %s", user, svc)
+	logs.Log.Printf(mnd.GetID(req.Context()), "[gui '%s' requested] Check Service: %s", user, svc)
 	http.Error(response, "Service Check Initiated", http.StatusOK)
 }
 
@@ -501,18 +515,18 @@ func (c *Client) getFileHandler(response http.ResponseWriter, req *http.Request)
 
 		lines, err := getLinesFromFile(fileInfo.Path, mux.Vars(req)["sort"], count, skip)
 		if err != nil {
-			logs.Log.Errorf("Handling Log File Request: %v", err)
+			logs.Log.Errorf(mnd.GetID(req.Context()), "Handling Log File Request: %v", err)
 			http.Error(response, err.Error(), http.StatusInternalServerError)
 		} else if fileInfo.Size == 0 {
 			http.Error(response, "the file is empty", http.StatusInternalServerError)
 		} else if _, err = response.Write(lines); err != nil {
-			logs.Log.Errorf("Writing HTTP Response: %v", err)
+			logs.Log.Errorf(mnd.GetID(req.Context()), "Writing HTTP Response: %v", err)
 		}
 
 		return
 	}
 
-	logs.Log.Errorf("Handling Log File Request: file ID not found: %s", mux.Vars(req)["id"])
+	logs.Log.Errorf(mnd.GetID(req.Context()), "Handling Log File Request: file ID not found: %s", mux.Vars(req)["id"])
 	http.Error(response, "no file found", http.StatusNotFound)
 }
 
@@ -573,7 +587,7 @@ func (c *Client) handleCheckAll(response http.ResponseWriter, request *http.Requ
 
 	output := checkapp.CheckAll(request.Context(), input)
 	if err := json.NewEncoder(response).Encode(output); err != nil {
-		logs.Log.Errorf("Encoding check all instances: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Encoding check all instances: %v", err)
 	}
 }
 
@@ -602,7 +616,7 @@ func (c *Client) handleFileBrowser(response http.ResponseWriter, request *http.R
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
-		logs.Log.Errorf("Encoding file browser directory: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Encoding file browser directory: %v", err)
 	}
 }
 
@@ -616,7 +630,7 @@ func (c *Client) getFileBrowserOutput(ctx context.Context, dirPath string) (*Bro
 	if (output.Path == "/" || output.Path == "" || output.Path == `\`) && mnd.IsWindows {
 		partitions, err := disk.PartitionsWithContext(ctx, false)
 		if err != nil {
-			logs.Log.Errorf("Getting disk partitions: %v", err)
+			logs.Log.Errorf(mnd.GetID(ctx), "Getting disk partitions: %v", err)
 		}
 
 		for _, partition := range partitions {
@@ -711,7 +725,7 @@ func (c *Client) getBrowsedDir(dir string) (*BrowseDir, error) {
 //	@Router			/browse [get]
 func (c *Client) handleNewFile(response http.ResponseWriter, request *http.Request) {
 	filePath := mux.Vars(request)["file"]
-	logs.Log.Printf("[user requested] Creating file: %s", filePath)
+	logs.Log.Printf(mnd.GetID(request.Context()), "[user requested] Creating file: %s", filePath)
 
 	f, err := os.Create(filePath)
 	if err != nil {
@@ -724,7 +738,7 @@ func (c *Client) handleNewFile(response http.ResponseWriter, request *http.Reque
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
-		logs.Log.Errorf("Encoding file browser directory: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Encoding file browser directory: %v", err)
 	}
 }
 
@@ -743,7 +757,7 @@ func (c *Client) handleNewFile(response http.ResponseWriter, request *http.Reque
 //	@Router			/browse [get]
 func (c *Client) handleNewFolder(response http.ResponseWriter, request *http.Request) {
 	dirPath := mux.Vars(request)["dir"]
-	logs.Log.Printf("[user requested] Creating folder: %s", dirPath)
+	logs.Log.Printf(mnd.GetID(request.Context()), "[user requested] Creating folder: %s", dirPath)
 
 	if err := os.MkdirAll(dirPath, mnd.Mode0750); err != nil {
 		http.Error(response, err.Error(), http.StatusInternalServerError)
@@ -754,7 +768,7 @@ func (c *Client) handleNewFolder(response http.ResponseWriter, request *http.Req
 	if err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
 	} else if err = json.NewEncoder(response).Encode(&output); err != nil {
-		logs.Log.Errorf("Encoding file browser directory: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Encoding file browser directory: %v", err)
 	}
 }
 
@@ -779,7 +793,7 @@ func (c *Client) handleCommandStats(response http.ResponseWriter, request *http.
 	}
 
 	if err := json.NewEncoder(response).Encode(cmd.Stats()); err != nil {
-		logs.Log.Errorf("Encoding command stats: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Encoding command stats: %v", err)
 	}
 }
 
@@ -944,7 +958,7 @@ func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.
 	}
 
 	if err := json.NewEncoder(response).Encode(integrations); err != nil {
-		logs.Log.Errorf("Encoding integrations: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Encoding integrations: %v", err)
 	}
 }
 
@@ -971,8 +985,9 @@ func (c *Client) handleRunCommand(response http.ResponseWriter, request *http.Re
 	_ = request.ParseForm()
 
 	cmd.Run(&common.ActionInput{
-		Type: website.EventGUI,
-		Args: request.PostForm["args"],
+		Type:  website.EventGUI,
+		Args:  request.PostForm["args"],
+		ReqID: mnd.GetID(request.Context()),
 	})
 	http.Error(response, "Check command output after a few seconds.", http.StatusOK)
 }
@@ -991,7 +1006,7 @@ func (c *Client) handleProcessList(response http.ResponseWriter, request *http.R
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 	} else if _, err = ps.WriteTo(response); err != nil {
 		user, _ := c.getUserName(request)
-		logs.Log.Errorf("[gui '%s' requested] Writing HTTP Response: %v", user, err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Writing HTTP Response: %v", user, err)
 	}
 }
 
@@ -1067,7 +1082,7 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 		http.Error(response, "Stop Failed: "+err.Error(), http.StatusInternalServerError)
 
 		user, _ := c.getUserName(request)
-		logs.Log.Errorf("[gui '%s' requested] Stopping File Watcher: %v", user, err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Stopping File Watcher: %v", user, err)
 
 		return
 	}
@@ -1095,13 +1110,14 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	config := &configfile.Config{}
 
 	if err := json.NewDecoder(request.Body).Decode(&config); err != nil {
-		logs.Log.Errorf("[gui '%s' requested] Decoding POSTed Config: %v, %#v", user, err, config)
+		logs.Log.Errorf(mnd.GetID(request.Context()),
+			"[gui '%s' requested] Decoding POSTed Config: %v, %#v", user, err, config)
 		http.Error(response, "Error decoding POSTed Config: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if err := c.validateNewConfig(config); err != nil {
-		logs.Log.Errorf("[gui '%s' requested] Validating POSTed Config: %v", user, err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Validating POSTed Config: %v", user, err)
 		http.Error(response, err.Error(), http.StatusBadRequest)
 
 		return
@@ -1114,7 +1130,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	if err := c.saveNewConfig(request.Context(), config); err != nil {
-		logs.Log.Errorf("[gui '%s' requested] Saving Config: %v", user, err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Saving Config: %v", user, err)
 		http.Error(response, "Saving Config: "+err.Error(), http.StatusInternalServerError)
 
 		return
@@ -1134,7 +1150,7 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 	}
 
 	// respond.
-	logs.Log.Printf("[gui '%s' requested] Updated Configuration.%s", user, reload)
+	logs.Log.Printf(mnd.GetID(request.Context()), "[gui '%s' requested] Updated Configuration.%s", user, reload)
 	http.Error(response, "Config Saved."+reload, http.StatusOK)
 }
 
@@ -1258,6 +1274,7 @@ func (c *Client) handleAPIKey(respond http.ResponseWriter, request *http.Request
 	}
 
 	// respond.
-	logs.Log.Printf("[gui '%s' requested] Updated Configuration. Reloading in 5 seconds...", username)
+	logs.Log.Printf(mnd.GetID(request.Context()),
+		"[gui '%s' requested] Updated Configuration. Reloading in 5 seconds...", username)
 	http.Error(respond, "Config Saved. Reloading in 5 seconds...", http.StatusOK)
 }

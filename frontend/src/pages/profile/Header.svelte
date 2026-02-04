@@ -68,6 +68,8 @@
           <p>{@html $_('profile.authType.option_desc.password')}</p>
           <h5>{$_('profile.authType.options.header')}</h5>
           <p>{@html $_('profile.authType.option_desc.header')}</p>
+          <h5>{$_('profile.authType.options.website')}</h5>
+          <p>{@html $_('profile.authType.option_desc.website')}</p>
           <h5>{$_('profile.authType.options.noauth')}</h5>
           <p>{@html $_('profile.authType.option_desc.noauth')}</p>
         </Card>

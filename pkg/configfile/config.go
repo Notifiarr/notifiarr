@@ -165,15 +165,13 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 		return nil, fmt.Errorf("filepath variables: %w", err)
 	}
 
-	result := &SetupResult{Output: output}
+	c.fixConfig()
 
 	if err := c.setupPassword(); err != nil {
 		return nil, err
 	}
 
-	c.fixConfig()
-
-	result.Services = services.New(&c.Services)
+	result := &SetupResult{Output: output, Services: services.New(&c.Services)}
 	if err := result.Services.Add(c.Service); err != nil {
 		return nil, fmt.Errorf("service checks: %w", err)
 	}

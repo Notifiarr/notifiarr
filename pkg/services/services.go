@@ -12,6 +12,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
 	"golift.io/version"
@@ -60,7 +61,7 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	s.done = make(chan bool)
 	s.actionChan = make(chan action)
 	s.replyChan = make(chan bool)
-	s.triggerChan = make(chan website.EventType)
+	s.triggerChan = make(chan *common.ActionInput)
 	s.checkChan = make(chan triggerCheck)
 
 	if s.parallel = uint(len(s.services) / svcsPerThread); s.parallel < 1 {
@@ -78,7 +79,7 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	}
 
 	s.applyLocalOverrides(plexName)
-	s.loadServiceStates()
+	s.loadServiceStates(mnd.GetID(ctx))
 
 	for range s.parallel {
 		go s.watchServiceChan(ctx)
@@ -91,11 +92,11 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 		word = "Disabled"
 	}
 
-	mnd.Log.Printf("==> Service Checker %s! %d services, parallel: %d",
+	mnd.Log.Printf(mnd.GetID(ctx), "==> Service Checker %s! %d services, parallel: %d",
 		word, len(s.services), s.parallel)
 
 	if s.log != mnd.Log {
-		s.log.Printf("==> Service Checker %s! %d services, parallel: %d",
+		s.log.Printf(mnd.GetID(ctx), "==> Service Checker %s! %d services, parallel: %d",
 			word, len(s.services), s.parallel)
 	}
 }
@@ -137,7 +138,7 @@ func (s *Services) applyLocalOverrides(plexName string) {
 
 // loadServiceStates brings service states from the website into the fold.
 // In other words, states are stored in the website's database.
-func (s *Services) loadServiceStates() {
+func (s *Services) loadServiceStates(reqID string) {
 	names := []string{}
 	for name := range s.services {
 		names = append(names, valuePrefix+name)
@@ -147,9 +148,9 @@ func (s *Services) loadServiceStates() {
 		return
 	}
 
-	values, err := website.GetState(names...)
+	values, err := website.GetState(reqID, names...)
 	if err != nil {
-		s.log.ErrorfNoShare("Getting initial service states from website: %v", err)
+		s.log.ErrorfNoShare(reqID, "Getting initial service states from website: %v", err)
 		return
 	}
 
@@ -158,12 +159,12 @@ func (s *Services) loadServiceStates() {
 			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
 				var svc Service
 				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
-					s.log.ErrorfNoShare("Service check data for '%s' returned from site is invalid: %v", name, err)
+					s.log.ErrorfNoShare(reqID, "Service check data for '%s' returned from site is invalid: %v", name, err)
 					break
 				}
 
 				if time.Since(svc.LastCheck) < 2*time.Hour {
-					s.log.Printf("==> Set service state with website-saved data: %s, %s for %s",
+					s.log.Printf(reqID, "==> Set service state with website-saved data: %s, %s for %s",
 						name, svc.State, time.Since(svc.Since).Round(time.Second))
 
 					s.services[name].Output = svc.Output
@@ -191,17 +192,18 @@ const (
 func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 	checker := time.NewTicker(time.Second)
 	running := true
+	reqID := mnd.ReqID()
 
 	defer func() {
 		defer s.log.CapturePanic()
 		checker.Stop()
-		s.log.Printf("==> Service Checker Stopped!")
+		s.log.Printf(reqID, "==> Service Checker Stopped!")
 		s.actionChan <- actionStop // signal we're finished.
 	}()
 
 	if !s.Disabled {
 		s.runChecks(true, version.Started)
-		s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()})
+		s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()}, reqID)
 	} else {
 		running = false
 		checker.Stop()
@@ -214,11 +216,11 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 			case actionCheck:
 				s.replyChan <- running
 			case actionResume:
-				s.log.Printf("==> Service Checker Resumed!")
+				s.log.Printf(reqID, "==> Service Checker Resumed!")
 				checker.Reset(time.Second)
 				running = true
 			case actionPause:
-				s.log.Printf("==> Service Checker Paused!")
+				s.log.Printf(reqID, "==> Service Checker Paused!")
 				checker.Stop()
 				running = false
 			case actionStop:
@@ -231,31 +233,32 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				return
 			}
 		case event := <-s.checkChan:
-			s.log.Printf("Running service check '%s' via event: %s, buffer: %d/%d",
-				event.Service.Name, event.Source, len(s.checks), cap(s.checks))
+			s.log.Printf(event.ReqID, "Running service check '%s' via event: %s, buffer: %d/%d",
+				event.ReqID, event.Service.Name, event.Source, len(s.checks), cap(s.checks))
 
 			if s.runCheck(event.Service, true, time.Now()) {
-				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()})
+				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()}, event.ReqID)
 			}
-		case event := <-s.triggerChan:
-			s.log.Debugf("Running all service checks via event: %s, buffer: %d/%d", event, len(s.checks), cap(s.checks))
+		case input := <-s.triggerChan:
+			s.log.Printf(input.ReqID, "Running all service checks via event: %s, buffer: %d/%d",
+				input.ReqID, input.Type, len(s.checks), cap(s.checks))
 			s.runChecks(true, time.Now())
 
-			if event != "log" {
-				s.SendResults(&Results{What: event, Svcs: s.GetResults()})
+			if input.Type != "log" {
+				s.SendResults(&Results{What: input.Type, Svcs: s.GetResults()}, input.ReqID)
 				continue
 			}
 
 			data, err := json.MarshalIndent(&Results{Svcs: s.GetResults()}, "", " ")
 			if err != nil {
-				s.log.Errorf("Marshalling Service Checks: %v; payload: %s", err, string(data))
+				s.log.Errorf(input.ReqID, "Marshalling Service Checks: %v; payload: %s", err, string(data))
 				continue
 			}
 
-			s.log.Debug("Service Checks Payload (log only):", string(data))
+			s.log.Printf(input.ReqID, "Service Checks Payload (log only):", string(data))
 		case now := <-checker.C:
 			if s.runChecks(false, now) {
-				s.SendResults(&Results{What: website.EventCron, Svcs: s.GetResults()})
+				s.SendResults(&Results{What: website.EventCron, Svcs: s.GetResults()}, reqID)
 			}
 		}
 	}
@@ -291,7 +294,7 @@ func (s *Services) Resume() {
 func (s *Services) Stop() {
 	defer func() {
 		logs.Log.CapturePanic()
-		logs.Log.Printf("==> Service Checker Stopped!")
+		logs.Log.Printf("called", "==> Service Checker Stopped!")
 	}()
 
 	s.stopLock.Lock()
@@ -329,7 +332,7 @@ func (s *Services) APIHandler(req *http.Request) (int, any) {
 
 func (s *Services) handleTrigger(req *http.Request, event website.EventType) (int, any) {
 	action := mux.Vars(req)["action"]
-	s.log.Debugf("[%s requested] Incoming Service Action: %s (%s)", event, action)
+	s.log.Debugf(mnd.GetID(req.Context()), "[%s requested] Incoming Service Action: %s (%s)", event, action)
 
 	switch action {
 	case "list":

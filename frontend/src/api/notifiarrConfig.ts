@@ -23,7 +23,8 @@ export enum Weekday {
 export enum AuthType {
   password = 0,
   header   = 1,
-  noauth   = 2,
+  website  = 2,
+  noauth   = 3,
 };
 
 /**
@@ -1567,6 +1568,7 @@ export interface LogConfig {
   logFileMb: number;
   fileMode: number;
   debug: boolean;
+  trace: boolean;
   quiet: boolean;
   noUploads: boolean;
 };
