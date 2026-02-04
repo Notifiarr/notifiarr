@@ -42,6 +42,8 @@ func (c *Client) setUserPass(ctx context.Context, authType configfile.AuthType, 
 		err = c.Config.UIPassword.SetHeader(username)
 	case configfile.AuthNone:
 		err = c.Config.UIPassword.SetNoAuth(username)
+	case configfile.AuthWebsite:
+		err = c.Config.UIPassword.Set("", "")
 	}
 
 	if err != nil {

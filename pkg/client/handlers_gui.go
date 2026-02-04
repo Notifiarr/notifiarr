@@ -176,6 +176,9 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		mnd.HTTPRequests.Add("GUI Logins", 1)
 		logs.Log.Printf(reqID, "[gui '%s' requested] Authenticated with local credentials", providedUsername)
 		return true
+	case c.Config.UIPassword.IsCrypted():
+		http.Error(response, "Unauthorized", http.StatusUnauthorized)
+		return false
 	case clientinfo.CheckPassword(providedUsername, request.FormValue("sha")):
 		providedUsername = clientinfo.Get().User.Username
 		if providedUsername == "" {

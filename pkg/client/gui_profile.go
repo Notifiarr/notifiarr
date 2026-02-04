@@ -219,7 +219,8 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	currUser, dynamic := c.getUserName(request)
 	if !dynamic {
 		// If the auth is currently using a password, check the password.
-		if !c.Config.UIPassword.Valid(currUser, post.Password) && !clientinfo.CheckPassword(currUser, post.Password) {
+		if !c.Config.UIPassword.Valid(currUser, post.Password) &&
+			(c.Config.UIPassword.IsCrypted() || !clientinfo.CheckPassword(currUser, post.Password)) {
 			logs.Log.Errorf(mnd.GetID(request.Context()), "[gui '%s' requested] Trust Profile: Invalid existing (current) password provided.", currUser)
 			http.Error(response, "Invalid existing (current) password provided.", http.StatusBadRequest)
 			return
