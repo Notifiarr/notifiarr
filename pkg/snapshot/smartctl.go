@@ -30,10 +30,10 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) []e
 		errs  = []error{}
 	)
 
-	if err := s.getBlocks(disks); err != nil {
+	if err := s.getBlocks(ctx, disks); err != nil {
 		errs = append(errs, err)
 
-		mnd.Log.Debugf("Snapshot: got blocks, %v", disks)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Snapshot: got blocks, %v", disks)
 
 		if err := s.getParts(ctx, disks); err != nil {
 			errs = append(errs, err)
@@ -42,14 +42,14 @@ func (s *Snapshot) getDriveData(ctx context.Context, run bool, useSudo bool) []e
 
 	if !mnd.IsDarwin {
 		// We also do this because getParts doesn't always return (all the) disk drives.
-		mnd.Log.Debugf("Snapshot: getting smart disks, %v", disks)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Snapshot: getting smart disks, %v", disks)
 
 		if err := s.getSmartDisks(ctx, useSudo, disks); err != nil {
 			errs = append(errs, err)
 		}
 	}
 
-	mnd.Log.Debugf("Snapshot: got disks: %v", disks)
+	mnd.Log.Debugf(mnd.GetID(ctx), "Snapshot: got disks: %v", disks)
 
 	if len(disks) == 0 {
 		return append(errs, ErrNoDisks)
@@ -89,7 +89,7 @@ func (s *Snapshot) getSmartDisks(ctx context.Context, useSudo bool, disks map[st
 	go func() {
 		for stdout.Scan() {
 			fields := strings.Fields(stdout.Text())
-			mnd.Log.Debugf("Snapshot: smartctl scan %v", fields)
+			mnd.Log.Debugf(mnd.GetID(ctx), "Snapshot: smartctl scan %v", fields)
 
 			if len(fields) < 3 || fields[0] == "#" {
 				continue
@@ -120,7 +120,7 @@ func (s *Snapshot) getParts(ctx context.Context, disks map[string]string) error 
 	}
 
 	for _, part := range partitions {
-		mnd.Log.Debugf("Snapshot: partition: %v", part)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Snapshot: partition: %v", part)
 
 		if mnd.IsDarwin {
 			if !strings.HasPrefix(part.Device, macDiskPrefix) || slices.Contains(part.Opts, "nobrowse") {
@@ -198,7 +198,7 @@ func (s *Snapshot) scanSmartctl(stdout *bufio.Scanner, name string, waitg *sync.
 	waitg.Done()
 }
 
-func (s *Snapshot) getBlocks(disks map[string]string) error {
+func (s *Snapshot) getBlocks(ctx context.Context, disks map[string]string) error {
 	block, err := ghw.Block()
 	if err != nil {
 		return fmt.Errorf("unable to get block devices: %w", err)
@@ -207,7 +207,7 @@ func (s *Snapshot) getBlocks(disks map[string]string) error {
 	have := make(map[string]struct{})
 
 	for _, dev := range block.Disks {
-		mnd.Log.Debugf("Snapshot: block dev: %v", dev)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Snapshot: block dev: %v", dev)
 
 		if _, ok := have[dev.BusPath]; ok && strings.ToLower(dev.BusPath) != "unknown" {
 			continue

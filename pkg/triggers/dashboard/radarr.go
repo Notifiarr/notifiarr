@@ -19,12 +19,12 @@ func (c *Cmd) getRadarrStates(ctx context.Context) []*State {
 			continue
 		}
 
-		mnd.Log.Debugf("Getting Radarr State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Getting Radarr State: %d:%s", instance+1, app.URL)
 
 		state, err := c.getRadarrState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			mnd.Log.Errorf("Getting Radarr Queue from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Getting Radarr Queue from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)

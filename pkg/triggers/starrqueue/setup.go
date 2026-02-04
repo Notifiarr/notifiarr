@@ -3,6 +3,7 @@ package starrqueue
 import (
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
@@ -54,15 +55,21 @@ type QueuesPaylod struct {
 
 // New configures the library.
 func New(config *common.Config) *Action {
+	reqID := logs.Log.Trace("", "start: common.New")
+	defer logs.Log.Trace(reqID, "end: common.New")
+
 	return &Action{cmd: &cmd{Config: config}}
 }
 
 // Create initializes the library.
 func (a *Action) Create() {
-	lidarr := a.cmd.setupLidarr()
-	radarr := a.cmd.setupRadarr()
-	readarr := a.cmd.setupReadarr()
-	sonarr := a.cmd.setupSonarr()
+	reqID := logs.Log.Trace("", "start: Action.Create")
+	defer logs.Log.Trace(reqID, "end: Action.Create")
+
+	lidarr := a.cmd.setupLidarr(reqID)
+	radarr := a.cmd.setupRadarr(reqID)
+	readarr := a.cmd.setupReadarr(reqID)
+	sonarr := a.cmd.setupSonarr(reqID)
 
 	if lidarr || radarr || readarr || sonarr {
 		a.cmd.Add(&common.Action{

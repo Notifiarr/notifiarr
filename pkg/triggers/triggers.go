@@ -9,6 +9,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/autoupdate"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/backups"
@@ -162,6 +163,7 @@ func (a *Actions) Stop(event website.EventType) context.Context {
 type inChData struct {
 	website.EventType
 	*clientinfo.Actions
+	ReqID string
 }
 
 // watchChan watches the inCh channel for new events from the website.
@@ -169,12 +171,13 @@ type inChData struct {
 func (a *Actions) watchChan(ctx context.Context) {
 	for event := range a.inCh {
 		a.outCh <- "Actions reconfiguration triggered."
+		ctx := mnd.SetID(ctx)
 
 		if event.Actions != nil {
 			// Handle POSTed actions data.
 			clientInfo := clientinfo.Get()
 			if clientInfo == nil {
-				logs.Log.ErrorfNoShare("[%s requested] Client info not found", event.EventType)
+				logs.Log.ErrorfNoShare(mnd.GetID(ctx), "[%s requested] Client info not found", event.EventType)
 				continue
 			}
 
@@ -182,11 +185,11 @@ func (a *Actions) watchChan(ctx context.Context) {
 			data.Save("clientInfo", clientInfo)
 		} else if _, err := a.Config.CI.SaveClientInfo(ctx, false); err != nil {
 			// ^ Go fetch the actions data from the website.
-			logs.Log.ErrorfNoShare("[%s requested] Error reconfiguring: %v", event.EventType, err)
+			logs.Log.ErrorfNoShare(mnd.GetID(ctx), "[%s requested] Error reconfiguring: %v", event.EventType, err)
 			continue
 		}
 
-		logs.Log.Printf("[%s requested] Actions reconfiguration: restarting actions.", event.EventType)
+		logs.Log.Printf(mnd.GetID(ctx), "[%s requested] Actions reconfiguration: restarting actions.", event.EventType)
 		a.Stop(event.EventType)
 		a.Start(ctx, nil, nil)
 	}

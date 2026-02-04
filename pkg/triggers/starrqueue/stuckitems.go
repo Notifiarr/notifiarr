@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
@@ -19,23 +20,31 @@ import (
 
 // StuckItems sends the stuck queues items for all apps.
 // Does not fetch fresh data first, uses cache.
-func (a *Action) StuckItems(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigStuckItems)
+func (a *Action) StuckItems(input *common.ActionInput) {
+	logs.Log.Trace(input.ReqID, "start: Action.StuckItems", input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: Action.StuckItems", input.Type)
+
+	a.cmd.Exec(input, TrigStuckItems)
 }
 
 // sendStuckQueues gathers the stuck queue from cache and sends them.
 func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
+	logs.Log.Trace(input.ReqID, "start: sendStuckQueues", input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: sendStuckQueues", input.Type)
+
+	ctx = mnd.WithID(ctx, input.ReqID)
 	lidarr := c.getFinishedItemsLidarr(ctx)
 	radarr := c.getFinishedItemsRadarr(ctx)
 	readarr := c.getFinishedItemsReadarr(ctx)
 	sonarr := c.getFinishedItemsSonarr(ctx)
 
 	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
-		mnd.Log.Debugf("[%s requested] No stuck items found.", input.Type)
+		mnd.Log.Debugf(input.ReqID, "[%s requested] No stuck items found.", input.Type)
 		return
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.StuckRoute,
 		Event:      input.Type,
 		LogPayload: true,
@@ -50,7 +59,10 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	})
 }
 
-func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsLidarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsLidarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsLidarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Lidarr {
@@ -85,14 +97,17 @@ func (c *cmd) getFinishedItemsLidarr(_ context.Context) itemList { //nolint:cycl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Lidarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
 	return stuck
 }
 
-func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsRadarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsRadarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsRadarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Radarr {
@@ -127,14 +142,17 @@ func (c *cmd) getFinishedItemsRadarr(_ context.Context) itemList { //nolint:cycl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Radarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
 	return stuck
 }
 
-func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsReadarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsReadarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsReadarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Readarr {
@@ -169,14 +187,17 @@ func (c *cmd) getFinishedItemsReadarr(_ context.Context) itemList { //nolint:cyc
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Readarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 
 	return stuck
 }
 
-func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cyclop
+func (c *cmd) getFinishedItemsSonarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsSonarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsSonarr")
+
 	stuck := make(itemList)
 
 	for idx, app := range c.Apps.Sonarr {
@@ -211,7 +232,7 @@ func (c *cmd) getFinishedItemsSonarr(_ context.Context) itemList { //nolint:cycl
 		}
 
 		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
-		mnd.Log.Debugf("Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+		mnd.Log.Debugf(reqID, "Checking Sonarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
 			instance, len(queue.Records), len(appqueue))
 	}
 

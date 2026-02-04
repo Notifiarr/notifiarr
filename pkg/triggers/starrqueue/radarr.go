@@ -5,23 +5,15 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
-	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 )
 
 const TrigRadarrQueue common.TriggerName = "Storing Radarr instance %d queue."
-
-// StoreRadarr fetches and stores the Radarr queue immediately for the specified instance.
-// Does not send data to the website.
-func (a *Action) StoreRadarr(event website.EventType, instance int) {
-	if name := TrigRadarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		mnd.Log.Errorf("[%s requested] Failed! %s Disabled?", event, name)
-	}
-}
 
 type radarrApp struct {
 	app *apps.Radarr
@@ -31,9 +23,12 @@ type radarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *radarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
+	logs.Log.Trace(input.ReqID, "start: radarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: radarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Getting Radarr Queue (instance %d): %v", input.Type, app.idx+1, err)
+		mnd.Log.Errorf(input.ReqID, "[%s requested] Getting Radarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -43,12 +38,15 @@ func (app *radarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 		item.Languages = nil
 	}
 
-	mnd.Log.Debugf("[%s requested] Stored Radarr Queue (%d items), instance %d %s",
+	mnd.Log.Printf(input.ReqID, "[%s requested] Stored Radarr Queue (%d items), instance %d %s",
 		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("radarr", app.idx, queue)
 }
 
-func (c *cmd) setupRadarr() bool {
+func (c *cmd) setupRadarr(reqID string) bool {
+	logs.Log.Trace(reqID, "start: setupRadarr")
+	defer logs.Log.Trace(reqID, "end: setupRadarr")
+
 	var enabled bool
 
 	for idx, app := range c.Apps.Radarr {

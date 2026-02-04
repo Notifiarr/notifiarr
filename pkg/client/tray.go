@@ -32,6 +32,8 @@ var menu = make(map[string]*systray.MenuItem) //nolint:gochecknoglobals
 // startTray Run()s readyTray to bring up the web server and the GUI app.
 func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInfo, reload func()) {
 	systray.Run(func() {
+		ctx := mnd.SetID(ctx)
+
 		defer os.Exit(0)
 		defer logs.Log.CapturePanic()
 
@@ -40,20 +42,20 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 		systray.SetTemplateIcon(file, file)
 		systray.SetTooltip(mnd.PrintVersionInfo(c.Flags.Name()))
 		// systray.SetOnClick(c.showMenu) // buggy
-		systray.SetOnRClick(c.showMenu)
+		systray.SetOnRClick(func(menu systray.IMenu) { c.showMenu(mnd.GetID(ctx), menu) })
 		systray.SetOnDClick(func(_ systray.IMenu) { c.openGUI(ctx) })
 		c.makeMenus(ctx, clientInfo) // make the menu before starting the web server.
 		c.setupMenus(clientInfo)     // code that runs on reload, too.
 
 		// This starts the web server, and waits for reload/exit signals.
 		if err := c.Exit(ctx, reload); err != nil {
-			logs.Log.Errorf("Server: %v", err)
+			logs.Log.Errorf(mnd.GetID(ctx), "Server: %v", err)
 			os.Exit(1) // web server problem
 		}
 	}, func() {
 		// This code only fires from menu->quit.
 		if err := c.stop(ctx, website.EventUser); err != nil {
-			logs.Log.Errorf("Server: %v", err)
+			logs.Log.Errorf(mnd.GetID(ctx), "Server: %v", err)
 			os.Exit(1) // web server problem
 		}
 		// because systray wants to control the exit code? no..
@@ -61,9 +63,9 @@ func (c *Client) startTray(ctx context.Context, clientInfo *clientinfo.ClientInf
 	})
 }
 
-func (c *Client) showMenu(menu systray.IMenu) {
+func (c *Client) showMenu(reqID string, menu systray.IMenu) {
 	if err := menu.ShowMenu(); err != nil {
-		logs.Log.Errorf("Menu Failed: %v", err)
+		logs.Log.Errorf(reqID, "Menu Failed: %v", err)
 	}
 }
 
@@ -146,7 +148,7 @@ func (c *Client) makeMenus(ctx context.Context, clientInfo *clientinfo.ClientInf
 	menu["sub"].Click(func() { ui.OpenURL(ctx, "https://github.com/sponsors/Notifiarr") })
 	menu["exit"] = systray.AddMenuItem("Quit", "exit "+c.Flags.Name())
 	menu["exit"].Click(func() {
-		logs.Log.Printf("Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
+		logs.Log.Printf(mnd.GetID(ctx), "Need help? %s\n=====> Exiting! User Requested", mnd.HelpLink)
 		systray.Quit() // this kills the app
 	})
 }
@@ -163,7 +165,7 @@ func (c *Client) configMenu(ctx context.Context) {
 	menu["edit"] = conf.AddSubMenuItem("Edit", "edit configuration")
 	menu["edit"].Click(func() {
 		ui.OpenFile(ctx, c.Flags.ConfigFile)
-		logs.Log.Print("user requested] Editing Config File:", c.Flags.ConfigFile)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Editing Config File:", c.Flags.ConfigFile)
 	})
 
 	menu["pass"] = conf.AddSubMenuItem("Password", "create or update the Web UI admin password")
@@ -180,11 +182,11 @@ func (c *Client) configMenu(ctx context.Context) {
 	menu["svcs"].Click(func() {
 		if menu["svcs"].Checked() {
 			menu["svcs"].Uncheck()
-			logs.Log.Printf("[user requested] Pausing service checks.")
+			logs.Log.Printf(mnd.GetID(ctx), "[user requested] Pausing service checks.")
 			c.Services.Pause()
 			ui.Toast(ctx, "Paused checking services!")
 		} else {
-			logs.Log.Printf("[user requested] Resuming service checks.")
+			logs.Log.Printf(mnd.GetID(ctx), "[user requested] Resuming service checks.")
 			menu["svcs"].Check()
 			c.Services.Resume()
 			ui.Toast(ctx, "Resumed checking services!")
@@ -227,25 +229,25 @@ func (c *Client) logsMenu(ctx context.Context) {
 	menu["logs_view"] = logsMenu.AddSubMenuItem("View", "view the application log")
 	menu["logs_view"].Click(func() {
 		ui.OpenLog(ctx, c.Config.LogFile)
-		logs.Log.Print("[user requested] Viewing App Log File:", c.Config.LogFile)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing App Log File:", c.Config.LogFile)
 	})
 
 	menu["logs_http"] = logsMenu.AddSubMenuItem("HTTP", "view the HTTP log")
 	menu["logs_http"].Click(func() {
 		ui.OpenLog(ctx, c.Config.HTTPLog)
-		logs.Log.Print("[user requested] Viewing HTTP Log File:", c.Config.HTTPLog)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing HTTP Log File:", c.Config.HTTPLog)
 	})
 
 	menu["debug_logs2"] = logsMenu.AddSubMenuItem("Debug", "view the Debug log")
 	menu["debug_logs2"].Click(func() {
 		ui.OpenLog(ctx, c.Config.LogConfig.DebugLog)
-		logs.Log.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
 	})
 
 	menu["logs_svcs"] = logsMenu.AddSubMenuItem("Services", "view the Services log")
 	menu["logs_svcs"].Click(func() {
 		ui.OpenLog(ctx, c.Config.Services.LogFile)
-		logs.Log.Print("[user requested] Viewing Services Log File:", c.Config.Services.LogFile)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing Services Log File:", c.Config.Services.LogFile)
 	})
 
 	menu["logs_rotate"] = logsMenu.AddSubMenuItem("Rotate", "rotate both log files")
@@ -280,46 +282,58 @@ func (c *Client) notifiarrMenu(ctx context.Context) {
 }
 
 func (c *Client) notifiarrMenuActions(ctx context.Context) {
-	menu["gaps"].Click(func() { c.triggers.Gaps.Send(website.EventUser) })
-	menu["synccf"].Click(func() { c.triggers.CFSync.SyncRadarrCF(website.EventUser) })
-	menu["syncqp"].Click(func() { c.triggers.CFSync.SyncSonarrRP(website.EventUser) })
-	menu["svcs_prod"].Click(func() {
-		logs.Log.Printf("[user requested] Checking services and sending results to Notifiarr.")
-		ui.Toast(ctx, "Running and sending %d Service Checks.", c.Services.SvcCount())
-		c.Services.RunChecks(website.EventUser)
+	menu["gaps"].Click(func() {
+		c.triggers.Gaps.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
 	})
-	menu["plex_prod"].Click(func() { c.triggers.PlexCron.Send(website.EventUser) })
-	menu["snap_prod"].Click(func() { c.triggers.SnapCron.Send(website.EventUser) })
-	menu["send_dash"].Click(func() { c.triggers.Dashboard.Send(website.EventUser) })
+	menu["synccf"].Click(func() {
+		c.triggers.CFSync.SyncRadarrCF(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["syncqp"].Click(func() {
+		c.triggers.CFSync.SyncSonarrRP(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["svcs_prod"].Click(func() {
+		logs.Log.Printf(mnd.GetID(ctx), "[user requested] Checking services and sending results to Notifiarr.")
+		ui.Toast(ctx, "Running and sending %d Service Checks.", c.Services.SvcCount())
+		c.Services.RunChecks(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["plex_prod"].Click(func() {
+		c.triggers.PlexCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["snap_prod"].Click(func() {
+		c.triggers.SnapCron.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["send_dash"].Click(func() {
+		c.triggers.Dashboard.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
 	menu["corrLidarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Lidarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Lidarr)
 	})
 	menu["corrProwlarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Prowlarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Prowlarr)
 	})
 	menu["corrRadarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Radarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Radarr)
 	})
 	menu["corrReadarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Readarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Readarr)
 	})
 	menu["corrSonarr"].Click(func() {
-		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser}, starr.Sonarr)
+		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Sonarr)
 	})
 	menu["backLidarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Lidarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Lidarr)
 	})
 	menu["backProwlarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Prowlarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Prowlarr)
 	})
 	menu["backRadarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Radarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Radarr)
 	})
 	menu["backReadarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Readarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Readarr)
 	})
 	menu["backSonarr"].Click(func() {
-		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser}, starr.Sonarr)
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Sonarr)
 	})
 }
 
@@ -330,19 +344,19 @@ func (c *Client) debugMenu(ctx context.Context) {
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["debug_logs"].Click(func() {
 		ui.OpenLog(ctx, c.Config.LogConfig.DebugLog)
-		logs.Log.Print("[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
 	})
 
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")
 	menu["svcs_log"].Click(func() {
-		logs.Log.Print("[user requested] Checking services and logging results.")
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Checking services and logging results.")
 		ui.Toast(ctx, "Running and logging %d Service Checks.", c.Services.SvcCount())
-		c.Services.RunChecks("log")
+		c.Services.RunChecks(&common.ActionInput{Type: "log", ReqID: mnd.GetID(ctx)})
 	})
 
 	debug.AddSubMenuItem("- Danger Zone -", "").Disable()
 	menu["debug_panic"] = debug.AddSubMenuItem("Application Panic", "cause an application panic (crash)")
-	menu["debug_panic"].Click(c.menuPanic)
+	menu["debug_panic"].Click(func() { c.menuPanic(mnd.GetID(ctx)) })
 }
 
 func (c *Client) buildDynamicTimerMenus() {
@@ -375,7 +389,7 @@ func (c *Client) buildDynamicTimerMenus() {
 
 		menu[name].SetTooltip(desc)
 		menu[name].Show()
-		menu[name].Click(func() { timers[idx].Run(&common.ActionInput{Type: website.EventUser}) })
+		menu[name].Click(func() { timers[idx].Run(&common.ActionInput{Type: website.EventUser, ReqID: mnd.ReqID()}) })
 	}
 }
 

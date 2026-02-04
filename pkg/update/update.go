@@ -125,7 +125,7 @@ func NowWithContext(ctx context.Context, update *Command) (string, error) {
 		return backupFile, err
 	}
 
-	mnd.Log.Printf("[UPDATE] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
+	mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
 
 	cmd := exec.Command(update.Path, update.Args...) //nolint:noctx // Can't put a context on this. Let it go.
 	if err := cmd.Start(); err != nil {              //nolint:gosec
@@ -160,15 +160,15 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 
 	backupFile := strings.TrimSuffix(u.Path, dotExe)
 	backupFile += ".backup." + time.Now().Format(backupTimeFormat) + suff
-	mnd.Log.Printf("[UPDATE] Renaming %s => %s", u.Path, backupFile)
+	mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Renaming %s => %s", u.Path, backupFile)
 
 	if err := os.Rename(u.Path, backupFile); err != nil {
 		return backupFile, fmt.Errorf("renaming original file: %w", err)
 	}
 
-	mnd.Log.Printf("[UPDATE] Renaming %s => %s", tempFile, u.Path)
+	mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Renaming %s => %s", tempFile, u.Path)
 
-	u.cleanOldBackups()
+	u.cleanOldBackups(ctx)
 
 	if err := os.Rename(tempFile, u.Path); err != nil {
 		return backupFile, fmt.Errorf("renaming downloaded file: %w", err)
@@ -184,7 +184,7 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 	}
 	defer tempFile.Close()
 
-	mnd.Log.Printf("[UPDATE] Primed Temp File: %s", tempFile.Name())
+	mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Primed Temp File: %s", tempFile.Name())
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u.URL, nil)
 	if err != nil {
@@ -197,15 +197,15 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 	}
 	defer resp.Body.Close()
 
-	return tempFile.Name(), u.decompressFile(tempFile, resp.Body, resp.ContentLength)
+	return tempFile.Name(), u.decompressFile(ctx, tempFile, resp.Body, resp.ContentLength)
 }
 
-func (u *Command) decompressFile(tempFile *os.File, resp io.Reader, size int64) error {
+func (u *Command) decompressFile(ctx context.Context, tempFile *os.File, resp io.Reader, size int64) error {
 	switch {
 	case strings.Contains(u.URL, ".zip?stamp"), strings.HasSuffix(u.URL, ".zip"):
 		if body, err := io.ReadAll(resp); err != nil {
 			return fmt.Errorf("reading file from URL: %w", err)
-		} else if err := u.writeZipFile(tempFile, body, size); err != nil {
+		} else if err := u.writeZipFile(ctx, tempFile, body, size); err != nil {
 			return err
 		}
 	case strings.Contains(u.URL, ".gz?stamp"), strings.HasSuffix(u.URL, ".gz"):
@@ -239,7 +239,7 @@ func (u *Command) writeGZipFile(tempFile *os.File, resp io.Reader) error {
 	return nil
 }
 
-func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error {
+func (u *Command) writeZipFile(ctx context.Context, tempFile *os.File, body []byte, size int64) error {
 	if size < 1 {
 		size = int64(len(body))
 	}
@@ -267,7 +267,7 @@ func (u *Command) writeZipFile(tempFile *os.File, body []byte, size int64) error
 		}
 	}
 
-	mnd.Log.Errorf("[UPDATE] exe file not found in zip file")
+	mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] exe file not found in zip file")
 
 	return nil
 }

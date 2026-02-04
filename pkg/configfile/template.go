@@ -82,6 +82,10 @@ quiet = {{.Quiet}}
 
 ## Debug prints more data and json payloads. This increases application memory usage.
 debug = {{.Debug}}
+##
+## Trace logs function entry/exit with request IDs. Use for debugging request flow.
+trace = {{.Trace}}
+##
 max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
 
 {{- if not force}}

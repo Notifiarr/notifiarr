@@ -29,6 +29,7 @@ const (
 
 // Setup must run in the creation routine.
 func (c *Command) Setup() {
+	reqID := mnd.ReqID()
 	if c.Name == "" {
 		if args := shlex.Split(c.Command); len(args) > 0 {
 			c.Name = args[0]
@@ -42,7 +43,7 @@ func (c *Command) Setup() {
 	}
 
 	if err := c.SetupRegexpArgs(); err != nil {
-		mnd.Log.Errorf("Command Setup Failed: %v", err)
+		mnd.Log.Errorf(reqID, "Command Setup Failed: %v", err)
 		c.disable = true //nolint:wsl
 	}
 
@@ -116,6 +117,7 @@ func (c *Command) RunNow(ctx context.Context, input *common.ActionInput) (string
 	// Send the notification before the lock.
 	if c.Notify {
 		website.SendData(&website.Request{
+			ReqID: mnd.GetID(ctx),
 			Route: website.CommandRoute,
 			Event: input.Type,
 			Payload: map[string]string{
@@ -156,14 +158,14 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, elapse
 		c.output = "error: " + eStr + ", output: " + oStr
 
 		if c.Log && oStr != "" {
-			mnd.Log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v, Output:\n%s",
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v, Output:\n%s",
 				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err, oStr)
 		} else {
-			mnd.Log.Errorf("[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v",
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Custom Command '%s%s' Failed (elapsed: %s): %v",
 				input.Type, c.Name, extra, elapsed.Round(time.Millisecond), err)
 		}
 	} else if c.Log && oStr != "" {
-		mnd.Log.Printf("[%s requested] Custom Command '%s%s' Output (elapsed: %s):\n%s",
+		mnd.Log.Printf(input.ReqID, "[%s requested] Custom Command '%s%s' Output (elapsed: %s):\n%s",
 			input.Type, c.Name, extra, elapsed.Round(time.Millisecond), oStr)
 	}
 }

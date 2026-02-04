@@ -35,17 +35,18 @@ func New(config *common.Config) *Action {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
-func (c *cmd) create() {
+func (c *cmd) create(reqID string) {
 	var dur time.Duration
 
 	ci := clientinfo.Get()
 	if ci != nil && ci.Actions.Gaps.Interval.Duration > 0 && len(ci.Actions.Gaps.Instances) > 0 {
 		randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
 		dur = ci.Actions.Gaps.Interval.Duration + randomTime
-		mnd.Log.Printf("==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
+		mnd.Log.Printf(reqID, "==> Collection Gaps Timer Enabled, interval:%s", ci.Actions.Gaps.Interval)
 	}
 
 	c.Add(&common.Action{
@@ -58,15 +59,15 @@ func (c *cmd) create() {
 }
 
 // Send radarr collection gaps to the website.
-func (a *Action) Send(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCollectionGaps)
+func (a *Action) Send(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigCollectionGaps)
 }
 
 func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 	info := clientinfo.Get()
 	if info == nil || len(info.Actions.Gaps.Instances) == 0 || len(c.Apps.Radarr) == 0 {
-		mnd.Log.Errorf("[%s requested] Cannot send Radarr Collection Gaps: instances or configured Radarrs (%d) are zero.",
-			input.Type, len(c.Apps.Radarr))
+		mnd.Log.Errorf(input.ReqID, "[%s requested] Cannot send Radarr Collection Gaps:"+
+			" instances or configured Radarrs (%d) are zero.", input.Type, len(c.Apps.Radarr))
 		return
 	}
 
@@ -84,12 +85,13 @@ func (c *cmd) sendGaps(ctx context.Context, input *common.ActionInput) {
 
 		movies, err := app.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
 		if err != nil {
-			mnd.Log.Errorf("[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v",
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Radarr Collection Gaps (%d:%s) failed: getting movies: %v",
 				input.Type, instance, app.URL, err)
 			continue
 		}
 
 		website.SendData(&website.Request{
+			ReqID:      mnd.GetID(ctx),
 			Route:      website.GapsRoute,
 			Event:      input.Type,
 			LogPayload: true,

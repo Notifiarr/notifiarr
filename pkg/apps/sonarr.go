@@ -87,7 +87,7 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 		if mnd.Log.DebugEnabled() {
 			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  mnd.Log.Debugf,
+				Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 				Caller:  metricMakerCallback(string(starr.Sonarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
@@ -836,10 +836,10 @@ func sonarrSearchSeries(req *http.Request) (int, any) {
 		return apiError(http.StatusServiceUnavailable, "getting series", err)
 	}
 
-	return http.StatusOK, seriesSearch(series, mux.Vars(req)["query"])
+	return http.StatusOK, seriesSearch(mnd.GetID(req.Context()), series, mux.Vars(req)["query"])
 }
 
-func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchItem {
+func seriesSearch(reqID string, series []*sonarr.Series, query string) []SeriesSearchItem {
 	const (
 		minLength  = 2 // Too short to search.
 		maxResults = 10
@@ -852,13 +852,13 @@ func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchItem {
 	}
 
 	titles, resp := buildTitlesList(series)
-	mnd.Log.Printf("[sonarr search] Found %d Sonarr titles from %d series for query %q (cleaned %q)",
+	mnd.Log.Printf(reqID, "[sonarr search] Found %d Sonarr titles from %d series for query %q (cleaned %q)",
 		len(titles), len(series), query, cleanedQuery)
 
 	// Find fuzzy matches.
 	matches, err := wuzzy.Extract(query, titles, -1, matcher, minScore)
 	if err != nil {
-		mnd.Log.Errorf("[sonarr search] Finding fuzzy matches: %s", err)
+		mnd.Log.Errorf(reqID, "[sonarr search] Finding fuzzy matches: %s", err)
 	}
 
 	have := map[int]bool{}
@@ -870,7 +870,7 @@ func seriesSearch(series []*sonarr.Series, query string) []SeriesSearchItem {
 
 		for _, idx := range seriesMatches(match, series) {
 			if !have[idx] {
-				mnd.Log.Printf("[sonarr search] Fuzzy match (score: %d): %q (matched: %q)",
+				mnd.Log.Printf(reqID, "[sonarr search] Fuzzy match (score: %d): %q (matched: %q)",
 					match.Score, series[idx].Title, match.Match)
 				resp = append(resp, convertToSeriesSearchOutput(series[idx], match.Score))
 				have[idx] = true

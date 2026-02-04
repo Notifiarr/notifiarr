@@ -156,6 +156,9 @@ func (c *Config) VersionHandlerInstance(r *http.Request) (int, any) {
 
 // appStatsForVersion loops each app and gets the version info.
 func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.appStatsForVersion")
+	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersion")
+
 	var (
 		lid  = make([]*LidarrConTest, len(c.Apps.Lidarr))
 		prl  = make([]*ProwlarrConTest, len(c.Apps.Prowlarr))
@@ -184,9 +187,9 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 	}
 }
 
-func (c *Config) getConTest(app string, name string, instance int, err error) conTest {
+func (c *Config) getConTest(reqID, app string, name string, instance int, err error) conTest {
 	if err != nil {
-		mnd.Log.Errorf("Getting %s %d (%s) system status: %v", app, instance, name, err)
+		mnd.Log.Errorf(reqID, "Getting %s %d (%s) system status: %v", app, instance, name, err)
 		return conTest{Instance: instance, Error: err.Error(), Name: name}
 	}
 
@@ -195,13 +198,16 @@ func (c *Config) getConTest(app string, name string, instance int, err error) co
 
 // appStatsForVersionInstance handles a single-app version request.
 func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, instance int) *AppStatuses { //nolint:cyclop,funlen
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.appStatsForVersionInstance", app, instance)
+	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersionInstance", app, instance)
+
 	switch idx := instance - 1; app {
 	case "lidarr":
 		if instance <= len(c.Apps.Lidarr) && c.Apps.Lidarr[idx].Enabled() {
 			stat, err := c.Apps.Lidarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
-			return &AppStatuses{Lidarr: []*LidarrConTest{{c.getConTest(app, c.Apps.Lidarr[idx].Name, instance, err), stat}}}
+			return &AppStatuses{Lidarr: []*LidarrConTest{{c.getConTest(reqID, app, c.Apps.Lidarr[idx].Name, instance, err), stat}}}
 		}
 
 		return &AppStatuses{Lidarr: []*LidarrConTest{{
@@ -212,7 +218,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			stat, err := c.Apps.Radarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
-			return &AppStatuses{Radarr: []*RadarrConTest{{c.getConTest(app, c.Apps.Radarr[idx].Name, instance, err), stat}}}
+			return &AppStatuses{Radarr: []*RadarrConTest{{c.getConTest(reqID, app, c.Apps.Radarr[idx].Name, instance, err), stat}}}
 		}
 
 		return &AppStatuses{Radarr: []*RadarrConTest{{
@@ -223,7 +229,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			stat, err := c.Apps.Readarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
-			return &AppStatuses{Readarr: []*ReadarrConTest{{c.getConTest(app, c.Apps.Readarr[idx].Name, instance, err), stat}}}
+			return &AppStatuses{Readarr: []*ReadarrConTest{{c.getConTest(reqID, app, c.Apps.Readarr[idx].Name, instance, err), stat}}}
 		}
 
 		return &AppStatuses{Readarr: []*ReadarrConTest{{
@@ -234,7 +240,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			stat, err := c.Apps.Sonarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
-			return &AppStatuses{Sonarr: []*SonarrConTest{{c.getConTest(app, c.Apps.Sonarr[idx].Name, instance, err), stat}}}
+			return &AppStatuses{Sonarr: []*SonarrConTest{{c.getConTest(reqID, app, c.Apps.Sonarr[idx].Name, instance, err), stat}}}
 		}
 
 		return &AppStatuses{Sonarr: []*SonarrConTest{{
@@ -245,14 +251,14 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			stat, err := c.Apps.Prowlarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
-			return &AppStatuses{Prowlarr: []*ProwlarrConTest{{c.getConTest(app, c.Apps.Prowlarr[idx].Name, instance, err), stat}}}
+			return &AppStatuses{Prowlarr: []*ProwlarrConTest{{c.getConTest(reqID, app, c.Apps.Prowlarr[idx].Name, instance, err), stat}}}
 		}
 
 		return &AppStatuses{Prowlarr: []*ProwlarrConTest{{
 			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Prowlarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
 		}}}
 	case "plex":
-		stat := &AppStatuses{Plex: c.plexVersionReply(c.Apps.Plex.GetInfo(ctx))}
+		stat := &AppStatuses{Plex: c.plexVersionReply(ctx)}
 		stat.Plex[0].Name = c.Apps.Plex.Server.Name()
 
 		return stat
@@ -266,7 +272,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		stat, err := c.Apps.Tautulli.GetInfo(ctx)
 		data.SaveWithID(app+mnd.Status, 1, stat)
 
-		return &AppStatuses{Tautulli: []*TautulliConTest{{c.getConTest(app, c.Apps.Tautulli.Name, 1, err), stat}}}
+		return &AppStatuses{Tautulli: []*TautulliConTest{{c.getConTest(reqID, app, c.Apps.Tautulli.Name, 1, err), stat}}}
 	}
 
 	return nil
@@ -281,16 +287,15 @@ func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lid
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Lidarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Lidarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Lidarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("lidarrStatus", idx, stat)
 
-			lid[idx] = &LidarrConTest{conTest: c.getConTest("Lidarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+			lid[idx] = &LidarrConTest{conTest: c.getConTest(reqID, "Lidarr", app.Name, idx+1, err), Status: stat}
+		})
 	}
 }
 
@@ -303,16 +308,15 @@ func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, p
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Prowlarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Prowlarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Prowlarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("prowlarrStatus", idx, stat)
 
-			prl[idx] = &ProwlarrConTest{conTest: c.getConTest("Prowlarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+			prl[idx] = &ProwlarrConTest{conTest: c.getConTest(reqID, "Prowlarr", app.Name, idx+1, err), Status: stat}
+		})
 	}
 }
 
@@ -325,16 +329,15 @@ func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, rad
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Radarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Radarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Radarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("radarrStatus", idx, stat)
 
-			rad[idx] = &RadarrConTest{conTest: c.getConTest("Radarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+			rad[idx] = &RadarrConTest{conTest: c.getConTest(reqID, "Radarr", app.Name, idx+1, err), Status: stat}
+		})
 	}
 }
 
@@ -347,16 +350,15 @@ func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, re
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Readarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Readarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Readarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("readarrStatus", idx, stat)
 
-			read[idx] = &ReadarrConTest{conTest: c.getConTest("Readarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+			read[idx] = &ReadarrConTest{conTest: c.getConTest(reqID, "Readarr", app.Name, idx+1, err), Status: stat}
+		})
 	}
 }
 
@@ -369,16 +371,15 @@ func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, son
 			continue
 		}
 
-		wait.Add(1)
-
-		go func(idx int, app apps.Sonarr) {
-			defer wait.Done()
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Sonarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Sonarr.GetSystemStatusContext")
 
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("sonarrStatus", idx, stat)
 
-			son[idx] = &SonarrConTest{conTest: c.getConTest("Sonarr", app.Name, idx+1, err), Status: stat}
-		}(idx, app)
+			son[idx] = &SonarrConTest{conTest: c.getConTest(reqID, "Sonarr", app.Name, idx+1, err), Status: stat}
+		})
 	}
 }
 
@@ -387,15 +388,13 @@ func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexS
 		return
 	}
 
-	wait.Add(1)
-
-	go func() {
-		defer wait.Done()
-		*plx = c.plexVersionReply(plexServer.GetInfo(ctx)) //nolint:wsl
-	}()
+	wait.Go(func() {
+		*plx = c.plexVersionReply(ctx) //nolint:wsl
+	})
 }
 
-func (c *Config) plexVersionReply(stat *plex.PMSInfo, err error) []*PlexConTest {
+func (c *Config) plexVersionReply(ctx context.Context) []*PlexConTest {
+	stat, err := c.Apps.Plex.GetInfo(ctx)
 	if stat == nil {
 		stat = &plex.PMSInfo{}
 	}
@@ -412,6 +411,6 @@ func (c *Config) plexVersionReply(stat *plex.PMSInfo, err error) []*PlexConTest 
 			MyPlexSubscription: stat.MyPlexSubscription,
 			PushNotifications:  stat.PushNotifications,
 		},
-		c.getConTest("Plex", stat.FriendlyName, 1, err),
+		c.getConTest(mnd.GetID(ctx), "Plex", stat.FriendlyName, 1, err),
 	}}
 }

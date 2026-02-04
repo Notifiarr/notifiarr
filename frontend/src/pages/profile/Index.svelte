@@ -48,30 +48,30 @@
   // Clear the status messages when the component unmounts.
   onMount(() => () => profile.clearStatus())
 
-  const saveDisabled =
-    // If current auth type is password, make sure their password is entered.
-    $derived(
-      ($profile?.upstreamType === Auth.password &&
-        (!form.password || form.password.length < 9)) ||
-        // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
-        (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
-        // If they changed the auth type to password from something else, make sure they entered a new password.
-        (form.authType === Auth.password &&
-          $profile?.upstreamType !== Auth.password &&
-          form.newPass.length < 9) ||
-        // Make sure they picked a header if header auth type is selected.
-        (form.authType === Auth.header && !form.header) ||
-        // Make sure they didn't enter a username that's not allowed.
-        form.username == 'webauth' ||
-        form.username == 'noauth' ||
-        form.username.includes(':') ||
-        // Make sure the auth type changed, or upstreams changed.
-        (form.authType === Auth.noauth &&
-          $profile?.upstreamType === Auth.noauth &&
-          form.upstreams === $profile?.upstreamIp) ||
-        // Enable the save button.
-        false,
-    )
+  const saveDisabled = $derived(
+    // If current auth type is password/website, make sure their password is entered.
+    ([Auth.password, Auth.website].includes($profile?.upstreamType) &&
+      (!form.password || form.password.length < 5)) ||
+      // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
+      (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
+      // If they changed the auth type to password from something else, make sure they entered a new password.
+      (form.authType === Auth.password &&
+        $profile?.upstreamType !== Auth.password &&
+        form.newPass.length < 9) ||
+      // Make sure they picked a header if header auth type is selected.
+      (form.authType === Auth.header && !form.header) ||
+      // Make sure they didn't enter a username that's not allowed.
+      form.username == 'webauth' ||
+      form.username == 'noauth' ||
+      form.username == 'website' ||
+      form.username.includes(':') ||
+      // Make sure the auth type changed, or upstreams changed.
+      (form.authType === Auth.noauth &&
+        $profile?.upstreamType === Auth.noauth &&
+        form.upstreams === $profile?.upstreamIp) ||
+      // Enable the save button.
+      false,
+  )
 </script>
 
 <Header {addit} />
@@ -88,6 +88,7 @@
           bind:value={form.authType}
           options={[
             { value: Auth.password, name: $_('profile.authType.options.password') },
+            { value: Auth.website, name: $_('profile.authType.options.website') },
             {
               value: Auth.header,
               name: $_('profile.authType.options.header'),
@@ -111,7 +112,7 @@
 
     <!-- Authentication Section -->
     <h4>{$_('profile.title.Authentication')}</h4>
-    {#if form.authType !== Auth.password}
+    {#if [Auth.password, Auth.website].includes(form.authType)}
       <Row>
         <Col md={8}>
           <Input id="profile.header" type="select" bind:value={form.header}>
@@ -134,7 +135,7 @@
           </Input>
         </Col>
       </Row>
-    {:else}
+    {:else if form.authType !== Auth.website}
       <Row>
         <Col md={8}>
           <Input
@@ -152,7 +153,7 @@
     {/if}
 
     <!-- Current Password Section, shows up any time a password is configured in the backend. -->
-    {#if $profile?.upstreamType === Auth.password}
+    {#if [Auth.password, Auth.website].includes($profile?.upstreamType)}
       <Row>
         <Col md={8}>
           <Input
