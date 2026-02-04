@@ -49,7 +49,7 @@ func (a *Apps) radarrHandlers() {
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrGetImportLists, "GET")
 	a.HandleAPIpath(starr.Radarr, "/importlist", radarrAddImportList, "POST")
 	a.HandleAPIpath(starr.Radarr, "/importlist/{ilid:[0-9]+}", radarrUpdateImportList, "PUT")
-	a.HandleAPIpath(starr.Radarr, "/command/search/{movieid:[0-9]+}", radarrTriggerSearchMovie, "GET")
+	a.HandleAPIpath(starr.Radarr, "/command/search/{movieid:[0-9]+}", radarrCommandMoviesSearch, "GET")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrGetNotifications, "GET")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrUpdateNotification, "PUT")
 	a.HandleAPIpath(starr.Radarr, "/notification", radarrAddNotification, "POST")
@@ -230,7 +230,7 @@ func radarrGetMovie(req *http.Request) (int, any) {
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/radarr/{instance}/command/search/{movieID} [get]
 // @Security		ApiKeyAuth
-func radarrTriggerSearchMovie(req *http.Request) (int, any) {
+func radarrCommandMoviesSearch(req *http.Request) (int, any) {
 	movieID, _ := strconv.ParseInt(mux.Vars(req)["movieid"], mnd.Base10, mnd.Bits64)
 
 	output, err := getRadarr(req).SendCommandContext(req.Context(), &radarr.CommandRequest{
@@ -238,7 +238,7 @@ func radarrTriggerSearchMovie(req *http.Request) (int, any) {
 		MovieIDs: []int64{movieID},
 	})
 	if err != nil {
-		return apiError(http.StatusServiceUnavailable, "triggering movie search", err)
+		return apiError(http.StatusServiceUnavailable, "commanding movie search", err)
 	}
 
 	return http.StatusOK, output.Status
