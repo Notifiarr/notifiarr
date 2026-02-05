@@ -595,7 +595,7 @@ func (a *Actions) unmonitor(req *http.Request, input *common.ActionInput) (int, 
 		return http.StatusBadRequest, "decoding unmonitor data: " + err.Error()
 	}
 
-	a.Unmonitor.Unmonitor(input, &data)
+	a.Unmonitor.Now(input, &data)
 
 	msg := "Unmonitoring"
 	if data.Action == "delete" {
