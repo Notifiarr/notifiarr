@@ -10,7 +10,9 @@ import (
 
 // unmonitorSonarrEpisode takes in a TVDB ID, Season, and Episode number
 // and unmonitors or deletes the episode from the given Sonarr instance.
-func (c *cmd) unmonitorSonarrEpisode(ctx context.Context, response *ResponseData, idx int) (int, string) {
+func (c *cmd) unmonitorSonarrEpisode( //nolint:cyclop
+	ctx context.Context, response *ResponseData, idx int,
+) (int, string) {
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: unmonitorSonarrEpisode", response.Instances[idx])
 	defer mnd.Log.Trace(reqID, "end: unmonitorSonarrEpisode", response.Instances[idx], response.TvdbID)
 
@@ -22,6 +24,7 @@ func (c *cmd) unmonitorSonarrEpisode(ctx context.Context, response *ResponseData
 		return parseStarrError(err)
 	}
 
+	// Make sure we got the correct series.
 	if len(series) == 0 || response.TvdbID != series[0].TvdbID || response.TvdbID == 0 {
 		return http.StatusNotFound, "Series not found in this Sonarr instance."
 	}
@@ -57,7 +60,8 @@ func (c *cmd) unmonitorSonarrEpisode(ctx context.Context, response *ResponseData
 
 	// Check if the instance is rate limited.
 	if !sonarrInstance.DelOK() {
-		return http.StatusLocked, "This Sonarr instance is rate limited. Too many deletes through the Notifiarr client in the last hour."
+		return http.StatusLocked, "This Sonarr instance is rate limited." +
+			"Too many deletes through the Notifiarr client in the last hour."
 	}
 
 	mnd.Log.Trace(reqID, response.Action, "episode: unmonitorSonarrEpisode", episodeID, episodeFileID)

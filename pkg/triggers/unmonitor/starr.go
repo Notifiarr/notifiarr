@@ -9,7 +9,8 @@ import (
 	"golift.io/starr"
 )
 
-// unmonitorStarrContent loops through the provided instance list and unmonitors or deletes the episode or movie requested.
+// unmonitorStarrContent loops through the provided instance
+// list and unmonitors or deletes the episode or movie requested.
 func (c *cmd) unmonitorStarrContent(ctx context.Context, data *UnmonitorData) *ResponseData { //nolint:cyclop
 	response := &ResponseData{
 		UnmonitorData: data,
@@ -44,7 +45,8 @@ func (c *cmd) unmonitorStarrContent(ctx context.Context, data *UnmonitorData) *R
 	return response
 }
 
-// parseStarrError parses a starr package error and returns the status code and error message from the underlying api request.
+// parseStarrError parses a starr package error and returns the
+// status code and error message from the underlying API request.
 func parseStarrError(err error) (int, string) {
 	var starrErr *starr.ReqError
 	if errors.As(err, &starrErr) {
