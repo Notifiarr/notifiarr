@@ -27,7 +27,7 @@ func (c *cmd) unmonitorRadarrMovie(ctx context.Context, response *ResponseData, 
 
 	// Check if the instance is rate limited.
 	if !radarrInstance.DelOK() {
-		return http.StatusLocked, "This Radarr instance is rate limited." +
+		return http.StatusLocked, "This Radarr instance is rate limited. " +
 			"Too many deletes through the Notifiarr client in the last hour."
 	}
 

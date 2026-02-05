@@ -60,7 +60,7 @@ func (c *cmd) unmonitorSonarrEpisode( //nolint:cyclop
 
 	// Check if the instance is rate limited.
 	if !sonarrInstance.DelOK() {
-		return http.StatusLocked, "This Sonarr instance is rate limited." +
+		return http.StatusLocked, "This Sonarr instance is rate limited. " +
 			"Too many deletes through the Notifiarr client in the last hour."
 	}
 
