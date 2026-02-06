@@ -10,13 +10,13 @@ import (
 )
 
 type UnmonitorData struct {
-	Action    website.EventType `json:"action"`    // unmonitor|delete
-	App       string            `json:"app"`       // sonarr|radarr
-	Instances []int             `json:"instances"` // 1,2,3
-	TvdbID    int64             `json:"tvdbid"`    // tvdb id
-	TmdbID    int64             `json:"tmdbid"`    // tmdb id
-	Season    int               `json:"season"`    // season number
-	Episode   int               `json:"episode"`   // episode number
+	Action    website.EventType `json:"action"`            // unmonitor|delete
+	App       string            `json:"app"`               // sonarr|radarr
+	Instances []int             `json:"instances"`         // 1,2,3
+	TmdbID    int64             `json:"tmdbId,omitempty"`  // tmdb id
+	TvdbID    int64             `json:"tvdbId,omitempty"`  // tvdb id
+	Season    int               `json:"season,omitempty"`  // season number
+	Episode   int               `json:"episode,omitempty"` // episode number
 }
 
 type ResponseData struct {
