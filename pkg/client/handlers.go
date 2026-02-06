@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golift.io/starr"
 )
 
@@ -28,7 +29,7 @@ func (c *Client) httpHandlers() {
 
 	defer func() {
 		// SPA gets all the requests so it can handle its own page router.
-		c.apps.Router.PathPrefix("/").Handler(gzip(c.loginHandler)).Methods("POST").Queries("login", "{login}")
+		c.apps.Router.PathPrefix("/").Handler(gzip(c.loginDelayHandler)).Methods("POST").Queries("login", "{login}")
 		c.apps.Router.PathPrefix("/").Handler(gzip(frontend.IndexHandler)).Methods("GET")
 		c.apps.Router.PathPrefix("/").Handler(gzip(c.notFound))
 		// 404 (or redirect to base path) everything else
@@ -39,12 +40,12 @@ func (c *Client) httpHandlers() {
 	frontend.URLBase = base
 
 	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.slash)).Methods("GET")
-	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginHandler)).Methods("POST")
+	c.apps.Router.Handle(strings.TrimSuffix(base, "/")+"/", gzip(c.loginDelayHandler)).Methods("POST")
 
 	// Handle the same URLs as above on the different base URL too.
 	if !strings.EqualFold(base, "/") {
 		c.apps.Router.Handle(base, gzip(c.slash)).Methods("GET")
-		c.apps.Router.Handle(base, gzip(c.loginHandler)).Methods("POST")
+		c.apps.Router.Handle(base, gzip(c.loginDelayHandler)).Methods("POST")
 	}
 
 	// If api key is set to "disabled", then the Web UI gets turned off.
@@ -86,6 +87,7 @@ func (c *Client) httpGuiHandlers(base string, compress func(handler http.Handler
 	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET").Queries("sort", "{sort}")
 	gui.HandleFunc("/getFile/{source}/{id}", c.getFileHandler).Methods("GET")
 	gui.HandleFunc("/profile", c.handleProfilePost).Methods("POST")
+	gui.HandleFunc("/services/config", c.handleServicesConfig).Methods("GET")
 	gui.HandleFunc("/ps", c.handleProcessList).Methods("GET")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST").Queries("noreload", "{noreload}")
 	gui.HandleFunc("/reconfig", c.handleConfigPost).Methods("POST")
@@ -125,6 +127,13 @@ func (c *Client) httpAPIHandlers() {
 	c.apps.HandleAPIpath("", "ping", c.handleInstancePing, "GET")
 	c.apps.HandleAPIpath("", "ping/{app:[a-z,]+}", c.handleInstancePing, "GET")
 	c.apps.HandleAPIpath("", "ping/{app:[a-z]+}/{instance:[0-9]+}", c.handleInstancePing, "GET")
+	// Prometheus metrics endpoint, protected by API key.
+	c.apps.Router.Handle("/api/metrics", c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
+	c.apps.Router.Handle("/metrics", c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
+	if c.Config.URLBase != "/" {
+		c.apps.Router.Handle(path.Join(c.Config.URLBase, "metrics"),
+			c.apps.CheckAPIKey(promhttp.Handler())).Methods("GET")
+	}
 
 	// Aggregate handlers. Non-app specific.
 	c.apps.HandleAPIpath("", "/trash/{app}", c.triggers.CFSync.Handler, "POST")

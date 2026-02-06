@@ -22,11 +22,12 @@ const (
 // event is either media.play or media.resume.
 func (c *cmd) sendSessionPlaying(ctx context.Context, session *plex.Session, sessions *plex.Sessions, event string) {
 	if err := c.checkPlexAgent(ctx, session); err != nil {
-		mnd.Log.Errorf("Failed Plex Request: %v", err)
+		mnd.Log.Errorf(mnd.GetID(ctx), "Failed Plex Request: %v", err)
 		return
 	}
 
 	website.SendData(&website.Request{
+		ReqID: mnd.GetID(ctx),
 		Route: website.PlexRoute,
 		Event: website.EventHook,
 		Payload: &website.Payload{

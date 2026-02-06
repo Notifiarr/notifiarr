@@ -1,9 +1,4 @@
-#
-# This is part of Application Builder.
-# https://github.com/golift/application-builder
-#
-
-FROM golang:1.25.6-bookworm AS builder
+FROM golang:1.25.7-bookworm AS builder
 
 # Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
@@ -14,11 +9,10 @@ COPY main.go go.mod go.sum ./
 RUN go mod download \
     && go run github.com/swaggo/swag/cmd/swag@latest -v
 
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash \
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash \
     && apt install -y nodejs
 
 COPY pkg pkg
-COPY frontend frontend
 COPY frontend frontend
 RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
     mkdir -p ./frontend/dist \

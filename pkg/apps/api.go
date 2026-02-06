@@ -37,13 +37,26 @@ func (a *Apps) HandleAPIpath(app starr.App, uri string, api APIHandler, method .
 
 	uri = path.Join(a.URLBase, "api", app.Lower(), id, uri)
 
-	return a.Router.Handle(uri, a.CheckAPIKey(a.compress(a.handleAPI(app, api)))).Methods(method...)
+	return a.Router.Handle(uri, a.CheckAPIKey(
+		a.compress(a.handleAPI(app, trace("handleAPI-sub "+uri, api))))).Methods(method...)
+}
+
+func trace(name string, fn func(*http.Request) (int, any)) func(*http.Request) (int, any) {
+	return func(r *http.Request) (int, any) {
+		reqID := mnd.Log.Trace(mnd.GetID(r.Context()), "start:", name)
+		defer mnd.Log.Trace(reqID, "end:", name)
+
+		return fn(r)
+	}
 }
 
 // This grabs the app struct and saves it in a context before calling the handler.
 // The purpose of this complicated monster is to keep API handler methods simple.
-func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop
+func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nolint:cyclop,funlen
 	return func(resp http.ResponseWriter, r *http.Request) { //nolint:varnamelen
+		reqID := mnd.Log.Trace(mnd.GetID(r.Context()), "start: handleAPI", r.Method, r.URL.String())
+		defer mnd.Log.Trace(reqID, "end: handleAPI", r.Method, r.URL.String())
+
 		var (
 			msg     any
 			ctx     = r.Context()
@@ -92,13 +105,14 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, aID)))
 		}
 
-		wrote := a.Respond(resp, code, msg)
+		wrote := a.Respond(mnd.GetID(r.Context()), resp, code, msg)
 
 		if str, _ := json.MarshalIndent(msg, "", " "); len(post) > 0 {
-			mnd.Log.Debugf("Incoming API: %s %s (%s): %s\nStatus: %d, Reply (%s): %s",
+			mnd.Log.Debugf(mnd.GetID(r.Context()), "Incoming API: %s %s (%s): %s\nStatus: %d, Reply (%s): %s",
 				r.Method, r.URL, mnd.FormatBytes(len(post)), string(post), code, mnd.FormatBytes(wrote), str)
 		} else {
-			mnd.Log.Debugf("Incoming API: %s %s, Status: %d, Reply (%s): %s", r.Method, r.URL, code, mnd.FormatBytes(wrote), str)
+			mnd.Log.Debugf(mnd.GetID(r.Context()), "Incoming API: %s %s, Status: %d, Reply (%s): %s",
+				r.Method, r.URL, code, mnd.FormatBytes(wrote), str)
 		}
 
 		if appName == "" {
@@ -135,7 +149,7 @@ type ApiResponse struct {
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs. Returns size of data sent.
-func (a *Apps) Respond(w http.ResponseWriter, stat int, msg any) int64 { //nolint:varnamelen
+func (a *Apps) Respond(reqID string, w http.ResponseWriter, stat int, msg any) int64 { //nolint:varnamelen
 	statusTxt := strconv.Itoa(stat) + ": " + http.StatusText(stat)
 
 	if stat == http.StatusFound || stat == http.StatusMovedPermanently ||
@@ -149,7 +163,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg any) int64 { //nolin
 	}
 
 	if m, ok := msg.(error); ok {
-		mnd.Log.Errorf("Request failed. Status: %s, Message: %v", statusTxt, m)
+		mnd.Log.Errorf(reqID, "Request failed. Status: %s, Message: %v", statusTxt, m)
 		msg = m.Error()
 	}
 
@@ -162,7 +176,7 @@ func (a *Apps) Respond(w http.ResponseWriter, stat int, msg any) int64 { //nolin
 
 	err := json.Encode(&ApiResponse{Status: statusTxt, Msg: msg})
 	if err != nil {
-		mnd.Log.Errorf("Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
+		mnd.Log.Errorf(reqID, "Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}
 
 	return int64(counter.Count())

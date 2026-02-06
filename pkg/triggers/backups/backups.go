@@ -248,10 +248,12 @@ func (c *cmd) sendBackups(ctx context.Context, input *genericInstance) {
 
 	fileList, err := input.app.GetBackupFilesContext(ctx)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
+		mnd.Log.Errorf(mnd.GetID(ctx), "[%s requested] Getting %s Backup Files (%d): %v",
+			input.event, input.name, input.int, err)
 		return
 	} else if len(fileList) == 0 {
-		mnd.Log.Printf("[%s requested] %s has no backup files (%d)", input.event, input.name, input.int)
+		mnd.Log.Printf(mnd.GetID(ctx), "[%s requested] %s has no backup files (%d)",
+			input.event, input.name, input.int)
 		return
 	}
 
@@ -263,6 +265,7 @@ func (c *cmd) sendBackups(ctx context.Context, input *genericInstance) {
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.BackupRoute,
 		Event:      input.event,
 		LogPayload: true,

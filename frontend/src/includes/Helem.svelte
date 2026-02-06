@@ -33,7 +33,7 @@
     ...rest
   }: Props = $props()
 
-  const title = $json([parent, id].filter(v => v).join('.'))
+  const title = $derived($json([parent, id].filter(v => v).join('.')))
 </script>
 
 {#snippet image()}

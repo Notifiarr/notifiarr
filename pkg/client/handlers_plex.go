@@ -40,7 +40,7 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	defer r.Body.Close()
 
 	if err := r.ParseMultipartForm(mnd.Megabyte); err != nil {
-		logs.Log.Errorf("Parsing Multipart Form (plex): %v", err)
+		logs.Log.Errorf(mnd.GetID(r.Context()), "Parsing Multipart Form (plex): %v", err)
 		mnd.Apps.Add("Plex&&Webhook Errors", 1)
 		http.Error(w, "form parse error", http.StatusBadRequest)
 
@@ -48,16 +48,16 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	}
 
 	payload := r.Form.Get("payload")
-	logs.Log.Debugf("Plex Webhook Payload: %s", payload)
+	logs.Log.Debugf(mnd.GetID(r.Context()), "Plex Webhook Payload: %s", payload)
 	r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 
-	var hook plex.IncomingWebhook
+	hook := plex.IncomingWebhook{ReqID: mnd.GetID(r.Context())}
 
 	switch err := json.Unmarshal([]byte(payload), &hook); {
 	case err != nil:
 		mnd.Apps.Add("Plex&&Webhook Errors", 1)
 		http.Error(w, "payload error", http.StatusBadRequest)
-		logs.Log.Errorf("Unmarshalling Plex payload: %v", err)
+		logs.Log.Errorf(mnd.GetID(r.Context()), "Unmarshalling Plex payload: %v", err)
 	case strings.EqualFold(hook.Event, "admin.database.backup"):
 		fallthrough
 	case strings.EqualFold(hook.Event, "device.new"):
@@ -67,9 +67,10 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 	case strings.EqualFold(hook.Event, "library.new"):
 		fallthrough
 	case strings.EqualFold(hook.Event, "admin.database.corrupt"):
-		logs.Log.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
+		logs.Log.Printf(mnd.GetID(r.Context()), "Plex Incoming Webhook: %s, %s '%s' ~> %s (relaying to Notifiarr)",
 			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 		website.SendData(&website.Request{
+			ReqID:      mnd.GetID(r.Context()),
 			Route:      website.PlexRoute,
 			Event:      website.EventHook,
 			LogPayload: true,
@@ -83,12 +84,12 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "process", http.StatusAccepted)
 	case strings.EqualFold(hook.Event, "media.resume") && c.plexTimer.Active(hook.Metadata.Key+"resume", c.plexCooldown()):
-		logs.Log.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
+		logs.Log.Printf(mnd.GetID(r.Context()), "Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
 			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 		http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
 	case strings.EqualFold(hook.Event, "media.play"), strings.EqualFold(hook.Event, "playback.started"):
 		if c.plexTimer.Active(hook.Metadata.Key+"play", c.plexCooldown()) {
-			logs.Log.Printf("Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
+			logs.Log.Printf(mnd.GetID(r.Context()), "Plex Incoming Webhook Ignored (cooldown): %s, %s '%s' ~> %s",
 				hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 			http.Error(w, "ignored, cooldown", http.StatusAlreadyReported)
 
@@ -100,13 +101,13 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		fallthrough
 	case strings.EqualFold(hook.Event, "media.resume"):
 		c.triggers.PlexCron.SendWebhook(&hook) //nolint:contextcheck,nolintlint
-		logs.Log.Printf("Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
+		logs.Log.Printf(mnd.GetID(r.Context()), "Plex Incoming Webhook: %s, %s '%s' ~> %s (collecting sessions)",
 			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 		r.Header.Set("X-Request-Time", fmt.Sprintf("%dms", time.Since(start).Milliseconds()))
 		http.Error(w, "processing", http.StatusAccepted)
 	default:
 		http.Error(w, "ignored, unsupported", http.StatusAlreadyReported)
-		logs.Log.Printf("Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' ~> %s",
+		logs.Log.Printf(mnd.GetID(r.Context()), "Plex Incoming Webhook Ignored (unsupported): %s, %s '%s' ~> %s",
 			hook.Server.Title, hook.Account.Title, hook.Event, hook.Metadata.Title)
 	}
 }

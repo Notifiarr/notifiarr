@@ -88,7 +88,8 @@ func (a *Action) GetByHash(hash string) *Command {
 
 // Create initializes the library.
 func (a *Action) Create() {
-	a.cmd.create()
+	reqID := mnd.ReqID()
+	a.cmd.create(reqID)
 }
 
 // Stats for a command's invocations.
@@ -127,7 +128,7 @@ func (c *Command) Stats() Stats {
 	}
 }
 
-func (c *cmd) create() {
+func (c *cmd) create(reqID string) {
 	for _, cmd := range c.cmdlist {
 		cmd.ch = make(chan *common.ActionInput, 1)
 
@@ -139,5 +140,5 @@ func (c *cmd) create() {
 		})
 	}
 
-	mnd.Log.Printf("==> Custom Commands: %d provided", len(c.cmdlist))
+	mnd.Log.Printf(reqID, "==> Custom Commands: %d provided", len(c.cmdlist))
 }

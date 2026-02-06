@@ -20,12 +20,12 @@ func (c *Cmd) getTransmissionStates(ctx context.Context) []*State {
 			continue
 		}
 
-		mnd.Log.Debugf("Getting Transmission State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Getting Transmission State: %d:%s", instance+1, app.URL)
 
 		state, err := c.getTransmissionState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			mnd.Log.Errorf("Getting Transmission Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Getting Transmission Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)

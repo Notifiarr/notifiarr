@@ -3,7 +3,7 @@ import { getUi } from '../../api/fetch'
 import { delay, success, warning } from '../../includes/util'
 import { get } from 'svelte/store'
 import { _ } from 'svelte-i18n'
-import { profile } from '../../api/profile.svelte'
+import type { ClientServicesConfig as ServicesConfig } from '../../api/notifiarrConfig'
 
 export const page = {
   id: 'Monitoring',
@@ -17,6 +17,7 @@ export const page = {
 class Mon {
   public refresh = $state(false)
   public checking = $state<Record<string, boolean>>({})
+  public config = $state<ServicesConfig>({ results: [], running: true, disabled: false })
 
   public states: Record<number, string> = {
     0: 'OK',
@@ -33,9 +34,11 @@ class Mon {
 
   public updateBackend = async (e: Event) => {
     this.refresh = true
-    e.preventDefault()
+    e?.preventDefault?.()
     try {
-      await profile.refresh()
+      const resp = await getUi('services/config')
+      if (!resp.ok) throw new Error('Failed to get services config')
+      this.config = resp.body as ServicesConfig
     } catch (error) {
       warning(`${error}`)
     } finally {
@@ -44,7 +47,7 @@ class Mon {
   }
 
   public check = async (e: Event, name: string) => {
-    e.preventDefault()
+    e?.preventDefault?.()
     if (this.checking[name]) return
     this.checking[name] = true
     const resp = await getUi('services/check/' + name, false)

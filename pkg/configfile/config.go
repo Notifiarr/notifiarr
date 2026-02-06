@@ -79,9 +79,7 @@ func NewConfig() *Config {
 				URLBase: "/",
 			},
 		},
-		Services: services.Config{
-			Interval: cnfg.Duration{Duration: services.DefaultSendInterval},
-		},
+		Services: services.Config{},
 		BindAddr: mnd.DefaultBindAddr,
 		Snapshot: snapshot.Config{
 			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
@@ -167,16 +165,13 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 		return nil, fmt.Errorf("filepath variables: %w", err)
 	}
 
-	result := &SetupResult{Output: output}
+	c.fixConfig()
 
 	if err := c.setupPassword(); err != nil {
 		return nil, err
 	}
 
-	c.fixConfig()
-	c.Services.Fix()
-
-	result.Services = services.New(&c.Services)
+	result := &SetupResult{Output: output, Services: services.New(&c.Services)}
 	if err := result.Services.Add(c.Service); err != nil {
 		return nil, fmt.Errorf("service checks: %w", err)
 	}

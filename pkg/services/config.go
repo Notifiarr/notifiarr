@@ -10,18 +10,16 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"golift.io/cnfg"
 )
 
 // Services Defaults.
 const (
-	DefaultSendInterval  = 10 * time.Minute
-	MinimumSendInterval  = DefaultSendInterval / 2
 	MinimumCheckInterval = 10 * time.Second
 	MinimumTimeout       = time.Second
 	DefaultTimeout       = 10 * MinimumTimeout
-	MaximumParallel      = 10
 	DefaultBuffer        = 1000
 )
 
@@ -40,8 +38,6 @@ type Services struct {
 
 // Config for this Services plugin comes from a config file.
 type Config struct {
-	Interval cnfg.Duration     `json:"interval" toml:"interval" xml:"interval"`
-	Parallel uint              `json:"parallel" toml:"parallel" xml:"parallel"`
 	Disabled bool              `json:"disabled" toml:"disabled" xml:"disabled"`
 	LogFile  string            `json:"logFile"  toml:"log_file" xml:"log_file"`
 	Plugins  *snapshot.Plugins `json:"-"        toml:"-"` // pass this in so we can service-check mysql
@@ -54,10 +50,11 @@ type data struct {
 	done        chan bool
 	actionChan  chan action
 	replyChan   chan bool
-	triggerChan chan website.EventType
+	triggerChan chan *common.ActionInput
 	checkChan   chan triggerCheck
 	stopLock    sync.Mutex
 	log         mnd.Logger
+	parallel    uint
 }
 
 // CheckType locks us into a few specific types of checks.
@@ -132,12 +129,12 @@ type ServiceConfig struct {
 }
 
 type Service struct {
-	Output       *Output    `json:"output"`
-	State        CheckState `json:"state"`
-	Since        time.Time  `json:"since"`
-	LastCheck    time.Time  `json:"lastCheck"`
-	log          mnd.Logger
-	sync.RWMutex `json:"-"`
+	Output    *Output    `json:"output"`
+	State     CheckState `json:"state"`
+	Since     time.Time  `json:"since"`
+	LastCheck time.Time  `json:"lastCheck"`
+	log       mnd.Logger
+	mu        sync.RWMutex `json:"-"`
 	*ServiceConfig
 }
 

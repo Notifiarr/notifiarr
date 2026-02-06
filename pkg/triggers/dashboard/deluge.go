@@ -19,12 +19,12 @@ func (c *Cmd) getDelugeStates(ctx context.Context) []*State {
 			continue
 		}
 
-		mnd.Log.Debugf("Getting Deluge State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Getting Deluge State: %d:%s", instance+1, app.URL)
 
 		state, err := c.getDelugeState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			mnd.Log.Errorf("Getting Deluge Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Getting Deluge Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)

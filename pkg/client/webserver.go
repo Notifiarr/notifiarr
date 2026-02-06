@@ -23,13 +23,14 @@ func (c *Client) SetupWebServer() {
 
 	// Create an apache-style logger.
 	apache, err := apachelog.New(`%{X-Forwarded-For}i - %{X-NotiClient-Username}i %t "%m %{X-Redacted-URI}i %H" %>s ` +
-		`%b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+		`%b "%{Referer}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms id:%{X-Request-ID}i`)
 	if err != nil {
 		panic(fmt.Sprintf("Creating Apache Logger: %v", err))
 	}
 
 	// Create a request router.
 	c.apps.Router = mux.NewRouter()
+	c.apps.Router.Use(c.withReqID) // set a request ID for the request to improve logging.
 	c.apps.Router.Use(c.fixForwardedFor)
 	c.apps.Router.Use(c.countRequest)
 	c.apps.Router.Use(c.addUsernameHeader)
@@ -74,7 +75,7 @@ func (c *Client) RunWebServer() {
 	}
 
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
-		logs.Log.Errorf("Web Server Failed: %v (shutting down)", err)
+		logs.Log.Errorf("failed", "Web Server Failed: %v (shutting down)", err)
 		c.sigkil <- os.Kill // stop the app.
 	}
 }
@@ -88,7 +89,7 @@ func (c *Client) StopWebServer(ctx context.Context) error {
 		return nil
 	}
 
-	logs.Log.Printf("==> Stopping Web Server!")
+	logs.Log.Printf(mnd.GetID(ctx), "==> Stopping Web Server!")
 
 	ctx, cancel := context.WithTimeout(ctx, c.Config.Timeout.Duration)
 	defer cancel()
@@ -103,7 +104,7 @@ func (c *Client) StopWebServer(ctx context.Context) error {
 		return fmt.Errorf("shutting down web server: %w", err)
 	}
 
-	logs.Log.Printf("==> Web Server Stopped!")
+	logs.Log.Printf(mnd.GetID(ctx), "==> Web Server Stopped!")
 
 	return nil
 }

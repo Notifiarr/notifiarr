@@ -43,7 +43,7 @@ func (c *PlexConfig) Setup(maxBody int) Plex {
 	if mnd.Log.DebugEnabled() {
 		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback(starr.Plex.String()),
 			Redact:  []string{c.Token},
 		})
@@ -89,7 +89,7 @@ func (c *TautulliConfig) Setup(maxBody int) Tautulli {
 	if mnd.Log.DebugEnabled() {
 		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback("Tautulli"),
 			Redact:  []string{c.APIKey},
 		})
@@ -146,7 +146,7 @@ func (c *DelugeConfig) setup(maxBody int) (*deluge.Deluge, error) {
 	if mnd.Log.DebugEnabled() {
 		c.Client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback("Deluge"),
 			Redact:  []string{c.Password, c.HTTPPass},
 		})
@@ -204,7 +204,7 @@ func (c *SabNZBConfig) Setup(maxBody, index int) (*SabNZB, error) {
 	if mnd.Log.DebugEnabled() {
 		client = starr.ClientWithDebug(c.Timeout.Duration, c.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback("SABnzbd"),
 			Redact:  []string{c.APIKey},
 		})
@@ -261,7 +261,7 @@ func (q *QbitConfig) Setup(maxBody int) (*qbit.Qbit, error) {
 	if mnd.Log.DebugEnabled() {
 		q.Client = starr.ClientWithDebug(q.Timeout.Duration, q.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback("qBittorrent"),
 			Redact:  []string{q.Pass, q.HTTPPass},
 		})
@@ -333,7 +333,7 @@ func (r *RtorrentConfig) Setup(maxBody int) *xmlrpc.Client {
 	if mnd.Log.DebugEnabled() {
 		client = starr.ClientWithDebug(r.Timeout.Duration, r.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback("rTorrent"),
 			Redact:  []string{r.Pass},
 		})
@@ -379,7 +379,7 @@ func (n *NZBGetConfig) Setup(maxBody int) *nzbget.NZBGet {
 	if mnd.Log.DebugEnabled() {
 		n.Client = starr.ClientWithDebug(n.Timeout.Duration, n.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,
-			Debugf:  mnd.Log.Debugf,
+			Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 			Caller:  metricMakerCallback("NZBGet"),
 			Redact:  []string{n.Pass},
 		})
@@ -432,7 +432,7 @@ func (a *AppsConfig) setupTransmission() ([]Xmission, error) {
 		if mnd.Log.DebugEnabled() {
 			client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
-				Debugf:  mnd.Log.Debugf,
+				Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 				Caller:  metricMakerCallback("Transmission"),
 				Redact:  []string{app.Pass},
 			})

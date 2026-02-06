@@ -8,10 +8,11 @@
   type Props = { snapshot: Snapshot; snapshotAge: Date }
   let { snapshot, snapshotAge }: Props = $props()
 
-  const totalCPUTime =
+  const totalCPUTime = $derived(
     snapshot.system.cpuTime.user +
-    snapshot.system.cpuTime.system +
-    snapshot.system.cpuTime.idle
+      snapshot.system.cpuTime.system +
+      snapshot.system.cpuTime.idle,
+  )
 </script>
 
 <Col class="mb-2" sm={12} md={6}>

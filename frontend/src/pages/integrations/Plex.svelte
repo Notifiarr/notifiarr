@@ -132,6 +132,7 @@
   title="Integrations.plexSessions"
   fa={{ i: faVideo }}
   get={() => getApi('plex/1/sessions')}
+  size="xl"
   bind:this={sessionsModal}>
   {#snippet children(resp?: BackendResponse)}
     {@const sessions = (resp?.body?.message as Sessions) ?? {}}

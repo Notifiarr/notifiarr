@@ -281,6 +281,11 @@
       "description": "Enable or disable quiet logging.",
       "tooltip": "Enabling Quiet makes the app not print anything to stdout. This is useful when a log file is enabled and you don't want logs spewing into a startup daemon too."
     },
+    "trace": {
+      "label": "Trace Logging",
+      "description": "Enable or disable trace logging.",
+      "tooltip": "Enabling Trace will write very verbose execution flow to the log. Use for deep debugging."
+    },
     "logFile": {
       "label": "Application Log File",
       "description": "Path to the application log file or folder.",
@@ -327,11 +332,6 @@
         "label": "Health Checks",
         "description": "Enable or disable health checks.",
         "tooltip": "Disable or enable monitoring for all health checks right here."
-      },
-      "parallel": {
-        "label": "Concurrent Checks",
-        "description": "Number of health checks that may run concurrently.",
-        "tooltip": "Normally, running health checks one at a time is fine, but if you have more than 30 or 40, you may want to increase this."
       },
       "interval": {
         "label": "Update Interval",
@@ -431,11 +431,13 @@
       "options": {
         "password": "Password: Local Username",
         "header": "Auth Proxy: Header",
+        "website": "Website Credentials",
         "noauth": "No Password (danger)"
       },
       "option_desc": {
         "password": "This is the default authentication type. Select the Password option to log into this application with a configured username and password. Only 1 username and password is supported. When selecting this option, you must fill in the username and new password fields. If this is the current authentication type you must also fill in the current password field to make changes.",
         "header": "Select this option to log into this application using an HTTP header that contains a username. This is commonly known as proxy authentication. We have <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">a wiki page</a> that provides instructions to configure Nginx for this feature. When selecting this option, you must also select a header for the auth proxy. If no headers are displayed, then no valid headers were provided by the upstream proxy.",
+        "website": "Select this option to log into this application using website credentials. This allows you to log into the client using your email address or username and password from Notifiarr.com. Your password is always safe and encrypted before being transmitted to the client.",
         "noauth": "This configuration is not recommended. The No Password authentication type allows any request from any configured <code>upstream IP</code>. It also works with an auth proxy to set the username. If no username is in the provided header, then it defaults to admin."
       }
     },
@@ -457,7 +459,7 @@
     },
     "password": {
       "label": "Current Password",
-      "description": "Your login password",
+      "description": "Enter your current password to make changes",
       "placeholder": "Enter current password"
     },
     "newPass": {
@@ -1011,7 +1013,7 @@
       "description": "Command to run.",
       "required": "Command is required",
       "placeholder": "echo 'Hello, world!'",
-      "tooltip": "This is the command that will execute when triggered.<br />Click the double-check icon to run the command right now. After it finishes, click refresh and show output to see the results.<br /><br />Check the box to wrap the command in a shell. On Windows, this will run the command with <code>cmd.exe</code> and on other operating systems, it will run the command with <code>/bin/bash</code>. This is useful for commands that require shell features like pipes and redirects. Custom positional arguments may be defined with this format: <code>({regex})</code> - that is a regular expression wrapped in curly braces and parentheses, ie. <code>({[a-z]})</code>. These arguments may be filled in by the person running the command; either in this Web UI or on your chat server. If a command has an argument, it is required; if it has multiple arguments, they're all required.<br /><br /> <h5>Examples</h5>Command using two arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />The above command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>.<br /> This command can be used to curl websites from within the scratch Docker container: <code>/notifiarr --curl ({https?://[^ ;]+})</code>"
+      "tooltip": "This is the command that will execute when triggered.<br />Click the double-check icon to run the command right now. After it finishes, click refresh and show output to see the results.<br /><br />Check the box to wrap the command in a shell. On Windows, this will run the command with <code>cmd.exe</code> and on other operating systems, it will run the command with <code>/bin/bash</code>. This is useful for commands that require shell features like pipes and redirects. Custom positional arguments may be defined with this format: <code>({regex})</code> - that is a regular expression wrapped in curly braces and parentheses, ie. <code>({[a-z]})</code>. These arguments may be filled in by the person running the command; either in this Web UI or on your chat server. If a command has an argument, it is required; if it has multiple arguments, they're all required.<br /><br /> <h5>Examples</h5>Command using two arguments: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />The above command will allow a user to do any combination of <code>ls -la</code> on either <code>/tmp</code>, <code>/</code>, <code>/home</code>, or <code>/lib</code>."
     },
     "notify": {
       "label": "Notify",
@@ -1109,7 +1111,7 @@
     }
   },
   "metrics": {
-    "CountersReset": "The counters on this page reset when the application exits.",
+    "CountersReset": "The counters on this page reset when the application exits. The application exposes these counters via Prometheus. You may scrape them and use the <a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">Notifiarr Client Grafana dashboard</a> to visualize them.",
     "ApplicationUptime": "Application Uptime: &nbsp;<b>{timeDuration}</b>",
     "logFiles": {
       "title": "Log Files",
@@ -1151,7 +1153,7 @@
     "ConfigureServices": "Health checks for configured integrations are enabled by giving them a check interval on their respective configuration pages. Some of these checks are from the <go-to page=\"starrapps\">Starr Apps</go-to> page, or the <go-to page=\"downloaders\">Download Apps</go-to> page, or the <go-to page=\"mediaapps\">Media Apps</go-to> page. The rest of the health checks displayed can be found on the <go-to page=\"services\">Services page</go-to>.",
     "ChecksDisabled": "Health Checks: Disabled",
     "ChecksStopped": "Health Checks: Paused",
-    "EnableOnConfig": "Enable health checks on the <go-to page=\"configuration\">Configuration</go-to> page.",
+    "EnableOnConfig": "Enable health checks on the <go-to page=\"services\">Services</go-to> page.",
     "StartChecks": "Resume Health Checks",
     "StopChecks": "Pause Health Checks",
     "stopFailed": "Failed to pause health checks.",
@@ -1192,7 +1194,7 @@
     "title": "Health Checks",
     "DeleteCheck": "Delete Health Check",
     "addInstance": "Create Health Check",
-    "description": "Use this form to configure health checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. Disable and Enable service health checks in whole on the <go-to page=\"configuration\">Configuration</go-to> page. View running service health information on the <go-to page=\"monitoring\">Monitoring</go-to> page. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
+    "description": "Use this form to configure health checks. Do not add starr, media, snapshot, or downloader apps here. Give them a check interval on their respective configuration pages instead. View the <go-to page=\"ProcessList\">running process list here</go-to>, and use it for inspiration when creating process checks.",
     "processListLink": "View the running process list here.",
     "timeout": {
       "label": "Check Timeout",
