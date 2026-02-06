@@ -29,6 +29,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/snapcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/starrqueue"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/unmonitor"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"github.com/go-co-op/gocron/v2"
@@ -68,6 +69,7 @@ type Actions struct {
 	PlexCron   *plexcron.Action
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
+	Unmonitor  *unmonitor.Action
 	inCh       chan inChData
 	outCh      chan string
 }
@@ -100,6 +102,7 @@ func New(ctx context.Context, config *Config) *Actions {
 		PlexCron:   plex,
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
+		Unmonitor:  unmonitor.New(common),
 		inCh:       make(chan inChData),
 		outCh:      make(chan string),
 	}

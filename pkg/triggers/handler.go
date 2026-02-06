@@ -14,6 +14,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/unmonitor"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -176,6 +177,10 @@ func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigg
 		return a.uploadlog(input, content)
 	case "reconfig", "TrigReconfig":
 		return a.reconfig(req, input)
+	case "unmonitor":
+		return a.unmonitor(req, input, content)
+	case "delete":
+		return a.delete(req, input, content)
 	default:
 		return http.StatusBadRequest, "Unknown trigger provided:'" + trigger + "'"
 	}
@@ -575,4 +580,79 @@ func (a *Actions) reconfig(req *http.Request, input *common.ActionInput) (int, s
 	a.inCh <- inChData{EventType: input.Type, Actions: actions}
 
 	return http.StatusOK, <-a.outCh
+}
+
+type unmonitorData struct {
+	// Instance number in the app. 1,2,3
+	Instances []int `json:"instances"`
+	// TMDb ID for the movie, when interacting Radarr.
+	TmdbID int64 `json:"tmdbid"`
+	// TVDB ID for the series when interacting Sonarr.
+	TvdbID int64 `json:"tvdbid"`
+	// Season number for the episode when interacting Sonarr.
+	Season int `json:"season"`
+	// Episode number for the episode when interacting Sonarr.
+	Episode int `json:"episode"`
+}
+
+// @Description	Unmonitors content in Sonarr or Radarr.
+// @Summary		Unmonitor content in Sonarr or Radarr
+// @Tags			Triggers
+// @Produce		json
+// @Param			app	path		string								true	"app type to unmonitor"	Enum(sonarr, radarr)
+// @Param			data	body		unmonitorData						true	"Data for the unmonitor request"
+// @Success		200		{object}	apps.ApiResponse{message=string}	"success"
+// @Failure		400		{object}	apps.ApiResponse{message=string}	"bad json input"
+// @Failure		404		{object}	string								"bad token or api key"
+// @Router			/trigger/unmonitor/{app} [post]
+// @Security		ApiKeyAuth
+func (a *Actions) unmonitor(req *http.Request, input *common.ActionInput, app string) (int, string) {
+	var data unmonitorData
+	if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
+		return http.StatusBadRequest, "decoding unmonitor data: " + err.Error()
+	}
+
+	a.Unmonitor.Now(input, &unmonitor.UnmonitorData{
+		Action:    "unmonitor",
+		App:       app,
+		Instances: data.Instances,
+		TvdbID:    data.TvdbID,
+		TmdbID:    data.TmdbID,
+		Season:    data.Season,
+		Episode:   data.Episode,
+	})
+
+	return http.StatusOK, fmt.Sprintf("Unmonitoring from %d %s instances. Request ID: %s.",
+		len(data.Instances), app, input.ReqID)
+}
+
+// @Description	Deletes content from Sonarr or Radarr.
+// @Summary		Delete content from Sonarr or Radarr
+// @Tags			Triggers
+// @Produce		json
+// @Param			app	path		string								true	"app type to delete"	Enum(sonarr, radarr)
+// @Param			data	body		unmonitorData						true	"Data for the delete request"
+// @Success		200		{object}	apps.ApiResponse{message=string}	"success"
+// @Failure		400		{object}	apps.ApiResponse{message=string}	"bad json input"
+// @Failure		404		{object}	string								"bad token or api key"
+// @Router			/trigger/delete/{app} [post]
+// @Security		ApiKeyAuth
+func (a *Actions) delete(req *http.Request, input *common.ActionInput, app string) (int, string) {
+	var data unmonitorData
+	if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
+		return http.StatusBadRequest, "decoding unmonitor data: " + err.Error()
+	}
+
+	a.Unmonitor.Now(input, &unmonitor.UnmonitorData{
+		Action:    "delete",
+		App:       app,
+		Instances: data.Instances,
+		TvdbID:    data.TvdbID,
+		TmdbID:    data.TmdbID,
+		Season:    data.Season,
+		Episode:   data.Episode,
+	})
+
+	return http.StatusOK, fmt.Sprintf("Deleting from %d %s instances. Request ID: %s.",
+		len(data.Instances), app, input.ReqID)
 }
