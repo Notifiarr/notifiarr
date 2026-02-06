@@ -54,8 +54,8 @@ func (c *cmd) unmonitorSonarrEpisode( //nolint:cyclop
 	}
 
 	// Make sure we got the correct episode.
-	if episodeID == 0 {
-		return http.StatusNotFound, "Episode not found in this Sonarr instance."
+	if episodeID == 0 || episodeFileID == 0 {
+		return http.StatusNotFound, "Episode or episode file not found in this Sonarr instance."
 	}
 
 	// Check if the instance is rate limited.

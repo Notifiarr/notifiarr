@@ -13561,6 +13561,85 @@
                 }
             }
         },
+        "/trigger/delete/{app}": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Deletes content from Sonarr or Radarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Triggers"
+                ],
+                "summary": "Delete content from Sonarr or Radarr",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "app type to delete",
+                        "name": "app",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Data for the delete request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/triggers.unmonitorData"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "bad json input",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/trigger/emptyplextrash/{libraryKeys}": {
             "get": {
                 "security": [
@@ -14190,21 +14269,39 @@
                 }
             }
         },
-        "/trigger/unmonitor": {
+        "/trigger/unmonitor/{app}": {
             "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Deletes or stops monitoring a Plex-played item in Sonarr or Radarr.",
+                "description": "Unmonitors content in Sonarr or Radarr.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Triggers"
                 ],
-                "summary": "Delete or stop monitoring a Plex-played item",
+                "summary": "Unmonitor content in Sonarr or Radarr",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "app type to unmonitor",
+                        "name": "app",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Data for the unmonitor request",
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/triggers.unmonitorData"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "success",
@@ -15343,8 +15440,6 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -15361,8 +15456,6 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
@@ -20922,6 +21015,34 @@
                     "items": {
                         "$ref": "#/definitions/common.TriggerInfo"
                     }
+                }
+            }
+        },
+        "triggers.unmonitorData": {
+            "type": "object",
+            "properties": {
+                "episode": {
+                    "description": "Episode number for the episode when interacting Sonarr.",
+                    "type": "integer"
+                },
+                "instances": {
+                    "description": "Instance number in the app. 1,2,3",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "season": {
+                    "description": "Season number for the episode when interacting Sonarr.",
+                    "type": "integer"
+                },
+                "tmdbid": {
+                    "description": "TMDb ID for the movie, when interacting Radarr.",
+                    "type": "integer"
+                },
+                "tvdbid": {
+                    "description": "TVDB ID for the series when interacting Sonarr.",
+                    "type": "integer"
                 }
             }
         },

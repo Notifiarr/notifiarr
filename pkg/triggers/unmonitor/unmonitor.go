@@ -25,7 +25,7 @@ type ResponseData struct {
 	Statuses []string `json:"statuses"` // one per instance
 }
 
-const TrigPlexUnmonitor common.TriggerName = "Unmonitoring or deleting Starr item played by Plex."
+const TrigUnmonitorOrDelete common.TriggerName = "Unmonitoring or deleting played Starr content."
 
 // Action contains the exported methods for this package.
 type Action struct {
@@ -48,23 +48,23 @@ func (a *Action) Create() {
 
 func (c *cmd) create() {
 	c.Add(&common.Action{
-		Key:  "TrigPlexUnmonitor",
-		Name: TrigPlexUnmonitor,
-		Fn:   c.unmonitorPlexPlayedItems,
+		Key:  "TrigUnmonitorOrDelete",
+		Name: TrigUnmonitorOrDelete,
+		Fn:   c.unmonitorOrDeleteContent,
 		C:    make(chan *common.ActionInput, 1),
 	})
 }
 
-// Now unmonitors Plex-Played Items in Sonarr or Radarr.
+// Now unmonitors or deletes played Starr content.
 func (a *Action) Now(input *common.ActionInput, data *UnmonitorData) {
 	input.Raw = data
-	a.cmd.Exec(input, TrigPlexUnmonitor)
+	a.cmd.Exec(input, TrigUnmonitorOrDelete)
 }
 
-// unmonitorPlexPlayedItems is Exec'd by the Now() method above though the actions channel.
-func (c *cmd) unmonitorPlexPlayedItems(ctx context.Context, input *common.ActionInput) {
-	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: unmonitorPlexPlayedItems", input.Type)
-	defer mnd.Log.Trace(reqID, "end: unmonitorPlexPlayedItems", input.Type)
+// unmonitorOrDeleteContent is Exec'd by the Now() method above though the actions channel.
+func (c *cmd) unmonitorOrDeleteContent(ctx context.Context, input *common.ActionInput) {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: unmonitorOrDeleteContent", input.Type)
+	defer mnd.Log.Trace(reqID, "end: unmonitorOrDeleteContent", input.Type)
 
 	var data *UnmonitorData
 	data, ok := input.Raw.(*UnmonitorData)
