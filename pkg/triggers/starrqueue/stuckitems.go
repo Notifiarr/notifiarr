@@ -222,14 +222,19 @@ func minimalLidarrRecord(r *lidarr.QueueRecord) *lidarr.QueueRecord {
 		ArtistID:              r.ArtistID,
 		AlbumID:               r.AlbumID,
 		Title:                 r.Title,
+		Size:                  r.Size,
+		Sizeleft:              r.Sizeleft,
 		Status:                r.Status,
 		TrackedDownloadStatus: r.TrackedDownloadStatus,
 		StatusMessages:        r.StatusMessages,
 		ErrorMessage:          r.ErrorMessage,
 		DownloadID:            r.DownloadID,
+		Protocol:              r.Protocol,
 		DownloadClient:        r.DownloadClient,
-		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
-		// OutputPath, Indexer, Protocol, HasPostImportCategory, DownloadForced
+		Indexer:               r.Indexer,
+		HasPostImportCategory: r.HasPostImportCategory,
+		// Omitted: Timeleft, EstimatedCompletionTime, Quality,
+		// OutputPath, DownloadForced
 	}
 }
 
@@ -240,15 +245,20 @@ func minimalRadarrRecord(r *radarr.QueueRecord) *radarr.QueueRecord {
 		ID:                    r.ID,
 		MovieID:               r.MovieID,
 		Title:                 r.Title,
+		Size:                  r.Size,
+		Sizeleft:              r.Sizeleft,
 		Status:                r.Status,
 		TrackedDownloadStatus: r.TrackedDownloadStatus,
 		TrackedDownloadState:  r.TrackedDownloadState,
 		StatusMessages:        r.StatusMessages,
 		ErrorMessage:          r.ErrorMessage,
 		DownloadID:            r.DownloadID,
+		Protocol:              r.Protocol,
 		DownloadClient:        r.DownloadClient,
-		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
-		// CustomFormats, Languages, OutputPath, Indexer, Protocol, HasPostImportCategory
+		Indexer:               r.Indexer,
+		HasPostImportCategory: r.HasPostImportCategory,
+		// Omitted: Timeleft, EstimatedCompletionTime, Quality,
+		// CustomFormats, Languages, OutputPath
 	}
 }
 
@@ -260,15 +270,20 @@ func minimalReadarrRecord(r *readarr.QueueRecord) *readarr.QueueRecord {
 		AuthorID:              r.AuthorID,
 		BookID:                r.BookID,
 		Title:                 r.Title,
+		Size:                  r.Size,
+		Sizeleft:              r.Sizeleft,
 		Status:                r.Status,
 		TrackedDownloadStatus: r.TrackedDownloadStatus,
 		TrackedDownloadState:  r.TrackedDownloadState,
 		StatusMessages:        r.StatusMessages,
 		ErrorMessage:          r.ErrorMessage,
 		DownloadID:            r.DownloadID,
+		Protocol:              r.Protocol,
 		DownloadClient:        r.DownloadClient,
-		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
-		// OutputPath, Indexer, Protocol, HasPostImportCategory, DownloadForced
+		Indexer:               r.Indexer,
+		HasPostImportCategory: r.HasPostImportCategory,
+		// Omitted: Timeleft, EstimatedCompletionTime, Quality,
+		// OutputPath, DownloadForced
 	}
 }
 
@@ -280,15 +295,20 @@ func minimalSonarrRecord(r *sonarr.QueueRecord) *sonarr.QueueRecord {
 		SeriesID:              r.SeriesID,
 		EpisodeID:             r.EpisodeID,
 		Title:                 r.Title,
+		Size:                  r.Size,
+		Sizeleft:              r.Sizeleft,
 		Status:                r.Status,
 		TrackedDownloadStatus: r.TrackedDownloadStatus,
 		TrackedDownloadState:  r.TrackedDownloadState,
 		StatusMessages:        r.StatusMessages,
 		ErrorMessage:          r.ErrorMessage,
 		DownloadID:            r.DownloadID,
+		Protocol:              r.Protocol,
 		DownloadClient:        r.DownloadClient,
-		// Omitted: Size, Sizeleft, Timeleft, EstimatedCompletionTime, Quality,
-		// Language, OutputPath, Indexer, Protocol, HasPostImportCategory
+		Indexer:               r.Indexer,
+		HasPostImportCategory: r.HasPostImportCategory,
+		// Omitted: Timeleft, EstimatedCompletionTime, Quality,
+		// Language, OutputPath
 	}
 }
 
