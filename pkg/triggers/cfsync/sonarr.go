@@ -34,13 +34,13 @@ type SonarrTrashPayload struct {
 }
 
 // SyncSonarrRP initializes a release profile sync with sonarr.
-func (a *Action) SyncSonarrRP(event website.EventType) {
-	a.cmd.Exec(&common.ActionInput{Type: event}, TrigCFSyncSonarr)
+func (a *Action) SyncSonarrRP(input *common.ActionInput) {
+	a.cmd.Exec(input, TrigCFSyncSonarr)
 }
 
 // SyncSonarrInstanceRP initializes a release profile sync with a specific sonarr instance.
-func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) error {
-	if name := TrigCFSyncSonarrInt.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
+func (a *Action) SyncSonarrInstanceRP(input *common.ActionInput, instance int) error {
+	if name := TrigCFSyncSonarrInt.WithInstance(instance); !a.cmd.Exec(input, name) {
 		return fmt.Errorf("%w: Sonarr instance: %d", common.ErrInvalidApp, instance)
 	}
 
@@ -51,17 +51,20 @@ func (a *Action) SyncSonarrInstanceRP(event website.EventType, instance int) err
 func (c *cmd) syncSonarr(ctx context.Context, input *common.ActionInput) {
 	info := clientinfo.Get()
 	if info == nil || len(info.Actions.Sync.SonarrInstances) < 1 {
-		mnd.Log.Printf("[%s requested] Cannot sync Sonarr profiles and formats. Website provided 0 instances.", input.Type)
+		mnd.Log.Printf(input.ReqID,
+			"[%s requested] Cannot sync Sonarr profiles and formats. Website provided 0 instances.", input.Type)
 		return
 	} else if len(c.Apps.Sonarr) < 1 {
-		mnd.Log.Printf("[%s requested] Cannot sync Sonarr profiles and formats. No Sonarr instances configured.", input.Type)
+		mnd.Log.Printf(input.ReqID,
+			"[%s requested] Cannot sync Sonarr profiles and formats. No Sonarr instances configured.", input.Type)
 		return
 	}
 
 	for idx, app := range c.Apps.Sonarr {
 		instance := idx + 1
 		if !app.Enabled() || !info.Actions.Sync.SonarrInstances.Has(instance) {
-			mnd.Log.Printf("[%s requested] Profiles and formats sync skipping Sonarr instance %d. Not in sync list: %v",
+			mnd.Log.Printf(input.ReqID,
+				"[%s requested] Profiles and formats sync skipping Sonarr instance %d. Not in sync list: %v",
 				input.Type, instance, info.Actions.Sync.SonarrInstances)
 			continue
 		}
@@ -75,6 +78,7 @@ func (c *sonarrApp) syncSonarr(ctx context.Context, input *common.ActionInput) {
 	start := time.Now()
 	payload := c.cmd.getSonarrProfiles(ctx, input.Type, c.idx+1)
 	website.SendData(&website.Request{
+		ReqID:      input.ReqID,
 		Route:      website.CFSyncRoute,
 		Event:      input.Type,
 		Params:     []string{"app=sonarr"},
@@ -82,11 +86,14 @@ func (c *sonarrApp) syncSonarr(ctx context.Context, input *common.ActionInput) {
 		LogMsg:     fmt.Sprintf("Sonarr profiles and formats sync (elapsed: %v)", time.Since(start).Round(time.Millisecond)),
 		LogPayload: true,
 	})
-	mnd.Log.Printf("[%s requested] Synced profiles and formats for Sonarr instance %d (%s/%s)",
+	mnd.Log.Printf(input.ReqID, "[%s requested] Synced profiles and formats for Sonarr instance %d (%s/%s)",
 		input.Type, c.idx+1, c.app.Name, c.app.URL)
 }
 
 func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, instance int) *SonarrTrashPayload {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: getSonarrProfiles", event, instance)
+	defer mnd.Log.Trace(reqID, "end: getSonarrProfiles", event, instance)
+
 	var (
 		err     error
 		app     = c.Config.Apps.Sonarr[instance-1]
@@ -97,28 +104,32 @@ func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, in
 	if err != nil {
 		errStr := fmt.Sprintf("getting quality profiles: %v ", err)
 		payload.Error += errStr
-		mnd.Log.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf(reqID, "[%s requested] Getting Sonarr data from instance %d (%s): %v",
+			event, instance, app.Name, errStr)
 	}
 
 	payload.ReleaseProfiles, err = app.GetReleaseProfilesContext(ctx)
 	if err != nil {
 		errStr := fmt.Sprintf("getting release profiles: %v ", err)
 		payload.Error += errStr
-		mnd.Log.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf(reqID, "[%s requested] Getting Sonarr data from instance %d (%s): %v",
+			event, instance, app.Name, errStr)
 	}
 
 	payload.QualityDefinitions, err = app.GetQualityDefinitionsContext(ctx)
 	if err != nil {
 		errStr := fmt.Sprintf("getting quality definitions: %v ", err)
 		payload.Error += errStr
-		mnd.Log.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf(reqID, "[%s requested] Getting Sonarr data from instance %d (%s): %v",
+			event, instance, app.Name, errStr)
 	}
 
 	payload.CustomFormats, err = app.GetCustomFormatsContext(ctx)
 	if err != nil && !errors.Is(err, starr.ErrInvalidStatusCode) {
 		errStr := fmt.Sprintf("getting custom formats: %v ", err)
 		payload.Error += errStr
-		mnd.Log.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf(reqID, "[%s requested] Getting Sonarr data from instance %d (%s): %v",
+			event, instance, app.Name, errStr)
 	} else if errors.Is(err, starr.ErrInvalidStatusCode) {
 		// This error is required so the site knows it's sonarr v3.
 		errStr := fmt.Sprintf("getting custom formats: %v ", err)
@@ -129,7 +140,8 @@ func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, in
 	if err != nil {
 		errStr := fmt.Sprintf("getting naming: %v ", err)
 		payload.Error += errStr
-		mnd.Log.Errorf("[%s requested] Getting Sonarr data from instance %d (%s): %v", event, instance, app.Name, errStr)
+		mnd.Log.Errorf(reqID, "[%s requested] Getting Sonarr data from instance %d (%s): %v",
+			event, instance, app.Name, errStr)
 	}
 
 	return &payload
@@ -141,6 +153,9 @@ func (c *cmd) aggregateTrashSonarr(
 	wait *sync.WaitGroup,
 	instances clientinfo.IntList,
 ) []*SonarrTrashPayload {
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: aggregateTrashSonarr", instances)
+	defer mnd.Log.Trace(reqID, "end: aggregateTrashSonarr", instances)
+
 	output := []*SonarrTrashPayload{}
 	event := website.EventAPI
 
@@ -150,7 +165,7 @@ func (c *cmd) aggregateTrashSonarr(
 			if app.Enabled() {
 				output = append(output, &SonarrTrashPayload{Instance: instance, Name: app.Name})
 			} else {
-				mnd.Log.Errorf("[%s requested] Profiles and formats aggregate for disabled Sonarr instance %d (%s)",
+				mnd.Log.Errorf(reqID, "[%s requested] Profiles and formats aggregate for disabled Sonarr instance %d (%s)",
 					event, instance, app.Name)
 			}
 		}

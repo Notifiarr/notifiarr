@@ -5,23 +5,15 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/data"
-	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 )
 
 const TrigLidarrQueue common.TriggerName = "Storing Lidarr instance %d queue."
-
-// StoreLidarr fetches and stores the Lidarr queue immediately for the specified instance.
-// Does not send data to the website.
-func (a *Action) StoreLidarr(event website.EventType, instance int) {
-	if name := TrigLidarrQueue.WithInstance(instance); !a.cmd.Exec(&common.ActionInput{Type: event}, name) {
-		mnd.Log.Errorf("[%s requested] Failed! %s Disabled?", event, name)
-	}
-}
 
 type lidarrApp struct {
 	app *apps.Lidarr
@@ -31,9 +23,14 @@ type lidarrApp struct {
 
 // storeQueue runs at an interval and saves the queue for an app internally.
 func (app *lidarrApp) storeQueue(ctx context.Context, input *common.ActionInput) {
+	logs.Log.Trace(input.ReqID, "start: lidarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+	defer logs.Log.Trace(input.ReqID, "end: lidarrApp.storeQueue", app.idx, app.app.Name, input.Type)
+
+	ctx = mnd.WithID(ctx, input.ReqID)
+
 	queue, err := app.app.GetQueueContext(ctx, queueItemsMax, 1)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Getting Lidarr Queue (instance %d): %v", input.Type, app.idx+1, err)
+		mnd.Log.Errorf(input.ReqID, "[%s requested] Getting Lidarr Queue (instance %d): %v", input.Type, app.idx+1, err)
 		return
 	}
 
@@ -41,12 +38,15 @@ func (app *lidarrApp) storeQueue(ctx context.Context, input *common.ActionInput)
 		record.Quality = nil
 	}
 
-	mnd.Log.Debugf("[%s requested] Stored Lidarr Queue (%d items), instance %d %s",
+	mnd.Log.Printf(input.ReqID, "[%s requested] Stored Lidarr Queue (%d items), instance %d %s",
 		input.Type, len(queue.Records), app.idx+1, app.app.Name)
 	data.SaveWithID("lidarr", app.idx, queue)
 }
 
-func (c *cmd) setupLidarr() bool {
+func (c *cmd) setupLidarr(reqID string) bool {
+	logs.Log.Trace(reqID, "start: setupLidarr")
+	defer logs.Log.Trace(reqID, "end: setupLidarr")
+
 	var enabled bool
 
 	for idx, app := range c.Apps.Lidarr {

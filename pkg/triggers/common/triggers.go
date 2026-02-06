@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler"
 	"github.com/Notifiarr/notifiarr/pkg/update"
@@ -87,8 +88,9 @@ func (c *Config) StopApp(reason string) {
 
 // ActionInput is used to send data to a trigger action.
 type ActionInput struct {
-	Type website.EventType
-	Args []string
+	Type  website.EventType
+	Args  []string
+	ReqID string
 }
 
 // TriggerName makes sure triggers have a known name.
@@ -109,7 +111,7 @@ type Action struct {
 
 // Services is the input interface to do things with services via triggers.
 type Services interface {
-	RunChecks(et website.EventType)
+	RunChecks(input *ActionInput)
 }
 
 // Exec runs a trigger. This abstraction method is used in a bunch of places.
@@ -141,7 +143,7 @@ func (c *Config) Get(name TriggerName) *Action {
 func (c *Config) Add(action ...*Action) {
 	for _, a := range action {
 		if a.J != nil {
-			a.job = a.J.New(c.Scheduler, func() { a.C <- &ActionInput{Type: website.EventCron} })
+			a.job = a.J.New(c.Scheduler, func() { a.C <- &ActionInput{Type: website.EventCron, ReqID: mnd.ReqID()} })
 		} else if a.D.Duration != 0 {
 			a.t = time.NewTicker(a.D.Duration)
 		}
@@ -163,7 +165,7 @@ func (c *Config) Stop(event website.EventType) context.Context {
 		panic("Notifiarr Timers cannot be stopped: not running!!")
 	}
 
-	c.stop.C <- &ActionInput{Type: event}
+	c.stop.C <- &ActionInput{Type: event, ReqID: mnd.ReqID()}
 	<-c.stop.C // wait for done signal.
 	c.stop = nil
 

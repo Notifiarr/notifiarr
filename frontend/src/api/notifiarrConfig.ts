@@ -23,7 +23,8 @@ export enum Weekday {
 export enum AuthType {
   password = 0,
   header   = 1,
-  noauth   = 2,
+  website  = 2,
+  noauth   = 3,
 };
 
 /**
@@ -1328,12 +1329,8 @@ export interface Profile {
   hostInfo?: InfoStat;
   disks?: Record<string, null | Partition>;
   proxyAllow: boolean;
-  poolStats?: Record<string, null | PoolSize>;
   started: Date;
   cmdList?: CmdconfigConfig[];
-  checkResults?: CheckResult[];
-  checkRunning: boolean;
-  checkDisabled: boolean;
   program: string;
   version: string;
   revision: string;
@@ -1443,8 +1440,6 @@ export interface MySQLConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Config>
  */
 export interface ServicesConfig {
-  interval: string;
-  parallel: number;
   disabled: boolean;
   logFile: string;
 };
@@ -1573,6 +1568,7 @@ export interface LogConfig {
   logFileMb: number;
   fileMode: number;
   debug: boolean;
+  trace: boolean;
   quiet: boolean;
   noUploads: boolean;
 };
@@ -2027,6 +2023,16 @@ export interface PoolSize {
   lastConn: Date;
   lastTry: Date;
   active: boolean;
+};
+
+/**
+ * ServicesConfig is the data returned by the services/config GET endpoint.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.ServicesConfig>
+ */
+export interface ClientServicesConfig {
+  results?: CheckResult[];
+  running: boolean;
+  disabled: boolean;
 };
 
 /**

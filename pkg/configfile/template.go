@@ -82,6 +82,10 @@ quiet = {{.Quiet}}
 
 ## Debug prints more data and json payloads. This increases application memory usage.
 debug = {{.Debug}}
+##
+## Trace logs function entry/exit with request IDs. Use for debugging request flow.
+trace = {{.Trace}}
+##
 max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
 
 {{- if not force}}
@@ -492,8 +496,6 @@ version = {{.Version}}
 
 [services]
   disabled = {{.Services.Disabled}} # Setting this to true disables all service checking routines.
-  parallel = {{.Services.Parallel}}     # How many services to check concurrently. 1 should be enough.
-  interval = "{{.Services.Interval}}" # How often to send service states to Notifiarr.com. Minimum = 5m.
   log_file = '{{.Services.LogFile}}'    # Service Check logs go to the app log by default. Change that by setting a services.log file here.
 
 ## Uncomment the following section to create a service check on a URL or IP:port.

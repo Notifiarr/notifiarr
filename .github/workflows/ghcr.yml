@@ -15,9 +15,9 @@ jobs:
       matrix:
         docker:
           [
-            { name: 'scratch', sfx: '' },
+            { name: 'alpine', sfx: '' },
             { name: 'cuda', sfx: '-cuda' },
-            { name: 'alpine', sfx: '-alpine' },
+            { name: 'ubuntu', sfx: '-ubuntu' },
           ]
     permissions:
       contents: read
@@ -62,22 +62,32 @@ jobs:
             eval echo "${item}=\$${item}" >> $GITHUB_ENV;
           done
 
+      - name: Login to DockerHub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: golift
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
       - name: Extract Docker ${{ matrix.docker.name }} metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: |
+            ghcr.io/${{ github.repository }}
+            golift/notifiarr
           flavor: latest=false
           tags: |
             type=semver,priority=1010,pattern=latest,enable=${{ matrix.docker.sfx == '' }}
-            type=semver,priority=1010,pattern=${{ matrix.docker.name }},enable=${{ matrix.docker.sfx != '' }}
+            type=semver,priority=1010,pattern=${{ matrix.docker.name }}
             type=semver,priority=1009,pattern={{major}}${{ matrix.docker.sfx }}
             type=semver,priority=1008,pattern={{major}}.{{minor}}${{ matrix.docker.sfx }}
             type=semver,priority=1007,pattern={{version}}${{ matrix.docker.sfx }}
             type=semver,priority=1006,pattern=v{{version}}${{ matrix.docker.sfx }}
             type=ref,enable=true,event=branch,suffix=${{ matrix.docker.sfx }}
+            type=ref,enable=true,event=branch,suffix=-${{ matrix.docker.name }},enable=${{ matrix.docker.sfx == '' }}
 
       # Build and push Docker image with Buildx
       # https://github.com/docker/build-push-action

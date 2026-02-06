@@ -22,6 +22,7 @@ type AuthType int
 const (
 	AuthPassword AuthType = iota
 	AuthHeader
+	AuthWebsite
 	AuthNone
 )
 
@@ -31,9 +32,10 @@ const (
 	authNone     = "noauth"
 )
 
+// setupPassword runs on startup to make sure the password is encrypted with a username.
 func (c *Config) setupPassword() error {
 	pass := c.UIPassword.Val()
-	if pass == "" || c.UIPassword.IsCrypted() {
+	if pass == "" || c.UIPassword.IsCrypted() || c.UIPassword.Webauth() {
 		return nil
 	}
 
@@ -48,6 +50,7 @@ func (t AuthType) Type() string {
 	return map[AuthType]string{
 		AuthPassword: "password",
 		AuthHeader:   "header",
+		AuthWebsite:  "website",
 		AuthNone:     "noauth",
 	}[t]
 }
@@ -56,6 +59,7 @@ func (t AuthType) String() string {
 	return map[AuthType]string{
 		AuthPassword: "Password",
 		AuthHeader:   "Header",
+		AuthWebsite:  "Website",
 		AuthNone:     "No Password",
 	}[t]
 }
@@ -104,6 +108,8 @@ func (p CryptPass) Type() AuthType {
 		return AuthNone
 	case p.Webauth():
 		return AuthHeader
+	case p.Val() == "":
+		return AuthWebsite
 	default:
 		return AuthPassword
 	}

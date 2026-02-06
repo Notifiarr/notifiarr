@@ -1,9 +1,4 @@
-#
-# This is part of Application Builder.
-# https://github.com/golift/application-builder
-#
-
-FROM golang:1.24.6-bullseye AS builder
+FROM golang:1.25.7-trixie AS builder
 
 # Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
@@ -14,13 +9,10 @@ COPY main.go go.mod go.sum ./
 RUN go mod download \
     && go run github.com/swaggo/swag/cmd/swag@latest -v
 
-# Cache apt installs.
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash  \
-    && apt install -y libncurses5 libstdc++6 libtinfo5 apt-utils ca-certificates ipmitool nodejs
-
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash \
+    && apt install -y nodejs
 
 COPY pkg pkg
-COPY frontend frontend
 COPY frontend frontend
 RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
     mkdir -p ./frontend/dist \
@@ -30,23 +22,10 @@ RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOK
 
 ARG TARGETARCH
 
+# Download MegaCli64 binary.
 RUN curl -sSo /notifiarr.tgz \
     https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
     && tar -zxf /notifiarr.tgz -C /
-
-# For megacli and ipmitool. All the *'s are to deal with multiarch. :(
-RUN mkdir -p /tmp/lib_link /tmp$(ls -d /lib/*-linux-gnu*) && cp /usr/lib/*-linux-gnu*/libstdc++.so* \
-    /lib/*-linux-gnu*/ld-2.*.so /lib/*-linux-gnu*/libpthread.so.0 /lib/*-linux-gnu*/libpthread-2.*.so \
-    /lib/*-linux-gnu*/libm.so.6 /lib/*-linux-gnu*/libm-2.*.so /lib/*-linux-gnu*/libgcc_s.so.1 \
-    /lib/*-linux-gnu*/libdl.so.2 /lib/*-linux-gnu*/libdl-2.*.so /lib/*-linux-gnu*/libc.so.6 \
-    /usr/lib/*-linux-gnu*/libgcrypt.so* /lib/*-linux-gnu*/libgpg-error.so.0 /lib/*-linux-gnu*/libtinfo.so* \
-    /lib/*-linux-gnu*/libc-2.*.so /lib/*-linux-gnu*/libncurses.so.5 /lib/*-linux-gnu*/libreadline.so* \
-    /usr/lib/*-linux-gnu*/libcrypto.so* /tmp$(ls -d /lib/*-linux-gnu*) && \
-    cp /usr/lib/libfreeipmi.so* /tmp/lib/ && \
-    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-x86-64.so.2 && \
-    ln -s /lib/*-linux-gnu*/ld-2.*.so /tmp/lib/ld-linux-aarch64.so.1 && \
-    ln -s /usr/lib /tmp/lib_link/lib64 && \
-    ln -s /usr/lib /tmp/lib_link/lib
 
 ARG TARGETOS
 ARG BUILD_DATE
@@ -64,22 +43,23 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
     -X \"golift.io/version.Revision=${ITERATION}\" \
     -X \"golift.io/version.Version=${VERSION}\""
 
-FROM scratch
+FROM ubuntu:24.04
 
-COPY --from=builder /tmp/notifiarr /notifiarr
-# Make sure we have an ssl cert chain and timezone data.
-COPY --from=builder /etc/ssl /etc/ssl
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-# For megacli.
-COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /smartctl /
-COPY --from=builder /tmp/lib /usr/lib
-COPY --from=builder /tmp/lib_link/ /
+COPY --from=builder /tmp/notifiarr /
 # Other tools.
-COPY --from=builder /usr/bin/ipmitool /ipmitool
+RUN apt update \
+    && apt install -y smartmontools ipmitool zfsutils-linux sysstat \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/*
+# For megacli.
+COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /
+RUN mkdir -p /usr/lib/x86_64-linux-gnu && \
+    ln -s /usr/lib/x86_64-linux-gnu/libncurses.so.6 /usr/lib/x86_64-linux-gnu/libncurses.so.5
 
 ENV TZ=UTC
-ENV PATH=/
+ENV PATH=/bin:/usr/bin:/sbin:/usr/sbin
 ENV USER=root
+ENV DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
 
 EXPOSE 5454
 ENTRYPOINT [ "/notifiarr" ]
@@ -98,7 +78,7 @@ ARG AUTHOR=golift
 
 # Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.created="${BUILD_DATE}" \
-    org.opencontainers.image.title="Notifiarr" \
+    org.opencontainers.image.title="Notifiarr on Ubuntu" \
     org.opencontainers.image.documentation="https://notifiarr.wiki" \
     org.opencontainers.image.description="${DESC}" \
     org.opencontainers.image.url="${SOURCE_URL}" \

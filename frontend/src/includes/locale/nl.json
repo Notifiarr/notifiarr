@@ -72,7 +72,7 @@
     "phrases": {
         "BackEndUpdated": "Back-end {timeDuration} geleden bijgewerkt.",
         "ReloadSuccess": "Herladen succesvol! Client is herladen.",
-        "LoginHelpBody": "Bent u uw wachtwoord vergeten? Raadpleeg dan de wikipagina <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">vergeten wachtwoorden</a>. Als dit uw eerste keer is dat u inlogt, kunt u uw wachtwoord vinden in het logbestand van de client. Als u de client een API-sleutel hebt gegeven voordat u deze voor het eerst startte, is uw wachtwoord de API-sleutel.",
+        "LoginHelpBody": "Als u voor het eerst inlogt, gebruik dan uw e-mailadres en wachtwoord van notifiarr.com. U kunt na het inloggen een lokaal wachtwoord instellen. Als u uw lokale wachtwoord bent vergeten, raadpleeg dan de wiki-pagina <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">vergeten wachtwoorden</a>.",
         "FailedToUpdateBackEnd": "Back-end updaten mislukt: {error}",
         "TryRefreshingThePage": "Probeer de pagina te vernieuwen.",
         "ConfigurationSavedReloading": "Configuratie opgeslagen! Client wordt opnieuw geladen...",
@@ -120,7 +120,14 @@
         "VariableDescription": "<span class=\"text-warning\">Opmerking:</span> Deze configuratiewaarde is afgeleid van een omgevingsvariabele. Als u de waarde hier wijzigt, wordt de nieuwe waarde naar het configuratiebestand geschreven, maar deze wordt niet toegepast. De volgende keer dat u op Opslaan klikt, wordt deze vervangen. Wijzig de waarde hierdoor de waarde van de omgevingsvariabele te wijzigen of door de variabele uit de omgeving te verwijderen.",
         "EnvironmentVariable": "Omgevingsvariabele naam: <code>{variableName}</code>",
         "EveryDuration": "Elke {timeDuration}",
-        "ToggleSpoilerVisibility": "Klik om spoiler zichtbaarheid te wijzigen."
+        "ToggleSpoilerVisibility": "Klik om spoiler zichtbaarheid te wijzigen.",
+        "APIKey": {
+            "setMsg": "API-sleutel succesvol ingesteld!",
+            "placeholder": "Globale API-sleutel van notifiarr.com",
+            "title": "Geef de API-sleutel op.",
+            "Setting": "API-sleutel instellen...",
+            "description": "De Notifiarr client vereist een geldige API-sleutel om te functioneren. Deze sleutel wordt gebruikt om te authenticeren bij de Notifiarr website, zodat u updates kunt ontvangen en meldingen kunt verzenden. De cliënt werkt niet zonder deze sleutel, dus voer hieronder uw API-sleutel in."
+        }
     },
     "navigation": {
         "pageDescription": {
@@ -336,7 +343,8 @@
             "LoginRequestTimedOut": "Inlog verzoek is verlopen",
             "LoginFailed": "Inloggen mislukt: {error}",
             "ProfileReqTimedOut": "Profiel verzoek is verlopen",
-            "PleaseEnterBothUsernameAndPassword": "Voer zowel uw gebruikersnaam als uw wachtwoord in."
+            "PleaseEnterBothUsernameAndPassword": "Voer zowel uw gebruikersnaam als uw wachtwoord in.",
+            "SetAPIKeyFailed": "Het instellen van de API-sleutel is mislukt: {error}"
         },
         "titles": {
             "Command": "Commando",
@@ -379,11 +387,6 @@
                 "label": "Update interval",
                 "description": "Update interval voor servicecontroles.",
                 "tooltip": "Abonnees kunnen vaker updaten."
-            },
-            "parallel": {
-                "label": "Parallelle controles",
-                "description": "Aantal parallelle servicecontroles.",
-                "tooltip": "Normaal gesproken is het voldoende om één service controle tegelijk uit te voeren, maar als u er meer dan 30 of 40 hebt, wilt u dit aantal mogelijk verhogen."
             }
         },
         "command": {
@@ -587,7 +590,7 @@
     },
     "monitoring": {
         "ConfigureServices": "Service controles voor geconfigureerde integraties worden ingeschakeld door ze een controle-interval te geven op de betreffende configuratie pagina's. Sommige van deze controles zijn afkomstig van de pagina <go-to page=\"starr apps\">Starr Apps</go-to>, de pagina <go-to page=\"downloaders\">Download Apps</go-to> of de pagina <go-to page=\"media apps\">Media Apps</go-to>. De overige weergegeven service controles zijn te vinden op de pagina <go-to page=\"services\">Services</go-to>.",
-        "EnableOnConfig": "Schakel service controles in op de pagina <go-to page=\"configuration\">Configuratie</go-to>.",
+        "EnableOnConfig": "Schakel service controles in op de pagina <go-to page=\"services\">Services</go-to>.",
         "cardsView": "Kaart weergave",
         "check": {
             "interval": {

@@ -518,7 +518,7 @@
                 }
             },
             "post": {
-                "description": "Updates user profile settings including authentication type, password, header, and upstream configuration.",
+                "description": "Updates login credentials, authentication settings, and upstream trusted networks.",
                 "consumes": [
                     "application/json"
                 ],
@@ -736,6 +736,32 @@
                     },
                     "400": {
                         "description": "error running service check",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/services/config": {
+            "get": {
+                "description": "Returns services config information including results and running status.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System"
+                ],
+                "summary": "Get services config",
+                "responses": {
+                    "200": {
+                        "description": "services config data",
+                        "schema": {
+                            "$ref": "#/definitions/client.ServicesConfig"
+                        }
+                    },
+                    "401": {
+                        "description": "unauthorized",
                         "schema": {
                             "type": "string"
                         }
@@ -1811,18 +1837,6 @@
                 "buildUser": {
                     "type": "string"
                 },
-                "checkDisabled": {
-                    "type": "boolean"
-                },
-                "checkResults": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/services.CheckResult"
-                    }
-                },
-                "checkRunning": {
-                    "type": "boolean"
-                },
                 "clientInfo": {
                     "$ref": "#/definitions/clientinfo.ClientInfo"
                 },
@@ -1935,12 +1949,6 @@
                 "plexInfo": {
                     "$ref": "#/definitions/plex.PMSInfo"
                 },
-                "poolStats": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "$ref": "#/definitions/client.PoolSize"
-                    }
-                },
                 "program": {
                     "type": "string"
                 },
@@ -2032,6 +2040,23 @@
                 },
                 "username": {
                     "type": "string"
+                }
+            }
+        },
+        "client.ServicesConfig": {
+            "type": "object",
+            "properties": {
+                "disabled": {
+                    "type": "boolean"
+                },
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/services.CheckResult"
+                    }
+                },
+                "running": {
+                    "type": "boolean"
                 }
             }
         },
@@ -2486,8 +2511,6 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -2504,8 +2527,6 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
@@ -2580,11 +2601,13 @@
             "enum": [
                 0,
                 1,
-                2
+                2,
+                3
             ],
             "x-enum-varnames": [
                 "AuthPassword",
                 "AuthHeader",
+                "AuthWebsite",
                 "AuthNone"
             ]
         },
@@ -2746,6 +2769,9 @@
                 },
                 "timeout": {
                     "$ref": "#/definitions/cnfg.Duration"
+                },
+                "trace": {
+                    "type": "boolean"
                 },
                 "transmission": {
                     "type": "array",
@@ -5291,14 +5317,8 @@
                 "disabled": {
                     "type": "boolean"
                 },
-                "interval": {
-                    "$ref": "#/definitions/cnfg.Duration"
-                },
                 "logFile": {
                     "type": "string"
-                },
-                "parallel": {
-                    "type": "integer"
                 }
             }
         },

@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 )
 
 func Command(ctx context.Context, input *Input) (string, int) {
-	action := &common.ActionInput{Type: website.EventGUI}
+	action := &common.ActionInput{Type: website.EventGUI, ReqID: mnd.GetID(ctx)}
 	for _, arg := range input.Args {
 		action.Args = append(action.Args, arg...)
 	}

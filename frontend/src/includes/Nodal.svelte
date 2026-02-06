@@ -197,8 +197,7 @@
   </ModalHeader>
 
   <form onsubmit={e => e.preventDefault()}>
-    <ModalBody
-      style="max-height: {full && !fullscreen ? height : 'auto'}; overflow: auto;">
+    <ModalBody style="max-height: {height}; overflow: auto;">
       {#if loading && !resp}
         <T id="phrases.Loading" />
       {:else if resp && resp.ok && showRaw}

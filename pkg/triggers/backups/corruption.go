@@ -11,6 +11,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -22,6 +23,9 @@ import (
 
 // Corruption initializes a corruption check for all instances of the provided app.
 func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
+	logs.Log.Trace(input.ReqID, "start: Corruption", input.Type, app)
+	defer logs.Log.Trace(input.ReqID, "end: Corruption", input.Type, app)
+
 	switch app { //nolint:exhaustive // We only check starr apps.
 	default:
 		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
@@ -245,35 +249,39 @@ func (c *cmd) sendSonarrCorruption(ctx context.Context, input *common.ActionInpu
 
 func (c *cmd) sendAndLogAppCorruption(ctx context.Context, input *genericInstance) string { //nolint:cyclop
 	if input.skip {
-		mnd.Log.Debugf("Skipping corruption check on %s: %s (%d), instance disabled.", input.name, input.cName, input.int)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Skipping corruption check on %s: %s (%d), instance disabled.",
+			input.name, input.cName, input.int)
 		return input.last
 	}
 
 	if (input.last == mnd.Disabled || input.last == "") && input.event == website.EventCron {
-		mnd.Log.Debugf("Skipping corruption check on %s: %s (%d), corruption checking disabled, last: %s",
+		mnd.Log.Debugf(mnd.GetID(ctx),
+			"Skipping corruption check on %s: %s (%d), corruption checking disabled, last: %s",
 			input.name, input.cName, input.int, input.last)
 		return input.last
 	}
 
 	fileList, err := input.app.GetBackupFilesContext(ctx)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Getting %s Backup Files (%d): %v", input.event, input.name, input.int, err)
+		mnd.Log.Errorf(mnd.GetID(ctx), "[%s requested] Getting %s Backup Files (%d): %v",
+			input.event, input.name, input.int, err)
 		return input.last
 	} else if len(fileList) == 0 {
-		mnd.Log.Printf("[%s requested] %s has no backup files (%d)", input.event, input.name, input.int)
+		mnd.Log.Printf(mnd.GetID(ctx), "[%s requested] %s has no backup files (%d)",
+			input.event, input.name, input.int)
 		return input.last
 	}
 
 	latest := fileList[0].Path
 	if input.last == latest {
-		mnd.Log.Printf("[%s requested] %s Backup DB Check (%d): already checked latest file: %s",
+		mnd.Log.Printf(mnd.GetID(ctx), "[%s requested] %s Backup DB Check (%d): already checked latest file: %s",
 			input.event, input.name, input.int, latest)
 		return input.last
 	}
 
 	backup, err := c.checkBackupFileCorruption(ctx, input, latest)
 	if err != nil {
-		mnd.Log.Errorf("[%s requested] Checking %s Backup File Corruption (%d): %s: %v (last file: %s)",
+		mnd.Log.Errorf(mnd.GetID(ctx), "[%s requested] Checking %s Backup File Corruption (%d): %s: %v (last file: %s)",
 			input.event, input.name, input.int, latest, err, input.last)
 		return input.last
 	}
@@ -285,6 +293,7 @@ func (c *cmd) sendAndLogAppCorruption(ctx context.Context, input *genericInstanc
 	backup.Date = fileList[0].Time.Round(time.Second)
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(ctx),
 		Route:      website.CorruptRoute,
 		Event:      input.event,
 		LogPayload: true,
@@ -312,14 +321,15 @@ func (c *cmd) checkBackupFileCorruption(
 	}
 
 	defer os.RemoveAll(folder) // clean up when we're done.
-	mnd.Log.Debugf("[%s requested] Downloading %s backup file (%d): %s", input.event, input.name, input.int, remotePath)
+	mnd.Log.Debugf(mnd.GetID(ctx),
+		"[%s requested] Downloading %s backup file (%d): %s", input.event, input.name, input.int, remotePath)
 
 	fileName, err := input.saveBackupFile(ctx, remotePath, folder)
 	if err != nil {
 		return nil, err
 	}
 
-	mnd.Log.Debugf("[%s requested] Extracting downloaded %s backup file (%d): %s",
+	mnd.Log.Debugf(mnd.GetID(ctx), "[%s requested] Extracting downloaded %s backup file (%d): %s",
 		input.event, input.name, input.int, fileName)
 
 	_, newFiles, err := xtractr.ExtractZIP(&xtractr.XFile{
@@ -334,7 +344,7 @@ func (c *cmd) checkBackupFileCorruption(
 
 	for _, filePath := range newFiles {
 		if path.Ext(filePath) == ".db" {
-			mnd.Log.Debugf("[%s requested] Checking %s backup sqlite3 file (%d): %s",
+			mnd.Log.Debugf(mnd.GetID(ctx), "[%s requested] Checking %s backup sqlite3 file (%d): %s",
 				input.event, input.name, input.int, filePath)
 			return input.checkCorruptSQLite(ctx, filePath)
 		}

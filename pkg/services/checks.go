@@ -30,6 +30,7 @@ type result struct {
 
 // triggerCheck is used to signal the check of one service.
 type triggerCheck struct {
+	ReqID   string
 	Source  website.EventType
 	Service *Service
 }
@@ -120,11 +121,11 @@ func (s *Service) checkNow(ctx context.Context) *result {
 }
 
 func (s *Service) check(ctx context.Context) bool {
-	return s.update(s.checkNow(ctx))
+	return s.update(mnd.GetID(ctx), s.checkNow(ctx))
 }
 
 // Return true if the service state changed.
-func (s *Service) update(res *result) bool {
+func (s *Service) update(reqID string, res *result) bool {
 	if res == nil {
 		return false
 	}
@@ -133,8 +134,8 @@ func (s *Service) update(res *result) bool {
 	mnd.ServiceChecks.Add(s.Name+"&&"+res.state.String(), 1)
 	//	mnd.ServiceChecks.Add("Total Checks Run", 1)
 
-	s.Lock()
-	defer s.Unlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	if s.LastCheck = time.Now().Round(time.Microsecond); s.Since.IsZero() {
 		s.Since = s.LastCheck
@@ -143,12 +144,12 @@ func (s *Service) update(res *result) bool {
 	s.Output = res.output
 
 	if s.State == res.state {
-		s.log.Printf("Service Checked: %s, state: %s for %v, output: %s",
+		s.log.Printf(reqID, "Service Checked: %s, state: %s for %v, output: %s",
 			s.Name, s.State, time.Since(s.Since).Round(time.Second), s.Output)
 		return false
 	}
 
-	s.log.Printf("Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.State, res.state, s.Output)
+	s.log.Printf(reqID, "Service Checked: %s, state: %s ~> %s, output: %s", s.Name, s.State, res.state, s.Output)
 	s.Since = s.LastCheck
 	s.State = res.state
 
@@ -289,8 +290,8 @@ func (s *ServiceConfig) checkTCP(ctx context.Context) *result {
 }
 
 func (s *Service) Due(now time.Time) bool {
-	s.RLock()
-	defer s.RUnlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	return s.Interval.Duration > 0 && now.Sub(s.LastCheck) > s.Interval.Duration
 }

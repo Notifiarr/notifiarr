@@ -12,6 +12,7 @@
     DropdownMenu,
     DropdownItem,
     Popover,
+    Spinner,
   } from '@sveltestrap/sveltestrap'
   import T, { _ } from '../../includes/Translate.svelte'
   import Header from '../../includes/Header.svelte'
@@ -32,6 +33,7 @@
   import Cookies from 'js-cookie'
   import { slide } from 'svelte/transition'
   import { theme as thm } from '../../includes/theme.svelte'
+  import { onMount } from 'svelte'
 
   const theme = $derived($thm)
 
@@ -68,14 +70,18 @@
   }
 
   let refreshInterval = $state(Number(Cookies.get('refreshInterval')) ?? 0)
-  // svelte-ignore state_referenced_locally
-  let nextRefresh = $state(refreshInterval ? profile.now + refreshInterval : 0)
+  let nextRefresh = $state(0)
 
   $effect(() => {
     if (nextRefresh && profile.now >= nextRefresh) {
       chk.updateBackend(new Event('refresh'))
       nextRefresh = profile.now + refreshInterval
     }
+  })
+
+  onMount(async () => {
+    await chk.updateBackend(new Event('mount'))
+    nextRefresh = refreshInterval ? profile.now + refreshInterval : 0
   })
 </script>
 
@@ -136,31 +142,35 @@
 </Header>
 
 <CardBody>
-  {#if $profile.checkDisabled}
-    <h5 class="text-danger"><T id="monitoring.ChecksDisabled" /></h5>
-    <p><T id="monitoring.EnableOnConfig" /></p>
-  {:else if !$profile.checkRunning}
-    <h5 class="text-danger d-inline-block"><T id="monitoring.ChecksStopped" /></h5>
-    <Button color="success" outline class="float-end" onclick={start} {disabled}>
-      <T id="monitoring.StartChecks" />
-    </Button>
-    <div style="clear:both"></div>
+  {#if chk.refresh && !chk.config}
+    <h5 class="text-muted"><Spinner size="sm" /> <T id="phrases.Loading" /></h5>
   {:else}
-    <Button color="primary" outline onclick={chk.updateBackend} disabled={chk.refresh}>
-      <T id={`phrases.${chk.refresh ? 'UpdatingBackEnd' : 'UpdateBackend'}`} />
-    </Button>
-    <Button color="danger" outline class="float-end" onclick={stop} {disabled}>
-      <T id="monitoring.StopChecks" />
-    </Button>
-  {/if}
-
-  <div class="mt-2">
-    {#if showCards}
-      <div transition:slide={{ duration: 420 }}><Cards bind:showOutput /></div>
+    {#if chk.config?.disabled}
+      <h5 class="text-danger"><T id="monitoring.ChecksDisabled" /></h5>
+      <p><T id="monitoring.EnableOnConfig" /></p>
+    {:else if !chk.config?.running}
+      <h5 class="text-danger d-inline-block"><T id="monitoring.ChecksStopped" /></h5>
+      <Button color="success" outline class="float-end" onclick={start} {disabled}>
+        <T id="monitoring.StartChecks" />
+      </Button>
+      <div style="clear:both"></div>
     {:else}
-      <div transition:slide={{ duration: 420 }}><Table /></div>
+      <Button color="primary" outline onclick={chk.updateBackend} disabled={chk.refresh}>
+        <T id={`phrases.${chk.refresh ? 'UpdatingBackEnd' : 'UpdateBackend'}`} />
+      </Button>
+      <Button color="danger" outline class="float-end" onclick={stop} {disabled}>
+        <T id="monitoring.StopChecks" />
+      </Button>
     {/if}
-  </div>
+
+    <div class="mt-2">
+      {#if showCards}
+        <div transition:slide={{ duration: 420 }}><Cards bind:showOutput /></div>
+      {:else}
+        <div transition:slide={{ duration: 420 }}><Table /></div>
+      {/if}
+    </div>
+  {/if}
 </CardBody>
 
 <style>

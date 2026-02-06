@@ -15,32 +15,40 @@
   }
   const { driveTemps, driveHealth, driveAges, mdstat }: Props = $props()
 
-  const mdstatRecords = mdstat.reduce(
-    (acc, line) => {
-      if (line?.length > 1 && line[0]) acc[line[0]] = line[1]
-      return acc
-    },
-    {} as Record<string, string>,
+  const mdstatRecords = $derived(
+    mdstat.reduce(
+      (acc, line) => {
+        if (line?.length > 1 && line[0]) acc[line[0]] = line[1]
+        return acc
+      },
+      {} as Record<string, string>,
+    ),
   )
 
-  const numDrives = Math.max(
-    parseInt(mdstatRecords['sbNumDisks'] ?? '0'),
-    parseInt(mdstatRecords['mdNumDisks'] ?? '0'),
+  const numDrives = $derived(
+    Math.max(
+      parseInt(mdstatRecords['sbNumDisks'] ?? '0'),
+      parseInt(mdstatRecords['mdNumDisks'] ?? '0'),
+    ),
   )
 
   // Get all unique drive names from all three records
-  const allDriveNames = new Set([
-    ...Object.keys(driveTemps),
-    ...Object.keys(driveHealth),
-    ...Object.keys(driveAges),
-  ])
+  const allDriveNames = $derived(
+    new Set([
+      ...Object.keys(driveTemps),
+      ...Object.keys(driveHealth),
+      ...Object.keys(driveAges),
+    ]),
+  )
 
-  const allDrives = Array.from(allDriveNames).map(driveName => ({
-    name: driveName,
-    temp: driveTemps[driveName] ?? 0,
-    health: driveHealth[driveName] ?? 'Unknown',
-    age: driveAges[driveName] ?? 0,
-  }))
+  const allDrives = $derived(
+    Array.from(allDriveNames).map(driveName => ({
+      name: driveName,
+      temp: driveTemps[driveName] ?? 0,
+      health: driveHealth[driveName] ?? 'Unknown',
+      age: driveAges[driveName] ?? 0,
+    })),
+  )
 </script>
 
 <!-- Drive Information -->

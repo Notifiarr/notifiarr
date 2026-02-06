@@ -18,10 +18,11 @@ import (
 func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 	sessions, err := c.getSessions(ctx, time.Minute)
 	if err != nil {
-		mnd.Log.Errorf("Getting Plex sessions: %v", err)
+		mnd.Log.Errorf(input.ReqID, "Getting Plex sessions: %v", err)
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      input.ReqID,
 		Route:      website.PlexRoute,
 		Event:      input.Type,
 		Payload:    &website.Payload{Snap: c.getMetaSnap(ctx), Plex: sessions},
@@ -34,6 +35,9 @@ func (c *cmd) sendPlexSessions(ctx context.Context, input *common.ActionInput) {
 // The Lock ensures only one request to Plex happens at once.
 // Because of the cache two requests may get the same answer.
 func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.Sessions, error) {
+	mnd.Log.Trace(mnd.GetID(ctx), "start: cmd.getSessions")
+	defer mnd.Log.Trace(mnd.GetID(ctx), "end: cmd.getSessions")
+
 	c.Lock()
 	defer c.Unlock()
 

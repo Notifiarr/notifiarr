@@ -20,7 +20,7 @@
     faExclamationCircle,
   } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import T, { _ } from './Translate.svelte'
-  import { type Snippet } from 'svelte'
+  import { onMount, type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
@@ -118,53 +118,58 @@
     currType = currType === 'password' ? 'text' : 'password'
   }
 
-  if (type === 'interval') {
-    currType = 'select'
-    options = [
-      { value: '0s', name: $_('words.select-option.ChecksDisabled') },
-      { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
-      { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
-      { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
-      { value: '4m0s', name: '4 ' + $_('words.select-option.minutes') },
-      { value: '5m0s', name: '5 ' + $_('words.select-option.minutes') },
-      { value: '6m0s', name: '6 ' + $_('words.select-option.minutes') },
-      { value: '7m0s', name: '7 ' + $_('words.select-option.minutes') },
-      { value: '8m0s', name: '8 ' + $_('words.select-option.minutes') },
-      { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
-      { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
-      { value: '15m0s', name: '15 ' + $_('words.select-option.minutes') },
-      { value: '20m0s', name: '20 ' + $_('words.select-option.minutes') },
-      { value: '25m0s', name: '25 ' + $_('words.select-option.minutes') },
-      { value: '30m0s', name: '30 ' + $_('words.select-option.minutes') },
-    ]
-  }
+  onMount(() => {
+    if (type === 'interval') {
+      currType = 'select'
+      options = [
+        { value: '0s', name: $_('words.select-option.ChecksDisabled') },
+        { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
+        { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
+        { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
+        { value: '4m0s', name: '4 ' + $_('words.select-option.minutes') },
+        { value: '5m0s', name: '5 ' + $_('words.select-option.minutes') },
+        { value: '6m0s', name: '6 ' + $_('words.select-option.minutes') },
+        { value: '7m0s', name: '7 ' + $_('words.select-option.minutes') },
+        { value: '8m0s', name: '8 ' + $_('words.select-option.minutes') },
+        { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
+        { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
+        { value: '15m0s', name: '15 ' + $_('words.select-option.minutes') },
+        { value: '20m0s', name: '20 ' + $_('words.select-option.minutes') },
+        { value: '25m0s', name: '25 ' + $_('words.select-option.minutes') },
+        { value: '30m0s', name: '30 ' + $_('words.select-option.minutes') },
+      ]
+    }
 
-  if (type === 'timeout') {
-    currType = 'select'
-    options = [
-      { value: '0s', name: $_('words.select-option.NoTimeout') },
-      { value: '1s', name: '1 ' + $_('words.select-option.seconds') },
-      { value: '2s', name: '2 ' + $_('words.select-option.seconds') },
-      { value: '3s', name: '3 ' + $_('words.select-option.seconds') },
-      { value: '4s', name: '4 ' + $_('words.select-option.seconds') },
-      { value: '5s', name: '5 ' + $_('words.select-option.seconds') },
-      { value: '10s', name: '10 ' + $_('words.select-option.seconds') },
-      { value: '15s', name: '15 ' + $_('words.select-option.seconds') },
-      { value: '30s', name: '30 ' + $_('words.select-option.seconds') },
-      { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
-      { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
-      { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
-      { value: '4m0s', name: '4 ' + $_('words.select-option.minutes') },
-      { value: '5m0s', name: '5 ' + $_('words.select-option.minutes') },
-      { value: '6m0s', name: '6 ' + $_('words.select-option.minutes') },
-      { value: '7m0s', name: '7 ' + $_('words.select-option.minutes') },
-      { value: '8m0s', name: '8 ' + $_('words.select-option.minutes') },
-      { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
-      { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
-    ]
-    if (!noDisable)
-      options.unshift({ value: '-1s', name: $_('words.select-option.InstanceDisabled') })
-  }
+    if (type === 'timeout') {
+      currType = 'select'
+      options = [
+        { value: '0s', name: $_('words.select-option.NoTimeout') },
+        { value: '1s', name: '1 ' + $_('words.select-option.seconds') },
+        { value: '2s', name: '2 ' + $_('words.select-option.seconds') },
+        { value: '3s', name: '3 ' + $_('words.select-option.seconds') },
+        { value: '4s', name: '4 ' + $_('words.select-option.seconds') },
+        { value: '5s', name: '5 ' + $_('words.select-option.seconds') },
+        { value: '10s', name: '10 ' + $_('words.select-option.seconds') },
+        { value: '15s', name: '15 ' + $_('words.select-option.seconds') },
+        { value: '30s', name: '30 ' + $_('words.select-option.seconds') },
+        { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
+        { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
+        { value: '3m0s', name: '3 ' + $_('words.select-option.minutes') },
+        { value: '4m0s', name: '4 ' + $_('words.select-option.minutes') },
+        { value: '5m0s', name: '5 ' + $_('words.select-option.minutes') },
+        { value: '6m0s', name: '6 ' + $_('words.select-option.minutes') },
+        { value: '7m0s', name: '7 ' + $_('words.select-option.minutes') },
+        { value: '8m0s', name: '8 ' + $_('words.select-option.minutes') },
+        { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
+        { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
+      ]
+      if (!noDisable)
+        options.unshift({
+          value: '-1s',
+          name: $_('words.select-option.InstanceDisabled'),
+        })
+    }
+  })
 </script>
 
 <div class="input">

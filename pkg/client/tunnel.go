@@ -58,17 +58,19 @@ func (c *Client) poolMax(info *clientinfo.ClientInfo) int {
 
 func (c *Client) startTunnel(ctx context.Context) {
 	// If clientinfo is nil, then we probably have a bad API key.
+	ctx = mnd.SetID(ctx)
 	info := clientinfo.Get()
 	if info == nil {
-		logs.Log.Errorf("Skipping tunnel creation because there is no client info.")
+		logs.Log.Errorf(mnd.GetID(ctx), "Skipping tunnel creation because there is no client info.")
 		return
 	}
 
 	c.makeTunnel(ctx, info)
-	logs.Log.Printf("Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
+	logs.Log.Printf(mnd.GetID(ctx),
+		"Tunneling to %d targets with %d connections; cleaner:%s, backoff:%s, url: %s, hash: %s",
 		len(c.tunnel.Targets), c.tunnel.PoolMaxSize, c.tunnel.CleanInterval,
 		c.tunnel.Backoff, info.User.TunnelURL, c.tunnel.GetID())
-	logs.Log.Printf("Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
+	logs.Log.Printf(mnd.GetID(ctx), "Tunnel Targets: %s", strings.Join(c.tunnel.Targets, ", "))
 	c.tunnel.Start(ctx)
 }
 
@@ -80,7 +82,7 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 
 	// This apache logger is only used for client->server websocket-tunneled requests.
 	remWs, _ := apachelog.New(`%{X-Forwarded-For}i %{X-User-ID}i env:%{X-User-Environment}i %t "%r" %>s %b ` +
-		`"%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms`)
+		`"%{X-Client-ID}i" "%{User-agent}i" %{X-Request-Time}i %{ms}Tms id:%{X-Request-ID}i`)
 
 	//nolint:mnd // just attempting a tiny bit of splay.
 	c.tunnel = mulery.NewClient(&mulery.Config{
@@ -96,7 +98,7 @@ func (c *Client) makeTunnel(ctx context.Context, info *clientinfo.ClientInfo) {
 		Handler:          remWs.Wrap(c.prefixURLbase(c.apps.Router), logs.Log.HTTPLog.Writer()).ServeHTTP,
 		RoundRobinConfig: c.roundRobinConfig(info),
 		Logger: &tunnelLogger{
-			ctx:            ctx,
+			ctx:            mnd.SetID(ctx),
 			sendSiteErrors: info.User.DevAllowed,
 		},
 	})
@@ -117,6 +119,7 @@ func (c *Client) roundRobinConfig(ci *clientinfo.ClientInfo) *mulery.RoundRobinC
 			defer data.Save("activeTunnel", socket)
 			// Tell the website we connected to a new tunnel, so it knows how to reach us.
 			website.SendData(&website.Request{
+				ReqID:      mnd.ReqID(),
 				Route:      website.TunnelRoute,
 				Event:      website.EventSignal,
 				Payload:    map[string]any{"socket": socket, "previous": data.Get("activeTunnel")},
@@ -185,22 +188,22 @@ type tunnelLogger struct {
 
 // Debugf prints a message with DEBUG prefixed.
 func (l *tunnelLogger) Debugf(format string, v ...any) {
-	mnd.Log.Debugf(format, v...)
+	mnd.Log.Debugf(mnd.GetID(l.ctx), format, v...)
 }
 
 // Errorf prints a message with ERROR prefixed.
 func (l *tunnelLogger) Errorf(format string, v ...any) {
 	// this is why we dont just pass the interface in as-is.
 	if l.sendSiteErrors {
-		mnd.Log.Errorf(format, v...)
+		mnd.Log.Errorf(mnd.GetID(l.ctx), format, v...)
 	} else {
-		mnd.Log.ErrorfNoShare(format, v...)
+		mnd.Log.ErrorfNoShare(mnd.GetID(l.ctx), format, v...)
 	}
 }
 
 // Printf prints a message with INFO prefixed.
 func (l *tunnelLogger) Printf(format string, v ...any) {
-	mnd.Log.Printf(format, v...)
+	mnd.Log.Printf(mnd.GetID(l.ctx), format, v...)
 }
 
 const pingTimeout = 7 * time.Second
@@ -247,7 +250,7 @@ func (c *Client) pingTunnels(response http.ResponseWriter, request *http.Request
 	wait.Wait()
 
 	if err := json.NewEncoder(response).Encode(list); err != nil {
-		logs.Log.Errorf("Pinging Tunnel: encoding json: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Pinging Tunnel: encoding json: %v", err)
 	}
 }
 
@@ -258,7 +261,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet,
 		strings.Replace(socket, "wss://", "https://", 1), nil)
 	if err != nil {
-		logs.Log.Errorf("Pinging Tunnel: creating request: %v", err)
+		logs.Log.Errorf(mnd.GetID(ctx), "Pinging Tunnel: creating request: %v", err)
 		return
 	}
 
@@ -266,7 +269,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logs.Log.Errorf("Pinging Tunnel: making request: %v", err)
+		logs.Log.Errorf(mnd.GetID(ctx), "Pinging Tunnel: making request: %v", err)
 		inCh <- map[int]string{idx: "error"}
 
 		return
@@ -291,7 +294,7 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request) {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
-		logs.Log.Errorf("Saving Tunnel: reading request: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Saving Tunnel: reading request: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -304,7 +307,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	}{}
 
 	if err = json.Unmarshal(body, &input); err != nil {
-		logs.Log.Errorf("Saving Tunnel: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Saving Tunnel: %v", err)
 		http.Error(response, err.Error(), http.StatusInternalServerError)
 
 		return
@@ -319,6 +322,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	}
 
 	website.SendData(&website.Request{
+		ReqID:      mnd.GetID(request.Context()),
 		Route:      website.TunnelRoute,
 		Event:      website.EventGUI,
 		Payload:    map[string]any{"sockets": sockets},
@@ -337,6 +341,6 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 	tunnels := map[string]any{"success": true, "primary": input.PrimaryTunnel, "backups": input.BackupTunnel}
 
 	if err := json.NewEncoder(response).Encode(tunnels); err != nil {
-		logs.Log.Errorf("Saving Tunnel: sending json response: %v", err)
+		logs.Log.Errorf(mnd.GetID(request.Context()), "Saving Tunnel: sending json response: %v", err)
 	}
 }

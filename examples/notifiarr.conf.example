@@ -35,6 +35,10 @@ quiet = false
 
 ## Debug prints more data and json payloads. This increases application memory usage.
 debug = false
+
+## Trace logs function entry/exit with request IDs. Use for debugging request flow.
+trace = false
+
 max_body = 0 # maximum body size for debug logs. 0 = no limit.
 
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
@@ -231,7 +235,6 @@ bus_ids  = []
 
 [services]
   disabled = false # Setting this to true disables all service checking routines.
-  parallel = 1     # How many services to check concurrently. 1 should be enough.
   interval = "10m" # How often to send service states to Notifiarr.com. Minimum = 5m.
   log_file = ''    # Service Check logs go to the app log by default. Change that by setting a services.log file here.
 
@@ -295,4 +298,3 @@ bus_ids  = []
 #  log     = true
 #  notify  = true
 #  timeout = "10s"
-

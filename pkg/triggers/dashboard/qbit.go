@@ -20,12 +20,12 @@ func (c *Cmd) getQbitStates(ctx context.Context) []*State {
 			continue
 		}
 
-		mnd.Log.Debugf("Getting Qbit State: %d:%s", instance+1, app.URL)
+		mnd.Log.Debugf(mnd.GetID(ctx), "Getting Qbit State: %d:%s", instance+1, app.URL)
 
 		state, err := c.getQbitState(ctx, instance+1, &app)
 		if err != nil {
 			state.Error = err.Error()
-			mnd.Log.Errorf("Getting Qbit Data from %d:%s: %v", instance+1, app.URL, err)
+			mnd.Log.Errorf(mnd.GetID(ctx), "Getting Qbit Data from %d:%s: %v", instance+1, app.URL, err)
 		}
 
 		states = append(states, state)

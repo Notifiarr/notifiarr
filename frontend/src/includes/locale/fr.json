@@ -272,11 +272,6 @@
                 "description": "Activer ou désactiver les contrôles de service.",
                 "tooltip": "Désactivez ou activez la surveillance de tous les contrôles de réseau et de service ici."
             },
-            "parallel": {
-                "tooltip": "Normalement, l'exécution d'un contrôle de service à la fois est correcte, mais si vous en avez plus de 30 ou 40, vous souhaiterez peut-être augmenter ce nombre.",
-                "label": "Contrôles parallèles",
-                "description": "Nombre de contrôles de service parallèles."
-            },
             "interval": {
                 "label": "Intervalle de mise à jour",
                 "description": "Intervalle de mise à jour pour les contrôles de service.",
@@ -536,7 +531,7 @@
     },
     "monitoring": {
         "ConfigureServices": "Configurez les contrôles de service affichés sur la <go-to page=\"services\">page Services</go-to>.",
-        "EnableOnConfig": "Activez les contrôles de service sur la page <go-to page=\"configuration\">Configuration</go-to>.",
+        "EnableOnConfig": "Activez les contrôles de service sur la page <go-to page=\"services\">Services</go-to>.",
         "check": {
             "state": {
                 "title": "Compteurs de contrôle de service",

@@ -60,6 +60,7 @@ func main() {
 	goat.Enums([]goty.Enum{
 		{Name: "password", Value: configfile.AuthPassword},
 		{Name: "header", Value: configfile.AuthHeader},
+		{Name: "website", Value: configfile.AuthWebsite},
 		{Name: "noauth", Value: configfile.AuthNone},
 	})
 	goat.Enums([]goty.Enum{
@@ -74,6 +75,7 @@ func main() {
 	goat.Parse(
 		client.Integrations{},
 		client.Profile{},
+		client.ServicesConfig{},
 		client.ProfilePost{},
 		commands.Stats{},
 		apps.ApiResponse{},

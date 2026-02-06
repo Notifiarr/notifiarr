@@ -4,7 +4,7 @@
 </script>
 
 <script lang="ts">
-  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { CardBody, Col, Row } from '@sveltestrap/sveltestrap'
   import { _ } from '../../includes/Translate.svelte'
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
@@ -28,10 +28,17 @@
   import { validator as pingValidator } from './Ping.svelte'
   import { validator as tcpValidator } from './TCP.svelte'
   import Fa from '../../includes/Fa.svelte'
+  import { deepEqual } from '../../includes/util'
+  import Input from '../../includes/Input.svelte'
+
+  // Local state that syncs with profile store.
+  let config = $state($profile.config)
 
   const submit = async () => {
-    await profile.writeConfig({ ...$profile.config, service: flt.instances })
-    if (!profile.error) flt.resetAll() // clears the delete counters.
+    await profile.writeConfig({ ...config, service: flt.instances })
+    if (profile.error) return
+    config = $profile.config
+    flt.resetAll() // clears the delete counters.
   }
 
   const validator = (id: string, val: any, idx: number, c: ServiceConfig[]): string => {
@@ -75,7 +82,7 @@
   let flt = $derived(new FormListTracker($profile.config.service ?? [], app))
 
   $effect(() => {
-    nav.formChanged = flt.formChanged
+    nav.formChanged = !deepEqual($profile.config, config) || flt.formChanged
   })
 
   // Shown next to the check name in each accordion header.
@@ -88,9 +95,28 @@
   }
 </script>
 
-<Header {page} />
+<Header {page}>
+  {#snippet description()}
+    <Row>
+      <Col xxl={9} xl={8} md={7} sm={6} xs={12}>
+        {@html $_('navigation.pageDescription.' + page.id)}
+      </Col>
+      <Col xxl={3} xl={4} md={5} sm={6} xs={12}>
+        <div class="d-block d-sm-none"><hr /></div>
+        <Input
+          class="mb-0"
+          id="config.services.disabled"
+          envVar="SERVICES_DISABLED"
+          type="select"
+          bind:value={config.services!.disabled}
+          original={$profile.config.services?.disabled} />
+      </Col>
+    </Row>
+  {/snippet}
+</Header>
 
 <CardBody>
+  <!-- Services Section -->
   <Instances {flt} Child={Check} deleteButton={app.id + '.DeleteCheck'}>
     {#snippet headerActive(index)}
       <Fa
@@ -111,7 +137,7 @@
   </Instances>
 </CardBody>
 
-<Footer {submit} saveDisabled={!flt.formChanged || flt.invalid} />
+<Footer {submit} saveDisabled={!nav.formChanged || flt.invalid} />
 
 <style>
   :global(.header-icon) {

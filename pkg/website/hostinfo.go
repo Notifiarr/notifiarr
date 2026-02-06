@@ -39,6 +39,9 @@ func GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
 		return site.hostInfoNoError(), nil
 	}
 
+	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: GetHostInfo")
+	defer mnd.Log.Trace(reqID, "end: GetHostInfo")
+
 	hostInfo, err := host.InfoWithContext(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("getting host info: %w", err)
