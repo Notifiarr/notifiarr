@@ -35,14 +35,17 @@ const (
 // setupPassword runs on startup to make sure the password is encrypted with a username.
 func (c *Config) setupPassword() error {
 	pass := c.UIPassword.Val()
+	// Any of these things means the password is already configured appropriately.
 	if pass == "" || c.UIPassword.IsCrypted() || c.UIPassword.Webauth() {
 		return nil
 	}
 
+	// If the password is a username and password, set it.
 	if spl := strings.SplitN(pass, ":", 2); len(spl) == 2 { //nolint:mnd
 		return c.UIPassword.Set(spl[0], spl[1])
 	}
 
+	// Any other "bare" value we assume is a password so set it with the default username.
 	return c.UIPassword.Set(DefaultUsername, pass)
 }
 

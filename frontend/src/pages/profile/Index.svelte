@@ -27,15 +27,26 @@
     authType: $profile?.upstreamType || Auth.password,
     upstreams: $profile?.config.upstreams?.join(' ') || '',
     newPass: '',
-    header: $profile?.config.uiPassword.startsWith('webauth:')
-      ? $profile?.config.uiPassword.split(':')[1]
-      : '',
+    header:
+      $profile?.config.uiPassword.startsWith('webauth:') ||
+      $profile?.config.uiPassword.startsWith('noauth:')
+        ? $profile?.config.uiPassword.split(':')[1]
+        : '',
   })
+
+  const orig = $state({ ...form })
+  let saving = $state(false)
 
   async function submit(e: Event) {
     e.preventDefault()
+    saving = true
     await profile.trustProfile(form)
+    // Remove the passwords.
     form.newPass = form.password = ''
+    // Reset the original form so the changed-inputs colors are reset.
+    Object.assign(orig, form)
+    // Re-enable the form inputs.
+    saving = false
   }
 
   function addit(e: Event) {
@@ -54,9 +65,9 @@
       (!form.password || form.password.length < 5)) ||
       // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
       (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
-      // If they changed the auth type to password from something else, make sure they entered a new password.
+      // If they changed the auth type to password from something other than website, make sure they enter a new password.
       (form.authType === Auth.password &&
-        $profile?.upstreamType !== Auth.password &&
+        ![Auth.password, Auth.website].includes($profile?.upstreamType) &&
         form.newPass.length < 9) ||
       // Make sure they picked a header if header auth type is selected.
       (form.authType === Auth.header && !form.header) ||
@@ -70,7 +81,7 @@
         $profile?.upstreamType === Auth.noauth &&
         form.upstreams === $profile?.upstreamIp) ||
       // Enable the save button.
-      false,
+      saving,
   )
 </script>
 
@@ -85,7 +96,9 @@
         <Input
           id="profile.authType"
           type="select"
+          disabled={saving}
           bind:value={form.authType}
+          original={orig.authType}
           options={[
             { value: Auth.password, name: $_('profile.authType.options.password') },
             { value: Auth.website, name: $_('profile.authType.options.website') },
@@ -105,17 +118,24 @@
         <Input
           id="profile.upstreams"
           type="text"
+          disabled={saving}
           bind:value={form.upstreams}
+          original={orig.upstreams}
           placeholder={$_('profile.upstreams.placeholder')} />
       </Col>
     </Row>
 
     <!-- Authentication Section -->
     <h4>{$_('profile.title.Authentication')}</h4>
-    {#if [Auth.password, Auth.website].includes(form.authType)}
+    {#if [Auth.noauth, Auth.header].includes(form.authType)}
       <Row>
         <Col md={8}>
-          <Input id="profile.header" type="select" bind:value={form.header}>
+          <Input
+            id="profile.header"
+            type="select"
+            disabled={saving}
+            bind:value={form.header}
+            original={orig.header}>
             {#each Object.entries($profile?.headers || {}) as [key, value]}
               {#each value! as val}
                 <option
@@ -142,12 +162,19 @@
             id="profile.newPass"
             name="noautofill"
             type="password"
-            bind:value={form.newPass} />
+            disabled={saving}
+            bind:value={form.newPass}
+            original={orig.newPass} />
         </Col>
       </Row>
       <Row>
         <Col md={8}>
-          <Input id="profile.username" type="text" bind:value={form.username} />
+          <Input
+            id="profile.username"
+            type="text"
+            disabled={saving}
+            bind:value={form.username}
+            original={orig.username} />
         </Col>
       </Row>
     {/if}
@@ -160,7 +187,9 @@
             id="profile.password"
             name="password"
             type="password"
-            bind:value={form.password} />
+            disabled={saving}
+            bind:value={form.password}
+            original={orig.password} />
         </Col>
       </Row>
     {/if}

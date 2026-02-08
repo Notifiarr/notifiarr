@@ -82,8 +82,8 @@ class ConfigProfile {
     this.status = get(_)('phrases.SavingConfiguration')
     this.error = ''
     this.updated = null
+    form.newPass = CryptoJS.MD5(form.newPass ? form.newPass : form.password).toString()
     form.password = CryptoJS.MD5(form.password).toString()
-    form.newPass = CryptoJS.MD5(form.newPass).toString()
 
     const { ok, body } = await postUi('profile', JSON.stringify(form), false)
 

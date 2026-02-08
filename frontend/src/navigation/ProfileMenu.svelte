@@ -5,6 +5,7 @@
     DropdownMenu,
     DropdownToggle,
     Nav,
+    Tooltip,
   } from '@sveltestrap/sveltestrap'
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
@@ -24,13 +25,15 @@
 
 <Nav vertical pills class="nav-custom" theme={$theme}>
   <Dropdown nav direction="up" class="ms-0" setActiveFromChild>
+    <Tooltip target="username1" placement="right">{$profile.username}</Tooltip>
     <DropdownToggle
+      id="username1"
       class="dropdown-custom {nav.active(ProfilePage.id) ? 'active' : ''}"
       nav>
       <span class="text-uppercase profile-icon">
         {$profile.username.charAt(0).toUpperCase()}
       </span>
-      {$profile.username}
+      {$profile.username.split('@')[0]}
     </DropdownToggle>
     <DropdownMenu>
       <DropdownItem

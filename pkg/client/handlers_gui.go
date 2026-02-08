@@ -167,7 +167,7 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		c.indexPage(request.Context(), response, request)
 		return false
 	case c.Config.UIPassword.Valid(providedUsername, request.FormValue("password")):
-		c.updateToNewPasswordMD5(request.Context(), loggedinUsername, providedUsername, request.FormValue("sha"))
+		c.updateToNewPasswordMD5(request.Context(), providedUsername, request.FormValue("sha"))
 		logs.Log.Printf(reqID, "[gui '%s' requested] Updated config with new password format.", providedUsername)
 		fallthrough
 	case c.Config.UIPassword.Valid(providedUsername, request.FormValue("sha")):
@@ -180,9 +180,8 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 		http.Error(response, "Unauthorized", http.StatusUnauthorized)
 		return false
 	case clientinfo.CheckPassword(providedUsername, request.FormValue("sha")):
-		providedUsername = clientinfo.Get().User.Username
-		if providedUsername == "" {
-			providedUsername = "admin"
+		if cinfo := clientinfo.Get(); cinfo != nil && cinfo.User.Username != "" {
+			providedUsername = cinfo.User.Username
 		}
 
 		request = c.setSession(providedUsername, response, request)
@@ -199,16 +198,13 @@ func (c *Client) loginHandler(response http.ResponseWriter, request *http.Reques
 // updateToNewPasswordMD5 saves the md5 version of the password to the config file.
 // This is used to update the password from the old plaintext version to the new md5 version.
 // In the future, the frontend will stop sending the plaintext password, and this will be removed.
-func (c *Client) updateToNewPasswordMD5(ctx context.Context, loggedinUsername, providedUsername, password string) {
+func (c *Client) updateToNewPasswordMD5(ctx context.Context, providedUsername, password string) {
 	if password == "" {
 		return
 	}
 
-	logs.Log.Printf(mnd.GetID(ctx), "[gui '%s' requested] Updating Trust Profile settings, username: %s",
-		loggedinUsername, providedUsername)
-
 	if err := c.setUserPass(ctx, configfile.AuthPassword, providedUsername, password); err != nil {
-		logs.Log.Errorf(mnd.GetID(ctx), "[gui '%s' requested] Setting user pass: %v", loggedinUsername, err)
+		logs.Log.Errorf(mnd.GetID(ctx), "[gui '%s' requested] Setting user pass: %v", providedUsername, err)
 	}
 }
 
