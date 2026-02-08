@@ -318,6 +318,8 @@ golift.io/mulery v0.0.11-0.20260201083556-b0d979a4fa42 h1:1dpeFQsdAiChRWvOx94juu
 golift.io/mulery v0.0.11-0.20260201083556-b0d979a4fa42/go.mod h1:eqU/uQSFyohZqfxPJPy4jPaaz7N7t4bqCvWBZFgCdiM=
 golift.io/mulery v0.0.11-0.20260205022916-4244c58a504f h1:+8Z6te6885/E9/3TYN/nPmemvD6/wbvF28fhDI/wyd4=
 golift.io/mulery v0.0.11-0.20260205022916-4244c58a504f/go.mod h1:eqU/uQSFyohZqfxPJPy4jPaaz7N7t4bqCvWBZFgCdiM=
+golift.io/mulery v0.0.11-0.20260208070603-90a6ca6f67be h1:vth/WEmre8BWnTrSLPKyxOsGuHLbpfTXA4KoDLdtReU=
+golift.io/mulery v0.0.11-0.20260208070603-90a6ca6f67be/go.mod h1:ZF0do+/4WiYY/8AyaGfgXQYivXAYK2fRapTx5jr68To=
 golift.io/nzbget v0.1.6 h1:DGVDT6aAm07m3D55AJR6PRSLaMC4L7GBlAy1kixO9u4=
 golift.io/nzbget v0.1.6/go.mod h1:IuYK1nnrKxCYZBOV7pymATnfBHF0cwX9xnkX05SbHQw=
 golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a h1:7luf0jnx4PEgu6jpnn+PlpP55yRXnS96clMHiGJogDc=
