@@ -12,7 +12,7 @@ import (
 )
 
 func (s *server) debughttplog(
-	reqID string, resp *http.Response, url string, start time.Time, data string, body io.Reader,
+	reqID string, resp *http.Response, url string, start time.Time, sentSize int, data []byte, body io.Reader,
 ) {
 	var headers strings.Builder
 	status := "0"
@@ -27,19 +27,21 @@ func (s *server) debughttplog(
 		}
 	}
 
-	if s.config.Apps.MaxBody > 0 && len(data) > s.config.Apps.MaxBody {
-		data = fmt.Sprintf("%s <data truncated, max: %d>", data[:s.config.Apps.MaxBody], s.config.Apps.MaxBody)
+	size := len(data)
+	if s.config.Apps.MaxBody > 0 && size > s.config.Apps.MaxBody {
+		data = fmt.Appendf(data[:s.config.Apps.MaxBody],
+			"\n<%d bytes truncated, max: %d>", size-s.config.Apps.MaxBody, s.config.Apps.MaxBody)
 	}
 
-	if data == "" {
+	if len(data) == 0 {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.config.Apps.MaxBody))
 		mnd.Log.Debugf(reqID, "Sent GET Request to %s in %s, %s Response (%s):\n%s\n%s",
 			url, time.Since(start).Round(time.Microsecond), mnd.FormatBytes(bodySize), status, headers.String(), truncatedBody)
 	} else {
 		truncatedBody, bodySize := readBodyForLog(body, int64(s.config.Apps.MaxBody))
-		mnd.Log.Debugf(reqID, "Sent %s JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
-			mnd.FormatBytes(len(data)), url, time.Since(start).Round(time.Microsecond),
-			data, mnd.FormatBytes(bodySize), status, headers.String(), truncatedBody)
+		mnd.Log.Debugf(reqID, "Sent %s (%s decompressed) JSON Payload to %s in %s:\n%s\n%s Response (%s):\n%s\n%s",
+			mnd.FormatBytes(sentSize), mnd.FormatBytes(size), url, time.Since(start).Round(time.Microsecond),
+			string(data), mnd.FormatBytes(bodySize), status, headers.String(), truncatedBody)
 	}
 }
 
@@ -50,13 +52,12 @@ func readBodyForLog(body io.Reader, max int64) (string, int64) {
 	}
 
 	if max > 0 {
-		limitReader := io.LimitReader(body, max)
-		bodyBytes, _ := io.ReadAll(limitReader)
+		bodyBytes, _ := io.ReadAll(io.LimitReader(body, max))
 		remaining, _ := io.Copy(io.Discard, body) // finish reading to the end.
 		total := remaining + int64(len(bodyBytes))
 
 		if remaining > 0 {
-			return fmt.Sprintf("%s <body truncated, max: %d>", string(bodyBytes), max), total
+			return fmt.Sprintf("%s\n<%d response bytes truncated, max: %d>", string(bodyBytes), remaining, max), total
 		}
 
 		return string(bodyBytes), total
@@ -72,7 +73,8 @@ func (s *server) debugLogResponseBody(
 	start time.Time,
 	resp *http.Response,
 	url string,
-	data []byte,
+	sentSize int, // different from size, because it's the compressed size.
+	data []byte, // uncompressed data.
 	log bool,
 ) io.ReadCloser {
 	var buf bytes.Buffer
@@ -81,9 +83,10 @@ func (s *server) debugLogResponseBody(
 	defer resp.Body.Close() // close this since we return a fake one after logging.
 
 	if log {
-		defer s.debughttplog(reqID, resp, url, start, string(data), tee)
+		defer s.debughttplog(reqID, resp, url, start, sentSize, data, tee)
 	} else {
-		defer s.debughttplog(reqID, resp, url, start, fmt.Sprintf("<data not logged, length:%d>", len(data)), tee)
+		defer s.debughttplog(reqID, resp, url, start, sentSize,
+			fmt.Appendf(nil, "<data not logged, length:%d>", len(data)), tee)
 	}
 
 	return io.NopCloser(&buf)

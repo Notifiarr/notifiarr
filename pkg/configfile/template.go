@@ -100,6 +100,10 @@ host_id = "{{.HostID}}"{{end}}
 ##
 urlbase = '''{{.URLBase}}'''
 
+## Disable compression of payloads sent to the website.
+##
+no_compress = {{.NoCompress}}
+
 ## Allowed upstream networks. Networks here are allowed to send two special headers:
 ## (1) x-forwarded-for (2) x-webauth-user
 ## The first header sets the IPs in logs.

@@ -10,7 +10,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Notifiarr/notifiarr/pkg/configfile"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/jackpal/gateway"
 )
@@ -25,43 +24,6 @@ func environ() map[string]string {
 	}
 
 	return out
-}
-
-func (c *Client) setUserPass(ctx context.Context, authType configfile.AuthType, username, password string) error {
-	c.Lock()
-	defer c.Unlock()
-
-	current := c.Config.UIPassword
-
-	var err error
-
-	switch authType {
-	case configfile.AuthPassword:
-		err = c.Config.UIPassword.Set(username, password)
-	case configfile.AuthHeader:
-		err = c.Config.UIPassword.SetHeader(username)
-	case configfile.AuthNone:
-		err = c.Config.UIPassword.SetNoAuth(username)
-	case configfile.AuthWebsite:
-		err = c.Config.UIPassword.Set("", "")
-	}
-
-	if err != nil {
-		c.Config.UIPassword = current
-		return fmt.Errorf("saving new auth settings: %w", err)
-	}
-
-	config, err := c.Config.CopyConfig()
-	if err != nil {
-		return fmt.Errorf("copying config: %w", err)
-	}
-
-	if err := c.saveNewConfig(ctx, config); err != nil {
-		c.Config.UIPassword = current
-		return err
-	}
-
-	return nil
 }
 
 // getLinesFromFile makes it easy to tail or head a file. Sorta.
@@ -181,9 +143,9 @@ func revBytes(output bytes.Buffer) []byte {
 	return data
 }
 
-func (c *Client) getDisks(ctx context.Context) map[string]*snapshot.Partition {
+func getDisks(ctx context.Context, zfsPools []string) map[string]*snapshot.Partition {
 	disks, _ := snapshot.GetDisksUsage(ctx, true)
-	zfspools, _ := snapshot.GetZFSPoolData(ctx, c.Config.Snapshot.ZFSPools)
+	zfspools, _ := snapshot.GetZFSPoolData(ctx, zfsPools)
 	output := make(map[string]*snapshot.Partition)
 
 	maps.Copy(output, disks)

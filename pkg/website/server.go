@@ -38,11 +38,12 @@ var (
 
 // Config is the input data needed to send payloads to notifiarr.
 type Config struct {
-	Apps     *apps.Apps
-	Retries  int
-	Timeout  cnfg.Duration
-	HostID   string
-	BindAddr string
+	Apps       *apps.Apps
+	Retries    int
+	Timeout    cnfg.Duration
+	HostID     string
+	BindAddr   string
+	NoCompress bool
 }
 
 // server is what you get for providing a Config to New().

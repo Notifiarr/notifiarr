@@ -1,7 +1,9 @@
 package client
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -154,7 +156,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		filepath.Join(filepath.Dir(c.Flags.ConfigFile), "backups", filepath.Base(c.Flags.ConfigFile)))
 	profile.HostInfo, _ = website.GetHostInfo(req.Context())
 	profile.Triggers, profile.Timers, profile.Schedules = c.triggers.GatherTriggerInfo()
-	profile.Disks = c.getDisks(req.Context())
+	profile.Disks = getDisks(req.Context(), c.Config.Snapshot.ZFSPools)
 
 	profile.ClientInfo = clientinfo.Get()
 	if profile.ClientInfo == nil {
@@ -392,4 +394,41 @@ func (c *Client) handleServicesConfig(resp http.ResponseWriter, req *http.Reques
 	if err != nil {
 		logs.Log.Errorf(mnd.GetID(req.Context()), "Writing HTTP Response: %v", err)
 	}
+}
+
+func (c *Client) setUserPass(ctx context.Context, authType configfile.AuthType, username, password string) error {
+	c.Lock()
+	defer c.Unlock()
+
+	current := c.Config.UIPassword
+
+	var err error
+
+	switch authType {
+	case configfile.AuthPassword:
+		err = c.Config.UIPassword.Set(username, password)
+	case configfile.AuthHeader:
+		err = c.Config.UIPassword.SetHeader(username)
+	case configfile.AuthNone:
+		err = c.Config.UIPassword.SetNoAuth(username)
+	case configfile.AuthWebsite:
+		err = c.Config.UIPassword.Set("", "")
+	}
+
+	if err != nil {
+		c.Config.UIPassword = current
+		return fmt.Errorf("saving new auth settings: %w", err)
+	}
+
+	config, err := c.Config.CopyConfig()
+	if err != nil {
+		return fmt.Errorf("copying config: %w", err)
+	}
+
+	if err := c.saveNewConfig(ctx, config); err != nil {
+		c.Config.UIPassword = current
+		return err
+	}
+
+	return nil
 }

@@ -39,7 +39,7 @@ func (s *server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 
 	resp, err := s.client.Do(req)
 	if err != nil {
-		s.debughttplog(reqID, nil, url, start, msg, nil)
+		s.debughttplog(reqID, nil, url, start, len(msg), []byte(msg), nil)
 		return nil, fmt.Errorf("making http request: %w", err)
 	}
 	defer resp.Body.Close()
@@ -47,7 +47,7 @@ func (s *server) sendFile(ctx context.Context, uri string, file *UploadFile) (*R
 	reader := resp.Body
 
 	if mnd.Log.DebugEnabled() {
-		reader = s.debugLogResponseBody(reqID, start, resp, url, []byte(msg), true)
+		reader = s.debugLogResponseBody(reqID, start, resp, url, len(msg), []byte(msg), true)
 	}
 
 	response, err := unmarshalResponse(url, resp.StatusCode, reader)
