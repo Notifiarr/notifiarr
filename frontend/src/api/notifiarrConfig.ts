@@ -1362,6 +1362,7 @@ export interface Config extends LogConfig, AppsConfig {
   hostId: string;
   uiPassword: string;
   bindAddr: string;
+  noCompress: boolean;
   sslCertFile: string;
   sslKeyFile: string;
   upstreams?: string[];

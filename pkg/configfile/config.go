@@ -52,6 +52,7 @@ type Config struct {
 	HostID     string                   `json:"hostId"      toml:"host_id"       xml:"host_id"       yaml:"hostId"`
 	UIPassword CryptPass                `json:"uiPassword"  toml:"ui_password"   xml:"ui_password"   yaml:"uiPassword"`
 	BindAddr   string                   `json:"bindAddr"    toml:"bind_addr"     xml:"bind_addr"     yaml:"bindAddr"`
+	NoCompress bool                     `json:"noCompress"  toml:"no_compress"   xml:"no_compress"   yaml:"noCompress"`
 	SSLCrtFile string                   `json:"sslCertFile" toml:"ssl_cert_file" xml:"ssl_cert_file" yaml:"sslCertFile"`
 	SSLKeyFile string                   `json:"sslKeyFile"  toml:"ssl_key_file"  xml:"ssl_key_file"  yaml:"sslKeyFile"`
 	Upstreams  []string                 `json:"upstreams"   toml:"upstreams"     xml:"upstreams"     yaml:"upstreams"`
@@ -190,11 +191,12 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 	// This function returns the notifiarr package Config struct too.
 	// This config contains [some of] the same data as the normal Config.
 	website.New(ctx, &website.Config{
-		Apps:     result.Apps,
-		Timeout:  c.Timeout,
-		Retries:  c.Retries,
-		HostID:   c.HostID,
-		BindAddr: c.BindAddr,
+		Apps:       result.Apps,
+		Timeout:    c.Timeout,
+		Retries:    c.Retries,
+		HostID:     c.HostID,
+		BindAddr:   c.BindAddr,
+		NoCompress: c.NoCompress,
 	})
 
 	result.Triggers = c.setup(ctx, flag, result.Services, result.Apps)
