@@ -8,7 +8,7 @@ import (
 	"golift.io/starr/radarr"
 )
 
-func (c *cmd) unmonitorRadarrMovie(ctx context.Context, response *ResponseData, idx int) (int, string) {
+func (c *cmd) unmonitorRadarrMovie(ctx context.Context, response *ResponseData, idx int) (int, string) { //nolint:cyclop
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: unmonitorRadarrMovie", response.Instances[idx], response.TmdbID)
 	defer mnd.Log.Trace(reqID, "end: unmonitorRadarrMovie", response.Instances[idx], response.TmdbID)
 
@@ -17,12 +17,23 @@ func (c *cmd) unmonitorRadarrMovie(ctx context.Context, response *ResponseData, 
 	// Get the internal RadarrMovie ID from Radarr using the TMDb ID.
 	movie, err := radarrInstance.GetMovieContext(ctx, &radarr.GetMovie{TMDBID: response.TmdbID})
 	if err != nil {
-		return parseStarrError(err)
+		return parseStarrError("getting movie", err)
 	}
 
 	// Make sure we got the correct movie.
 	if len(movie) == 0 || response.TmdbID != movie[0].TmdbID || response.TmdbID == 0 {
 		return http.StatusNotFound, "Movie not found in this Radarr instance."
+	}
+
+	mnd.Log.Trace(reqID, response.Action, "movie: unmonitorRadarrMovie", movie[0].ID)
+
+	_, err = radarrInstance.UpdateMovieContext(ctx, movie[0].ID, movie[0], false)
+	if err != nil {
+		return parseStarrError("unmonitoring movie", err)
+	}
+
+	if response.Action != "delete" {
+		return http.StatusOK, "OK"
 	}
 
 	// Check if the instance is rate limited.
@@ -31,18 +42,18 @@ func (c *cmd) unmonitorRadarrMovie(ctx context.Context, response *ResponseData, 
 			"Too many deletes through the Notifiarr client in the last hour."
 	}
 
-	mnd.Log.Trace(reqID, response.Action, "movie: unmonitorRadarrMovie", movie[0].ID)
-
-	if response.Action == "delete" {
-		// Delete the Movie File if the action is delete.
-		err = radarrInstance.DeleteMovieFilesContext(ctx, movie[0].MovieFile.ID)
-	} else { // Otherwise, only unmonitor the movie.
-		movie[0].Monitored = false
-		_, err = radarrInstance.UpdateMovieContext(ctx, movie[0].ID, movie[0], false)
+	// Delete the Movie File if the action is delete.
+	err = radarrInstance.DeleteMovieFilesContext(ctx, movie[0].MovieFile.ID)
+	if err != nil {
+		return parseStarrError("deleting movie file", err)
 	}
 
-	if err != nil {
-		return parseStarrError(err)
+	if response.MovieToo {
+		// Delete the Movie also if the action is delete.
+		err = radarrInstance.DeleteMovieContext(ctx, movie[0].ID, true, true)
+		if err != nil {
+			return parseStarrError("deleting movie file", err)
+		}
 	}
 
 	return http.StatusOK, "OK"

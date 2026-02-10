@@ -47,11 +47,11 @@ func (c *cmd) unmonitorStarrContent(ctx context.Context, data *UnmonitorData) *R
 
 // parseStarrError parses a starr package error and returns the
 // status code and error message from the underlying API request.
-func parseStarrError(err error) (int, string) {
+func parseStarrError(prefix string, err error) (int, string) {
 	var starrErr *starr.ReqError
 	if errors.As(err, &starrErr) {
-		return starrErr.Code, string(starrErr.Body)
+		return starrErr.Code, prefix + ": " + string(starrErr.Body)
 	}
 
-	return http.StatusInternalServerError, err.Error()
+	return http.StatusInternalServerError, prefix + ": " + err.Error()
 }

@@ -21,7 +21,7 @@ func (c *cmd) unmonitorSonarrEpisode( //nolint:cyclop
 	// Get the internal SonarrSeries ID from Sonarr using the TVDB ID.
 	series, err := sonarrInstance.GetSeriesContext(ctx, response.TvdbID)
 	if err != nil {
-		return parseStarrError(err)
+		return parseStarrError("getting series", err)
 	}
 
 	// Make sure we got the correct series.
@@ -37,7 +37,7 @@ func (c *cmd) unmonitorSonarrEpisode( //nolint:cyclop
 		SeasonNumber: response.Season,
 	})
 	if err != nil {
-		return parseStarrError(err)
+		return parseStarrError("getting episodes", err)
 	}
 
 	var (
@@ -58,24 +58,27 @@ func (c *cmd) unmonitorSonarrEpisode( //nolint:cyclop
 		return http.StatusNotFound, "Episode or episode file not found in this Sonarr instance."
 	}
 
+	mnd.Log.Trace(reqID, response.Action, "episode: unmonitorSonarrEpisode", episodeID, episodeFileID)
+
+	_, err = sonarrInstance.MonitorEpisodeContext(ctx, []int64{episodeID}, false)
+	if err != nil {
+		return parseStarrError("unmonitoring episode", err)
+	}
+
+	if response.Action != "delete" {
+		return http.StatusOK, "OK"
+	}
+
 	// Check if the instance is rate limited.
 	if !sonarrInstance.DelOK() {
 		return http.StatusLocked, "This Sonarr instance is rate limited. " +
 			"Too many deletes through the Notifiarr client in the last hour."
 	}
 
-	mnd.Log.Trace(reqID, response.Action, "episode: unmonitorSonarrEpisode", episodeID, episodeFileID)
-
-	if response.Action == "delete" {
-		// Delete the Episode File if the action is delete.
-		err = sonarrInstance.DeleteEpisodeFileContext(ctx, episodeFileID)
-	} else {
-		// Unmonitor the Episode if the action is unmonitor.
-		_, err = sonarrInstance.MonitorEpisodeContext(ctx, []int64{episodeID}, false)
-	}
-
+	// Delete the Episode File if the action is delete.
+	err = sonarrInstance.DeleteEpisodeFileContext(ctx, episodeFileID)
 	if err != nil {
-		return parseStarrError(err)
+		return parseStarrError("deleting episode file", err)
 	}
 
 	return http.StatusOK, "OK"

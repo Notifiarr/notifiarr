@@ -148,7 +148,7 @@ func (c *Client) loginDelayHandler(response http.ResponseWriter, request *http.R
 	}
 }
 
-func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) bool { //nolint:cyclop,funlen
+func (c *Client) loginHandler(response http.ResponseWriter, request *http.Request) bool { //nolint:cyclop
 	loggedinUsername, _ := c.getUserName(request)
 	providedUsername := request.FormValue("name")
 	reqID := mnd.GetID(request.Context())

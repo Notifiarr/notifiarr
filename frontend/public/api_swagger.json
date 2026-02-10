@@ -15440,8 +15440,6 @@
                         1000000000,
                         60000000000,
                         3600000000000,
-                        -9223372036854775808,
-                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -15458,8 +15456,6 @@
                         "Second",
                         "Minute",
                         "Hour",
-                        "minDuration",
-                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
@@ -21036,15 +21032,19 @@
                         "type": "integer"
                     }
                 },
+                "movieToo": {
+                    "description": "When deleting, delete the movie too? Otherwise just the files. Only used for Radarr.",
+                    "type": "boolean"
+                },
                 "season": {
                     "description": "Season number for the episode when interacting Sonarr.",
                     "type": "integer"
                 },
-                "tmdbid": {
+                "tmdbId": {
                     "description": "TMDb ID for the movie, when interacting Radarr.",
                     "type": "integer"
                 },
-                "tvdbid": {
+                "tvdbId": {
                     "description": "TVDB ID for the series when interacting Sonarr.",
                     "type": "integer"
                 }

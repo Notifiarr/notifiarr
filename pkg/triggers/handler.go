@@ -586,13 +586,15 @@ type unmonitorData struct {
 	// Instance number in the app. 1,2,3
 	Instances []int `json:"instances"`
 	// TMDb ID for the movie, when interacting Radarr.
-	TmdbID int64 `json:"tmdbid"`
+	TmdbID int64 `json:"tmdbId"`
 	// TVDB ID for the series when interacting Sonarr.
-	TvdbID int64 `json:"tvdbid"`
+	TvdbID int64 `json:"tvdbId"`
 	// Season number for the episode when interacting Sonarr.
 	Season int `json:"season"`
 	// Episode number for the episode when interacting Sonarr.
 	Episode int `json:"episode"`
+	// When deleting, delete the movie too? Otherwise just the files. Only used for Radarr.
+	MovieToo bool `json:"movieToo"`
 }
 
 // @Description	Unmonitors content in Sonarr or Radarr.
@@ -620,6 +622,7 @@ func (a *Actions) unmonitor(req *http.Request, input *common.ActionInput, app st
 		TmdbID:    data.TmdbID,
 		Season:    data.Season,
 		Episode:   data.Episode,
+		MovieToo:  data.MovieToo,
 	})
 
 	return http.StatusOK, fmt.Sprintf("Unmonitoring from %d %s instances. Request ID: %s.",
