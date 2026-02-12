@@ -94,7 +94,7 @@ func (c *cmd) sendMDBList(ctx context.Context, input *common.ActionInput) {
 }
 
 func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput) []*mdbListPayload {
-	output := []*mdbListPayload{}
+	output := make([]*mdbListPayload, 0, len(c.Apps.Radarr))
 	ci := clientinfo.Get()
 
 	for idx, app := range c.Apps.Radarr {
@@ -107,19 +107,19 @@ func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput)
 		library := &mdbListPayload{Instance: instance, Name: app.Name}
 		output = append(output, library)
 
-		items, err := app.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
+		exclusions, err := app.GetExclusionsContext(ctx)
 		if err != nil {
 			library.Error = err.Error()
-			mnd.Log.Errorf(input.ReqID, "[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting movies: %v",
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting exclusions: %v",
 				input.Type, instance, app.URL, library.Error)
 
 			continue
 		}
 
-		exclusions, err := app.GetExclusionsContext(ctx)
+		items, err := app.GetMovieContext(ctx, &radarr.GetMovie{ExcludeLocalCovers: true})
 		if err != nil {
 			library.Error = err.Error()
-			mnd.Log.Errorf(input.ReqID, "[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting exclusions: %v",
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting movies: %v",
 				input.Type, instance, app.URL, library.Error)
 
 			continue
@@ -142,7 +142,7 @@ func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput)
 }
 
 func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput) []*mdbListPayload {
-	output := []*mdbListPayload{}
+	output := make([]*mdbListPayload, 0, len(c.Apps.Sonarr))
 	ci := clientinfo.Get()
 
 	for idx, app := range c.Apps.Sonarr {
@@ -155,6 +155,15 @@ func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput)
 		library := &mdbListPayload{Instance: instance, Name: app.Name}
 		output = append(output, library)
 
+		exclusions, err := app.GetExclusionsContext(ctx)
+		if err != nil {
+			library.Error = err.Error()
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Sonarr Library (MDBList) (%d:%s) failed: getting exclusions: %v",
+				input.Type, instance, app.URL, library.Error)
+
+			continue
+		}
+
 		items, err := app.GetSeriesContext(ctx, 0)
 		if err != nil {
 			library.Error = err.Error()
@@ -164,14 +173,6 @@ func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput)
 			continue
 		}
 
-		exclusions, err := app.GetExclusionsContext(ctx)
-		if err != nil {
-			library.Error = err.Error()
-			mnd.Log.Errorf(input.ReqID, "[%s requested] Sonarr Library (MDBList) (%d:%s) failed: getting exclusions: %v",
-				input.Type, instance, app.URL, library.Error)
-
-			continue
-		}
 		library.Library = make([]*libraryData, len(items))
 		for idx, item := range items {
 			library.Library[idx] = &libraryData{
