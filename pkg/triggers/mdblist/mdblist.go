@@ -2,6 +2,7 @@ package mdblist
 
 import (
 	"context"
+	"slices"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -10,6 +11,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
 	"golift.io/cnfg"
 	"golift.io/starr/radarr"
+	"golift.io/starr/sonarr"
 )
 
 const TrigMDBListSync common.TriggerName = "Sending Library contents for MDBList."
@@ -70,10 +72,11 @@ type mdbListPayload struct {
 }
 
 type libraryData struct {
-	Imdb   string `json:"imdb,omitempty"`
-	Tmdb   int64  `json:"tmdb,omitempty"`
-	Tvdb   int64  `json:"tvdb,omitempty"`
-	Exists bool   `json:"exists"`
+	Imdb     string `json:"imdb,omitempty"`
+	Tmdb     int64  `json:"tmdb,omitempty"`
+	Tvdb     int64  `json:"tvdb,omitempty"`
+	Exists   bool   `json:"exists"`
+	Excluded bool   `json:"excluded"`
 }
 
 func (c *cmd) sendMDBList(ctx context.Context, input *common.ActionInput) {
@@ -113,12 +116,24 @@ func (c *cmd) getRadarrLibraries(ctx context.Context, input *common.ActionInput)
 			continue
 		}
 
+		exclusions, err := app.GetExclusionsContext(ctx)
+		if err != nil {
+			library.Error = err.Error()
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Radarr Library (MDBList) (%d:%s) failed: getting exclusions: %v",
+				input.Type, instance, app.URL, library.Error)
+
+			continue
+		}
+
 		library.Library = make([]*libraryData, len(items))
 		for idx, item := range items {
 			library.Library[idx] = &libraryData{
 				Imdb:   item.ImdbID,
 				Tmdb:   item.TmdbID,
 				Exists: item.SizeOnDisk > 0,
+				Excluded: slices.ContainsFunc(exclusions, func(exclusion *radarr.Exclusion) bool {
+					return exclusion.TMDBID == item.TmdbID
+				}),
 			}
 		}
 	}
@@ -149,12 +164,23 @@ func (c *cmd) getSonarrLibraries(ctx context.Context, input *common.ActionInput)
 			continue
 		}
 
+		exclusions, err := app.GetExclusionsContext(ctx)
+		if err != nil {
+			library.Error = err.Error()
+			mnd.Log.Errorf(input.ReqID, "[%s requested] Sonarr Library (MDBList) (%d:%s) failed: getting exclusions: %v",
+				input.Type, instance, app.URL, library.Error)
+
+			continue
+		}
 		library.Library = make([]*libraryData, len(items))
 		for idx, item := range items {
 			library.Library[idx] = &libraryData{
 				Imdb:   item.ImdbID,
 				Tvdb:   item.TvdbID,
 				Exists: item.Statistics != nil && item.Statistics.SizeOnDisk > 0,
+				Excluded: slices.ContainsFunc(exclusions, func(exclusion *sonarr.Exclusion) bool {
+					return exclusion.TVDBID == item.TvdbID
+				}),
 			}
 		}
 	}
