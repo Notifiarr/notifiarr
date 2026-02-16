@@ -28,7 +28,7 @@ require (
 	github.com/ncruces/zenity v0.10.14
 	github.com/nxadm/tail v1.4.11
 	github.com/paul-mannino/go-fuzzywuzzy v0.0.0-20241117160931-a1769aeb6b21
-	github.com/prometheus-community/pro-bing v0.7.0
+	github.com/prometheus-community/pro-bing v0.8.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/shirou/gopsutil/v4 v4.26.1
 	github.com/spf13/pflag v1.0.10
@@ -45,7 +45,7 @@ require (
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/goty v0.0.4
-	golift.io/mulery v0.0.11-0.20260201083556-b0d979a4fa42
+	golift.io/mulery v0.0.11-0.20260205022916-4244c58a504f
 	golift.io/nzbget v0.1.6
 	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
 	golift.io/rotatorr v0.0.0-20240723172740-cb73b9c4894c
@@ -107,7 +107,6 @@ require (
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/stretchr/objx v0.5.3 // indirect
-	github.com/tevino/abool v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.16 // indirect
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/ulikunitz/xz v0.5.15 // indirect

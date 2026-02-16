@@ -44,7 +44,7 @@ We have a client troubleshooting section in the wiki too.
 
 ## Contributing
 
-[Join us on Discord](https://notifiarr.com/discord) and we can discuss.
+[Join us on Discord](https://notifiarr.com/discord) where we can discuss your proposal.
 
 ## License
 
