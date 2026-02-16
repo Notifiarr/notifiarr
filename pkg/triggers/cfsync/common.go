@@ -64,7 +64,7 @@ func (c *cmd) create(reqID string) {
 
 		if len(info.Actions.Sync.LidarrInstances) > 0 {
 			mnd.Log.Printf(reqID, "==> Lidarr profile and format sync interval: %s, %s",
-				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.SonarrSync, ", "))
+				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.LidarrSync, ", "))
 		}
 	}
 
