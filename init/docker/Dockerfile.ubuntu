@@ -1,4 +1,4 @@
-FROM golang:1.25.7-trixie AS builder
+FROM golang:1.26.0-trixie AS builder
 
 # Build speed magic!
 # https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/
