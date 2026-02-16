@@ -12,6 +12,7 @@ import (
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/private"
+	"github.com/dsnet/compress/bzip2"
 	"golift.io/datacounter"
 	"golift.io/version"
 )
@@ -168,60 +169,103 @@ func (s *server) sendPayload(ctx context.Context, uri string, payload any, log b
 		}
 	}
 
-	var post []byte
+	var buf bytes.Buffer
+	encoder := json.NewEncoder(&buf)
 
 	if log {
-		post, err = json.MarshalIndent(payload, "", " ")
-	} else {
-		post, err = json.Marshal(payload)
+		encoder.SetIndent("", " ")
 	}
 
-	if err != nil {
+	if err := encoder.Encode(payload); err != nil {
 		return nil, fmt.Errorf("encoding data to JSON (report this bug please): %w", err)
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, s.getTimeout())
 	defer cancel()
 
-	code, body, err := s.sendJSON(ctx, BaseURL+uri, post, log)
+	code, size, body, err := s.sendJSON(ctx, BaseURL+uri, &buf, log)
 	if err != nil {
 		return nil, err
 	}
 
 	resp, err := unmarshalResponse(BaseURL+uri, code, body)
 	if resp != nil {
-		resp.sent = len(post)
+		resp.sent = size
 	}
 
 	return resp, err
 }
 
+// compressBzip2 compresses a payload using bzip2 if it's larger than 768 bytes.
+// We send the compressed payload to the website, and the website decompresses it.
+func (s *server) compressBzip2(data []byte) (*bytes.Buffer, bool, error) {
+	const compressThreshold = 768
+
+	if len(data) < compressThreshold || s.config.NoCompress {
+		return bytes.NewBuffer(data), false, nil
+	}
+
+	var buf bytes.Buffer
+	zwriter, err := bzip2.NewWriter(&buf, &bzip2.WriterConfig{Level: 8}) //nolint:mnd
+	if err != nil {
+		return nil, false, fmt.Errorf("creating bzip2 writer: %w", err)
+	}
+
+	if _, err := zwriter.Write(data); err != nil {
+		_ = zwriter.Close()
+		return nil, false, fmt.Errorf("writing bzip2 data: %w", err)
+	}
+
+	if err := zwriter.Close(); err != nil {
+		return nil, false, fmt.Errorf("closing bzip2 writer: %w", err)
+	}
+
+	return &buf, true, nil
+}
+
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.
-func (s *server) sendJSON(ctx context.Context, url string, data []byte, log bool) (int, io.ReadCloser, error) {
+// body is the data to send (possibly compressed). logData is the uncompressed data for logging; if nil, body is used.
+func (s *server) sendJSON(
+	ctx context.Context, url string, body *bytes.Buffer, log bool,
+) (int, int, io.ReadCloser, error) {
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: sendJSON", url)
 	defer mnd.Log.Trace(reqID, "end: sendJSON", url)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
+	bodyBytes := body.Bytes()
+
+	compressed, addHeader, err := s.compressBzip2(bodyBytes)
 	if err != nil {
-		return 0, nil, fmt.Errorf("creating http request: %w", err)
+		mnd.Log.Errorf(reqID, "Compressing payload: %v", err)
+		compressed = bytes.NewBuffer(bodyBytes)
+	}
+
+	sentSize := compressed.Len()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, compressed)
+	if err != nil {
+		return 0, 0, nil, fmt.Errorf("creating http request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", mnd.ContentTypeJSON)
 	req.Header.Set("X-Api-Key", s.config.Apps.APIKey)
 
+	if addHeader {
+		req.Header.Set("Content-Encoding", "bzip2")
+	}
+
 	start := time.Now()
 
 	resp, err := s.client.Do(req)
 	if err != nil {
-		s.debughttplog(reqID, nil, url, start, string(data), nil)
-		return 0, nil, fmt.Errorf("making http request: %w", err)
+		s.debughttplog(reqID, nil, url, start, sentSize, bodyBytes, nil)
+		return 0, 0, nil, fmt.Errorf("making http request: %w", err)
 	}
 
 	if !mnd.Log.DebugEnabled() { // no debug, just return the body.
-		return resp.StatusCode, resp.Body, nil
+		return resp.StatusCode, sentSize, resp.Body, nil
 	}
 
-	return resp.StatusCode, s.debugLogResponseBody(reqID, start, resp, url, data, log), nil
+	return resp.StatusCode, sentSize, s.debugLogResponseBody(reqID, start, resp, url, sentSize, bodyBytes, log), nil
 }
 
 func (s *server) getTimeout() time.Duration {
