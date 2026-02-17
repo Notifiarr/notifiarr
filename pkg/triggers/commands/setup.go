@@ -65,7 +65,7 @@ func (c *Command) Run(input *common.ActionInput) {
 
 // List returns a list of active triggers that can be executed.
 func (a *Action) List() []*cmdconfig.Config {
-	output := []*cmdconfig.Config{}
+	output := make([]*cmdconfig.Config, 0, len(a.cmd.cmdlist))
 
 	for _, c := range a.cmd.cmdlist {
 		config := c.Config

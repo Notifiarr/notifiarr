@@ -126,7 +126,7 @@ func (c *CronJob) fix() { //nolint:cyclop
 }
 
 func (a AtTimes) AtTimes() func() []gocron.AtTime {
-	output := []gocron.AtTime{}
+	output := make([]gocron.AtTime, 0, len(a))
 
 	for _, times := range a {
 		output = append(output, gocron.NewAtTime(times[fieldHours], times[fieldMinutes], times[fieldSeconds]))
