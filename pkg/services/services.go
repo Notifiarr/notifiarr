@@ -139,7 +139,7 @@ func (s *Services) applyLocalOverrides(plexName string) {
 // loadServiceStates brings service states from the website into the fold.
 // In other words, states are stored in the website's database.
 func (s *Services) loadServiceStates(reqID string) {
-	names := []string{}
+	names := make([]string, 0, len(s.services))
 	for name := range s.services {
 		names = append(names, valuePrefix+name)
 	}
