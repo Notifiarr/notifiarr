@@ -30,6 +30,11 @@ type cmd struct {
 	Plex *apps.Plex
 	sent map[string]struct{} // Tracks Finished sessions already sent.
 	sync.Mutex
+
+	startAt       time.Time
+	healthLock    sync.Mutex
+	lastWebhookAt time.Time
+	lastAlertAt   time.Time
 }
 
 const (
@@ -51,9 +56,10 @@ const (
 func New(config *common.Config, plex *apps.Plex) *Action {
 	return &Action{
 		cmd: &cmd{
-			Config: config,
-			Plex:   plex,
-			sent:   make(map[string]struct{}),
+			Config:  config,
+			Plex:    plex,
+			sent:    make(map[string]struct{}),
+			startAt: time.Now(),
 		},
 	}
 }
@@ -113,6 +119,11 @@ func (c *cmd) run(reqID string) {
 // SendWebhook is called in a go routine after a plex media.play webhook is received.
 func (a *Action) SendWebhook(hook *plex.IncomingWebhook) {
 	go a.cmd.sendWebhook(hook)
+}
+
+// RecordWebhook marks the current time as the most recent Plex webhook receipt.
+func (a *Action) RecordWebhook() {
+	a.cmd.recordWebhookAt(time.Now())
 }
 
 func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
