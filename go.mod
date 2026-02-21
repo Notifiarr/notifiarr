@@ -45,7 +45,7 @@ require (
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
 	golift.io/goty v0.0.4
-	golift.io/mulery v0.0.11-0.20260208070603-90a6ca6f67be
+	golift.io/mulery v0.0.11-0.20260221015939-741f9c91eb2b
 	golift.io/nzbget v0.1.6
 	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
 	golift.io/rotatorr v0.0.0-20260217050959-f6ac6fc7b38e
