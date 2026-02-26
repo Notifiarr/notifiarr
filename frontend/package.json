@@ -30,7 +30,7 @@
     "vite": "^7.1.5"
   },
   "dependencies": {
-    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^7.0.0",
     "@fortawesome/sharp-duotone-light-svg-icons": "^6.7.2",
     "@fortawesome/sharp-duotone-regular-svg-icons": "^6.7.2",
     "@fortawesome/sharp-duotone-solid-svg-icons": "^6.7.2",
