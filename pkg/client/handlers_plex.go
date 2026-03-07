@@ -58,6 +58,12 @@ func (c *Client) PlexHandler(w http.ResponseWriter, r *http.Request) { //nolint:
 		mnd.Apps.Add("Plex&&Webhook Errors", 1)
 		http.Error(w, "payload error", http.StatusBadRequest)
 		logs.Log.Errorf(mnd.GetID(r.Context()), "Unmarshalling Plex payload: %v", err)
+		return
+	default:
+		c.triggers.PlexCron.RecordWebhook()
+	}
+
+	switch {
 	case strings.EqualFold(hook.Event, "admin.database.backup"):
 		fallthrough
 	case strings.EqualFold(hook.Event, "device.new"):

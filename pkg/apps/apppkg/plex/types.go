@@ -285,12 +285,16 @@ type Similar struct {
 
 // WebsiteConfig is the website-derived configuration for Plex.
 type WebsiteConfig struct {
-	Interval   cnfg.Duration `json:"interval"`
-	TrackSess  bool          `json:"trackSessions"`
-	AccountMap string        `json:"accountMap"`
-	NoActivity bool          `json:"noActivity"`
-	Delay      cnfg.Duration `json:"activityDelay"`
-	Cooldown   cnfg.Duration `json:"cooldown"`
-	SeriesPC   uint          `json:"seriesPc"`
-	MoviesPC   uint          `json:"moviesPc"`
+	Interval             cnfg.Duration `json:"interval"`
+	TrackSess            bool          `json:"trackSessions"`
+	AccountMap           string        `json:"accountMap"`
+	NoActivity           bool          `json:"noActivity"`
+	Delay                cnfg.Duration `json:"activityDelay"`
+	Cooldown             cnfg.Duration `json:"cooldown"`
+	SeriesPC             uint          `json:"seriesPc"`
+	MoviesPC             uint          `json:"moviesPc"`
+	WebhookHealthEnabled *bool         `json:"webhookHealthEnabled,omitempty"`
+	WebhookStaleAfter    cnfg.Duration `json:"webhookStaleAfter"`
+	WebhookAlertCooldown cnfg.Duration `json:"webhookAlertCooldown"`
+	WebhookStartupGrace  cnfg.Duration `json:"webhookStartupGrace"`
 }
