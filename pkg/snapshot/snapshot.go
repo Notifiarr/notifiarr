@@ -108,7 +108,7 @@ type RaidData struct {
 
 // Partition is used for ZFS pools as well as normal Disk arrays.
 type Partition struct {
-	Device     string   `json:"name"`              // Mount point or display name.
+	Device     string   `json:"name"`             // Mount point or display name.
 	DevicePath string   `json:"device,omitempty"` // Block device path (e.g. /dev/sda1); empty for ZFS pools.
 	Total      uint64   `json:"total"`
 	Free       uint64   `json:"free"`

@@ -2511,6 +2511,8 @@
                         1000000000,
                         60000000000,
                         3600000000000,
+                        -9223372036854775808,
+                        9223372036854775807,
                         1,
                         1000,
                         1000000,
@@ -2527,6 +2529,8 @@
                         "Second",
                         "Minute",
                         "Hour",
+                        "minDuration",
+                        "maxDuration",
                         "Nanosecond",
                         "Microsecond",
                         "Millisecond",
@@ -5758,6 +5762,10 @@
         "snapshot.Partition": {
             "type": "object",
             "properties": {
+                "device": {
+                    "description": "Block device path (e.g. /dev/sda1); empty for ZFS pools.",
+                    "type": "string"
+                },
                 "free": {
                     "type": "integer"
                 },
@@ -5765,6 +5773,7 @@
                     "type": "string"
                 },
                 "name": {
+                    "description": "Mount point or display name.",
                     "type": "string"
                 },
                 "opts": {
