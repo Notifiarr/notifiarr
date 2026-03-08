@@ -7,6 +7,8 @@ github.com/CAFxX/httpcompression v0.0.9 h1:0ue2X8dOLEpxTm8tt+OdHcgA+gbDge0OqFQWG
 github.com/CAFxX/httpcompression v0.0.9/go.mod h1:XX8oPZA+4IDcfZ0A71Hz0mZsv/YJOgYygkFhizVPilM=
 github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc=
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
+github.com/Unpackerr/iso9660 v0.0.3 h1:WXXFIcmDLhnsKhXjPg2moUmHxhoUmIX7FLxrtqHJ7yQ=
+github.com/Unpackerr/iso9660 v0.0.3/go.mod h1:4Py6ZWQ+sUVo4BmmzZaFgOLcS3to5BMvH39TlOYNxhA=
 github.com/akavel/rsrc v0.10.2 h1:Zxm8V5eI1hW4gGaYsJQUhxpjkENuG91ki8B4zCrvEsw=
 github.com/akavel/rsrc v0.10.2/go.mod h1:uLoCtb9J+EyAqh+26kdrTgmzRBFPGOolLWKpdxkKq+c=
 github.com/andybalholm/brotli v1.0.5/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHGRSepvi9Eig=
@@ -116,6 +118,9 @@ github.com/hekmon/transmissionrpc/v3 v3.0.0 h1:0Fb11qE0IBh4V4GlOwHNYpqpjcYDp5Gou
 github.com/hekmon/transmissionrpc/v3 v3.0.0/go.mod h1:38SlNhFzinVUuY87wGj3acOmRxeYZAZfrj6Re7UgCDg=
 github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa h1:s3KPo0nThtvjEamF/aElD4k5jSsBHew3/sgNTnth+2M=
 github.com/hugelgupf/go-shlex v0.0.0-20200702092117-c80c9d0918fa/go.mod h1:I1uW6ymzwsy5TlQgD1bFAghdMgBYqH1qtCeHoZgHMqs=
+github.com/icza/bitio v1.1.0 h1:ysX4vtldjdi3Ygai5m1cWy4oLkhWTAi+SyO6HC8L9T0=
+github.com/icza/bitio v1.1.0/go.mod h1:0jGnlLAx8MKMr9VGnn/4YrvZiprkvBelsVIbA9Jjr9A=
+github.com/icza/mighty v0.0.0-20180919140131-cfd07d671de6/go.mod h1:xQig96I1VNBDIWGCdTt54nHt6EeI639SmHycLYL7FkA=
 github.com/jackpal/gateway v1.1.1 h1:UXXXkJGIHFsStms9ZBgGpoaFEJP7oJtFn5vplIT68E8=
 github.com/jackpal/gateway v1.1.1/go.mod h1:Tl1vZVtUaXx5j6P5HFmv45alhEi4yHHLfT4PRbB7eyw=
 github.com/jaypipes/ghw v0.23.0 h1:WOL4hpLcIu1kIm+z5Oz19Tk1HNw/Sncrx/6GS8O0Kl0=
@@ -154,6 +159,12 @@ github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 h1:PTw+yKnXcOFCR6
 github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88/go.mod h1:autxFIvghDt3jPTLoqZ9OZ7s9qTGNAWmYCjVFWPX/zg=
 github.com/mattn/go-isatty v0.0.20 h1:xfD0iDuEKnDkl03q4limB+vH+GxLEtL/jb4xVJSWWEY=
 github.com/mattn/go-isatty v0.0.20/go.mod h1:W+V8PltTTMOvKvAeJH7IuucS94S2C6jfK/D7dTCTo3Y=
+github.com/mewkiz/flac v1.0.13 h1:6wF8rRQKBFW159Daqx6Ro7K5ZnlVhHUKfS5aTsC4oXs=
+github.com/mewkiz/flac v1.0.13/go.mod h1:HfPYDA+oxjyuqMu2V+cyKcxF51KM6incpw5eZXmfA6k=
+github.com/mewkiz/pkg v0.0.0-20250417130911-3f050ff8c56d h1:IL2tii4jXLdhCeQN69HNzYYW1kl0meSG0wt5+sLwszU=
+github.com/mewkiz/pkg v0.0.0-20250417130911-3f050ff8c56d/go.mod h1:SIpumAnUWSy0q9RzKD3pyH3g1t5vdawUAPcW5tQrUtI=
+github.com/mewpkg/term v0.0.0-20241026122259-37a80af23985 h1:h8O1byDZ1uk6RUXMhj1QJU3VXFKXHDZxr4TXRPGeBa8=
+github.com/mewpkg/term v0.0.0-20241026122259-37a80af23985/go.mod h1:uiPmbdUbdt1NkGApKl7htQjZ8S7XaGUAVulJUJ9v6q4=
 github.com/mitchellh/go-homedir v1.1.0 h1:lukF9ziXFxDFPkA1vsr5zpc1XuPDn/wFntq5mG+4E0Y=
 github.com/mitchellh/go-homedir v1.1.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=
 github.com/mrobinsn/go-rtorrent v1.8.0 h1:+61aDIP0asy57lRD/uZtmxfE0/gjkHnt3uddOhMKUJ8=
@@ -203,6 +214,8 @@ github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0t
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
+github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d h1:hrujxIzL1woJ7AwssoOcM/tq5JjjG2yYOc8odClEiXA=
+github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d/go.mod h1:uugorj2VCxiV1x+LzaIdVa9b4S4qGAcH6cbhh4qVxOU=
 github.com/shirou/gopsutil/v4 v4.26.2 h1:X8i6sicvUFih4BmYIGT1m2wwgw2VG9YgrDTi7cIRGUI=
 github.com/shirou/gopsutil/v4 v4.26.2/go.mod h1:LZ6ewCSkBqUpvSOf+LsTGnRinC6iaNUNMGBtDkJBaLQ=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
@@ -302,10 +315,14 @@ golift.io/rotatorr v0.0.0-20260217050959-f6ac6fc7b38e h1:FgfNgbg2EUhFzAWPycsbh1d
 golift.io/rotatorr v0.0.0-20260217050959-f6ac6fc7b38e/go.mod h1:l/fgYTDxyEw15tRLjAtc13M3is1SXMU4hAIE0tdduAQ=
 golift.io/starr v1.3.0 h1:dmIt27th+LWIPWHdiHXvDeG8H1h9TT+PQE1ID3DssFY=
 golift.io/starr v1.3.0/go.mod h1:W8A/49qhVfoU0HgZyJla4NKRCM5eUHuhSesc+buPIBU=
+golift.io/udf v0.0.1 h1:kEcJVzqqR+IEWGMuPjuVPT9DzXRDukEgsizKAKn1LF8=
+golift.io/udf v0.0.1/go.mod h1:ndK7AlWOh+u+nW9tNsQR95dfHsfASG5Y3dMyzVqmPjw=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
 golift.io/version v0.0.2/go.mod h1:76aHNz8/Pm7CbuxIsDi97jABL5Zui3f2uZxDm4vB6hU=
 golift.io/xtractr v0.3.0 h1:t7U5Wf6svibttGeqZCH03Cd60pWLU5neYoRbI4aAkLg=
 golift.io/xtractr v0.3.0/go.mod h1:MUbnKZmnjdga3kjonnGlX6uW67Cr6+LBz+r6fuXxftc=
+golift.io/xtractr v0.3.1 h1:91ZU0DBL3SSfrVYbrENSLUQG4BdHT91rTqkod7TfOUI=
+golift.io/xtractr v0.3.1/go.mod h1:X3IQQIiYgwDmAuqeRSBfQqvo6KIWrFzCADTx3yFmt7o=
 google.golang.org/protobuf v1.36.11 h1:fV6ZwhNocDyBLK0dj+fg8ektcVegBBuEolpbTQyBNVE=
 google.golang.org/protobuf v1.36.11/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
