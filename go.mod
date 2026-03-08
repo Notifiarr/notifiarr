@@ -38,7 +38,7 @@ require (
 	golang.org/x/mod v0.33.0
 	golang.org/x/sys v0.41.0
 	golang.org/x/text v0.34.0
-	golang.org/x/time v0.14.0
+	golang.org/x/time v0.15.0
 	golift.io/cache v0.0.2
 	golift.io/cnfg v0.2.5
 	golift.io/cnfgfile v0.0.0-20240713024420-a5436d84eb48
