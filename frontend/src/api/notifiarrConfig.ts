@@ -196,6 +196,7 @@ export interface MegaCLI {
  */
 export interface Partition {
   name: string;
+  device?: string;
   total: number;
   free: number;
   used: number;

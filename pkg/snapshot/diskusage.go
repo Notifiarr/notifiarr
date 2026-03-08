@@ -64,13 +64,14 @@ func GetDisksUsage(ctx context.Context, allDrives bool) (map[string]*Partition, 
 		}
 
 		output[partitions[idx].Device] = &Partition{
-			Device:   partitions[idx].Mountpoint,
-			Total:    usage.Total,
-			Free:     usage.Free,
-			Used:     usage.Used,
-			FSType:   usage.Fstype,
-			ReadOnly: slices.Contains(partitions[idx].Opts, "ro"),
-			Opts:     partitions[idx].Opts,
+			Device:     partitions[idx].Mountpoint,
+			DevicePath: partitions[idx].Device,
+			Total:      usage.Total,
+			Free:       usage.Free,
+			Used:       usage.Used,
+			FSType:     usage.Fstype,
+			ReadOnly:   slices.Contains(partitions[idx].Opts, "ro"),
+			Opts:       partitions[idx].Opts,
 		}
 	}
 
@@ -105,10 +106,11 @@ func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
 			space := getQuotaSize(fields[2])
 			quota := getQuotaSize(fields[3])
 			s.Quotas[fields[0]] = &Partition{
-				Device: fields[1],
-				Total:  uint64(quota),
-				Free:   uint64(quota - space),
-				Used:   uint64(space),
+				Device:     fields[1],
+				DevicePath: fields[0],
+				Total:      uint64(quota),
+				Free:       uint64(quota - space),
+				Used:       uint64(space),
 			}
 		}
 		waitg.Done()
@@ -171,7 +173,12 @@ func GetZFSPoolData(ctx context.Context, pools []string) (map[string]*Partition,
 
 			for _, pool := range pools {
 				if len(fields) > 3 && strings.EqualFold(fields[0], pool) {
-					output[pool] = &Partition{Device: fields[4], FSType: "zfs", Opts: []string{fields[9]}}
+					output[pool] = &Partition{
+						Device:     fields[4],
+						DevicePath: fields[0],
+						FSType:     "zfs",
+						Opts:       []string{fields[9]},
+					}
 					output[pool].Total, _ = strconv.ParseUint(fields[1], mnd.Base10, mnd.Bits64)
 					output[pool].Free, _ = strconv.ParseUint(fields[3], mnd.Base10, mnd.Bits64)
 				}

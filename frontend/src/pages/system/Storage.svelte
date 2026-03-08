@@ -5,13 +5,11 @@
   import Header from '../../includes/Helem.svelte'
   import { formatBytes } from '../../includes/util'
   import { _ } from '../../includes/Translate.svelte'
-  import { get } from 'svelte/store'
 
-  let free = $derived(get(_)('system.StorageData.Free'))
-  let used = $derived(get(_)('system.StorageData.Used'))
-  let total = $derived(get(_)('system.StorageData.Total'))
-  let fs = $derived(get(_)('system.StorageData.FS'))
-  let ro = $derived(get(_)('system.StorageData.ro'))
+  let free = $derived($_('system.StorageData.Free'))
+  let used = $derived($_('system.StorageData.Used'))
+  let total = $derived($_('system.StorageData.Total'))
+  let fs = $derived($_('system.StorageData.FS'))
 </script>
 
 <Header
@@ -23,10 +21,18 @@
   d2="lightcyan" />
 
 <Table>
+  <thead>
+    <tr>
+      <th>{$_('system.StorageData.Device')}</th>
+      <th>{$_('system.StorageData.Mount')}</th>
+      <th>{$_('words.select-option.Information')}</th>
+    </tr>
+  </thead>
   <tbody>
-    {#each Object.entries($profile.disks || {}) as [device, disk]}
+    {#each Object.entries($profile.disks || {}) as [mapKey, disk]}
       <tr>
-        <th>{device}</th>
+        <th>{disk?.device ?? mapKey ?? '—'}</th>
+        <th>{disk?.name ?? '-'}</th>
         <td>
           <div class="row">
             <div class="col-md-3">{total}: {formatBytes(disk?.total || 0)}</div>
