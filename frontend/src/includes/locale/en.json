@@ -14,6 +14,7 @@
       "bytes": "bytes",
       "Daily": "Daily",
       "custom": "custom",
+      "Information": "Information",
       "InstanceDisabled": "Instance Disabled",
       "NoTimeout": "No Timeout",
       "ChecksDisabled": "Checks Disabled"
@@ -494,6 +495,8 @@
     },
     "StorageData": {
       "title": "Storage Data",
+      "Device": "Device",
+      "Mount": "Mount",
       "Total": "Total",
       "Used": "Used",
       "Free": "Free",

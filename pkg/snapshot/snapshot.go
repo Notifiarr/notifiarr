@@ -108,13 +108,14 @@ type RaidData struct {
 
 // Partition is used for ZFS pools as well as normal Disk arrays.
 type Partition struct {
-	Device   string   `json:"name"`
-	Total    uint64   `json:"total"`
-	Free     uint64   `json:"free"`
-	Used     uint64   `json:"used"`
-	FSType   string   `json:"fsType,omitempty"`
-	ReadOnly bool     `json:"readOnly,omitempty"`
-	Opts     []string `json:"opts,omitempty"`
+	Device     string   `json:"name"`              // Mount point or display name.
+	DevicePath string   `json:"device,omitempty"` // Block device path (e.g. /dev/sda1); empty for ZFS pools.
+	Total      uint64   `json:"total"`
+	Free       uint64   `json:"free"`
+	Used       uint64   `json:"used"`
+	FSType     string   `json:"fsType,omitempty"`
+	ReadOnly   bool     `json:"readOnly,omitempty"`
+	Opts       []string `json:"opts,omitempty"`
 }
 
 // Validate makes sure the snapshot configuration is valid.
