@@ -49,7 +49,7 @@ require (
 	golift.io/nzbget v0.1.6
 	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
 	golift.io/rotatorr v0.0.0-20260217050959-f6ac6fc7b38e
-	golift.io/starr v1.3.0
+	golift.io/starr v1.3.1
 	golift.io/version v0.0.2
 	golift.io/xtractr v0.3.1
 	modernc.org/sqlite v1.46.1
