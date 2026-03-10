@@ -16,7 +16,8 @@
             "bytes": "bytes",
             "InstanceDisabled": "Instantie uitgeschakeld",
             "NoTimeout": "Geen time-out",
-            "ChecksDisabled": "Controles uitgeschakeld"
+            "ChecksDisabled": "Controles uitgeschakeld",
+            "Information": "Informatie"
         },
         "clock": {
             "days": {
@@ -514,7 +515,9 @@
             "Used": "Gebruikt",
             "Free": "Vrij",
             "FS": "FS",
-            "ro": "ro"
+            "ro": "ro",
+            "Device": "Apparaat",
+            "Mount": "Koppelen"
         },
         "NetworkInformation": {
             "Netmask": "Netmask",
