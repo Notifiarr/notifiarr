@@ -1,0 +1,46 @@
+name: Feature Request
+description: Suggest an idea or enhancement for the Notifiarr client
+title: "FR - "
+labels: ["enhancement", "triage"]
+type: Feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Feature Request
+        Thanks for taking the time to suggest a new feature!
+        Please fill out the information below as detailed as possible.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Description
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: I'm always frustrated when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented.
+      placeholder: It would be great if...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Describe any alternative solutions or features you've considered.
+      placeholder: I've thought about...
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context, screenshots, or examples about the feature request.
+      placeholder: Any additional information...

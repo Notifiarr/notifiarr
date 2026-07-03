@@ -1,0 +1,85 @@
+name: Bug Report
+description: File a bug report to help us improve the Notifiarr client
+title: "Bug - "
+labels: ["bug", "triage"]
+type: Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Bug Report
+        Thanks for taking the time to fill out this bug report!
+        Please fill out the information below as detailed as possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the bug
+      description: A clear and concise description of what the bug is.
+      placeholder: Tell us what happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you expected to happen.
+      placeholder: Tell us what should have happened...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
+    validations:
+      required: true
+
+  - type: input
+    id: client-version
+    attributes:
+      label: Notifiarr Client Version
+      description: |
+        What version of the Notifiarr client are you running?
+        You can find it in the web UI footer or by running `notifiarr --version`.
+      placeholder: "v0.8.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: How are you running the Notifiarr client?
+      options:
+        - Docker
+        - Linux (package)
+        - Windows
+        - macOS
+        - FreeBSD
+        - Synology
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: |
+        Paste any relevant client log output. This will be automatically formatted, so no need for backticks.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add any other context about the problem here (screenshots, config snippets, etc.).
+      placeholder: Any additional information...
