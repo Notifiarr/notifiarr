@@ -30,6 +30,23 @@
                 },
                 "type": "object"
             },
+            "apps.APIResponse-array_apps_SportarrSeriesSearchItem": {
+                "properties": {
+                    "message": {
+                        "description": "This message contains the request-specific response payload.",
+                        "items": {
+                            "$ref": "#/components/schemas/apps.SportarrSeriesSearchItem"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "status": {
+                        "description": "The status always matches the HTTP response.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "apps.APIResponse-array_apps_lidarrSearchAlbum_albumData": {
                 "properties": {
                     "message": {
@@ -121,6 +138,23 @@
                         "description": "This message contains the request-specific response payload.",
                         "items": {
                             "$ref": "#/components/schemas/cfsync.SonarrTrashPayload"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "status": {
+                        "description": "The status always matches the HTTP response.",
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "apps.APIResponse-array_cfsync_SportarrTrashPayload": {
+                "properties": {
+                    "message": {
+                        "description": "This message contains the request-specific response payload.",
+                        "items": {
+                            "$ref": "#/components/schemas/cfsync.SportarrTrashPayload"
                         },
                         "type": "array",
                         "uniqueItems": false
@@ -857,6 +891,62 @@
                 },
                 "type": "object"
             },
+            "apps.SportarrSeriesSearchItem": {
+                "properties": {
+                    "added": {
+                        "type": "string"
+                    },
+                    "exists": {
+                        "type": "boolean"
+                    },
+                    "first": {
+                        "type": "string"
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "languageProfileId": {
+                        "type": "integer"
+                    },
+                    "monitored": {
+                        "type": "boolean"
+                    },
+                    "next": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "prev": {
+                        "type": "string"
+                    },
+                    "qualityId": {
+                        "type": "integer"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "seasonFolder": {
+                        "type": "boolean"
+                    },
+                    "seriesType": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "tvdbId": {
+                        "type": "integer"
+                    },
+                    "year": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
             "apps.deleteResponse": {
                 "description": "This message contains the request-specific response payload.",
                 "properties": {
@@ -1142,6 +1232,51 @@
                 },
                 "type": "object"
             },
+            "cfsync.SportarrTrashPayload": {
+                "properties": {
+                    "customFormats": {
+                        "items": {
+                            "$ref": "#/components/schemas/sonarr.CustomFormatOutput"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "error": {
+                        "type": "string"
+                    },
+                    "instance": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "naming": {
+                        "$ref": "#/components/schemas/sonarr.Naming"
+                    },
+                    "qualityDefinitions": {
+                        "items": {
+                            "$ref": "#/components/schemas/sonarr.QualityDefinition"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "qualityProfiles": {
+                        "items": {
+                            "$ref": "#/components/schemas/sonarr.QualityProfile"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "releaseProfiles": {
+                        "items": {
+                            "$ref": "#/components/schemas/sonarr.ReleaseProfile"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    }
+                },
+                "type": "object"
+            },
             "cfsync.TrashAggInput": {
                 "properties": {
                     "instances": {
@@ -1185,6 +1320,13 @@
                         "uniqueItems": false
                     },
                     "sonarr": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "sportarr": {
                         "items": {
                             "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
                         },
@@ -1385,6 +1527,13 @@
                         "type": "array",
                         "uniqueItems": false
                     },
+                    "sportarr": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.SportarrConTest"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
                     "tautulli": {
                         "items": {
                             "$ref": "#/components/schemas/clientinfo.TautulliConTest"
@@ -1549,6 +1698,30 @@
                 "type": "object"
             },
             "clientinfo.SonarrConTest": {
+                "properties": {
+                    "error": {
+                        "description": "Error returned.",
+                        "type": "string"
+                    },
+                    "instance": {
+                        "description": "The site-ID for the instance (1-index).",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "user-provided name of the instance.",
+                        "type": "string"
+                    },
+                    "systemStatus": {
+                        "$ref": "#/components/schemas/sonarr.SystemStatus"
+                    },
+                    "up": {
+                        "description": "Up is true if the instance is reachable.",
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
+            "clientinfo.SportarrConTest": {
                 "properties": {
                     "error": {
                         "description": "Error returned.",
@@ -9632,7 +9805,8 @@
                                 "prowlarr",
                                 "radarr",
                                 "readarr",
-                                "sonarr"
+                                "sonarr",
+                                "sportarr"
                             ],
                             "type": "string"
                         }
@@ -9686,7 +9860,8 @@
                                 "prowlarr",
                                 "radarr",
                                 "readarr",
-                                "sonarr"
+                                "sonarr",
+                                "sportarr"
                             ],
                             "type": "string"
                         }
@@ -17669,6 +17844,3155 @@
                 ]
             }
         },
+        "/sportarr/{instance}": {
+            "put": {
+                "description": "Updates a series in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "move files? true/false",
+                        "in": "query",
+                        "name": "moveFiles",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.Series",
+                                "summary": "PUT",
+                                "description": "series content"
+                            }
+                        }
+                    },
+                    "description": "series content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "OK"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Series",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/add": {
+            "post": {
+                "description": "Adds a new Series to Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.AddSeriesInput",
+                                "summary": "POST",
+                                "description": "new item content"
+                            }
+                        }
+                    },
+                    "description": "new item content",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_Series"
+                                }
+                            }
+                        },
+                        "description": "series content"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "bad json payload"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "item already exists"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "no item ID provided"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error during add"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error during check"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Add Sportarr Series",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/check/{tvdbid}": {
+            "get": {
+                "description": "Checks if a Sportarr Series already exists.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "TVDB ID",
+                        "in": "path",
+                        "name": "tvdbid",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "series does not exist"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "409": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "item already exists"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Check Sportarr Series Existence",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/command": {
+            "post": {
+                "description": "Execute any command in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.CommandRequest",
+                                "summary": "POST",
+                                "description": "command content, must include series ID"
+                            }
+                        }
+                    },
+                    "description": "command content, must include series ID",
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_CommandResponse"
+                                }
+                            }
+                        },
+                        "description": "command response"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid json input"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Execute Sportarr Command",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/command/search/{seriesID}": {
+            "get": {
+                "description": "Trigger an Internet search for a Sportarr Series.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Series ID",
+                        "in": "path",
+                        "name": "seriesID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "search status"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Search for Sportarr Series",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/command/{commandID}": {
+            "get": {
+                "description": "Check the status of an executed Sportarr Command.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Command ID returned by executing a command",
+                        "in": "path",
+                        "name": "commandID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_CommandResponse"
+                                }
+                            }
+                        },
+                        "description": "command status"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Sonar Command Status",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/customformats": {
+            "get": {
+                "description": "Returns all Custom Format from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_CustomFormatOutput"
+                                }
+                            }
+                        },
+                        "description": "custom formats"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Custom Formats",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "post": {
+                "description": "Creates a new Custom Format in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.CustomFormatInput",
+                                "summary": "POST",
+                                "description": "New Custom Format content"
+                            }
+                        }
+                    },
+                    "description": "New Custom Format content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_CustomFormatOutput"
+                                }
+                            }
+                        },
+                        "description": "custom format"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid json provided"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Create Sportarr Custom Format",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/customformats/all": {
+            "delete": {
+                "description": "Delete all Custom Formats from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-apps_deleteResponse"
+                                }
+                            }
+                        },
+                        "description": "item delete counters"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Delete all Sportarr Custom Formats",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/customformats/{formatID}": {
+            "delete": {
+                "description": "Delete a Custom Format from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Custom Format ID",
+                        "in": "path",
+                        "name": "formatID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Delete Sportarr Custom Format",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "put": {
+                "description": "Updates a Custom Format in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Custom Format ID",
+                        "in": "path",
+                        "name": "formatID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.CustomFormatInput",
+                                "summary": "PUT",
+                                "description": "Updated Custom Format content"
+                            }
+                        }
+                    },
+                    "description": "Updated Custom Format content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_CustomFormatOutput"
+                                }
+                            }
+                        },
+                        "description": "custom format"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid json provided"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Custom Format",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/delete/{episodeFileID}": {
+            "post": {
+                "description": "Delete episode files from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "episode file ID to delete, not episode ID",
+                        "in": "path",
+                        "name": "episodeFileID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "423": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "rate limit reached"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Remove Sportarr episode files",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/get/{seriesID}": {
+            "get": {
+                "description": "Returns a Sportarr Series by ID.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Series ID",
+                        "in": "path",
+                        "name": "seriesID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_Series"
+                                }
+                            }
+                        },
+                        "description": "series content"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Series",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/getEpisodes/{seriesID}": {
+            "get": {
+                "description": "Returns a Sportarr Series Episodes by Series ID.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Series ID",
+                        "in": "path",
+                        "name": "seriesID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_Episode"
+                                }
+                            }
+                        },
+                        "description": "episodes content"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Series Episodes",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/importlist": {
+            "get": {
+                "description": "Returns all Import Lists from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_ImportListOutput"
+                                }
+                            }
+                        },
+                        "description": "list of import lists"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Import Lists",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "post": {
+                "description": "Creates a new Import List in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.ImportListInput",
+                                "summary": "POST",
+                                "description": "New Import List"
+                            }
+                        }
+                    },
+                    "description": "New Import List",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_ImportListOutput"
+                                }
+                            }
+                        },
+                        "description": "import list returns"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid json provided"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Create Sportarr Import List",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/importlist/{listID}": {
+            "put": {
+                "description": "Updates an Import List in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Import List ID",
+                        "in": "path",
+                        "name": "listID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.ImportListInput",
+                                "summary": "PUT",
+                                "description": "Updated Import List Content"
+                            }
+                        }
+                    },
+                    "description": "Updated Import List Content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_ImportListOutput"
+                                }
+                            }
+                        },
+                        "description": "import list returns"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid json provided"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Import List",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/languageProfiles": {
+            "get": {
+                "description": "Fetches all Language Profiles from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-map_int64_string"
+                                }
+                            }
+                        },
+                        "description": "map of ID to name"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Language Profiles",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/naming": {
+            "get": {
+                "description": "Returns Sportarr series naming conventions.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_Naming"
+                                }
+                            }
+                        },
+                        "description": "naming conventions"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Retrieve Sportarr Series Naming",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "put": {
+                "description": "Updates the Sportarr series naming conventions.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.Naming",
+                                "summary": "PUT",
+                                "description": "naming conventions"
+                            }
+                        }
+                    },
+                    "description": "naming conventions",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-int64"
+                                }
+                            }
+                        },
+                        "description": "naming ID"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "bad json input"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Series Naming",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/notification": {
+            "post": {
+                "description": "Creates a new Sportarr Notification.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.NotificationInput",
+                                "summary": "POST",
+                                "description": "new item content"
+                            }
+                        }
+                    },
+                    "description": "new item content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-int64"
+                                }
+                            }
+                        },
+                        "description": "new notification ID"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "json input error"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Add Sportarr Notification",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "put": {
+                "description": "Updates a Notification in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.NotificationInput",
+                                "summary": "PUT",
+                                "description": "notification content"
+                            }
+                        }
+                    },
+                    "description": "notification content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "bad json input"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Notification",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/notifications": {
+            "get": {
+                "description": "Returns Sportarr Notifications with a name that matches 'notifiar'.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_NotificationOutput"
+                                }
+                            }
+                        },
+                        "description": "notifications"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Retrieve Sportarr Notifications",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/qualityProfile": {
+            "get": {
+                "description": "Fetches all Quality Profiles Data from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_QualityProfile"
+                                }
+                            }
+                        },
+                        "description": "all profiles"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Quality Profile Data",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "post": {
+                "description": "Creates a new Sportarr Quality Profile.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.QualityProfile",
+                                "summary": "POST",
+                                "description": "new item content"
+                            }
+                        }
+                    },
+                    "description": "new item content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-int64"
+                                }
+                            }
+                        },
+                        "description": "new profile ID"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "json input error"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Add Sportarr Quality Profile",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/qualityProfile/{profileID}": {
+            "delete": {
+                "description": "Removes a Sportarr Quality Profile.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "profile ID to update",
+                        "in": "path",
+                        "name": "profileID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "no profile ID"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Remove Sportarr Quality Profile",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "put": {
+                "description": "Updates a Sportarr Quality Profile.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "profile ID to update",
+                        "in": "path",
+                        "name": "profileID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.QualityProfile",
+                                "summary": "PUT",
+                                "description": "updated item content"
+                            }
+                        }
+                    },
+                    "description": "updated item content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "json input error"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "no profile ID"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Quality Profile",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/qualityProfiles": {
+            "get": {
+                "description": "Fetches all Quality Profiles from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-map_int64_string"
+                                }
+                            }
+                        },
+                        "description": "map of ID to name"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Quality Profiles",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/qualityProfiles/all": {
+            "delete": {
+                "description": "Removes all Sportarr Quality Profiles.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-apps_deleteResponse"
+                                }
+                            }
+                        },
+                        "description": "delete status"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error getting profiles"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Remove Sportarr Quality Profiles",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/qualitydefinition": {
+            "get": {
+                "description": "Returns all Quality Definitions from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_QualityDefinition"
+                                }
+                            }
+                        },
+                        "description": "quality definitions list"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Quality Definitions",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "put": {
+                "description": "Updates all Quality Definitions in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "items": {
+                                    "$ref": "#/components/schemas/sonarr.QualityDefinition"
+                                },
+                                "title": "PUT",
+                                "type": "array"
+                            }
+                        }
+                    },
+                    "description": "Updated Import Listcontent",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_QualityDefinition"
+                                }
+                            }
+                        },
+                        "description": "quality definitions return"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid json provided"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Quality Definitions",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/queue/{queueID}": {
+            "delete": {
+                "description": "Delete items from the activity queue.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "queue ID to delete",
+                        "in": "path",
+                        "name": "queueID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "remove download from download client?",
+                        "in": "query",
+                        "name": "removeFromClient",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "description": "add item to blocklist?",
+                        "in": "query",
+                        "name": "blocklist",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "description": "skip downloading this again?",
+                        "in": "query",
+                        "name": "skipRedownload",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "description": "tell download client to change categories?",
+                        "in": "query",
+                        "name": "changeCategory",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "423": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "rate limit reached"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Delete Queue Items",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/releaseProfile": {
+            "get": {
+                "description": "Fetches all Release Profile Data from Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_sonarr_ReleaseProfile"
+                                }
+                            }
+                        },
+                        "description": "all profiles"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Get Sportarr Release Profile Data",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "post": {
+                "description": "Creates a new Sportarr Release Profile.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.ReleaseProfile",
+                                "summary": "POST",
+                                "description": "new item content"
+                            }
+                        }
+                    },
+                    "description": "new item content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-int64"
+                                }
+                            }
+                        },
+                        "description": "new profile ID"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "json input error"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Add Sportarr Release Profile",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/releaseProfile/all": {
+            "delete": {
+                "description": "Removes all Sportarr Release Profiles.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-apps_deleteResponse"
+                                }
+                            }
+                        },
+                        "description": "delete status"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error getting profiles"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Remove Sportarr Release Profiles",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/releaseProfile/{profileID}": {
+            "delete": {
+                "description": "Removes a Sportarr Release Profile.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "profile ID to update",
+                        "in": "path",
+                        "name": "profileID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "no profile ID"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Remove Sportarr Release Profile",
+                "tags": [
+                    "Sportarr"
+                ]
+            },
+            "put": {
+                "description": "Updates a Sportarr Release Profile.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "profile ID to update",
+                        "in": "path",
+                        "name": "profileID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.ReleaseProfile",
+                                "summary": "PUT",
+                                "description": "updated item content"
+                            }
+                        }
+                    },
+                    "description": "updated item content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "json input error"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "422": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "no profile ID"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Release Profile",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/rootFolder": {
+            "get": {
+                "description": "Returns all Sportarr Root Folders paths and free space.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-map_string_int64"
+                                }
+                            }
+                        },
+                        "description": "map of path-\u003espace free"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "500": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Retrieve Sportarr Root Folders",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/search/{query}": {
+            "get": {
+                "description": "Searches all Sportarr Series Titles for the search term provided. Returns a minimal amount of data for each found item.",
+                "parameters": [
+                    {
+                        "description": "title search string",
+                        "in": "path",
+                        "name": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_apps_SportarrSeriesSearchItem"
+                                }
+                            }
+                        },
+                        "description": "minimal series data"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Search for Sportarr Series",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/seasonPass": {
+            "post": {
+                "description": "Season Pass allows you to mass-edit items in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/sonarr.SeasonPass",
+                                "summary": "POST",
+                                "description": "Season pass content"
+                            }
+                        }
+                    },
+                    "description": "Season pass content",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "ok"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid json provided"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Publish Sportarr Season Pass",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/tag": {
+            "get": {
+                "description": "Returns all Sportarr Tags.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_starr_Tag"
+                                }
+                            }
+                        },
+                        "description": "tags"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Retrieve Sportarr Tags",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/tag/{label}": {
+            "put": {
+                "description": "Create a brand new tag in Sportarr.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "tag label",
+                        "in": "path",
+                        "name": "label",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-int64"
+                                }
+                            }
+                        },
+                        "description": "tag ID"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Create Sportarr Tag",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/tag/{tagID}/{label}": {
+            "put": {
+                "description": "Updates the label for an existing Sportarr tag.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "tag ID to update",
+                        "in": "path",
+                        "name": "tagID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "new label",
+                        "in": "path",
+                        "name": "label",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-int64"
+                                }
+                            }
+                        },
+                        "description": "tag ID"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Update Sportarr Tag Label",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
+        "/sportarr/{instance}/unmonitor/{episodeID}": {
+            "get": {
+                "description": "Unmonnitors and returns a Sportarr Series Episode.",
+                "parameters": [
+                    {
+                        "description": "instance ID",
+                        "in": "path",
+                        "name": "instance",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "Episode ID",
+                        "in": "path",
+                        "name": "episodeID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-sonarr_Episode"
+                                }
+                            }
+                        },
+                        "description": "episode content"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "instance error"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Unmonnitors Sportarr Series Episode",
+                "tags": [
+                    "Sportarr"
+                ]
+            }
+        },
         "/trash/lidarr": {
             "post": {
                 "description": "Returns custom format and related data for multiple Lidarr instances at once. May be slow.",
@@ -17846,6 +21170,66 @@
                 "tags": [
                     "TRaSH",
                     "Sonarr"
+                ]
+            }
+        },
+        "/trash/sportarr": {
+            "post": {
+                "description": "Returns custom format and related data for multiple Sportarr instances at once. May be slow.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/cfsync.TrashAggInput",
+                                "summary": "request",
+                                "description": "list of instances"
+                            }
+                        }
+                    },
+                    "description": "list of instances",
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-array_cfsync_SportarrTrashPayload"
+                                }
+                            }
+                        },
+                        "description": "contains app info included appStatus"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "bad input payload or missing app"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Retrieve custom format data from multiple Sportarr instances.",
+                "tags": [
+                    "TRaSH",
+                    "Sportarr"
                 ]
             }
         },
@@ -18762,6 +22146,53 @@
                 ]
             }
         },
+        "/trigger/sportarrsync/{instance}": {
+            "get": {
+                "description": "Sync custom profiles and formats to Sportarr.",
+                "parameters": [
+                    {
+                        "description": "Triggers sync on this instance if provided, otherwise all instances",
+                        "in": "path",
+                        "name": "instance",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "success"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "Sync TRaSH Sportarr data",
+                "tags": [
+                    "Triggers",
+                    "TRaSH"
+                ]
+            }
+        },
         "/trigger/stuckitems": {
             "get": {
                 "description": "Sends cached stuck items notification.",
@@ -18953,6 +22384,7 @@
                                 "radarr",
                                 "readarr",
                                 "sonarr",
+                                "sportarr",
                                 "plex",
                                 "tautulli"
                             ],

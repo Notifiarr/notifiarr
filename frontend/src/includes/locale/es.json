@@ -620,6 +620,7 @@
                 "placeholder": "sonarr-clave-de-api"
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Prowlarr": {
             "title": "Prowlarr",
             "addInstance": "Agregar instancia de Prowlarr",

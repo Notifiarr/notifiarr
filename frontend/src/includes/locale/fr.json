@@ -90,6 +90,7 @@
                 "tooltip": "Vous n'avez besoin que d'un nom d'utilisateur et d'un mot de passe si vous souhaitez vérifier les sauvegardes de la base de données, car celles-ci ne peuvent pas être téléchargées via l'API."
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Lidarr": {
             "title": "Lidarr",
             "addInstance": "Ajouter une instance Lidarr",

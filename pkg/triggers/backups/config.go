@@ -23,6 +23,7 @@ type cmd struct {
 	radarr   map[int]string
 	readarr  map[int]string
 	sonarr   map[int]string
+	sportarr map[int]string
 }
 
 // Errors returned by this package.
@@ -43,11 +44,13 @@ const (
 	TrigRadarrCorrupt   common.TriggerName = "Checking Radarr for database backup corruption."
 	TrigReadarrCorrupt  common.TriggerName = "Checking Readarr for database backup corruption."
 	TrigSonarrCorrupt   common.TriggerName = "Checking Sonarr for database backup corruption."
+	TrigSportarrCorrupt common.TriggerName = "Checking Sportarr for database backup corruption."
 	TrigLidarrBackup    common.TriggerName = "Sending Lidarr Backup File List to Notifiarr."
 	TrigProwlarrBackup  common.TriggerName = "Sending Prowlarr Backup File List to Notifiarr."
 	TrigRadarrBackup    common.TriggerName = "Sending Radarr Backup File List to Notifiarr."
 	TrigReadarrBackup   common.TriggerName = "Sending Readarr Backup File List to Notifiarr."
 	TrigSonarrBackup    common.TriggerName = "Sending Sonarr Backup File List to Notifiarr."
+	TrigSportarrBackup  common.TriggerName = "Sending Sportarr Backup File List to Notifiarr."
 )
 
 // Info contains a pile of information about a Starr database (backup).
@@ -99,6 +102,7 @@ func New(config *common.Config) *Action {
 		radarr:   make(map[int]string),
 		readarr:  make(map[int]string),
 		sonarr:   make(map[int]string),
+		sportarr: make(map[int]string),
 	}}
 }
 
@@ -109,10 +113,12 @@ func (a *Action) Create() {
 	a.cmd.makeBackupTriggersRadarr(info)
 	a.cmd.makeBackupTriggersReadarr(info)
 	a.cmd.makeBackupTriggersSonarr(info)
+	a.cmd.makeBackupTriggersSportarr(info)
 	a.cmd.makeBackupTriggersProwlarr(info)
 	a.cmd.makeCorruptionTriggersLidarr(info)
 	a.cmd.makeCorruptionTriggersRadarr(info)
 	a.cmd.makeCorruptionTriggersReadarr(info)
 	a.cmd.makeCorruptionTriggersSonarr(info)
+	a.cmd.makeCorruptionTriggersSportarr(info)
 	a.cmd.makeCorruptionTriggersProwlarr(info)
 }

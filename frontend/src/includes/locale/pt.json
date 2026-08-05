@@ -820,6 +820,7 @@
                 "placeholder": "sonarr-api-key"
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Lidarr": {
             "title": "Lidarr",
             "addInstance": "Adicionar instância Lidarr",

@@ -11,6 +11,7 @@ import (
 	"path"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -37,6 +38,7 @@ func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
 		a.cmd.Exec(input, TrigRadarrCorrupt)
 		a.cmd.Exec(input, TrigReadarrCorrupt)
 		a.cmd.Exec(input, TrigSonarrCorrupt)
+		a.cmd.Exec(input, TrigSportarrCorrupt)
 	case starr.Lidarr:
 		a.cmd.Exec(input, TrigLidarrCorrupt)
 	case starr.Prowlarr:
@@ -47,6 +49,8 @@ func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
 		a.cmd.Exec(input, TrigReadarrCorrupt)
 	case starr.Sonarr:
 		a.cmd.Exec(input, TrigSonarrCorrupt)
+	case apps.SportarrApp:
+		a.cmd.Exec(input, TrigSportarrCorrupt)
 	}
 
 	return nil
@@ -177,6 +181,31 @@ func (c *cmd) makeCorruptionTriggersSonarr(info *clientinfo.ClientInfo) {
 	}
 }
 
+func (c *cmd) makeCorruptionTriggersSportarr(info *clientinfo.ClientInfo) {
+	action := &common.Action{
+		Name: TrigSportarrCorrupt,
+		Key:  "TrigSportarrCorrupt",
+		Fn:   c.sendSportarrCorruption,
+		C:    make(chan *common.ActionInput, 1),
+	}
+	defer c.Add(action)
+
+	if info == nil {
+		return
+	}
+
+	for idx, app := range c.Apps.Sportarr {
+		if app.Enabled() {
+			c.sportarr[idx] = info.Actions.Apps.Sportarr.Corrupt(idx + 1)
+			if c.sportarr[idx] != mnd.Disabled {
+				randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
+					time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
+				action.D = cnfg.Duration{Duration: checkInterval + randomTime}
+			}
+		}
+	}
+}
+
 func (c *cmd) sendLidarrCorruption(ctx context.Context, input *common.ActionInput) {
 	for idx, app := range c.Apps.Lidarr {
 		c.lidarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
@@ -239,6 +268,20 @@ func (c *cmd) sendSonarrCorruption(ctx context.Context, input *common.ActionInpu
 			event: input.Type,
 			last:  c.sonarr[idx],
 			name:  starr.Sonarr,
+			int:   idx + 1,
+			app:   app.Sonarr,
+			cName: app.Name,
+			skip:  !app.Enabled(),
+		})
+	}
+}
+
+func (c *cmd) sendSportarrCorruption(ctx context.Context, input *common.ActionInput) {
+	for idx, app := range c.Apps.Sportarr {
+		c.sportarr[idx] = c.sendAndLogAppCorruption(ctx, &genericInstance{
+			event: input.Type,
+			last:  c.sportarr[idx],
+			name:  apps.SportarrApp,
 			int:   idx + 1,
 			app:   app.Sonarr,
 			cName: app.Name,

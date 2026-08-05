@@ -722,6 +722,7 @@
         "placeholder": "password"
       }
     },
+    "Sportarr": { "title": "Sportarr" },
     "Readarr": {
       "title": "Readarr",
       "addInstance": "添加 Readarr 实例",

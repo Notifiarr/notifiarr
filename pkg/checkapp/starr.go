@@ -56,3 +56,12 @@ func Sonarr(ctx context.Context, config apps.StarrConfig) (string, int) {
 
 	return success + status.Version, http.StatusOK
 }
+
+func Sportarr(ctx context.Context, config apps.StarrConfig) (string, int) {
+	status, err := sonarr.New(&config.Config).GetSystemStatusContext(ctx)
+	if err != nil {
+		return connecting + err.Error(), http.StatusFailedDependency
+	}
+
+	return success + status.Version, http.StatusOK
+}

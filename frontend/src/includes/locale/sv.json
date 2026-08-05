@@ -90,6 +90,7 @@
                 "placeholder": "lösenord"
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Prowlarr": {
             "username": {
                 "placeholder": "admin",

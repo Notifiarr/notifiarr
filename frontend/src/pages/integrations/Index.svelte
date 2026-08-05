@@ -33,7 +33,7 @@
 {#snippet starr(
   resp: Integrations,
   config: Config,
-  app: 'sonarr' | 'radarr' | 'readarr' | 'lidarr' | 'prowlarr',
+  app: 'sonarr' | 'sportarr' | 'radarr' | 'readarr' | 'lidarr' | 'prowlarr',
 )}
   {#each config[app] ?? [] as status, index}
     {#if config[app]?.[index]}
@@ -101,11 +101,11 @@
 
   <Row><Col><h4><T id="navigation.titles.StarrApps" /></h4></Col></Row>
   <Row>
-    {#each ['sonarr', 'radarr', 'readarr', 'lidarr', 'prowlarr'] as app}
+    {#each ['sonarr', 'sportarr', 'radarr', 'readarr', 'lidarr', 'prowlarr'] as app}
       {@render starr(
         resp,
         config,
-        app as 'sonarr' | 'radarr' | 'readarr' | 'lidarr' | 'prowlarr',
+        app as 'sonarr' | 'sportarr' | 'radarr' | 'readarr' | 'lidarr' | 'prowlarr',
       )}
     {/each}
   </Row>
