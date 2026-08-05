@@ -25,6 +25,7 @@ import (
 type AppsConfig struct {
 	BaseConfig
 	Sonarr       []StarrConfig    `json:"sonarr,omitempty"       toml:"sonarr"       xml:"sonarr"       yaml:"sonarr,omitempty"`
+	Sportarr     []StarrConfig    `json:"sportarr,omitempty"     toml:"sportarr"     xml:"sportarr"     yaml:"sportarr,omitempty"`
 	Radarr       []StarrConfig    `json:"radarr,omitempty"       toml:"radarr"       xml:"radarr"       yaml:"radarr,omitempty"`
 	Lidarr       []StarrConfig    `json:"lidarr,omitempty"       toml:"lidarr"       xml:"lidarr"       yaml:"lidarr,omitempty"`
 	Readarr      []StarrConfig    `json:"readarr,omitempty"      toml:"readarr"      xml:"readarr"      yaml:"readarr,omitempty"`
@@ -53,6 +54,7 @@ type Apps struct {
 	Radarr       []Radarr
 	Readarr      []Readarr
 	Sonarr       []Sonarr
+	Sportarr     []Sportarr
 	Prowlarr     []Prowlarr
 	Deluge       []Deluge
 	NZBGet       []NZBGet
@@ -93,6 +95,7 @@ var (
 	ErrNoMBID     = errors.New("MBID ID must not be empty")
 	ErrNoRadarr   = fmt.Errorf("configured %s ID not found", starr.Radarr)
 	ErrNoSonarr   = fmt.Errorf("configured %s ID not found", starr.Sonarr)
+	ErrNoSportarr = fmt.Errorf("configured %s ID not found", SportarrApp)
 	ErrNoLidarr   = fmt.Errorf("configured %s ID not found", starr.Lidarr)
 	ErrNoReadarr  = fmt.Errorf("configured %s ID not found", starr.Readarr)
 	ErrNoProwlarr = fmt.Errorf("configured %s ID not found", starr.Prowlarr)
@@ -132,6 +135,12 @@ func CheckURLs(config *AppsConfig) error { //nolint:cyclop,gocognit,funlen
 
 	for idx, app := range config.Sonarr {
 		if err := checkUrl(app.URL, starr.Sonarr.String(), idx); err != nil {
+			return err
+		}
+	}
+
+	for idx, app := range config.Sportarr {
+		if err := checkUrl(app.URL, SportarrApp.String(), idx); err != nil {
 			return err
 		}
 	}
@@ -224,6 +233,11 @@ func New(config *AppsConfig) (*Apps, error) { //nolint:cyclop,funlen
 		return nil, err
 	}
 
+	apps.Sportarr, err = config.setupSportarr()
+	if err != nil {
+		return nil, err
+	}
+
 	apps.Deluge, err = config.setupDeluge()
 	if err != nil {
 		return nil, err
@@ -274,6 +288,7 @@ func (a *Apps) InitHandlers() {
 	a.radarrHandlers()
 	a.readarrHandlers()
 	a.sonarrHandlers()
+	a.sportarrHandlers()
 }
 
 // DelOK returns true if the delete limit isn't reached.

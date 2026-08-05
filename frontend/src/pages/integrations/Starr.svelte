@@ -1,4 +1,4 @@
-<!-- This page is used to display the status of the Starr apps: Lidarr, Radarr, Readarr, Sonarr, and Prowlarr. -->
+<!-- This page is used to display the status of the Starr apps: Lidarr, Radarr, Readarr, Sonarr, Sportarr, and Prowlarr. -->
 <script lang="ts">
   import type {
     RadarrSystemStatus,
@@ -23,7 +23,7 @@
   type Props = {
     index: number
     config: StarrConfig
-    app: 'lidarr' | 'radarr' | 'readarr' | 'sonarr' | 'prowlarr'
+    app: 'lidarr' | 'radarr' | 'readarr' | 'sonarr' | 'sportarr' | 'prowlarr'
     status?:
       | SystemStatus
       | RadarrSystemStatus
@@ -128,7 +128,7 @@
               <td class="text-nowrap"><T id="Integrations.starrTitles.Elapsed" /></td>
               <td class="text-break">{data.elapsed}</td>
             </tr>
-            {#if app == 'sonarr'}
+            {#if app == 'sonarr' || app == 'sportarr'}
               <tr>
                 <td class="text-nowrap"><T id="Integrations.starrTitles.Shows" /></td>
                 <td class="text-break">{data.shows}</td>

@@ -82,6 +82,12 @@ export interface Integrations {
     queue?: SonarrQueue[];
     queueAge?: Date[];
   };
+  sportarr: {
+    status?: SonarrSystemStatus[];
+    statusAge?: Date[];
+    queue?: SonarrQueue[];
+    queueAge?: Date[];
+  };
   prowlarr: {
     status?: ProwlarrSystemStatus[];
     statusAge?: Date[];
@@ -695,6 +701,7 @@ export interface States {
   radarr?: State[];
   readarr?: State[];
   sonarr?: State[];
+  sportarr?: State[];
   nzbget?: State[];
   rtorrent?: State[];
   qbit?: State[];
@@ -1581,6 +1588,7 @@ export interface LogConfig {
  */
 export interface AppsConfig extends BaseConfig {
   sonarr?: StarrConfig[];
+  sportarr?: StarrConfig[];
   radarr?: StarrConfig[];
   lidarr?: StarrConfig[];
   readarr?: StarrConfig[];
@@ -1830,6 +1838,7 @@ export interface AllAppConfigs {
   radarr?: AppConfig[];
   readarr?: AppConfig[];
   sonarr?: AppConfig[];
+  sportarr?: AppConfig[];
 };
 
 /**
@@ -1858,6 +1867,7 @@ export interface DashConfig {
   radarr: boolean;
   readarr: boolean;
   sonarr: boolean;
+  sportarr: boolean;
   plex: boolean;
   sabnzbd: boolean;
   nzbget: boolean;
@@ -1874,8 +1884,10 @@ export interface SyncConfig {
   lidarrInstances?: number[];
   radarrInstances?: number[];
   sonarrInstances?: number[];
+  sportarrInstances?: number[];
   lidarrSync?: string[];
   sonarrSync?: string[];
+  sportarrSync?: string[];
   radarrSync?: string[];
 };
 
@@ -2106,6 +2118,7 @@ export interface ApiResponse {
  */
 export interface CheckAllOutput {
   Sonarr?: TestResult[];
+  Sportarr?: TestResult[];
   Radarr?: TestResult[];
   Readarr?: TestResult[];
   Lidarr?: TestResult[];

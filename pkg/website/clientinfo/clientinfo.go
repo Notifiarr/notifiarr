@@ -82,13 +82,15 @@ type CronConfig struct {
 
 // SyncConfig is the configuration returned from the notifiarr website for CF/RP TraSH sync.
 type SyncConfig struct {
-	Interval        cnfg.Duration `json:"interval"`        // how often to fire.
-	LidarrInstances IntList       `json:"lidarrInstances"` // which instance IDs we sync
-	RadarrInstances IntList       `json:"radarrInstances"` // which instance IDs we sync
-	SonarrInstances IntList       `json:"sonarrInstances"` // which instance IDs we sync
-	LidarrSync      []string      `json:"lidarrSync"`      // items in sync.
-	SonarrSync      []string      `json:"sonarrSync"`      // items in sync.
-	RadarrSync      []string      `json:"radarrSync"`      // items in sync.
+	Interval          cnfg.Duration `json:"interval"`          // how often to fire.
+	LidarrInstances   IntList       `json:"lidarrInstances"`   // which instance IDs we sync
+	RadarrInstances   IntList       `json:"radarrInstances"`   // which instance IDs we sync
+	SonarrInstances   IntList       `json:"sonarrInstances"`   // which instance IDs we sync
+	SportarrInstances IntList       `json:"sportarrInstances"` // which instance IDs we sync
+	LidarrSync        []string      `json:"lidarrSync"`        // items in sync.
+	SonarrSync        []string      `json:"sonarrSync"`        // items in sync.
+	SportarrSync      []string      `json:"sportarrSync"`      // items in sync.
+	RadarrSync        []string      `json:"radarrSync"`        // items in sync.
 }
 
 // MdbListConfig contains the instances we send libraries for, and the interval we do it in.
@@ -107,6 +109,7 @@ type DashConfig struct {
 	Radarr       bool          `json:"radarr"`
 	Readarr      bool          `json:"readarr"`
 	Sonarr       bool          `json:"sonarr"`
+	Sportarr     bool          `json:"sportarr"`
 	Plex         bool          `json:"plex"`
 	SabNZB       bool          `json:"sabnzbd"`
 	NZBGet       bool          `json:"nzbget"`
@@ -135,6 +138,7 @@ type AllAppConfigs struct {
 	Radarr   InstanceConfig `json:"radarr"`
 	Readarr  InstanceConfig `json:"readarr"`
 	Sonarr   InstanceConfig `json:"sonarr"`
+	Sportarr InstanceConfig `json:"sportarr"`
 }
 
 // GapsConfig is the configuration returned from the notifiarr website for Radarr Collection Gaps.

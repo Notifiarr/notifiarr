@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -126,6 +127,8 @@ func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigg
 		return a.cfsync(input, content)
 	case "rpsync", "TrigCFSyncSonarr":
 		return a.rpsync(input, content)
+	case "sportarrsync", "TrigCFSyncSportarr":
+		return a.sportarrsync(input, content)
 	case "TrigCFSyncLidarr":
 		return http.StatusNotImplemented, "Lidarr sync is not implemented."
 	case "services":
@@ -152,6 +155,8 @@ func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigg
 		return a.corrupt(input, starr.Readarr.String())
 	case "TrigSonarrCorrupt":
 		return a.corrupt(input, starr.Sonarr.String())
+	case "TrigSportarrCorrupt":
+		return a.corrupt(input, apps.SportarrApp.String())
 	case "backup":
 		return a.backup(input, content)
 	case "TrigLidarrBackup":
@@ -162,6 +167,8 @@ func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigg
 		return a.backup(input, starr.Readarr.String())
 	case "TrigSonarrBackup":
 		return a.backup(input, starr.Sonarr.String())
+	case "TrigSportarrBackup":
+		return a.backup(input, apps.SportarrApp.String())
 	case "TrigProwlarrBackup":
 		return a.backup(input, starr.Prowlarr.String())
 	case "reload", "TrigStop":
@@ -329,6 +336,30 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 	return http.StatusOK, "Sonarr profile and format sync initiated for instance " + content
 }
 
+// @Description	Sync custom profiles and formats to Sportarr.
+// @Summary		Sync TRaSH Sportarr data
+// @Tags			Triggers,TRaSH
+// @Produce		json
+// @Param			instance	path		bool								false	"Triggers sync on this instance if provided, otherwise all instances"
+// @Success		200			{object}	apps.ApiResponse{message=string}	"success"
+// @Failure		404			{object}	string								"bad token or api key"
+// @Router			/trigger/sportarrsync/{instance} [get]
+// @Security		ApiKeyAuth
+func (a *Actions) sportarrsync(input *common.ActionInput, content string) (int, string) {
+	if content == "" {
+		a.CFSync.SyncSportarrRP(input)
+		return http.StatusOK, "Sportarr profile and format sync initiated."
+	}
+
+	instance, _ := strconv.Atoi(content)
+	if err := a.CFSync.SyncSportarrInstanceRP(input, instance); err != nil {
+		return http.StatusBadRequest,
+			"Sportarr profile and format sync initiated for instance " + content + ": " + err.Error()
+	}
+
+	return http.StatusOK, "Sportarr profile and format sync initiated for instance " + content
+}
+
 // @Description	Reschedule all service checks to run immediately.
 // @Summary		Run all service checks
 // @Tags			Triggers
@@ -417,7 +448,7 @@ func (a *Actions) gaps(input *common.ActionInput) (int, string) {
 // @Summary		Start app-specific corruption check
 // @Tags			Triggers
 // @Produce		json
-// @Param			app	path		string								true	"app type to check"	Enum(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Param			app	path		string								true	"app type to check"	Enum(lidarr, prowlarr, radarr, readarr, sonarr, sportarr)
 // @Success		200	{object}	apps.ApiResponse{message=string}	"success"
 // @Failure		400	{object}	apps.ApiResponse{message=string}	"missing app"
 // @Failure		404	{object}	string								"bad token or api key"
@@ -438,7 +469,7 @@ func (a *Actions) corrupt(input *common.ActionInput, content string) (int, strin
 // @Summary		Start app-specific backup check
 // @Tags			Triggers
 // @Produce		json
-// @Param			app	path		string								true	"app type to check"	Enum(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Param			app	path		string								true	"app type to check"	Enum(lidarr, prowlarr, radarr, readarr, sonarr, sportarr)
 // @Success		200	{object}	apps.ApiResponse{message=string}	"success"
 // @Failure		400	{object}	apps.ApiResponse{message=string}	"missing app"
 // @Failure		404	{object}	string								"bad token or api key"

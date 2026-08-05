@@ -113,6 +113,7 @@ api/v2/user/client?event=start
 api/v1/user/trash?app=...
   radarr
   sonarr
+  sportarr
 */
 const (
 	BaseURL = "https://notifiarr.com"

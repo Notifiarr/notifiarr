@@ -7,7 +7,7 @@ SYNOPSIS
 `notifiarr -c /etc/notifiarr/notifiarr.conf`
 
 This service runs a web server that allows notifiarr.com's Media Bot to
-communicate with Radarr, Lidarr, Readarr and Sonarr. This provides the ability
+communicate with Radarr, Lidarr, Readarr, Sonarr, and Sportarr. This provides the ability
 to add new content to your libraries from within Discord. This client also sends
 system snapshot and Plex session data to Notifiarr for Discord notifications.
 

@@ -1535,6 +1535,12 @@
                         "$ref": "#/definitions/checkapp.TestResult"
                     }
                 },
+                "Sportarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/checkapp.TestResult"
+                    }
+                },
                 "Tautulli": {
                     "type": "array",
                     "items": {
@@ -1745,6 +1751,35 @@
                     "type": "string"
                 },
                 "sonarr": {
+                    "type": "object",
+                    "properties": {
+                        "queue": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/sonarr.Queue"
+                            }
+                        },
+                        "queueAge": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "status": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/sonarr.SystemStatus"
+                            }
+                        },
+                        "statusAge": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "sportarr": {
                     "type": "object",
                     "properties": {
                         "queue": {
@@ -2160,6 +2195,12 @@
                     "items": {
                         "$ref": "#/definitions/clientinfo.AppConfig"
                     }
+                },
+                "sportarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/clientinfo.AppConfig"
+                    }
                 }
             }
         },
@@ -2331,6 +2372,9 @@
                 "sonarr": {
                     "type": "boolean"
                 },
+                "sportarr": {
+                    "type": "boolean"
+                },
                 "transmission": {
                     "type": "boolean"
                 }
@@ -2452,6 +2496,20 @@
                     }
                 },
                 "sonarrSync": {
+                    "description": "items in sync.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "sportarrInstances": {
+                    "description": "which instance IDs we sync",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "sportarrSync": {
                     "description": "items in sync.",
                     "type": "array",
                     "items": {
@@ -2760,6 +2818,12 @@
                     "$ref": "#/definitions/snapshot.Config"
                 },
                 "sonarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/apps.StarrConfig"
+                    }
+                },
+                "sportarr": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/apps.StarrConfig"
@@ -3118,6 +3182,12 @@
                     }
                 },
                 "sonarr": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dashboard.State"
+                    }
+                },
+                "sportarr": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/dashboard.State"

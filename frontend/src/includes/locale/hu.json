@@ -432,6 +432,7 @@
                 "placeholder": ""
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Prowlarr": {
             "url": {
                 "label": "",

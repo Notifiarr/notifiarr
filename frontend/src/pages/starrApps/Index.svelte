@@ -16,6 +16,7 @@
 
   const flt = $derived({
     Sonarr: new FormListTracker($profile.config.sonarr ?? [], Starr.Sonarr),
+    Sportarr: new FormListTracker($profile.config.sportarr ?? [], Starr.Sportarr),
     Radarr: new FormListTracker($profile.config.radarr ?? [], Starr.Radarr),
     Readarr: new FormListTracker($profile.config.readarr ?? [], Starr.Readarr),
     Lidarr: new FormListTracker($profile.config.lidarr ?? [], Starr.Lidarr),
@@ -26,6 +27,7 @@
     const c = {
       ...$profile.config,
       sonarr: flt.Sonarr.instances as StarrConfig[],
+      sportarr: flt.Sportarr.instances as StarrConfig[],
       radarr: flt.Radarr.instances as StarrConfig[],
       readarr: flt.Readarr.instances as StarrConfig[],
       lidarr: flt.Lidarr.instances as StarrConfig[],
@@ -53,6 +55,7 @@
   <!-- only nav.goto if the tab is different -->
   <TabContent on:tab={e => goto(e, page.id)}>
     <Tab bind:flt={flt.Sonarr} titles={Starr.title} />
+    <Tab bind:flt={flt.Sportarr} titles={Starr.title} />
     <Tab bind:flt={flt.Radarr} titles={Starr.title} />
     <Tab bind:flt={flt.Readarr} titles={Starr.title} />
     <Tab bind:flt={flt.Lidarr} titles={Starr.title} />

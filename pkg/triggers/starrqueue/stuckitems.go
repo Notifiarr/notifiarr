@@ -37,8 +37,9 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 	radarr := c.getFinishedItemsRadarr(ctx)
 	readarr := c.getFinishedItemsReadarr(ctx)
 	sonarr := c.getFinishedItemsSonarr(ctx)
+	sportarr := c.getFinishedItemsSportarr(ctx)
 
-	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
+	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() && sportarr.Empty() {
 		mnd.Log.Debugf(input.ReqID, "[%s requested] No stuck items found.", input.Type)
 		return
 	}
@@ -48,13 +49,14 @@ func (c *cmd) sendStuckQueues(ctx context.Context, input *common.ActionInput) {
 		Route:      website.StuckRoute,
 		Event:      input.Type,
 		LogPayload: true,
-		LogMsg: fmt.Sprintf("Stuck Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
+		LogMsg: fmt.Sprintf("Stuck Items; Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d, Sportarr: %d",
+			lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len(), sportarr.Len()),
 		Payload: &QueuesPaylod{
-			Lidarr:  lidarr,
-			Radarr:  radarr,
-			Readarr: readarr,
-			Sonarr:  sonarr,
+			Lidarr:   lidarr,
+			Radarr:   radarr,
+			Readarr:  readarr,
+			Sonarr:   sonarr,
+			Sportarr: sportarr,
 		},
 	})
 }
@@ -239,6 +241,51 @@ func (c *cmd) getFinishedItemsSonarr(ctx context.Context) itemList { //nolint:cy
 	return stuck
 }
 
+func (c *cmd) getFinishedItemsSportarr(ctx context.Context) itemList { //nolint:cyclop
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getFinishedItemsSportarr")
+	defer logs.Log.Trace(reqID, "end: getFinishedItemsSportarr")
+
+	stuck := make(itemList)
+
+	for idx, app := range c.Apps.Sportarr {
+		ci := clientinfo.Get()
+		if !app.Enabled() || ci == nil || !ci.Actions.Apps.Sportarr.Stuck(idx+1) {
+			continue
+		}
+
+		cacheItem := data.GetWithID("sportarr", idx)
+		if cacheItem == nil || cacheItem.Data == nil {
+			continue
+		}
+
+		queue, _ := cacheItem.Data.(*sonarr.Queue)
+		instance := idx + 1
+		// Pre-allocate with capacity to reduce allocations during append.
+		appqueue := make([]*sportarrRecord, 0, len(queue.Records))
+		// repeatStomper is used to collapse duplicate download IDs.
+		repeatStomper := make(map[string]struct{}, len(queue.Records))
+
+		for _, item := range queue.Records {
+			if s := strings.ToLower(item.Status); s != completed && s != warning &&
+				s != failed && s != errorstr && item.ErrorMessage == "" && len(item.StatusMessages) == 0 {
+				continue
+			} else if _, exists := repeatStomper[item.DownloadID]; exists {
+				continue
+			}
+
+			repeatStomper[item.DownloadID] = struct{}{}
+			// Create minimal copy with only fields needed for stuck item detection.
+			appqueue = append(appqueue, &sportarrRecord{QueueRecord: minimalSportarrRecord(item)}) //nolint:wsl
+		}
+
+		stuck[instance] = listItem{Name: app.Name, Queue: appqueue, Total: len(appqueue)}
+		mnd.Log.Debugf(reqID, "Checking Sportarr (%d) Queue for Stuck Items, queue size: %d, stuck: %d",
+			instance, len(queue.Records), len(appqueue))
+	}
+
+	return stuck
+}
+
 // minimalLidarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
 // This reduces payload size by omitting progress info and metadata not relevant to stuck items.
 func minimalLidarrRecord(record *lidarr.QueueRecord) *lidarr.QueueRecord {
@@ -309,6 +356,29 @@ func minimalReadarrRecord(record *readarr.QueueRecord) *readarr.QueueRecord {
 // minimalSonarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
 // This reduces payload size by omitting progress info and metadata not relevant to stuck items.
 func minimalSonarrRecord(record *sonarr.QueueRecord) *sonarr.QueueRecord {
+	return &sonarr.QueueRecord{
+		ID:                    record.ID,
+		SeriesID:              record.SeriesID,
+		EpisodeID:             record.EpisodeID,
+		Title:                 record.Title,
+		Size:                  record.Size,
+		Sizeleft:              record.Sizeleft,
+		Status:                record.Status,
+		TrackedDownloadStatus: record.TrackedDownloadStatus,
+		TrackedDownloadState:  record.TrackedDownloadState,
+		StatusMessages:        record.StatusMessages,
+		ErrorMessage:          record.ErrorMessage,
+		DownloadID:            record.DownloadID,
+		Protocol:              record.Protocol,
+		DownloadClient:        record.DownloadClient,
+		Indexer:               record.Indexer,
+		HasPostImportCategory: record.HasPostImportCategory,
+	}
+}
+
+// minimalSportarrRecord creates a copy of the QueueRecord with only fields needed for stuck item detection.
+// This reduces payload size by omitting progress info and metadata not relevant to stuck items.
+func minimalSportarrRecord(record *sonarr.QueueRecord) *sonarr.QueueRecord {
 	return &sonarr.QueueRecord{
 		ID:                    record.ID,
 		SeriesID:              record.SeriesID,

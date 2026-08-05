@@ -47,10 +47,11 @@ const (
 
 // QueuesPaylod is what we send to the website.
 type QueuesPaylod struct {
-	Lidarr  itemList `json:"lidarr"`
-	Radarr  itemList `json:"radarr"`
-	Readarr itemList `json:"readarr"`
-	Sonarr  itemList `json:"sonarr"`
+	Lidarr   itemList `json:"lidarr"`
+	Radarr   itemList `json:"radarr"`
+	Readarr  itemList `json:"readarr"`
+	Sonarr   itemList `json:"sonarr"`
+	Sportarr itemList `json:"sportarr"`
 }
 
 // New configures the library.
@@ -70,8 +71,9 @@ func (a *Action) Create() {
 	radarr := a.cmd.setupRadarr(reqID)
 	readarr := a.cmd.setupReadarr(reqID)
 	sonarr := a.cmd.setupSonarr(reqID)
+	sportarr := a.cmd.setupSportarr(reqID)
 
-	if lidarr || radarr || readarr || sonarr {
+	if lidarr || radarr || readarr || sonarr || sportarr {
 		a.cmd.Add(&common.Action{
 			Key:  "TrigStuckItems",
 			Name: TrigStuckItems,

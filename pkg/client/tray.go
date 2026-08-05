@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/frontend"
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/logs"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
@@ -263,6 +264,7 @@ func (c *Client) notifiarrMenu(ctx context.Context) {
 	menu["gaps"] = data.AddSubMenuItem("Send Radarr Gaps", "[premium feature] trigger radarr collections gaps")
 	menu["synccf"] = data.AddSubMenuItem("TRaSH: Sync Radarr", "[premium feature] trigger TRaSH radarr sync")
 	menu["syncqp"] = data.AddSubMenuItem("TRaSH: Sync Sonarr", "[premium feature] trigger TRaSH sonarr sync")
+	menu["syncsp"] = data.AddSubMenuItem("TRaSH: Sync Sportarr", "[premium feature] trigger TRaSH sportarr sync")
 	menu["svcs_prod"] = data.AddSubMenuItem("Check and Send Services", "check all services and send results to notifiarr")
 	menu["plex_prod"] = data.AddSubMenuItem("Send Plex Sessions", "send plex sessions to notifiarr")
 	menu["snap_prod"] = data.AddSubMenuItem("Send System Snapshot", "send system snapshot to notifiarr")
@@ -272,11 +274,13 @@ func (c *Client) notifiarrMenu(ctx context.Context) {
 	menu["corrRadarr"] = data.AddSubMenuItem("Check Radarr Corruption", "check latest backup database in each instance for corruption")
 	menu["corrReadarr"] = data.AddSubMenuItem("Check Readarr Corruption", "check latest backup database in each instance for corruption")
 	menu["corrSonarr"] = data.AddSubMenuItem("Check Sonarr Corruption", "check latest backup database in each instance for corruption")
+	menu["corrSportarr"] = data.AddSubMenuItem("Check Sportarr Corruption", "check latest backup database in each instance for corruption")
 	menu["backLidarr"] = data.AddSubMenuItem("Send Lidarr Backups", "send backup file list for each instance to Notifiarr")
 	menu["backProwlarr"] = data.AddSubMenuItem("Send Prowlarr Backups", "send backup file list for each instance to Notifiarr")
 	menu["backRadarr"] = data.AddSubMenuItem("Send Radarr Backups", "send backup file list for each instance to Notifiarr")
 	menu["backReadarr"] = data.AddSubMenuItem("Send Readarr Backups", "send backup file list for each instance to Notifiarr")
 	menu["backSonarr"] = data.AddSubMenuItem("Send Sonarr Backups", "send backup file list for each instance to Notifiarr")
+	menu["backSportarr"] = data.AddSubMenuItem("Send Sportarr Backups", "send backup file list for each instance to Notifiarr")
 
 	c.notifiarrMenuActions(ctx)
 }
@@ -290,6 +294,9 @@ func (c *Client) notifiarrMenuActions(ctx context.Context) {
 	})
 	menu["syncqp"].Click(func() {
 		c.triggers.CFSync.SyncSonarrRP(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
+	})
+	menu["syncsp"].Click(func() {
+		c.triggers.CFSync.SyncSportarrRP(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
 	})
 	menu["svcs_prod"].Click(func() {
 		logs.Log.Printf(mnd.GetID(ctx), "[user requested] Checking services and sending results to Notifiarr.")
@@ -305,6 +312,13 @@ func (c *Client) notifiarrMenuActions(ctx context.Context) {
 	menu["send_dash"].Click(func() {
 		c.triggers.Dashboard.Send(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)})
 	})
+	c.notifiarrMenuCorruption(ctx)
+	c.notifiarrMenuBackups(ctx)
+}
+
+// notifiarrMenuCorruption wires up the per-app "Check Corruption" tray items.
+// Split out of notifiarrMenuActions to keep that function's line count sane.
+func (c *Client) notifiarrMenuCorruption(ctx context.Context) {
 	menu["corrLidarr"].Click(func() {
 		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Lidarr)
 	})
@@ -320,6 +334,15 @@ func (c *Client) notifiarrMenuActions(ctx context.Context) {
 	menu["corrSonarr"].Click(func() {
 		_ = c.triggers.Backups.Corruption(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Sonarr)
 	})
+	menu["corrSportarr"].Click(func() {
+		_ = c.triggers.Backups.Corruption(
+			&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, apps.SportarrApp)
+	})
+}
+
+// notifiarrMenuBackups wires up the per-app "Send Backups" tray items.
+// Split out of notifiarrMenuActions to keep that function's line count sane.
+func (c *Client) notifiarrMenuBackups(ctx context.Context) {
 	menu["backLidarr"].Click(func() {
 		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Lidarr)
 	})
@@ -334,6 +357,9 @@ func (c *Client) notifiarrMenuActions(ctx context.Context) {
 	})
 	menu["backSonarr"].Click(func() {
 		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, starr.Sonarr)
+	})
+	menu["backSportarr"].Click(func() {
+		_ = c.triggers.Backups.Backup(&common.ActionInput{Type: website.EventUser, ReqID: mnd.GetID(ctx)}, apps.SportarrApp)
 	})
 }
 

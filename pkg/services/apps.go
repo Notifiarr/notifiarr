@@ -26,6 +26,7 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	svcs = collectRadarrApps(svcs, apps.Radarr)
 	svcs = collectReadarrApps(svcs, apps.Readarr)
 	svcs = collectSonarrApps(svcs, apps.Sonarr)
+	svcs = collectSportarrApps(svcs, apps.Sportarr)
 	svcs = collectDelugeApps(svcs, apps.Deluge)
 	svcs = collectNZBGetApps(svcs, apps.NZBGet)
 	svcs = collectQbittorrentApps(svcs, apps.Qbit)
@@ -164,6 +165,35 @@ func collectReadarrApps(svcs []*Service, readarr []apps.Readarr) []*Service {
 
 func collectSonarrApps(svcs []*Service, sonarr []apps.Sonarr) []*Service {
 	for _, app := range sonarr {
+		if !app.Enabled() || app.Name == "" {
+			continue
+		}
+
+		interval := app.Interval
+		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+			interval.Duration = MinimumCheckInterval
+		}
+
+		if app.Name != "" {
+			svcs = append(svcs, &Service{
+				ServiceConfig: &ServiceConfig{
+					validSSL: app.ValidSSL,
+					Name:     app.Name,
+					Type:     CheckHTTP,
+					Value:    app.URL + starrV3StatusURI + app.APIKey,
+					Expect:   "200",
+					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
+					Interval: interval,
+				},
+			})
+		}
+	}
+
+	return svcs
+}
+
+func collectSportarrApps(svcs []*Service, sportarr []apps.Sportarr) []*Service {
+	for _, app := range sportarr {
 		if !app.Enabled() || app.Name == "" {
 			continue
 		}
