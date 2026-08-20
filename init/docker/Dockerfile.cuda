@@ -1,4 +1,4 @@
-FROM golang:1.26.1-bookworm AS builder
+FROM golang:1.26.6-bookworm AS builder
 
 WORKDIR /src
 COPY main.go go.mod go.sum ./
@@ -45,7 +45,7 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
     -X \"golift.io/version.Revision=${ITERATION}\" \
     -X \"golift.io/version.Version=${VERSION}\""
 
-FROM nvidia/cuda:13.1.1-base-ubuntu24.04
+FROM nvidia/cuda:13.3.1-base-ubuntu24.04
 # Copy the binary.
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
