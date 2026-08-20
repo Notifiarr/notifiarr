@@ -156,6 +156,7 @@
     "UsernameMustNotBeEmpty": "Username must not be empty.",
     "NameInUseByInstance": "This name is in use by instance {number}.",
     "APIKeyMustBeCountCharacters": "API key must be {count} characters or longer.",
+    "InvalidAPIKey": "Invalid Notifiarr API key — update it in Configuration.",
     "TokenMustBeCountCharacters": "Token must be {count} characters or longer.",
     "LeavePage": "Do you really want to leave this page?",
     "Landing": {
@@ -529,7 +530,8 @@
       "YesYesYouAre": "Yes, yes you are! 💚",
       "HellaAwesome": "Hella Awesome",
       "YoureSoGifted": "You're so gifted, and we love you! 💜",
-      "DateFormat": "Date Format"
+      "DateFormat": "Date Format",
+      "InvalidAPIKey": "Not signed in to Notifiarr; the API key was rejected."
     },
     "EnvironmentVariables": { "title": "Environment Variables" }
   },

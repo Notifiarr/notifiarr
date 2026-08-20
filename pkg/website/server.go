@@ -50,12 +50,13 @@ type Config struct {
 type server struct {
 	config *Config
 	// Internal cruft.
-	client    *httpClient
-	hostInfo  *host.InfoStat
-	sendData  chan *Request // in (buffered)
-	reconfig  chan *Config  // in+out (unbuffered bidirectional)
-	getConfig chan struct{} // in (buffered)
-	mu        sync.RWMutex
+	client     *httpClient
+	hostInfo   *host.InfoStat
+	sendData   chan *Request // in (buffered)
+	reconfig   chan *Config  // in+out (unbuffered bidirectional)
+	getConfig  chan struct{} // in (buffered)
+	invalidKey error         // sticky auth failure from a live POST
+	mu         sync.RWMutex
 }
 
 func New(ctx context.Context, config *Config) {
@@ -125,11 +126,36 @@ func RawGetData(ctx context.Context, req *Request) (*Response, time.Duration, er
 
 // ValidAPIKey checks if the API key is valid.
 func ValidAPIKey() error {
-	if len(GetConfig().Apps.APIKey) != APIKeyLength {
-		return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
+	if site == nil {
+		return ErrNoChannel
+	}
+
+	return site.checkAPIKey()
+}
+
+func errAPIKeyLength() error {
+	return fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
+}
+
+func (s *server) checkAPIKey() error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.invalidKey != nil {
+		return s.invalidKey
+	}
+
+	if s.config == nil || s.config.Apps == nil || len(s.config.Apps.APIKey) != APIKeyLength {
+		return errAPIKeyLength()
 	}
 
 	return nil
+}
+
+func (s *server) setInvalidKey(err error) {
+	s.mu.Lock()
+	s.invalidKey = err
+	s.mu.Unlock()
 }
 
 func (s *server) watchSendDataChan(ctx context.Context) {
@@ -139,6 +165,7 @@ func (s *server) watchSendDataChan(ctx context.Context) {
 			s.mu.Lock()
 			s.client.Retries = config.Retries
 			s.config = config
+			s.invalidKey = nil
 			s.mu.Unlock()
 		case data := <-s.sendData:
 			ctx := mnd.WithID(ctx, data.ReqID)

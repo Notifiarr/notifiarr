@@ -101,7 +101,7 @@ class ConfigProfile {
     // Merge whatever was provided with the existing config.
     const newConfig = { ...get(this.profile).config, ...config }
     // Send the config to the server using postUi.
-    const { ok, body } = await postUi('reconfig', JSON.stringify(newConfig), false)
+    const { ok, body } = await postUi('reconfig', JSON.stringify(newConfig), false, 20000)
     // If it's an error, set the error message, and exit.
     if (!ok) {
       this.status = ''
