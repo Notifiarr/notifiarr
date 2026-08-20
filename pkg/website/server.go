@@ -87,11 +87,19 @@ func New(ctx context.Context, config *Config) {
 
 // SendData puts a POST request to notifiarr.com into a channel queue.
 func SendData(req *Request) {
+	if site == nil || site.sendData == nil {
+		return
+	}
+
 	site.sendData <- req
 }
 
 // GetData sends data to a notifiarr URL as JSON and returns a response.
 func GetData(req *Request) (*Response, error) {
+	if site == nil || site.sendData == nil {
+		return nil, ErrNoChannel
+	}
+
 	req.respChan = make(chan *chResponse)
 	defer close(req.respChan)
 

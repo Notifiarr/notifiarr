@@ -146,7 +146,7 @@ func (s *Service) checkNow(ctx context.Context) *result {
 	case CheckTCP:
 		return s.checkTCP(ctx)
 	case CheckPING, CheckICMP:
-		return s.checkPING()
+		return s.checkPING(ctx)
 	case CheckPROC:
 		return s.checkProccess(ctx)
 	default:
@@ -155,7 +155,12 @@ func (s *Service) checkNow(ctx context.Context) *result {
 }
 
 func (s *Service) check(ctx context.Context) bool {
-	return s.update(mnd.GetID(ctx), s.checkNow(ctx))
+	res := s.checkNow(ctx)
+	if ctx.Err() != nil {
+		return false
+	}
+
+	return s.update(mnd.GetID(ctx), res)
 }
 
 // Return true if the service state changed.

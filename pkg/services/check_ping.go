@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strconv"
@@ -74,7 +75,13 @@ func (s *ServiceConfig) fillPingExpect(icmp bool) error {
 	return nil
 }
 
-func (s *ServiceConfig) checkPING() *result {
+func (s *ServiceConfig) checkPING(ctx context.Context) *result {
+	if s.Timeout.Duration > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, s.Timeout.Duration)
+		defer cancel()
+	}
+
 	pinger, err := ping.NewPinger(s.Value)
 	if err != nil {
 		return &result{
@@ -88,7 +95,7 @@ func (s *ServiceConfig) checkPING() *result {
 	pinger.Count = s.ping.count
 	pinger.Interval = time.Duration(s.ping.interval) * time.Millisecond
 
-	if err = pinger.Run(); err != nil { // blocks.
+	if err = pinger.RunWithContext(ctx); err != nil { // blocks until done or ctx is canceled.
 		return &result{
 			state:  StateCritical,
 			output: &Output{str: "error pinging service: " + err.Error()},

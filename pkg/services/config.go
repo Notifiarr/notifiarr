@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -56,6 +57,8 @@ type data struct {
 	log         mnd.Logger
 	parallel    uint
 	stopping    bool
+	cancel      context.CancelFunc
+	stopped     chan struct{}
 }
 
 // CheckType locks us into a few specific types of checks.

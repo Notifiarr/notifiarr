@@ -7,7 +7,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
-	"golift.io/cnfg"
 )
 
 // PlexServerName is hard coded as the service name for Plex.
@@ -18,14 +17,19 @@ const (
 	starrV1StatusURI = "/api/v1/system/status|X-API-Key:"
 )
 
+type starrChecker interface {
+	Enabled() bool
+	Starr() apps.StarrApp
+}
+
 // AddApps turns app configs into service checks if they have a name.
 func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	svcs := []*Service{}
-	svcs = collectLidarrApps(svcs, apps.Lidarr)
-	svcs = collectProwlarrApps(svcs, apps.Prowlarr)
-	svcs = collectRadarrApps(svcs, apps.Radarr)
-	svcs = collectReadarrApps(svcs, apps.Readarr)
-	svcs = collectSonarrApps(svcs, apps.Sonarr)
+	svcs = collectStarrApps(svcs, apps.Lidarr, starrV1StatusURI)
+	svcs = collectStarrApps(svcs, apps.Prowlarr, starrV1StatusURI)
+	svcs = collectStarrApps(svcs, apps.Radarr, starrV3StatusURI)
+	svcs = collectStarrApps(svcs, apps.Readarr, starrV1StatusURI)
+	svcs = collectStarrApps(svcs, apps.Sonarr, starrV3StatusURI)
 	svcs = collectDelugeApps(svcs, apps.Deluge)
 	svcs = collectNZBGetApps(svcs, apps.NZBGet)
 	svcs = collectQbittorrentApps(svcs, apps.Qbit)
@@ -46,324 +50,124 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	}
 }
 
-func collectLidarrApps(svcs []*Service, lidarr []apps.Lidarr) []*Service {
-	for _, app := range lidarr {
-		if !app.Enabled() || app.Name == "" {
+func collectStarrApps[T starrChecker](svcs []*Service, list []T, statusURI string) []*Service {
+	for _, app := range list {
+		if !app.Enabled() {
 			continue
 		}
 
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL + starrV1StatusURI + app.APIKey,
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+		starr := app.Starr()
+		svcs = appendHTTPCheck(svcs, starr.ExtraConfig, starr.URL+statusURI+starr.APIKey, "200")
 	}
 
 	return svcs
 }
 
-func collectProwlarrApps(svcs []*Service, prowlarr []apps.Prowlarr) []*Service {
-	for _, app := range prowlarr {
-		if !app.Enabled() || app.Name == "" {
-			continue
-		}
-
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL + starrV1StatusURI + app.APIKey,
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+func appendHTTPCheck(svcs []*Service, extra apps.ExtraConfig, value, expect string) []*Service {
+	if extra.Name == "" || extra.Interval.Duration < 0 {
+		return svcs
 	}
 
-	return svcs
-}
-
-func collectRadarrApps(svcs []*Service, radarr []apps.Radarr) []*Service {
-	for _, app := range radarr {
-		if !app.Enabled() || app.Name == "" {
-			continue
-		}
-
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL + starrV3StatusURI + app.APIKey,
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+	interval := extra.Interval
+	if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
+		interval.Duration = MinimumCheckInterval
 	}
 
-	return svcs
-}
-
-func collectReadarrApps(svcs []*Service, readarr []apps.Readarr) []*Service {
-	for _, app := range readarr {
-		if !app.Enabled() || app.Name == "" {
-			continue
-		}
-
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL + starrV1StatusURI + app.APIKey,
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
-	}
-
-	return svcs
-}
-
-func collectSonarrApps(svcs []*Service, sonarr []apps.Sonarr) []*Service {
-	for _, app := range sonarr {
-		if !app.Enabled() || app.Name == "" {
-			continue
-		}
-
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL + starrV3StatusURI + app.APIKey,
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
-	}
-
-	return svcs
+	return append(svcs, &Service{
+		ServiceConfig: &ServiceConfig{
+			validSSL: extra.ValidSSL,
+			Name:     extra.Name,
+			Type:     CheckHTTP,
+			Value:    value,
+			Expect:   expect,
+			Timeout:  extra.Timeout,
+			Interval: interval,
+		},
+	})
 }
 
 func collectDelugeApps(svcs []*Service, deluge []apps.Deluge) []*Service {
-	// Deluge instanceapp.
 	for _, app := range deluge {
-		if !app.Enabled() || app.Name == "" {
+		if !app.Enabled() {
 			continue
 		}
 
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    strings.TrimSuffix(app.URL, "/json"),
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+		svcs = appendHTTPCheck(svcs, app.ExtraConfig, strings.TrimSuffix(app.URL, "/json"), "200")
 	}
 
 	return svcs
 }
 
 func collectNZBGetApps(svcs []*Service, nzbget []apps.NZBGet) []*Service {
-	// NZBGet instances.
 	for _, app := range nzbget {
-		if !app.Enabled() || app.Name == "" {
+		if !app.Enabled() {
 			continue
 		}
 
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		checkURL := app.URL
-		if !strings.Contains(app.URL, "@") {
-			user := url.PathEscape(app.User) + ":" + url.PathEscape(app.Pass) + "@"
-			scheme := "http://"
-
-			if strings.HasPrefix(app.URL, "https://") {
-				scheme = "https://"
-			}
-
-			host := strings.TrimPrefix(strings.TrimPrefix(app.URL, "https://"), "http://")
-			checkURL = scheme + user + host
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    checkURL,
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+		svcs = appendHTTPCheck(svcs, app.ExtraConfig, nzbgetCheckURL(app), "200")
 	}
 
 	return svcs
 }
 
+func nzbgetCheckURL(app apps.NZBGet) string {
+	if strings.Contains(app.URL, "@") {
+		return app.URL
+	}
+
+	user := url.PathEscape(app.User) + ":" + url.PathEscape(app.Pass) + "@"
+	scheme := "http://"
+
+	if strings.HasPrefix(app.URL, "https://") {
+		scheme = "https://"
+	}
+
+	host := strings.TrimPrefix(strings.TrimPrefix(app.URL, "https://"), "http://")
+
+	return scheme + user + host
+}
+
 func collectQbittorrentApps(svcs []*Service, qbit []apps.Qbit) []*Service {
-	// Qbittorrent instanceapp.
 	for _, app := range qbit {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL,
-					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+		svcs = appendHTTPCheck(svcs, app.ExtraConfig, app.URL, "200")
 	}
 
 	return svcs
 }
 
 func collectRtorrentApps(svcs []*Service, rtorrent []apps.Rtorrent) []*Service {
-	// rTorrent instanceapp.
 	for _, app := range rtorrent {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL,
-					Expect:   "200,401", // could not find a 200...
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+		svcs = appendHTTPCheck(svcs, app.ExtraConfig, app.URL, "200,401")
 	}
 
 	return svcs
 }
 
 func collectSabNZBApps(svcs []*Service, sabnzb []apps.SabNZB) []*Service {
-	// SabNBZd instanceapp.
 	for _, app := range sabnzb {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() {
 			continue
 		}
 
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
-		}
-
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.SabNZBConfig.URL + "/api?mode=version&apikey=" + app.SabNZBConfig.APIKey,
-					Expect:   "200",
-					Timeout:  app.ExtraConfig.Timeout,
-					Interval: interval,
-				},
-			})
-		}
+		svcs = appendHTTPCheck(svcs, app.ExtraConfig,
+			app.SabNZBConfig.URL+"/api?mode=version&apikey="+app.SabNZBConfig.APIKey, "200")
 	}
 
 	return svcs
 }
 
 func collectXmissionApps(svcs []*Service, xmission []apps.Xmission) []*Service {
-	// Transmission instances.
 	for _, app := range xmission {
-		if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+		if !app.Enabled() {
 			continue
-		}
-
-		interval := app.Interval
-		if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-			interval.Duration = MinimumCheckInterval
 		}
 
 		expect := "401"
@@ -371,73 +175,30 @@ func collectXmissionApps(svcs []*Service, xmission []apps.Xmission) []*Service {
 			expect = "409"
 		}
 
-		if app.Name != "" {
-			svcs = append(svcs, &Service{
-				ServiceConfig: &ServiceConfig{
-					validSSL: app.ValidSSL,
-					Name:     app.Name,
-					Type:     CheckHTTP,
-					Value:    app.URL,
-					Expect:   expect, // no 200 from RPC endpoint.
-					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
-					Interval: interval,
-				},
-			})
-		}
+		svcs = appendHTTPCheck(svcs, app.ExtraConfig, app.URL, expect)
 	}
 
 	return svcs
 }
 
 func collectTautulliApps(svcs []*Service, app apps.Tautulli) []*Service {
-	// Tautulli instance (1).
-	if !app.Enabled() || app.Name == "" || app.Interval.Duration < 0 {
+	if !app.Enabled() {
 		return svcs
 	}
 
-	interval := app.Interval
-	if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-		interval.Duration = MinimumCheckInterval
-	}
-
-	svcs = append(svcs, &Service{
-		ServiceConfig: &ServiceConfig{
-			validSSL: app.ValidSSL,
-			Name:     app.Name,
-			Type:     CheckHTTP,
-			Value:    app.TautulliConfig.URL + "/api/v2?cmd=status&apikey=" + app.TautulliConfig.APIKey,
-			Expect:   "200",
-			Timeout:  app.ExtraConfig.Timeout,
-			Interval: interval,
-		},
-	})
-
-	return svcs
+	return appendHTTPCheck(svcs, app.ExtraConfig,
+		app.TautulliConfig.URL+"/api/v2?cmd=status&apikey="+app.TautulliConfig.APIKey, "200")
 }
 
 func collectPlexApps(svcs []*Service, app *apps.Plex) []*Service {
-	if !app.Enabled() || app.Interval.Duration < 0 {
+	if !app.Enabled() {
 		return svcs
 	}
 
-	interval := app.Interval
-	if interval.Duration != 0 && interval.Duration < MinimumCheckInterval {
-		interval.Duration = MinimumCheckInterval
-	}
+	extra := app.ExtraConfig
+	extra.Name = PlexServerName
 
-	svcs = append(svcs, &Service{
-		ServiceConfig: &ServiceConfig{
-			validSSL: app.ValidSSL,
-			Name:     PlexServerName,
-			Type:     CheckHTTP,
-			Value:    app.PlexConfig.URL + "|X-Plex-Token:" + app.PlexConfig.Token,
-			Expect:   "200",
-			Timeout:  app.Timeout,
-			Interval: interval,
-		},
-	})
-
-	return svcs
+	return appendHTTPCheck(svcs, extra, app.PlexConfig.URL+"|X-Plex-Token:"+app.PlexConfig.Token, "200")
 }
 
 func collectMySQLApps(svcs []*Service, mysql []snapshot.MySQLConfig) []*Service { //nolint:cyclop

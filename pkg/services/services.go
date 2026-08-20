@@ -55,14 +55,25 @@ func (s *Services) add(svc *ServiceConfig) {
 	}
 }
 
-// Start begins the service check routines.
-// Runs Parallel checkers and the check reporter.
-func (s *Services) Start(ctx context.Context, plexName string) {
-	if s.parallel = uint(len(s.services) / svcsPerThread); s.parallel < 1 {
+func (s *Services) setParallel() {
+	count := len(s.services)
+	if count == 0 {
+		s.parallel = 0
+		return
+	}
+
+	s.parallel = uint(count / svcsPerThread)
+	if s.parallel < 1 {
 		s.parallel = 1
 	} else if s.parallel > maxParallel {
 		s.parallel = maxParallel
 	}
+}
+
+// Start begins the service check routines.
+// Runs Parallel checkers and the check reporter.
+func (s *Services) Start(ctx context.Context, plexName string) {
+	s.setParallel()
 
 	if s.log = mnd.Log; s.LogFile != "" {
 		s.log = logs.CustomLog(s.LogFile, "Services")
@@ -75,7 +86,11 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	s.applyLocalOverrides(plexName)
 	s.loadServiceStates(mnd.GetID(ctx))
 
+	ctx, cancel := context.WithCancel(ctx)
+
 	s.stopLock.Lock()
+	s.cancel = cancel
+	s.stopped = make(chan struct{})
 	s.checks = make(chan *Service, DefaultBuffer)
 	s.done = make(chan bool, s.parallel)
 	s.actionChan = make(chan action, actionBuf)
@@ -87,7 +102,7 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 		go s.watchServiceChan(ctx)
 	}
 
-	go s.runServiceChecker()
+	go s.runServiceChecker(ctx)
 	s.stopLock.Unlock()
 
 	word := "Started"
@@ -196,7 +211,14 @@ const (
 	actionCheck                // check if service checks are running.
 )
 
-func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
+func (s *Services) stopWorkers() {
+	for range s.parallel {
+		s.checks <- nil
+		<-s.done
+	}
+}
+
+func (s *Services) runServiceChecker(ctx context.Context) { //nolint:cyclop,funlen
 	checker := time.NewTicker(time.Second)
 	running := true
 	reqID := mnd.ReqID()
@@ -205,12 +227,15 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 		defer s.log.CapturePanic()
 		checker.Stop()
 		s.log.Printf(reqID, "==> Service Checker Stopped!")
-		s.actionChan <- actionStop // signal we're finished.
+		close(s.stopped)
 	}()
 
 	if !s.Disabled {
 		s.runChecks(true, version.Started)
-		s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()}, reqID)
+
+		if ctx.Err() == nil {
+			s.SendResults(&Results{What: website.EventStart, Svcs: s.GetResults()}, reqID)
+		}
 	} else {
 		running = false
 		checker.Stop()
@@ -218,6 +243,9 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 
 	for {
 		select {
+		case <-ctx.Done():
+			s.stopWorkers()
+			return
 		case action := <-s.actionChan:
 			switch action {
 			case actionCheck:
@@ -231,12 +259,7 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				checker.Stop()
 				running = false
 			case actionStop:
-				// Stop all the checkers.
-				for range s.parallel {
-					s.checks <- nil
-					<-s.done
-				}
-
+				s.stopWorkers()
 				return
 			}
 		case event := <-s.checkChan:
@@ -308,10 +331,7 @@ func (s *Services) sendAction(act action) {
 
 // Stop ends all service checker routines.
 func (s *Services) Stop() {
-	defer func() {
-		logs.Log.CapturePanic()
-		logs.Log.Printf("called", "==> Service Checker Stopped!")
-	}()
+	defer logs.Log.CapturePanic()
 
 	s.stopLock.Lock()
 	if s.actionChan == nil || s.stopping {
@@ -320,11 +340,17 @@ func (s *Services) Stop() {
 	}
 
 	s.stopping = true
-	actionChan := s.actionChan
+	cancel := s.cancel
+	stopped := s.stopped
 	s.stopLock.Unlock()
 
-	actionChan <- actionStop
-	<-actionChan
+	if cancel != nil {
+		cancel()
+	}
+
+	if stopped != nil {
+		<-stopped
+	}
 
 	s.stopLock.Lock()
 	defer s.stopLock.Unlock()
@@ -332,6 +358,8 @@ func (s *Services) Stop() {
 	s.actionChan = nil
 	s.triggerChan = nil
 	s.checkChan = nil
+	s.cancel = nil
+	s.stopped = nil
 	s.stopping = false
 
 	if s.checks != nil {
