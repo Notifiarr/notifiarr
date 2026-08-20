@@ -418,7 +418,7 @@
     "phrase": {
       "ShowMoreDesc": "Three authentication types are currently supported. Auth Proxy and No Password are only available if the current request comes from a valid, configured upstream IP address.",
       "PasswordOnlyUsed": "Username and Password are only used if Authentication Type is set to Password.",
-      "HeaderOnlyUsed": "Auth Header is only used if Authentication Type is <b>not</b> set to Password.",
+      "HeaderOnlyUsed": "Auth Header is only used if Authentication Type is set to Header or No Password.",
       "AuthTypeChange": "If Authentication Type changes, log out to complete the process.",
       "ProfileUpdated": "Profile updated successfully {timeDuration} ago!",
       "EnterCurrentPassword": "Enter your current password to make changes.",
