@@ -3,7 +3,6 @@ package services
 import (
 	"net/url"
 	"strings"
-	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
@@ -35,13 +34,9 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	svcs = collectTautulliApps(svcs, apps.Tautulli)
 	svcs = collectPlexApps(svcs, &apps.Plex)
 	svcs = collectMySQLApps(svcs, mysql)
-	now := time.Now()
 
 	for _, svc := range svcs {
 		svc.validated = true
-		svc.log = s.log
-		svc.State = StateUnknown
-		svc.Since = now
 		s.add(svc.ServiceConfig)
 	}
 }
@@ -233,13 +228,17 @@ func collectNZBGetApps(svcs []*Service, nzbget []apps.NZBGet) []*Service {
 			interval.Duration = MinimumCheckInterval
 		}
 
-		prefix := "" // add auth to the url here. woo, hacky, but it works!
-
+		checkURL := app.URL
 		if !strings.Contains(app.URL, "@") {
 			user := url.PathEscape(app.User) + ":" + url.PathEscape(app.Pass) + "@"
-			if prefix = "http://" + user; strings.HasPrefix(app.URL, "https://") {
-				prefix = "https://" + user
+			scheme := "http://"
+
+			if strings.HasPrefix(app.URL, "https://") {
+				scheme = "https://"
 			}
+
+			host := strings.TrimPrefix(strings.TrimPrefix(app.URL, "https://"), "http://")
+			checkURL = scheme + user + host
 		}
 
 		if app.Name != "" {
@@ -248,7 +247,7 @@ func collectNZBGetApps(svcs []*Service, nzbget []apps.NZBGet) []*Service {
 					validSSL: app.ValidSSL,
 					Name:     app.Name,
 					Type:     CheckHTTP,
-					Value:    prefix + strings.TrimPrefix(strings.TrimPrefix(app.URL, "https://"), "http://"),
+					Value:    checkURL,
 					Expect:   "200",
 					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 					Interval: interval,
@@ -338,9 +337,9 @@ func collectSabNZBApps(svcs []*Service, sabnzb []apps.SabNZB) []*Service {
 					validSSL: app.ValidSSL,
 					Name:     app.Name,
 					Type:     CheckHTTP,
-					Value:    app.SabNZB.URL + "/api?mode=version&apikey=" + app.SabNZB.APIKey,
+					Value:    app.SabNZBConfig.URL + "/api?mode=version&apikey=" + app.SabNZBConfig.APIKey,
 					Expect:   "200",
-					Timeout:  cnfg.Duration{Duration: app.SabNZB.Timeout},
+					Timeout:  app.ExtraConfig.Timeout,
 					Interval: interval,
 				},
 			})
@@ -401,7 +400,7 @@ func collectTautulliApps(svcs []*Service, app apps.Tautulli) []*Service {
 			validSSL: app.ValidSSL,
 			Name:     app.Name,
 			Type:     CheckHTTP,
-			Value:    app.Tautulli.URL + "/api/v2?cmd=status&apikey=" + app.Tautulli.APIKey,
+			Value:    app.TautulliConfig.URL + "/api/v2?cmd=status&apikey=" + app.TautulliConfig.APIKey,
 			Expect:   "200",
 			Timeout:  app.ExtraConfig.Timeout,
 			Interval: interval,
@@ -426,7 +425,7 @@ func collectPlexApps(svcs []*Service, app *apps.Plex) []*Service {
 			validSSL: app.ValidSSL,
 			Name:     PlexServerName,
 			Type:     CheckHTTP,
-			Value:    app.Server.URL + "|X-Plex-Token:" + app.Server.Token,
+			Value:    app.PlexConfig.URL + "|X-Plex-Token:" + app.PlexConfig.Token,
 			Expect:   "200",
 			Timeout:  app.Timeout,
 			Interval: interval,

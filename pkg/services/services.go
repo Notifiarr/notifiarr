@@ -48,6 +48,8 @@ func (s *Services) add(svc *ServiceConfig) {
 	// Add this validated service to our service map.
 	s.services[svc.Name] = &Service{
 		ServiceConfig: svc,
+		State:         StateUnknown,
+		Since:         time.Now(),
 	}
 }
 
@@ -234,14 +236,14 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 			}
 		case event := <-s.checkChan:
 			s.log.Printf(event.ReqID, "Running service check '%s' via event: %s, buffer: %d/%d",
-				event.ReqID, event.Service.Name, event.Source, len(s.checks), cap(s.checks))
+				event.Service.Name, event.Source, len(s.checks), cap(s.checks))
 
 			if s.runCheck(event.Service, true, time.Now()) {
 				s.SendResults(&Results{What: event.Source, Svcs: s.GetResults()}, event.ReqID)
 			}
 		case input := <-s.triggerChan:
 			s.log.Printf(input.ReqID, "Running all service checks via event: %s, buffer: %d/%d",
-				input.ReqID, input.Type, len(s.checks), cap(s.checks))
+				input.Type, len(s.checks), cap(s.checks))
 			s.runChecks(true, time.Now())
 
 			if input.Type != "log" {
@@ -255,7 +257,7 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 				continue
 			}
 
-			s.log.Printf(input.ReqID, "Service Checks Payload (log only):", string(data))
+			s.log.Printf(input.ReqID, "Service Checks Payload (log only): %s", string(data))
 		case now := <-checker.C:
 			if s.runChecks(false, now) {
 				s.SendResults(&Results{What: website.EventCron, Svcs: s.GetResults()}, reqID)
