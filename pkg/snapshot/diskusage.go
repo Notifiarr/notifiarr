@@ -25,37 +25,35 @@ func (s *Snapshot) getDisksUsage(ctx context.Context, run bool, allDrives bool) 
 	return errs
 }
 
-func GetDisksUsage(ctx context.Context, allDrives bool) (map[string]*Partition, []error) { //nolint:cyclop
-	var (
-		errs        []error
-		output      = make(map[string]*Partition)
-		getAllDisks = allDrives || mnd.IsDocker
-	)
+func GetDisksUsage(ctx context.Context, allDrives bool) (map[string]*Partition, []error) {
+	var errs []error
 
-	partitions, err := disk.PartitionsWithContext(ctx, getAllDisks)
+	// Docker and "all drives" must pass all=true: gopsutil otherwise omits nodev
+	// filesystems, which includes nfs/nfs4/cifs/fuse used by bind mounts and automounts.
+	partitions, err := disk.PartitionsWithContext(ctx, allDrives || mnd.IsDocker)
 	if err != nil {
 		errs = append(errs, fmt.Errorf("unable to get partitions: %w", err))
 	}
 
+	return collectDiskUsage(partitions, func(mount string) (*disk.UsageStat, error) {
+		return disk.UsageWithContext(ctx, mount)
+	}), errs
+}
+
+func collectDiskUsage( //nolint:cyclop
+	partitions []disk.PartitionStat,
+	usageFor func(string) (*disk.UsageStat, error),
+) map[string]*Partition {
+	output := make(map[string]*Partition)
+
 	for idx := range partitions {
-		usage, err := disk.UsageWithContext(ctx, partitions[idx].Mountpoint)
-		if err != nil {
-			// errs = append(errs, fmt.Errorf("unable to get partition usage: %s: %w", partitions[idx].Mountpoint, err))
+		part := &partitions[idx]
+		if skipPartition(part) {
 			continue
 		}
 
-		// skip tmpfs volumes
-		if usage.Fstype == "tmpfs" ||
-			// skip read only volumes with no device.
-			(slices.Contains(partitions[idx].Opts, "ro") && slices.Contains(partitions[idx].Opts, "nodev")) ||
-			// skip hidden volumes on macos.
-			(mnd.IsDarwin && slices.Contains(partitions[idx].Opts, "nobrowse")) {
-			continue
-		}
-
-		if usage.Total == 0 ||
-			((mnd.IsDarwin || strings.HasSuffix(runtime.GOOS, "bsd")) &&
-				!strings.HasPrefix(partitions[idx].Device, "/dev/")) {
+		usage, err := usageFor(part.Mountpoint)
+		if err != nil || skipUsage(part, usage) {
 			continue
 		}
 
@@ -63,19 +61,120 @@ func GetDisksUsage(ctx context.Context, allDrives bool) (map[string]*Partition, 
 			usage.Used = usage.Total - usage.Free
 		}
 
-		output[partitions[idx].Device] = &Partition{
-			Device:     partitions[idx].Mountpoint,
-			DevicePath: partitions[idx].Device,
+		fstype := usage.Fstype
+		if fstype == "" {
+			fstype = part.Fstype
+		}
+
+		next := &Partition{
+			Device:     part.Mountpoint,
+			DevicePath: part.Device,
 			Total:      usage.Total,
 			Free:       usage.Free,
 			Used:       usage.Used,
-			FSType:     usage.Fstype,
-			ReadOnly:   slices.Contains(partitions[idx].Opts, "ro"),
-			Opts:       partitions[idx].Opts,
+			FSType:     fstype,
+			ReadOnly:   slices.Contains(part.Opts, "ro"),
+			Opts:       part.Opts,
 		}
+
+		key := diskUsageKey(part)
+		if existing, ok := output[key]; ok && mountScore(existing.Device) >= mountScore(next.Device) {
+			continue
+		}
+
+		output[key] = next
 	}
 
-	return output, errs
+	return output
+}
+
+// virtualFSTypes are kernel/synthetic filesystems, not user storage.
+// Match partition fstype from mountinfo; usage.Fstype comes from statfs and
+// can follow a triggered automount (autofs → nfs) or the backing overlay.
+var virtualFSTypes = map[string]struct{}{
+	"autofs": {}, "binfmt_misc": {}, "bpf": {}, "cgroup": {}, "cgroup2": {},
+	"configfs": {}, "debugfs": {}, "devpts": {}, "devtmpfs": {}, "efivarfs": {},
+	"fusectl": {}, "hugetlbfs": {}, "mqueue": {}, "nsfs": {}, "proc": {},
+	"pstore": {}, "ramfs": {}, "rpc_pipefs": {}, "securityfs": {}, "shm": {},
+	"squashfs": {}, "sysfs": {}, "tmpfs": {}, "tracefs": {},
+}
+
+func skipPartition(part *disk.PartitionStat) bool {
+	if isVirtualFS(part.Fstype) || isVirtualFS(part.Device) ||
+		strings.HasPrefix(part.Device, "systemd-") || isJunkMount(part.Mountpoint) {
+		return true
+	}
+
+	if mnd.IsDarwin && slices.Contains(part.Opts, "nobrowse") {
+		return true
+	}
+
+	return false
+}
+
+func skipUsage(part *disk.PartitionStat, usage *disk.UsageStat) bool {
+	if usage == nil || usage.Total == 0 {
+		return true
+	}
+
+	if part.Fstype == "" && isVirtualFS(usage.Fstype) {
+		return true
+	}
+
+	// Keep NFS/CIFS/etc. Darwin/BSD still hide other non-device mounts.
+	if (mnd.IsDarwin || strings.HasSuffix(runtime.GOOS, "bsd")) &&
+		!strings.HasPrefix(part.Device, "/dev/") && !isNetworkDevice(part.Device) {
+		return true
+	}
+
+	return false
+}
+
+func isVirtualFS(fstype string) bool {
+	_, ok := virtualFSTypes[strings.ToLower(fstype)]
+	return ok
+}
+
+func isNetworkDevice(device string) bool {
+	return strings.Contains(device, ":/") || strings.HasPrefix(device, "//")
+}
+
+func isJunkMount(mount string) bool {
+	switch mount {
+	case "/etc/resolv.conf", "/etc/hostname", "/etc/hosts", "/etc/mtab":
+		return true
+	}
+
+	return strings.HasPrefix(mount, "/proc") ||
+		strings.HasPrefix(mount, "/sys") ||
+		strings.HasPrefix(mount, "/dev/") ||
+		strings.HasPrefix(mount, "/run/")
+}
+
+func diskUsageKey(part *disk.PartitionStat) string {
+	if isNetworkDevice(part.Device) {
+		return part.Mountpoint
+	}
+
+	return part.Device
+}
+
+const (
+	mountScoreRoot     = 100
+	mountScoreBoot     = 20
+	mountScoreDefault  = 80
+	maxMountLenPenalty = 40
+)
+
+func mountScore(mount string) int {
+	switch {
+	case mount == "/" || (len(mount) == 2 && mount[1] == ':'):
+		return mountScoreRoot
+	case strings.HasPrefix(mount, "/boot"):
+		return mountScoreBoot
+	default:
+		return mountScoreDefault - min(len(mount), maxMountLenPenalty)
+	}
 }
 
 func (s *Snapshot) getQuota(ctx context.Context, run bool) error {
