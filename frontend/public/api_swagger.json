@@ -2174,7 +2174,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "map of path->space free",
                         "schema": {
                             "allOf": [
                                 {
@@ -2770,7 +2770,7 @@
                 "summary": "Ping all starr instances.",
                 "responses": {
                     "200": {
-                        "description": "map for app-\u003einstance-\u003eup",
+                        "description": "map for app->instance->up",
                         "schema": {
                             "allOf": [
                                 {
@@ -2836,7 +2836,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "map for app-\u003einstance-\u003eup",
+                        "description": "map for app->instance->up",
                         "schema": {
                             "allOf": [
                                 {
@@ -2910,7 +2910,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "map for app-\u003einstance-\u003eup",
+                        "description": "map for app->instance->up",
                         "schema": {
                             "allOf": [
                                 {
@@ -6526,7 +6526,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "map of path->space free",
                         "schema": {
                             "allOf": [
                                 {
@@ -8262,7 +8262,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "map of path->space free",
                         "schema": {
                             "allOf": [
                                 {
@@ -12279,7 +12279,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "map of path->space free",
                         "schema": {
                             "allOf": [
                                 {
@@ -12795,94 +12795,6 @@
                                     "properties": {
                                         "message": {
                                             "$ref": "#/definitions/sonarr.Episode"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "bad token or api key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "503": {
-                        "description": "instance error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/sportarr/{instance}": {
-            "put": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Updates a series in Sportarr.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Sportarr"
-                ],
-                "summary": "Update Sportarr Series",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "instance ID",
-                        "name": "instance",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "move files? true/false",
-                        "name": "moveFiles",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "description": "series content",
-                        "name": "PUT",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/sonarr.Series"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
                                         }
                                     }
                                 }
@@ -13858,7 +13770,7 @@
             }
         },
         "/sportarr/{instance}/delete/{episodeFileID}": {
-            "post": {
+            "delete": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -14821,9 +14733,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/sportarr/{instance}/notifications": {
+            },
             "get": {
                 "security": [
                     {
@@ -15439,78 +15349,6 @@
             }
         },
         "/sportarr/{instance}/qualitydefinition": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Returns all Quality Definitions from Sportarr.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Sportarr"
-                ],
-                "summary": "Get Sportarr Quality Definitions",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "instance ID",
-                        "name": "instance",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "quality definitions list",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/sonarr.QualityDefinition"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "bad token or api key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "instance error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
             "put": {
                 "security": [
                     {
@@ -15584,6 +15422,80 @@
                                     "properties": {
                                         "message": {
                                             "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/sportarr/{instance}/qualitydefinitions": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Returns all Quality Definitions from Sportarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sportarr"
+                ],
+                "summary": "Get Sportarr Quality Definitions",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "quality definitions list",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.QualityDefinition"
+                                            }
                                         }
                                     }
                                 }
@@ -15727,78 +15639,6 @@
             }
         },
         "/sportarr/{instance}/releaseProfile": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Fetches all Release Profile Data from Sportarr.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Sportarr"
-                ],
-                "summary": "Get Sportarr Release Profile Data",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "instance ID",
-                        "name": "instance",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "all profiles",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "array",
-                                            "items": {
-                                                "$ref": "#/definitions/sonarr.ReleaseProfile"
-                                            }
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "bad token or api key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "instance error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -15881,77 +15721,6 @@
                     },
                     "500": {
                         "description": "instance error",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
-        "/sportarr/{instance}/releaseProfile/all": {
-            "delete": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "Removes all Sportarr Release Profiles.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Sportarr"
-                ],
-                "summary": "Remove Sportarr Release Profiles",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "format": "int64",
-                        "description": "instance ID",
-                        "name": "instance",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "delete status",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/apps.ApiResponse"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "message": {
-                                            "$ref": "#/definitions/apps.deleteResponse"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "404": {
-                        "description": "bad token or api key",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "instance error getting profiles",
                         "schema": {
                             "allOf": [
                                 {
@@ -16193,6 +15962,151 @@
                 }
             }
         },
+        "/sportarr/{instance}/releaseProfiles": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Fetches all Release Profile Data from Sportarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sportarr"
+                ],
+                "summary": "Get Sportarr Release Profile Data",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "all profiles",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/sonarr.ReleaseProfile"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/sportarr/{instance}/releaseProfiles/all": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Removes all Sportarr Release Profiles.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sportarr"
+                ],
+                "summary": "Remove Sportarr Release Profiles",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "delete status",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "$ref": "#/definitions/apps.deleteResponse"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "instance error getting profiles",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/sportarr/{instance}/rootFolder": {
             "get": {
                 "security": [
@@ -16220,7 +16134,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "map of path-\u003espace free",
+                        "description": "map of path->space free",
                         "schema": {
                             "allOf": [
                                 {
@@ -16736,6 +16650,94 @@
                                     "properties": {
                                         "message": {
                                             "$ref": "#/definitions/sonarr.Episode"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "404": {
+                        "description": "bad token or api key",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "503": {
+                        "description": "instance error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "/sportarr/{instance}/update": {
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Updates a series in Sportarr.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sportarr"
+                ],
+                "summary": "Update Sportarr Series",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "instance ID",
+                        "name": "instance",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "format": "int64",
+                        "description": "move files? true/false",
+                        "name": "moveFiles",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "series content",
+                        "name": "PUT",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sonarr.Series"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/apps.ApiResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
                                         }
                                     }
                                 }
@@ -17359,7 +17361,7 @@
                             "type": "string"
                         },
                         "collectionFormat": "multi",
-                        "example": "args=/tmp\u0026args=/var",
+                        "example": "args=/tmp&args=/var",
                         "description": "provide args as multiple 'args' parameters in POST body",
                         "name": "args",
                         "in": "formData",
@@ -19153,7 +19155,7 @@
             "type": "object",
             "properties": {
                 "users": {
-                    "description": "Tautulli userID -\u003e email map.",
+                    "description": "Tautulli userID -> email map.",
                     "type": "object",
                     "additionalProperties": {
                         "type": "string"

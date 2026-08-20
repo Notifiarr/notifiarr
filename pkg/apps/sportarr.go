@@ -559,7 +559,7 @@ func sportarrDeleteAllQualityProfiles(req *http.Request) (int, any) {
 // @Success		201			{object}	apps.ApiResponse{message=[]sonarr.ReleaseProfile}	"all profiles"
 // @Failure		500			{object}	apps.ApiResponse{message=string}					"instance error"
 // @Failure		404			{object}	string												"bad token or api key"
-// @Router			/sportarr/{instance}/releaseProfile [get]
+// @Router			/sportarr/{instance}/releaseProfiles [get]
 // @Security		ApiKeyAuth
 func sportarrGetReleaseProfiles(req *http.Request) (int, any) {
 	// Get the profiles from sportarr.
@@ -675,7 +675,7 @@ func sportarrDeleteReleaseProfile(req *http.Request) (int, any) {
 // @Success		200			{object}	apps.ApiResponse{message=apps.deleteResponse}	"delete status"
 // @Failure		500			{object}	apps.ApiResponse{message=string}				"instance error getting profiles"
 // @Failure		404			{object}	string											"bad token or api key"
-// @Router			/sportarr/{instance}/releaseProfile/all [delete]
+// @Router			/sportarr/{instance}/releaseProfiles/all [delete]
 // @Security		ApiKeyAuth
 func sportarrDeleteAllReleaseProfiles(req *http.Request) (int, any) {
 	profiles, err := getSportarr(req).GetReleaseProfilesContext(req.Context())
@@ -1018,7 +1018,7 @@ func sportarrSetTag(req *http.Request) (int, any) {
 // @Success		200			{object}	apps.ApiResponse{message=string}	"OK"
 // @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
-// @Router			/sportarr/{instance} [put]
+// @Router			/sportarr/{instance}/update [put]
 // @Security		ApiKeyAuth
 func sportarrUpdateSeries(req *http.Request) (int, any) {
 	var series sonarr.AddSeriesInput
@@ -1028,7 +1028,7 @@ func sportarrUpdateSeries(req *http.Request) (int, any) {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
 	}
 
-	moveFiles := mux.Vars(req)["moveFiles"] == strconv.FormatBool(true)
+	moveFiles := req.URL.Query().Get("moveFiles") == mnd.True
 
 	_, err = getSportarr(req).UpdateSeriesContext(req.Context(), &series, moveFiles)
 	if err != nil {
@@ -1287,7 +1287,7 @@ func sportarrAddImportList(req *http.Request) (int, any) {
 // @Success		200			{object}	apps.ApiResponse{message=[]sonarr.QualityDefinition}	"quality definitions list"
 // @Failure		500			{object}	apps.ApiResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
-// @Router			/sportarr/{instance}/qualitydefinition [get]
+// @Router			/sportarr/{instance}/qualitydefinitions [get]
 // @Security		ApiKeyAuth
 func sportarrGetQualityDefinitions(req *http.Request) (int, any) {
 	output, err := getSportarr(req).GetQualityDefinitionsContext(req.Context())
@@ -1333,7 +1333,7 @@ func sportarrUpdateQualityDefinition(req *http.Request) (int, any) {
 // @Success		200			{object}	apps.ApiResponse{message=[]sonarr.NotificationOutput}	"notifications"
 // @Failure		503			{object}	apps.ApiResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
-// @Router			/sportarr/{instance}/notifications [get]
+// @Router			/sportarr/{instance}/notification [get]
 // @Security		ApiKeyAuth
 func sportarrGetNotifications(req *http.Request) (int, any) {
 	notifs, err := getSportarr(req).GetNotificationsContext(req.Context())
@@ -1455,7 +1455,7 @@ func sportarrDeleteQueue(req *http.Request) (int, any) {
 // @Failure		500				{object}	apps.ApiResponse{message=string}	"instance error"
 // @Failure		404				{object}	string								"bad token or api key"
 // @Failure		423				{object}	string								"rate limit reached"
-// @Router			/sportarr/{instance}/delete/{episodeFileID} [post]
+// @Router			/sportarr/{instance}/delete/{episodeFileID} [delete]
 // @Security		ApiKeyAuth
 func sportarrDeleteEpisode(req *http.Request) (int, any) {
 	idString := mux.Vars(req)["episodeFileID"]

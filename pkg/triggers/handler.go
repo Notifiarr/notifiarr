@@ -340,7 +340,7 @@ func (a *Actions) rpsync(input *common.ActionInput, content string) (int, string
 // @Summary		Sync TRaSH Sportarr data
 // @Tags			Triggers,TRaSH
 // @Produce		json
-// @Param			instance	path		bool								false	"Triggers sync on this instance if provided, otherwise all instances"
+// @Param			instance	path		int 								false	"Triggers sync on this instance if provided, otherwise all instances"
 // @Success		200			{object}	apps.ApiResponse{message=string}	"success"
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/trigger/sportarrsync/{instance} [get]

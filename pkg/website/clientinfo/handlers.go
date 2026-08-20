@@ -211,6 +211,13 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.appStatsForVersionInstance", app, instance)
 	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersionInstance", app, instance)
 
+	// Instances are 1-indexed and the route accepts any digits, including 0.
+	// Every app below indexes its slice at instance-1, so a 0 reaches [-1]
+	// and panics. The length checks do not catch it because 0 is under them.
+	if instance < 1 {
+		return nil
+	}
+
 	switch idx := instance - 1; app {
 	case "lidarr":
 		if instance <= len(c.Apps.Lidarr) && c.Apps.Lidarr[idx].Enabled() {
