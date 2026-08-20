@@ -211,6 +211,13 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.appStatsForVersionInstance", app, instance)
 	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersionInstance", app, instance)
 
+	// The route accepts instance 0. Starr instances start at 1.
+	// Without this check, instance 0 reads index -1 and panics.
+	// Plex and Tautulli ignore the instance number.
+	if instance < 1 && app != "plex" && app != "tautulli" {
+		return nil
+	}
+
 	switch idx := instance - 1; app {
 	case "lidarr":
 		if instance <= len(c.Lidarr) && c.Apps.Lidarr[idx].Enabled() {
