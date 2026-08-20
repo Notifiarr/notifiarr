@@ -12,6 +12,7 @@ import (
 
 type CheckAllInput struct {
 	Sonarr       []apps.StarrConfig    `json:"sonarr"`
+	Sportarr     []apps.StarrConfig    `json:"sportarr"`
 	Radarr       []apps.StarrConfig    `json:"radarr"`
 	Readarr      []apps.StarrConfig    `json:"readarr"`
 	Lidarr       []apps.StarrConfig    `json:"lidarr"`
@@ -40,6 +41,7 @@ type TestResult struct {
 //nolint:tagliatelle
 type CheckAllOutput struct {
 	Sonarr    []TestResult `json:"Sonarr"`
+	Sportarr  []TestResult `json:"Sportarr"`
 	Radarr    []TestResult `json:"Radarr"`
 	Readarr   []TestResult `json:"Readarr"`
 	Lidarr    []TestResult `json:"Lidarr"`
@@ -78,6 +80,7 @@ func CheckAll(ctx context.Context, input *CheckAllInput) *CheckAllOutput {
 func newCheckAll(input *CheckAllInput) *checkAll {
 	output := &CheckAllOutput{
 		Sonarr:   make([]TestResult, len(input.Sonarr)),
+		Sportarr: make([]TestResult, len(input.Sportarr)),
 		Radarr:   make([]TestResult, len(input.Radarr)),
 		Readarr:  make([]TestResult, len(input.Readarr)),
 		Lidarr:   make([]TestResult, len(input.Lidarr)),
@@ -91,11 +94,11 @@ func newCheckAll(input *CheckAllInput) *checkAll {
 		Xmiss:    make([]TestResult, len(input.Transmission)),
 		SabNZB:   make([]TestResult, len(input.SabNZB)),
 		TimeMS:   time.Now().UnixMilli(),
-		Instances: len(input.Sonarr) + len(input.Radarr) + len(input.Readarr) +
-			len(input.Lidarr) + len(input.Prowlarr) + len(input.Plex) +
-			len(input.Tautulli) + len(input.NZBGet) + len(input.Deluge) +
-			len(input.Qbit) + len(input.Rtorrent) + len(input.Transmission) +
-			len(input.SabNZB),
+		Instances: len(input.Sonarr) + len(input.Sportarr) + len(input.Radarr) +
+			len(input.Readarr) + len(input.Lidarr) + len(input.Prowlarr) +
+			len(input.Plex) + len(input.Tautulli) + len(input.NZBGet) +
+			len(input.Deluge) + len(input.Qbit) + len(input.Rtorrent) +
+			len(input.Transmission) + len(input.SabNZB),
 	}
 
 	return &checkAll{input: input, ch: make(chan *job, cBuffer), output: output}
@@ -128,6 +131,11 @@ func (c *checkAll) checkAllStarr(ctx context.Context) {
 	for i, sonarr := range c.input.Sonarr {
 		c.output.Sonarr[i].Config = sonarr.ExtraConfig
 		c.ch <- &job{res: &c.output.Sonarr[i], fn: chk(ctx, sonarr, Sonarr)}
+	}
+
+	for i, sportarr := range c.input.Sportarr {
+		c.output.Sportarr[i].Config = sportarr.ExtraConfig
+		c.ch <- &job{res: &c.output.Sportarr[i], fn: chk(ctx, sportarr, Sportarr)}
 	}
 
 	for i, radarr := range c.input.Radarr {

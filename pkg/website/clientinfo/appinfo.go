@@ -93,6 +93,7 @@ type AppConfigs struct {
 	Radarr   []*AppInfoAppConfig `json:"radarr"`
 	Readarr  []*AppInfoAppConfig `json:"readarr"`
 	Sonarr   []*AppInfoAppConfig `json:"sonarr"`
+	Sportarr []*AppInfoAppConfig `json:"sportarr"`
 	Tautulli *AppInfoTautulli    `json:"tautulli"`
 }
 
@@ -169,6 +170,7 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo { //nolint:fun
 			"tautulli":     numTautulli,
 			"sabnzbd":      len(c.Apps.SabNZB),
 			"sonarr":       len(c.Apps.Sonarr),
+			"sportarr":     len(c.Apps.Sportarr),
 		},
 		Config: AppInfoConfig{
 			WebsiteTimeout: webconf.Timeout.String(),
@@ -209,6 +211,10 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 
 	for i, app := range c.Apps.Sonarr {
 		apps.Sonarr = append(apps.Sonarr, add(i, app.Name))
+	}
+
+	for i, app := range c.Apps.Sportarr {
+		apps.Sportarr = append(apps.Sportarr, add(i, app.Name))
 	}
 
 	if !startup {

@@ -1096,7 +1096,8 @@
                 "description": "",
                 "placeholder": ""
             }
-        }
+        },
+        "Sportarr": { "title": "Sportarr" }
     },
     "RegexTester": {
         "testRegex": {

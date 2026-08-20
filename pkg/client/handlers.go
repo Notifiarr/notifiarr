@@ -265,7 +265,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 // @Summary		Ping 1 starr instance.
 // @Tags			Client
 // @Produce		json
-// @Param			app			path		string												true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Param			app			path		string												true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr, sportarr)
 // @Param			instance	path		int64												true	"Application instance (1-index)."
 // @Success		200			{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404			{object}	string												"bad token or api key"
@@ -278,7 +278,7 @@ func _() {}
 // @Summary		Ping all instances for 1 or more starr apps.
 // @Tags			Client
 // @Produce		json
-// @Param			apps	path		string												true	"Application, comma separated"	Enums(lidarr, prowlarr, radarr, readarr, sonarr)
+// @Param			apps	path		string												true	"Application, comma separated"	Enums(lidarr, prowlarr, radarr, readarr, sonarr, sportarr)
 // @Success		200		{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404		{object}	string												"bad token or api key"
 // @Router			/ping/{apps} [get]
@@ -306,6 +306,7 @@ func (c *Client) handleInstancePing(req *http.Request) (int, any) { //nolint:cyc
 			starr.Radarr.Lower(),
 			starr.Readarr.Lower(),
 			starr.Sonarr.Lower(),
+			"sportarr", // apps.SportarrApp; the apps package is shadowed in this func.
 			starr.Prowlarr.Lower(),
 		}
 	}
@@ -327,6 +328,10 @@ func (c *Client) handleInstancePing(req *http.Request) (int, any) { //nolint:cyc
 		case starr.Sonarr.Lower():
 			for idx := range c.apps.Sonarr {
 				c.pingInstance(req.Context(), c.apps.Sonarr[idx], app, idx, instance, output)
+			}
+		case "sportarr":
+			for idx := range c.apps.Sportarr {
+				c.pingInstance(req.Context(), c.apps.Sportarr[idx], app, idx, instance, output)
 			}
 		case starr.Prowlarr.Lower():
 			for idx := range c.apps.Prowlarr {

@@ -612,6 +612,7 @@
                 "tooltip": ""
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Radarr": {
             "url": {
                 "label": "",

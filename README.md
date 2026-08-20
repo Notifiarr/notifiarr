@@ -11,7 +11,7 @@ Written in Go & Svelte; works on most operating systems.
 - Service and network health checks and notifications.
 - Trigger scripts and commands from Discord.
 - Media requests from Discord.
-- Sync TRaSH profiles to Radarr & Sonarr.
+- Sync TRaSH profiles to Radarr, Sonarr & Sportarr.
 - Backup corruption checks for all starr applications.
 - Scheduled system snapshot notifications.
 - Scheduled media and downloads dashboard notifications.

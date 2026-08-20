@@ -398,6 +398,7 @@
                 "placeholder": "password"
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Readarr": {
             "title": "Readarr",
             "addInstance": "Aggiungi Istanza Readarr",

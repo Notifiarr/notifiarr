@@ -42,6 +42,19 @@ func _() {}
 // @Security		ApiKeyAuth
 func _() {}
 
+// @Description	Returns custom format and related data for multiple Sportarr instances at once. May be slow.
+// @Summary		Retrieve custom format data from multiple Sportarr instances.
+// @Tags			TRaSH,Sportarr
+// @Produce		json
+// @Accept			json
+// @Param			request	body		TrashAggInput										true	"list of instances"
+// @Success		200		{object}	apps.ApiResponse{message=[]SportarrTrashPayload}	"contains app info included appStatus"
+// @Failure		400		{object}	apps.ApiResponse{message=string}					"bad input payload or missing app"
+// @Failure		404		{object}	string												"bad token or api key"
+// @Router			/trash/sportarr [post]
+// @Security		ApiKeyAuth
+func _() {}
+
 // Handler is passed into the webserver as an HTTP handler.
 //
 //	@Description	Returns custom format and related data for multiple Sonarr instances at once. May be slow.
@@ -80,6 +93,8 @@ func (c *cmd) aggregateTrash(req *http.Request) (int, any) {
 		return http.StatusBadRequest, fmt.Errorf("decoding POST payload: (app: %s) %w", app, err)
 	case app == "sonarr":
 		return http.StatusOK, c.aggregateTrashSonarr(req.Context(), &wait, input.Instances)
+	case app == "sportarr":
+		return http.StatusOK, c.aggregateTrashSportarr(req.Context(), &wait, input.Instances)
 	case app == "radarr":
 		return http.StatusOK, c.aggregateTrashRadarr(req.Context(), &wait, input.Instances)
 	case app == "lidarr":

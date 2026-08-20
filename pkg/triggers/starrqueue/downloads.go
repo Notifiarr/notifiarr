@@ -49,6 +49,12 @@ type readarrRecord struct {
 	ForeignAuthorID string `json:"foreignAuthorId"`
 }
 
+type sportarrRecord struct {
+	*sonarr.QueueRecord
+	Name            string `json:"name"`
+	ForeignSeriesID int64  `json:"foreignSeriesId"`
+}
+
 // sendDownloadingQueues gathers the downloading queue items from cache and sends them.
 func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInput) {
 	logs.Log.Trace(input.ReqID, "start: sendDownloadingQueues", input.Type)
@@ -59,13 +65,14 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 	radarr := c.getDownloadingItemsRadarr(ctx)
 	readarr := c.getDownloadingItemsReadarr(ctx)
 	sonarr := c.getDownloadingItemsSonarr(ctx)
+	sportarr := c.getDownloadingItemsSportarr(ctx)
 	msg := ""
 
-	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() {
+	if lidarr.Empty() && radarr.Empty() && readarr.Empty() && sonarr.Empty() && sportarr.Empty() {
 		if c.empty { // We already sent an empty payload, so don't send another.
 			logs.Log.Debugf(input.ReqID, "[%s requested] No Downloading Items found; "+
-				"Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-				input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len())
+				"Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d, Sportarr: %d",
+				input.Type, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len(), sportarr.Len())
 			return
 		}
 
@@ -81,13 +88,14 @@ func (c *cmd) sendDownloadingQueues(ctx context.Context, input *common.ActionInp
 		Event:      input.Type,
 		LogPayload: true,
 		ErrorsOnly: !logs.Log.DebugEnabled(),
-		LogMsg: fmt.Sprintf("Downloading Items;%s Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d",
-			msg, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len()),
+		LogMsg: fmt.Sprintf("Downloading Items;%s Lidarr: %d, Radarr: %d, Readarr: %d, Sonarr: %d, Sportarr: %d",
+			msg, lidarr.Len(), radarr.Len(), readarr.Len(), sonarr.Len(), sportarr.Len()),
 		Payload: &QueuesPaylod{
-			Lidarr:  lidarr,
-			Radarr:  radarr,
-			Readarr: readarr,
-			Sonarr:  sonarr,
+			Lidarr:   lidarr,
+			Radarr:   radarr,
+			Readarr:  readarr,
+			Sonarr:   sonarr,
+			Sportarr: sportarr,
 		},
 	})
 }
@@ -434,4 +442,89 @@ func (c *cmd) rangeDownloadingItemsSonarr(
 	}
 
 	return sonarrQueue
+}
+
+func (c *cmd) getDownloadingItemsSportarr(ctx context.Context) itemList {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: getDownloadingItemsSportarr")
+	defer logs.Log.Trace(reqID, "end: getDownloadingItemsSportarr")
+
+	items := make(itemList)
+
+	info := clientinfo.Get()
+	if info == nil {
+		return items
+	}
+
+	for idx, app := range c.Apps.Sportarr {
+		instance := idx + 1
+		if !app.Enabled() || !info.Actions.Apps.Sportarr.Finished(instance) {
+			continue
+		}
+
+		cacheItem := data.GetWithID("sportarr", idx)
+		if cacheItem == nil || cacheItem.Data == nil {
+			continue
+		}
+
+		queue, _ := cacheItem.Data.(*sonarr.Queue)
+		sportarrQueue := c.rangeDownloadingItemsSportarr(ctx, idx, &app, queue.Records)
+		items[instance] = listItem{Name: app.Name, Queue: sportarrQueue, Total: len(sportarrQueue)}
+	}
+
+	return items
+}
+
+func (c *cmd) rangeDownloadingItemsSportarr(
+	ctx context.Context,
+	idx int,
+	app *apps.Sportarr,
+	records []*sonarr.QueueRecord,
+) []*sportarrRecord {
+	reqID := logs.Log.Trace(mnd.GetID(ctx), "start: rangeDownloadingItemsSportarr", idx, app.Name)
+	defer logs.Log.Trace(reqID, "end: rangeDownloadingItemsSportarr", idx, app.Name)
+
+	// Pre-allocate with capacity based on max payload size to reduce allocations.
+	sportarrQueue := make([]*sportarrRecord, 0, maxQueuePayloadSize)
+	// repeatStomper is used to collapse duplicate download IDs.
+	repeatStomper := make(map[string]struct{}, maxQueuePayloadSize)
+
+	for _, item := range records {
+		if len(sportarrQueue) >= maxQueuePayloadSize {
+			break
+		}
+
+		// Delay items have no download ID, so group (de-duplicate) them by size.
+		if item.DownloadID == "" {
+			item.DownloadID = fmt.Sprint(item.Size)
+		}
+
+		_, exists := repeatStomper[item.DownloadID]
+		if s := strings.ToLower(item.Status); s != downloading || exists {
+			continue
+		}
+
+		// We have to connect back to the starr app and pull meta data for the active downloading item.
+		// The data gets cached for a while so this extra api hit should only happen once for each item.
+		cacheItem := data.GetWithID(fmt.Sprint("sportarrSeries", item.SeriesID), idx)
+		if cacheItem == nil || cacheItem.Data == nil {
+			series, err := app.GetSeriesByIDContext(ctx, item.SeriesID)
+			if err != nil {
+				logs.Log.Errorf(reqID, "Getting data for downloading item: %v", err)
+				cacheItem = &cache.Item{Data: &sonarr.Series{}} //nolint:wsl
+			} else {
+				data.SaveWithID(fmt.Sprint("sportarrSeries", item.SeriesID), idx, series)
+				cacheItem = &cache.Item{Data: series}
+			}
+		}
+
+		series, _ := cacheItem.Data.(*sonarr.Series)
+		repeatStomper[item.DownloadID] = struct{}{}
+		sportarrQueue = append(sportarrQueue, &sportarrRecord{ //nolint:wsl
+			QueueRecord:     item,
+			Name:            series.Title,
+			ForeignSeriesID: series.TvdbID,
+		})
+	}
+
+	return sportarrQueue
 }

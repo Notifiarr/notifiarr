@@ -590,6 +590,7 @@
                 "placeholder": ""
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Prowlarr": {
             "title": "",
             "addInstance": "",

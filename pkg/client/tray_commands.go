@@ -111,6 +111,17 @@ func (c *Client) displayConfig() string { //nolint: funlen,cyclop
 		}
 	}
 
+	if count := len(c.Config.Sportarr); count == 1 {
+		out.WriteString(fmt.Sprintf("\n- Sportarr Config: 1 server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+			c.Config.Sportarr[0].URL, c.Config.Sportarr[0].APIKey != "", c.Config.Sportarr[0].Timeout,
+			c.Config.Sportarr[0].ValidSSL))
+	} else {
+		for _, f := range c.Config.Sportarr {
+			out.WriteString(fmt.Sprintf("\n- Sportarr Server: %s, apikey:%v, timeout:%v, verify ssl:%v",
+				f.URL, f.APIKey != "", f.Timeout, f.ValidSSL))
+		}
+	}
+
 	return out.String() + "\n"
 }
 

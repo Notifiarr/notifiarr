@@ -687,6 +687,36 @@
         "placeholder": "password"
       }
     },
+    "Sportarr": {
+      "title": "Sportarr",
+      "addInstance": "Add Sportarr Instance",
+      "name": {
+        "label": "Instance Name",
+        "description": "Name of the Sportarr instance.",
+        "placeholder": "custom name for notifications"
+      },
+      "url": {
+        "label": "URL",
+        "description": "URL of the Sportarr instance.",
+        "placeholder": "http://sportarr.server.tv:1867"
+      },
+      "apiKey": {
+        "label": "API Key",
+        "description": "API key for the Sportarr instance.",
+        "placeholder": "sportarr-api-key"
+      },
+      "username": {
+        "label": "Username",
+        "description": "Username for the Sportarr instance.",
+        "placeholder": "admin",
+        "tooltip": "You only need a username and password if you want to check database backups since those cannot be downloaded through the API."
+      },
+      "password": {
+        "label": "Password",
+        "description": "Password for the Sportarr instance.",
+        "placeholder": "password"
+      }
+    },
     "Readarr": {
       "title": "Readarr",
       "addInstance": "Add Readarr Instance",
@@ -1380,6 +1410,11 @@
         "button": "Sync all Sonarr instances",
         "success": "Sonarr profile and format sync initiated."
       },
+      "TrigCFSyncSportarr": {
+        "label": "Sportarr profile and format sync",
+        "button": "Sync all Sportarr instances",
+        "success": "Sportarr profile and format sync initiated."
+      },
       "TrigStop": { "label": "Client reloads", "button": "Reload client" },
       "TrigSnapshot": {
         "label": "Snapshot collection",
@@ -1411,6 +1446,11 @@
         "button": "Check Sonarr",
         "success": "Sonarr database corruption check initiated."
       },
+      "TrigSportarrCorrupt": {
+        "label": "Sportarr database corruption",
+        "button": "Check Sportarr",
+        "success": "Sportarr database corruption check initiated."
+      },
       "TrigProwlarrBackup": {
         "label": "Prowlarr database backups",
         "button": "Check Prowlarr",
@@ -1436,6 +1476,11 @@
         "button": "Check Sonarr",
         "success": "Sonarr database backups check initiated."
       },
+      "TrigSportarrBackup": {
+        "label": "Sportarr database backups",
+        "button": "Check Sportarr",
+        "success": "Sportarr database backups check initiated."
+      },
       "TrigUpCheck": { "label": "Client to website up-check" },
       "TrigEndpointURL": {
         "label": "Endpoint URL relayed to website: {name}",
@@ -1451,6 +1496,7 @@
       "TrigCFSyncLidarrInt": { "label": "Lidarr custom format sync per instance" },
       "TrigCFSyncRadarrInt": { "label": "Radarr custom format sync per instance" },
       "TrigCFSyncSonarrInt": { "label": "Sonarr custom format sync per instance" },
+      "TrigCFSyncSportarrInt": { "label": "Sportarr custom format sync per instance" },
       "TrigCustomCronTimer": {
         "label": "Website timer: {name}",
         "button": "Run Timer Now",
@@ -1461,6 +1507,7 @@
       "TrigRadarrQueue": { "label": "Radarr queue cacher" },
       "TrigReadarrQueue": { "label": "Readarr queue cacher" },
       "TrigSonarrQueue": { "label": "Sonarr queue cacher" },
+      "TrigSportarrQueue": { "label": "Sportarr queue cacher" },
       "TrigStuckItems": {
         "label": "Stuck items check",
         "button": "Check for stuck items",
@@ -1622,6 +1669,7 @@
     "radarrDashboard": { "title": "Raw Radarr Dashboard" },
     "readarrDashboard": { "title": "Raw Readarr Dashboard" },
     "sonarrDashboard": { "title": "Raw Sonarr Dashboard" },
+    "sportarrDashboard": { "title": "Raw Sportarr Dashboard" },
     "delugeDashboard": { "title": "Raw Deluge Dashboard" },
     "nzbgetDashboard": { "title": "Raw NZBGet Dashboard" },
     "qbitDashboard": { "title": "Raw QBit Dashboard" },
@@ -1629,6 +1677,7 @@
     "transmissionDashboard": { "title": "Raw Transmission Dashboard" },
     "sabnzbdDashboard": { "title": "Raw SabNZBD Dashboard" },
     "sonarrQueue": { "title": "Raw Sonarr Queue" },
+    "sportarrQueue": { "title": "Raw Sportarr Queue" },
     "radarrQueue": { "title": "Raw Radarr Queue" },
     "readarrQueue": { "title": "Raw Readarr Queue" },
     "lidarrQueue": { "title": "Raw Lidarr Queue" },
@@ -1636,6 +1685,7 @@
     "radarrStatus": { "title": "Raw Radarr Info" },
     "readarrStatus": { "title": "Raw Readarr Info" },
     "sonarrStatus": { "title": "Raw Sonarr Info" },
+    "sportarrStatus": { "title": "Raw Sportarr Info" },
     "lidarrStatus": { "title": "Raw Lidarr Info" },
     "tautulliStatus": { "title": "Raw Tautulli Info" },
     "tautulliUsers": { "title": "Tautulli Users" },

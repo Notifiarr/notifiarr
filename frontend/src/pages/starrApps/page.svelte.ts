@@ -4,6 +4,7 @@ import { deepCopy } from '../../includes/util'
 import type { StarrConfig } from '../../api/notifiarrConfig'
 import { profile } from '../../api/profile.svelte'
 import sonarrLogo from '../../assets/logos/sonarr.png'
+import sportarrLogo from '../../assets/logos/sportarr.png'
 import radarrLogo from '../../assets/logos/radarr.png'
 import readarrLogo from '../../assets/logos/readarr.png'
 import lidarrLogo from '../../assets/logos/lidarr.png'
@@ -36,11 +37,12 @@ export const starrConfig: StarrConfig = {
 }
 
 export class Starr {
-  static readonly tabs = ['sonarr', 'radarr', 'readarr', 'lidarr', 'prowlarr']
+  static readonly tabs = ['sonarr', 'sportarr', 'radarr', 'readarr', 'lidarr', 'prowlarr']
 
   static get title(): Record<string, string> {
     return {
       Sonarr: get(_)('StarrApps.Sonarr.title'),
+      Sportarr: get(_)('StarrApps.Sportarr.title'),
       Radarr: get(_)('StarrApps.Radarr.title'),
       Readarr: get(_)('StarrApps.Readarr.title'),
       Lidarr: get(_)('StarrApps.Lidarr.title'),
@@ -58,6 +60,21 @@ export class Starr {
       const c = deepCopy(get(profile).config)
       if (!c.sonarr) c.sonarr = []
       c.sonarr[index] = form
+      return c
+    },
+    validator,
+  }
+
+  static readonly Sportarr: App<StarrConfig> = {
+    name: 'Sportarr',
+    id: page.id + '.Sportarr',
+    envPrefix: 'SPORTARR',
+    logo: sportarrLogo,
+    empty: starrConfig,
+    merge: (index: number, form: StarrConfig) => {
+      const c = deepCopy(get(profile).config)
+      if (!c.sportarr) c.sportarr = []
+      c.sportarr[index] = form
       return c
     },
     validator,

@@ -292,6 +292,28 @@ version = {{.Version}}
 #api_key   = ""
 
 
+{{end}}{{if .Sportarr}}{{range .Sportarr}}[[sportarr]]
+  name     = '''{{.Name}}'''
+  url      = '''{{.URL}}'''
+  api_key  = '''{{.APIKey}}'''{{if .Username}}
+  username = '''{{.Username}}'''
+  password = '''{{.Password}}'''{{end}}{{if .HTTPUser}}
+  http_user = '''{{.HTTPUser}}'''
+  http_pass = '''{{.HTTPPass}}'''{{end}}
+  interval = "{{.Interval}}" # Service check duration (if name is not empty).
+  timeout  = "{{.Timeout}}"
+  deletes  = {{.Deletes}}
+  {{- if .ValidSSL}}
+  valid_ssl = true
+  {{- end}}
+
+{{end}}
+{{else}}#[[sportarr]]
+#name      = ""  # Set a name to enable checks of your service.
+#url       = "http://sportarr:1867/"
+#api_key   = ""
+
+
 {{end -}}
 
 # Download Client Configs (below) are used for dashboard state and service checks.
@@ -504,7 +526,7 @@ version = {{.Version}}
 
 ## Uncomment the following section to create a service check on a URL or IP:port.
 ## You may include as many [[service]] sections as you have services to check.
-## Do not add Radarr, Sonarr, Readarr, Prowlarr, or Lidarr here! Add a name to enable their checks.
+## Do not add Radarr, Sonarr, Sportarr, Readarr, Prowlarr, or Lidarr here! Add a name to enable their checks.
 ##
 ## Example with comments follows.
 #[[service]]

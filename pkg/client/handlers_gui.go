@@ -565,6 +565,7 @@ func (c *Client) handleInstanceCheck(response http.ResponseWriter, request *http
 func (c *Client) handleCheckAll(response http.ResponseWriter, request *http.Request) {
 	input := &checkapp.CheckAllInput{
 		Sonarr:       c.Config.Sonarr,
+		Sportarr:     c.Config.Sportarr,
 		Radarr:       c.Config.Radarr,
 		Readarr:      c.Config.Readarr,
 		Lidarr:       c.Config.Lidarr,
@@ -835,6 +836,12 @@ type Integrations struct {
 		Queue     []*sonarr.Queue        `json:"queue"`
 		QueueAge  []time.Time            `json:"queueAge"`
 	} `json:"sonarr"`
+	Sportarr struct {
+		Status    []*sonarr.SystemStatus `json:"status"`
+		StatusAge []time.Time            `json:"statusAge"`
+		Queue     []*sonarr.Queue        `json:"queue"`
+		QueueAge  []time.Time            `json:"queueAge"`
+	} `json:"sportarr"`
 	Prowlarr struct {
 		Status    []*prowlarr.SystemStatus `json:"status"`
 		StatusAge []time.Time              `json:"statusAge"`
@@ -861,16 +868,20 @@ func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.
 	integrations.Readarr.Queue = make([]*readarr.Queue, len(c.apps.Readarr))
 	integrations.Sonarr.Status = make([]*sonarr.SystemStatus, len(c.apps.Sonarr))
 	integrations.Sonarr.Queue = make([]*sonarr.Queue, len(c.apps.Sonarr))
+	integrations.Sportarr.Status = make([]*sonarr.SystemStatus, len(c.apps.Sportarr))
+	integrations.Sportarr.Queue = make([]*sonarr.Queue, len(c.apps.Sportarr))
 	integrations.Prowlarr.Status = make([]*prowlarr.SystemStatus, len(c.apps.Prowlarr))
 	integrations.Lidarr.StatusAge = make([]time.Time, len(c.apps.Lidarr))
 	integrations.Radarr.StatusAge = make([]time.Time, len(c.apps.Radarr))
 	integrations.Readarr.StatusAge = make([]time.Time, len(c.apps.Readarr))
 	integrations.Sonarr.StatusAge = make([]time.Time, len(c.apps.Sonarr))
+	integrations.Sportarr.StatusAge = make([]time.Time, len(c.apps.Sportarr))
 	integrations.Prowlarr.StatusAge = make([]time.Time, len(c.apps.Prowlarr))
 	integrations.Lidarr.QueueAge = make([]time.Time, len(c.apps.Lidarr))
 	integrations.Radarr.QueueAge = make([]time.Time, len(c.apps.Radarr))
 	integrations.Readarr.QueueAge = make([]time.Time, len(c.apps.Readarr))
 	integrations.Sonarr.QueueAge = make([]time.Time, len(c.apps.Sonarr))
+	integrations.Sportarr.QueueAge = make([]time.Time, len(c.apps.Sportarr))
 
 	if item := data.Get("snapshot"); item != nil {
 		integrations.SnapshotAge = item.Time
@@ -950,6 +961,8 @@ func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.
 		}
 	}
 
+	c.fillSportarrIntegrations(integrations)
+
 	for idx := range c.apps.Prowlarr {
 		if item := data.GetWithID("prowlarrStatus", idx); item != nil {
 			integrations.Prowlarr.StatusAge[idx] = item.Time
@@ -959,6 +972,23 @@ func (c *Client) handleIntegrations(response http.ResponseWriter, request *http.
 
 	if err := json.NewEncoder(response).Encode(integrations); err != nil {
 		logs.Log.Errorf(mnd.GetID(request.Context()), "Encoding integrations: %v", err)
+	}
+}
+
+// fillSportarrIntegrations reads the cached Sportarr status and queue for
+// every configured instance. Split out of handleIntegrations to keep that
+// function's cognitive complexity in check.
+func (c *Client) fillSportarrIntegrations(integrations Integrations) {
+	for idx := range c.apps.Sportarr {
+		if item := data.GetWithID("sportarrStatus", idx); item != nil {
+			integrations.Sportarr.StatusAge[idx] = item.Time
+			integrations.Sportarr.Status[idx], _ = item.Data.(*sonarr.SystemStatus)
+		}
+
+		if item := data.GetWithID("sportarr", idx); item != nil {
+			integrations.Sportarr.QueueAge[idx] = item.Time
+			integrations.Sportarr.Queue[idx], _ = item.Data.(*sonarr.Queue)
+		}
 	}
 }
 

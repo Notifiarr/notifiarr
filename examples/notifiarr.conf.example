@@ -153,6 +153,12 @@ version = 1
 #api_key   = ""
 
 
+#[[sportarr]]
+#name      = ""  # Set a name to enable checks of your service.
+#url       = "http://sportarr:1867/"
+#api_key   = ""
+
+
 # Download Client Configs (below) are used for dashboard state and service checks.
 
 #[[deluge]]
@@ -261,7 +267,7 @@ version = 1
 
 ## Uncomment the following section to create a service check on a URL or IP:port.
 ## You may include as many [[service]] sections as you have services to check.
-## Do not add Radarr, Sonarr, Readarr, Prowlarr, or Lidarr here! Add a name to enable their checks.
+## Do not add Radarr, Sonarr, Sportarr, Readarr, Prowlarr, or Lidarr here! Add a name to enable their checks.
 ##
 ## Example with comments follows.
 #[[service]]

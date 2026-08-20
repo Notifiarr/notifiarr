@@ -48,6 +48,7 @@ func (c *cmd) create(reqID string) {
 	info := clientinfo.Get()
 	c.setupRadarr(info)
 	c.setupSonarr(info)
+	c.setupSportarr(info)
 	c.setupLidarr(info)
 
 	// Check each instance and enable only if needed.
@@ -60,6 +61,11 @@ func (c *cmd) create(reqID string) {
 		if len(info.Actions.Sync.SonarrInstances) > 0 {
 			mnd.Log.Printf(reqID, "==> Sonarr TRaSH Sync: interval: %s, %s ",
 				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.SonarrSync, ", "))
+		}
+
+		if len(info.Actions.Sync.SportarrInstances) > 0 {
+			mnd.Log.Printf(reqID, "==> Sportarr TRaSH Sync: interval: %s, %s ",
+				info.Actions.Sync.Interval, strings.Join(info.Actions.Sync.SportarrSync, ", "))
 		}
 
 		if len(info.Actions.Sync.LidarrInstances) > 0 {
@@ -78,6 +84,11 @@ func (c *cmd) create(reqID string) {
 		Name: TrigCFSyncSonarr,
 		Key:  "TrigCFSyncSonarr",
 		Fn:   c.syncSonarr,
+		C:    make(chan *common.ActionInput, 1),
+	}, &common.Action{
+		Name: TrigCFSyncSportarr,
+		Key:  "TrigCFSyncSportarr",
+		Fn:   c.syncSportarr,
 		C:    make(chan *common.ActionInput, 1),
 	}, &common.Action{
 		Name: TrigCFSyncLidarr,
@@ -187,6 +198,41 @@ func (c *cmd) setupSonarr(info *clientinfo.ClientInfo) {
 			D:    dur,
 			Name: TrigCFSyncSonarrInt.WithInstance(instance),
 			Fn:   (&sonarrApp{app: &app, cmd: c, idx: idx}).syncSonarr,
+			C:    make(chan *common.ActionInput, 1),
+		})
+	}
+}
+
+type sportarrApp struct {
+	app *apps.Sportarr
+	cmd *cmd
+	idx int
+}
+
+func (c *cmd) setupSportarr(info *clientinfo.ClientInfo) {
+	if info == nil {
+		return
+	}
+
+	for idx, app := range c.Apps.Sportarr {
+		instance := idx + 1
+		if !app.Enabled() || !info.Actions.Sync.SportarrInstances.Has(instance) {
+			continue
+		}
+
+		var dur cnfg.Duration
+
+		if info.Actions.Sync.Interval.Duration > 0 {
+			randomTime := time.Duration(c.Config.Rand().Intn(randomMilliseconds)) * time.Millisecond
+			dur = cnfg.Duration{Duration: info.Actions.Sync.Interval.Duration + randomTime}
+		}
+
+		c.Add(&common.Action{
+			Key:  "TrigCFSyncSportarrInt",
+			Hide: true,
+			D:    dur,
+			Name: TrigCFSyncSportarrInt.WithInstance(instance),
+			Fn:   (&sportarrApp{app: &app, cmd: c, idx: idx}).syncSportarr,
 			C:    make(chan *common.ActionInput, 1),
 		})
 	}

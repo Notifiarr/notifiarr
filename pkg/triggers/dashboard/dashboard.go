@@ -99,6 +99,7 @@ type States struct {
 	Radarr   []*State `json:"radarr"`
 	Readarr  []*State `json:"readarr"`
 	Sonarr   []*State `json:"sonarr"`
+	Sportarr []*State `json:"sportarr"`
 	NZBGet   []*State `json:"nzbget"`
 	RTorrent []*State `json:"rtorrent"`
 	Qbit     []*State `json:"qbit"`
@@ -180,6 +181,7 @@ func (c *Cmd) getStates(ctx context.Context) *States {
 		Radarr:   c.getRadarrStates(ctx),
 		Readarr:  c.getReadarrStates(ctx),
 		Sonarr:   c.getSonarrStates(ctx),
+		Sportarr: c.getSportarrStates(ctx),
 		SabNZB:   c.getSabNZBStates(ctx),
 		Xmission: c.getTransmissionStates(ctx),
 		Plex:     sessions,
