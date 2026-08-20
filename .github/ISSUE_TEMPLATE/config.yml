@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Notifiarr Discord
+    url: https://notifiarr.com/discord
+    about: For support, questions, and general help, please join our Discord server.
+  - name: Notifiarr Wiki
+    url: https://notifiarr.wiki
+    about: Client installation, configuration, and troubleshooting documentation.
