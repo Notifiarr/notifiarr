@@ -1407,7 +1407,7 @@ export interface SnapshotConfig extends Plugins {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Plugins>
  */
 export interface Plugins {
-  nvidia: NvidiaConfig;
+  nvidia?: NvidiaConfig;
   mysql?: MySQLConfig[];
 };
 

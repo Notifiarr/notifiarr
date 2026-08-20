@@ -141,6 +141,10 @@ func (c *Config) Validate() {
 	if mnd.IsDocker || !mnd.IsLinux {
 		c.IOTop = 0
 	}
+
+	if c.Nvidia.BusIDs == nil {
+		c.Nvidia.BusIDs = []string{}
+	}
 }
 
 // GetSnapshot returns a system snapshot based on requested data in the config.

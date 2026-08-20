@@ -61,7 +61,8 @@ export class SnapshotApps {
     empty: { busIDs: [''], smiPath: '', disabled: false },
     merge: (index: number, form: NvidiaConfig) => {
       const c = deepCopy(get(profile).config)
-      c.snapshot.nvidia = form
+      if (!c.snapshot) c.snapshot = { nvidia: form } as typeof c.snapshot
+      else c.snapshot.nvidia = form
       return c
     },
   }

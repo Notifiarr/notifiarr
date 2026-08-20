@@ -12,17 +12,29 @@
 </script>
 
 <script lang="ts">
-  if (!$profile.config.snapshot.nvidia.busIDs?.length) {
-    $profile.config.snapshot.nvidia.busIDs = ['']
+  const emptyNvidia = App.nvidiaApp.empty ?? {
+    busIDs: [''],
+    smiPath: '',
+    disabled: false,
+  }
+  if ($profile.config.snapshot) {
+    $profile.config.snapshot.nvidia ??= { ...emptyNvidia }
+    if (!$profile.config.snapshot.nvidia.busIDs?.length) {
+      $profile.config.snapshot.nvidia.busIDs = ['']
+    }
   }
 
   let flt = $derived({
-    MySQL: new FormListTracker($profile.config.snapshot.mysql ?? [], App.mysqlApp),
-    Nvidia: new FormListTracker([$profile.config.snapshot.nvidia], App.nvidiaApp),
+    MySQL: new FormListTracker($profile.config.snapshot?.mysql ?? [], App.mysqlApp),
+    Nvidia: new FormListTracker(
+      [$profile.config.snapshot?.nvidia ?? { ...emptyNvidia }],
+      App.nvidiaApp,
+    ),
   })
 
   async function submit() {
     const c = { ...$profile.config }
+    c.snapshot ??= { nvidia: emptyNvidia } as typeof c.snapshot
     c.snapshot.mysql = flt.MySQL.instances
     c.snapshot.nvidia = flt.Nvidia.instances[0]
     await profile.writeConfig(c)
