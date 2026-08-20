@@ -21,7 +21,7 @@ import (
 
 // AppsConfig is the input configuration to relay requests to Starr apps.
 //
-//nolint:lll
+//nolint:lll,revive // Maybe it stutters, oh well.
 type AppsConfig struct {
 	BaseConfig
 	Sonarr       []StarrConfig    `json:"sonarr,omitempty"       toml:"sonarr"       xml:"sonarr"       yaml:"sonarr,omitempty"`
@@ -107,79 +107,79 @@ var (
 // CheckURLs validates the configuration for each app.
 func CheckURLs(config *AppsConfig) error { //nolint:cyclop,gocognit,funlen
 	for idx, app := range config.Lidarr {
-		if err := checkUrl(app.URL, starr.Lidarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Lidarr.String(), idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Prowlarr {
-		if err := checkUrl(app.URL, starr.Prowlarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Prowlarr.String(), idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Radarr {
-		if err := checkUrl(app.URL, starr.Radarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Radarr.String(), idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Readarr {
-		if err := checkUrl(app.URL, starr.Readarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Readarr.String(), idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Sonarr {
-		if err := checkUrl(app.URL, starr.Sonarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Sonarr.String(), idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Deluge {
-		if err := checkUrl(app.URL, "Deluge", idx); err != nil {
+		if err := checkURL(app.URL, "Deluge", idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Rtorrent {
-		if err := checkUrl(app.URL, "Rtorrent", idx); err != nil {
+		if err := checkURL(app.URL, "Rtorrent", idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.SabNZB {
-		if err := checkUrl(app.URL, "SabNZB", idx); err != nil {
+		if err := checkURL(app.URL, "SabNZB", idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.NZBGet {
-		if err := checkUrl(app.URL, "NZBGet", idx); err != nil {
+		if err := checkURL(app.URL, "NZBGet", idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Qbit {
-		if err := checkUrl(app.URL, "Qbit", idx); err != nil {
+		if err := checkURL(app.URL, "Qbit", idx); err != nil {
 			return err
 		}
 	}
 
 	for idx, app := range config.Transmission {
-		if err := checkUrl(app.URL, "Transmission", idx); err != nil {
+		if err := checkURL(app.URL, "Transmission", idx); err != nil {
 			return err
 		}
 	}
 
 	if config.Tautulli.URL != "" {
-		if err := checkUrl(config.Tautulli.URL, "Tautulli", 0); err != nil {
+		if err := checkURL(config.Tautulli.URL, "Tautulli", 0); err != nil {
 			return err
 		}
 	}
 
 	if config.Plex.URL != "" {
-		if err := checkUrl(config.Plex.URL, "Plex", 0); err != nil {
+		if err := checkURL(config.Plex.URL, "Plex", 0); err != nil {
 			return err
 		}
 	}
@@ -295,7 +295,7 @@ func apiError(backupCode int, msg string, err error) (int, error) {
 	return backupCode, fmt.Errorf("%s: %w", msg, err)
 }
 
-func checkUrl(appURL, app string, idx int) error {
+func checkURL(appURL, app string, idx int) error {
 	if appURL == "" {
 		return fmt.Errorf("%w: missing url: %s config %d", ErrInvalidApp, app, idx+1)
 	} else if !strings.HasPrefix(appURL, "http://") && !strings.HasPrefix(appURL, "https://") {

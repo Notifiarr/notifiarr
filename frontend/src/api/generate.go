@@ -78,7 +78,7 @@ func main() {
 		client.ServicesConfig{},
 		client.ProfilePost{},
 		commands.Stats{},
-		apps.ApiResponse{},
+		apps.APIResponse{},
 		checkapp.CheckAllOutput{},
 		client.BrowseDir{},
 	)

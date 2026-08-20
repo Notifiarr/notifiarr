@@ -71,7 +71,7 @@ func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
 	for idx := range a.Lidarr {
 		app := &a.Lidarr[idx]
 
-		if err := checkUrl(app.URL, starr.Lidarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Lidarr.String(), idx); err != nil {
 			return nil, err
 		}
 

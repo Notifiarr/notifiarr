@@ -72,7 +72,7 @@ func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
 
 	for idx := range a.Radarr {
 		app := &a.Radarr[idx]
-		if err := checkUrl(app.URL, starr.Radarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Radarr.String(), idx); err != nil {
 			return nil, err
 		}
 

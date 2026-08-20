@@ -55,7 +55,7 @@ func (a *AppsConfig) setupReadarr() ([]Readarr, error) {
 
 	for idx := range a.Readarr {
 		app := &a.Readarr[idx]
-		if err := checkUrl(app.URL, starr.Readarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Readarr.String(), idx); err != nil {
 			return nil, err
 		}
 

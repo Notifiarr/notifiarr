@@ -1249,7 +1249,7 @@ func (c *Client) indexPage(_ context.Context, response http.ResponseWriter, requ
 // handleAPIKey allows updating the API key from the GUI without a password.
 // This method is only enabled if the API Key is not 36 characters long.
 func (c *Client) handleAPIKey(respond http.ResponseWriter, request *http.Request) {
-	err := website.TestApiKey(request.Context(), request.Header.Get("X-Api-Key"))
+	err := website.TestAPIKey(request.Context(), request.Header.Get("X-Api-Key"))
 	if err != nil {
 		http.Error(respond, err.Error(), http.StatusInternalServerError)
 		return

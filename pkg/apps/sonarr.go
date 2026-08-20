@@ -80,7 +80,7 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 
 	for idx := range a.Sonarr {
 		app := &a.Sonarr[idx]
-		if err := checkUrl(app.URL, starr.Sonarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Sonarr.String(), idx); err != nil {
 			return nil, err
 		}
 

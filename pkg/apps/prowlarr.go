@@ -32,7 +32,7 @@ func (a *AppsConfig) setupProwlarr() ([]Prowlarr, error) {
 
 	for idx := range a.Prowlarr {
 		app := &a.Prowlarr[idx]
-		if err := checkUrl(app.URL, starr.Prowlarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Prowlarr.String(), idx); err != nil {
 			return nil, err
 		}
 

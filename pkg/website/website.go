@@ -317,8 +317,8 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 	return &resp, nil
 }
 
-// TestApiKey tests if the API key is valid.
-func TestApiKey(ctx context.Context, apiKey string) error {
+// TestAPIKey tests if the API key is valid.
+func TestAPIKey(ctx context.Context, apiKey string) error {
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: TestApiKey")
 	defer mnd.Log.Trace(reqID, "end: TestApiKey")
 

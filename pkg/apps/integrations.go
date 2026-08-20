@@ -124,7 +124,7 @@ func (a *AppsConfig) setupDeluge() ([]Deluge, error) {
 
 	for idx := range a.Deluge {
 		app := &a.Deluge[idx]
-		if err := checkUrl(app.URL, "Deluge", idx); err != nil {
+		if err := checkURL(app.URL, "Deluge", idx); err != nil {
 			return nil, err
 		}
 
@@ -197,7 +197,7 @@ func (c *SabNZBConfig) Setup(maxBody, index int) (*SabNZB, error) {
 	var client *http.Client
 
 	c.URL = strings.TrimRight(c.URL, "/")
-	if err := checkUrl(c.URL, "SABnzbd", index); err != nil {
+	if err := checkURL(c.URL, "SABnzbd", index); err != nil {
 		return nil, err
 	}
 
@@ -239,7 +239,7 @@ func (a *AppsConfig) setupQbit() ([]Qbit, error) {
 
 	for idx := range a.Qbit {
 		app := &a.Qbit[idx]
-		if err := checkUrl(app.URL, "qBittorrent", idx); err != nil {
+		if err := checkURL(app.URL, "qBittorrent", idx); err != nil {
 			return nil, err
 		}
 
@@ -300,7 +300,7 @@ func (a *AppsConfig) setupRtorrent() ([]Rtorrent, error) {
 
 	for idx := range a.Rtorrent {
 		app := &a.Rtorrent[idx]
-		if err := checkUrl(app.URL, "rTorrent", idx); err != nil {
+		if err := checkURL(app.URL, "rTorrent", idx); err != nil {
 			return nil, err
 		}
 
@@ -362,7 +362,7 @@ func (a *AppsConfig) setupNZBGet() ([]NZBGet, error) {
 
 	for idx := range a.NZBGet {
 		app := &a.NZBGet[idx]
-		if err := checkUrl(app.URL, "NZBGet", idx); err != nil {
+		if err := checkURL(app.URL, "NZBGet", idx); err != nil {
 			return nil, err
 		}
 
@@ -419,7 +419,7 @@ func (a *AppsConfig) setupTransmission() ([]Xmission, error) {
 
 	for idx := range a.Transmission {
 		app := &a.Transmission[idx]
-		if err := checkUrl(app.URL, "Transmission", idx); err != nil {
+		if err := checkURL(app.URL, "Transmission", idx); err != nil {
 			return nil, err
 		}
 
