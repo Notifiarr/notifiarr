@@ -46,18 +46,18 @@ func (s *server) debughttplog(
 }
 
 // readBodyForLog truncates the response body, or not, for the debug log. errors are ignored.
-func readBodyForLog(body io.Reader, max int64) (string, int64) {
+func readBodyForLog(body io.Reader, truncateAt int64) (string, int64) {
 	if body == nil {
 		return "", 0
 	}
 
-	if max > 0 {
-		bodyBytes, _ := io.ReadAll(io.LimitReader(body, max))
+	if truncateAt > 0 {
+		bodyBytes, _ := io.ReadAll(io.LimitReader(body, truncateAt))
 		remaining, _ := io.Copy(io.Discard, body) // finish reading to the end.
 		total := remaining + int64(len(bodyBytes))
 
 		if remaining > 0 {
-			return fmt.Sprintf("%s\n<%d response bytes truncated, max: %d>", string(bodyBytes), remaining, max), total
+			return fmt.Sprintf("%s\n<%d response bytes truncated, max: %d>", string(bodyBytes), remaining, truncateAt), total
 		}
 
 		return string(bodyBytes), total

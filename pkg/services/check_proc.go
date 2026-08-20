@@ -120,7 +120,7 @@ func (s *Service) getProcessResults(ctx context.Context, processes []*process.Pr
 
 // checkProcessCounts validates process check thresholds.
 func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
-	min, max, age, pid := s.getProcessStrings(pids, ages)
+	least, most, age, pid := s.getProcessStrings(pids, ages)
 
 	switch count := len(pids); {
 	case !s.proc.running && count == 0: // not running!
@@ -130,7 +130,7 @@ func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 	case count < s.proc.countMin: // not enough running!
 		return &result{
 			state:  StateCritical,
-			output: &Output{str: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid)},
+			output: &Output{str: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, least, most, age, pid)},
 		}
 	case s.proc.running && count > 0: // running but should not be!
 		return &result{
@@ -140,7 +140,7 @@ func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 	default: // running within thresholds!
 		return &result{
 			state:  StateOK,
-			output: &Output{str: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, min, max, age, pid)},
+			output: &Output{str: fmt.Sprintf("%s: found %d processes; %s%s%s%s", s.Value, count, least, most, age, pid)},
 		}
 	}
 }
@@ -148,16 +148,16 @@ func (s *Service) checkProcessCounts(pids []int32, ages []time.Time) *result {
 // getProcessStrings compiles output strings for a process service check.
 func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (string, string, string, string) {
 	var (
-		min           = "min: 1"
-		max, age, pid string
+		minStr           = "min: 1"
+		maxStr, age, pid string
 	)
 
 	if s.proc.countMin > 0 { // min always exists.
-		min = fmt.Sprintf("min: %d", s.proc.countMin)
+		minStr = fmt.Sprintf("min: %d", s.proc.countMin)
 	}
 
 	if s.proc.countMax > 0 {
-		max = fmt.Sprintf(", max: %d", s.proc.countMax)
+		maxStr = fmt.Sprintf(", max: %d", s.proc.countMax)
 	}
 
 	if len(ages) == 1 && !ages[0].IsZero() {
@@ -174,7 +174,7 @@ func (s *Service) getProcessStrings(pids []int32, ages []time.Time) (string, str
 		pid += strconv.Itoa(int(activePid))
 	}
 
-	return min, max, age, pid
+	return minStr, maxStr, age, pid
 }
 
 // getProcInfo returns age and cli args for a process.
