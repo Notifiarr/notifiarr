@@ -119,7 +119,7 @@ type Partition struct {
 }
 
 // Validate makes sure the snapshot configuration is valid.
-func (c *Config) Validate() {
+func (c *Config) Validate() { //nolint:cyclop
 	switch {
 	case c.Timeout.Duration == 0:
 		c.Timeout.Duration = DefaultTimeout
@@ -140,6 +140,10 @@ func (c *Config) Validate() {
 
 	if mnd.IsDocker || !mnd.IsLinux {
 		c.IOTop = 0
+	}
+
+	if c.Nvidia.BusIDs == nil {
+		c.Nvidia.BusIDs = []string{}
 	}
 }
 
