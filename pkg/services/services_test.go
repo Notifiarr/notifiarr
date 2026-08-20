@@ -189,3 +189,120 @@ func TestStopCancelsInFlightHTTP(t *testing.T) {
 
 	svc.Stop() // no-op Stop must not hang or log as a fresh shutdown
 }
+
+func waitFinished(t *testing.T, done <-chan struct{}) {
+	t.Helper()
+
+	select {
+	case <-done:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for service checker lifecycle")
+	}
+}
+
+func TestRunningAndStopDoNotDeadlock(t *testing.T) {
+	t.Parallel()
+
+	svc := services.New(&services.Config{Disabled: true})
+	svc.Start(t.Context(), "")
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+
+		for range 100 {
+			_ = svc.Running()
+		}
+	}()
+
+	time.Sleep(10 * time.Millisecond)
+	svc.Stop()
+	waitFinished(t, done)
+}
+
+func TestRunCheckAndStopDoNotDeadlock(t *testing.T) {
+	t.Parallel()
+
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		writer.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(server.Close)
+
+	svc := services.New(&services.Config{Disabled: true})
+	require.NoError(t, svc.Add([]services.ServiceConfig{{
+		Name:     "web",
+		Type:     services.CheckHTTP,
+		Value:    server.URL,
+		Timeout:  cnfg.Duration{Duration: time.Second},
+		Interval: cnfg.Duration{Duration: time.Minute},
+	}}))
+	svc.Start(t.Context(), "")
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+
+		for range 50 {
+			_ = svc.RunCheck(t.Context(), website.EventAPI, "web")
+			svc.RunChecks(&common.ActionInput{Type: "log", ReqID: "race"})
+		}
+	}()
+
+	time.Sleep(10 * time.Millisecond)
+	svc.Stop()
+	waitFinished(t, done)
+}
+
+func TestAddAfterEmptyStartCanRunCheck(t *testing.T) {
+	t.Parallel()
+
+	started := make(chan struct{})
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		close(started)
+		writer.WriteHeader(http.StatusOK)
+	}))
+	t.Cleanup(server.Close)
+
+	svc := services.New(&services.Config{Disabled: true})
+	svc.Start(t.Context(), "")
+	t.Cleanup(svc.Stop)
+
+	require.NoError(t, svc.Add([]services.ServiceConfig{{
+		Name:     "late",
+		Type:     services.CheckHTTP,
+		Value:    server.URL,
+		Timeout:  cnfg.Duration{Duration: time.Second},
+		Interval: cnfg.Duration{Duration: time.Minute},
+	}}))
+	require.NoError(t, svc.RunCheck(t.Context(), website.EventAPI, "late"))
+
+	select {
+	case <-started:
+	case <-time.After(2 * time.Second):
+		t.Fatal("check queued after empty Start never ran; worker pool was empty")
+	}
+}
+
+func TestConcurrentStartAndStop(t *testing.T) {
+	t.Parallel()
+
+	for range 10 {
+		svc := services.New(&services.Config{Disabled: true})
+		require.NoError(t, svc.Add([]services.ServiceConfig{{
+			Name:    "web",
+			Type:    services.CheckTCP,
+			Value:   "127.0.0.1:9",
+			Timeout: cnfg.Duration{Duration: 50 * time.Millisecond},
+		}}))
+
+		done := make(chan struct{})
+		go func() {
+			svc.Start(t.Context(), "")
+			close(done)
+		}()
+
+		svc.Stop()
+		waitFinished(t, done)
+		svc.Stop()
+	}
+}

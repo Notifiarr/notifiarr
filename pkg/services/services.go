@@ -56,18 +56,58 @@ func (s *Services) add(svc *ServiceConfig) {
 }
 
 func (s *Services) setParallel() {
-	count := len(s.services)
-	if count == 0 {
-		s.parallel = 0
-		return
-	}
-
-	s.parallel = uint(count / svcsPerThread)
+	s.parallel = uint(len(s.services) / svcsPerThread)
 	if s.parallel < 1 {
 		s.parallel = 1
 	} else if s.parallel > maxParallel {
 		s.parallel = maxParallel
 	}
+}
+
+func sendLive[T any](live chan T, val T, stopped <-chan struct{}) bool {
+	if live == nil || stopped == nil {
+		return false
+	}
+
+	select {
+	case live <- val:
+		return true
+	case <-stopped:
+		return false
+	}
+}
+
+func (s *Services) beginLifecycle(cancel context.CancelFunc) {
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
+
+	s.cancel = cancel
+	s.stopped = make(chan struct{})
+	s.stopping = false
+	s.checks = make(chan *Service, DefaultBuffer)
+	s.done = make(chan bool, s.parallel)
+	s.actionChan = make(chan action, actionBuf)
+	s.replyChan = make(chan bool, controlBuf)
+	s.triggerChan = make(chan *common.ActionInput, controlBuf)
+	s.checkChan = make(chan triggerCheck, controlBuf)
+}
+
+func (s *Services) launchChecker(ctx context.Context) bool {
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
+
+	if s.stopping || ctx.Err() != nil {
+		close(s.stopped)
+		return false
+	}
+
+	for range s.parallel {
+		go s.watchServiceChan(ctx)
+	}
+
+	go s.runServiceChecker(ctx)
+
+	return true
 }
 
 // Start begins the service check routines.
@@ -84,26 +124,14 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	}
 
 	s.applyLocalOverrides(plexName)
-	s.loadServiceStates(mnd.GetID(ctx))
 
 	ctx, cancel := context.WithCancel(ctx)
+	s.beginLifecycle(cancel)
+	s.loadServiceStates(mnd.GetID(ctx))
 
-	s.stopLock.Lock()
-	s.cancel = cancel
-	s.stopped = make(chan struct{})
-	s.checks = make(chan *Service, DefaultBuffer)
-	s.done = make(chan bool, s.parallel)
-	s.actionChan = make(chan action, actionBuf)
-	s.replyChan = make(chan bool, controlBuf)
-	s.triggerChan = make(chan *common.ActionInput, controlBuf)
-	s.checkChan = make(chan triggerCheck, controlBuf)
-
-	for range s.parallel {
-		go s.watchServiceChan(ctx)
+	if !s.launchChecker(ctx) {
+		return
 	}
-
-	go s.runServiceChecker(ctx)
-	s.stopLock.Unlock()
 
 	word := "Started"
 	if s.Disabled || len(s.services) == 0 {
@@ -298,16 +326,20 @@ func (s *Services) Running() bool {
 	s.stopLock.Lock()
 	actionChan := s.actionChan
 	replyChan := s.replyChan
+	stopped := s.stopped
 	stopping := s.stopping
 	s.stopLock.Unlock()
 
-	if actionChan == nil || stopping {
+	if actionChan == nil || stopping || !sendLive(actionChan, actionCheck, stopped) {
 		return false
 	}
 
-	actionChan <- actionCheck
-
-	return <-replyChan
+	select {
+	case running := <-replyChan:
+		return running
+	case <-stopped:
+		return false
+	}
 }
 
 func (s *Services) Pause() {
@@ -321,12 +353,15 @@ func (s *Services) Resume() {
 func (s *Services) sendAction(act action) {
 	s.stopLock.Lock()
 	actionChan := s.actionChan
+	stopped := s.stopped
 	stopping := s.stopping
 	s.stopLock.Unlock()
 
-	if actionChan != nil && !stopping {
-		actionChan <- act
+	if actionChan == nil || stopping {
+		return
 	}
+
+	sendLive(actionChan, act, stopped)
 }
 
 // Stop ends all service checker routines.
@@ -358,6 +393,7 @@ func (s *Services) Stop() {
 	s.actionChan = nil
 	s.triggerChan = nil
 	s.checkChan = nil
+	s.replyChan = nil
 	s.cancel = nil
 	s.stopped = nil
 	s.stopping = false

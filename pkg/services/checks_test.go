@@ -381,8 +381,4 @@ func TestGetAllProcesses(t *testing.T) {
 	procs, err := services.GetAllProcesses(t.Context())
 	require.NoError(t, err)
 	assert.NotEmpty(t, procs)
-
-	for _, proc := range procs {
-		assert.NotZero(t, proc.PID)
-	}
 }

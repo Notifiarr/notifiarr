@@ -19,26 +19,27 @@ var ErrSvcsStopped = errors.New("service check routine stopped")
 func (s *Services) RunChecks(input *common.ActionInput) {
 	s.stopLock.Lock()
 	triggerChan := s.triggerChan
-	stopped := s.actionChan == nil || s.stopping
+	stopped := s.stopped
+	halted := s.actionChan == nil || s.stopping
 	s.stopLock.Unlock()
 
-	if triggerChan == nil || stopped {
+	if halted || !sendLive(triggerChan, input, stopped) {
 		mnd.Log.Errorf(input.ReqID, "Cannot run service checks. Go routine is not running.")
-		return
 	}
-
-	triggerChan <- input
 }
 
 // RunCheck runs a single check from an external package.
 func (s *Services) RunCheck(ctx context.Context, source website.EventType, name string) error {
 	s.stopLock.Lock()
+
 	checkChan := s.checkChan
+	stopped := s.stopped
 	svc, found := s.services[name]
-	stopped := s.actionChan == nil || s.stopping
+	halted := s.actionChan == nil || s.stopping
+
 	s.stopLock.Unlock()
 
-	if checkChan == nil || stopped {
+	if checkChan == nil || halted || stopped == nil {
 		return fmt.Errorf("cannot check service, %w", ErrSvcsStopped)
 	}
 
@@ -46,9 +47,16 @@ func (s *Services) RunCheck(ctx context.Context, source website.EventType, name 
 		return fmt.Errorf("%w: service '%s' not found", ErrNoName, name)
 	}
 
-	checkChan <- triggerCheck{ReqID: mnd.GetID(ctx), Source: source, Service: svc}
+	event := triggerCheck{ReqID: mnd.GetID(ctx), Source: source, Service: svc}
 
-	return nil
+	select {
+	case checkChan <- event:
+		return nil
+	case <-stopped:
+		return fmt.Errorf("cannot check service, %w", ErrSvcsStopped)
+	case <-ctx.Done():
+		return fmt.Errorf("cannot check service: %w", ctx.Err())
+	}
 }
 
 // runCheck runs a service check if it is due. Passing force runs it regardless.
