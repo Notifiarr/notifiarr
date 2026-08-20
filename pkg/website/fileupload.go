@@ -81,7 +81,7 @@ func (s *server) createFileUpload(file *UploadFile) (*bytes.Buffer, string, erro
 	}
 
 	compress := gzip.NewWriter(fw)
-	compress.Header.Name = file.FileName
+	compress.Name = file.FileName
 
 	// Copy the contents of the file to the form field with compression.
 	if _, err := io.Copy(compress, file); err != nil {

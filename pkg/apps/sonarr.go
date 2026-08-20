@@ -80,20 +80,20 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 
 	for idx := range a.Sonarr {
 		app := &a.Sonarr[idx]
-		if err := checkUrl(app.URL, starr.Sonarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Sonarr.String(), idx); err != nil {
 			return nil, err
 		}
 
 		if mnd.Log.DebugEnabled() {
-			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+			app.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
 				Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 				Caller:  metricMakerCallback(string(starr.Sonarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
 		} else {
-			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Sonarr.String(), app.Config.Client.Transport)
+			app.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			app.Client.Transport = NewMetricsRoundTripper(starr.Sonarr.String(), app.Client.Transport)
 		}
 
 		app.URL = strings.TrimRight(app.URL, "/")
@@ -1456,7 +1456,7 @@ func sonarrDeleteEpisode(req *http.Request) (int, any) {
 	idString := mux.Vars(req)["episodeFileID"]
 	episodeFileID, _ := strconv.ParseInt(idString, mnd.Base10, mnd.Bits64)
 
-	if !getSonarr(req).StarrApp.DelOK() {
+	if !getSonarr(req).DelOK() {
 		return http.StatusLocked, ErrRateLimit
 	}
 

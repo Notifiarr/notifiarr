@@ -332,7 +332,7 @@ func (c *Client) saveTunnels(response http.ResponseWriter, request *http.Request
 
 	ci := clientinfo.Get()
 	ci.User.Tunnels = sockets // pass different data to makeTunnels().
-	tl, _ := c.tunnel.Config.Logger.(*tunnelLogger)
+	tl, _ := c.tunnel.Logger.(*tunnelLogger)
 
 	c.tunnel.Shutdown()
 	c.makeTunnel(tl.ctx, ci) //nolint:contextcheck // these cannot be inherited from the http request.

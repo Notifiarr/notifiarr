@@ -129,12 +129,12 @@ func (c *Client) printLogFileInfo(reqID string) { //nolint:cyclop
 		}
 	}
 
-	if c.Config.Debug && c.Config.LogConfig.DebugLog != "" {
+	if c.Config.Debug && c.Config.DebugLog != "" {
 		if c.Config.LogFiles > 0 {
 			logs.Log.Printf(reqID, " => Debug Log: %s (%d @ %dMb)",
-				c.Config.LogConfig.DebugLog, c.Config.LogFiles, c.Config.LogFileMb)
+				c.Config.DebugLog, c.Config.LogFiles, c.Config.LogFileMb)
 		} else {
-			logs.Log.Printf(reqID, " => Debug Log: %s (no rotation)", c.Config.LogConfig.DebugLog)
+			logs.Log.Printf(reqID, " => Debug Log: %s (no rotation)", c.Config.DebugLog)
 		}
 	}
 
@@ -154,7 +154,7 @@ func (c *Client) printPlex(reqID string) {
 		return
 	}
 
-	name := c.apps.Plex.Server.Name()
+	name := c.apps.Plex.Name()
 	if name == "" {
 		name = "<connection error?>"
 	}
@@ -260,7 +260,7 @@ func (c *Client) printDeluge(reqID string) {
 
 	for i, f := range c.Config.Deluge {
 		logs.Log.Printf(reqID, " =>    Server %d: %s password:%v timeout:%s valid_ssl:%v",
-			i+1, f.Config.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
+			i+1, f.URL, f.Password != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 
@@ -290,7 +290,7 @@ func (c *Client) printNZBGet(reqID string) {
 
 	for i, f := range c.Config.NZBGet {
 		logs.Log.Printf(reqID, " =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
-			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
+			i+1, f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 
@@ -305,7 +305,7 @@ func (c *Client) printQbit(reqID string) {
 
 	for i, f := range c.Config.Qbit {
 		logs.Log.Printf(reqID, " =>    Server %d: %s username:%s password:%v timeout:%s valid_ssl:%v",
-			i+1, f.Config.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
+			i+1, f.URL, f.User, f.Pass != "", cnfg.Duration{Duration: f.Timeout.Duration}, f.ValidSSL)
 	}
 }
 

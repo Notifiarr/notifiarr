@@ -106,8 +106,7 @@ func (c *Config) CopyConfig() (*Config, error) {
 
 	dec := toml.NewDecoder(&buf)
 	if _, err := dec.Decode(&newConfig); err != nil {
-		var parseErr toml.ParseError
-		if errors.As(err, &parseErr) {
+		if parseErr, ok := errors.AsType[toml.ParseError](err); ok {
 			return nil, fmt.Errorf("decoding config from toml for copying (this is a bug!): %w: %s",
 				err, parseErr.ErrorWithUsage())
 		}
@@ -213,7 +212,7 @@ func (c *Config) fixConfig() {
 	}
 
 	// Windows has no stdout, so turn it off.
-	c.LogConfig.Quiet = mnd.IsWindows || c.LogConfig.Quiet
+	c.Quiet = mnd.IsWindows || c.Quiet
 	c.Services.Plugins = &c.Snapshot.Plugins
 }
 
@@ -227,7 +226,7 @@ func (c *Config) setup(ctx context.Context, flag *Flags, svc *services.Services,
 	if ui.HasGUI() {
 		// Setting AppName forces log files (even if not configured).
 		// Used for GUI apps that have no console output.
-		c.LogConfig.AppName = mnd.Title
+		c.AppName = mnd.Title
 	}
 
 	// Ordering.....
@@ -239,7 +238,7 @@ func (c *Config) setup(ctx context.Context, flag *Flags, svc *services.Services,
 		Apps:       apps,
 		Snapshot:   &c.Snapshot,
 		WatchFiles: c.WatchFiles,
-		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
+		LogFiles:   c.GetActiveLogFilePaths(),
 		Commands:   c.Commands,
 		ClientInfo: clientinfo,
 		ConfigFile: flag.ConfigFile,

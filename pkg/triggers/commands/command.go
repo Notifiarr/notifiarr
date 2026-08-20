@@ -149,7 +149,7 @@ func (c *Command) logOutput(input *common.ActionInput, oStr, eStr string, elapse
 	if len(c.lastArg) > 0 {
 		extra.WriteString(", args:")
 		for idx, arg := range c.lastArg {
-			extra.WriteString(fmt.Sprintf(" %d: %q", idx+1, arg))
+			fmt.Fprintf(&extra, " %d: %q", idx+1, arg)
 		}
 	}
 

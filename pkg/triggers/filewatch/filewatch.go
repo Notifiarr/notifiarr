@@ -257,13 +257,13 @@ func (c *cmd) tailFiles(ctx context.Context, cases []reflect.SelectCase, tails [
 			mnd.Log.Errorf(reqID, "Got non-addressable file watcher data from %s", item.Path)
 			mnd.FileWatcher.Add(item.Path+Errors, 1)
 		case idx == 0:
-			item, _ = data.Elem().Addr().Interface().(*WatchFile)
+			item, _ = reflect.TypeAssert[*WatchFile](data.Elem().Addr())
 			tails = append(tails, item)
 			cases = append(cases, reflect.SelectCase{Dir: reflect.SelectRecv, Chan: reflect.ValueOf(item.tail.Lines)})
 		default:
 			mnd.FileWatcher.Add(item.Path+" Lines", 1)
 
-			line, _ := data.Elem().Addr().Interface().(*tail.Line)
+			line, _ := reflect.TypeAssert[*tail.Line](data.Elem().Addr())
 			c.checkLineMatch(reqID, line, item)
 			mnd.FileWatcher.Add(item.Path+" Bytes", int64(len(line.Text)))
 		}

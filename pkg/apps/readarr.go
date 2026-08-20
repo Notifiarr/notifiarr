@@ -55,20 +55,20 @@ func (a *AppsConfig) setupReadarr() ([]Readarr, error) {
 
 	for idx := range a.Readarr {
 		app := &a.Readarr[idx]
-		if err := checkUrl(app.URL, starr.Readarr.String(), idx); err != nil {
+		if err := checkURL(app.URL, starr.Readarr.String(), idx); err != nil {
 			return nil, err
 		}
 
 		if mnd.Log.DebugEnabled() {
-			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+			app.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
 				Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 				Caller:  metricMakerCallback(string(starr.Readarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
 		} else {
-			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), app.Config.Client.Transport)
+			app.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			app.Client.Transport = NewMetricsRoundTripper(starr.Readarr.String(), app.Client.Transport)
 		}
 
 		app.URL = strings.TrimRight(app.URL, "/")

@@ -36,7 +36,7 @@ func (c *cmd) sendSessionPlaying(ctx context.Context, session *plex.Session, ses
 			Load: convertSessionsToWebhook(session, event),
 		},
 		LogMsg: fmt.Sprintf("Plex New Session on %s {%s/%s} %s => %s: %s (%s)",
-			c.Plex.Server.Name(), session.Session.ID, session.SessionKey, session.User.Title,
+			c.Plex.Name(), session.Session.ID, session.SessionKey, session.User.Title,
 			session.Type, session.Title, session.Player.State),
 		LogPayload: true,
 	})

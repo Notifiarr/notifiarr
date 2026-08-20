@@ -36,7 +36,7 @@ func (s *Server) GetSessionsWithContext(ctx context.Context) (*Sessions, error) 
 		sessions = &Sessions{Name: s.name}
 	)
 
-	body, err := s.getPlexURL(ctx, s.Config.URL+"/status/sessions", nil)
+	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions", nil)
 	if err != nil {
 		return sessions, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -59,7 +59,7 @@ func (s *Server) KillSessionWithContext(ctx context.Context, sessionID, reason s
 	params.Add("sessionId", sessionID)
 	params.Add("reason", reason)
 
-	body, err := s.getPlexURL(ctx, s.Config.URL+"/status/sessions/terminate", params)
+	body, err := s.getPlexURL(ctx, s.URL+"/status/sessions/terminate", params)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -76,7 +76,7 @@ func (s *Server) MarkPlayedWithContext(ctx context.Context, key string) ([]byte,
 	params.Add("identifier", "com.plexapp.plugins.library")
 	params.Add("key", key)
 
-	body, err := s.getPlexURL(ctx, s.Config.URL+"/:/scrobble", params)
+	body, err := s.getPlexURL(ctx, s.URL+"/:/scrobble", params)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -90,7 +90,7 @@ func (s *Server) EmptyTrashWithContext(ctx context.Context, libraryKey string) (
 	defer mnd.Log.Trace(reqID, "end: plex.EmptyTrashWithContext", libraryKey)
 
 	// Requires PUT with no data.
-	body, err := s.putPlexURL(ctx, s.Config.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
+	body, err := s.putPlexURL(ctx, s.URL+"/library/sections/"+libraryKey+"/emptyTrash", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("%w: %s", err, string(body))
 	}
@@ -130,12 +130,13 @@ func GetMediaTranscode(mediaList []*Media) []string {
 	)
 
 	for _, stream := range media.Part[0].Stream {
-		if stream.StreamType == 1 {
+		switch stream.StreamType {
+		case 1:
 			videoMsg = stream.DisplayTitle
 			if stream.Decision == "transcode" {
 				videoMsg += fmt.Sprintf(" → %s (%s)", media.VideoResolution, strings.ToUpper(stream.Codec))
 			}
-		} else if stream.StreamType == 2 { //nolint:mnd
+		case 2: //nolint:mnd
 			audioMsg = stream.DisplayTitle
 			if stream.Decision == "transcode" {
 				audioMsg += " → " + strings.ToUpper(stream.Codec)

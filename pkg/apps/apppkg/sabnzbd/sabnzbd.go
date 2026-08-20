@@ -252,7 +252,7 @@ func (s *SabNZB) GetURLInto(ctx context.Context, params url.Values, into any) er
 
 	req.URL.RawQuery = params.Encode()
 
-	resp, err := s.Client.Do(req)
+	resp, err := s.Do(req)
 	if err != nil {
 		return fmt.Errorf("making request: %w", err)
 	}

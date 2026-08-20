@@ -77,7 +77,7 @@ func (s *Server) reqPlexURL(
 	params url.Values,
 	sendData io.Reader,
 ) ([]byte, error) {
-	if s.Config.URL == "" || s.Config.Token == "" {
+	if s.URL == "" || s.Token == "" {
 		return nil, ErrNoURLToken
 	}
 
@@ -87,7 +87,7 @@ func (s *Server) reqPlexURL(
 	}
 
 	req.URL.RawQuery = params.Encode()
-	req.Header.Set("X-Plex-Token", s.Config.Token)
+	req.Header.Set("X-Plex-Token", s.Token)
 	req.Header.Set("Accept", "application/json") // do not add a charset.
 
 	resp, err := s.Client.Do(req)

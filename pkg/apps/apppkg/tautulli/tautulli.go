@@ -41,7 +41,7 @@ func (t *Tautulli) GetURLInto(ctx context.Context, params url.Values, into any) 
 
 		req.URL.RawQuery = params.Encode()
 
-		resp, err := t.Client.Do(req)
+		resp, err := t.Do(req)
 		if err != nil {
 			return fmt.Errorf("making request: %w", err)
 		}

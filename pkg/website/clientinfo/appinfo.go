@@ -117,12 +117,12 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo { //nolint:fun
 	defer mnd.Log.Trace(reqID, "end: Config.Info", startup)
 
 	numPlex := 0 // maybe one day we'll support more than 1 plex.
-	if c.Apps.Plex.Enabled() {
+	if c.Plex.Enabled() {
 		numPlex = 1
 	}
 
 	numTautulli := 0 // maybe one day we'll support more than 1 tautulli.
-	if c.Apps.Tautulli.Enabled() {
+	if c.Tautulli.Enabled() {
 		numTautulli = 1
 	}
 
@@ -156,19 +156,19 @@ func (c *Config) Info(ctx context.Context, startup bool) *AppInfo { //nolint:fun
 			Tunnel:    true, // no toggle for this.
 		},
 		Num: map[string]int{
-			"nzbget":       len(c.Apps.NZBGet),
-			"deluge":       len(c.Apps.Deluge),
-			"lidarr":       len(c.Apps.Lidarr),
+			"nzbget":       len(c.NZBGet),
+			"deluge":       len(c.Deluge),
+			"lidarr":       len(c.Lidarr),
 			"plex":         numPlex,
-			"prowlarr":     len(c.Apps.Prowlarr),
-			"qbit":         len(c.Apps.Qbit),
-			"rtorrent":     len(c.Apps.Rtorrent),
-			"transmission": len(c.Apps.Transmission),
-			"radarr":       len(c.Apps.Radarr),
-			"readarr":      len(c.Apps.Readarr),
+			"prowlarr":     len(c.Prowlarr),
+			"qbit":         len(c.Qbit),
+			"rtorrent":     len(c.Rtorrent),
+			"transmission": len(c.Transmission),
+			"radarr":       len(c.Radarr),
+			"readarr":      len(c.Readarr),
 			"tautulli":     numTautulli,
-			"sabnzbd":      len(c.Apps.SabNZB),
-			"sonarr":       len(c.Apps.Sonarr),
+			"sabnzbd":      len(c.SabNZB),
+			"sonarr":       len(c.Sonarr),
 		},
 		Config: AppInfoConfig{
 			WebsiteTimeout: webconf.Timeout.String(),
@@ -191,23 +191,23 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 		}
 	}
 
-	for i, app := range c.Apps.Lidarr {
+	for i, app := range c.Lidarr {
 		apps.Lidarr = append(apps.Lidarr, add(i, app.Name))
 	}
 
-	for i, app := range c.Apps.Prowlarr {
+	for i, app := range c.Prowlarr {
 		apps.Prowlarr = append(apps.Prowlarr, add(i, app.Name))
 	}
 
-	for i, app := range c.Apps.Radarr {
+	for i, app := range c.Radarr {
 		apps.Radarr = append(apps.Radarr, add(i, app.Name))
 	}
 
-	for i, app := range c.Apps.Readarr {
+	for i, app := range c.Readarr {
 		apps.Readarr = append(apps.Readarr, add(i, app.Name))
 	}
 
-	for i, app := range c.Apps.Sonarr {
+	for i, app := range c.Sonarr {
 		apps.Sonarr = append(apps.Sonarr, add(i, app.Name))
 	}
 
@@ -234,7 +234,7 @@ func (c *Config) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
 		return users, nil
 	}
 
-	users, err := c.Apps.Tautulli.GetUsers(ctx)
+	users, err := c.Tautulli.GetUsers(ctx)
 	if err != nil {
 		return users, fmt.Errorf("tautulli failed: %w", err)
 	}

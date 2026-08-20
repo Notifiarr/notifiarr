@@ -146,7 +146,7 @@ func (c *Client) httpAPIHandlers() {
 		c.apps.HandleAPIpath(starr.Plex, "kill", c.apps.Plex.HandleKillSession, "GET").
 			Queries("reason", "{reason:.*}", "sessionId", "{sessionId:.*}")
 
-		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.AppsConfig.APIKey)
+		tokens := fmt.Sprintf("{token:%s|%s}", c.Config.Plex.Token, c.Config.APIKey)
 		c.apps.Router.HandleFunc("/plex", c.PlexHandler).Methods("POST").Queries("token", tokens)
 		c.apps.Router.HandleFunc("/", c.PlexHandler).Methods("POST").Queries("token", tokens)
 		// Give it an api path to get around some proxies that block /plex.
@@ -190,7 +190,7 @@ func (c *Client) slash(response http.ResponseWriter, request *http.Request) {
 // stripSecrets runs first to save a redacted URI in a special request header.
 // The logger uses this special value to save a redacted URI in the log file.
 func (c *Client) stripSecrets(next http.Handler) http.Handler {
-	secrets := []string{c.Config.AppsConfig.APIKey}
+	secrets := []string{c.Config.APIKey}
 	secrets = append(secrets, c.Config.ExKeys...)
 	// gather configured/known secrets.
 	if c.Config.Plex.Enabled() {

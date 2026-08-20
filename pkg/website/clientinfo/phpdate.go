@@ -13,7 +13,7 @@ type PHPDate struct {
 
 // UnmarshalJSON turns a php date/time format into a golang struct.
 func (p *PHPDate) UnmarshalJSON(b []byte) error {
-	p.PHP = (strings.Trim(string(b), `"`))
+	p.PHP = strings.Trim(string(b), `"`)
 	for _, character := range p.PHP {
 		p.Fmt += flip(string(character))
 	}

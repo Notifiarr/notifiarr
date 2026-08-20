@@ -60,7 +60,7 @@ func (c *PlexConfig) Setup(maxBody int) Plex {
 
 // Enabled returns true if the server is configured, false otherwise.
 func (c *PlexConfig) Enabled() bool {
-	return c != nil && c.Config.URL != "" && c.Config.Token != "" && c.Timeout.Duration >= 0
+	return c != nil && c.URL != "" && c.Token != "" && c.Timeout.Duration >= 0
 }
 
 type TautulliConfig struct {
@@ -124,7 +124,7 @@ func (a *AppsConfig) setupDeluge() ([]Deluge, error) {
 
 	for idx := range a.Deluge {
 		app := &a.Deluge[idx]
-		if err := checkUrl(app.URL, "Deluge", idx); err != nil {
+		if err := checkURL(app.URL, "Deluge", idx); err != nil {
 			return nil, err
 		}
 
@@ -151,8 +151,8 @@ func (c *DelugeConfig) setup(maxBody int) (*deluge.Deluge, error) {
 			Redact:  []string{c.Password, c.HTTPPass},
 		})
 	} else {
-		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("Deluge", c.Config.Client.Transport)
+		c.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
+		c.Client.Transport = NewMetricsRoundTripper("Deluge", c.Client.Transport)
 	}
 
 	deluge, err := deluge.NewNoAuth(&c.Config)
@@ -197,7 +197,7 @@ func (c *SabNZBConfig) Setup(maxBody, index int) (*SabNZB, error) {
 	var client *http.Client
 
 	c.URL = strings.TrimRight(c.URL, "/")
-	if err := checkUrl(c.URL, "SABnzbd", index); err != nil {
+	if err := checkURL(c.URL, "SABnzbd", index); err != nil {
 		return nil, err
 	}
 
@@ -239,7 +239,7 @@ func (a *AppsConfig) setupQbit() ([]Qbit, error) {
 
 	for idx := range a.Qbit {
 		app := &a.Qbit[idx]
-		if err := checkUrl(app.URL, "qBittorrent", idx); err != nil {
+		if err := checkURL(app.URL, "qBittorrent", idx); err != nil {
 			return nil, err
 		}
 
@@ -266,8 +266,8 @@ func (q *QbitConfig) Setup(maxBody int) (*qbit.Qbit, error) {
 			Redact:  []string{q.Pass, q.HTTPPass},
 		})
 	} else {
-		q.Config.Client = starr.Client(q.Timeout.Duration, q.ValidSSL)
-		q.Config.Client.Transport = NewMetricsRoundTripper("qBittorrent", q.Config.Client.Transport)
+		q.Client = starr.Client(q.Timeout.Duration, q.ValidSSL)
+		q.Client.Transport = NewMetricsRoundTripper("qBittorrent", q.Client.Transport)
 	}
 
 	qbit, err := qbit.NewNoAuth(&q.Config)
@@ -300,7 +300,7 @@ func (a *AppsConfig) setupRtorrent() ([]Rtorrent, error) {
 
 	for idx := range a.Rtorrent {
 		app := &a.Rtorrent[idx]
-		if err := checkUrl(app.URL, "rTorrent", idx); err != nil {
+		if err := checkURL(app.URL, "rTorrent", idx); err != nil {
 			return nil, err
 		}
 
@@ -362,7 +362,7 @@ func (a *AppsConfig) setupNZBGet() ([]NZBGet, error) {
 
 	for idx := range a.NZBGet {
 		app := &a.NZBGet[idx]
-		if err := checkUrl(app.URL, "NZBGet", idx); err != nil {
+		if err := checkURL(app.URL, "NZBGet", idx); err != nil {
 			return nil, err
 		}
 
@@ -384,8 +384,8 @@ func (n *NZBGetConfig) Setup(maxBody int) *nzbget.NZBGet {
 			Redact:  []string{n.Pass},
 		})
 	} else {
-		n.Config.Client = starr.Client(n.Timeout.Duration, n.ValidSSL)
-		n.Config.Client.Transport = NewMetricsRoundTripper("NZBGet", n.Config.Client.Transport)
+		n.Client = starr.Client(n.Timeout.Duration, n.ValidSSL)
+		n.Client.Transport = NewMetricsRoundTripper("NZBGet", n.Client.Transport)
 	}
 
 	return nzbget.New(&n.Config)
@@ -419,7 +419,7 @@ func (a *AppsConfig) setupTransmission() ([]Xmission, error) {
 
 	for idx := range a.Transmission {
 		app := &a.Transmission[idx]
-		if err := checkUrl(app.URL, "Transmission", idx); err != nil {
+		if err := checkURL(app.URL, "Transmission", idx); err != nil {
 			return nil, err
 		}
 
