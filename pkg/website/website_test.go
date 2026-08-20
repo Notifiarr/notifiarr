@@ -1,4 +1,4 @@
-package website
+package website //nolint:testpackage
 
 import (
 	"errors"

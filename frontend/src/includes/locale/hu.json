@@ -317,7 +317,7 @@
         "NameMustNotBeEmpty": "",
         "HostMustNotBeEmpty": "",
         "UsernameMustNotBeEmpty": "",
-        "APIKeyMustBeCountCharacters": "",
+        "APIKeyMustBeCountCharactersOrLonger": "",
         "TokenMustBeCountCharacters": "",
         "LeavePage": "",
         "FailedToUpdateBackEnd": "",

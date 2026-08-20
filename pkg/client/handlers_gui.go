@@ -1190,7 +1190,7 @@ func (c *Client) testPostedAPIKey(ctx context.Context, user, apiKey string) erro
 		logs.Log.Errorf(mnd.GetID(ctx), "[gui '%s' requested] Testing API key: %v", user, err)
 
 		if errors.Is(err, website.ErrInvalidAPIKey) {
-			return err
+			return err //nolint:wrapcheck // We want to return this error.
 		}
 
 		return fmt.Errorf("could not reach notifiarr.com to verify API key: %w", err)
