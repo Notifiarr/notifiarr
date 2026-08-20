@@ -21,6 +21,8 @@ import (
 const (
 	svcsPerThread = 10
 	maxParallel   = 10
+	actionBuf     = 2
+	controlBuf    = 1
 )
 
 func (s *Services) Add(services []ServiceConfig) error {
@@ -56,16 +58,6 @@ func (s *Services) add(svc *ServiceConfig) {
 // Start begins the service check routines.
 // Runs Parallel checkers and the check reporter.
 func (s *Services) Start(ctx context.Context, plexName string) {
-	s.stopLock.Lock()
-	defer s.stopLock.Unlock()
-
-	s.checks = make(chan *Service, DefaultBuffer)
-	s.done = make(chan bool)
-	s.actionChan = make(chan action)
-	s.replyChan = make(chan bool)
-	s.triggerChan = make(chan *common.ActionInput)
-	s.checkChan = make(chan triggerCheck)
-
 	if s.parallel = uint(len(s.services) / svcsPerThread); s.parallel < 1 {
 		s.parallel = 1
 	} else if s.parallel > maxParallel {
@@ -83,11 +75,20 @@ func (s *Services) Start(ctx context.Context, plexName string) {
 	s.applyLocalOverrides(plexName)
 	s.loadServiceStates(mnd.GetID(ctx))
 
+	s.stopLock.Lock()
+	s.checks = make(chan *Service, DefaultBuffer)
+	s.done = make(chan bool, s.parallel)
+	s.actionChan = make(chan action, actionBuf)
+	s.replyChan = make(chan bool, controlBuf)
+	s.triggerChan = make(chan *common.ActionInput, controlBuf)
+	s.checkChan = make(chan triggerCheck, controlBuf)
+
 	for range s.parallel {
 		go s.watchServiceChan(ctx)
 	}
 
 	go s.runServiceChecker()
+	s.stopLock.Unlock()
 
 	word := "Started"
 	if s.Disabled || len(s.services) == 0 {
@@ -156,27 +157,31 @@ func (s *Services) loadServiceStates(reqID string) {
 		return
 	}
 
+	saved := make(map[string][]byte, len(values))
+	for siteDataName, data := range values {
+		saved[strings.TrimPrefix(siteDataName, valuePrefix)] = data
+	}
+
 	for name := range s.services {
-		for siteDataName := range values {
-			if name == strings.TrimPrefix(siteDataName, valuePrefix) {
-				var svc Service
-				if err := json.Unmarshal(values[siteDataName], &svc); err != nil {
-					s.log.ErrorfNoShare(reqID, "Service check data for '%s' returned from site is invalid: %v", name, err)
-					break
-				}
+		data, ok := saved[name]
+		if !ok {
+			continue
+		}
 
-				if time.Since(svc.LastCheck) < 2*time.Hour {
-					s.log.Printf(reqID, "==> Set service state with website-saved data: %s, %s for %s",
-						name, svc.State, time.Since(svc.Since).Round(time.Second))
+		var svc Service
+		if err := json.Unmarshal(data, &svc); err != nil {
+			s.log.ErrorfNoShare(reqID, "Service check data for '%s' returned from site is invalid: %v", name, err)
+			continue
+		}
 
-					s.services[name].Output = svc.Output
-					s.services[name].State = svc.State
-					s.services[name].Since = svc.Since
-					s.services[name].LastCheck = svc.LastCheck
-				}
+		if time.Since(svc.LastCheck) < 2*time.Hour {
+			s.log.Printf(reqID, "==> Set service state with website-saved data: %s, %s for %s",
+				name, svc.State, time.Since(svc.Since).Round(time.Second))
 
-				break
-			}
+			s.services[name].Output = svc.Output
+			s.services[name].State = svc.State
+			s.services[name].Since = svc.Since
+			s.services[name].LastCheck = svc.LastCheck
 		}
 	}
 }
@@ -268,31 +273,40 @@ func (s *Services) runServiceChecker() { //nolint:cyclop,funlen
 
 func (s *Services) Running() bool {
 	s.stopLock.Lock()
-	defer s.stopLock.Unlock()
+	actionChan := s.actionChan
+	replyChan := s.replyChan
+	stopping := s.stopping
+	s.stopLock.Unlock()
 
-	s.actionChan <- actionCheck
-	return <-s.replyChan
+	if actionChan == nil || stopping {
+		return false
+	}
+
+	actionChan <- actionCheck
+
+	return <-replyChan
 }
 
 func (s *Services) Pause() {
-	s.stopLock.Lock()
-	defer s.stopLock.Unlock()
-
-	if s.actionChan != nil {
-		s.actionChan <- actionPause
-	}
+	s.sendAction(actionPause)
 }
 
 func (s *Services) Resume() {
-	s.stopLock.Lock()
-	defer s.stopLock.Unlock()
+	s.sendAction(actionResume)
+}
 
-	if s.actionChan != nil {
-		s.actionChan <- actionResume
+func (s *Services) sendAction(act action) {
+	s.stopLock.Lock()
+	actionChan := s.actionChan
+	stopping := s.stopping
+	s.stopLock.Unlock()
+
+	if actionChan != nil && !stopping {
+		actionChan <- act
 	}
 }
 
-// Stop sends current states to the website and ends all service checker routines.
+// Stop ends all service checker routines.
 func (s *Services) Stop() {
 	defer func() {
 		logs.Log.CapturePanic()
@@ -300,26 +314,35 @@ func (s *Services) Stop() {
 	}()
 
 	s.stopLock.Lock()
-	defer s.stopLock.Unlock()
-
-	if s.actionChan == nil {
+	if s.actionChan == nil || s.stopping {
+		s.stopLock.Unlock()
 		return
 	}
 
-	defer close(s.actionChan)
-	s.actionChan <- actionStop
-	<-s.actionChan // wait for all go routines to die off.
+	s.stopping = true
+	actionChan := s.actionChan
+	s.stopLock.Unlock()
 
-	close(s.triggerChan)
-	close(s.checkChan)
-	close(s.checks)
-	close(s.done)
+	actionChan <- actionStop
+	<-actionChan
 
+	s.stopLock.Lock()
+	defer s.stopLock.Unlock()
+
+	s.actionChan = nil
 	s.triggerChan = nil
 	s.checkChan = nil
-	s.checks = nil
-	s.done = nil
-	s.actionChan = nil
+	s.stopping = false
+
+	if s.checks != nil {
+		close(s.checks)
+		s.checks = nil
+	}
+
+	if s.done != nil {
+		close(s.done)
+		s.done = nil
+	}
 }
 
 // SvcCount returns the count of services being monitored.

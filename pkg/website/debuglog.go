@@ -22,7 +22,7 @@ func (s *server) debughttplog(
 
 		for k, vs := range resp.Header {
 			for _, v := range vs {
-				headers.WriteString(k + ": " + v + "\n")
+				fmt.Fprintf(&headers, "%s: %s\n", k, v)
 			}
 		}
 	}

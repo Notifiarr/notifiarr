@@ -18,10 +18,44 @@ import (
 )
 
 const (
-	sslstring   = "SSL" // used for checking HTTPS certs
-	expectdelim = ","   // extra (split) delimiter
-	maxOutput   = 170   // maximum length of output.
+	sslstring           = "SSL" // used for checking HTTPS certs
+	expectdelim         = ","   // extra (split) delimiter
+	maxOutput           = 170   // maximum length of output.
+	drainLimit          = 64 << 10
+	maxIdleConns        = 64
+	maxIdleConnsPerHost = 8
+	idleConnTimeout     = 90 * time.Second
 )
+
+var (
+	httpClientInsecure = newHTTPClient(true)
+	httpClientSecure   = newHTTPClient(false)
+)
+
+func newHTTPClient(insecureSkipVerify bool) *http.Client {
+	return &http.Client{
+		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+		Transport: &http.Transport{
+			Proxy:                 http.ProxyFromEnvironment,
+			TLSClientConfig:       &tls.Config{InsecureSkipVerify: insecureSkipVerify}, //nolint:gosec
+			MaxIdleConns:          maxIdleConns,
+			MaxIdleConnsPerHost:   maxIdleConnsPerHost,
+			IdleConnTimeout:       idleConnTimeout,
+			TLSHandshakeTimeout:   DefaultTimeout,
+			ExpectContinueTimeout: time.Second,
+		},
+	}
+}
+
+func httpClient(validSSL bool) *http.Client {
+	if validSSL {
+		return httpClientSecure
+	}
+
+	return httpClientInsecure
+}
 
 type result struct {
 	output *Output
@@ -156,14 +190,14 @@ func (s *Service) update(reqID string, res *result) bool {
 	return true
 }
 
-// checkHTTPReq builds the client and request for the http service check.
-func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request, error) {
+// checkHTTPReq builds the request for the http service check.
+func (s *Service) checkHTTPReq(ctx context.Context) (*http.Request, error) {
 	// Allow adding headers by appending them after a pipe symbol.
 	splitVal := strings.Split(s.Value, "|")
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, splitVal[0], nil)
 	if err != nil {
-		return nil, nil, err //nolint:wrapcheck // handled by caller
+		return nil, err //nolint:wrapcheck // handled by caller
 	}
 
 	for _, val := range splitVal[1:] {
@@ -177,14 +211,7 @@ func (s *Service) checkHTTPReq(ctx context.Context) (*http.Client, *http.Request
 		}
 	}
 
-	return &http.Client{
-		CheckRedirect: func(_ *http.Request, _ []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-		Timeout: s.Timeout.Duration, Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: !s.validSSL}, //nolint:gosec
-		},
-	}, req, nil
+	return req, nil
 }
 
 func (s *Service) checkHTTP(ctx context.Context) *result {
@@ -194,12 +221,12 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 	}
 
 	if s.Timeout.Duration > 0 {
-		var cancel func()
+		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, s.Timeout.Duration)
 		defer cancel()
 	}
 
-	client, req, err := s.checkHTTPReq(ctx)
+	req, err := s.checkHTTPReq(ctx)
 	if err != nil {
 		res.output = &Output{str: "creating request: " + RemoveSecrets(s.Value, err.Error())}
 		return res
@@ -208,18 +235,12 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 	// If there is an error at this point it's a bad request.
 	res.state = StateCritical
 
-	resp, err := client.Do(req)
+	resp, err := httpClient(s.validSSL).Do(req)
 	if err != nil {
 		res.output = &Output{str: "making request: " + RemoveSecrets(s.Value, err.Error())}
 		return res
 	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		res.output = &Output{str: "reading body: " + RemoveSecrets(s.Value, err.Error())}
-		return res
-	}
+	defer drainAndClose(resp.Body)
 
 	for code := range strings.SplitSeq(s.Expect, expectdelim) {
 		if strconv.Itoa(resp.StatusCode) == strings.TrimSpace(code) {
@@ -230,23 +251,26 @@ func (s *Service) checkHTTP(ctx context.Context) *result {
 		}
 	}
 
-	// Reduce the size of the body before processing it to speed things up on large body outputs.
-	// This avoids expensive string operations (EscapeString, Fields, Join) on large responses.
-	if len(body) > maxOutput+maxOutput {
-		body = body[:maxOutput+maxOutput]
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxOutput+maxOutput))
+	if err != nil {
+		res.output = &Output{str: "reading body: " + RemoveSecrets(s.Value, err.Error())}
+		return res
 	}
 
 	res.state = StateCritical
 	res.output = &Output{esc: true, str: resp.Status + ": " + strings.TrimSpace(
 		html.EscapeString(strings.Join(strings.Fields(RemoveSecrets(s.Value, string(body))), " ")))}
 
-	// Reduce the string to the final max length.
-	// We do it this way so all secrets are properly escaped before string splitting.
 	if len(res.output.str) > maxOutput {
 		res.output.str = res.output.str[:maxOutput]
 	}
 
 	return res
+}
+
+func drainAndClose(body io.ReadCloser) {
+	_, _ = io.Copy(io.Discard, io.LimitReader(body, drainLimit))
+	body.Close()
 }
 
 // RemoveSecrets removes secret token values in a message parsed from a url.

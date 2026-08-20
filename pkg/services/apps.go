@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
+	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"golift.io/cnfg"
 )
@@ -36,7 +37,11 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	svcs = collectMySQLApps(svcs, mysql)
 
 	for _, svc := range svcs {
-		svc.validated = true
+		if err := svc.Validate(); err != nil {
+			mnd.Log.Errorf("called", "Skipping invalid app service check %s: %v", svc.Name, err)
+			continue
+		}
+
 		s.add(svc.ServiceConfig)
 	}
 }
