@@ -8,15 +8,14 @@ linters:
     - nlreturn # Not needed because wsl is good enough; better actually.
     - godot # Does not work with annotations.
     - depguard # Not even sure why this is useful. We have too many deps to care.
-    - gomodguard_v2 # same.
+    - gomodguard # deprecated
     - funcorder # lol no one cares.
     - gochecknoglobals # we use global sparingly, but they are useful.
     - interfacebloat # I'll do what I want with my own interfaces.
-    # fix these.
+    - recvcheck # This is a false positive. Uncomment and check once in a while.
     - gosec
-    - recvcheck
     - wsl_v5
-    - wsl
+    - wsl # deprecated
     - goconst
     - noinlineerr
     - embeddedstructfieldcheck

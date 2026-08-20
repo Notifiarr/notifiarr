@@ -54,7 +54,9 @@ func Restart(ctx context.Context, cmd *Command, waitForPid int) error {
 	waitForPidToExit(waitForPid)
 
 	execCmd := exec.Command(cmd.Path, cmd.Args...) //nolint:noctx // Can't put a context on this. Let it go.
-	if err := execCmd.Start(); err != nil {        //nolint:gosec
+
+	err := execCmd.Start()
+	if err != nil {
 		ui.Error("Restarting Notifiarr client: " + err.Error())
 		return fmt.Errorf("executing command %w", err)
 	}
@@ -114,10 +116,15 @@ func Now(ctx context.Context, u *Command) (string, error) {
 func NowWithContext(ctx context.Context, update *Command) (string, error) {
 	if update.Path == "" {
 		return "", ErrNoPath
-	} else if _, err := os.Stat(update.Path); err != nil {
-		return "", fmt.Errorf("checking path: %w", err)
-	} else if !strings.HasPrefix(update.URL, "http") {
+	}
+
+	if !strings.HasPrefix(update.URL, "http") {
 		return "", ErrInvalidURL
+	}
+
+	_, err := os.Stat(update.Path)
+	if err != nil {
+		return "", fmt.Errorf("checking path: %w", err)
 	}
 
 	backupFile, err := update.replaceFile(ctx)
@@ -128,7 +135,9 @@ func NowWithContext(ctx context.Context, update *Command) (string, error) {
 	mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Triggering Restart: %s %s", update.Path, strings.Join(update.Args, " "))
 
 	cmd := exec.Command(update.Path, update.Args...) //nolint:noctx // Can't put a context on this. Let it go.
-	if err := cmd.Start(); err != nil {              //nolint:gosec
+
+	err = cmd.Start()
+	if err != nil {
 		return backupFile, fmt.Errorf("executing restart command: %w", err)
 	}
 
@@ -162,7 +171,8 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 	backupFile += ".backup." + time.Now().Format(backupTimeFormat) + suff
 	mnd.Log.Printf(mnd.GetID(ctx), "[UPDATE] Renaming %s => %s", u.Path, backupFile)
 
-	if err := os.Rename(u.Path, backupFile); err != nil {
+	err = os.Rename(u.Path, backupFile)
+	if err != nil {
 		return backupFile, fmt.Errorf("renaming original file: %w", err)
 	}
 
@@ -170,7 +180,8 @@ func (u *Command) replaceFile(ctx context.Context) (string, error) {
 
 	u.cleanOldBackups(ctx)
 
-	if err := os.Rename(tempFile, u.Path); err != nil {
+	err = os.Rename(tempFile, u.Path)
+	if err != nil {
 		return backupFile, fmt.Errorf("renaming downloaded file: %w", err)
 	}
 
@@ -203,21 +214,28 @@ func (u *Command) writeFile(ctx context.Context, folderPath string) (string, err
 func (u *Command) decompressFile(ctx context.Context, tempFile *os.File, resp io.Reader, size int64) error {
 	switch {
 	case strings.Contains(u.URL, ".zip?stamp"), strings.HasSuffix(u.URL, ".zip"):
-		if body, err := io.ReadAll(resp); err != nil {
+		body, err := io.ReadAll(resp)
+		if err != nil {
 			return fmt.Errorf("reading file from URL: %w", err)
-		} else if err := u.writeZipFile(ctx, tempFile, body, size); err != nil {
+		}
+
+		err = u.writeZipFile(ctx, tempFile, body, size)
+		if err != nil {
 			return err
 		}
 	case strings.Contains(u.URL, ".gz?stamp"), strings.HasSuffix(u.URL, ".gz"):
-		if err := u.writeGZipFile(tempFile, resp); err != nil {
+		err := u.writeGZipFile(tempFile, resp)
+		if err != nil {
 			return err
 		}
 	case strings.Contains(u.URL, ".bz2?stamp"), strings.HasSuffix(u.URL, ".bz2"):
-		if _, err := io.Copy(tempFile, bzip2.NewReader(resp)); err != nil {
+		_, err := io.Copy(tempFile, bzip2.NewReader(resp))
+		if err != nil {
 			return fmt.Errorf("bzunzipping temporary file: %w", err)
 		}
 	default:
-		if _, err := io.Copy(tempFile, resp); err != nil {
+		_, err := io.Copy(tempFile, resp)
+		if err != nil {
 			return fmt.Errorf("writing temporary file: %w", err)
 		}
 	}
@@ -232,7 +250,8 @@ func (u *Command) writeGZipFile(tempFile *os.File, resp io.Reader) error {
 	}
 	defer gzFile.Close()
 
-	if _, err := io.Copy(tempFile, gzFile); err != nil { //nolint:gosec
+	_, err = io.Copy(tempFile, gzFile)
+	if err != nil {
 		return fmt.Errorf("gunzipping temporary file: %w", err)
 	}
 
@@ -259,7 +278,8 @@ func (u *Command) writeZipFile(ctx context.Context, tempFile *os.File, body []by
 			}
 			defer zipOpen.Close()
 
-			if _, err := io.Copy(tempFile, zipOpen); err != nil { //nolint:gosec
+			_, err = io.Copy(tempFile, zipOpen)
+			if err != nil {
 				return fmt.Errorf("unzipping temporary file: %w", err)
 			}
 
