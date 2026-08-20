@@ -145,6 +145,10 @@ func isJunkMount(mount string) bool {
 		return true
 	}
 
+	if strings.HasPrefix(mount, "/run/media/") || mount == "/run/media" {
+		return false
+	}
+
 	return strings.HasPrefix(mount, "/proc") ||
 		strings.HasPrefix(mount, "/sys") ||
 		strings.HasPrefix(mount, "/dev/") ||

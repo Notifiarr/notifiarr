@@ -139,6 +139,14 @@ func TestIsNetworkDevice(t *testing.T) {
 	assert.False(t, isNetworkDevice("systemd-1"))
 }
 
+func TestIsJunkMountKeepsRemovableMedia(t *testing.T) {
+	t.Parallel()
+
+	assert.False(t, isJunkMount("/run/media/user/USB"))
+	assert.True(t, isJunkMount("/run/docker.sock"))
+	assert.True(t, isJunkMount("/etc/hosts"))
+}
+
 func TestSkipPartitionDoesNotTreatNodevAsNoDevice(t *testing.T) {
 	t.Parallel()
 
