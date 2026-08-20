@@ -13,6 +13,10 @@
   import T from '../../includes/Translate.svelte'
   import type { Props } from '../../includes/Fa.svelte'
 
+  const invalidAPIKey = $derived(
+    $profile.apiKeyValid === false && $profile.config?.apiKey?.length === 36,
+  )
+
   let icon: Props = { i: faUserAlt, c1: 'green', c2: 'lightgreen', d2: 'white' }
 
   if ($profile.clientInfo?.user?.subscriber) {
@@ -37,31 +41,37 @@
 
 <Table>
   <tbody>
-    <tr>
-      <th><T id="system.UserInformation.Patron" /></th>
-      <td>{$profile.clientInfo?.user?.patron ? 'Yes' : 'No'}</td>
-    </tr>
-    <tr>
-      <th><T id="system.UserInformation.Subscriber" /></th>
-      <td>{$profile.clientInfo?.user?.subscriber ? 'Yes' : 'No'}</td>
-    </tr>
-    {#if $profile.clientInfo?.user?.subscriber}
+    {#if invalidAPIKey}
       <tr>
-        <th><T id="system.UserInformation.AbsoluteBadAss" /></th>
-        <td><T id="system.UserInformation.YesYesYouAre" /></td>
+        <td colspan="2"><T id="system.UserInformation.InvalidAPIKey" /></td>
       </tr>
-    {:else if $profile.clientInfo?.user?.patron}
+    {:else}
       <tr>
-        <th><T id="system.UserInformation.HellaAwesome" /></th>
-        <td><T id="system.UserInformation.YoureSoGifted" /></td>
+        <th><T id="system.UserInformation.Patron" /></th>
+        <td>{$profile.clientInfo?.user?.patron ? 'Yes' : 'No'}</td>
+      </tr>
+      <tr>
+        <th><T id="system.UserInformation.Subscriber" /></th>
+        <td>{$profile.clientInfo?.user?.subscriber ? 'Yes' : 'No'}</td>
+      </tr>
+      {#if $profile.clientInfo?.user?.subscriber}
+        <tr>
+          <th><T id="system.UserInformation.AbsoluteBadAss" /></th>
+          <td><T id="system.UserInformation.YesYesYouAre" /></td>
+        </tr>
+      {:else if $profile.clientInfo?.user?.patron}
+        <tr>
+          <th><T id="system.UserInformation.HellaAwesome" /></th>
+          <td><T id="system.UserInformation.YoureSoGifted" /></td>
+        </tr>
+      {/if}
+      <tr>
+        <th><T id="system.UserInformation.DateFormat" /></th>
+        <td>
+          {$profile.clientInfo?.user.dateFormat.fmt}
+          from {$profile.clientInfo?.user.dateFormat.php}
+        </td>
       </tr>
     {/if}
-    <tr>
-      <th><T id="system.UserInformation.DateFormat" /></th>
-      <td>
-        {$profile.clientInfo?.user.dateFormat.fmt}
-        from {$profile.clientInfo?.user.dateFormat.php}
-      </td>
-    </tr>
   </tbody>
 </Table>

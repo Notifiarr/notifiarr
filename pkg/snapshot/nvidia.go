@@ -9,7 +9,6 @@ import (
 	"os/exec"
 	"reflect"
 	"runtime"
-	"slices"
 	"strconv"
 	"strings"
 
@@ -38,11 +37,25 @@ type NvidiaOutput struct {
 
 // HasID returns true if the ID is requested, or no IDs are filtered.
 func (n *NvidiaConfig) HasID(busID string) bool {
-	if slices.Contains(n.BusIDs, busID) {
+	if n == nil {
 		return true
 	}
 
-	return len(n.BusIDs) == 0 || n.BusIDs[0] == ""
+	filtered := false
+
+	for _, id := range n.BusIDs {
+		if id == "" {
+			continue
+		}
+
+		if id == busID {
+			return true
+		}
+
+		filtered = true
+	}
+
+	return !filtered
 }
 
 // GetNvidia requires nvidia-smi executable and Nvidia drivers.

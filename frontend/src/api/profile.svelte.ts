@@ -78,18 +78,27 @@ class ConfigProfile {
   }
 
   /** Use trustProfile to update the authZ/authN configuration on the backend and reload. */
-  public async trustProfile(form: ProfilePost) {
+  public async trustProfile(form: ProfilePost): Promise<boolean> {
     this.status = get(_)('phrases.SavingConfiguration')
     this.error = ''
+    this.formError = ''
     this.updated = null
-    form.password = CryptoJS.MD5(form.password).toString()
-    form.newPass = CryptoJS.MD5(form.newPass).toString()
 
-    const { ok, body } = await postUi('profile', JSON.stringify(form), false)
+    const payload = { ...form }
+    if (payload.password) payload.password = CryptoJS.MD5(payload.password).toString()
+    if (payload.newPass) payload.newPass = CryptoJS.MD5(payload.newPass).toString()
 
-    if (!ok) this.formError = this.error = body
-    else await this.waitForReload()
+    const { ok, body } = await postUi('profile', JSON.stringify(payload), false)
+
+    if (!ok) {
+      this.status = ''
+      this.formError = this.error = body
+      return false
+    }
+
+    await this.waitForReload()
     this.status = ''
+    return true
   }
 
   /** Use writeConfig to update a partial configuration on the backend and reload. */
@@ -101,7 +110,7 @@ class ConfigProfile {
     // Merge whatever was provided with the existing config.
     const newConfig = { ...get(this.profile).config, ...config }
     // Send the config to the server using postUi.
-    const { ok, body } = await postUi('reconfig', JSON.stringify(newConfig), false)
+    const { ok, body } = await postUi('reconfig', JSON.stringify(newConfig), false, 20000)
     // If it's an error, set the error message, and exit.
     if (!ok) {
       this.status = ''

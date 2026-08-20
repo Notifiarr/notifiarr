@@ -4,6 +4,7 @@ package main
 import (
 	"log"
 	"runtime/debug"
+	_ "time/tzdata" // so TZ= works without distro tzdata (Alpine/Docker).
 
 	"github.com/Notifiarr/notifiarr/pkg/client"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"

@@ -22,8 +22,8 @@ import (
 // @Produce		json
 // @Accept			json
 // @Param			request	body		TrashAggInput									true	"list of instances"
-// @Success		200		{object}	apps.ApiResponse{message=[]RadarrTrashPayload}	"contains app info included appStatus"
-// @Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
+// @Success		200		{object}	apps.APIResponse{message=[]RadarrTrashPayload}	"contains app info included appStatus"
+// @Failure		400		{object}	apps.APIResponse{message=string}				"bad input payload or missing app"
 // @Failure		404		{object}	string											"bad token or api key"
 // @Router			/trash/radarr [post]
 // @Security		ApiKeyAuth
@@ -35,8 +35,8 @@ func _() {}
 // @Produce		json
 // @Accept			json
 // @Param			request	body		TrashAggInput									true	"list of instances"
-// @Success		200		{object}	apps.ApiResponse{message=[]LidarrTrashPayload}	"contains app info included appStatus"
-// @Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
+// @Success		200		{object}	apps.APIResponse{message=[]LidarrTrashPayload}	"contains app info included appStatus"
+// @Failure		400		{object}	apps.APIResponse{message=string}				"bad input payload or missing app"
 // @Failure		404		{object}	string											"bad token or api key"
 // @Router			/trash/lidarr [post]
 // @Security		ApiKeyAuth
@@ -50,8 +50,8 @@ func _() {}
 //	@Produce		json
 //	@Accept			json
 //	@Param			request	body		TrashAggInput									true	"list of instances"
-//	@Success		200		{object}	apps.ApiResponse{message=[]SonarrTrashPayload}	"contains app info included appStatus"
-//	@Failure		400		{object}	apps.ApiResponse{message=string}				"bad input payload or missing app"
+//	@Success		200		{object}	apps.APIResponse{message=[]SonarrTrashPayload}	"contains app info included appStatus"
+//	@Failure		400		{object}	apps.APIResponse{message=string}				"bad input payload or missing app"
 //	@Failure		404		{object}	string											"bad token or api key"
 //	@Router			/trash/sonarr [post]
 //	@Security		ApiKeyAuth

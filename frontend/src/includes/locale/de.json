@@ -24,7 +24,7 @@
         "Every3Hours": "",
         "ConfirmReloadBody": "Willst du den Client wirklich neu laden?",
         "ReloadSuccess": "",
-        "APIKeyMustBeCountCharacters": "API-Schlüssel muss {count} Zeichen oder länger sein.",
+        "APIKeyMustBeCountCharactersOrLonger": "API-Schlüssel muss {count} Zeichen oder länger sein.",
         "TokenMustBeCountCharacters": "",
         "Reloading": "",
         "FailedToReload": "",

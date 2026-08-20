@@ -42,7 +42,7 @@
         "ConfirmReload": "",
         "HostMustNotBeEmpty": "",
         "UsernameMustNotBeEmpty": "",
-        "APIKeyMustBeCountCharacters": "",
+        "APIKeyMustBeCountCharactersOrLonger": "",
         "TokenMustBeCountCharacters": "",
         "LeavePage": "",
         "LoginHelpBody": ""

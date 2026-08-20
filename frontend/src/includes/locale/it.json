@@ -1142,7 +1142,7 @@
         "HostMustNotBeEmpty": "Host non può essere vuoto.",
         "UsernameMustNotBeEmpty": "Username non può essere vuoto.",
         "NameInUseByInstance": "Questo nome è in uso dall'istanza {number}.",
-        "APIKeyMustBeCountCharacters": "La chiave API deve essere composta da {count} caratteri o più.",
+        "APIKeyMustBeCountCharactersOrLonger": "La chiave API deve essere composta da {count} caratteri o più.",
         "TokenMustBeCountCharacters": "Token deve essere di {count} caratteri o più lungo.",
         "LeavePage": "Vuoi lasciare questa pagina?",
         "Landing": {

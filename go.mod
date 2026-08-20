@@ -1,6 +1,6 @@
 module github.com/Notifiarr/notifiarr
 
-go 1.26.6
+go 1.27.0
 
 require (
 	github.com/BurntSushi/toml v1.6.0
@@ -47,7 +47,7 @@ require (
 	golift.io/goty v0.0.4
 	golift.io/mulery v0.0.11
 	golift.io/nzbget v0.1.6
-	golift.io/qbit v0.0.0-20250523235126-41e80ebf0c7a
+	golift.io/qbit v0.0.0-20260820074458-65c1b2bfc5c7
 	golift.io/rotatorr v0.0.0-20260217050959-f6ac6fc7b38e
 	golift.io/starr v1.3.1
 	golift.io/version v0.0.2

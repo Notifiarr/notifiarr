@@ -19,6 +19,7 @@
   import Footer from '../../includes/Footer.svelte'
   import { onMount } from 'svelte'
   import Header from './Header.svelte'
+  import { nav } from '../../navigation/nav.svelte'
 
   // Form state, this is what we're sending to the backend.
   const form = $state({
@@ -27,15 +28,23 @@
     authType: $profile?.upstreamType || Auth.password,
     upstreams: $profile?.config.upstreams?.join(' ') || '',
     newPass: '',
-    header: $profile?.config.uiPassword.startsWith('webauth:')
-      ? $profile?.config.uiPassword.split(':')[1]
-      : '',
+    header: $profile?.upstreamHeader || '',
   })
+
+  // Native <select> may stringify enum values; keep comparisons numeric.
+  const authType = $derived(Number(form.authType) as Auth)
+  const origUpstreams = $derived($profile?.config.upstreams?.join(' ') || '')
+  const reservedUser = $derived(
+    form.username == 'webauth' ||
+      form.username == 'noauth' ||
+      form.username == 'website' ||
+      form.username.includes(':'),
+  )
 
   async function submit(e: Event) {
     e.preventDefault()
-    await profile.trustProfile(form)
-    form.newPass = form.password = ''
+    const ok = await profile.trustProfile({ ...form, authType })
+    if (ok) form.newPass = form.password = ''
   }
 
   function addit(e: Event) {
@@ -46,31 +55,34 @@
   }
 
   // Clear the status messages when the component unmounts.
-  onMount(() => () => profile.clearStatus())
+  onMount(() => () => {
+    profile.clearStatus()
+    nav.formChanged = false
+  })
+
+  $effect(() => {
+    nav.formChanged =
+      authType !== $profile?.upstreamType ||
+      form.upstreams !== origUpstreams ||
+      form.header !== ($profile?.upstreamHeader || '') ||
+      form.username !== ($profile?.username || '') ||
+      !!form.newPass
+  })
 
   const saveDisabled = $derived(
-    // If current auth type is password/website, make sure their password is entered.
+    // Current password/website auth requires the current password to save.
     ([Auth.password, Auth.website].includes($profile?.upstreamType) &&
       (!form.password || form.password.length < 5)) ||
-      // If selected auth type is password and they entered a new password, make sure it's at least 9 characters.
-      (form.authType === Auth.password && form.newPass && form.newPass.length < 9) ||
-      // If they changed the auth type to password from something else, make sure they entered a new password.
-      (form.authType === Auth.password &&
+      // New local password must be at least 9 characters when provided.
+      (authType === Auth.password && form.newPass.length > 0 && form.newPass.length < 9) ||
+      // Switching to password requires a new password and a usable username.
+      (authType === Auth.password &&
         $profile?.upstreamType !== Auth.password &&
         form.newPass.length < 9) ||
-      // Make sure they picked a header if header auth type is selected.
-      (form.authType === Auth.header && !form.header) ||
-      // Make sure they didn't enter a username that's not allowed.
-      form.username == 'webauth' ||
-      form.username == 'noauth' ||
-      form.username == 'website' ||
-      form.username.includes(':') ||
-      // Make sure the auth type changed, or upstreams changed.
-      (form.authType === Auth.noauth &&
-        $profile?.upstreamType === Auth.noauth &&
-        form.upstreams === $profile?.upstreamIp) ||
-      // Enable the save button.
-      false,
+      (authType === Auth.password && (!form.username || reservedUser)) ||
+      // Header auth requires a header; noauth may omit it.
+      (authType === Auth.header && !form.header) ||
+      !nav.formChanged,
   )
 </script>
 
@@ -112,7 +124,7 @@
 
     <!-- Authentication Section -->
     <h4>{$_('profile.title.Authentication')}</h4>
-    {#if [Auth.password, Auth.website].includes(form.authType)}
+    {#if authType === Auth.header || authType === Auth.noauth}
       <Row>
         <Col md={8}>
           <Input id="profile.header" type="select" bind:value={form.header}>
@@ -135,7 +147,7 @@
           </Input>
         </Col>
       </Row>
-    {:else if form.authType !== Auth.website}
+    {:else if authType === Auth.password}
       <Row>
         <Col md={8}>
           <Input

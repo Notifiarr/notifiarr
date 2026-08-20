@@ -41,6 +41,10 @@
   import { age, delay } from '../includes/util'
   import Reload from './Reload.svelte'
   import Shutdown from './Shutdown.svelte'
+
+  const invalidAPIKey = $derived(
+    $profile.apiKeyValid === false && $profile.config?.apiKey?.length === 36,
+  )
 </script>
 
 <Row>
@@ -70,14 +74,23 @@
         {#if $profile?.loggedIn}
           <a href="#reload" onclick={updateBackend} class="text-decoration-none">
             <Fa i={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
-            {#if notification}
-              {@html notification}
-            {:else if profile.updated}
+          </a>
+          {#if notification}
+            {@html notification}
+          {:else if invalidAPIKey}
+            <a
+              href="#Configuration"
+              onclick={e => nav.goto(e, 'Configuration')}
+              class="text-danger text-decoration-none">
+              <T id="phrases.InvalidAPIKey" />
+            </a>
+          {:else if profile.updated}
+            <a href="#reload" onclick={updateBackend} class="text-decoration-none">
               <T
                 id="phrases.BackEndUpdated"
                 timeDuration={age(profile.now - new Date($profile.updated).getTime())} />
-            {/if}
-          </a>
+            </a>
+          {/if}
         {/if}
       </span>
     </Card>

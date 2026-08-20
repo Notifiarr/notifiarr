@@ -92,6 +92,8 @@ type Profile struct {
 	MD5             string                         `json:"md5"`
 	ActiveTunnel    string                         `json:"activeTunnel"`
 	TunnelPoolStats map[string]*mulery.PoolSize    `json:"tunnelPoolStats"`
+	APIKeyValid     bool                           `json:"apiKeyValid"`
+	APIKeyError     string                         `json:"apiKeyError,omitempty"`
 }
 
 // handleProfile returns the current user's username in a JSON response.
@@ -163,6 +165,13 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 		profile.ClientInfo = &clientinfo.ClientInfo{}
 	}
 
+	if err := website.ValidAPIKey(); err != nil {
+		profile.APIKeyValid = false
+		profile.APIKeyError = err.Error()
+	} else {
+		profile.APIKeyValid = true
+	}
+
 	profile.PlexInfo = &plex.PMSInfo{}
 	profile.PlexAge = time.Time{}
 	if ps := data.Get("plexStatus"); ps != nil {
@@ -188,7 +197,7 @@ func (c *Client) handleProfile(resp http.ResponseWriter, req *http.Request) {
 // handleProfileNoAPIKey handles a minimal profile response for the UI when no API key is set.
 func (c *Client) handleProfileNoAPIKey(resp http.ResponseWriter, req *http.Request) {
 	resp.Header().Set("Content-Type", mnd.ContentTypeJSON)
-	profile := &Profile{Updated: time.Now().UTC()}
+	profile := &Profile{Updated: time.Now().UTC(), APIKeyValid: false}
 	profile.Config.APIKey = c.Config.APIKey
 	profile.Config.URLBase = c.Config.URLBase
 
@@ -252,6 +261,12 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	case post.AuthType == configfile.AuthNone:
 		logs.Log.Printf(mnd.GetID(request.Context()), "[gui '%s' requested] Disabled WebUI authentication.", currUser)
 		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
+		c.reloadAppNow()
+	case post.AuthType == configfile.AuthWebsite:
+		logs.Log.Printf(mnd.GetID(request.Context()),
+			"[gui '%s' requested] Enabled WebUI website authentication.", currUser)
+		c.setSession(currUser, response, request)
+		http.Error(response, "Enabled WebUI website authentication.", http.StatusOK)
 		c.reloadAppNow()
 	default:
 		logs.Log.Printf(mnd.GetID(request.Context()),

@@ -106,7 +106,7 @@ type AppStatuses struct {
 //	@Summary		Retrieve client info.
 //	@Tags			Client
 //	@Produce		json
-//	@Success		200	{object}	apps.ApiResponse{message=AppInfo}	"contains all info except appStatus"
+//	@Success		200	{object}	apps.APIResponse{message=AppInfo}	"contains all info except appStatus"
 //	@Failure		404	{object}	string								"bad token or api key"
 //	@Router			/info [get]
 //	@Security		ApiKeyAuth
@@ -122,7 +122,7 @@ func (c *Config) InfoHandler(r *http.Request) (int, any) {
 //	@Summary		Retrieve client info + starr/plex info.
 //	@Tags			Client
 //	@Produce		json
-//	@Success		200	{object}	apps.ApiResponse{message=AppInfo}	"contains app info included appStatus"
+//	@Success		200	{object}	apps.APIResponse{message=AppInfo}	"contains app info included appStatus"
 //	@Failure		404	{object}	string								"bad token or api key"
 //	@Router			/version [get]
 //	@Security		ApiKeyAuth
@@ -142,7 +142,7 @@ func (c *Config) VersionHandler(r *http.Request) (int, any) {
 //	@Produce		json
 //	@Param			app			path		string								true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr, plex, tautulli)
 //	@Param			instance	path		int64								true	"Application instance (1-index)."
-//	@Success		200			{object}	apps.ApiResponse{message=AppInfo}	"contains app info included appStatus"
+//	@Success		200			{object}	apps.APIResponse{message=AppInfo}	"contains app info included appStatus"
 //	@Failure		404			{object}	string								"bad token or api key"
 //	@Router			/version/{app}/{instance} [get]
 //	@Security		ApiKeyAuth
@@ -211,7 +211,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		}
 
 		return &AppStatuses{Lidarr: []*LidarrConTest{{
-			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Lidarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
+			Instance: instance, Up: false, Name: c.Apps.Lidarr[idx].Name, Error: mnd.ErrDisabledInstance.Error(),
 		}}}
 	case "radarr":
 		if instance <= len(c.Radarr) && c.Apps.Radarr[idx].Enabled() {
@@ -222,7 +222,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		}
 
 		return &AppStatuses{Radarr: []*RadarrConTest{{
-			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Radarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
+			Instance: instance, Up: false, Name: c.Apps.Radarr[idx].Name, Error: mnd.ErrDisabledInstance.Error(),
 		}}}
 	case "readarr":
 		if instance <= len(c.Readarr) && c.Apps.Readarr[idx].Enabled() {
@@ -233,7 +233,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		}
 
 		return &AppStatuses{Readarr: []*ReadarrConTest{{
-			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Readarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
+			Instance: instance, Up: false, Name: c.Apps.Readarr[idx].Name, Error: mnd.ErrDisabledInstance.Error(),
 		}}}
 	case "sonarr":
 		if instance <= len(c.Sonarr) && c.Apps.Sonarr[idx].Enabled() {
@@ -244,7 +244,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		}
 
 		return &AppStatuses{Sonarr: []*SonarrConTest{{
-			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Sonarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
+			Instance: instance, Up: false, Name: c.Apps.Sonarr[idx].Name, Error: mnd.ErrDisabledInstance.Error(),
 		}}}
 	case "prowlarr":
 		if instance <= len(c.Prowlarr) && c.Apps.Prowlarr[idx].Enabled() {
@@ -255,7 +255,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		}
 
 		return &AppStatuses{Prowlarr: []*ProwlarrConTest{{
-			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Prowlarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
+			Instance: instance, Up: false, Name: c.Apps.Prowlarr[idx].Name, Error: mnd.ErrDisabledInstance.Error(),
 		}}}
 	case "plex":
 		stat := &AppStatuses{Plex: c.plexVersionReply(ctx)}
@@ -265,7 +265,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 	case "tautulli":
 		if !c.Tautulli.Enabled() {
 			return &AppStatuses{Tautulli: []*TautulliConTest{{
-				conTest: conTest{Instance: 1, Up: false, Name: c.Tautulli.Name, Error: mnd.ErrDisabledInstance.Error()},
+				Instance: 1, Up: false, Name: c.Tautulli.Name, Error: mnd.ErrDisabledInstance.Error(),
 			}}}
 		}
 
@@ -280,7 +280,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 
 func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lidarrs []apps.Lidarr, lid []*LidarrConTest) {
 	for idx, app := range lidarrs {
-		lid[idx] = &LidarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
+		lid[idx] = &LidarrConTest{Instance: idx + 1, Up: false, Name: app.Name}
 
 		if !app.Enabled() {
 			lid[idx].Error = mnd.ErrDisabledInstance.Error()
@@ -301,7 +301,7 @@ func (c *Config) getLidarrVersion(ctx context.Context, wait *sync.WaitGroup, lid
 
 func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, prowlarrs []apps.Prowlarr, prl []*ProwlarrConTest) {
 	for idx, app := range prowlarrs {
-		prl[idx] = &ProwlarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
+		prl[idx] = &ProwlarrConTest{Instance: idx + 1, Up: false, Name: app.Name}
 
 		if !app.Enabled() {
 			prl[idx].Error = mnd.ErrDisabledInstance.Error()
@@ -322,7 +322,7 @@ func (c *Config) getProwlarrVersion(ctx context.Context, wait *sync.WaitGroup, p
 
 func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, radarrs []apps.Radarr, rad []*RadarrConTest) {
 	for idx, app := range radarrs {
-		rad[idx] = &RadarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
+		rad[idx] = &RadarrConTest{Instance: idx + 1, Up: false, Name: app.Name}
 
 		if !app.Enabled() {
 			rad[idx].Error = mnd.ErrDisabledInstance.Error()
@@ -343,7 +343,7 @@ func (c *Config) getRadarrVersion(ctx context.Context, wait *sync.WaitGroup, rad
 
 func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, readarrs []apps.Readarr, read []*ReadarrConTest) {
 	for idx, app := range readarrs {
-		read[idx] = &ReadarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
+		read[idx] = &ReadarrConTest{Instance: idx + 1, Up: false, Name: app.Name}
 
 		if !app.Enabled() {
 			read[idx].Error = mnd.ErrDisabledInstance.Error()
@@ -364,7 +364,7 @@ func (c *Config) getReadarrVersion(ctx context.Context, wait *sync.WaitGroup, re
 
 func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, sonarrs []apps.Sonarr, son []*SonarrConTest) {
 	for idx, app := range sonarrs {
-		son[idx] = &SonarrConTest{conTest: conTest{Instance: idx + 1, Up: false, Name: app.Name}}
+		son[idx] = &SonarrConTest{Instance: idx + 1, Up: false, Name: app.Name}
 
 		if !app.Enabled() {
 			son[idx].Error = mnd.ErrDisabledInstance.Error()
