@@ -265,6 +265,7 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 	case post.AuthType == configfile.AuthWebsite:
 		logs.Log.Printf(mnd.GetID(request.Context()),
 			"[gui '%s' requested] Enabled WebUI website authentication.", currUser)
+		c.setSession(currUser, response, request)
 		http.Error(response, "Enabled WebUI website authentication.", http.StatusOK)
 		c.reloadAppNow()
 	default:
