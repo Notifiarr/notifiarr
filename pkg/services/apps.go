@@ -38,7 +38,7 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	now := time.Now()
 
 	for _, svc := range svcs {
-		svc.ServiceConfig.validated = true
+		svc.validated = true
 		svc.log = s.log
 		svc.State = StateUnknown
 		svc.Since = now
@@ -209,7 +209,7 @@ func collectDelugeApps(svcs []*Service, deluge []apps.Deluge) []*Service {
 					validSSL: app.ValidSSL,
 					Name:     app.Name,
 					Type:     CheckHTTP,
-					Value:    strings.TrimSuffix(app.Config.URL, "/json"),
+					Value:    strings.TrimSuffix(app.URL, "/json"),
 					Expect:   "200",
 					Timeout:  cnfg.Duration{Duration: app.Timeout.Duration},
 					Interval: interval,

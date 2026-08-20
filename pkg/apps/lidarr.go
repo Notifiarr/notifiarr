@@ -76,15 +76,15 @@ func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
 		}
 
 		if mnd.Log.DebugEnabled() {
-			app.Config.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
+			app.Client = starr.ClientWithDebug(app.Timeout.Duration, app.ValidSSL, debuglog.Config{
 				MaxBody: a.MaxBody,
 				Debugf:  func(format string, v ...any) { mnd.Log.Debugf("remote", format, v...) },
 				Caller:  metricMakerCallback(string(starr.Lidarr)),
 				Redact:  []string{app.APIKey, app.Password, app.HTTPPass},
 			})
 		} else {
-			app.Config.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
-			app.Config.Client.Transport = NewMetricsRoundTripper(starr.Lidarr.String(), nil)
+			app.Client = starr.Client(app.Timeout.Duration, app.ValidSSL)
+			app.Client.Transport = NewMetricsRoundTripper(starr.Lidarr.String(), nil)
 		}
 
 		app.URL = strings.TrimRight(app.URL, "/")

@@ -15,7 +15,7 @@ func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: plex.GetInfo")
 	defer mnd.Log.Trace(reqID, "end: plex.GetInfo")
 
-	pms, err := s.getPlexURL(ctx, s.Config.URL, nil)
+	pms, err := s.getPlexURL(ctx, s.URL, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +25,7 @@ func (s *Server) GetInfo(ctx context.Context) (*PMSInfo, error) {
 	}
 
 	if err := json.Unmarshal(pms, &output); err != nil {
-		return nil, fmt.Errorf("unmarshaling main page from %s: %w", s.Config.URL, err)
+		return nil, fmt.Errorf("unmarshaling main page from %s: %w", s.URL, err)
 	}
 
 	s.mu.Lock()

@@ -50,9 +50,10 @@ func (c *Cmd) getNZBGetState(ctx context.Context, instance int, n *apps.NZBGet) 
 	state.Latest = []*Sortable{}
 
 	for idx, xfer := range queue {
-		if xfer.Status == nzbget.GroupDOWNLOADING {
+		switch xfer.Status { //nolint:exhaustive // We only check nzbget groups.
+		case nzbget.GroupDOWNLOADING:
 			state.Downloading++
-		} else if xfer.Status == nzbget.GroupPAUSED {
+		case nzbget.GroupPAUSED:
 			state.Paused++
 		}
 

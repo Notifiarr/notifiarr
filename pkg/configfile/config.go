@@ -212,7 +212,7 @@ func (c *Config) fixConfig() {
 	}
 
 	// Windows has no stdout, so turn it off.
-	c.LogConfig.Quiet = mnd.IsWindows || c.LogConfig.Quiet
+	c.Quiet = mnd.IsWindows || c.Quiet
 	c.Services.Plugins = &c.Snapshot.Plugins
 }
 
@@ -226,7 +226,7 @@ func (c *Config) setup(ctx context.Context, flag *Flags, svc *services.Services,
 	if ui.HasGUI() {
 		// Setting AppName forces log files (even if not configured).
 		// Used for GUI apps that have no console output.
-		c.LogConfig.AppName = mnd.Title
+		c.AppName = mnd.Title
 	}
 
 	// Ordering.....
@@ -238,7 +238,7 @@ func (c *Config) setup(ctx context.Context, flag *Flags, svc *services.Services,
 		Apps:       apps,
 		Snapshot:   &c.Snapshot,
 		WatchFiles: c.WatchFiles,
-		LogFiles:   c.LogConfig.GetActiveLogFilePaths(),
+		LogFiles:   c.GetActiveLogFilePaths(),
 		Commands:   c.Commands,
 		ClientInfo: clientinfo,
 		ConfigFile: flag.ConfigFile,

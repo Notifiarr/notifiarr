@@ -80,7 +80,7 @@ func (c *Client) setupMenus(clientInfo *clientinfo.ClientInfo) {
 	} else {
 		menu["debug"].Show()
 
-		if c.Config.LogConfig.DebugLog == "" {
+		if c.Config.DebugLog == "" {
 			menu["debug_logs"].Hide()
 			menu["debug_logs2"].Hide()
 		} else {
@@ -240,8 +240,8 @@ func (c *Client) logsMenu(ctx context.Context) {
 
 	menu["debug_logs2"] = logsMenu.AddSubMenuItem("Debug", "view the Debug log")
 	menu["debug_logs2"].Click(func() {
-		ui.OpenLog(ctx, c.Config.LogConfig.DebugLog)
-		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
+		ui.OpenLog(ctx, c.Config.DebugLog)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing Debug File:", c.Config.DebugLog)
 	})
 
 	menu["logs_svcs"] = logsMenu.AddSubMenuItem("Services", "view the Services log")
@@ -343,8 +343,8 @@ func (c *Client) debugMenu(ctx context.Context) {
 
 	menu["debug_logs"] = debug.AddSubMenuItem("View Debug Log", "view the Debug log")
 	menu["debug_logs"].Click(func() {
-		ui.OpenLog(ctx, c.Config.LogConfig.DebugLog)
-		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing Debug File:", c.Config.LogConfig.DebugLog)
+		ui.OpenLog(ctx, c.Config.DebugLog)
+		logs.Log.Print(mnd.GetID(ctx), "[user requested] Viewing Debug File:", c.Config.DebugLog)
 	})
 
 	menu["svcs_log"] = debug.AddSubMenuItem("Log Service Checks", "check all services and log results")

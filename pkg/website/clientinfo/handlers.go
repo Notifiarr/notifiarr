@@ -160,21 +160,21 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersion")
 
 	var (
-		lid  = make([]*LidarrConTest, len(c.Apps.Lidarr))
-		prl  = make([]*ProwlarrConTest, len(c.Apps.Prowlarr))
-		rad  = make([]*RadarrConTest, len(c.Apps.Radarr))
-		read = make([]*ReadarrConTest, len(c.Apps.Readarr))
-		son  = make([]*SonarrConTest, len(c.Apps.Sonarr))
+		lid  = make([]*LidarrConTest, len(c.Lidarr))
+		prl  = make([]*ProwlarrConTest, len(c.Prowlarr))
+		rad  = make([]*RadarrConTest, len(c.Radarr))
+		read = make([]*ReadarrConTest, len(c.Readarr))
+		son  = make([]*SonarrConTest, len(c.Sonarr))
 		plx  = []*PlexConTest{}
 		wait sync.WaitGroup
 	)
 
-	c.getPlexVersion(ctx, &wait, &c.Apps.Plex, &plx)
-	c.getLidarrVersion(ctx, &wait, c.Apps.Lidarr, lid)
-	c.getProwlarrVersion(ctx, &wait, c.Apps.Prowlarr, prl)
-	c.getRadarrVersion(ctx, &wait, c.Apps.Radarr, rad)
-	c.getReadarrVersion(ctx, &wait, c.Apps.Readarr, read)
-	c.getSonarrVersion(ctx, &wait, c.Apps.Sonarr, son)
+	c.getPlexVersion(ctx, &wait, &c.Plex, &plx)
+	c.getLidarrVersion(ctx, &wait, c.Lidarr, lid)
+	c.getProwlarrVersion(ctx, &wait, c.Prowlarr, prl)
+	c.getRadarrVersion(ctx, &wait, c.Radarr, rad)
+	c.getReadarrVersion(ctx, &wait, c.Readarr, read)
+	c.getSonarrVersion(ctx, &wait, c.Sonarr, son)
 	wait.Wait()
 
 	return &AppStatuses{
@@ -203,7 +203,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 
 	switch idx := instance - 1; app {
 	case "lidarr":
-		if instance <= len(c.Apps.Lidarr) && c.Apps.Lidarr[idx].Enabled() {
+		if instance <= len(c.Lidarr) && c.Apps.Lidarr[idx].Enabled() {
 			stat, err := c.Apps.Lidarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
@@ -214,7 +214,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Lidarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
 		}}}
 	case "radarr":
-		if instance <= len(c.Apps.Radarr) && c.Apps.Radarr[idx].Enabled() {
+		if instance <= len(c.Radarr) && c.Apps.Radarr[idx].Enabled() {
 			stat, err := c.Apps.Radarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
@@ -225,7 +225,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Radarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
 		}}}
 	case "readarr":
-		if instance <= len(c.Apps.Readarr) && c.Apps.Readarr[idx].Enabled() {
+		if instance <= len(c.Readarr) && c.Apps.Readarr[idx].Enabled() {
 			stat, err := c.Apps.Readarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
@@ -236,7 +236,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Readarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
 		}}}
 	case "sonarr":
-		if instance <= len(c.Apps.Sonarr) && c.Apps.Sonarr[idx].Enabled() {
+		if instance <= len(c.Sonarr) && c.Apps.Sonarr[idx].Enabled() {
 			stat, err := c.Apps.Sonarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
@@ -247,7 +247,7 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 			conTest: conTest{Instance: instance, Up: false, Name: c.Apps.Sonarr[idx].Name, Error: mnd.ErrDisabledInstance.Error()},
 		}}}
 	case "prowlarr":
-		if instance <= len(c.Apps.Prowlarr) && c.Apps.Prowlarr[idx].Enabled() {
+		if instance <= len(c.Prowlarr) && c.Apps.Prowlarr[idx].Enabled() {
 			stat, err := c.Apps.Prowlarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
 
@@ -259,20 +259,20 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		}}}
 	case "plex":
 		stat := &AppStatuses{Plex: c.plexVersionReply(ctx)}
-		stat.Plex[0].Name = c.Apps.Plex.Server.Name()
+		stat.Plex[0].Name = c.Plex.Name()
 
 		return stat
 	case "tautulli":
-		if !c.Apps.Tautulli.Enabled() {
+		if !c.Tautulli.Enabled() {
 			return &AppStatuses{Tautulli: []*TautulliConTest{{
-				conTest: conTest{Instance: 1, Up: false, Name: c.Apps.Tautulli.Name, Error: mnd.ErrDisabledInstance.Error()},
+				conTest: conTest{Instance: 1, Up: false, Name: c.Tautulli.Name, Error: mnd.ErrDisabledInstance.Error()},
 			}}}
 		}
 
-		stat, err := c.Apps.Tautulli.GetInfo(ctx)
+		stat, err := c.Tautulli.GetInfo(ctx)
 		data.SaveWithID(app+mnd.Status, 1, stat)
 
-		return &AppStatuses{Tautulli: []*TautulliConTest{{c.getConTest(reqID, app, c.Apps.Tautulli.Name, 1, err), stat}}}
+		return &AppStatuses{Tautulli: []*TautulliConTest{{c.getConTest(reqID, app, c.Tautulli.Name, 1, err), stat}}}
 	}
 
 	return nil
@@ -394,7 +394,7 @@ func (c *Config) getPlexVersion(ctx context.Context, wait *sync.WaitGroup, plexS
 }
 
 func (c *Config) plexVersionReply(ctx context.Context) []*PlexConTest {
-	stat, err := c.Apps.Plex.GetInfo(ctx)
+	stat, err := c.Plex.GetInfo(ctx)
 	if stat == nil {
 		stat = &plex.PMSInfo{}
 	}

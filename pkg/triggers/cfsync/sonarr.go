@@ -99,7 +99,7 @@ func (c *cmd) getSonarrProfiles(ctx context.Context, event website.EventType, in
 
 	var (
 		err     error
-		app     = c.Config.Apps.Sonarr[instance-1]
+		app     = c.Apps.Sonarr[instance-1]
 		payload = SonarrTrashPayload{Instance: instance, Name: app.Name}
 	)
 
@@ -163,7 +163,7 @@ func (c *cmd) aggregateTrashSonarr(
 	event := website.EventAPI
 
 	// Create our known+requested instances, so we can write slice values in go routines.
-	for idx, app := range c.Config.Apps.Sonarr {
+	for idx, app := range c.Apps.Sonarr {
 		if instance := idx + 1; instances.Has(instance) {
 			if app.Enabled() {
 				output = append(output, &SonarrTrashPayload{Instance: instance, Name: app.Name})
@@ -176,7 +176,7 @@ func (c *cmd) aggregateTrashSonarr(
 
 	// Grab data for each requested instance in parallel/go routine.
 	for idx := range output {
-		if c.Config.Apps.Serial {
+		if c.Apps.Serial {
 			output[idx] = c.getSonarrProfiles(ctx, event, output[idx].Instance)
 			continue
 		}

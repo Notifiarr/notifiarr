@@ -26,7 +26,7 @@ func (a *Action) Corruption(input *common.ActionInput, app starr.App) error {
 	logs.Log.Trace(input.ReqID, "start: Corruption", input.Type, app)
 	defer logs.Log.Trace(input.ReqID, "end: Corruption", input.Type, app)
 
-	switch app {
+	switch app { //nolint:exhaustive // We only check starr apps.
 	default:
 		return fmt.Errorf("%w: %s", common.ErrInvalidApp, app)
 	case "":

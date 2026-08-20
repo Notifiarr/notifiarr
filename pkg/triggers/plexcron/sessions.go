@@ -53,19 +53,19 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 
 	switch {
 	case errors.Is(err, context.DeadlineExceeded):
-		return &plex.Sessions{Name: c.Plex.Server.Name()}, fmt.Errorf("plex sessions timed out after %s: %w", timeout, err)
+		return &plex.Sessions{Name: c.Plex.Name()}, fmt.Errorf("plex sessions timed out after %s: %w", timeout, err)
 	case errors.Is(err, context.Canceled):
-		return &plex.Sessions{Name: c.Plex.Server.Name()},
+		return &plex.Sessions{Name: c.Plex.Name()},
 			fmt.Errorf("plex sessions cancelled after %s: %w", time.Since(start), err)
 	case err != nil:
-		return &plex.Sessions{Name: c.Plex.Server.Name()}, fmt.Errorf("plex sessions: %w", err)
+		return &plex.Sessions{Name: c.Plex.Name()}, fmt.Errorf("plex sessions: %w", err)
 	case item != nil && item.Data != nil:
 		c.plexSessionTracker(ctx, sessions, item.Data.(*plex.Sessions)) //nolint:forcetypeassert
 	default:
 		c.plexSessionTracker(ctx, sessions, nil)
 	}
 
-	sessions.Name = c.Plex.Server.Name()
+	sessions.Name = c.Plex.Name()
 
 	return sessions, nil
 }

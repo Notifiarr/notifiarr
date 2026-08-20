@@ -99,7 +99,7 @@ func (c *cmd) getRadarrProfiles(ctx context.Context, event website.EventType, in
 
 	var (
 		err     error
-		app     = c.Config.Apps.Radarr[instance-1]
+		app     = c.Apps.Radarr[instance-1]
 		payload = RadarrTrashPayload{Instance: instance, Name: app.Name}
 	)
 
@@ -151,7 +151,7 @@ func (c *cmd) aggregateTrashRadarr(
 	event := website.EventAPI
 
 	// Create our known+requested instances, so we can write slice values in go routines.
-	for idx, app := range c.Config.Apps.Radarr {
+	for idx, app := range c.Apps.Radarr {
 		if instance := idx + 1; instances.Has(instance) {
 			if app.Enabled() {
 				output = append(output, &RadarrTrashPayload{Instance: instance, Name: app.Name})
@@ -164,7 +164,7 @@ func (c *cmd) aggregateTrashRadarr(
 
 	// Grab data for each requested instance in parallel/go routine.
 	for idx := range output {
-		if c.Config.Apps.Serial {
+		if c.Apps.Serial {
 			output[idx] = c.getRadarrProfiles(ctx, event, output[idx].Instance)
 			continue
 		}

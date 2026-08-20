@@ -99,7 +99,7 @@ func (s *Service) copyResults() *CheckResult {
 	defer s.mu.RUnlock()
 
 	return &CheckResult{
-		Interval:    s.Interval.Duration.Seconds(),
+		Interval:    s.Interval.Seconds(),
 		Name:        s.Name,
 		State:       s.State,
 		Output:      s.Output,

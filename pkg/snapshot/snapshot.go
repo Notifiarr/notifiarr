@@ -182,7 +182,7 @@ func (c *Config) getSnapshot(ctx context.Context, snap *Snapshot) ([]error, []er
 		debug = append(debug, err...) // these can be noisy, so debug/hide them.
 	}
 
-	if err := snap.GetMySQL(ctx, c.Plugins.MySQL, c.MyTop); len(err) != 0 {
+	if err := snap.GetMySQL(ctx, c.MySQL, c.MyTop); len(err) != 0 {
 		errs = append(errs, err...)
 	}
 

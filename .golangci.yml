@@ -21,7 +21,6 @@ linters:
     - gomodguard_v2
     - goconst
     - noinlineerr
-    - staticcheck
     - embeddedstructfieldcheck
   exclusions:
     presets:

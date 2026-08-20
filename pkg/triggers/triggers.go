@@ -183,7 +183,7 @@ func (a *Actions) watchChan(ctx context.Context) {
 
 			clientInfo.Actions = *event.Actions
 			data.Save("clientInfo", clientInfo)
-		} else if _, err := a.Config.CI.SaveClientInfo(ctx, false); err != nil {
+		} else if _, err := a.CI.SaveClientInfo(ctx, false); err != nil {
 			// ^ Go fetch the actions data from the website.
 			logs.Log.ErrorfNoShare(mnd.GetID(ctx), "[%s requested] Error reconfiguring: %v", event.EventType, err)
 			continue

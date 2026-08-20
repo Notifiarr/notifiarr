@@ -60,7 +60,7 @@ func (c *PlexConfig) Setup(maxBody int) Plex {
 
 // Enabled returns true if the server is configured, false otherwise.
 func (c *PlexConfig) Enabled() bool {
-	return c != nil && c.Config.URL != "" && c.Config.Token != "" && c.Timeout.Duration >= 0
+	return c != nil && c.URL != "" && c.Token != "" && c.Timeout.Duration >= 0
 }
 
 type TautulliConfig struct {
@@ -151,8 +151,8 @@ func (c *DelugeConfig) setup(maxBody int) (*deluge.Deluge, error) {
 			Redact:  []string{c.Password, c.HTTPPass},
 		})
 	} else {
-		c.Config.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
-		c.Config.Client.Transport = NewMetricsRoundTripper("Deluge", c.Config.Client.Transport)
+		c.Client = starr.Client(c.Timeout.Duration, c.ValidSSL)
+		c.Client.Transport = NewMetricsRoundTripper("Deluge", c.Client.Transport)
 	}
 
 	deluge, err := deluge.NewNoAuth(&c.Config)
@@ -266,8 +266,8 @@ func (q *QbitConfig) Setup(maxBody int) (*qbit.Qbit, error) {
 			Redact:  []string{q.Pass, q.HTTPPass},
 		})
 	} else {
-		q.Config.Client = starr.Client(q.Timeout.Duration, q.ValidSSL)
-		q.Config.Client.Transport = NewMetricsRoundTripper("qBittorrent", q.Config.Client.Transport)
+		q.Client = starr.Client(q.Timeout.Duration, q.ValidSSL)
+		q.Client.Transport = NewMetricsRoundTripper("qBittorrent", q.Client.Transport)
 	}
 
 	qbit, err := qbit.NewNoAuth(&q.Config)
@@ -384,8 +384,8 @@ func (n *NZBGetConfig) Setup(maxBody int) *nzbget.NZBGet {
 			Redact:  []string{n.Pass},
 		})
 	} else {
-		n.Config.Client = starr.Client(n.Timeout.Duration, n.ValidSSL)
-		n.Config.Client.Transport = NewMetricsRoundTripper("NZBGet", n.Config.Client.Transport)
+		n.Client = starr.Client(n.Timeout.Duration, n.ValidSSL)
+		n.Client.Transport = NewMetricsRoundTripper("NZBGet", n.Client.Transport)
 	}
 
 	return nzbget.New(&n.Config)
