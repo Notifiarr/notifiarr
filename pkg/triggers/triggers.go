@@ -125,17 +125,17 @@ func (a *Actions) Start(ctx context.Context, reloadCh, stopCh chan os.Signal) {
 	defer a.Run(ctx)
 
 	actions := reflect.ValueOf(a).Elem()
-	for idx := range actions.NumField() {
-		if !actions.Field(idx).CanInterface() {
+	for _, field := range actions.Fields() {
+		if !field.CanInterface() {
 			continue
 		}
 
 		// A panic here means you screwed up the code somewhere else.
-		if action, ok := actions.Field(idx).Interface().(common.Create); ok {
+		if action, ok := reflect.TypeAssert[common.Create](field); ok {
 			action.Create()
 		}
 		// No 'else if' so you can have both if you need them.
-		if action, ok := actions.Field(idx).Interface().(common.Run); ok {
+		if action, ok := reflect.TypeAssert[common.Run](field); ok {
 			go action.Run(ctx)
 		}
 	}
@@ -147,12 +147,12 @@ func (a *Actions) Stop(event website.EventType) context.Context {
 
 	actions := reflect.ValueOf(a).Elem()
 	// Stop them in reverse order they were started.
-	for i := range actions.NumField() {
-		if !actions.Field(i).CanInterface() {
+	for _, field := range actions.Fields() {
+		if !field.CanInterface() {
 			continue
 		}
 
-		if action, ok := actions.Field(i).Interface().(common.Run); ok {
+		if action, ok := reflect.TypeAssert[common.Run](field); ok {
 			action.Stop()
 		}
 	}

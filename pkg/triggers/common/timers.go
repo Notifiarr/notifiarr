@@ -161,9 +161,9 @@ func (c *Config) runTimerLoop(ctx context.Context, actions []*Action, cases []re
 		action := actions[index]
 
 		var input *ActionInput
-		if _, ok := val.Interface().(time.Time); ok {
+		if _, ok := reflect.TypeAssert[time.Time](val); ok {
 			input = &ActionInput{Type: website.EventCron, ReqID: mnd.ReqID()}
-		} else if input, ok = val.Interface().(*ActionInput); !ok {
+		} else if input, ok = reflect.TypeAssert[*ActionInput](val); !ok {
 			input = &ActionInput{Type: "unknown", ReqID: mnd.ReqID()}
 		}
 

@@ -3,6 +3,7 @@ linters:
   default: all
   disable:
     - exhaustruct # This will never work in this app.
+    - exhaustruct_v5 # same.
     - dupl # Maybe one day we can reduce the duplicate code with generics.
     - nlreturn # Not needed because wsl is good enough; better actually.
     - godot # Does not work with annotations.
@@ -17,6 +18,8 @@ linters:
     - revive
     - wsl_v5
     - wsl
+    - gomodguard_v2
+    - goconst
     - noinlineerr
     - staticcheck
     - embeddedstructfieldcheck

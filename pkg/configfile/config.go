@@ -106,8 +106,7 @@ func (c *Config) CopyConfig() (*Config, error) {
 
 	dec := toml.NewDecoder(&buf)
 	if _, err := dec.Decode(&newConfig); err != nil {
-		var parseErr toml.ParseError
-		if errors.As(err, &parseErr) {
+		if parseErr, ok := errors.AsType[toml.ParseError](err); ok {
 			return nil, fmt.Errorf("decoding config from toml for copying (this is a bug!): %w: %s",
 				err, parseErr.ErrorWithUsage())
 		}

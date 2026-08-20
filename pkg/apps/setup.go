@@ -288,9 +288,7 @@ func (s StarrConfig) Enabled() bool {
 
 // apiError attempts to parse the api error message to create a better return code.
 func apiError(backupCode int, msg string, err error) (int, error) {
-	var reqerr *starr.ReqError
-
-	if errors.As(err, &reqerr) {
+	if reqerr, ok := errors.AsType[*starr.ReqError](err); ok {
 		return reqerr.Code, fmt.Errorf("%s: %w", msg, reqerr)
 	}
 
