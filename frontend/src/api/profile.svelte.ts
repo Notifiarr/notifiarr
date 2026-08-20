@@ -78,18 +78,27 @@ class ConfigProfile {
   }
 
   /** Use trustProfile to update the authZ/authN configuration on the backend and reload. */
-  public async trustProfile(form: ProfilePost) {
+  public async trustProfile(form: ProfilePost): Promise<boolean> {
     this.status = get(_)('phrases.SavingConfiguration')
     this.error = ''
+    this.formError = ''
     this.updated = null
-    form.password = CryptoJS.MD5(form.password).toString()
-    form.newPass = CryptoJS.MD5(form.newPass).toString()
 
-    const { ok, body } = await postUi('profile', JSON.stringify(form), false)
+    const payload = { ...form }
+    if (payload.password) payload.password = CryptoJS.MD5(payload.password).toString()
+    if (payload.newPass) payload.newPass = CryptoJS.MD5(payload.newPass).toString()
 
-    if (!ok) this.formError = this.error = body
-    else await this.waitForReload()
+    const { ok, body } = await postUi('profile', JSON.stringify(payload), false)
+
+    if (!ok) {
+      this.status = ''
+      this.formError = this.error = body
+      return false
+    }
+
+    await this.waitForReload()
     this.status = ''
+    return true
   }
 
   /** Use writeConfig to update a partial configuration on the backend and reload. */

@@ -262,6 +262,12 @@ func (c *Client) handleProfilePost(response http.ResponseWriter, request *http.R
 		logs.Log.Printf(mnd.GetID(request.Context()), "[gui '%s' requested] Disabled WebUI authentication.", currUser)
 		http.Error(response, "Disabled WebUI authentication.", http.StatusOK)
 		c.reloadAppNow()
+	case post.AuthType == configfile.AuthWebsite:
+		logs.Log.Printf(mnd.GetID(request.Context()),
+			"[gui '%s' requested] Enabled WebUI website authentication.", currUser)
+		c.setSession(currUser, response, request)
+		http.Error(response, "Enabled WebUI website authentication.", http.StatusOK)
+		c.reloadAppNow()
 	default:
 		logs.Log.Printf(mnd.GetID(request.Context()),
 			"[gui '%s' requested] Enabled WebUI proxy authentication, header: %s", currUser, post.Header)
