@@ -21,9 +21,13 @@ REPO=Notifiarr/notifiarr
 # DSM restores /usr/bin (and the rest of the system partition) from its factory
 # image on every boot, so anything placed directly in /usr/bin disappears after
 # a reboot even though the systemd unit, config, and cron job survive untouched.
-# Install the real binary under /usr/local instead, which DSM does not reset,
-# and keep /usr/bin/notifiarr as a convenience symlink for interactive use.
-BINDIR=/usr/local/notifiarr
+# Synology's dev guide documents /usr/local as backed up/restored across DSM
+# upgrades, and /usr/local/bin specifically as where Package Center symlinks
+# installed packages' binaries (confirmed live on real DSM7 hardware). Install
+# the real binary there and keep /usr/bin/notifiarr as a convenience symlink
+# for interactive use. /usr/local/bin doesn't exist out of the box on stock
+# DSM, so it's created below.
+BINDIR=/usr/local/bin
 BINARY=${BINDIR}/notifiarr
 
 # Nothing else needs to be changed. Unless you're fixing things!
