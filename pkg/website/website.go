@@ -104,8 +104,7 @@ func (s *server) sendAndLogRequest(ctx context.Context, data *Request) {
 
 // sendRequest sends a request to the website and returns the result.
 func (s *server) sendRequest(ctx context.Context, data *Request) (*Response, time.Duration, error) {
-	if len(s.config.Apps.APIKey) != APIKeyLength {
-		err := fmt.Errorf("%w: length must be %d characters", ErrInvalidAPIKey, APIKeyLength)
+	if err := s.checkAPIKey(); err != nil {
 		if data.respChan != nil {
 			data.respChan <- &chResponse{
 				Response: nil,
@@ -138,6 +137,10 @@ func (s *server) sendRequest(ctx context.Context, data *Request) (*Response, tim
 	}
 
 	elapsed := time.Since(start).Round(time.Millisecond)
+
+	if errors.Is(err, ErrInvalidAPIKey) {
+		s.setInvalidKey(err)
+	}
 
 	if data.respChan != nil {
 		data.respChan <- &chResponse{
@@ -302,12 +305,23 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 
 	err := json.NewDecoder(io.TeeReader(counter, &buf)).Decode(&resp)
 	if code < http.StatusOK || code > http.StatusIMUsed {
+		var out error
 		if err != nil {
-			return nil, fmt.Errorf("%w: %s: %d %s (unmarshal error: %v), body: %s",
+			out = fmt.Errorf("%w: %s: %d %s (unmarshal error: %v), body: %s",
 				ErrNon200, url, code, http.StatusText(code), err, buf.String()) //nolint:errorlint
+		} else {
+			out = fmt.Errorf("%w: %s: %d %s", ErrNon200, url, code, http.StatusText(code))
 		}
 
-		return &resp, fmt.Errorf("%w: %s: %d %s", ErrNon200, url, code, http.StatusText(code))
+		if code == http.StatusUnauthorized || code == http.StatusForbidden {
+			out = fmt.Errorf("%w: %w", ErrInvalidAPIKey, out)
+		}
+
+		if err != nil {
+			return nil, out
+		}
+
+		return &resp, out
 	}
 
 	if err != nil {
@@ -321,6 +335,10 @@ func unmarshalResponse(url string, code int, body io.ReadCloser) (*Response, err
 func TestAPIKey(ctx context.Context, apiKey string) error {
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: TestApiKey")
 	defer mnd.Log.Trace(reqID, "end: TestApiKey")
+
+	if len(apiKey) != APIKeyLength {
+		return errAPIKeyLength()
+	}
 
 	if site == nil {
 		return ErrNoChannel // this will never happen, but we'll be safe.

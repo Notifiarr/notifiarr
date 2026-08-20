@@ -24,6 +24,7 @@
   import { deepEqual } from '../../includes/util'
   import { nav } from '../../navigation/nav.svelte'
   import Nodal from '../../includes/Nodal.svelte'
+  import { get } from 'svelte/store'
 
   // Local state that syncs with profile store.
   let config = $state($profile.config)
@@ -68,7 +69,11 @@
     type="password"
     envVar="API_KEY"
     bind:value={config.apiKey}
-    original={$profile.config.apiKey} />
+    original={$profile.config.apiKey}
+    validate={(_id, value) =>
+      (value ?? '').length === 36
+        ? undefined
+        : get(_)('phrases.APIKeyMustBeCountCharacters', { values: { count: 36 } })} />
   <Input
     id="config.extraKeys"
     type="textarea"

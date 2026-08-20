@@ -1353,6 +1353,8 @@ export interface Profile {
   md5: string;
   activeTunnel: string;
   tunnelPoolStats?: Record<string, null | PoolSize>;
+  apiKeyValid: boolean;
+  apiKeyError?: string;
 };
 
 /**

@@ -978,7 +978,7 @@
         "HostMustNotBeEmpty": "",
         "UsernameMustNotBeEmpty": "",
         "NameInUseByInstance": "",
-        "APIKeyMustBeCountCharacters": "",
+        "APIKeyMustBeCountCharactersOrLonger": "",
         "TokenMustBeCountCharacters": "",
         "LeavePage": "",
         "Loading": "",

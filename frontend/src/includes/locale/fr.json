@@ -804,7 +804,7 @@
         "HostMustNotBeEmpty": "L'hôte ne doit pas être vide.",
         "UsernameMustNotBeEmpty": "Le nom d'utilisateur ne doit pas être vide.",
         "NameInUseByInstance": "Ce nom est utilisé par l'instance {number}.",
-        "APIKeyMustBeCountCharacters": "La clé API doit comporter {count} caractères ou plus.",
+        "APIKeyMustBeCountCharactersOrLonger": "La clé API doit comporter {count} caractères ou plus.",
         "TokenMustBeCountCharacters": "Le jeton doit comporter {count} caractères ou plus.",
         "LeavePage": "Voulez-vous vraiment quitter cette page ?",
         "Landing": {
