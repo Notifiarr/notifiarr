@@ -63,8 +63,8 @@ func (a *AppsConfig) setupProwlarr() ([]Prowlarr, error) {
 // @Tags			Prowlarr
 // @Produce		json
 // @Param			instance	path		int64													true	"instance ID"
-// @Success		200			{object}	apps.ApiResponse{message=[]prowlarr.NotificationOutput}	"notifications"
-// @Failure		503			{object}	apps.ApiResponse{message=string}						"instance error"
+// @Success		200			{object}	apps.APIResponse{message=[]prowlarr.NotificationOutput}	"notifications"
+// @Failure		503			{object}	apps.APIResponse{message=string}						"instance error"
 // @Failure		404			{object}	string													"bad token or api key"
 // @Router			/prowlarr/{instance}/notifications [get]
 // @Security		ApiKeyAuth
@@ -92,9 +92,9 @@ func prowlarrGetNotifications(req *http.Request) (int, any) {
 // @Accept			json
 // @Param			instance	path		int64								true	"instance ID"
 // @Param			PUT			body		prowlarr.NotificationInput			true	"notification content"
-// @Success		200			{object}	apps.ApiResponse{message=string}	"ok"
-// @Failure		400			{object}	apps.ApiResponse{message=string}	"bad json input"
-// @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
+// @Success		200			{object}	apps.APIResponse{message=string}	"ok"
+// @Failure		400			{object}	apps.APIResponse{message=string}	"bad json input"
+// @Failure		503			{object}	apps.APIResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/prowlarr/{instance}/notification [put]
 // @Security		ApiKeyAuth
@@ -121,9 +121,9 @@ func prowlarrUpdateNotification(req *http.Request) (int, any) {
 // @Accept			json
 // @Param			instance	path		int64								true	"instance ID"
 // @Param			POST		body		prowlarr.NotificationInput			true	"new item content"
-// @Success		200			{object}	apps.ApiResponse{message=int64}		"new notification ID"
-// @Failure		400			{object}	apps.ApiResponse{message=string}	"json input error"
-// @Failure		503			{object}	apps.ApiResponse{message=string}	"instance error"
+// @Success		200			{object}	apps.APIResponse{message=int64}		"new notification ID"
+// @Failure		400			{object}	apps.APIResponse{message=string}	"json input error"
+// @Failure		503			{object}	apps.APIResponse{message=string}	"instance error"
 // @Failure		404			{object}	string								"bad token or api key"
 // @Router			/prowlarr/{instance}/notification [post]
 // @Security		ApiKeyAuth
