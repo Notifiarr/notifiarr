@@ -47,7 +47,9 @@ export class SnapshotApps {
     },
     merge: (index: number, form: MySQLConfig) => {
       const c = deepCopy(get(profile).config)
-      c.snapshot.mysql![index] = form
+      if (!c.snapshot) c.snapshot = { mysql: [] } as typeof c.snapshot
+      c.snapshot.mysql ??= []
+      c.snapshot.mysql[index] = form
       return c
     },
   }
