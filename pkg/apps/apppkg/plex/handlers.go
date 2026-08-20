@@ -17,8 +17,8 @@ import (
 //	@Summary		Retrieve Plex sessions.
 //	@Tags			Plex
 //	@Produce		json
-//	@Success		200	{object}	apps.ApiResponse{message=Sessions}	"contains app info included appStatus"
-//	@Failure		500	{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Success		200	{object}	apps.APIResponse{message=Sessions}	"contains app info included appStatus"
+//	@Failure		500	{object}	apps.APIResponse{message=string}	"Plex error"
 //	@Failure		404	{object}	string								"bad token or api key"
 //	@Router			/plex/1/sessions [get]
 //	@Security		ApiKeyAuth
@@ -60,8 +60,8 @@ func (s *Server) HandleSessions(r *http.Request) (int, any) {
 //	@Produce		json
 //	@Param			sessionId	query		string								true	"Plex session ID"
 //	@Param			reason		query		string								true	"Reason the session is being terminated. Sent to the user."
-//	@Success		200			{object}	apps.ApiResponse{message=string}	"success"
-//	@Failure		500			{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Success		200			{object}	apps.APIResponse{message=string}	"success"
+//	@Failure		500			{object}	apps.APIResponse{message=string}	"Plex error"
 //	@Failure		404			{object}	string								"bad token or api key"
 //	@Router			/plex/1/kill [get]
 //	@Security		ApiKeyAuth
@@ -88,8 +88,8 @@ func (s *Server) HandleKillSession(r *http.Request) (int, any) {
 //	@Summary		Retrieve the Plex Library Directory.
 //	@Tags			Plex
 //	@Produce		json
-//	@Success		200	{object}	apps.ApiResponse{message=SectionDirectory}	"Plex Library Directory"
-//	@Failure		500	{object}	apps.ApiResponse{message=string}			"Plex error"
+//	@Success		200	{object}	apps.APIResponse{message=SectionDirectory}	"Plex Library Directory"
+//	@Failure		500	{object}	apps.APIResponse{message=string}			"Plex error"
 //	@Failure		404	{object}	string										"bad token or api key"
 //	@Router			/plex/1/directory [get]
 //	@Security		ApiKeyAuth
@@ -119,8 +119,8 @@ func (s *Server) HandleDirectory(req *http.Request) (int, any) {
 //	@Tags			Plex
 //	@Produce		json
 //	@Param			libraryKey	path		string								true	"Plex Library Section Key"
-//	@Success		200			{object}	apps.ApiResponse{message=string}	"ok"
-//	@Failure		500			{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Success		200			{object}	apps.APIResponse{message=string}	"ok"
+//	@Failure		500			{object}	apps.APIResponse{message=string}	"Plex error"
 //	@Failure		404			{object}	string								"bad token or api key"
 //	@Router			/plex/1/emptytrash/{libraryKey} [get]
 //	@Security		ApiKeyAuth
@@ -143,8 +143,8 @@ func (s *Server) HandleEmptyTrash(r *http.Request) (int, any) {
 //	@Tags			Plex
 //	@Produce		json
 //	@Param			itemKey	path		string								true	"Plex Item Key"
-//	@Success		200		{object}	apps.ApiResponse{message=string}	"ok"
-//	@Failure		500		{object}	apps.ApiResponse{message=string}	"Plex error"
+//	@Success		200		{object}	apps.APIResponse{message=string}	"ok"
+//	@Failure		500		{object}	apps.APIResponse{message=string}	"Plex error"
 //	@Failure		404		{object}	string								"bad token or api key"
 //	@Router			/plex/1/markwatched/{itemKey} [get]
 //	@Security		ApiKeyAuth

@@ -267,7 +267,7 @@ func (c *Client) fixForwardedFor(next http.Handler) http.Handler {
 // @Produce		json
 // @Param			app			path		string												true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr)
 // @Param			instance	path		int64												true	"Application instance (1-index)."
-// @Success		200			{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
+// @Success		200			{object}	apps.APIResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404			{object}	string												"bad token or api key"
 // @Router			/ping/{app}/{instance} [get]
 // @Security		ApiKeyAuth
@@ -279,7 +279,7 @@ func _() {}
 // @Tags			Client
 // @Produce		json
 // @Param			apps	path		string												true	"Application, comma separated"	Enums(lidarr, prowlarr, radarr, readarr, sonarr)
-// @Success		200		{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
+// @Success		200		{object}	apps.APIResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404		{object}	string												"bad token or api key"
 // @Router			/ping/{apps} [get]
 // @Security		ApiKeyAuth
@@ -291,7 +291,7 @@ func _() {}
 // @Summary		Ping all starr instances.
 // @Tags			Client
 // @Produce		json
-// @Success		200	{object}	apps.ApiResponse{message=map[string]map[int]bool}	"map for app->instance->up"
+// @Success		200	{object}	apps.APIResponse{message=map[string]map[int]bool}	"map for app->instance->up"
 // @Failure		404	{object}	string												"bad token or api key"
 // @Router			/ping [get]
 // @Security		ApiKeyAuth
