@@ -455,7 +455,7 @@ func collectMySQLApps(svcs []*Service, mysql []snapshot.MySQLConfig) []*Service 
 			interval.Duration = MinimumCheckInterval
 		}
 
-		host := strings.TrimLeft(strings.TrimRight(app.Host, ")"), "@tcp(")
+		host := strings.TrimSuffix(strings.TrimPrefix(app.Host, "@tcp("), ")")
 		if app.Name == "" || host == "" || strings.HasPrefix(host, "@") {
 			continue
 		}
