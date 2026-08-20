@@ -41,7 +41,7 @@
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "svelte-i18n": "^4.0.1",
-    "svelte-select": "^5.8.3",
+    "svelte-select": "^6.0.0",
     "svelte-table": "^0.6.5",
     "swagger-ui": "^5.31.0",
     "swagger-ui-themes": "^3.0.1"
