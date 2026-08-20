@@ -2,8 +2,10 @@ package services_test
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -200,24 +202,74 @@ func waitFinished(t *testing.T, done <-chan struct{}) {
 	}
 }
 
+// waitUntilCheckerLive blocks until Start has published checker channels.
+func waitUntilCheckerLive(t *testing.T, svc *services.Services, name string) {
+	t.Helper()
+
+	timer := time.NewTimer(2 * time.Second)
+	defer timer.Stop()
+
+	ticker := time.NewTicker(time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		if !errors.Is(svc.RunCheck(t.Context(), website.EventAPI, name), services.ErrSvcsStopped) {
+			return
+		}
+
+		select {
+		case <-timer.C:
+			t.Fatal("timed out waiting for Start to enter checker lifecycle")
+		case <-ticker.C:
+		}
+	}
+}
+
+// runUntilStopped runs work until Stop returns, after at least one call has finished.
+func runUntilStopped(t *testing.T, stop func(), work func()) {
+	t.Helper()
+
+	var stopping, signaled atomic.Bool
+
+	ready := make(chan struct{})
+	done := make(chan struct{})
+
+	go func() {
+		defer close(done)
+
+		for {
+			work()
+
+			if signaled.CompareAndSwap(false, true) {
+				close(ready)
+			}
+
+			if stopping.Load() {
+				return
+			}
+		}
+	}()
+
+	select {
+	case <-ready:
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for producer to become active")
+	}
+
+	stop()
+	stopping.Store(true)
+	waitFinished(t, done)
+}
+
 func TestRunningAndStopDoNotDeadlock(t *testing.T) {
 	t.Parallel()
 
 	svc := services.New(&services.Config{Disabled: true})
 	svc.Start(t.Context(), "")
 
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-
-		for range 100 {
-			_ = svc.Running()
-		}
-	}()
-
-	time.Sleep(10 * time.Millisecond)
-	svc.Stop()
-	waitFinished(t, done)
+	runUntilStopped(t, svc.Stop, func() {
+		_ = svc.Running()
+	})
 }
 
 func TestRunCheckAndStopDoNotDeadlock(t *testing.T) {
@@ -238,19 +290,10 @@ func TestRunCheckAndStopDoNotDeadlock(t *testing.T) {
 	}}))
 	svc.Start(t.Context(), "")
 
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-
-		for range 50 {
-			_ = svc.RunCheck(t.Context(), website.EventAPI, "web")
-			svc.RunChecks(&common.ActionInput{Type: "log", ReqID: "race"})
-		}
-	}()
-
-	time.Sleep(10 * time.Millisecond)
-	svc.Stop()
-	waitFinished(t, done)
+	runUntilStopped(t, svc.Stop, func() {
+		_ = svc.RunCheck(t.Context(), website.EventAPI, "web")
+		svc.RunChecks(&common.ActionInput{Type: "log", ReqID: "race"})
+	})
 }
 
 func TestAddAfterEmptyStartCanRunCheck(t *testing.T) {
@@ -297,10 +340,11 @@ func TestConcurrentStartAndStop(t *testing.T) {
 
 		done := make(chan struct{})
 		go func() {
+			defer close(done)
 			svc.Start(t.Context(), "")
-			close(done)
 		}()
 
+		waitUntilCheckerLive(t, svc, "web")
 		svc.Stop()
 		waitFinished(t, done)
 		svc.Stop()
