@@ -17,7 +17,7 @@
         "ConfirmShutdown": "",
         "DeletedNumber": "",
         "ItsGone": "",
-        "APIKeyMustBeCountCharacters": "",
+        "APIKeyMustBeCountCharactersOrLonger": "",
         "TokenMustBeCountCharacters": "",
         "LeavePage": "",
         "Version": "",

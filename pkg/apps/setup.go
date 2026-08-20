@@ -85,6 +85,9 @@ type StarrApp struct {
 	delLimit *rate.Limiter
 }
 
+// Starr returns the embedded Starr app config. Promoted onto Lidarr/Radarr/etc.
+func (e StarrApp) Starr() StarrApp { return e }
+
 // Errors sent to client web requests.
 var (
 	ErrNoTMDB     = errors.New("TMDB ID must not be empty")

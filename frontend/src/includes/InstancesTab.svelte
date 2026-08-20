@@ -34,7 +34,7 @@
     <div class="title" slot="tab">
       <h5 class="title {flt.invalid ? 'text-danger' : ''}">
         {titles[flt.app.name]}
-        {#if flt.instances.length > 0 && (!one || !flt.instances[0].disabled)}
+        {#if flt.instances.length > 0 && (!one || !flt.instances[0]?.disabled)}
           <Badge class="tab-badge" color="success">{flt.instances.length}</Badge>
         {/if}
         {#if flt.invalid}

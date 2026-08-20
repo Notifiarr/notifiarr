@@ -1353,6 +1353,8 @@ export interface Profile {
   md5: string;
   activeTunnel: string;
   tunnelPoolStats?: Record<string, null | PoolSize>;
+  apiKeyValid: boolean;
+  apiKeyError?: string;
 };
 
 /**
@@ -1407,7 +1409,7 @@ export interface SnapshotConfig extends Plugins {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Plugins>
  */
 export interface Plugins {
-  nvidia: NvidiaConfig;
+  nvidia?: NvidiaConfig;
   mysql?: MySQLConfig[];
 };
 

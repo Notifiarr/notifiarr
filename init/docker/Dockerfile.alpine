@@ -1,4 +1,4 @@
-FROM golang:1.26.6-alpine AS builder
+FROM golang:1.27.0-alpine AS builder
 
 WORKDIR /src
 COPY main.go go.mod go.sum ./
@@ -41,7 +41,7 @@ FROM alpine
 # Copy the binary.
 COPY --from=builder /tmp/notifiarr /
 # Other tools. (iostat is the wrong version on Alpine.)
-RUN apk add ipmitool smartmontools zfs sysstat && \
+RUN apk add ipmitool smartmontools zfs sysstat tzdata && \
     rm -f /bin/iostat
 # Defaults.
 ENV TZ=UTC

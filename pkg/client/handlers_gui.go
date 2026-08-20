@@ -1123,6 +1123,14 @@ func (c *Client) handleConfigPost(response http.ResponseWriter, request *http.Re
 		return
 	}
 
+	config.APIKey = strings.TrimSpace(config.APIKey)
+	if config.APIKey != c.Config.APIKey {
+		if err := c.testPostedAPIKey(request.Context(), user, config.APIKey); err != nil {
+			http.Error(response, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
 	// Check app integration configs before saving.
 	if err := apps.CheckURLs(&config.AppsConfig); err != nil {
 		http.Error(response, err.Error(), http.StatusNotAcceptable)
@@ -1172,6 +1180,20 @@ func (c *Client) saveNewConfig(ctx context.Context, config *configfile.Config) e
 	// move new config file to existing config file.
 	if err := os.Rename(destFile, c.Flags.ConfigFile); err != nil {
 		return fmt.Errorf("renaming temporary file: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) testPostedAPIKey(ctx context.Context, user, apiKey string) error {
+	if err := website.TestAPIKey(ctx, apiKey); err != nil {
+		logs.Log.Errorf(mnd.GetID(ctx), "[gui '%s' requested] Testing API key: %v", user, err)
+
+		if errors.Is(err, website.ErrInvalidAPIKey) {
+			return err //nolint:wrapcheck // We want to return this error.
+		}
+
+		return fmt.Errorf("could not reach notifiarr.com to verify API key: %w", err)
 	}
 
 	return nil

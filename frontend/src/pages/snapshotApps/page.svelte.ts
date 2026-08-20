@@ -47,7 +47,9 @@ export class SnapshotApps {
     },
     merge: (index: number, form: MySQLConfig) => {
       const c = deepCopy(get(profile).config)
-      c.snapshot.mysql![index] = form
+      if (!c.snapshot) c.snapshot = { mysql: [] } as typeof c.snapshot
+      c.snapshot.mysql ??= []
+      c.snapshot.mysql[index] = form
       return c
     },
   }
@@ -61,7 +63,8 @@ export class SnapshotApps {
     empty: { busIDs: [''], smiPath: '', disabled: false },
     merge: (index: number, form: NvidiaConfig) => {
       const c = deepCopy(get(profile).config)
-      c.snapshot.nvidia = form
+      if (!c.snapshot) c.snapshot = { nvidia: form } as typeof c.snapshot
+      else c.snapshot.nvidia = form
       return c
     },
   }

@@ -113,7 +113,7 @@
         "HostMustNotBeEmpty": "Host mag niet leeg zijn.",
         "UsernameMustNotBeEmpty": "Gebruikersnaam mag niet leeg zijn.",
         "NameInUseByInstance": "Deze naam wordt gebruikt door instantie {number}.",
-        "APIKeyMustBeCountCharacters": "De API-sleutel moet minimaal {count} tekens lang zijn.",
+        "APIKeyMustBeCountCharactersOrLonger": "De API-sleutel moet minimaal {count} tekens lang zijn.",
         "TokenMustBeCountCharacters": "Het token moet minimaal {count} tekens lang zijn.",
         "LeavePage": "Wilt u deze pagina echt verlaten?",
         "ShowMore": "Meer informatie weergeven",
