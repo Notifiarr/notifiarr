@@ -18,33 +18,45 @@ var ErrSvcsStopped = errors.New("service check routine stopped")
 // RunChecks runs checks from an external package.
 func (s *Services) RunChecks(input *common.ActionInput) {
 	s.stopLock.Lock()
-	defer s.stopLock.Unlock()
+	triggerChan := s.triggerChan
+	stopped := s.stopped
+	halted := s.actionChan == nil || s.stopping
+	s.stopLock.Unlock()
 
-	if s.triggerChan == nil || s.actionChan == nil {
+	if halted || !sendLive(triggerChan, input, stopped) {
 		mnd.Log.Errorf(input.ReqID, "Cannot run service checks. Go routine is not running.")
-		return
 	}
-
-	s.triggerChan <- input
 }
 
 // RunCheck runs a single check from an external package.
 func (s *Services) RunCheck(ctx context.Context, source website.EventType, name string) error {
 	s.stopLock.Lock()
-	defer s.stopLock.Unlock()
 
-	if s.triggerChan == nil || s.actionChan == nil {
+	checkChan := s.checkChan
+	stopped := s.stopped
+	svc, found := s.services[name]
+	halted := s.actionChan == nil || s.stopping
+
+	s.stopLock.Unlock()
+
+	if checkChan == nil || halted || stopped == nil {
 		return fmt.Errorf("cannot check service, %w", ErrSvcsStopped)
 	}
 
-	svc, ok := s.services[name]
-	if !ok {
+	if !found {
 		return fmt.Errorf("%w: service '%s' not found", ErrNoName, name)
 	}
 
-	s.checkChan <- triggerCheck{ReqID: mnd.GetID(ctx), Source: source, Service: svc}
+	event := triggerCheck{ReqID: mnd.GetID(ctx), Source: source, Service: svc}
 
-	return nil
+	select {
+	case checkChan <- event:
+		return nil
+	case <-stopped:
+		return fmt.Errorf("cannot check service, %w", ErrSvcsStopped)
+	case <-ctx.Done():
+		return fmt.Errorf("cannot check service: %w", ctx.Err())
+	}
 }
 
 // runCheck runs a service check if it is due. Passing force runs it regardless.
@@ -64,18 +76,38 @@ func (s *Services) runChecks(forceAll bool, now time.Time) bool {
 		return false
 	}
 
-	count := 0
+	outstanding := 0
 	changes := false
 
-	for svc := range s.services {
-		if s.services[svc].Interval.Duration > 0 && (forceAll || s.services[svc].Due(now)) {
-			count++
-			s.checks <- s.services[svc]
+	for _, svc := range s.services {
+		if svc.Interval.Duration == 0 || (!forceAll && !svc.Due(now)) {
+			continue
 		}
+
+		outstanding, changes = s.enqueueCheck(svc, outstanding, changes)
 	}
 
-	for ; count > 0; count-- {
+	return s.waitChecks(outstanding, changes)
+}
+
+// enqueueCheck queues a check without blocking forever if the worker pool is full.
+// Completions are drained in the same select so the done channel cannot deadlock.
+func (s *Services) enqueueCheck(svc *Service, outstanding int, changes bool) (int, bool) {
+	for {
+		select {
+		case s.checks <- svc:
+			return outstanding + 1, changes
+		case changed := <-s.done:
+			outstanding--
+			changes = changes || changed
+		}
+	}
+}
+
+func (s *Services) waitChecks(outstanding int, changes bool) bool {
+	for outstanding > 0 {
 		changes = <-s.done || changes
+		outstanding--
 	}
 
 	return changes
