@@ -66,6 +66,7 @@ func (c *cmd) getSessions(ctx context.Context, allowedAge time.Duration) (*plex.
 	}
 
 	sessions.Name = c.Plex.Server.Name()
+	c.evaluateWebhookHealth(ctx, sessions)
 
 	return sessions, nil
 }
