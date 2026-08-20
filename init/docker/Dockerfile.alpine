@@ -41,7 +41,7 @@ FROM alpine
 # Copy the binary.
 COPY --from=builder /tmp/notifiarr /
 # Other tools. (iostat is the wrong version on Alpine.)
-RUN apk add ipmitool smartmontools zfs sysstat && \
+RUN apk add ipmitool smartmontools zfs sysstat tzdata && \
     rm -f /bin/iostat
 # Defaults.
 ENV TZ=UTC

@@ -47,7 +47,7 @@ FROM ubuntu:24.04
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
 RUN DEBIAN_FRONTEND=noninteractive apt update \
-    && apt install -y smartmontools ipmitool zfsutils-linux sysstat libncurses6 \
+    && apt install -y smartmontools ipmitool zfsutils-linux sysstat libncurses6 tzdata \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 # For LSI Avago Broadcom MegaCli.
