@@ -10,7 +10,6 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/services"
 	"golift.io/cnfg"
-	"golift.io/starr"
 )
 
 func TestMain(m *testing.M) {
@@ -37,9 +36,7 @@ func extraConfig(name string, interval time.Duration) apps.ExtraConfig {
 
 func starrApp(name, appURL, apiKey string, interval time.Duration) apps.StarrApp {
 	return apps.StarrApp{
-		StarrConfig: apps.StarrConfig{
-			Config:      starr.Config{URL: appURL, APIKey: apiKey},
-			ExtraConfig: extraConfig(name, interval),
-		},
+		URL: appURL, APIKey: apiKey,
+		ExtraConfig: extraConfig(name, interval),
 	}
 }

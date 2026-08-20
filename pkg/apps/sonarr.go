@@ -98,10 +98,8 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 
 		app.URL = strings.TrimRight(app.URL, "/")
 		output[idx] = Sonarr{
-			StarrApp: StarrApp{
-				StarrConfig: a.Sonarr[idx],
-			},
-			Sonarr: sonarr.New(&app.Config),
+			StarrConfig: a.Sonarr[idx],
+			Sonarr:      sonarr.New(&app.Config),
 		}
 
 		if app.Deletes > 0 {

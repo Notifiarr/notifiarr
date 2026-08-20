@@ -97,10 +97,8 @@ func (a *AppsConfig) setupRadarr() ([]Radarr, error) {
 
 		app.URL = strings.TrimRight(app.URL, "/")
 		output[idx] = Radarr{
-			Radarr: radarr.New(&app.Config),
-			StarrApp: StarrApp{
-				StarrConfig: a.Radarr[idx],
-			},
+			Radarr:      radarr.New(&app.Config),
+			StarrConfig: a.Radarr[idx],
 		}
 
 		if app.Deletes > 0 {

@@ -73,10 +73,8 @@ func (a *AppsConfig) setupReadarr() ([]Readarr, error) {
 
 		app.URL = strings.TrimRight(app.URL, "/")
 		output[idx] = Readarr{
-			StarrApp: StarrApp{
-				StarrConfig: a.Readarr[idx],
-			},
-			Readarr: readarr.New(&app.Config),
+			StarrConfig: a.Readarr[idx],
+			Readarr:     readarr.New(&app.Config),
 		}
 
 		if app.Deletes > 0 {

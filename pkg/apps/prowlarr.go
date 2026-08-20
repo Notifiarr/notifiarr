@@ -50,10 +50,8 @@ func (a *AppsConfig) setupProwlarr() ([]Prowlarr, error) {
 
 		app.URL = strings.TrimRight(app.URL, "/")
 		output[idx] = Prowlarr{
-			StarrApp: StarrApp{
-				StarrConfig: a.Prowlarr[idx],
-			},
-			Prowlarr: prowlarr.New(&app.Config),
+			StarrConfig: a.Prowlarr[idx],
+			Prowlarr:    prowlarr.New(&app.Config),
 		}
 	}
 

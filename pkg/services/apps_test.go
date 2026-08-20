@@ -14,9 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golift.io/cnfg"
-	"golift.io/deluge"
 	"golift.io/nzbget"
-	"golift.io/qbit"
 )
 
 func TestCollectMySQLAppsPreservesHostnames(t *testing.T) {
@@ -54,10 +52,8 @@ func collectorApps() *apps.Apps { //nolint:funlen
 		Readarr:  []apps.Readarr{{StarrApp: starrApp("Readarr", "http://readarr.example", "readkey", 0)}},
 		Sonarr:   []apps.Sonarr{{StarrApp: starrApp("Sonarr", "http://sonarr.example", "sonkey", 0)}},
 		Deluge: []apps.Deluge{{
-			DelugeConfig: apps.DelugeConfig{
-				ExtraConfig: extraConfig("Deluge", 0),
-				Config:      deluge.Config{URL: "http://deluge.example/json"},
-			},
+			ExtraConfig: extraConfig("Deluge", 0),
+			URL:         "http://deluge.example/json",
 		}},
 		NZBGet: []apps.NZBGet{{
 			NZBGetConfig: apps.NZBGetConfig{
@@ -66,16 +62,12 @@ func collectorApps() *apps.Apps { //nolint:funlen
 			},
 		}},
 		Qbit: []apps.Qbit{{
-			QbitConfig: apps.QbitConfig{
-				ExtraConfig: extraConfig("qBittorrent", 0),
-				Config:      qbit.Config{URL: "http://qbit.example"},
-			},
+			ExtraConfig: extraConfig("qBittorrent", 0),
+			URL:         "http://qbit.example",
 		}},
 		Rtorrent: []apps.Rtorrent{{
-			RtorrentConfig: apps.RtorrentConfig{
-				ExtraConfig: extraConfig("rTorrent", 0),
-				URL:         "http://rtorrent.example",
-			},
+			ExtraConfig: extraConfig("rTorrent", 0),
+			URL:         "http://rtorrent.example",
 		}},
 		SabNZB: []apps.SabNZB{{
 			SabNZBConfig: apps.SabNZBConfig{
@@ -86,17 +78,13 @@ func collectorApps() *apps.Apps { //nolint:funlen
 		}},
 		Transmission: []apps.Xmission{
 			{
-				XmissionConfig: apps.XmissionConfig{
-					URL:         "http://transmission.example",
-					User:        "user",
-					ExtraConfig: extraConfig("TransmissionAuth", 0),
-				},
+				URL:         "http://transmission.example",
+				User:        "user",
+				ExtraConfig: extraConfig("TransmissionAuth", 0),
 			},
 			{
-				XmissionConfig: apps.XmissionConfig{
-					URL:         "http://transmission-open.example",
-					ExtraConfig: extraConfig("TransmissionOpen", 0),
-				},
+				URL:         "http://transmission-open.example",
+				ExtraConfig: extraConfig("TransmissionOpen", 0),
 			},
 		},
 		Tautulli: apps.Tautulli{
@@ -224,16 +212,14 @@ func TestAddAppsSkipsDisabledAndInvalid(t *testing.T) {
 	svc.AddApps(&apps.Apps{
 		Lidarr: []apps.Lidarr{
 			{StarrApp: starrApp("", "http://lidarr.example", "key", 0)},
-			{StarrApp: apps.StarrApp{StarrConfig: apps.StarrConfig{ExtraConfig: extraConfig("NoURL", 0)}}},
+			{ExtraConfig: extraConfig("NoURL", 0)},
 		},
 		Qbit: []apps.Qbit{{
-			QbitConfig: apps.QbitConfig{
-				ExtraConfig: negative,
-				Config:      qbit.Config{URL: "http://qbit.example"},
-			},
+			ExtraConfig: negative,
+			URL:         "http://qbit.example",
 		}},
 		Rtorrent: []apps.Rtorrent{{
-			RtorrentConfig: apps.RtorrentConfig{ExtraConfig: negative, URL: "http://rtorrent.example"},
+			ExtraConfig: negative, URL: "http://rtorrent.example",
 		}},
 		SabNZB: []apps.SabNZB{{
 			SabNZBConfig: apps.SabNZBConfig{
@@ -242,7 +228,7 @@ func TestAddAppsSkipsDisabledAndInvalid(t *testing.T) {
 			},
 		}},
 		Transmission: []apps.Xmission{{
-			XmissionConfig: apps.XmissionConfig{URL: "http://x.example", ExtraConfig: negative},
+			URL: "http://x.example", ExtraConfig: negative,
 		}},
 		Tautulli: apps.Tautulli{
 			TautulliConfig: apps.TautulliConfig{
@@ -256,7 +242,7 @@ func TestAddAppsSkipsDisabledAndInvalid(t *testing.T) {
 				ExtraConfig: apps.ExtraConfig{Interval: cnfg.Duration{Duration: -time.Second}},
 			},
 		},
-		Deluge: []apps.Deluge{{DelugeConfig: apps.DelugeConfig{ExtraConfig: disabled}}},
+		Deluge: []apps.Deluge{{ExtraConfig: disabled}},
 	}, []snapshot.MySQLConfig{
 		{Name: "empty-host", Host: ""},
 		{Name: "neg-timeout", Host: "db.example", Timeout: cnfg.Duration{Duration: -time.Second}},

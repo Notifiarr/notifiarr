@@ -75,22 +75,16 @@ type Config struct {
 // NewConfig returns a fresh config with only defaults and a logger ready to go.
 func NewConfig() *Config {
 	return &Config{
-		AppsConfig: apps.AppsConfig{
-			BaseConfig: apps.BaseConfig{
-				URLBase: "/",
-				MaxBody: mnd.KB100,
-			},
-		},
+		URLBase:  "/",
+		MaxBody:  mnd.KB100,
 		Services: services.Config{},
 		BindAddr: mnd.DefaultBindAddr,
 		Snapshot: snapshot.Config{
 			Timeout: cnfg.Duration{Duration: snapshot.DefaultTimeout},
 		},
-		LogConfig: logs.LogConfig{
-			LogFiles:  mnd.DefaultLogFiles,
-			LogFileMb: mnd.DefaultLogFileMb,
-		},
-		Timeout: cnfg.Duration{Duration: mnd.DefaultTimeout},
+		LogFiles:  mnd.DefaultLogFiles,
+		LogFileMb: mnd.DefaultLogFileMb,
+		Timeout:   cnfg.Duration{Duration: mnd.DefaultTimeout},
 	}
 }
 

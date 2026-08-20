@@ -89,10 +89,8 @@ func (a *AppsConfig) setupLidarr() ([]Lidarr, error) {
 
 		app.URL = strings.TrimRight(app.URL, "/")
 		output[idx] = Lidarr{
-			StarrApp: StarrApp{
-				StarrConfig: a.Lidarr[idx],
-			},
-			Lidarr: lidarr.New(&app.Config),
+			StarrConfig: a.Lidarr[idx],
+			Lidarr:      lidarr.New(&app.Config),
 		}
 
 		if app.Deletes > 0 {
