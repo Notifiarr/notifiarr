@@ -26,6 +26,9 @@ linters:
       - common-false-positives
       - legacy
     rules:
+      - path: 'pkg/.*/.*_test.go'
+        linters:
+          - err113
       # Exclude some linters from running on auto-generated files.
       - path: 'pkg/bindata/docs/*'
         linters:

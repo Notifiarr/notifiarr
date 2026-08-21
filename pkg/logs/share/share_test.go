@@ -12,14 +12,14 @@ func TestDeduperTake(t *testing.T) {
 	duper := newDeduper(time.Hour)
 	duper.now = func() time.Time { return now }
 
-	line, ok := duper.take("boom")
-	if !ok || line != "boom" {
-		t.Fatalf("first take: got %q ok=%v, want boom true", line, ok)
+	line, exists := duper.take("boom")
+	if !exists || line != "boom" {
+		t.Fatalf("first take: got %q ok=%v, want boom true", line, exists)
 	}
 
-	line, ok = duper.take("boom")
-	if ok || line != "" {
-		t.Fatalf("second take during cooldown: got %q ok=%v, want empty false", line, ok)
+	line, exists = duper.take("boom")
+	if exists || line != "" {
+		t.Fatalf("second take during cooldown: got %q ok=%v, want empty false", line, exists)
 	}
 
 	_, _ = duper.take("boom")
@@ -27,14 +27,14 @@ func TestDeduperTake(t *testing.T) {
 
 	now = now.Add(time.Hour)
 
-	line, ok = duper.take("boom")
-	if !ok || line != "boom (repeated 2 times)" {
-		t.Fatalf("after cooldown: got %q ok=%v, want annotated true", line, ok)
+	line, exists = duper.take("boom")
+	if !exists || line != "boom (repeated 2 times)" {
+		t.Fatalf("after cooldown: got %q ok=%v, want annotated true", line, exists)
 	}
 
-	line, ok = duper.take("other")
-	if !ok || line != "other" {
-		t.Fatalf("other after cooldown with no extras: got %q ok=%v", line, ok)
+	line, exists = duper.take("other")
+	if !exists || line != "other" {
+		t.Fatalf("other after cooldown with no extras: got %q ok=%v", line, exists)
 	}
 }
 
