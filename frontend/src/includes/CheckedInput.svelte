@@ -47,6 +47,7 @@
 
   const checkInstance = async (e: Event) => {
     e.preventDefault()
+    if (!form) return
     body = ''
     testing = true
 
@@ -75,8 +76,8 @@
     outline
     title="Validate SSL certificate"
     color="notifiarr"
-    class={form['validSsl'] !== original['validSsl'] ? 'changed' : ''}
-    onclick={() => (form['validSsl'] = !form['validSsl'])}>
+    class={form?.['validSsl'] !== original?.['validSsl'] ? 'changed' : ''}
+    onclick={() => form && (form['validSsl'] = !form['validSsl'])}>
     <Box type="checkbox" bind:checked={form['validSsl']} />
   </Button>
 {/snippet}
@@ -88,77 +89,79 @@
     outline
     title="Run as shell command"
     color="notifiarr"
-    class={form['shell'] !== original['shell'] ? 'changed' : ''}
-    onclick={() => (form['shell'] = !form['shell'])}>
+    class={form?.['shell'] !== original?.['shell'] ? 'changed' : ''}
+    onclick={() => form && (form['shell'] = !form['shell'])}>
     <Box type="checkbox" bind:checked={form['shell']} />
   </Button>
 {/snippet}
 
-<div class="checked-input">
-  <Input
-    id={app.id + '.' + id.toString()}
-    bind:value={form[id]}
-    original={original?.[id] ?? undefined}
-    disabled={app.disabled?.includes(id.toString())}
-    description={id === 'url' && form[id]?.toString()?.startsWith('https://')
-      ? get(_)('words.instance-options.validSsl.description')
-      : rest.description}
-    {envVar}
-    {...rest}>
-    <!-- This is a "checked" input, so add a check button for the instance. -->
-    {#snippet pre()}
-      <Button
-        style="width:44px;"
-        type="button"
-        outline
-        title="Check instance"
-        color="notifiarr"
-        disabled={testing || disabled}
-        onclick={checkInstance}>
-        {#if testing}
-          <Fa i={faSpinner} c1="orange" spin scale={1.5} />
-        {:else}
-          <Fa
-            i={faCheckDouble}
-            c1={disabled ? 'lightgrey' : 'green'}
-            c2={disabled ? 'darkgrey' : 'darkcyan'}
-            d1={disabled ? 'darkgrey' : 'limegreen'}
-            d2={disabled ? 'lightgrey' : 'cyan'}
-            scale={1.5} />
-        {/if}
-      </Button>
-    {/snippet}
-
-    <!-- If they type in an https:// url, add a checkbox to validate the SSL certificate. -->
-    {#snippet post()}
-      {#if id === 'url' && form[id]?.startsWith('https://')}
-        {@render validSsl()}
-      {:else if id === 'command'}
-        {@render shell()}
-      {/if}
-    {/snippet}
-
-    <!-- Feedback message is only used when the test/check button is clicked. -->
-    {#snippet msg()}
-      {#if body}
-        <div transition:slide>
-          <Alert
-            fade={false}
-            isOpen
-            toggle={() => (body = '')}
-            color={ok ? 'success' : 'danger'}>
+{#if form}
+  <div class="checked-input">
+    <Input
+      id={app.id + '.' + id.toString()}
+      bind:value={form[id]}
+      original={original?.[id] ?? undefined}
+      disabled={app.disabled?.includes(id.toString())}
+      description={id === 'url' && form[id]?.toString()?.startsWith('https://')
+        ? get(_)('words.instance-options.validSsl.description')
+        : rest.description}
+      {envVar}
+      {...rest}>
+      <!-- This is a "checked" input, so add a check button for the instance. -->
+      {#snippet pre()}
+        <Button
+          style="width:44px;"
+          type="button"
+          outline
+          title="Check instance"
+          color="notifiarr"
+          disabled={testing || disabled}
+          onclick={checkInstance}>
+          {#if testing}
+            <Fa i={faSpinner} c1="orange" spin scale={1.5} />
+          {:else}
             <Fa
-              scale={1.5}
-              i={ok ? faCircleCheck : faCircleXmark}
-              c1={ok ? 'green' : 'firebrick'}
-              c2="white"
-              d2="black" /> &nbsp; {@html maxLength(body, 200)}
-          </Alert>
-        </div>
-      {/if}
-    {/snippet}
-  </Input>
-</div>
+              i={faCheckDouble}
+              c1={disabled ? 'lightgrey' : 'green'}
+              c2={disabled ? 'darkgrey' : 'darkcyan'}
+              d1={disabled ? 'darkgrey' : 'limegreen'}
+              d2={disabled ? 'lightgrey' : 'cyan'}
+              scale={1.5} />
+          {/if}
+        </Button>
+      {/snippet}
+
+      <!-- If they type in an https:// url, add a checkbox to validate the SSL certificate. -->
+      {#snippet post()}
+        {#if id === 'url' && form[id]?.startsWith('https://')}
+          {@render validSsl()}
+        {:else if id === 'command'}
+          {@render shell()}
+        {/if}
+      {/snippet}
+
+      <!-- Feedback message is only used when the test/check button is clicked. -->
+      {#snippet msg()}
+        {#if body}
+          <div transition:slide>
+            <Alert
+              fade={false}
+              isOpen
+              toggle={() => (body = '')}
+              color={ok ? 'success' : 'danger'}>
+              <Fa
+                scale={1.5}
+                i={ok ? faCircleCheck : faCircleXmark}
+                c1={ok ? 'green' : 'firebrick'}
+                c2="white"
+                d2="black" /> &nbsp; {@html maxLength(body, 200)}
+            </Alert>
+          </div>
+        {/if}
+      {/snippet}
+    </Input>
+  </div>
+{/if}
 
 <style>
   .checked-input :global(.changed) {

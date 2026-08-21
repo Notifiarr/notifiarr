@@ -17,14 +17,14 @@
   }: ChildProps<Endpoint> = $props()
 
   let originalQuery = $derived.by(() =>
-    Object.entries(original.query ?? {})
+    Object.entries(original?.query ?? {})
       .filter(([_, value]) => value !== null)
       .map(([key, value]) => value?.map(v => `${key}=${v}`).join('\n') ?? '')
       .join('\n'),
   )
 
   let originalHeader = $derived.by(() =>
-    Object.entries(original.header ?? {})
+    Object.entries(original?.header ?? {})
       .filter(([_, value]) => value !== null)
       .map(([key, value]) => value?.map(v => `${key}: ${v}`).join('\n') ?? '')
       .join('\n'),
@@ -32,14 +32,14 @@
 
   // These are the form-binded values
   let query = $state<string>(
-    Object.entries(form.query ?? {})
+    Object.entries(form?.query ?? {})
       .filter(([_, value]) => value !== null)
       .map(([key, value]) => value?.map(v => `${key}=${v}`).join('\n') ?? '')
       .join('\n'),
   )
 
   let header = $state<string>(
-    Object.entries(form.header ?? {})
+    Object.entries(form?.header ?? {})
       .filter(([_, value]) => value !== null)
       .map(([key, value]) => value?.map(v => `${key}: ${v}`).join('\n') ?? '')
       .join('\n'),
@@ -50,12 +50,12 @@
   // This is called by Instances.svelte when the reset button is clicked.
   export const reset = () => {
     cronScheduler?.reset()
-    header = Object.entries(form.header ?? {})
+    header = Object.entries(form?.header ?? {})
       .filter(([_, value]) => value !== null)
       .map(([key, value]) => value?.map(v => `${key}: ${v}`).join('\n') ?? '')
       .join('\n')
 
-    query = Object.entries(form.query ?? {})
+    query = Object.entries(form?.query ?? {})
       .filter(([_, value]) => value !== null)
       .map(([key, value]) => value?.map(v => `${key}=${v}`).join('\n') ?? '')
       .join('\n')
@@ -75,113 +75,116 @@
   }
 </script>
 
-<div class="endpoint">
-  <Row>
-    <Col md={12}>
-      <Input
-        id={app.id + '.name'}
-        envVar={`${app.envPrefix}_${index}_NAME`}
-        bind:value={form.name}
-        original={original?.name}
-        {validate} />
-    </Col>
-    <Col md={6}>
-      <Input
-        id={app.id + '.template'}
-        envVar={`${app.envPrefix}_${index}_TEMPLATE`}
-        bind:value={form.template}
-        original={original?.template}
-        {validate}>
-        {#snippet post()}
-          <Button
-            color="secondary"
-            outline
-            style="width:44px;"
-            title="Follow redirects"
-            class={form.follow === original.follow ? '' : 'changed'}>
-            <Box type="checkbox" id={app.id + '.follow'} bind:checked={form.follow} />
-          </Button>
-        {/snippet}
-      </Input>
-    </Col>
-    <Col md={6}>
-      <Input
-        type="timeout"
-        id={app.id + '.timeout'}
-        envVar={`${app.envPrefix}_${index}_TIMEOUT`}
-        bind:value={form.timeout}
-        original={original?.timeout}
-        noDisable
-        {validate} />
-    </Col>
-    <Col md={2}>
-      <Input
-        type="select"
-        id={app.id + '.method'}
-        envVar={`${app.envPrefix}_${index}_METHOD`}
-        bind:value={form.method}
-        original={original?.method}
-        {validate}
-        options={['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'].map(m => ({
-          name: m,
-          value: m,
-        }))} />
-    </Col>
-    <Col md={10}>
-      <CheckedInput
-        id="url"
-        {app}
-        {index}
-        envVar={`${app.envPrefix}_${index}_URL`}
-        bind:form
-        bind:original
-        {validate} />
-    </Col>
-    <Col lg={12}>
-      <Input
-        rows={Math.min(form.body?.split('\n').length ?? 1, 15)}
-        type="textarea"
-        id={app.id + '.body'}
-        envVar={`${app.envPrefix}_${index}_BODY`}
-        bind:value={form.body}
-        original={original?.body}
-        badge={$_(app.id + '.badge.body', { values: { count: form.body?.length ?? 0 } })}
-        {validate} />
-    </Col>
-    <Col lg={12}>
-      <Input
-        rows={Math.min(query.split('\n').length, 15)}
-        type="textarea"
-        id={app.id + '.query'}
-        envVar={`${app.envPrefix}_${index}_QUERY`}
-        bind:value={query}
-        original={originalQuery}
-        badge={$_(app.id + '.badge.query', {
-          values: { count: mapLength(form.query ?? {}) },
-        })}
-        oninput={() => (form.query = updateMap(query, '='))}
-        {validate} />
-    </Col>
-    <Col lg={12}>
-      <Input
-        rows={Math.min(header.split('\n').length, 15)}
-        type="textarea"
-        id={app.id + '.header'}
-        envVar={`${app.envPrefix}_${index}_HEADER`}
-        bind:value={header}
-        original={originalHeader}
-        badge={$_(app.id + '.badge.header', {
-          values: { count: mapLength(form.header ?? {}) },
-        })}
-        oninput={() => (form.header = updateMap(header, ': '))}
-        {validate} />
-    </Col>
+{#if form}
+  <div class="endpoint">
+    <Row>
+      <Col md={12}>
+        <Input
+          id={app.id + '.name'}
+          envVar={`${app.envPrefix}_${index}_NAME`}
+          bind:value={form.name}
+          original={original?.name}
+          {validate} />
+      </Col>
+      <Col md={6}>
+        <Input
+          id={app.id + '.template'}
+          envVar={`${app.envPrefix}_${index}_TEMPLATE`}
+          bind:value={form.template}
+          original={original?.template}
+          {validate}>
+          {#snippet post()}
+            <Button
+              color="secondary"
+              outline
+              style="width:44px;"
+              title="Follow redirects"
+              class={form.follow === original?.follow ? '' : 'changed'}>
+              <Box type="checkbox" id={app.id + '.follow'} bind:checked={form.follow} />
+            </Button>
+          {/snippet}
+        </Input>
+      </Col>
+      <Col md={6}>
+        <Input
+          type="timeout"
+          id={app.id + '.timeout'}
+          envVar={`${app.envPrefix}_${index}_TIMEOUT`}
+          bind:value={form.timeout}
+          original={original?.timeout}
+          noDisable
+          {validate} />
+      </Col>
+      <Col md={2}>
+        <Input
+          type="select"
+          id={app.id + '.method'}
+          envVar={`${app.envPrefix}_${index}_METHOD`}
+          bind:value={form.method}
+          original={original?.method}
+          {validate}
+          options={['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'].map(
+            m => ({ name: m, value: m }),
+          )} />
+      </Col>
+      <Col md={10}>
+        <CheckedInput
+          id="url"
+          {app}
+          {index}
+          envVar={`${app.envPrefix}_${index}_URL`}
+          bind:form
+          bind:original
+          {validate} />
+      </Col>
+      <Col lg={12}>
+        <Input
+          rows={Math.min(form.body?.split('\n').length ?? 1, 15)}
+          type="textarea"
+          id={app.id + '.body'}
+          envVar={`${app.envPrefix}_${index}_BODY`}
+          bind:value={form.body}
+          original={original?.body}
+          badge={$_(app.id + '.badge.body', {
+            values: { count: form.body?.length ?? 0 },
+          })}
+          {validate} />
+      </Col>
+      <Col lg={12}>
+        <Input
+          rows={Math.min(query.split('\n').length, 15)}
+          type="textarea"
+          id={app.id + '.query'}
+          envVar={`${app.envPrefix}_${index}_QUERY`}
+          bind:value={query}
+          original={originalQuery}
+          badge={$_(app.id + '.badge.query', {
+            values: { count: mapLength(form.query ?? {}) },
+          })}
+          oninput={() => (form.query = updateMap(query, '='))}
+          {validate} />
+      </Col>
+      <Col lg={12}>
+        <Input
+          rows={Math.min(header.split('\n').length, 15)}
+          type="textarea"
+          id={app.id + '.header'}
+          envVar={`${app.envPrefix}_${index}_HEADER`}
+          bind:value={header}
+          original={originalHeader}
+          badge={$_(app.id + '.badge.header', {
+            values: { count: mapLength(form.header ?? {}) },
+          })}
+          oninput={() => (form.header = updateMap(header, ': '))}
+          {validate} />
+      </Col>
 
-    <Col md={12}>
-      <CronScheduler bind:cron={form} {original} {validate} bind:this={cronScheduler} />
-    </Col>
-  </Row>
-</div>
+      <Col md={12}>
+        <CronScheduler bind:cron={form} {original} {validate} bind:this={cronScheduler} />
+      </Col>
+    </Row>
+  </div>
+{/if}
 
 <style>
   .endpoint :global(.changed) {

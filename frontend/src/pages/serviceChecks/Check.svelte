@@ -22,7 +22,8 @@
 
   // When the check type changes, reset the form.
   const onchange = () => {
-    if (form.type === original.type) form = { ...original }
+    if (!form) return
+    if (original && form.type === original.type) Object.assign(form, original)
     else form.expect = form.value = ''
     reset()
   }
@@ -37,79 +38,81 @@
 
   // This is called by Instances.svelte when the reset button is clicked.
   // Calls the exported reset method of the current page component.
-  export const reset = () => pages[form.type]?.reset?.()
+  export const reset = () => pages[form?.type]?.reset?.()
 </script>
 
-<div class="serviceCheck">
-  <Row>
-    <Col md={6}>
-      <Input
-        id={app.id + '.name'}
-        envVar={`${app.envPrefix}_${index}_NAME`}
-        bind:value={form.name}
-        original={original.name}
-        {validate} />
-    </Col>
-    <Col md={6}>
-      <Input
-        type="select"
-        id={app.id + '.type'}
-        envVar={`${app.envPrefix}_${index}_TYPE`}
-        bind:value={form.type}
-        original={original?.type}
-        {onchange}
-        {validate}
-        options={['process', 'http', 'tcp', 'ping', 'icmp'].map(type => ({
-          name: $_(`ServiceChecks.type.options.${type}`),
-          value: type,
-          disabled: type === 'ping' && $profile.isWindows,
-        }))} />
-    </Col>
-  </Row>
+{#if form}
+  <div class="serviceCheck">
+    <Row>
+      <Col md={6}>
+        <Input
+          id={app.id + '.name'}
+          envVar={`${app.envPrefix}_${index}_NAME`}
+          bind:value={form.name}
+          original={original?.name}
+          {validate} />
+      </Col>
+      <Col md={6}>
+        <Input
+          type="select"
+          id={app.id + '.type'}
+          envVar={`${app.envPrefix}_${index}_TYPE`}
+          bind:value={form.type}
+          original={original?.type}
+          {onchange}
+          {validate}
+          options={['process', 'http', 'tcp', 'ping', 'icmp'].map(type => ({
+            name: $_(`ServiceChecks.type.options.${type}`),
+            value: type,
+            disabled: type === 'ping' && $profile.isWindows,
+          }))} />
+      </Col>
+    </Row>
 
-  {#if form.type === 'http'}
-    <div class="row" transition:slide>
-      <Http {form} {original} {app} {index} {validate} bind:this={pages.http} />
-    </div>
-  {:else if form.type === 'process'}
-    <div class="row" transition:slide>
-      <Proc {form} {original} {app} {index} {validate} bind:this={pages.process} />
-    </div>
-  {:else if form.type === 'icmp'}
-    <div class="row" transition:slide>
-      <Ping {form} {original} {app} {index} {validate} bind:this={pages.icmp} />
-    </div>
-  {:else if form.type === 'ping'}
-    <div class="row" transition:slide>
-      <Ping {form} {original} {app} {index} {validate} bind:this={pages.ping} />
-    </div>
-  {:else if form.type === 'tcp'}
-    <div class="row" transition:slide>
-      <Tcp {form} {original} {app} {index} {validate} bind:this={pages.tcp} />
-    </div>
-  {/if}
+    {#if form.type === 'http'}
+      <div class="row" transition:slide>
+        <Http {form} {original} {app} {index} {validate} bind:this={pages.http} />
+      </div>
+    {:else if form.type === 'process'}
+      <div class="row" transition:slide>
+        <Proc {form} {original} {app} {index} {validate} bind:this={pages.process} />
+      </div>
+    {:else if form.type === 'icmp'}
+      <div class="row" transition:slide>
+        <Ping {form} {original} {app} {index} {validate} bind:this={pages.icmp} />
+      </div>
+    {:else if form.type === 'ping'}
+      <div class="row" transition:slide>
+        <Ping {form} {original} {app} {index} {validate} bind:this={pages.ping} />
+      </div>
+    {:else if form.type === 'tcp'}
+      <div class="row" transition:slide>
+        <Tcp {form} {original} {app} {index} {validate} bind:this={pages.tcp} />
+      </div>
+    {/if}
 
-  <Row>
-    <Col md={6}>
-      <Input
-        id={app.id + '.timeout'}
-        type="timeout"
-        envVar={`${app.envPrefix}_${index}_TIMEOUT`}
-        bind:value={form.timeout}
-        original={original?.timeout}
-        {validate} />
-    </Col>
-    <Col md={6}>
-      <Input
-        id={app.id + '.interval'}
-        type="interval"
-        envVar={`${app.envPrefix}_${index}_INTERVAL`}
-        bind:value={form.interval}
-        original={original?.interval}
-        {validate} />
-    </Col>
-  </Row>
-</div>
+    <Row>
+      <Col md={6}>
+        <Input
+          id={app.id + '.timeout'}
+          type="timeout"
+          envVar={`${app.envPrefix}_${index}_TIMEOUT`}
+          bind:value={form.timeout}
+          original={original?.timeout}
+          {validate} />
+      </Col>
+      <Col md={6}>
+        <Input
+          id={app.id + '.interval'}
+          type="interval"
+          envVar={`${app.envPrefix}_${index}_INTERVAL`}
+          bind:value={form.interval}
+          original={original?.interval}
+          {validate} />
+      </Col>
+    </Row>
+  </div>
+{/if}
 
 <style>
   .serviceCheck :global(.changed) {

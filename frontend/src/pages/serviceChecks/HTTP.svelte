@@ -4,7 +4,10 @@
 
   export const validator = (id: string, value: any): string => {
     /* HTTP */
-    if (id == 'url' && !value.match(/^http:\/\/../) && !value.match(/^https:\/\/../))
+    if (
+      id == 'url' &&
+      (!value || (!value.match(/^http:\/\/../) && !value.match(/^https:\/\/../)))
+    )
       return get(_)('phrases.URLMustBeginWithHttp')
     if (id === 'codes' && (!value || value.length === 0))
       return get(_)('ServiceChecks.http.codes.required')
@@ -44,9 +47,9 @@
     }
   }
 
-  const originalHttp = $derived(setData(original.value, original.expect))
-  let httpCheck = $state(setData(form.value, form.expect))
-  export const reset = () => (httpCheck = setData(form.value, form.expect))
+  const originalHttp = $derived(setData(original?.value ?? '', original?.expect ?? ''))
+  let httpCheck = $state(setData(form?.value ?? '', form?.expect ?? ''))
+  export const reset = () => (httpCheck = setData(form?.value ?? '', form?.expect ?? ''))
 
   let codeFeedback = $state<string | undefined>(undefined)
 
