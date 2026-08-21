@@ -193,6 +193,11 @@ func (w *WatchFile) setup(ignored ignored) error {
 	return nil
 }
 
+// isQuietSetupErr is true for expected setup outcomes that must not be shared to Discord.
+func isQuietSetupErr(err error) bool {
+	return errors.Is(err, ErrIgnoredLog) || errors.Is(err, ErrDisabled)
+}
+
 // logWatchSetupError logs a file-watcher setup failure.
 // Watching the client's own log, or a disabled watcher, is expected and is never shared.
 func logWatchSetupError(reqID string, err error) {
@@ -321,11 +326,21 @@ func (c *cmd) fileWatcherTicker(ctx context.Context, died bool) bool {
 			item.retries, maxRetries, item.Path)
 
 		if err := c.addFileWatcher(item); err != nil {
-			mnd.Log.Errorf(mnd.GetID(ctx), "Restarting File Watcher (retries: %d/%d): %s: %v",
-				item.retries, maxRetries, item.Path, err)
 			mnd.FileWatcher.Add(item.Path+Errors, 1)
-
 			stilldead = true
+
+			reqID := mnd.GetID(ctx)
+			switch {
+			case isQuietSetupErr(err):
+				logWatchSetupError(reqID, err)
+				retries = maxRetries // do not keep retrying expected failures.
+			case retries >= maxRetries:
+				mnd.Log.Errorf(reqID, "Giving up restarting File Watcher after %d retries: %s: %v",
+					maxRetries, item.Path, err)
+			default:
+				mnd.Log.ErrorfNoShare(reqID, "Restarting File Watcher (retries: %d/%d): %s: %v",
+					retries, maxRetries, item.Path, err)
+			}
 		} else {
 			mnd.FileWatcher.Add(item.Path+" Restarts", 1)
 		}
