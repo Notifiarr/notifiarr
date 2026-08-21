@@ -42,7 +42,7 @@ RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
     -X \"golift.io/version.Revision=${ITERATION}\" \
     -X \"golift.io/version.Version=${VERSION}\""
 
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 # Copy the binary.
 COPY --from=builder /tmp/notifiarr /
 # Other tools.
