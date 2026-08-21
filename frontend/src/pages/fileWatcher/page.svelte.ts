@@ -37,10 +37,36 @@ const merge = (index: number, form: WatchFile): Config => {
   return c
 }
 
+const normalizePath = (path: string, windows: boolean): string => {
+  let n = path.trim().replaceAll('\\', '/').replace(/\/+$/, '')
+  if (windows) n = n.toLowerCase()
+  return n
+}
+
+const isClientLogPath = (path: string): boolean => {
+  const p = get(profile)
+  const windows = !!p.isWindows
+  const want = normalizePath(path, windows)
+  if (!want) return false
+
+  const candidates = [
+    p.config?.logFile,
+    p.config?.httpLog,
+    p.config?.debugLog,
+    p.config?.services?.logFile,
+    ...(p.logFileInfo?.list ?? []).filter(f => f.used).map(f => f.path),
+  ]
+
+  return candidates.some(
+    c => typeof c === 'string' && c !== '' && normalizePath(c, windows) === want,
+  )
+}
+
 const validator = (id: string, value: any): string => {
   id = id.split('.').pop() ?? id
   if (id === 'path') {
     if (!value) return get(_)('FileWatcher.path.required')
+    if (isClientLogPath(value)) return get(_)('FileWatcher.path.clientLog')
   } else if (id === 'regex') {
     if (!value) return get(_)('FileWatcher.regex.required')
   }

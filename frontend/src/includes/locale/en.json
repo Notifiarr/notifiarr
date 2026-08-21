@@ -959,7 +959,8 @@
       "label": "File Path",
       "description": "Path to the file to watch. Recommend absolute path names.",
       "placeholder": "/var/log/nginx/access.log",
-      "required": "Path is required"
+      "required": "Path is required",
+      "clientLog": "Cannot watch the client's own log file; that would loop. Client errors are already sent as client_error_log."
     },
     "disabled": { "label": "Active", "description": "Disable this watcher." },
     "regex": {
