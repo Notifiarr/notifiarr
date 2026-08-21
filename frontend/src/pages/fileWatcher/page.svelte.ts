@@ -38,9 +38,25 @@ const merge = (index: number, form: WatchFile): Config => {
 }
 
 const normalizePath = (path: string, windows: boolean): string => {
-  let n = path.trim().replaceAll('\\', '/').replace(/\/+$/, '')
+  let n = path.trim().replaceAll('\\', '/')
   if (windows) n = n.toLowerCase()
-  return n
+
+  const unc = n.startsWith('//')
+  const stack: string[] = []
+  for (const part of n.split('/')) {
+    if (part === '' || part === '.') continue
+    if (part === '..') {
+      const head = stack.at(-1)
+      if (head && head !== '..' && !(windows && /^[a-z]:$/.test(head))) stack.pop()
+      continue
+    }
+    stack.push(part)
+  }
+
+  let out = stack.join('/')
+  if (unc) out = '//' + out
+  else if (n.startsWith('/')) out = '/' + out
+  return out.replace(/\/+$/, '')
 }
 
 const isClientLogPath = (path: string): boolean => {
