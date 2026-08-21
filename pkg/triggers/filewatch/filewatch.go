@@ -141,7 +141,7 @@ func (c *cmd) run(ctx context.Context) {
 
 	for _, item := range c.files {
 		if err := item.setup(c.ignored); err != nil {
-			mnd.Log.Errorf(mnd.GetID(ctx), "Unable to watch file: %v", err)
+			logWatchSetupError(mnd.GetID(ctx), err)
 			continue
 		}
 
@@ -191,6 +191,19 @@ func (w *WatchFile) setup(ignored ignored) error {
 	w.retries = 0
 
 	return nil
+}
+
+// logWatchSetupError logs a file-watcher setup failure.
+// Watching the client's own log, or a disabled watcher, is expected and is never shared.
+func logWatchSetupError(reqID string, err error) {
+	switch {
+	case errors.Is(err, ErrIgnoredLog):
+		mnd.Log.Printf(reqID, "Skipping File Watcher for client's own log (would loop): %v", err)
+	case errors.Is(err, ErrDisabled):
+		mnd.Log.Debugf(reqID, "Skipping disabled File Watcher: %v", err)
+	default:
+		mnd.Log.Errorf(reqID, "Unable to watch file: %v", err)
+	}
 }
 
 // collectFileTails uses reflection to watch a dynamic list of files in one go routine.
