@@ -293,7 +293,7 @@ func (c *cmd) tailFiles(ctx context.Context, cases []reflect.SelectCase, tails [
 // If that does not return an error, it means Stop was already called.
 func (c *cmd) killWatcher(ctx context.Context, item *WatchFile) bool {
 	if err := item.deactivate(); err != nil {
-		mnd.Log.Errorf(mnd.GetID(ctx), "No longer watching file (channel closed): %s: %v", item.Path, err)
+		mnd.Log.ErrorfNoShare(mnd.GetID(ctx), "No longer watching file (channel closed): %s: %v", item.Path, err)
 		mnd.FileWatcher.Add(item.Path+Errors, 1)
 
 		return true

@@ -42,12 +42,14 @@ const normalizePath = (path: string, windows: boolean): string => {
   if (windows) n = n.toLowerCase()
 
   const unc = n.startsWith('//')
+  const rooted = unc || n.startsWith('/') || (windows && /^[a-z]:\//.test(n))
   const stack: string[] = []
   for (const part of n.split('/')) {
     if (part === '' || part === '.') continue
     if (part === '..') {
       const head = stack.at(-1)
       if (head && head !== '..' && !(windows && /^[a-z]:$/.test(head))) stack.pop()
+      else if (!rooted) stack.push('..')
       continue
     }
     stack.push(part)
