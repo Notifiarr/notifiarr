@@ -64,9 +64,9 @@ export class FormListTracker<T> {
   private feedback: Record<number, Record<string, string | undefined>>
   /** The form-bound list of instances in our tabs. */
   public instances: T[]
-  /** List of removed instance indexes. Use .length to get the number of removed instances. */
+  /** Count of deleted saved instances. Use .length for the Deleted badge. Indexes are not stable. */
   public removed: number[]
-  /** The original list of instances in our tabs. */
+  /** Saved instances still in the form. Kept index-aligned with `instances` when deleting. */
   public readonly original: T[]
   /** Data about the app we're validating. */
   public readonly app: App<T>
@@ -105,12 +105,13 @@ export class FormListTracker<T> {
     this.active = undefined
     // Wait for it to slide shut.
     await delay(400)
+    // Drop the matching saved original so remaining rows keep the right Reset/Changed state.
+    if (index < this.original.length) {
+      this.original.splice(index, 1)
+      this.removed.push(index)
+    }
     // Remove the instance from the form (delete the accordion).
     this.instances.splice(index, 1)
-    // Record the removed index. Once. If it's not a new index.
-    // This is the 'Deleted' counter.
-    if (!this.removed.includes(index) && index < this.original.length)
-      this.removed.push(index)
     // Reset the feedback for the instance.
     this.feedback = {}
     // Re-open a remaining instance. Never select index 0 on an empty list:
