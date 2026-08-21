@@ -83,7 +83,7 @@ type deduper struct {
 	skipped map[string]int
 }
 
-func newDeduper(cool time.Duration) *deduper {
+func newDeduper(cool time.Duration) *deduper { //nolint:unparam
 	return &deduper{
 		cool:    cool,
 		now:     time.Now,
@@ -98,12 +98,12 @@ func shareKey(msg string) string {
 		return msg
 	}
 
-	idx := strings.Index(msg, traceClose)
-	if idx < 0 {
+	_, after, ok := strings.Cut(msg, traceClose)
+	if !ok {
 		return msg
 	}
 
-	return msg[idx+len(traceClose):]
+	return after
 }
 
 func repeatedSuffix(n int) string {
