@@ -18,6 +18,18 @@
 # Set the repo name correctly.
 REPO=Notifiarr/notifiarr
 
+# DSM restores /usr/bin (and the rest of the system partition) from its factory
+# image on every boot, so anything placed directly in /usr/bin disappears after
+# a reboot even though the systemd unit, config, and cron job survive untouched.
+# Synology's dev guide documents /usr/local as backed up/restored across DSM
+# upgrades, and /usr/local/bin specifically as where Package Center symlinks
+# installed packages' binaries (confirmed live on real DSM7 hardware). Install
+# the real binary there and keep /usr/bin/notifiarr as a convenience symlink
+# for interactive use. /usr/local/bin doesn't exist out of the box on stock
+# DSM, so it's created below.
+BINDIR=/usr/local/bin
+BINARY=${BINDIR}/notifiarr
+
 # Nothing else needs to be changed. Unless you're fixing things!
 
 LATEST=https://api.github.com/repos/${REPO}/releases/latest
@@ -65,7 +77,7 @@ if [ "$WGET" = "" ]; then
   exit 1
 fi
 
-INSTALLED=$(/usr/bin/notifiarr -v 2>/dev/null | cut -d' ' -f 2 | cut -d- -f1)
+INSTALLED=$(${BINARY} -v 2>/dev/null | cut -d' ' -f 2 | cut -d- -f1)
 
 # Grab latest release file from github.
 PAYLOAD=$($WGET ${LATEST})
@@ -122,19 +134,20 @@ echo "${P} To Location: /tmp/${FILE}"
 $WGET ${URL} > /tmp/${FILE}
 
 if [ "$(id -u)" != "0" ]; then
-  echo "${P} Downloaded, but no root access. Install the file manually to /usr/bin/notifiarr"
+  echo "${P} Downloaded, but no root access. Install the file manually to ${BINARY}"
   echo "${P} Recommend re-running this script as root instead!"
   echo "${P} Doing so will install the upstart file, notifiarr user, and config file."
   exit 0
 fi
 
 # Install it.
-echo "${P} Downloaded. Installing the binary to /usr/bin/notifiarr"
+echo "${P} Downloaded. Installing the binary to ${BINARY}"
 
 [ -z "$SYSTEMCTL" ] && status notifiarr 2>/dev/null >/dev/null || systemctl status notifiarr 2>/dev/null >/dev/null
 RUNNING=$?
 stop notifiarr 2>/dev/null || systemctl stop notifiarr 2>/dev/null >/dev/null
-gunzip -c /tmp/${FILE} > /usr/bin/notifiarr
+mkdir -p ${BINDIR}
+gunzip -c /tmp/${FILE} > ${BINARY}
 rm /tmp/${FILE}
 
 ID=$(id notifiarr 2>&1)
@@ -153,13 +166,19 @@ if [ ! -f "${CONFIGFILE}" ]; then
   echo " " > "${CONFIGFILE}"
   DN_LOG_FILE="/var/log/notifiarr/app.log" \
     DN_HTTP_LOG="/var/log/notifiarr/http.log" \
-    /usr/bin/notifiarr --config "${CONFIGFILE}" --write "${CONFIGFILE}.new"
+    ${BINARY} --config "${CONFIGFILE}" --write "${CONFIGFILE}.new"
   mv "${CONFIGFILE}.new" "${CONFIGFILE}"
 fi
 
-echo "${P} Setting permissions/ownership on: /usr/bin/notifiarr /var/log/notifiarr"
-chmod 0755 /usr/bin/notifiarr /var/log/notifiarr
+echo "${P} Setting permissions/ownership on: ${BINARY} /var/log/notifiarr"
+chmod 0755 ${BINARY} /var/log/notifiarr
 chown -R notifiarr: /var/log/notifiarr /etc/notifiarr
+
+# Keep /usr/bin/notifiarr as a convenience symlink for interactive shell use.
+# DSM wipes real files placed directly in /usr/bin on every boot, but it's
+# harmless to recreate this symlink on every run/update; the systemd unit and
+# upstart config below point at ${BINARY} directly and don't depend on it.
+ln -sf ${BINARY} /usr/bin/notifiarr
 
 echo "${P} Adding sudoers entry to: /etc/sudoers"
 sed -i '/notifiarr/d' /etc/sudoers
@@ -179,7 +198,7 @@ respawn
 respawn limit 5 10
 
 setuid notifiarr
-exec /usr/bin/notifiarr -c ${CONFIGFILE}
+exec ${BINARY} -c ${CONFIGFILE}
 EOT
 else
   echo "${P} Updating unit file: /etc/systemd/system/notifiarr.service"
@@ -190,7 +209,7 @@ After=network.target
 Requires=network.target
 
 [Service]
-ExecStart=/usr/bin/notifiarr -c ${CONFIGFILE}
+ExecStart=${BINARY} -c ${CONFIGFILE}
 Restart=always
 RestartSec=10
 SyslogIdentifier=notifiarr
