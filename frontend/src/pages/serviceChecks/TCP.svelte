@@ -26,7 +26,7 @@
   }: ChildProps<ServiceConfig> = $props()
 
   onMount(() => {
-    validate?.(app.id + '.value', form.value)
+    validate?.(app.id + '.value', form?.value)
     return () => validate?.(app.id + '.value', 'this.is.valid')
   })
 </script>

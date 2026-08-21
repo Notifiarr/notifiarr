@@ -45,7 +45,7 @@
       </h5>
     </div>
 
-    {#if one}
+    {#if one && flt.instances[0]}
       <InstanceHeader {flt} />
       <Instance
         index={0}
@@ -53,7 +53,7 @@
         bind:form={flt.instances[0]}
         original={flt.original[0]}
         app={flt.app} />
-    {:else}
+    {:else if !one}
       <Instances bind:flt Child={Instance}>
         {#snippet headerActive(index)}
           {index + 1}. {flt.original[index]?.name}

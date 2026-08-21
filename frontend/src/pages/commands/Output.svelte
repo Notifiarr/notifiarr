@@ -37,7 +37,7 @@
   /** Retrieve the command output and update the last refreshed time. */
   export const getStats = async (e?: Event) => {
     e?.preventDefault()
-    if (!form.hash) return
+    if (!form?.hash) return
     const res = await getUi('ajax/cmdstats/' + form.hash)
     if (!res.ok) failure('Failure getting command output. ' + res.body)
     else output = res.body as Stats
@@ -46,7 +46,7 @@
 
   $effect(() => {
     // The delay prevents an error when saving the page.
-    if (active) delay(50).then(() => getStats())
+    if (active && form) delay(50).then(() => getStats())
   })
 
   $effect(() => {

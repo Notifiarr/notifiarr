@@ -81,10 +81,12 @@ export class FormListTracker<T> {
     this.instances = $state(deepCopy(instances ?? []))
     this.original = $state(deepCopy(instances ?? []))
     this.app = app
-    this.formChanged = $derived(!deepEqual(this.instances, this.original))
     this.feedback = $state({})
     this.removed = $state([])
     this.active = $state(0)
+    this.formChanged = $derived(
+      this.removed.length > 0 || !deepEqual(this.instances, this.original),
+    )
     this.invalid = $derived(
       Object.values(this.feedback).some(v => Object.values(v).some(v => !!v)),
     )
@@ -92,7 +94,8 @@ export class FormListTracker<T> {
 
   /** Add a new instance to the list. */
   public addInstance = () => {
-    this.instances.push(this.app.empty!)
+    // Copy the empty template so each new instance is its own object.
+    this.instances.push(deepCopy(this.app.empty!))
     this.active = this.instances.length - 1
   }
 
@@ -110,7 +113,11 @@ export class FormListTracker<T> {
       this.removed.push(index)
     // Reset the feedback for the instance.
     this.feedback = {}
-    this.active = 0
+    // Re-open a remaining instance. Never select index 0 on an empty list:
+    // {#key flt.active} would remount children bound to undefined form and freeze the UI.
+    this.active = this.instances.length
+      ? Math.min(index, this.instances.length - 1)
+      : undefined
   }
 
   /** Reset the form to the original values. Call this after a form has been submitted. */

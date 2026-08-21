@@ -36,9 +36,9 @@
     }
   }
 
-  const originalProc = $derived(setData(original.expect))
-  let procCheck = $state(setData(form.expect))
-  export const reset = () => (procCheck = setData(form.expect))
+  const originalProc = $derived(setData(original?.expect ?? ''))
+  let procCheck = $state(setData(form?.expect ?? ''))
+  export const reset = () => (procCheck = setData(form?.expect ?? ''))
 
   const updateExpect = (id: string, value: any) => {
     if (procCheck.running) {
@@ -48,7 +48,7 @@
       procCheck.maximum = 0
       resetValidators()
     } else {
-      const os = original.expect.split(':').length
+      const os = original?.expect?.split(':').length ?? 0
       form.expect =
         `count:${procCheck.minimum}` +
         (procCheck.maximum > 0 || os > 2 ? `:${procCheck.maximum}` : '') +

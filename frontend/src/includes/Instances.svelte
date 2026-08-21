@@ -53,7 +53,7 @@
 {#if flt.instances.length > 0}
   <div class="instances" transition:slide>
     <Accordion class="mb-2">
-      {#each flt.instances as instance, index}
+      {#each flt.instances as instance, index (instance)}
         {@const changed = !deepEqual(instance, flt.original?.[index] ?? flt.app.empty)}
         <div class="accordion-item">
           <AccordionHeader
@@ -82,30 +82,35 @@
             <Card
               class="accordion-collapse {flt.active === index ? 'd-block' : 'd-none'}">
               <div class="accordion-body" transition:slide={{ duration: 350, axis: 'y' }}>
-                <Child
-                  bind:this={children[index]}
-                  bind:form={flt.instances[index]}
-                  original={flt.original?.[index] ?? flt.app.empty}
-                  app={flt.app}
-                  validate={(id, value) => flt.validate(id, value, index)}
-                  {index}
-                  active={flt.active === index} />
-                <Button
-                  color="danger"
-                  class="float-end"
-                  outline
-                  onclick={() => flt.delInstance(index)}>
-                  {$_(deleteButton)}
-                </Button>
-                <Button
-                  color="primary"
-                  class="float-end me-2"
-                  outline
-                  disabled={!changed}
-                  onclick={() => (flt.resetForm(index), children[index]?.reset?.())}>
-                  {$_('buttons.ResetForm')}
-                </Button>
-                <div style="clear: both;"></div>
+                <!-- Bind the live slot only while it is still this each item. After splice the
+                     outro keeps this block mounted, but flt.instances[index] is a different
+                     instance or undefined — which used to freeze the UI. -->
+                {#if flt.instances[index] === instance}
+                  <Child
+                    bind:this={children[index]}
+                    bind:form={flt.instances[index]}
+                    original={flt.original?.[index] ?? flt.app.empty}
+                    app={flt.app}
+                    validate={(id, value) => flt.validate(id, value, index)}
+                    {index}
+                    active={flt.active === index} />
+                  <Button
+                    color="danger"
+                    class="float-end"
+                    outline
+                    onclick={() => flt.delInstance(index)}>
+                    {$_(deleteButton)}
+                  </Button>
+                  <Button
+                    color="primary"
+                    class="float-end me-2"
+                    outline
+                    disabled={!changed}
+                    onclick={() => (flt.resetForm(index), children[index]?.reset?.())}>
+                    {$_('buttons.ResetForm')}
+                  </Button>
+                  <div style="clear: both;"></div>
+                {/if}
               </div>
             </Card>
           {/key}

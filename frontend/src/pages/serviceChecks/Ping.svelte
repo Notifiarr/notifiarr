@@ -37,9 +37,9 @@
     }
   }
 
-  const originalPing = $derived(setData(original.expect))
-  let pingCheck = $state(setData(form.expect))
-  export const reset = () => (pingCheck = setData(form.expect))
+  const originalPing = $derived(setData(original?.expect ?? ''))
+  let pingCheck = $state(setData(form?.expect ?? ''))
+  export const reset = () => (pingCheck = setData(form?.expect ?? ''))
 
   const updateExpect = (id: string, value: any) => {
     validate?.(app.id + '.ping.count', pingCheck.count)

@@ -27,14 +27,16 @@ export const validate = (
     })
     return value ? found : get(_)('phrases.NameMustNotBeEmpty')
   } else if (key == 'url') {
-    return value.startsWith('http://') || value.startsWith('https://')
+    // value is undefined while a deleted instance accordion is still outroing.
+    return typeof value === 'string' &&
+      (value.startsWith('http://') || value.startsWith('https://'))
       ? ''
       : get(_)('phrases.URLMustBeginWithHttp')
   } else if (key == 'host' && value === '') {
     return get(_)('phrases.HostMustNotBeEmpty')
-  } else if (key == 'apiKey' && value.length < 32) {
+  } else if (key == 'apiKey' && (value?.length ?? 0) < 32) {
     return get(_)('phrases.APIKeyMustBeCountCharactersOrLonger', { values: { count: 32 } })
-  } else if (key == 'token' && value.length < 8) {
+  } else if (key == 'token' && (value?.length ?? 0) < 8) {
     return get(_)('phrases.TokenMustBeCountCharacters', { values: { count: 8 } })
   }
 
