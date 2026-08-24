@@ -43,9 +43,18 @@
 
 <svelte:window
   bind:innerWidth={() => windowWidth, setWindowWidth}
-  on:popstate={e => nav.popstate(e)} />
+  onpopstate={e => nav.popstate(e)} />
 
 <Modals />
+
+{#if isMobile && sidebarOpen}
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    aria-label={$_('buttons.HideMenu')}
+    onclick={closeSidebar}>
+  </button>
+{/if}
 
 {#if isMobile}
   <div class="menu-toggle-wrapper">
@@ -131,6 +140,17 @@
     gap: 8px;
     width: 100%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1015;
+    margin: 0;
+    border: 0;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.4);
+    cursor: pointer;
   }
 
   /* Mobile drawer: fill the visual viewport and let Sidebar scroll internally. */

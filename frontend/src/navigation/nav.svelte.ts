@@ -27,6 +27,8 @@ class Navigator {
   public showUnsavedAlert = $state('')
   /** This is used to force a navigation event even if there are unsaved changes. */
   public forceEvent = { type: 'force', preventDefault: () => { } } as Event
+  // Ignore the synthetic popstate from history.go(1) after blocking Back.
+  private ignorePop = false
 
   /** Call this in the onMount function of the parent component to set the initial page. */
   public onMount = () => {
@@ -62,7 +64,7 @@ class Navigator {
     }
 
     if (this.formChanged && event?.type !== 'force' && pid !== this.activePage) {
-      this.showUnsavedAlert = pid
+      this.showUnsavedAlert = pid || 'Landing'
       return
     }
 
@@ -92,15 +94,33 @@ class Navigator {
 
   // popstate is split from goto(), so we can call it from popstate.
   /**  Call this only when the back button is clicked. */
-  public popstate = (e: PopStateEvent) => (
-    e.preventDefault(),
-    this.setActivePage(e.state?.uri ?? '')
-  )
+  public popstate = (e: PopStateEvent) => {
+    e.preventDefault()
+
+    if (this.ignorePop) {
+      this.ignorePop = false
+      return
+    }
+
+    closeSidebar()
+
+    const pid = e.state?.uri ?? ''
+    if (this.formChanged && pid !== this.activePage) {
+      this.ignorePop = true
+      window.history.go(1)
+      this.showUnsavedAlert = pid || 'Landing'
+      return
+    }
+
+    this.setActivePage(pid)
+  }
 
   /** active returns true if the provided page id is currently selected. */
   public active = (page: string): boolean => iequals(this.activePage, page)
 
   private setActivePage = (newPage: string): string => {
+    if (iequals(newPage, 'Landing')) newPage = ''
+
     const page = allPages.find(p => iequals(p.path ?? p.id, newPage))
     this.ActivePage = page?.component || Landing
     return (this.activePage = page ? (page.path ?? page.id) : '')
