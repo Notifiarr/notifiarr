@@ -324,6 +324,24 @@ func TestAddAfterEmptyStartCanRunCheck(t *testing.T) {
 	case <-time.After(2 * time.Second):
 		t.Fatal("check queued after empty Start never ran; worker pool was empty")
 	}
+
+	// Wait for update() to finish, not just the HTTP hit. A nil Service.log panics there.
+	deadline := time.After(2 * time.Second)
+	ticker := time.NewTicker(time.Millisecond)
+	defer ticker.Stop()
+
+	for {
+		got := resultsByName(svc.GetResults())
+		if late := got["late"]; late != nil && late.State == services.StateOK {
+			return
+		}
+
+		select {
+		case <-deadline:
+			t.Fatal("late check started but never recorded a result")
+		case <-ticker.C:
+		}
+	}
 }
 
 func TestConcurrentStartAndStop(t *testing.T) {
