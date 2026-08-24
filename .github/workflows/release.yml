@@ -99,6 +99,9 @@ jobs:
       - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         env:
           FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
+          # Job-level CODESIGN_URL is only for the codesign step's if.
+          # Make must not see it: signexe.sh would fail before the Action installs the CLI.
+          CODESIGN_URL: ""
         id: release
         run: |
           sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools
