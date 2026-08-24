@@ -52,6 +52,7 @@ func (s *Services) add(svc *ServiceConfig) {
 		ServiceConfig: svc,
 		State:         StateUnknown,
 		Since:         time.Now(),
+		log:           s.log,
 	}
 }
 
