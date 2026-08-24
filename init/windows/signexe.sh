@@ -7,8 +7,8 @@ set -e -o pipefail
 # This script is for local `make windows` when CODESIGN_URL is set (SSH tunnel
 # or a configured CLI). PKCS#12 secrets are retired.
 #
-# On macOS, never call /usr/bin/codesign (Apple's tool). Prefer CODESIGN_BIN
-# or "$(go env GOPATH)/bin/codesign".
+# On macOS, never call /usr/bin/codesign (Apple's tool). Prefer CODESIGN_BIN,
+# "$(go env GOPATH)/bin/codesign", then any other `codesign` on PATH.
 
 function pick_codesign() {
   if [ -n "${CODESIGN_BIN:-}" ]; then
@@ -20,14 +20,15 @@ function pick_codesign() {
     echo "${gopath}/bin/codesign"
     return
   fi
-  case "$(uname -s)" in
-    Darwin)
-      return 1
-      ;;
-    *)
-      command -v codesign
-      ;;
-  esac
+  # Apple ships /usr/bin/codesign. Skip it; any other PATH hit is the CLI.
+  while IFS= read -r p; do
+    case "$p" in
+      /usr/bin/codesign|/bin/codesign) continue ;;
+    esac
+    echo "$p"
+    return
+  done < <(type -a -p codesign 2>/dev/null || true)
+  return 1
 }
 
 function sign() {

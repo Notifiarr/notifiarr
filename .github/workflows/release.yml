@@ -116,6 +116,7 @@ jobs:
       - name: Zip Windows exe
         run: |
           make windows_zip
+          rm -f release/sha512sums.txt
           openssl dgst -r -sha512 release/* | sed 's#release/##' | tee release/sha512sums.txt
       - name: Upload Release Artifacts v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         uses: actions/upload-artifact@v7
