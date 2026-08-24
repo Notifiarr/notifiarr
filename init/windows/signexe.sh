@@ -2,24 +2,54 @@
 
 set -e -o pipefail
 
-# https://blog.synapp.nz/2017/06/16/code-signing-a-windows-application-on-linux-on-windows/
-# https://stackoverflow.com/a/29073957/1142
+# Authenticode-sign a Windows PE via golift/codesign (YubiKey-backed signerd).
+# GitHub Actions uses golift/codesign@v1 after `make release WINDOWS_ZIP=0`.
+# This script is for local `make windows` when CODESIGN_URL is set (SSH tunnel
+# or a configured CLI). PKCS#12 secrets are retired.
+#
+# On macOS, never call /usr/bin/codesign (Apple's tool). Prefer CODESIGN_BIN,
+# "$(go env GOPATH)/bin/codesign", then any other `codesign` on PATH.
+
+function pick_codesign() {
+  if [ -n "${CODESIGN_BIN:-}" ]; then
+    echo "${CODESIGN_BIN}"
+    return
+  fi
+  gopath="$(go env GOPATH 2>/dev/null || true)"
+  if [ -n "${gopath}" ] && [ -x "${gopath}/bin/codesign" ]; then
+    echo "${gopath}/bin/codesign"
+    return
+  fi
+  # Apple ships /usr/bin/codesign. Skip it; any other PATH hit is the CLI.
+  while IFS= read -r p; do
+    case "$p" in
+      /usr/bin/codesign|/bin/codesign) continue ;;
+    esac
+    echo "$p"
+    return
+  done < <(type -a -p codesign 2>/dev/null || true)
+  return 1
+}
+
 function sign() {
-  if [ -z "${EXE_SIGNING_KEY}" ] || [ -z "${EXE_SIGNING_KEY_PASSWORD}" ]; then
-    echo "Skipped signing ${FILE} .." >&2
+  if [ -z "${CODESIGN_URL:-}" ]; then
+    echo "Skipped signing ${FILE} (CODESIGN_URL unset) .." >&2
     exit 0
   fi
 
-  rm -f "${FILE}.signed"
-  echo "${EXE_SIGNING_KEY}" | base64 -d | \
-  osslsigncode sign -pkcs12 /dev/stdin \
-    -pass "${EXE_SIGNING_KEY_PASSWORD}" \
-    -n "Notifiarr" \
-    -i "https://notifiarr.com" \
-    -t "http://timestamp.comodoca.com/authenticode" \
-    -in "${FILE}" -out "${FILE}.signed" \
-    && cp "${FILE}.signed" "${FILE}" >> /tmp/pwd >&2 \
-    && echo "Signed ${FILE} .." >&2
+  bin="$(pick_codesign)" || {
+    if [ -n "${GITHUB_ACTIONS:-}" ]; then
+      echo "Skipped signing ${FILE} (codesign CLI not on PATH; Action signs later) .." >&2
+      exit 0
+    fi
+    echo "CODESIGN_URL is set but golift codesign CLI not found (set CODESIGN_BIN)" >&2
+    exit 1
+  }
+
+  CODESIGN_NAME="${CODESIGN_NAME:-Notifiarr}" \
+  CODESIGN_WEBSITE="${CODESIGN_WEBSITE:-https://notifiarr.com}" \
+  "${bin}" -- "${FILE}"
+  echo "Signed ${FILE} .." >&2
 }
 
 [ -z "$1" ] || FILE="$1" sign

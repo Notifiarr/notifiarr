@@ -64,11 +64,14 @@ jobs:
       revision: ${{ steps.vars.outputs.revision }}
     name: Make Release Assets
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     env:
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
       SLIPPERS: ${{ secrets.SLIPPERS }}
-      EXE_SIGNING_KEY: ${{ secrets.EXE_SIGNING_KEY }}
-      EXE_SIGNING_KEY_PASSWORD: ${{ secrets.EXE_SIGNING_KEY_PASSWORD }}
+      # Map first: secrets cannot be referenced in steps.if.
+      CODESIGN_URL: ${{ secrets.CODESIGN_URL }}
     steps:
       - name: Configure Fast APT Mirror
         uses: vegardit/fast-apt-mirror.sh@v1
@@ -96,13 +99,30 @@ jobs:
       - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         env:
           FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
+          # Job-level CODESIGN_URL is only for the codesign step's if.
+          # Make must not see it: signexe.sh would fail before the Action installs the CLI.
+          CODESIGN_URL: ""
         id: release
         run: |
-          sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools osslsigncode
+          sudo apt install -y rpm fakeroot zip debsigs gnupg jq libarchive-tools
           sudo gem install --no-document fpm
           echo "${GPG_SIGNING_KEY}" | gpg --import -
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
-          make release
+          make release WINDOWS_ZIP=0
+      - uses: golift/codesign@v1
+        if: env.CODESIGN_URL != ''
+        with:
+          files: notifiarr.amd64.exe
+          url: ${{ secrets.CODESIGN_URL }}
+          client-cert: ${{ secrets.CODESIGN_CLIENT_CERT }}
+          client-key: ${{ secrets.CODESIGN_CLIENT_KEY }}
+          name: Notifiarr
+          website: https://notifiarr.com
+      - name: Zip Windows exe
+        run: |
+          make windows_zip
+          rm -f release/sha512sums.txt
+          openssl dgst -r -sha512 release/* | sed 's#release/##' | tee release/sha512sums.txt
       - name: Upload Release Artifacts v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         uses: actions/upload-artifact@v7
         with:
