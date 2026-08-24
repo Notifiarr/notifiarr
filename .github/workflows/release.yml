@@ -165,9 +165,13 @@ jobs:
           for file in *.{zip,dmg,gz}; do
             [ -f "$file" ] || continue;
             echo "Uploading: ${file}";
-            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}";
+            curl -sS --fail-with-body --retry 5 --retry-all-errors --retry-delay 2
+            -H "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}"
+            "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}";
             echo '{"version":"${{needs.release.outputs.version}}","revision":${{needs.release.outputs.revision}},"size":'$(stat --printf="%s" ${file})'}' >> ${file}.txt
-            curl -sSH "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}" "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}.txt";
+            curl -sS --fail-with-body --retry 5 --retry-all-errors --retry-delay 2
+            -H "X-API-KEY: ${{ secrets.UNSTABLE_UPLOAD_KEY }}"
+            "https://unstable.golift.io/upload.php?folder=notifiarr" -F "file=@${file}.txt";
           done
 
   deploy-unstable-packagecloud:
