@@ -70,6 +70,8 @@ jobs:
     env:
       GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
       SLIPPERS: ${{ secrets.SLIPPERS }}
+      # Map first: secrets cannot be referenced in steps.if.
+      CODESIGN_URL: ${{ secrets.CODESIGN_URL }}
     steps:
       - name: Configure Fast APT Mirror
         uses: vegardit/fast-apt-mirror.sh@v1
@@ -105,7 +107,7 @@ jobs:
           [ -z SLIPPERS ] || eval "${SLIPPERS}"
           make release WINDOWS_ZIP=0
       - uses: golift/codesign@v1
-        if: ${{ secrets.CODESIGN_URL != '' }}
+        if: env.CODESIGN_URL != ''
         with:
           files: notifiarr.amd64.exe
           url: ${{ secrets.CODESIGN_URL }}
