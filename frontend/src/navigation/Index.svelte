@@ -25,7 +25,7 @@
   // windowWidth is used for sidebar collapse state.
   let windowWidth = $state(magicNumber - 1)
   const isMobile = $derived(windowWidth <= magicNumber)
-  // Use this to limit the sidebar height to the content height.
+  // Desktop: stretch the sticky sidebar to the content height.
   let contentHeight = $state(0)
 
   onMount(async () => {
@@ -33,12 +33,17 @@
     await nav.onMount()
   })
 
-  $effect(() => {
-    if (windowWidth < magicNumber) sidebarOpen = false
-  })
+  // Close the overlay only when crossing desktop → mobile, not on every
+  // innerWidth tick (rotation would otherwise dismiss an open menu).
+  const setWindowWidth = (width: number) => {
+    if (width <= magicNumber && windowWidth > magicNumber) sidebarOpen = false
+    windowWidth = width
+  }
 </script>
 
-<svelte:window bind:innerWidth={windowWidth} on:popstate={e => nav.popstate(e)} />
+<svelte:window
+  bind:innerWidth={() => windowWidth, setWindowWidth}
+  on:popstate={e => nav.popstate(e)} />
 
 <Modals />
 
@@ -64,7 +69,7 @@
   {@const transition = { duration: 600, axis: 'x' as const }}
   <!-- Navigation Sidebar. -->
   <div class="sidebar-col col mb-2 {flex}" transition:slide={transition}>
-    <Sidebar slide={transition} height={contentHeight} />
+    <Sidebar slide={transition} height={contentHeight} {isMobile} />
   </div>
 {/if}
 
@@ -128,17 +133,27 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
 
-  /* Mobile styles for sidebar. Turns it into a fixed sidebar w/ toggler. */
+  /* Mobile drawer: fill the visual viewport and let Sidebar scroll internally. */
   .flex-col {
     position: fixed;
     z-index: 1020;
-    max-height: 100vh;
-    overflow-y: auto;
     top: 0;
     left: 0;
+    bottom: 0;
+    height: 100dvh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     padding: 1px;
     border-radius: 12px;
     box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
     background: rgba(118, 122, 126, 0.9);
+  }
+
+  .flex-col :global(.sidebar-card-wrapper) {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
   }
 </style>
