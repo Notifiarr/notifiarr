@@ -51,7 +51,7 @@ require (
 	golift.io/rotatorr v0.0.0-20260217050959-f6ac6fc7b38e
 	golift.io/starr v1.3.1
 	golift.io/version v0.0.2
-	golift.io/xtractr v0.4.2
+	golift.io/xtractr v0.6.0
 	modernc.org/sqlite v1.57.0
 )
 
