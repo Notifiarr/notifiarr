@@ -1,8 +1,5 @@
-# systemd-tmpfiles.d — config and log dirs for User=notifiarr (see notifiarr.service).
-# Chown packaged conf files before the directory. systemd rejects a notifiarr-owned
-# directory that still contains root-owned files ("unsafe path transition").
-z /etc/notifiarr/notifiarr.conf 0644 notifiarr notifiarr -
-z /etc/notifiarr/notifiarr.conf.example 0644 notifiarr notifiarr -
-z /etc/notifiarr 0755 notifiarr notifiarr -
+# systemd-tmpfiles.d — log dir for User=notifiarr (see notifiarr.service).
+# Do not chown /etc/notifiarr here. systemd-tmpfiles runs on every boot and
+# would reset an admin who overrode User=/Group=. Fresh-install ownership is
+# set once from after-install.sh (deb/rpm) or notifiarr.install (AUR).
 d /var/log/notifiarr 0755 notifiarr notifiarr -
-z /var/log/notifiarr 0755 notifiarr notifiarr -
