@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-# Docker Hub autobuild hooks are retired. Images are built by GoReleaser Pro
-# dockers_v2 from a pre-built linux binary. See .github/workflows/README.md.
-echo "init/docker/hooks/build is unused; Docker images are published by release.yml" >&2
-exit 1

@@ -1,4 +1,0 @@
-#!/bin/bash
-# Docker Hub autobuild hooks are retired. See .github/workflows/README.md.
-echo "init/docker/hooks/pre_build is unused; Docker images are published by release.yml" >&2
-exit 1
