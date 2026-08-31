@@ -1,6 +1,6 @@
 # systemd-tmpfiles.d — log dir for User=notifiarr (see notifiarr.service).
 # Do not chown /etc/notifiarr here. systemd-tmpfiles runs on every boot and
 # would reset an admin who overrode User=/Group=. Config ownership is claimed
-# while the path is still root-owned, from after-install.sh (deb/rpm/nFPM) or
+# while the path is still root:root, from after-install.sh (deb/rpm/nFPM) or
 # notifiarr.install (AUR).
 d /var/log/notifiarr 0755 notifiarr notifiarr -
