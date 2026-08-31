@@ -3,8 +3,20 @@
 # This file is used by deb, rpm and BSD packages.
 # FPM/nFPM adds this as the after-install script.
 #
-# Chown config and log dirs only on a first install. Upgrades must not reset
-# an admin who overrode User=/Group= and chowned those trees to match.
+# Chown the packaged config files only on a first install. Upgrades must not
+# reset an admin who overrode User=/Group= and chowned the config to match.
+# Name the packaged files instead of chown -R so extra files in the directory
+# keep the ownership the admin set. Only touch this OS's config/log roots.
+
+OS="$(uname -s)"
+
+if [ "${OS}" = "Linux" ]; then
+  confdir=/etc/notifiarr
+  logdir=/var/log/notifiarr
+else
+  confdir=/usr/local/etc/notifiarr
+  logdir=/usr/local/var/log/notifiarr
+fi
 
 # nFPM: deb $1=configure $2=oldver-or-empty; rpm $1=1 install / $1=2 upgrade.
 first_install=0
@@ -15,17 +27,13 @@ elif [ "${1:-}" = "configure" ] && [ -z "${2:-}" ]; then
 fi
 
 if [ "${first_install}" = 1 ]; then
-  if [ -d /usr/local/etc/notifiarr ]; then
-    chown -R notifiarr: /usr/local/etc/notifiarr
+  if [ -d "${confdir}" ]; then
+    chown notifiarr: "${confdir}"
+    [ -f "${confdir}/notifiarr.conf" ] && chown notifiarr: "${confdir}/notifiarr.conf"
+    [ -f "${confdir}/notifiarr.conf.example" ] && chown notifiarr: "${confdir}/notifiarr.conf.example"
   fi
-  if [ -d /etc/notifiarr ]; then
-    chown -R notifiarr: /etc/notifiarr
-  fi
-  if [ -d /var/log/notifiarr ]; then
-    chown -R notifiarr: /var/log/notifiarr
-  fi
-  if [ -d /usr/local/var/log/notifiarr ]; then
-    chown -R notifiarr: /usr/local/var/log/notifiarr
+  if [ -d "${logdir}" ]; then
+    chown notifiarr: "${logdir}"
   fi
 fi
 

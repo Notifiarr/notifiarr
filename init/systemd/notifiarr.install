@@ -1,11 +1,14 @@
 # Fresh install only. Upgrades must not reset config ownership for admins
-# who overrode User=/Group= in a systemd drop-in.
+# who overrode User=/Group= in a systemd drop-in. Name the packaged files
+# instead of chown -R so extra files in the directory keep their owner.
 post_install() {
   if command -v systemd-sysusers >/dev/null; then
     systemd-sysusers notifiarr.conf
   fi
   if [ -d /etc/notifiarr ]; then
-    chown -R notifiarr:notifiarr /etc/notifiarr
+    chown notifiarr:notifiarr /etc/notifiarr
+    [ -f /etc/notifiarr/notifiarr.conf ] && chown notifiarr:notifiarr /etc/notifiarr/notifiarr.conf
+    [ -f /etc/notifiarr/notifiarr.conf.example ] && chown notifiarr:notifiarr /etc/notifiarr/notifiarr.conf.example
   fi
 }
 
