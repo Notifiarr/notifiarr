@@ -47,7 +47,7 @@ before:
       -internal-name notifiarr
       -original-name notifiarr.exe
       -product-name Notifiarr
-      -file-version "{{ index (split .Version \"-\") 0 }}.{{ .Env.REVISION }}"
+      -file-version "{{ index (split .Version "-") 0 }}.{{ .Env.REVISION }}"
       -product-version "{{ .Version }}"
       -translation 1033
       -charset 1200
