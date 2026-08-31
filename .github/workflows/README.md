@@ -85,7 +85,7 @@ The app executable is `Contents/MacOS/Notifiarr` (`builds.binary: Notifiarr`). H
 
 ## Merge destinations
 
-- **Docker** — always `ghcr.io/notifiarr/notifiarr` and Hub `docker.io/golift/notifiarr` (`DOCKERHUB_PUBLISH=1`). Empty `DOCKERHUB_PASSWORD` fails the merge job. Platforms: `linux/amd64`, `linux/arm64` (no arm/v7). Three Dockerfiles (runtime COPY of the Pro binary): Alpine, Ubuntu (`-ubuntu`, MegaCli), CUDA (`-cuda`, MegaCli + `nvidia-smi`). Frontend/FA token never enter the image.
+- **Docker** — always `ghcr.io/notifiarr/notifiarr` and Hub `docker.io/golift/notifiarr` (`DOCKERHUB_PUBLISH=1`). Empty `DOCKERHUB_PASSWORD` fails the merge job. Platforms: `linux/amd64`, `linux/arm64` (no arm/v7). Three Dockerfiles (runtime COPY of the Pro binary): Alpine, Ubuntu (`-ubuntu`, MegaCli), CUDA (`-cuda`, MegaCli + `nvidia-smi`). Frontend/FA token never enter the image. `upload-artifact` zip stores files as `0644`; the merge job `chmod 0755`s `dist/linux/**/notifiarr` and each Dockerfile `COPY --chmod=755` so the image entrypoint is executable.
 - **GitHub Release** — tagged `v*` only (`release.disable: "{{ .IsNightly }}"`). macOS is the notarized `Notifiarr.dmg`. Windows assets are `notifiarr.amd64.exe.zip`. FreeBSD assets are pkgng `notifiarr-<version>.{amd64,i386,armhf}.txz` plus `.freebsd.gz`. Linux assets are `notifiarr.{amd64,386,arm,arm64}.linux.gz` plus nFPM deb/rpm/zst.
 - **AUR** — `init/archlinux/aur-deploy.sh` on the merge job, **release channel only**. Binary package `notifiarr-bin`. Do not add GoReleaser `aur_sources` (needs the source tarball on `--split` and cannot `npm run build` without the FA token).
 - **packagecloud** — `golift/pkgs` vs `golift/unstable`. Skip when `CHANNEL=nightly`.

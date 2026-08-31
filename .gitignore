@@ -39,7 +39,6 @@ MANUAL.html
 README
 README.html
 /*_manual.html
-/homebrew-mugs
 .secret*files.tar
 *key*
 !.github/scripts/macos_keychain.sh

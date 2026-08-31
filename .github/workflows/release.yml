@@ -387,6 +387,19 @@ jobs:
           mkdir -p dist/darwin
           tar -xf dist/dist-darwin.tar -C dist/darwin
           rm -f dist/dist-darwin.tar
+      - name: Restore execute bits lost by artifact zip
+        run: |
+          set -euo pipefail
+          # upload-artifact zip forces 0644. dockers_v2 gio.Copy preserves that,
+          # so /notifiarr in the image is not executable (Unpackerr #675 / #674).
+          mapfile -t bins < <(find dist/linux -type f -name notifiarr)
+          if [ "${#bins[@]}" -eq 0 ]; then
+            echo "no dist/linux/**/notifiarr binaries" >&2
+            find dist/linux -type f | head >&2 || true
+            exit 1
+          fi
+          chmod 0755 "${bins[@]}"
+          ls -l "${bins[@]}"
       - uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
         with:
           distribution: goreleaser-pro
@@ -399,7 +412,6 @@ jobs:
           GORELEASER_KEY: ${{ secrets.GORELEASER_PRO_KEY }}
           USER: github-actions
           PACKAGECLOUD_TOKEN: ${{ secrets.PACKAGECLOUD_TOKEN }}
-          AUR_DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
           GPG_FINGERPRINT: ${{ steps.import_gpg.outputs.fingerprint }}
       - name: Flatten Linux packages for packagecloud
         if: needs.channel.outputs.channel != 'nightly'

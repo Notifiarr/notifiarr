@@ -1,7 +1,7 @@
 FROM alpine:3.24@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
 
 ARG TARGETPLATFORM
-COPY ${TARGETPLATFORM}/notifiarr /notifiarr
+COPY --chmod=755 ${TARGETPLATFORM}/notifiarr /notifiarr
 
 # iostat from Alpine sysstat is the wrong version for snapshots.
 RUN apk add --no-cache ca-certificates ipmitool smartmontools zfs sysstat tzdata && \
