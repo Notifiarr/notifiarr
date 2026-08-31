@@ -221,6 +221,9 @@ source:
   name_template: '{{ .ProjectName }}-{{ .Version }}'
   prefix_template: '{{ .ProjectName }}-{{ .Version }}/'
 
+# AUR notifiarr-bin: .github/scripts/aur_publish.sh after continue --merge
+# (CHANNEL=release). Binary package; do not add aur_sources.
+
 archives:
   # pkg/update/check.go only matches assets ending in .exe.zip.
   # Linux/FreeBSD GitHub+AUR names are gzipped binaries staged after --split
