@@ -42,6 +42,7 @@ README.html
 /homebrew-mugs
 .secret*files.tar
 *key*
+!.github/scripts/macos_keychain.sh
 aur_deploy_key*
 .metadata.make
 /*-rendered.sh
