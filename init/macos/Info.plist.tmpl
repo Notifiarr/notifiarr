@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>Notifiarr</string>
+	<key>CFBundleIdentifier</key>
+	<string>io.golift.notifiarr</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleVersion</key>
+	<string>{{ .Env.REVISION }}</string>
+	<key>CFBundleShortVersionString</key>
+	<string>{{ index (split .Version "-") 0 }}</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>13.0</string>
+	<key>CFBundleExecutable</key>
+	<string>{{ .BinaryName }}</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>CFBundleIconFile</key>
+	<string>icon.icns</string>
+	<key>CFBundleDisplayName</key>
+	<string>Notifiarr</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>© Go Lift (https://golift.io)</string>
+	<key>LSEnvironment</key>
+	<dict>
+		<key>USEGUI</key>
+		<string>true</string>
+		<key>DN_QUIET</key>
+		<string>true</string>
+	</dict>
+	<key>NSHighResolutionCapable</key>
+	<true/>
+</dict>
+</plist>

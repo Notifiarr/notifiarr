@@ -1,88 +1,22 @@
-FROM golang:1.27.0-trixie AS builder
-
-WORKDIR /src
-COPY main.go go.mod go.sum ./
-
-# Cache all the needed tools.
-RUN go mod download \
-    && go run github.com/swaggo/swag/cmd/swag@latest -v
-
-ENV DEBIAN_FRONTEND=noninteractive
-RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash \
-    && apt install -y nodejs
-
-COPY pkg pkg
-COPY frontend frontend
-RUN --mount=type=secret,id=FONTAWESOME_PACKAGE_TOKEN,env=FONTAWESOME_PACKAGE_TOKEN \
-    mkdir -p ./frontend/dist \
-    && echo "Fake frontend build." > ./frontend/dist/index.html \
-    && go generate ./frontend/src/api \
-    && go generate ./frontend
-
-ARG TARGETARCH
-
-# Download MegaCli64 binary.
-RUN curl -sSo /notifiarr.tgz \
-    https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-$TARGETARCH.tgz \
-    && tar -zxf /notifiarr.tgz -C /
-
-ARG TARGETOS
-ARG BUILD_DATE
-ARG BRANCH
-ARG VERSION
-ARG ITERATION
-ARG COMMIT
-
-# Build the app.
-RUN GOFLAGS="-trimpath -mod=readonly -modcacherw" \
-    GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /tmp/notifiarr -tags osusergo,netgo \
-    -ldflags "-w -s -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
-    -X \"golift.io/version.BuildDate=${BUILD_DATE}\" \
-    -X \"golift.io/version.BuildUser=docker\" \
-    -X \"golift.io/version.Revision=${ITERATION}\" \
-    -X \"golift.io/version.Version=${VERSION}\""
-
 FROM ubuntu:26.04
-# Copy the binary.
-COPY --from=builder /tmp/notifiarr /
-# Other tools.
-RUN DEBIAN_FRONTEND=noninteractive apt update \
-    && apt install -y smartmontools ipmitool zfsutils-linux sysstat libncurses6 tzdata \
-    && apt clean \
+
+ARG TARGETPLATFORM
+ARG TARGETARCH
+COPY ${TARGETPLATFORM}/notifiarr /notifiarr
+
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates curl smartmontools ipmitool zfsutils-linux sysstat libncurses6 tzdata \
+    && curl -sSo /notifiarr.tgz \
+        "https://raw.githubusercontent.com/Notifiarr/build-dependencies/main/notifiarr-docker-${TARGETARCH}.tgz" \
+    && tar -zxf /notifiarr.tgz -C / \
+    && rm -f /notifiarr.tgz \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-# For LSI Avago Broadcom MegaCli.
-COPY --from=builder /MegaCli* /libstorelibir-2.so.14.07-0 /
-# Defaults.
+
 ENV TZ=UTC
 ENV PATH=/bin:/usr/bin:/sbin:/usr/sbin
 ENV USER=root
 
 EXPOSE 5454
-ENTRYPOINT [ "/notifiarr" ]
-
-# Label inputs.
-ARG TARGETOS
-ARG TARGETARCH
-ARG BUILD_DATE
-ARG COMMIT
-ARG VERSION
-ARG ITERATION
-ARG LICENSE=MIT
-ARG SOURCE_URL=http://github.com/golift/application-builder
-ARG DESC=application-builder
-ARG VENDOR=golift
-ARG AUTHOR=golift
-
-# Build-time metadata as defined at https://github.com/opencontainers/image-spec/blob/master/annotations.md
-LABEL org.opencontainers.image.created="${BUILD_DATE}" \
-    org.opencontainers.image.title="Notifiarr on Ubuntu" \
-    org.opencontainers.image.documentation="https://notifiarr.wiki" \
-    org.opencontainers.image.description="${DESC}" \
-    org.opencontainers.image.url="${SOURCE_URL}" \
-    org.opencontainers.image.revision="${COMMIT}" \
-    org.opencontainers.image.source="${SOURCE_URL}" \
-    org.opencontainers.image.vendor="${VENDOR}" \
-    org.opencontainers.image.authors="${AUTHOR}" \
-    org.opencontainers.image.architecture="${TARGETOS} ${TARGETARCH}" \
-    org.opencontainers.image.licenses="${LICENSE}" \
-    org.opencontainers.image.version="${VERSION}-${ITERATION}"
+ENTRYPOINT ["/notifiarr"]

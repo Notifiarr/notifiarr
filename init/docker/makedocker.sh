@@ -1,20 +1,29 @@
 #!/usr/bin/env bash
 
-# This is invoked by the Makefile to create a simple docker image ready to go.
+# Local amd64 image from the runtime-only Alpine Dockerfile.
+# Releases use GoReleaser Pro dockers_v2 (see .github/workflows/README.md).
+
+set -euo pipefail
 
 source settings.sh
+
+root="$(cd "$(dirname "$0")/../.." && pwd)"
+stage="${root}/.docker-build/linux/amd64"
+mkdir -p "${stage}"
+
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 \
+  go build -tags osusergo,netgo -trimpath -mod=readonly -modcacherw \
+  -o "${stage}/notifiarr" \
+  -ldflags "-w -s \
+    -X \"golift.io/version.Branch=${BRANCH} (${COMMIT})\" \
+    -X \"golift.io/version.BuildDate=${DATE}\" \
+    -X \"golift.io/version.BuildUser=$(whoami || echo unknown)\" \
+    -X \"golift.io/version.Revision=${ITERATION}\" \
+    -X \"golift.io/version.Version=${VERSION}\"" \
+  "${root}"
 
 docker buildx build --load --pull --tag notifiarr \
     --progress=plain \
     --platform linux/amd64 \
-    --build-arg "BUILD_DATE=${DATE}" \
-    --build-arg "COMMIT=${COMMIT}" \
-    --build-arg "BRANCH=${BRANCH}" \
-    --build-arg "VERSION=${VERSION}" \
-    --build-arg "ITERATION=${ITERATION}" \
-    --build-arg "LICENSE=${LICENSE}" \
-    --build-arg "DESC=${DESC}" \
-    --build-arg "VENDOR=${VENDOR}" \
-    --build-arg "AUTHOR=${MAINT}" \
-    --build-arg "SOURCE_URL=${SOURCE_URL}" \
-    --file init/docker/Dockerfile.alpine .
+    --file "${root}/init/docker/Dockerfile.alpine" \
+    "${root}/.docker-build"

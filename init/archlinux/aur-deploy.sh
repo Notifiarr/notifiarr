@@ -1,34 +1,46 @@
 #!/bin/bash -x
 
 # Deploys a new aur PKGBUILD file to the Arch Linux AUR repo.
-# Run by GitHub Actions when a new release is created on GitHub.
+# Run by GitHub Actions on tagged releases after GoReleaser merge.
 
 source settings.sh
 
+if [[ -n ${REVISION:-} ]]; then
+  ITERATION="${REVISION}"
+fi
+
 sha512sum=sha512sum
 $sha512sum -v 2>/dev/null || sha512sum="shasum -a 512" # macos
+
+hash_file() {
+  $sha512sum "$1" | awk '{print $1}'
+}
+
+find_gz() {
+  find dist -name "$1" 2>/dev/null | head -1
+}
+
+hash_or_fetch() {
+  local name=$1 url=$2
+  local f
+  f=$(find_gz "${name}")
+  if [[ -n $f && -f $f ]]; then
+    echo "==> Hashing ${f}" >&2
+    hash_file "$f"
+  else
+    echo "==> Fetching ${url}" >&2
+    curl -sL "$url" | $sha512sum | awk '{print $1}'
+  fi
+}
 
 SOURCE_PATH="https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz"
 echo "==> Using URL: $SOURCE_PATH"
 SHA=$(curl -sL "$SOURCE_PATH" | $sha512sum | awk '{print $1}')
 
-if [ -f sha512sums.txt ]; then
-  echo "==> Using SHA512SUMS file"
-  SHA_X64=$(grep notifiarr.amd64.linux.gz sha512sums.txt | awk '{print $1}')
-  SHA_ARMHF=$(grep notifiarr.arm.linux.gz sha512sums.txt | awk '{print $1}')
-  SHA_ARCH64=$(grep notifiarr.arm64.linux.gz sha512sums.txt | awk '{print $1}')
-  SHA_386=$(grep notifiarr.386.linux.gz sha512sums.txt | awk '{print $1}')
-else
-  echo "==> Not Using SHA512SUMS file"
-  source_x64="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.amd64.linux.gz"
-  source_armhf="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.arm.linux.gz"
-  source_arm64="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.arm64.linux.gz"
-  source_386="https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.386.linux.gz"
-  SHA_X64=$(curl -sL "$source_x64" | $sha512sum | awk '{print $1}')
-  SHA_ARMHF=$(curl -sL "$source_armhf" | $sha512sum | awk '{print $1}')
-  SHA_ARCH64=$(curl -sL "$source_arm64" | $sha512sum | awk '{print $1}')
-  SHA_386=$(curl -sL "$source_386" | $sha512sum | awk '{print $1}')
-fi
+SHA_X64=$(hash_or_fetch notifiarr.amd64.linux.gz "https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.amd64.linux.gz")
+SHA_ARMHF=$(hash_or_fetch notifiarr.arm.linux.gz "https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.arm.linux.gz")
+SHA_ARCH64=$(hash_or_fetch notifiarr.arm64.linux.gz "https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.arm64.linux.gz")
+SHA_386=$(hash_or_fetch notifiarr.386.linux.gz "https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.386.linux.gz")
 
 push_it() {
   git config user.email "code@golift.io"

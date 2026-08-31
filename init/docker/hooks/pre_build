@@ -1,6 +1,4 @@
 #!/bin/bash
-
-# This upgrades the docker client on the Docker Cloud server to a version
-# that contains the `docker manifest` command, so we can build with QEMU.
-
-docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+# Docker Hub autobuild hooks are retired. See .github/workflows/README.md.
+echo "init/docker/hooks/pre_build is unused; Docker images are published by release.yml" >&2
+exit 1
