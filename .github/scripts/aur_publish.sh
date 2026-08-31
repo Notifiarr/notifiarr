@@ -128,6 +128,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
+cp -f init/systemd/notifiarr.install "${stage}/notifiarr.install"
+
 # PKGBUILD functions keep ${pkgname}/${pkgver}/${pkgdir} for makepkg.
 cat > "${stage}/PKGBUILD" <<EOF
 # Maintainer: David Newhall II <captain at golift dot io>
@@ -145,6 +147,7 @@ provides=('notifiarr')
 makedepends=('go' 'gzip')
 options=('!strip')
 backup=('etc/notifiarr/notifiarr.conf')
+install=notifiarr.install
 source=("\${pkgname}-\${pkgver}.tar.gz::${src_url}")
 sha256sums=('${sum}')
 source_x86_64=("\${pkgname}-\${pkgver}.x86_64.gz::${url_amd64}")
@@ -188,11 +191,8 @@ package() {
   echo "u \${appname} - \\"\${appname} daemon\\"" > "\${appname}.sysusers"
   install -D -m 644 "\${appname}.sysusers" "\${pkgdir}/usr/lib/sysusers.d/\${appname}.conf"
   printf '%s\n' \
-    "z /etc/notifiarr/notifiarr.conf 0644 notifiarr notifiarr -" \
-    "z /etc/notifiarr/notifiarr.conf.example 0644 notifiarr notifiarr -" \
-    "z /etc/notifiarr 0755 notifiarr notifiarr -" \
+    "# Log dir only. Do not z-chown /etc/notifiarr; that runs on every boot." \
     "d /var/log/notifiarr 0755 notifiarr notifiarr -" \
-    "z /var/log/notifiarr 0755 notifiarr notifiarr -" \
     > "\${appname}.tmpfiles"
   install -D -m 644 "\${appname}.tmpfiles" "\${pkgdir}/usr/lib/tmpfiles.d/\${appname}.conf"
 }
@@ -216,6 +216,7 @@ EOF
   echo "	provides = notifiarr"
   echo "	options = !strip"
   echo "	backup = etc/notifiarr/notifiarr.conf"
+  echo "	install = notifiarr.install"
   echo "	source = ${pkgname}-${pkgver}.tar.gz::${src_url}"
   echo "	sha256sums = ${sum}"
   echo "	source_x86_64 = ${pkgname}-${pkgver}.x86_64.gz::${url_amd64}"
@@ -238,7 +239,7 @@ echo "AUR ${pkgname} ${pkgver}-${pkgrel}"
 
 if [ "${DRY_RUN:-}" = 1 ]; then
   mkdir -p "${dir}/aur"
-  cp -f "${stage}/PKGBUILD" "${stage}/.SRCINFO" "${dir}/aur/"
+  cp -f "${stage}/PKGBUILD" "${stage}/.SRCINFO" "${stage}/notifiarr.install" "${dir}/aur/"
   echo "DRY_RUN=1 wrote ${dir}/aur/PKGBUILD"
   exit 0
 fi
@@ -250,7 +251,7 @@ if [ -z "${AUR_DEPLOY_KEY:-}" ]; then
   fi
   echo "AUR_DEPLOY_KEY unset; wrote files without pushing:" >&2
   mkdir -p "${dir}/aur"
-  cp -f "${stage}/PKGBUILD" "${stage}/.SRCINFO" "${dir}/aur/"
+  cp -f "${stage}/PKGBUILD" "${stage}/.SRCINFO" "${stage}/notifiarr.install" "${dir}/aur/"
   ls -l "${dir}/aur"
   exit 0
 fi
@@ -264,10 +265,10 @@ export GIT_SSH_COMMAND="ssh -i ${keyfile} -o IdentitiesOnly=yes -o StrictHostKey
 clone="${stage}/repo"
 # Empty AUR packages have no HEAD; --depth 1 fails on first create.
 git clone "${aur_git}" "${clone}"
-cp -f "${stage}/PKGBUILD" "${stage}/.SRCINFO" "${clone}/"
+cp -f "${stage}/PKGBUILD" "${stage}/.SRCINFO" "${stage}/notifiarr.install" "${clone}/"
 git -C "${clone}" config user.name goreleaserbot
 git -C "${clone}" config user.email bot@goreleaser.com
-git -C "${clone}" add PKGBUILD .SRCINFO
+git -C "${clone}" add PKGBUILD .SRCINFO notifiarr.install
 if git -C "${clone}" diff --cached --quiet; then
   echo "AUR already at ${pkgver}-${pkgrel}"
   exit 0
