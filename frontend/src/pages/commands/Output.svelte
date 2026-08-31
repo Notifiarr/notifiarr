@@ -8,11 +8,9 @@
     Popover,
   } from '@sveltestrap/sveltestrap'
   import Fa from '../../includes/Fa.svelte'
-  import {
-    faArrowDownFromBracket,
-    faArrowRotateRight,
-    faArrowUpFromBracket,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import DownloadSimple from 'phosphor-svelte/lib/DownloadSimple'
+  import ArrowClockwise from 'phosphor-svelte/lib/ArrowClockwise'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
   import { age, delay, failure, since } from '../../includes/util'
   import T from '../../includes/Translate.svelte'
   import { theme } from '../../includes/theme.svelte'
@@ -64,13 +62,13 @@
 {#snippet buttons()}
   <Badge class="refresh"><T id="Commands.refreshed" {timeDuration} /></Badge>
   <Button id="outputRefresh{index}" color="success" size="sm" outline onclick={getStats}>
-    <Fa i={faArrowRotateRight} c1="limegreen" c2="darkcyan" d2="cyan" scale="1.5" />
+    <Fa i={ArrowClockwise} c1="limegreen" scale="1.25" />
   </Button>
   <Button id="toggleCmd{index}" color="warning" size="sm" outline onclick={toggleOutput}>
     {#if showOutput}
-      <Fa i={faArrowUpFromBracket} c1="orange" c2="brown" d2="wheat" scale="1.5" />
+      <Fa i={UploadSimple} c1="orange" scale="1.25" />
     {:else}
-      <Fa i={faArrowDownFromBracket} c1="orange" c2="brown" d2="wheat" scale="1.5" />
+      <Fa i={DownloadSimple} c1="orange" scale="1.25" />
     {/if}
   </Button>
   <!-- Refresh and output toggle buttons tooltips. -->
@@ -129,6 +127,10 @@
     margin-left: 0.5rem;
     width: 32px;
     height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .output-header :global(.refresh) {

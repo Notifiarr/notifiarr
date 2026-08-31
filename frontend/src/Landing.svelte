@@ -4,15 +4,7 @@
   import Header from './includes/Header.svelte'
   import T from './includes/Translate.svelte'
   import golift from './assets/golift.png?inline'
-  import { faHouseChimneyHeart } from '@fortawesome/sharp-duotone-light-svg-icons'
-  export const page = {
-    id: 'Landing',
-    i: faHouseChimneyHeart,
-    c1: 'seagreen',
-    c2: 'darkgreen',
-    d1: 'lightblue',
-    d2: 'silver',
-  }
+  export const page = { id: 'Landing' }
 </script>
 
 <Header {page} />

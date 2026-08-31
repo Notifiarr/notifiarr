@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { faCompactDisc } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import Disc from 'phosphor-svelte/lib/Disc'
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Header from '../../includes/Helem.svelte'
@@ -14,7 +14,7 @@
 
 <Header
   id="StorageData"
-  i={faCompactDisc}
+  i={Disc}
   c1="darkblue"
   c2="lightblue"
   d1="cyan"

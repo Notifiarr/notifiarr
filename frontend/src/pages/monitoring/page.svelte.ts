@@ -1,18 +1,10 @@
-import { faDisplayChartUpCircleCurrency } from '@fortawesome/sharp-duotone-regular-svg-icons'
 import { getUi } from '../../api/fetch'
 import { delay, success, warning } from '../../includes/util'
 import { get } from 'svelte/store'
 import { _ } from 'svelte-i18n'
 import type { ClientServicesConfig as ServicesConfig } from '../../api/notifiarrConfig'
 
-export const page = {
-  id: 'Monitoring',
-  i: faDisplayChartUpCircleCurrency,
-  c1: 'darkslateblue',
-  c2: 'gainsboro',
-  d1: 'papayawhip',
-  d2: 'paleturquoise',
-}
+export const page = { id: 'Monitoring' }
 
 class Mon {
   public refresh = $state(false)

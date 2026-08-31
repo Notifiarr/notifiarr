@@ -4,15 +4,9 @@
   import { Button } from '@sveltestrap/sveltestrap'
   import T from '../../includes/Translate.svelte'
   import Nodal from '../../includes/Nodal.svelte'
-  import { faListTree } from '@fortawesome/sharp-duotone-solid-svg-icons'
   export const page = {
     type: 'modal' as const,
     id: 'ProcessList',
-    i: faListTree,
-    c1: 'coral',
-    c2: 'steelblue',
-    d1: 'wheat',
-    d2: 'lime',
   }
 </script>
 
@@ -23,7 +17,7 @@
   export const toggle = () => (isOpen = !isOpen)
 </script>
 
-<Nodal {get} bind:isOpen title={page.id} fa={page} esc size="xl" full>
+<Nodal {get} bind:isOpen title={page.id} esc size="xl" full>
   {#snippet children(resp)}
     <pre style="overflow: visible;" class:wrap>{resp?.body ?? ''}</pre>
   {/snippet}

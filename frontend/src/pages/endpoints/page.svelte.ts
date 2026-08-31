@@ -4,17 +4,10 @@ import { get } from 'svelte/store'
 import { _ } from '../../includes/Translate.svelte'
 import { profile } from '../../api/profile.svelte'
 import { deepCopy } from '../../includes/util'
-import { faLinkSimple, faWebhook } from '@fortawesome/sharp-duotone-solid-svg-icons'
+import LinkSimple from 'phosphor-svelte/lib/LinkSimple'
 import { validator as cronValidator } from './CronScheduler.svelte'
 
-export const page = {
-  id: 'Endpoints',
-  i: faWebhook,
-  c1: 'sandybrown',
-  c2: 'saddlebrown',
-  d1: 'lightcoral',
-  d2: 'tan',
-}
+export const page = { id: 'Endpoints' }
 
 const empty: Endpoint = {
   name: '',
@@ -72,7 +65,7 @@ export const app: App<Endpoint> = {
   name: 'Endpoints',
   id: 'Endpoints',
   envPrefix: 'ENDPOINT',
-  logo: faLinkSimple,
+  logo: LinkSimple,
   iconProps: { c1: 'orange', c2: 'violet' },
   disabled: [],
   hidden: [],

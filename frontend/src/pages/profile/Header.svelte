@@ -1,6 +1,5 @@
 <script lang="ts">
   import Header from '../../includes/Header.svelte'
-  import { faSplotch } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import Fa from '../../includes/Fa.svelte'
   import T, { _ } from '../../includes/Translate.svelte'
   import { Card, Row } from '@sveltestrap/sveltestrap'
@@ -23,38 +22,36 @@
   <!-- Bullet Points-->
   <ul class="mb-2 list-unstyled">
     <li>
-      <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-      {@html $_('profile.phrase.PasswordOnlyUsed')}
+      <Fa bullet>{@html $_('profile.phrase.PasswordOnlyUsed')}</Fa>
     </li>
     <li>
-      <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-      {@html $_('profile.phrase.HeaderOnlyUsed')}
+      <Fa bullet>{@html $_('profile.phrase.HeaderOnlyUsed')}</Fa>
     </li>
     <li>
-      <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-      {@html $_('profile.phrase.AuthTypeChange')}
+      <Fa bullet>{@html $_('profile.phrase.AuthTypeChange')}</Fa>
     </li>
     <li>
-      <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-      {@html $_('profile.phrase.SeeWikiForAuthProxyHelp')}
+      <Fa bullet>{@html $_('profile.phrase.SeeWikiForAuthProxyHelp')}</Fa>
     </li>
     <!-- Missing/Add upstream section -->
     {#if !$profile?.upstreamAllowed}
       <li>
-        <Fa i={faSplotch} c1="maroon" c2="salmon" d1="salmon" d2="maroon" />
-        <b><T id="profile.phrase.ProxyAuthDisabled" {upstreamIp} /></b>
-        <a href="#addit" onclick={addit}>
-          {$_('profile.phrase.Addit')}
-        </a>
+        <Fa bullet="square" c1="maroon" d1="salmon">
+          <b><T id="profile.phrase.ProxyAuthDisabled" {upstreamIp} /></b>
+          <a href="#addit" onclick={addit}>
+            {$_('profile.phrase.Addit')}
+          </a>
+        </Fa>
       </li>
     {/if}
 
     <!-- Show more toggle -->
     <li>
-      <Fa i={faSplotch} c1="darkblue" d1="lightblue" c2="royalblue" />
-      <a href="#toggle-more" onclick={toggleMore}>
-        {showMore ? $_('profile.phrase.ShowMeLess') : $_('profile.phrase.ShowMeMore')}
-      </a>
+      <Fa bullet="triangle" c1="darkblue" d1="lightblue">
+        <a href="#toggle-more" onclick={toggleMore}>
+          {showMore ? $_('profile.phrase.ShowMeLess') : $_('profile.phrase.ShowMeMore')}
+        </a>
+      </Fa>
     </li>
   </ul>
 

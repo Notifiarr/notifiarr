@@ -27,7 +27,7 @@
   import { deepCopy, deepEqual } from '../../includes/util'
   import Select from 'svelte-select'
   import Fa from '../../includes/Fa.svelte'
-  import { faRightToLine } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import ArrowLineRight from 'phosphor-svelte/lib/ArrowLineRight'
   import { cronDesc, cronTimes, weekdays } from './schedule'
 
   type Props = {
@@ -161,8 +161,8 @@
               <!-- Add button -->
               <Button class="addButton" color="secondary" outline onclick={addNewTime}>
                 <Fa
-                  i={faRightToLine}
-                  scale="1.5"
+                  i={ArrowLineRight}
+                  btn
                   c2="coral"
                   d2="pink"
                   c1="green"

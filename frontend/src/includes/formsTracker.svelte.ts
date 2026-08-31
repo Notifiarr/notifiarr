@@ -1,24 +1,23 @@
 import { deepCopy, deepEqual, delay } from './util'
-import type { Props as FaProps } from './Fa.svelte'
+import type { Props as FaProps, IconSource } from './Fa.svelte'
 import type { Config } from '../api/notifiarrConfig'
-import type { IconDefinition } from '@fortawesome/sharp-duotone-light-svg-icons'
 
 /**
  * App is a type that defines the structure of an application, instance or integration.
  * It is used to track the state of a form and its instances.
  * @param id - The id of the app. (StarrApps.Sonarr)
  * @param name - The name of the app. (Sonarr)
- * @param logo - The imported logo or FA icon of the app. (../../assets/logos/sonarr.png)
+ * @param logo - The imported logo or Phosphor icon of the app. (../../assets/logos/sonarr.png)
  */
 export type App<T> = {
   /** The id of the app. (StarrApps.Sonarr) */
   id: string
   /** The name of the app. (Sonarr) */
   name: string
-  /** The imported logo or FA icon of the app. (../../assets/logos/sonarr.png) */
-  logo: string | IconDefinition
-  /** If you provided an FA icon, you can use this to set the icon props. */
-  iconProps?: Omit<FaProps, 'i'>
+  /** The imported logo or Phosphor icon of the app. (../../assets/logos/sonarr.png) */
+  logo: string | IconSource
+  /** Extra Fa props when `logo` is a Phosphor component. */
+  iconProps?: Omit<FaProps, 'i' | 'children'>
   /** The disabled fields of the app. (['apiKey', 'username']) */
   disabled?: string[]
   /** The hidden fields of the app. (['deletes']) */

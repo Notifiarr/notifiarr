@@ -1,13 +1,5 @@
 <script lang="ts" module>
-  import { faSatellite } from '@fortawesome/sharp-duotone-light-svg-icons'
-  export const page = {
-    id: 'SiteTunnel',
-    i: faSatellite,
-    c1: 'blue',
-    c2: 'lightblue',
-    d1: 'steelblue',
-    d2: 'brown',
-  }
+  export const page = { id: 'SiteTunnel' }
 </script>
 
 <script lang="ts">
@@ -17,7 +9,6 @@
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
   import { warning } from '../../includes/util'
-  import { faSplotch } from '@fortawesome/sharp-duotone-light-svg-icons'
   import Fa from '../../includes/Fa.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import { getUi } from '../../api/fetch'
@@ -71,8 +62,9 @@
   <Card body color="success" outline>
     <p>{@html $_('SiteTunnel.subText')}</p>
     <p class="mb-0">
-      <Fa i={faSplotch} c1="gray" d1="gainsboro" c2="orange" />
-      <b><T id="SiteTunnel.phrases.ActiveTunnel" tunnel={$profile.activeTunnel} /></b>
+      <Fa bullet>
+        <b><T id="SiteTunnel.phrases.ActiveTunnel" tunnel={$profile.activeTunnel} /></b>
+      </Fa>
     </p>
   </Card>
 

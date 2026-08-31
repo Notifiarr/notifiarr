@@ -15,10 +15,6 @@ export default defineConfig({
               name: 'bootstrap',
               test: /[\\/]node_modules[\\/](?:@sveltestrap[\\/]sveltestrap|bootstrap)(?:[\\/]|$)/,
             },
-            {
-              name: 'fontawesome',
-              test: /[\\/]node_modules[\\/]@fortawesome[\\/]/,
-            },
             // If the app grows too big, this is a good place to split it:
             // {
             //   name: 'includes',

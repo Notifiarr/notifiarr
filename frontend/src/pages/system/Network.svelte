@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { faChartNetwork } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import ShareNetwork from 'phosphor-svelte/lib/ShareNetwork'
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Header from '../../includes/Helem.svelte'
@@ -9,7 +9,7 @@
 <!-- Network Section -->
 <Header
   id="NetworkInformation"
-  i={faChartNetwork}
+  i={ShareNetwork}
   c1="firebrick"
   c2="firebrick"
   d1="pink" />

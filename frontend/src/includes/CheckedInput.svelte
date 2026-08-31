@@ -2,12 +2,10 @@
 <script lang="ts">
   import { Button, Alert, Input as Box } from '@sveltestrap/sveltestrap'
   import { _ } from './Translate.svelte'
-  import {
-    faCircleCheck,
-    faCircleXmark,
-    faSpinner,
-  } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import { faCheckDouble } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import CircleNotch from 'phosphor-svelte/lib/CircleNotch'
+  import Checks from 'phosphor-svelte/lib/Checks'
+  import CheckCircle from 'phosphor-svelte/lib/CheckCircle'
+  import XCircle from 'phosphor-svelte/lib/XCircle'
   import { get } from 'svelte/store'
   import type { App } from './formsTracker.svelte'
   import Input from './Input.svelte'
@@ -118,15 +116,13 @@
           disabled={testing || disabled}
           onclick={checkInstance}>
           {#if testing}
-            <Fa i={faSpinner} c1="orange" spin scale={1.5} />
+            <Fa i={CircleNotch} c1="orange" spin btn />
           {:else}
             <Fa
-              i={faCheckDouble}
+              i={Checks}
               c1={disabled ? 'lightgrey' : 'green'}
-              c2={disabled ? 'darkgrey' : 'darkcyan'}
               d1={disabled ? 'darkgrey' : 'limegreen'}
-              d2={disabled ? 'lightgrey' : 'cyan'}
-              scale={1.5} />
+              btn />
           {/if}
         </Button>
       {/snippet}
@@ -150,11 +146,11 @@
               toggle={() => (body = '')}
               color={ok ? 'success' : 'danger'}>
               <Fa
-                scale={1.5}
-                i={ok ? faCircleCheck : faCircleXmark}
+                btn
+                i={ok ? CheckCircle : XCircle}
                 c1={ok ? 'green' : 'firebrick'}
                 c2="white"
-                d2="black" /> &nbsp; {@html maxLength(body, 200)}
+                d2="black">{@html maxLength(body, 200)}</Fa>
             </Alert>
           </div>
         {/if}

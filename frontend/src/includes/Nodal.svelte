@@ -24,19 +24,17 @@
   import Fa from './Fa.svelte'
   import type { Props as FaProps } from './Fa.svelte'
   import { tick, type Snippet } from 'svelte'
-  import {
-    faArrowsRotate,
-    faCompress,
-    faExpand,
-    faSwapArrows,
-    faXmarkLarge,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import ArrowsClockwise from 'phosphor-svelte/lib/ArrowsClockwise'
+  import ArrowsIn from 'phosphor-svelte/lib/ArrowsIn'
+  import ArrowsOut from 'phosphor-svelte/lib/ArrowsOut'
+  import ArrowsLeftRight from 'phosphor-svelte/lib/ArrowsLeftRight'
+  import X from 'phosphor-svelte/lib/X'
   import { delay } from './util'
 
   type Props = {
     /** Children is rendered in a modal body. Backend response is passed as the first argument. */
     children: Snippet<[BackendResponse | undefined]>
-    /** Icon to display in the modal header. This is a Font Awesome icon object. */
+    /** Icon to display in the modal header. */
     fa?: FaProps
     /** Title to display in the modal header. This is a full translation key. */
     title?: string
@@ -114,15 +112,24 @@
   })
 </script>
 
+{#snippet heading()}
+  {#if title}
+    {@const t = $_(title, { values: values ?? undefined })}
+    {#if typeof t !== 'string'}{t['title']}{:else}{t}{/if}
+  {/if}
+{/snippet}
+
 <Modal
   {...{ ...rest, isOpen, modalClassName, theme: $theme, fullscreen }}
   toggle={esc && !disabled ? close : undefined}>
   <ModalHeader class="d-inline-block">
     <!-- Header title and icon. -->
-    {#if fa}<Fa {...fa} scale={1.4} class="me-2" />{/if}
-    {#if title}
-      {@const t = $_(title, { values: values ?? undefined })}
-      {#if typeof t !== 'string'}{t['title']}{:else}{t}{/if}
+    {#if fa && title}
+      <Fa {...fa} logo>{@render heading()}</Fa>
+    {:else if fa}
+      <Fa {...fa} logo />
+    {:else}
+      {@render heading()}
     {/if}
     <!-- Header buttons. -->
     {#if isOpen}
@@ -137,11 +144,11 @@
             aria-label={$_('Nodal.button.refresh')}
             title={$_('Nodal.button.refresh')}>
             <Fa
-              i={faArrowsRotate}
+              i={ArrowsClockwise}
               c1="steelblue"
               c2="firebrick"
               d2="pink"
-              scale={1.5}
+              btn
               spin={loading} />
           </Button>
           <Popover target="refreshM" trigger="hover" theme={$theme}>
@@ -154,7 +161,7 @@
               color="secondary"
               size="sm"
               on:click={() => (showRaw = !showRaw)}>
-              <Fa i={faSwapArrows} c1="steelblue" c2="firebrick" d2="pink" scale={1.5} />
+              <Fa i={ArrowsLeftRight} c1="steelblue" c2="firebrick" d2="pink" btn />
             </Button>
             <Popover target="rawM" trigger="hover" theme={$theme}>
               <T id="Nodal.button.raw" />
@@ -171,11 +178,11 @@
           aria-label={$_('Nodal.button.fullscreen')}
           title={$_('Nodal.button.fullscreen')}>
           <Fa
-            i={fullscreen ? faCompress : faExpand}
+            i={fullscreen ? ArrowsIn : ArrowsOut}
             c1="steelblue"
             c2="firebrick"
             d2="pink"
-            scale={1.5} />
+            btn />
         </Button>
         <Popover target="fullscreenM" trigger="hover" theme={$theme}>
           <T id="Nodal.button.fullscreen" />
@@ -190,7 +197,7 @@
           aria-label={$_('buttons.Close')}
           on:click={close}
           {disabled}>
-          <Fa i={faXmarkLarge} c2="orange" d2="gold" scale={1.5} />
+          <Fa i={X} c2="orange" d2="gold" btn />
         </Button>
       </ButtonGroup>
     {/if}

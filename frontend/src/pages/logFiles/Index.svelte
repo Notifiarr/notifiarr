@@ -1,16 +1,5 @@
 <script lang="ts" module>
-  import {
-    faArrowsSpin,
-    faPrintMagnifyingGlass,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  export const page = {
-    id: 'LogFiles',
-    i: faPrintMagnifyingGlass,
-    c1: 'midnightblue',
-    c2: 'darkslategray',
-    d1: 'lightgreen',
-    d2: 'gold',
-  }
+  export const page = { id: 'LogFiles' }
 </script>
 
 <script lang="ts">
@@ -22,7 +11,8 @@
   import FileInfo from './FileInfo.svelte'
   import type { LogFileInfo } from '../../api/notifiarrConfig'
   import Fa from '../../includes/Fa.svelte'
-  import { faListTimeline } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import ListBullets from 'phosphor-svelte/lib/ListBullets'
+  import ArrowsClockwise from 'phosphor-svelte/lib/ArrowsClockwise'
   import Content from './Content.svelte'
   import { theme } from '../../includes/theme.svelte'
 
@@ -67,7 +57,7 @@
               </Popover>
               <th id="followTooltip">
                 <a href="#moreInfo" onclick={e => e.preventDefault()}>
-                  <Fa i={faArrowsSpin} scale={1.2} /></a>
+                  <Fa i={ArrowsClockwise} scale={1.2} /></a>
               </th>
               <th>
                 <T id="LogFiles.titles.Name" />
@@ -97,7 +87,7 @@
                   aria-label={$_('LogFiles.titles.TailFile', vals)}
                   title={$_('LogFiles.titles.TailFile', vals)}
                   onclick={e => (file.used ? tailFile(e, file) : null)}>
-                  {#if file.used}<Fa i={faListTimeline} scale={1.2} />{:else}&nbsp;{/if}
+                  {#if file.used}<Fa i={ListBullets} scale={1.2} />{:else}&nbsp;{/if}
                 </th>
                 <td class:isActive>
                   <a

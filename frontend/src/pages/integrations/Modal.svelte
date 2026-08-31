@@ -1,12 +1,10 @@
 <script lang="ts">
   import Nodal from '../../includes/Nodal.svelte'
-  import {
-    faCodeSimple,
-    type IconDefinition,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import CodeSimple from 'phosphor-svelte/lib/CodeSimple'
+  import type { IconSource } from '../../includes/Fa.svelte'
 
-  type Props = { data: any; pageId: string; icon?: IconDefinition }
-  let { data, pageId, icon = faCodeSimple }: Props = $props()
+  type Props = { data: any; pageId: string; icon?: IconSource }
+  let { data, pageId, icon = CodeSimple }: Props = $props()
   let isOpen = $state(false)
   export const toggle = (e?: Event) => (e?.preventDefault?.(), (isOpen = !isOpen))
 </script>

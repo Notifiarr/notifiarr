@@ -33,7 +33,7 @@
   import { profile } from '../api/profile.svelte'
   import { urlbase } from '../api/fetch'
   import { nav } from '../navigation/nav.svelte'
-  import { faArrowsRepeat } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import ArrowsClockwise from 'phosphor-svelte/lib/ArrowsClockwise'
   import Fa from '../includes/Fa.svelte'
   import { Navbar, NavbarBrand, Row, Col, Card } from '@sveltestrap/sveltestrap'
   import logo from '../assets/notifiarr.svg?inline'
@@ -73,7 +73,7 @@
       <span class="text-nowrap">
         {#if $profile?.loggedIn}
           <a href="#reload" onclick={updateBackend} class="text-decoration-none">
-            <Fa i={faArrowsRepeat} c1="#3cd2a5" d1="green" class="me-1" {spin} />
+            <Fa i={ArrowsClockwise} weight="bold" c1="#3cd2a5" d1="green" class="me-1" {spin} />
           </a>
           {#if notification}
             {@html notification}
