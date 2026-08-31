@@ -1,0 +1,9 @@
+# systemd-tmpfiles.d — config and log dirs for User=notifiarr (see notifiarr.service).
+# Package files are root:root; z fixes ownership after sysusers creates the user.
+# Do not use Z (recursive): that would make notifiarr.conf mode 0755.
+d /etc/notifiarr 0755 notifiarr notifiarr -
+d /var/log/notifiarr 0755 notifiarr notifiarr -
+z /etc/notifiarr 0755 notifiarr notifiarr -
+z /etc/notifiarr/notifiarr.conf 0644 notifiarr notifiarr -
+z /etc/notifiarr/notifiarr.conf.example 0644 notifiarr notifiarr -
+z /var/log/notifiarr 0755 notifiarr notifiarr -

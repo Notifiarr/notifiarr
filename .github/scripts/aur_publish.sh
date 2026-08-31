@@ -171,7 +171,7 @@ build() {
 package() {
   install -D -m 755 "\${pkgname}-\${pkgver}.\${CARCH}" "\${pkgdir}/usr/bin/\${appname}"
   cd "\${appname}-\${pkgver}"
-  install -d -m 755 "\${pkgdir}/usr/share/licenses/\${appname}" "\${pkgdir}/usr/share/doc/\${appname}" "\${pkgdir}/usr/share/applications" "\${pkgdir}/etc/\${appname}"
+  install -d -m 755 "\${pkgdir}/usr/share/licenses/\${appname}" "\${pkgdir}/usr/share/doc/\${appname}" "\${pkgdir}/usr/share/applications" "\${pkgdir}/etc/\${appname}" "\${pkgdir}/var/log/\${appname}"
   install -D -m 644 "examples/\${appname}.conf.example" "\${pkgdir}/etc/\${appname}/\${appname}.conf"
   install -D -m 644 "examples/\${appname}.conf.example" "\${pkgdir}/etc/\${appname}/\${appname}.conf.example"
   install -D -m 644 LICENSE "\${pkgdir}/usr/share/licenses/\${appname}/LICENSE"
@@ -187,6 +187,15 @@ package() {
   install -D -m 644 "init/systemd/\${appname}.service" "\${pkgdir}/usr/lib/systemd/system/\${appname}.service"
   echo "u \${appname} - \\"\${appname} daemon\\"" > "\${appname}.sysusers"
   install -D -m 644 "\${appname}.sysusers" "\${pkgdir}/usr/lib/sysusers.d/\${appname}.conf"
+  printf '%s\n' \
+    "d /etc/notifiarr 0755 notifiarr notifiarr -" \
+    "d /var/log/notifiarr 0755 notifiarr notifiarr -" \
+    "z /etc/notifiarr 0755 notifiarr notifiarr -" \
+    "z /etc/notifiarr/notifiarr.conf 0644 notifiarr notifiarr -" \
+    "z /etc/notifiarr/notifiarr.conf.example 0644 notifiarr notifiarr -" \
+    "z /var/log/notifiarr 0755 notifiarr notifiarr -" \
+    > "\${appname}.tmpfiles"
+  install -D -m 644 "\${appname}.tmpfiles" "\${pkgdir}/usr/lib/tmpfiles.d/\${appname}.conf"
 }
 EOF
 
