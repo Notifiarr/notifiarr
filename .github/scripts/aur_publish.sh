@@ -188,9 +188,10 @@ package() {
   echo "u \${appname} - \\"\${appname} daemon\\"" > "\${appname}.sysusers"
   install -D -m 644 "\${appname}.sysusers" "\${pkgdir}/usr/lib/sysusers.d/\${appname}.conf"
   printf '%s\n' \
-    "d /etc/notifiarr 0775 root notifiarr -" \
+    "z /etc/notifiarr/notifiarr.conf 0644 notifiarr notifiarr -" \
+    "z /etc/notifiarr/notifiarr.conf.example 0644 notifiarr notifiarr -" \
+    "z /etc/notifiarr 0755 notifiarr notifiarr -" \
     "d /var/log/notifiarr 0755 notifiarr notifiarr -" \
-    "z /etc/notifiarr 0775 root notifiarr -" \
     "z /var/log/notifiarr 0755 notifiarr notifiarr -" \
     > "\${appname}.tmpfiles"
   install -D -m 644 "\${appname}.tmpfiles" "\${pkgdir}/usr/lib/tmpfiles.d/\${appname}.conf"
