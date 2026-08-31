@@ -341,6 +341,10 @@ nfpms:
         type: config
         file_info:
           mode: 0644
+      - src: init/systemd/notifiarr.tmpfiles
+        dst: /usr/lib/tmpfiles.d/notifiarr.conf
+        file_info:
+          mode: 0644
       - src: init/linux/deb/usr/share/applications/notifiarr.desktop
         dst: /usr/share/applications/notifiarr.desktop
         file_info:
