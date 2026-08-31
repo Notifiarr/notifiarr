@@ -33,22 +33,49 @@
   let doc = $state(apiDocs[0])
   let ui = $state<any>()
 
+  // Keep the last fetched spec. Swagger UI's internal state.json often drops
+  // `swagger`/`openapi`; rewriting from that triggers the missing-version error.
+  let currentSpec: Record<string, any> | undefined
+
   // https://github.com/swagger-api/swagger-ui/issues/5981
   const UrlMutatorPlugin = (system: any) => ({
     rootInjects: {
       setBasePath: (basePath: string) => {
         if (doc.id === 'api')
           system.preauthorizeApiKey('ApiKeyAuth', $profile.config.apiKey)
-        const jsonSpec = system.getState().toJSON().spec.json
-        return system.specActions.updateJsonSpec({ ...jsonSpec, basePath })
+        if (!currentSpec) return
+        currentSpec = { ...currentSpec, basePath }
+        return system.specActions.updateJsonSpec(currentSpec)
       },
     },
   })
 
-  const onchange = () => {
-    ui.specActions.updateUrl($urlbase + doc.file)
-    ui.specActions.download($urlbase + doc.file)
-    ui.setBasePath($urlbase + doc.path)
+  // Swagger UI 5 requires info.version. Stamp it from golift.io/version (profile).
+  const specVersion = () =>
+    [$profile.version, $profile.revision].filter(Boolean).join('-') || '0.0.0'
+
+  const stampSpec = (spec: any) => {
+    currentSpec = {
+      ...spec,
+      info: { ...spec.info, version: specVersion() },
+    }
+    return currentSpec
+  }
+
+  const fetchSpec = async () => {
+    const res = await fetch($urlbase + doc.file)
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+    return stampSpec(await res.json())
+  }
+
+  const onchange = async () => {
+    try {
+      loadError = ''
+      ui.specActions.updateJsonSpec(await fetchSpec())
+      ui.setBasePath($urlbase + doc.path)
+    } catch (error) {
+      loadError = error instanceof Error ? error.message : `${error}`
+    }
   }
 
   onMount(async () => {
@@ -56,9 +83,10 @@
     try {
       await import('swagger-ui/dist/swagger-ui.css')
       const SwaggerUI = await import('swagger-ui')
+      const spec = await fetchSpec()
 
       ui = await SwaggerUI.default({
-        url: $urlbase + doc.file,
+        spec,
         plugins: [UrlMutatorPlugin],
         defaultModelsExpandDepth: 0,
         dom_id: '#swagger-ui-container',

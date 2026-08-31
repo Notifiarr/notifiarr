@@ -42,6 +42,7 @@ import (
 )
 
 //	@title			Notifiarr Client GUI API Documentation
+//	@version		1.0
 //	@description	Monitors local services and sends notifications.
 //	@termsOfService	https://notifiarr.com
 //	@contact.name	Notifiarr Discord
