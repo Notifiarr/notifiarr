@@ -14,7 +14,7 @@
 </script>
 
 <script lang="ts">
-  import { onMount, tick } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import T from '../../includes/Translate.svelte'
   import { theme } from '../../includes/theme.svelte'
   import { urlbase } from '../../api/fetch'
@@ -36,6 +36,9 @@
   // Keep the last fetched spec. Swagger UI's internal state.json often drops
   // `swagger`/`openapi`; rewriting from that triggers the missing-version error.
   let currentSpec: Record<string, any> | undefined
+  let loadSeq = 0
+  let fetchAbort: AbortController | undefined
+  let uiInit: Promise<any> | undefined
 
   // https://github.com/swagger-api/swagger-ui/issues/5981
   const UrlMutatorPlugin = (system: any) => ({
@@ -54,53 +57,87 @@
   const specVersion = () =>
     [$profile.version, $profile.revision].filter(Boolean).join('-') || '0.0.0'
 
-  const stampSpec = (spec: any) => {
-    currentSpec = {
-      ...spec,
-      info: { ...spec.info, version: specVersion() },
-    }
-    return currentSpec
-  }
+  const stampSpec = (spec: any) => ({
+    ...spec,
+    info: { ...spec.info, version: specVersion() },
+  })
 
-  const fetchSpec = async () => {
-    const res = await fetch($urlbase + doc.file)
+  const fetchSpec = async (
+    selected: (typeof apiDocs)[number],
+    signal: AbortSignal,
+  ) => {
+    const res = await fetch($urlbase + selected.file, { signal })
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
     return stampSpec(await res.json())
   }
 
-  const onchange = async () => {
-    try {
-      loadError = ''
-      ui.specActions.updateJsonSpec(await fetchSpec())
-      ui.setBasePath($urlbase + doc.path)
-    } catch (error) {
-      loadError = error instanceof Error ? error.message : `${error}`
-    }
+  const showSpec = (
+    spec: Record<string, any>,
+    selected: (typeof apiDocs)[number],
+  ) => {
+    currentSpec = spec
+    ui?.specActions.updateJsonSpec(spec)
+    ui?.setBasePath($urlbase + selected.path)
   }
 
-  onMount(async () => {
-    await tick()
-    try {
+  const ensureUi = async (
+    spec: Record<string, any>,
+    selected: (typeof apiDocs)[number],
+    seq: number,
+  ) => {
+    uiInit ??= (async () => {
       await import('swagger-ui/dist/swagger-ui.css')
       const SwaggerUI = await import('swagger-ui')
-      const spec = await fetchSpec()
-
-      ui = await SwaggerUI.default({
+      return SwaggerUI.default({
         spec,
         plugins: [UrlMutatorPlugin],
         defaultModelsExpandDepth: 0,
         dom_id: '#swagger-ui-container',
-        onComplete: () => ui.setBasePath($urlbase + doc.path),
+        onComplete: () => {
+          if (seq !== loadSeq || !ui) return
+          ui.setBasePath($urlbase + selected.path)
+        },
       })
+    })()
+
+    try {
+      ui = await uiInit
     } catch (error) {
+      uiInit = undefined
+      throw error
+    }
+    if (seq !== loadSeq) return
+    showSpec(spec, selected)
+  }
+
+  const loadSelected = async () => {
+    const selected = doc
+    const seq = ++loadSeq
+    fetchAbort?.abort()
+    fetchAbort = new AbortController()
+    const { signal } = fetchAbort
+    loadError = ''
+    try {
+      const spec = await fetchSpec(selected, signal)
+      if (seq !== loadSeq) return
+      await ensureUi(spec, selected, seq)
+    } catch (error) {
+      if (signal.aborted || seq !== loadSeq) return
       loadError = error instanceof Error ? error.message : `${error}`
     }
+  }
+
+  onDestroy(() => fetchAbort?.abort())
+
+  onMount(async () => {
+    await tick()
+    await loadSelected()
   })
 </script>
 
 <Header {page} badge="v{$profile.version}">
   <p><T id="ApiDocs.Contrast" /></p>
-  <Input type="select" bind:value={doc} {onchange} class="mb-2">
+  <Input type="select" bind:value={doc} onchange={loadSelected} class="mb-2">
     <option value={null} disabled><T id="ApiDocs.Choose" /></option>
     {#each apiDocs as ad}
       <option value={ad} selected={ad.id === doc.id}>
