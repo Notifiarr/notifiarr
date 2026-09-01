@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
+    "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "exports": {
     ".": {
@@ -15,17 +18,24 @@
     }
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@tsconfig/svelte": "^5.0.4",
     "@types/crypto-js": "^4.2.2",
     "@types/js-cookie": "^3.0.6",
+    "@types/node": "^22",
     "@types/swagger-ui": "^5.21.1",
+    "eslint": "^10.4.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.19.0",
+    "globals": "^17.6.0",
     "js-cookie": "^3.0.5",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^4.0.0",
     "svelte": "^5.33.19",
     "svelte-check": "^4.2.1",
     "typescript": "~5.9.0",
+    "typescript-eslint": "^8.60.1",
     "vite": "^8.0.0"
   },
   "dependencies": {

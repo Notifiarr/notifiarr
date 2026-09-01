@@ -66,6 +66,6 @@ export const dur = (row: TriggerInfo): string => {
 
 /** Formats and translates the name of the action, used for sorting and filtering. */
 export const val = (row: TriggerInfo): string => {
-  let name = row.key == 'TrigCustomCronTimer' ? row.name.split("'")[1] : row.name
+  const name = row.key == 'TrigCustomCronTimer' ? row.name.split("'")[1] : row.name
   return get(_)(`Actions.triggers.${row.key}.label`, { values: { name } })
 }

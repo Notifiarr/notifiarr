@@ -1,0 +1,28 @@
+name: frontend
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: npm ci
+        run: npm ci
+      - name: svelte-check
+        run: npm run check
+        continue-on-error: true
+      - name: eslint
+        run: npm run lint
+      - name: prettier
+        run: npm run format:check
+        continue-on-error: true
