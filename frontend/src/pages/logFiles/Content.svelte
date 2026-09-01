@@ -20,6 +20,7 @@
   import SortAscending from 'phosphor-svelte/lib/SortAscending'
   import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
   import ArrowsLeftRight from 'phosphor-svelte/lib/ArrowsLeftRight'
+  import ArrowUDownLeft from 'phosphor-svelte/lib/ArrowUDownLeft'
   import { slide } from 'svelte/transition'
   import { delay, warning } from '../../includes/util'
   import { FileTail } from './tail.svelte'
@@ -205,10 +206,11 @@
         <Button
           outline
           onclick={() => (wrap = !wrap)}
+          active={wrap}
           aria-label={$_('LogFiles.ToggleLineWrap')}
           title={$_('LogFiles.ToggleLineWrap')}>
           <Fa
-            i={ArrowsLeftRight}
+            i={wrap ? ArrowUDownLeft : ArrowsLeftRight}
             weight="bold"
             c1="orange"
             d1="gold"

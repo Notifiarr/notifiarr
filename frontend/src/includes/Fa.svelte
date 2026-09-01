@@ -1,6 +1,6 @@
 <script lang="ts" module>
   import type { Component, Snippet } from 'svelte'
-  import type { IconWeight } from 'phosphor-svelte/lib/shared'
+  import type { IconWeight } from 'phosphor-svelte'
 
   /** Phosphor Svelte component, or a PNG/SVG URL (Vite import). */
   export type IconSource = Component<any> | string
@@ -214,6 +214,7 @@
     height: 1em;
     width: auto;
     max-height: 1em;
+    max-width: 1.6em;
     object-fit: contain;
   }
   .nr-icon.ringed {
