@@ -99,9 +99,16 @@
               color="secondary"
               outline
               style="width:44px;"
-              title="Follow redirects"
-              class={form.follow === original?.follow ? '' : 'changed'}>
-              <Box type="checkbox" id={app.id + '.follow'} bind:checked={form.follow} />
+              title={$_('phrases.FollowRedirects')}
+              aria-pressed={!!form.follow}
+              class={form.follow === original?.follow ? '' : 'changed'}
+              onclick={() => (form.follow = !form.follow)}>
+              <Box
+                type="checkbox"
+                id={app.id + '.follow'}
+                checked={!!form.follow}
+                tabindex={-1}
+                style="pointer-events:none" />
             </Button>
           {/snippet}
         </Input>
