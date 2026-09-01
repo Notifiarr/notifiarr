@@ -294,8 +294,11 @@
     font-family: Verdana, Geneva, Tahoma, sans-serif;
   }
 
-  .input :global(.changed) {
-    background-color: rgba(205, 92, 92, 0.322);
+  /* Beat Bootstrap .form-control.is-valid / .form-select.is-valid. */
+  .input :global(.form-control.changed),
+  .input :global(.form-select.changed),
+  .input :global(.btn.changed) {
+    background-color: rgba(205, 92, 92, 0.322) !important;
   }
 
   .input :global(.input-group > .btn) {

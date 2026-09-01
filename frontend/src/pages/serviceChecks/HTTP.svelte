@@ -138,4 +138,8 @@
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: 550;
   }
+
+  .http-group :global(.changed) {
+    background-color: rgba(205, 92, 92, 0.322) !important;
+  }
 </style>
