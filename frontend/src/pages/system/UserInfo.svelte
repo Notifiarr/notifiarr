@@ -15,23 +15,32 @@
     $profile.apiKeyValid === false && $profile.config?.apiKey?.length === 36,
   )
 
-  let icon: Props = { i: Bug, c1: 'green', c2: 'lightgreen', d2: 'white' }
+  /** Fa.logo is a boolean size flag; Helem.logo is an image URL. Do not spread logo. */
+  type Icon = Omit<Props, 'logo' | 'page' | 'children'>
 
-  if ($profile.clientInfo?.user?.subscriber) {
-    icon.i = $profile.clientInfo?.user?.devAllowed ? Horse : Cat
-    icon.c1 = 'darkgoldenrod'
-    icon.c2 = 'lightcoral'
-    icon.d1 = 'goldenrod'
-    icon.d2 = 'azure'
-  } else if ($profile.clientInfo?.user?.patron) {
-    icon.i = $profile.clientInfo?.user?.devAllowed ? BugBeetle : Butterfly
-    icon.c1 = 'orange'
-    icon.c2 = 'wheat'
-  } else if ($profile.clientInfo?.user?.devAllowed) {
-    icon.i = Bird
-    icon.c1 = 'purple'
-    icon.c2 = 'coral'
-  }
+  const icon = $derived.by((): Icon => {
+    const user = $profile.clientInfo?.user
+    if (user?.subscriber) {
+      return {
+        i: user.devAllowed ? Horse : Cat,
+        c1: 'darkgoldenrod',
+        c2: 'lightcoral',
+        d1: 'goldenrod',
+        d2: 'azure',
+      }
+    }
+    if (user?.patron) {
+      return {
+        i: user.devAllowed ? BugBeetle : Butterfly,
+        c1: 'orange',
+        c2: 'wheat',
+      }
+    }
+    if (user?.devAllowed) {
+      return { i: Bird, c1: 'purple', c2: 'coral' }
+    }
+    return { i: Bug, c1: 'green', c2: 'lightgreen', d2: 'white' }
+  })
 </script>
 
 <!-- User Section -->
