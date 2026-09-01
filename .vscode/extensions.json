@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "svelte.svelte-vscode",
+    "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "ardenivanov.svelte-intellisense",
     "golang.go"

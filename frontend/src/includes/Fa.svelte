@@ -157,7 +157,7 @@
         'has-c1': !!primaryColor,
       },
     ]}
-    id,
+    id={id}
     style="--icon-c1: {primaryColor ??
       'currentColor'}; --icon-c2: {secondaryColor ??
       'currentColor'}; font-size: {size}; {style}">

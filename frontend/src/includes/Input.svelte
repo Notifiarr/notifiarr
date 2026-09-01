@@ -113,7 +113,7 @@
   const placeholderText = $derived(translated('placeholder', placeholder))
   const descriptionText = $derived(translated('description', description))
   const tooltipText = $derived(translated('tooltip', tooltip))
-  const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
+  const inputClass = $derived(feedback ? 'is-invalid' : changed ? 'is-valid' : '')
   const env = $derived('DN_' + envVar?.toUpperCase())
   const hasEnv = $derived(!rest.disabled && !!envVar && !!$profile.environment?.[env])
   const inverted = $derived(invert ?? id.endsWith('disabled'))
