@@ -56,6 +56,8 @@
     inner?: any
     /** When type is "timeout" this controls if -1 / disabled is an option. */
     noDisable?: boolean
+    /** Invert Enabled/Disabled select values (true = Disabled). Defaults to id ending in "disabled". */
+    invert?: boolean
     /** If this env var is set a notice is provided to the user as such. */
     envVar?: string
     /** Optional other attributes to apply to the input. */
@@ -80,6 +82,7 @@
     msg,
     inner = $bindable(),
     noDisable = false,
+    invert,
     envVar,
     class: restClass,
     ...rest
@@ -113,6 +116,7 @@
   const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
   const env = $derived('DN_' + envVar?.toUpperCase())
   const hasEnv = $derived(!rest.disabled && !!envVar && !!$profile.environment?.[env])
+  const inverted = $derived(invert ?? id.endsWith('disabled'))
   const selectOptions = $derived.by((): Option[] | undefined => {
     if (type === 'interval') {
       return [
@@ -230,13 +234,10 @@
             </option>
           {/each}
         {:else if typeof value === 'boolean' && type === 'select'}
-          <!-- Create a boolean select-option list: Enabled/Disabled
-           If the name of the input ends with 'disabled', then the values are inverted.
-           -->
-          <option value={id.endsWith('disabled') ? true : false}>
+          <option value={inverted}>
             {$_('words.select-option.Disabled')}
           </option>
-          <option value={id.endsWith('disabled') ? false : true}>
+          <option value={!inverted}>
             {$_('words.select-option.Enabled')}
           </option>
         {/if}
