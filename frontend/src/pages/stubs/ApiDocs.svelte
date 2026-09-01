@@ -129,8 +129,8 @@
   <p><T id="ApiDocs.Contrast" /></p>
   <Input type="select" bind:value={doc} onchange={loadSelected} class="mb-2">
     <option value={null} disabled><T id="ApiDocs.Choose" /></option>
-    {#each apiDocs as ad}
-      <option value={ad} selected={ad.id === doc.id}>
+    {#each apiDocs as ad (ad.id)}
+      <option value={ad}>
         <T id={`ApiDocs.${ad.id}.title`} basePath={$urlbase + ad.path} />
       </option>
     {/each}
