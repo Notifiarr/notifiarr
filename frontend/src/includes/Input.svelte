@@ -219,13 +219,13 @@
           <!-- render provided options. -->
           {#if !selectOptions.map(o => o.value).includes(value)}
             <!-- If the current value is not in the options list, add it. -->
-            <option {value} selected>
+            <option {value}>
               {value} ({$_('words.select-option.custom')})
             </option>
           {/if}
           <!-- Create a select option list from `options` input. -->
-          {#each selectOptions as o}
-            <option value={o.value} selected={value === o.value} disabled={o.disabled}>
+          {#each selectOptions as o (o.value)}
+            <option value={o.value} disabled={o.disabled}>
               {o.name}
             </option>
           {/each}
@@ -233,14 +233,10 @@
           <!-- Create a boolean select-option list: Enabled/Disabled
            If the name of the input ends with 'disabled', then the values are inverted.
            -->
-          <option
-            value={id.endsWith('disabled') ? true : false}
-            selected={value === id.endsWith('disabled') ? true : false}>
+          <option value={id.endsWith('disabled') ? true : false}>
             {$_('words.select-option.Disabled')}
           </option>
-          <option
-            value={id.endsWith('disabled') ? false : true}
-            selected={value === id.endsWith('disabled') ? false : true}>
+          <option value={id.endsWith('disabled') ? false : true}>
             {$_('words.select-option.Enabled')}
           </option>
         {/if}
