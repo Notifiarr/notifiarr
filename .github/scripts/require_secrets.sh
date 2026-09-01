@@ -25,8 +25,6 @@ need DOCKERHUB_PASSWORD
 need CODESIGN_URL
 need CODESIGN_CLIENT_CERT
 need CODESIGN_CLIENT_KEY
-# Frontend npm install (every split, including nightly Docker).
-need FONTAWESOME_PACKAGE_TOKEN
 
 # Nightly still builds linux/windows/freebsd and publishes Docker.
 # It skips Darwin, GitHub Releases, AUR, and packagecloud.
