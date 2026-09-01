@@ -52,8 +52,6 @@
     children?: Snippet
     /** Optional message to display below the input. */
     msg?: Snippet
-    /** Optional inner value for binding. */
-    inner?: any
     /** When type is "timeout" this controls if -1 / disabled is an option. */
     noDisable?: boolean
     /** Invert Enabled/Disabled select values (true = Disabled). Defaults to id ending in "disabled". */
@@ -80,7 +78,6 @@
     badge = '',
     post,
     msg,
-    inner = $bindable(),
     noDisable = false,
     invert,
     envVar,
@@ -107,7 +104,7 @@
         ? 'text'
         : type,
   )
-  const passIcon = $derived(currType === 'password' ? EyeSlash : Eye)
+  const passIcon = $derived(revealed ? EyeSlash : Eye)
   const feedback = $derived(validate?.(id, value) ?? '')
   const labelText = $derived(label ?? $_(`${id}.label`))
   const placeholderText = $derived(translated('placeholder', placeholder))
@@ -197,6 +194,7 @@
           onclick={toggleTooltip}
           outline
           style="width:44px;"
+          aria-expanded={showTooltip}
           title={$_('phrases.ShowMore')}>
           {#if showTooltip}
             <Fa i={UploadSimple} c1="dimgray" d1="gainsboro" btn />
@@ -212,10 +210,11 @@
         {id}
         class={[inputClass, changed && 'changed', restClass]}
         type={currType as InputType}
-        bind:inner
         bind:value
         autocomplete="off"
         placeholder={placeholderText}
+        aria-invalid={!!feedback}
+        aria-describedby={feedback ? `${id}-feedback` : undefined}
         {...rest}>
         {#if children}
           {@render children()}
@@ -250,13 +249,16 @@
           outline
           onclick={togglePassword}
           style="width:44px;"
-          title="Toggle password visibility">
+          aria-pressed={revealed}
+          title={$_(revealed ? 'phrases.HidePassword' : 'phrases.ShowPassword')}>
           <Fa i={passIcon} c1="royalblue" d1="orange" btn />
         </Button>
       {/if}
       {@render post?.()}
     </InputGroup>
-    <div class="text-danger">{feedback}</div>
+    {#if feedback}
+      <div class="text-danger" id="{id}-feedback">{feedback}</div>
+    {/if}
 
     {#if showTooltip}
       <div transition:slide>
@@ -280,10 +282,6 @@
 </div>
 
 <style>
-  .input {
-    margin-bottom: 1rem;
-  }
-
   /** Allows textarea to be resized vertically on mobile. */
   .input :global(textarea) {
     resize: vertical;
