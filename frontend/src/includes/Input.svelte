@@ -38,6 +38,8 @@
     value?: any
     /** Optional original value. Used to check for changes.*/
     original?: any
+    /** When false, skip dirty highlighting. Defaults to true. */
+    showChanged?: boolean
     /** Optional badge to display on the input header. */
     badge?: string
     /** Optional options for select input. */
@@ -71,6 +73,7 @@
     tooltip,
     value = $bindable(undefined),
     original = value,
+    showChanged = true,
     options = undefined,
     validate,
     pre,
@@ -96,7 +99,7 @@
 
   let showTooltip = $state(false)
   let revealed = $state(false)
-  let changed = $derived(original !== null && !deepEqual(value, original))
+  let changed = $derived(showChanged && original !== null && !deepEqual(value, original))
   const currType = $derived(
     type === 'interval' || type === 'timeout'
       ? 'select'

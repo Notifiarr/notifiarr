@@ -90,6 +90,7 @@
           id="profile.authType"
           type="select"
           bind:value={form.authType}
+          original={$profile?.upstreamType}
           options={[
             { value: Auth.password, name: $_('profile.authType.options.password') },
             { value: Auth.website, name: $_('profile.authType.options.website') },
@@ -110,6 +111,7 @@
           id="profile.upstreams"
           type="text"
           bind:value={form.upstreams}
+          original={origUpstreams}
           placeholder={$_('profile.upstreams.placeholder')} />
       </Col>
     </Row>
@@ -119,20 +121,22 @@
     {#if authType === Auth.header || authType === Auth.noauth}
       <Row>
         <Col md={8}>
-          <Input id="profile.header" type="select" bind:value={form.header}>
+          <Input
+            id="profile.header"
+            type="select"
+            bind:value={form.header}
+            original={$profile?.upstreamHeader || ''}>
             {#each Object.entries($profile?.headers || {}) as [key, value]}
               {#each value! as val}
-                <option
-                  value={key}
-                  selected={form.header.toLowerCase() === key.toLowerCase()}>
+                <option value={key}>
                   {key} ({val})
                 </option>
               {/each}
             {/each}
             {#if form.header === ''}
-              <option value={form.header} selected>(none)</option>
+              <option value={form.header}>(none)</option>
             {:else if !$profile?.headers?.[form.header]}
-              <option value={form.header} selected>
+              <option value={form.header}>
                 {form.header} (other)
               </option>
             {/if}
@@ -146,12 +150,17 @@
             id="profile.newPass"
             name="noautofill"
             type="password"
-            bind:value={form.newPass} />
+            bind:value={form.newPass}
+            original="" />
         </Col>
       </Row>
       <Row>
         <Col md={8}>
-          <Input id="profile.username" type="text" bind:value={form.username} />
+          <Input
+            id="profile.username"
+            type="text"
+            bind:value={form.username}
+            original={$profile?.username || ''} />
         </Col>
       </Row>
     {/if}
@@ -164,7 +173,8 @@
             id="profile.password"
             name="password"
             type="password"
-            bind:value={form.password} />
+            bind:value={form.password}
+            showChanged={false} />
         </Col>
       </Row>
     {/if}
