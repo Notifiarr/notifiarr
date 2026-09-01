@@ -165,6 +165,8 @@
       "Welcome": "Welcome, {username}!"
     },
     "ShowMore": "Show more information",
+    "ShowPassword": "Show password",
+    "HidePassword": "Hide password",
     "APIKey": {
       "title": "Provide API Key",
       "placeholder": "Global API key from notifiarr.com",
