@@ -8,18 +8,10 @@ import radarrLogo from '../../assets/logos/radarr.png'
 import readarrLogo from '../../assets/logos/readarr.png'
 import lidarrLogo from '../../assets/logos/lidarr.png'
 import prowlarrLogo from '../../assets/logos/prowlarr.png'
-import { faStars } from '@fortawesome/sharp-duotone-regular-svg-icons'
 import { validate as validator } from '../../includes/instanceValidator'
 import type { App } from '../../includes/formsTracker.svelte'
 
-export const page = {
-  id: 'StarrApps',
-  i: faStars,
-  c1: 'darkgoldenrod',
-  c2: 'gold',
-  d1: 'gold',
-  d2: 'darkgoldenrod',
-}
+export const page = { id: 'StarrApps' }
 
 export const starrConfig: StarrConfig = {
   name: '',

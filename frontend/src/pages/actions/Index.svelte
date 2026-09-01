@@ -1,19 +1,9 @@
 <script lang="ts" module>
-  import {
-    faStarfighter,
-    faX,
-    faListCheck,
-    faTableCellsLarge,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import X from 'phosphor-svelte/lib/X'
+  import ListChecks from 'phosphor-svelte/lib/ListChecks'
+  import SquaresFour from 'phosphor-svelte/lib/SquaresFour'
 
-  export const page = {
-    id: 'Actions',
-    i: faStarfighter,
-    c1: 'lightcoral',
-    c2: 'palevioletred',
-    d1: 'thistle',
-    d2: 'gainsboro',
-  }
+  export const page = { id: 'Actions' }
 </script>
 
 <script lang="ts">
@@ -33,7 +23,7 @@
   const toggleCards = () =>
     Cookies.set('showActionCards', (showCards = !showCards).toString())
   let showCards = $state(Cookies.get('showActionCards') === 'true')
-  const icon = $derived(showCards ? faListCheck : faTableCellsLarge)
+  const icon = $derived(showCards ? ListChecks : SquaresFour)
 
   let filter = $state('')
 
@@ -45,14 +35,14 @@
   <InputGroup>
     {#if filter}
       <Button color="warning" outline onclick={() => (filter = '')}>
-        <Fa i={faX} scale="1.2" />
+        <Fa i={X} scale="1.2" />
       </Button>
     {/if}
     <!-- Filter input. Clear button is above.-->
     <Input bind:value={filter} placeholder={$_('Actions.titles.Filter')} />
     <!-- Toggle cards view. -->
     <Button color="info" outline onclick={toggleCards} id="cards-btn">
-      <Fa i={icon} c1="lightblue" d1="slateblue" scale="1.5" />
+      <Fa i={icon} c1="lightblue" d1="slateblue" btn />
     </Button>
     <Popover target="cards-btn" placement="left" trigger="hover" theme={$thm}>
       <T id={`monitoring.${showCards ? 'classicView' : 'cardsView'}`} />
@@ -78,3 +68,14 @@
       ].flat()} />
   </div>
 {/if}
+
+<style>
+  :global(#cards-btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+</style>

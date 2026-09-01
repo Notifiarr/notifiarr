@@ -1,13 +1,5 @@
 <script lang="ts" module>
-  import { faHouseLock } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  export const page = {
-    id: 'TrustProfile',
-    i: faHouseLock,
-    c1: 'steelblue',
-    c2: 'darkblue',
-    d1: 'lightsteelblue',
-    d2: 'white',
-  }
+  export const page = { id: 'TrustProfile' }
 </script>
 
 <script lang="ts">

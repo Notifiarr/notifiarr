@@ -23,13 +23,11 @@
   import { Monitor as chk } from './page.svelte'
   import Cards from './Cards.svelte'
   import Fa from '../../includes/Fa.svelte'
-  import {
-    faListCheck,
-    faTableCellsLarge,
-    faArrowDownToBracket,
-    faArrowUpFromBracket,
-    faClock,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import ListChecks from 'phosphor-svelte/lib/ListChecks'
+  import SquaresFour from 'phosphor-svelte/lib/SquaresFour'
+  import DownloadSimple from 'phosphor-svelte/lib/DownloadSimple'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
+  import Clock from 'phosphor-svelte/lib/Clock'
   import Cookies from 'js-cookie'
   import { slide } from 'svelte/transition'
   import { theme as thm } from '../../includes/theme.svelte'
@@ -57,11 +55,11 @@
 
   const toggleCards = () => Cookies.set('showCards', (showCards = !showCards).toString())
   let showCards = $state(Cookies.get('showCards') === 'true')
-  const icon = $derived(showCards ? faListCheck : faTableCellsLarge)
+  const icon = $derived(showCards ? ListChecks : SquaresFour)
 
   let showOutput = $state<Record<string, boolean>>({})
   let showOutputAll = $state(false)
-  const showAllI = $derived(showOutputAll ? faArrowUpFromBracket : faArrowDownToBracket)
+  const showAllI = $derived(showOutputAll ? UploadSimple : DownloadSimple)
 
   const toggleOutput = (e: Event) => {
     e.preventDefault()
@@ -93,7 +91,7 @@
         <T id={`monitoring.${showOutputAll ? 'hideAllOutputs' : 'showAllOutputs'}`} />
       </Popover>
       <Button color="info" outline onclick={toggleOutput} id="showAll-button">
-        <Fa i={showAllI} c1="lightblue" d1="slateblue" scale="1.5" />
+        <Fa i={showAllI} c1="lightblue" d1="slateblue" btn />
       </Button>
     {/if}
     <Popover target="refresh-button" placement="left" trigger="hover" {theme}>
@@ -104,7 +102,7 @@
         {#if refreshInterval}
           {age(refreshInterval, true)}
         {:else}
-          <Fa i={faClock} c1="slateblue" d1="wheat" scale="1.5" />
+          <Fa i={Clock} c1="slateblue" d1="wheat" btn />
         {/if}
       </DropdownToggle>
       <DropdownMenu>
@@ -127,7 +125,7 @@
       <T id={`monitoring.${showCards ? 'classicView' : 'cardsView'}`} />
     </Popover>
     <Button color="info" outline onclick={toggleCards} id="cards-button">
-      <Fa i={icon} c1="blue" d1="slateblue" scale="1.5" />
+      <Fa i={icon} c1="blue" d1="slateblue" btn />
     </Button>
   </div>
   {#if nextRefresh}
@@ -174,8 +172,22 @@
 </CardBody>
 
 <style>
+  .toggle-buttons :global(.btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+  }
+
+  .toggle-buttons :global(#showAll-button),
+  .toggle-buttons :global(#cards-button) {
+    width: 2.5rem;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
   .toggle-buttons :global(.interval-picker) {
-    min-width: 45px !important;
+    min-width: 2.5rem !important;
     padding: 0.375rem !important;
   }
 </style>

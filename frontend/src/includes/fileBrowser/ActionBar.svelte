@@ -14,14 +14,11 @@
     Card,
   } from '@sveltestrap/sveltestrap'
   import Fa from '../Fa.svelte'
-  import { faArrowUpFromBracket } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
   import T, { _ } from '../Translate.svelte'
   import type { FileBrowser } from './browser.svelte'
   import { theme } from '../theme.svelte'
-  import {
-    faSpinner,
-    faQuestionCircle,
-  } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import CircleNotch from 'phosphor-svelte/lib/CircleNotch'
   import { slide } from 'svelte/transition'
 
   type Props = { filter: string; fb: FileBrowser; children: () => any }
@@ -49,9 +46,9 @@
     style="width:44px;"
     title={$_('phrases.ShowMore')}>
     {#if showTooltip}
-      <Fa i={faArrowUpFromBracket} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+      <Fa i={UploadSimple} c1="gray" d1="gainsboro" btn />
     {:else}
-      <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+      <Fa help btn />
     {/if}
   </Button>
 
@@ -98,8 +95,9 @@
         <Input bind:value={newPath} />
         <Button color="success" outline type="submit" disabled={!newPath || fb.loading}>
           {#if fb.loading}
-            <Fa i={faSpinner} c1="gray" d1="gainsboro" c2="orange" scale={1.5} spin />
-            <T id="FileBrowser.Creating" />
+            <Fa i={CircleNotch} c1="gray" d1="gainsboro" c2="orange" btn spin>
+              <T id="FileBrowser.Creating" />
+            </Fa>
           {:else}
             <T id="buttons.Create" />
           {/if}

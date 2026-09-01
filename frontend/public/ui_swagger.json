@@ -11,7 +11,8 @@
         "license": {
             "name": "MIT",
             "url": "https://github.com/Notifiarr/notifiarr/blob/main/LICENSE"
-        }
+        },
+        "version": "1.0"
     },
     "basePath": "/ui",
     "paths": {

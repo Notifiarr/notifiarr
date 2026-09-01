@@ -5,16 +5,9 @@ import { _ } from '../../includes/Translate.svelte'
 import { profile } from '../../api/profile.svelte'
 import type { WatchFile } from '../../api/notifiarrConfig'
 import { deepCopy } from '../../includes/util'
-import { faEyeEvil, faFileWaveform } from '@fortawesome/sharp-duotone-light-svg-icons'
+import Eye from 'phosphor-svelte/lib/Eye'
 
-export const page = {
-  id: 'FileWatcher',
-  i: faFileWaveform,
-  d1: 'thistle',
-  d2: 'blue',
-  c1: 'sienna',
-  c2: 'moccasin',
-}
+export const page = { id: 'FileWatcher' }
 
 const empty: WatchFile = {
   path: '',
@@ -95,8 +88,8 @@ export const app: App<WatchFile> = {
   id: 'FileWatcher',
   name: 'FileWatcher',
   envPrefix: 'WATCH_FILE',
-  logo: faEyeEvil,
-  iconProps: { c1: 'purple', c2: 'firebrick', d1: 'thistle', d2: 'violet' },
+  logo: Eye,
+  iconProps: { c1: 'steelblue', d1: 'lightsteelblue' },
   disabled: [],
   hidden: [],
   empty,

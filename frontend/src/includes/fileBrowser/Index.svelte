@@ -11,11 +11,12 @@
     Tooltip,
   } from '@sveltestrap/sveltestrap'
   import Fa from '../Fa.svelte'
-  import { faArrowUpToArc } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
+  import Check from 'phosphor-svelte/lib/Check'
+  import CircleNotch from 'phosphor-svelte/lib/CircleNotch'
   import T from '../Translate.svelte'
   import { type Snippet } from 'svelte'
   import FileList from './FileList.svelte'
-  import { faCheck, faSpinner } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { FileBrowser } from './browser.svelte'
   import ActionBar from './ActionBar.svelte'
   import { slide } from 'svelte/transition'
@@ -75,10 +76,10 @@
           type="button">
           {#if fb.loading}
             <!-- Loading spinner. -->
-            <Fa i={faSpinner} c1="steelblue" d2="firebrick" scale={1.5} spin />
+            <Fa i={CircleNotch} c1="steelblue" d2="firebrick" btn spin />
           {:else}
             <!-- Up button. -->
-            <Fa i={faArrowUpToArc} c1="steelblue" d2="firebrick" scale={1.5} />
+            <Fa i={UploadSimple} c1="steelblue" d2="firebrick" btn />
           {/if}
         </Button>
         <Tooltip target="upBut"><T id="FileBrowser.tooltip.Up" /></Tooltip>
@@ -100,7 +101,7 @@
             outline
             type="button"
             onclick={e => fb.select(e, fb.input, true)}>
-            <Fa i={faCheck} c1="limegreen" d1="green" scale={1.5} />
+            <Fa i={Check} c1="limegreen" d1="green" btn />
           </Button>
           <Tooltip target="fBut">
             <T id="FileBrowser.tooltip.SelectPath" path={fb.input} /></Tooltip>

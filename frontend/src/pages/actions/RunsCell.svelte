@@ -10,7 +10,7 @@
   import { _ } from '../../includes/Translate.svelte'
   import Fa from '../../includes/Fa.svelte'
   import { failure, successIf } from '../../includes/util'
-  import { faCirclePlay } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import PlayCircle from 'phosphor-svelte/lib/PlayCircle'
   import type { TriggerInfo } from '../../api/notifiarrConfig'
   import { run } from './run'
 
@@ -52,7 +52,7 @@
         size="sm">
         <Fa
           style="vertical-align: text-top;"
-          i={faCirclePlay}
+          i={PlayCircle}
           spin={disabled}
           scale={1.2}
           c1="green"

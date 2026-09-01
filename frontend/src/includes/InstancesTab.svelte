@@ -14,7 +14,7 @@
 
 <script lang="ts">
   import Fa from './Fa.svelte'
-  import { faExclamationTriangle } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import Warning from 'phosphor-svelte/lib/Warning'
   import { Badge, TabPane } from '@sveltestrap/sveltestrap'
   import Instances from './Instances.svelte'
   import type { FormListTracker } from './formsTracker.svelte'
@@ -38,9 +38,9 @@
           <Badge class="tab-badge" color="success">{flt.instances.length}</Badge>
         {/if}
         {#if flt.invalid}
-          <Fa i={faExclamationTriangle} c1="red" c2="red" />
+          <Fa i={Warning} c1="red" c2="red" />
         {:else if flt.formChanged || flt.removed.length > 0}
-          <Fa i={faExclamationTriangle} c1="orange" c2="orange" />
+          <Fa i={Warning} c1="orange" c2="orange" />
         {/if}
       </h5>
     </div>

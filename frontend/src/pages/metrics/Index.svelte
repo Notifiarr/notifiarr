@@ -1,13 +1,5 @@
 <script lang="ts" module>
-  import { faChartLine } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  export const page = {
-    id: 'Metrics',
-    i: faChartLine,
-    c1: 'darkgoldenrod',
-    c2: 'darkorange',
-    d1: 'darkkhaki',
-    d2: 'peachpuff',
-  }
+  export const page = { id: 'Metrics' }
 </script>
 
 <script lang="ts">
