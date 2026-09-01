@@ -18,7 +18,7 @@
   let password = $state('')
   let isLoading = $state(false)
   let helpModal = $state<Nodal>()
-  let { error } = $props()
+  let { error = $bindable('') } = $props()
 
   async function onsubmit(e: Event) {
     e.preventDefault()
