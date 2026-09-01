@@ -26,3 +26,5 @@ jobs:
       - name: prettier
         run: npm run format:check
         continue-on-error: true
+      - name: vitest
+        run: npm test
