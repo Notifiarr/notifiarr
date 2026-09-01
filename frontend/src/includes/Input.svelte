@@ -81,6 +81,7 @@
     inner = $bindable(),
     noDisable = false,
     envVar,
+    class: restClass,
     ...rest
   }: Props = $props()
 
@@ -195,7 +196,7 @@
       {@render pre?.()}
       <Input
         {id}
-        class="{inputClass} {changed ? 'changed' : ''}"
+        class={[inputClass, changed && 'changed', restClass]}
         type={currType as InputType}
         bind:inner
         bind:value
