@@ -179,6 +179,7 @@
     <InputGroup>
       {#if tooltip != id + '.tooltip' || (envVar && !rest.disabled)}
         <Button
+          type="button"
           color="secondary"
           onclick={toggleTooltip}
           outline
