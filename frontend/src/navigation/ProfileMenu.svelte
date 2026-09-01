@@ -19,8 +19,11 @@
   import { page as LanguagesPage } from '../pages/stubs/Languages.svelte'
   import { closeSidebar } from './Index.svelte'
 
-  let newLang = $derived(locale.current)
-  const onchange = () => (locale.set(newLang), closeSidebar())
+  const onchange = (e: Event) => {
+    const code = (e.currentTarget as HTMLSelectElement).value
+    locale.set(code)
+    closeSidebar()
+  }
 </script>
 
 <Nav vertical pills class="nav-custom" theme={$theme}>
@@ -42,9 +45,9 @@
         {$_('navigation.titles.' + ProfilePage.id)}
       </DropdownItem>
       <span class="lang-wrapper">
-        <Input type="select" bind:value={newLang} {onchange}>
+        <Input type="select" value={locale.current} {onchange}>
           {#each Object.entries($profile.languages?.[locale.current] || {}) as [code, lang]}
-            <option value={code} selected={code === locale.current}>
+            <option value={code}>
               {Flags[code]}&nbsp;&nbsp; {lang.name}
             </option>
           {/each}
