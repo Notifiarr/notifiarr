@@ -34,13 +34,13 @@
   type="textarea"
   bind:value={test}
   rows={1}
-  original={null} />
+  showChanged={false} />
 <Input
   id={'RegexTester.testPattern'}
   type="textarea"
   bind:value={pattern}
   rows={1}
-  original={null} />
+  showChanged={false} />
 
 {#if pattern && test}
   <div transition:slide>
