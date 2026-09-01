@@ -15,7 +15,7 @@
   import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
   import WarningCircle from 'phosphor-svelte/lib/WarningCircle'
   import T, { _ } from './Translate.svelte'
-  import { onMount, type Snippet } from 'svelte'
+  import { type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
@@ -88,36 +88,23 @@
   type Option = { value: string | number | boolean; name: string; disabled?: boolean }
 
   let showTooltip = $state(false)
+  let revealed = $state(false)
   let changed = $derived(original !== null && !deepEqual(value, original))
-  let currType = $derived(type)
-  let passIcon = $derived(currType === 'password' ? EyeSlash : Eye)
+  const currType = $derived(
+    type === 'interval' || type === 'timeout'
+      ? 'select'
+      : type === 'password' && revealed
+        ? 'text'
+        : type,
+  )
+  const passIcon = $derived(currType === 'password' ? EyeSlash : Eye)
   let feedback = $state('')
   const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
   const env = $derived('DN_' + envVar?.toUpperCase())
   const hasEnv = $derived(!rest.disabled && !!envVar && !!$profile.environment?.[env])
-
-  $effect(() => {
-    placeholder = placeholder == id + '.placeholder' ? '' : placeholder
-  })
-
-  $effect(() => {
-    feedback = validate?.(id, value) ?? ''
-  })
-
-  function toggleTooltip(e: Event | undefined = undefined) {
-    e?.preventDefault()
-    showTooltip = !showTooltip
-  }
-
-  function togglePassword(e: Event | undefined = undefined) {
-    e?.preventDefault()
-    currType = currType === 'password' ? 'text' : 'password'
-  }
-
-  onMount(() => {
+  const selectOptions = $derived.by((): Option[] | undefined => {
     if (type === 'interval') {
-      currType = 'select'
-      options = [
+      return [
         { value: '0s', name: $_('words.select-option.ChecksDisabled') },
         { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
         { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
@@ -135,10 +122,8 @@
         { value: '30m0s', name: '30 ' + $_('words.select-option.minutes') },
       ]
     }
-
     if (type === 'timeout') {
-      currType = 'select'
-      options = [
+      const opts: Option[] = [
         { value: '0s', name: $_('words.select-option.NoTimeout') },
         { value: '1s', name: '1 ' + $_('words.select-option.seconds') },
         { value: '2s', name: '2 ' + $_('words.select-option.seconds') },
@@ -159,13 +144,34 @@
         { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
         { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
       ]
-      if (!noDisable)
-        options.unshift({
+      if (!noDisable) {
+        opts.unshift({
           value: '-1s',
           name: $_('words.select-option.InstanceDisabled'),
         })
+      }
+      return opts
     }
+    return options
   })
+
+  $effect(() => {
+    placeholder = placeholder == id + '.placeholder' ? '' : placeholder
+  })
+
+  $effect(() => {
+    feedback = validate?.(id, value) ?? ''
+  })
+
+  function toggleTooltip(e: Event | undefined = undefined) {
+    e?.preventDefault()
+    showTooltip = !showTooltip
+  }
+
+  function togglePassword(e: Event | undefined = undefined) {
+    e?.preventDefault()
+    revealed = !revealed
+  }
 </script>
 
 <div class="input">
@@ -206,16 +212,16 @@
         {...rest}>
         {#if children}
           {@render children()}
-        {:else if options}
+        {:else if selectOptions}
           <!-- render provided options. -->
-          {#if !options.map(o => o.value).includes(value)}
+          {#if !selectOptions.map(o => o.value).includes(value)}
             <!-- If the current value is not in the options list, add it. -->
             <option {value} selected>
               {value} ({$_('words.select-option.custom')})
             </option>
           {/if}
           <!-- Create a select option list from `options` input. -->
-          {#each options as o}
+          {#each selectOptions as o}
             <option value={o.value} selected={value === o.value} disabled={o.disabled}>
               {o.name}
             </option>
