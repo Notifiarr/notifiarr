@@ -4,7 +4,6 @@
   import { getUi } from '../../api/fetch'
   import type { CheckAllOutput, TestResult } from '../../api/notifiarrConfig'
   import Nodal from '../../includes/Nodal.svelte'
-  import { faTents } from '@fortawesome/sharp-duotone-regular-svg-icons'
   import { age } from '../../includes/util'
   import { profile } from '../../api/profile.svelte'
   import T, { _ } from '../../includes/Translate.svelte'
@@ -15,11 +14,6 @@
   export const page = {
     type: 'modal' as const,
     id: 'TestAllInstances',
-    i: faTents,
-    c1: 'coral',
-    c2: 'steelblue',
-    d1: 'wheat',
-    d2: 'lime',
   }
 </script>
 
@@ -79,7 +73,7 @@
   ]
 </script>
 
-<Nodal {get} bind:isOpen title={page.id + '.title'} fa={page} size="xl" full>
+<Nodal {get} bind:isOpen title={page.id + '.title'} size="xl" full>
   {#snippet children(resp)}
     {#if resp?.ok}
       <ul class="mb-1">

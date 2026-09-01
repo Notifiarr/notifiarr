@@ -75,7 +75,6 @@ jobs:
           CODESIGN_URL: ${{ secrets.CODESIGN_URL }}
           CODESIGN_CLIENT_CERT: ${{ secrets.CODESIGN_CLIENT_CERT }}
           CODESIGN_CLIENT_KEY: ${{ secrets.CODESIGN_CLIENT_KEY }}
-          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
           MACOS_SIGN_P12: ${{ secrets.MACOS_SIGN_P12 }}
           MACOS_SIGN_PASSWORD: ${{ secrets.MACOS_SIGN_PASSWORD }}
           MACOS_NOTARY_KEY: ${{ secrets.MACOS_NOTARY_KEY }}
@@ -150,7 +149,6 @@ jobs:
           REVISION: ${{ needs.channel.outputs.revision }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GORELEASER_KEY: ${{ secrets.GORELEASER_PRO_KEY }}
-          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
           USER: github-actions
           GPG_SIGNING_KEY: /tmp/key.gpg
           GPG_SIGNING_KEY_ID: ${{ steps.import_gpg.outputs.keyid }}
@@ -218,7 +216,6 @@ jobs:
           REVISION: ${{ needs.channel.outputs.revision }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GORELEASER_KEY: ${{ secrets.GORELEASER_PRO_KEY }}
-          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
           USER: github-actions
           GPG_SIGNING_KEY: /tmp/key.gpg
           CODESIGN_URL: ${{ secrets.CODESIGN_URL }}
@@ -278,7 +275,6 @@ jobs:
           REVISION: ${{ needs.channel.outputs.revision }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GORELEASER_KEY: ${{ secrets.GORELEASER_PRO_KEY }}
-          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
           USER: github-actions
           KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
           MACOS_SIGN_IDENTITY: ${{ env.MACOS_SIGN_IDENTITY }}

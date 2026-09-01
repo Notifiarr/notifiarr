@@ -7,16 +7,8 @@ import mysqlLogo from '../../assets/logos/mysql.png'
 import nvidiaLogo from '../../assets/logos/nvidia.png'
 import { type App } from '../../includes/formsTracker.svelte'
 import { validate } from '../../includes/instanceValidator'
-import { faCameraRetro } from '@fortawesome/sharp-duotone-light-svg-icons'
 
-export const page = {
-  id: 'SnapshotApps',
-  i: faCameraRetro,
-  c1: 'burlywood',
-  c2: 'darkgray',
-  d1: 'burlywood',
-  d2: 'silver',
-}
+export const page = { id: 'SnapshotApps' }
 
 export class SnapshotApps {
   static get title(): Record<string, string> {

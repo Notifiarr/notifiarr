@@ -1,8 +1,7 @@
 <script lang="ts">
   import { Table, Popover } from '@sveltestrap/sveltestrap'
   import T, { _, datetime } from '../../includes/Translate.svelte'
-  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import { faRedo } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import ArrowClockwise from 'phosphor-svelte/lib/ArrowClockwise'
   import Fa from '../../includes/Fa.svelte'
   import { age, since } from '../../includes/util'
   import { profile } from '../../api/profile.svelte'
@@ -22,7 +21,7 @@
           {$_('monitoring.check.last.tooltip')}
         </Popover>
         <span id="tablelast" class="help-icon">
-          <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" />
+          <Fa help />
         </span>
         {$_('monitoring.check.last.short')}
       </th>
@@ -35,7 +34,7 @@
           {$_('monitoring.check.since.tooltip')}
         </Popover>
         <span id="tablesince" class="help-icon">
-          <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" />
+          <Fa help />
         </span>
         {$_('monitoring.check.since.short')}
       </th>
@@ -48,7 +47,7 @@
           {$_('monitoring.check.interval.tooltip')}
         </Popover>
         <span id="tableinterval" class="help-icon">
-          <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" />
+          <Fa help />
         </span>
         {$_('monitoring.check.interval.short')}
       </th>
@@ -62,7 +61,7 @@
       <tr>
         <td class="fw-bold">
           <a href="recheck/{result.name}" onclick={e => chk.check(e, result.name)}>
-            <Fa i={faRedo} spin={chk.checking[result.name]} />
+            <Fa i={ArrowClockwise} spin={chk.checking[result.name]} />
           </a>&nbsp;
           {result.name}
         </td>
@@ -83,7 +82,7 @@
             {/each}
           </Popover>
           <span id={id + 'state'} class="help-icon">
-            <Fa i={faQuestionCircle} c1="gainsboro" d1="gainsboro" c2="orange" />
+            <Fa help c1="gainsboro" />
           </span>
         </td>
 
@@ -103,7 +102,7 @@
             {new Date(result.time).toISOString()}
           </Popover>
           <span id={id + 'last'} class="help-icon">
-            <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" />
+            <Fa help />
           </span>
         </td>
 
@@ -121,7 +120,7 @@
             {new Date(result.since).toISOString()}
           </Popover>
           <span id={id + 'since'} class="help-icon">
-            <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" />
+            <Fa help />
           </span>
         </td>
 

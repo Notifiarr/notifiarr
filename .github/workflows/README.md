@@ -31,7 +31,7 @@ GoReleaser Pro `--split` / `--continue --merge` builds each GOOS in its own job,
 - Darwin needs **CGO** (`energye/systray` Cocoa) and **native** `codesign` / `notarytool`. Quill on Linux can sign a naked binary; a `.app` inside a DMG is rejected by Gatekeeper unless the bundle is signed on macOS.
 - Windows Authenticode talks to house **signerd** (`golift.io/codesign`) and needs `id-token: write` for GitHub OIDC. That is ubuntu, not macOS.
 - Linux nFPM (deb/rpm) needs `rpm` + GPG. FreeBSD pkgng `.txz` is built after `--split` by `fpm -t freebsd` (nFPM has no freebsd target). Wrapper: `.github/scripts/freebsd_txz.sh`.
-- Every split compiles the frontend (`go generate ./frontend`), so each job has Node 24 and `FONTAWESOME_PACKAGE_TOKEN`.
+- Every split compiles the frontend (`go generate ./frontend`), so each job has Node 24. Icons are public `phosphor-svelte`; there is no private npm token.
 
 So:
 
@@ -71,7 +71,7 @@ Auto-update **constructs URLs**; it does not scrape a directory listing. Do not 
 
 Linux GitHub matching is already weak (suffix is just `amd64`); in-place auto-update is Windows-only.
 
-**AUR `notifiarr-bin`** (`.github/scripts/aur_publish.sh`) downloads those same GitHub `.linux.gz` names. Keep **binary** AUR: a source PKGBUILD cannot `npm run build` without `FONTAWESOME_PACKAGE_TOKEN`.
+**AUR `notifiarr-bin`** (`.github/scripts/aur_publish.sh`) downloads those same GitHub `.linux.gz` names. Keep **binary** AUR: `--split` has no source tarball, and merge Publish is a silent no-op without `aur_sources`.
 
 Historical Linux/FreeBSD `.gz` names are staged after `--split` by `.github/scripts/legacy_gz.sh` and injected into `artifacts.json` as Archive entries (`internal_type: 1`).
 
@@ -85,9 +85,9 @@ The app executable is `Contents/MacOS/Notifiarr` (`builds.binary: Notifiarr`). H
 
 ## Merge destinations
 
-- **Docker** — always `ghcr.io/notifiarr/notifiarr` and Hub `docker.io/golift/notifiarr` (`DOCKERHUB_PUBLISH=1`). Empty `DOCKERHUB_PASSWORD` fails the merge job. Platforms: `linux/amd64`, `linux/arm64` (no arm/v7). Three Dockerfiles (runtime COPY of the Pro binary): Alpine, Ubuntu (`-ubuntu`, MegaCli), CUDA (`-cuda`, MegaCli + `nvidia-smi`). Frontend/FA token never enter the image. `upload-artifact` zip stores files as `0644`; the merge job `chmod 0755`s `dist/linux/**/notifiarr` and each Dockerfile `COPY --chmod=755` so the image entrypoint is executable.
+- **Docker** — always `ghcr.io/notifiarr/notifiarr` and Hub `docker.io/golift/notifiarr` (`DOCKERHUB_PUBLISH=1`). Empty `DOCKERHUB_PASSWORD` fails the merge job. Platforms: `linux/amd64`, `linux/arm64` (no arm/v7). Three Dockerfiles (runtime COPY of the Pro binary): Alpine, Ubuntu (`-ubuntu`, MegaCli), CUDA (`-cuda`, MegaCli + `nvidia-smi`). The frontend never enters the image. `upload-artifact` zip stores files as `0644`; the merge job `chmod 0755`s `dist/linux/**/notifiarr` and each Dockerfile `COPY --chmod=755` so the image entrypoint is executable.
 - **GitHub Release** — tagged `v*` only (`release.disable: "{{ .IsNightly }}"`). macOS is the notarized `Notifiarr.dmg`. Windows assets are `notifiarr.amd64.exe.zip`. FreeBSD assets are pkgng `notifiarr-<version>.{amd64,i386,armhf}.txz` plus `.freebsd.gz`. Linux assets are `notifiarr.{amd64,386,arm,arm64}.linux.gz` plus nFPM deb/rpm/zst.
-- **AUR** — tagged `CHANNEL=release` only, after packagecloud. `.github/scripts/aur_publish.sh` hashes `dist/linux/notifiarr.*.linux.gz` from `legacy_gz.sh` (CI fails if those files are missing). Binary package `notifiarr-bin`. Do not add GoReleaser `aur_sources` (`--split` fatals `no linux archives found`; merge Publish is a silent no-op; source PKGBUILD cannot `npm run build` without the FA token). Skip nightly/unstable. nFPM `.pkg.tar.zst` on the GitHub Release is a separate binary package.
+- **AUR** — tagged `CHANNEL=release` only, after packagecloud. `.github/scripts/aur_publish.sh` hashes `dist/linux/notifiarr.*.linux.gz` from `legacy_gz.sh` (CI fails if those files are missing). Binary package `notifiarr-bin`. Do not add GoReleaser `aur_sources` (`--split` fatals `no linux archives found`; merge Publish is a silent no-op). Skip nightly/unstable. nFPM `.pkg.tar.zst` on the GitHub Release is a separate binary package.
 - **packagecloud** — `golift/pkgs` vs `golift/unstable`. Skip when `CHANNEL=nightly`.
 - **unstable.golift.io** — only `CHANNEL=unstable` (tagged releases do **not** clobber testers). Script: `.github/scripts/unstable_upload.sh`. Upload overwrites by name. Empty `UNSTABLE_UPLOAD_KEY` fails in GitHub Actions.
 - **Homebrew** — none. Do not require `HOMEBREW_TAP_GITHUB_TOKEN`.
@@ -101,7 +101,6 @@ Set on the `Notifiarr/notifiarr` repo (or org, granted to this public repo). `.g
 | Secret | Used by |
 |---|---|
 | `GORELEASER_PRO_KEY` | every goreleaser-action (env `GORELEASER_KEY`) |
-| `FONTAWESOME_PACKAGE_TOKEN` | frontend `npm install` on every split |
 | `GPG_SIGNING_KEY` | Linux nFPM signatures |
 | `MACOS_SIGN_P12`, `MACOS_SIGN_PASSWORD` | Developer ID `.p12` (PEM or long-line base64) |
 | `MACOS_NOTARY_KEY`, `MACOS_NOTARY_KEY_ID`, `MACOS_NOTARY_ISSUER_ID` | App Store Connect `.p8` |

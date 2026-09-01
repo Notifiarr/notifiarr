@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { faCubes } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import Cube from 'phosphor-svelte/lib/Cube'
   import { profile } from '../../api/profile.svelte'
   import { Table } from '@sveltestrap/sveltestrap'
   import Header from '../../includes/Helem.svelte'
@@ -9,7 +9,7 @@
 </script>
 
 <!-- Environment Section -->
-<Header id="EnvironmentVariables" i={faCubes} c1="tan" c2="orange" />
+<Header id="EnvironmentVariables" i={Cube} c1="tan" c2="orange" />
 <Table>
   <tbody>
     {#each Object.entries($profile.environment || {}) as [key, value]}

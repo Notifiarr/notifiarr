@@ -7,7 +7,7 @@
   import { color, getLogo } from './data'
   import T, { _ } from '../../includes/Translate.svelte'
   import { getApi, type BackendResponse } from '../../api/fetch'
-  import { faVideo } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import VideoCamera from 'phosphor-svelte/lib/VideoCamera'
   import Nodal from '../../includes/Nodal.svelte'
 
   type Props = {
@@ -130,7 +130,7 @@
 
 <Nodal
   title="Integrations.plexSessions"
-  fa={{ i: faVideo }}
+  fa={{ i: VideoCamera }}
   get={() => getApi('plex/1/sessions')}
   size="xl"
   bind:this={sessionsModal}>

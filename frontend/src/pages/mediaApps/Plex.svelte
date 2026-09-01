@@ -1,6 +1,5 @@
 <!-- this is a standalone component page for the `/plex` URI -->
 <script lang="ts" module>
-  import { faLocationQuestion } from '@fortawesome/sharp-duotone-light-svg-icons'
   import { Card, CardBody, CardHeader, Col, Row, Table } from '@sveltestrap/sveltestrap'
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
@@ -9,14 +8,7 @@
   import { urlbase } from '../../api/fetch'
   import { fade } from 'svelte/transition'
 
-  export const page = {
-    id: 'Plex',
-    i: faLocationQuestion,
-    c1: 'blue',
-    c2: 'wheat',
-    d1: 'darkcyan',
-    d2: 'gold',
-  }
+  export const page = { id: 'Plex' }
 </script>
 
 <Header {page} />

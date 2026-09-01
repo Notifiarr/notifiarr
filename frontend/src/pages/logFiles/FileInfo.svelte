@@ -3,13 +3,10 @@
   import type { LogFileInfo } from '../../api/notifiarrConfig'
   import { profile } from '../../api/profile.svelte'
   import T, { _, datetime } from '../../includes/Translate.svelte'
-  import {
-    faCloudDownload,
-    faCloudUpload,
-    faTrashAlt,
-    faArrowUpFromBracket,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import { faQuestionCircle } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import CloudArrowDown from 'phosphor-svelte/lib/CloudArrowDown'
+  import CloudArrowUp from 'phosphor-svelte/lib/CloudArrowUp'
+  import Trash from 'phosphor-svelte/lib/Trash'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
   import Fa from '../../includes/Fa.svelte'
   import { getUi, urlbase } from '../../api/fetch'
   import { success, warning } from '../../includes/util'
@@ -67,7 +64,9 @@
       size="sm"
       title={$_('LogFiles.button.download')}
       outline>
-      <Fa i={faCloudDownload} scale={1.5} />&nbsp; <T id="LogFiles.button.download" />
+      <Fa i={CloudArrowDown} btn>
+        <T id="LogFiles.button.download" />
+      </Fa>
     </Button>
     <Button
       color="primary"
@@ -75,7 +74,9 @@
       title={$_('LogFiles.button.upload')}
       outline
       onclick={uploadFile}>
-      <Fa i={faCloudUpload} scale={1.5} />&nbsp; <T id="LogFiles.button.upload" />
+      <Fa i={CloudArrowUp} btn>
+        <T id="LogFiles.button.upload" />
+      </Fa>
     </Button>
   </ButtonGroup>
 </div>
@@ -88,9 +89,9 @@
       outline
       title={$_('phrases.ShowMore')}>
       {#if showTooltip}
-        <Fa i={faArrowUpFromBracket} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+        <Fa i={UploadSimple} c1="gray" d1="gainsboro" btn />
       {:else}
-        <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+        <Fa help btn />
       {/if}
     </Button>
     <Button
@@ -100,7 +101,9 @@
       outline
       disabled={file.used}
       onclick={() => (showDelModal = true)}>
-      <Fa i={faTrashAlt} scale={1.5} />&nbsp; <T id="LogFiles.button.delete" />
+      <Fa i={Trash} btn>
+        <T id="LogFiles.button.delete" />
+      </Fa>
     </Button>
   </ButtonGroup>
 </div>

@@ -1,12 +1,10 @@
 <script lang="ts">
-  import {
-    faUserAlt,
-    faUserSecret,
-    faUserBountyHunter,
-    faUserNinja,
-    faUserCowboy,
-  } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import { faUserHairMullet } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import Bug from 'phosphor-svelte/lib/Bug'
+  import Butterfly from 'phosphor-svelte/lib/Butterfly'
+  import BugBeetle from 'phosphor-svelte/lib/BugBeetle'
+  import Cat from 'phosphor-svelte/lib/Cat'
+  import Horse from 'phosphor-svelte/lib/Horse'
+  import Bird from 'phosphor-svelte/lib/Bird'
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Header from '../../includes/Helem.svelte'
@@ -17,20 +15,20 @@
     $profile.apiKeyValid === false && $profile.config?.apiKey?.length === 36,
   )
 
-  let icon: Props = { i: faUserAlt, c1: 'green', c2: 'lightgreen', d2: 'white' }
+  let icon: Props = { i: Bug, c1: 'green', c2: 'lightgreen', d2: 'white' }
 
   if ($profile.clientInfo?.user?.subscriber) {
-    icon.i = $profile.clientInfo?.user?.devAllowed ? faUserBountyHunter : faUserNinja
+    icon.i = $profile.clientInfo?.user?.devAllowed ? Horse : Cat
     icon.c1 = 'darkgoldenrod'
     icon.c2 = 'lightcoral'
     icon.d1 = 'goldenrod'
     icon.d2 = 'azure'
   } else if ($profile.clientInfo?.user?.patron) {
-    icon.i = $profile.clientInfo?.user?.devAllowed ? faUserCowboy : faUserHairMullet
+    icon.i = $profile.clientInfo?.user?.devAllowed ? BugBeetle : Butterfly
     icon.c1 = 'orange'
     icon.c2 = 'wheat'
   } else if ($profile.clientInfo?.user?.devAllowed) {
-    icon.i = faUserSecret
+    icon.i = Bird
     icon.c1 = 'purple'
     icon.c2 = 'coral'
   }

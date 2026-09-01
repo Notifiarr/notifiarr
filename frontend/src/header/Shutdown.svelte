@@ -2,7 +2,7 @@
   import { Button } from '@sveltestrap/sveltestrap'
   import { getUi } from '../api/fetch'
   import { _ } from '../includes/Translate.svelte'
-  import { faPowerOff } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import Power from 'phosphor-svelte/lib/Power'
   import Fa from '../includes/Fa.svelte'
   import Nodal from '../includes/Nodal.svelte'
 
@@ -12,7 +12,7 @@
 </script>
 
 <a href="#shutdown" onclick={e => (e.preventDefault(), (isOpen = true))} title="shutdown">
-  <Fa i={faPowerOff} c1="salmon" c2="maroon" d1="firebrick" d2="red" class="me-2" />
+  <Fa i={Power} weight="bold" c1="salmon" d1="tomato" class="me-2" />
 </a>
 
 <Nodal bind:isOpen title="phrases.ConfirmShutdown" disabled={shutdown} esc>

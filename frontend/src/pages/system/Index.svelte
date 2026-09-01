@@ -1,13 +1,5 @@
 <script lang="ts" module>
-  import { faServer } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  export const page = {
-    id: 'System',
-    i: faServer,
-    c1: 'darkslategray',
-    c2: 'dimgray',
-    d1: 'lavender',
-    d2: 'gainsboro',
-  }
+  export const page = { id: 'System' }
 </script>
 
 <script lang="ts">

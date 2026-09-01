@@ -17,18 +17,10 @@ import xmissionLogo from '../../assets/logos/transmission.png'
 import delugeLogo from '../../assets/logos/deluge.png'
 import sabnzbLogo from '../../assets/logos/sabnzb.png'
 import nzbgetLogo from '../../assets/logos/nzbget.png'
-import { faDownload } from '@fortawesome/sharp-duotone-regular-svg-icons'
 import { validate } from '../../includes/instanceValidator'
 import type { App } from '../../includes/formsTracker.svelte'
 
-export const page = {
-  id: 'Downloaders',
-  i: faDownload,
-  c1: 'brown',
-  c2: 'lightsalmon',
-  d1: 'coral',
-  d2: 'lightpink',
-}
+export const page = { id: 'Downloaders' }
 
 const downloadConfig: Form = {
   name: '',

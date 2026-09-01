@@ -78,8 +78,6 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
-        env:
-          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
         run: |
           # Fake frontend build.
           mkdir -p ./frontend/dist

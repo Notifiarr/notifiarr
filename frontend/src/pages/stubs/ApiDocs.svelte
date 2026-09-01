@@ -1,26 +1,16 @@
 <script lang="ts" module>
-  import {
-    faBook,
-    faExclamationTriangle,
-  } from '@fortawesome/sharp-duotone-light-svg-icons'
-  export const page = {
-    id: 'ApiDocs',
-    i: faBook,
-    c1: 'lightcoral',
-    c2: 'lightblue',
-    d1: 'lightblue',
-    d2: 'lightcoral',
-  }
+  export const page = { id: 'ApiDocs' }
 </script>
 
 <script lang="ts">
-  import { onMount, tick } from 'svelte'
+  import { onDestroy, onMount, tick } from 'svelte'
   import T from '../../includes/Translate.svelte'
   import { theme } from '../../includes/theme.svelte'
   import { urlbase } from '../../api/fetch'
   import { CardBody, Input } from '@sveltestrap/sveltestrap'
   import Fa from '../../includes/Fa.svelte'
-  import { faSpinner } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import Warning from 'phosphor-svelte/lib/Warning'
+  import CircleNotch from 'phosphor-svelte/lib/CircleNotch'
   import { profile } from '../../api/profile.svelte'
   import Header from '../../includes/Header.svelte'
 
@@ -33,46 +23,111 @@
   let doc = $state(apiDocs[0])
   let ui = $state<any>()
 
+  // Keep the last fetched spec. Swagger UI's internal state.json often drops
+  // `swagger`/`openapi`; rewriting from that triggers the missing-version error.
+  let currentSpec: Record<string, any> | undefined
+  let loadSeq = 0
+  let fetchAbort: AbortController | undefined
+  let uiInit: Promise<any> | undefined
+
   // https://github.com/swagger-api/swagger-ui/issues/5981
   const UrlMutatorPlugin = (system: any) => ({
     rootInjects: {
       setBasePath: (basePath: string) => {
         if (doc.id === 'api')
           system.preauthorizeApiKey('ApiKeyAuth', $profile.config.apiKey)
-        const jsonSpec = system.getState().toJSON().spec.json
-        return system.specActions.updateJsonSpec({ ...jsonSpec, basePath })
+        if (!currentSpec) return
+        currentSpec = { ...currentSpec, basePath }
+        return system.specActions.updateJsonSpec(currentSpec)
       },
     },
   })
 
-  const onchange = () => {
-    ui.specActions.updateUrl($urlbase + doc.file)
-    ui.specActions.download($urlbase + doc.file)
-    ui.setBasePath($urlbase + doc.path)
+  // Swagger UI 5 requires info.version. Stamp it from golift.io/version (profile).
+  const specVersion = () =>
+    [$profile.version, $profile.revision].filter(Boolean).join('-') || '0.0.0'
+
+  const stampSpec = (spec: any) => ({
+    ...spec,
+    info: { ...spec.info, version: specVersion() },
+  })
+
+  const fetchSpec = async (
+    selected: (typeof apiDocs)[number],
+    signal: AbortSignal,
+  ) => {
+    const res = await fetch($urlbase + selected.file, { signal })
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
+    return stampSpec(await res.json())
   }
 
-  onMount(async () => {
-    await tick()
-    try {
+  const showSpec = (
+    spec: Record<string, any>,
+    selected: (typeof apiDocs)[number],
+  ) => {
+    currentSpec = spec
+    ui?.specActions.updateJsonSpec(spec)
+    ui?.setBasePath($urlbase + selected.path)
+  }
+
+  const ensureUi = async (
+    spec: Record<string, any>,
+    selected: (typeof apiDocs)[number],
+    seq: number,
+  ) => {
+    uiInit ??= (async () => {
       await import('swagger-ui/dist/swagger-ui.css')
       const SwaggerUI = await import('swagger-ui')
-
-      ui = await SwaggerUI.default({
-        url: $urlbase + doc.file,
+      return SwaggerUI.default({
+        spec,
         plugins: [UrlMutatorPlugin],
         defaultModelsExpandDepth: 0,
         dom_id: '#swagger-ui-container',
-        onComplete: () => ui.setBasePath($urlbase + doc.path),
+        onComplete: () => {
+          if (seq !== loadSeq || !ui) return
+          ui.setBasePath($urlbase + selected.path)
+        },
       })
+    })()
+
+    try {
+      ui = await uiInit
     } catch (error) {
+      uiInit = undefined
+      throw error
+    }
+    if (seq !== loadSeq) return
+    showSpec(spec, selected)
+  }
+
+  const loadSelected = async () => {
+    const selected = doc
+    const seq = ++loadSeq
+    fetchAbort?.abort()
+    fetchAbort = new AbortController()
+    const { signal } = fetchAbort
+    loadError = ''
+    try {
+      const spec = await fetchSpec(selected, signal)
+      if (seq !== loadSeq) return
+      await ensureUi(spec, selected, seq)
+    } catch (error) {
+      if (signal.aborted || seq !== loadSeq) return
       loadError = error instanceof Error ? error.message : `${error}`
     }
+  }
+
+  onDestroy(() => fetchAbort?.abort())
+
+  onMount(async () => {
+    await tick()
+    await loadSelected()
   })
 </script>
 
 <Header {page} badge="v{$profile.version}">
   <p><T id="ApiDocs.Contrast" /></p>
-  <Input type="select" bind:value={doc} {onchange} class="mb-2">
+  <Input type="select" bind:value={doc} onchange={loadSelected} class="mb-2">
     <option value={null} disabled><T id="ApiDocs.Choose" /></option>
     {#each apiDocs as ad}
       <option value={ad} selected={ad.id === doc.id}>
@@ -90,12 +145,14 @@
   <CardBody>
     <h5>
       {#if loadError}
-        <Fa i={faExclamationTriangle} class="me-2" scale={1.5} c1="red" />
-        <T id="phrases.ERROR" /><br />
+        <Fa i={Warning} btn c1="red">
+          <T id="phrases.ERROR" />
+        </Fa><br />
         {loadError}
       {:else}
-        <Fa i={faSpinner} spin class="me-2" scale={1.5} c1="orange" />
-        <T id="phrases.Loading" />
+        <Fa i={CircleNotch} spin weight="bold" btn c1="orange">
+          <T id="phrases.Loading" />
+        </Fa>
       {/if}
     </h5>
   </CardBody>

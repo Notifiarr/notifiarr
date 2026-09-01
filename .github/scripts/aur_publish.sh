@@ -2,8 +2,7 @@
 # Push the AUR binary package after a tagged merge.
 #
 # Keep notifiarr-bin (prebuilt .linux.gz). Do not add GoReleaser aur_sources:
-# --split fatals "no linux archives found", merge Publish is a silent no-op,
-# and a source PKGBUILD cannot npm run build without FONTAWESOME_PACKAGE_TOKEN.
+# --split fatals "no linux archives found", merge Publish is a silent no-op.
 #
 # Usage: aur_publish.sh [dist]
 # Env: AUR_DEPLOY_KEY (required to push), VERSION, TAG, CHANNEL, DRY_RUN=1

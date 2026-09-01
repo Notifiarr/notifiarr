@@ -14,13 +14,12 @@
   import type { ServiceConfig } from '../../api/notifiarrConfig'
   import { get } from 'svelte/store'
   import type { App } from '../../includes/formsTracker.svelte'
-  import { faMicrochip, faStaffSnake } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import {
-    faGlobePointer,
-    faHexagonNodesBolt,
-    faPingPongPaddleBall,
-  } from '@fortawesome/sharp-duotone-light-svg-icons'
-  import { type IconDefinition } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import { type IconSource } from '../../includes/Fa.svelte'
+  import Pulse from 'phosphor-svelte/lib/Pulse'
+  import Globe from 'phosphor-svelte/lib/Globe'
+  import Cpu from 'phosphor-svelte/lib/Cpu'
+  import PingPong from 'phosphor-svelte/lib/PingPong'
+  import PlugsConnected from 'phosphor-svelte/lib/PlugsConnected'
   import Instances from '../../includes/Instances.svelte'
   import Check from './Check.svelte'
   import { validator as httpValidator } from './HTTP.svelte'
@@ -70,7 +69,7 @@
     name: 'Checks',
     id: 'ServiceChecks',
     envPrefix: 'SERVICE',
-    logo: faStaffSnake,
+    logo: Pulse,
     iconProps: { c1: 'coral', c2: 'lightcoral' },
     disabled: [],
     hidden: [],
@@ -86,12 +85,12 @@
   })
 
   // Shown next to the check name in each accordion header.
-  const icons: Record<string, IconDefinition> = {
-    http: faGlobePointer,
-    process: faMicrochip,
-    ping: faPingPongPaddleBall,
-    icmp: faPingPongPaddleBall,
-    tcp: faHexagonNodesBolt,
+  const icons: Record<string, IconSource> = {
+    http: Globe,
+    process: Cpu,
+    ping: PingPong,
+    icmp: PingPong,
+    tcp: PlugsConnected,
   }
 </script>
 
@@ -120,15 +119,15 @@
   <Instances {flt} Child={Check} deleteButton={app.id + '.DeleteCheck'}>
     {#snippet headerActive(index)}
       <Fa
-        flip={flt.original?.[index]?.type === 'icmp' ? 'horizontal' : undefined}
+        flip={flt.original?.[index]?.type === 'icmp'}
         i={icons[flt.original?.[index]?.type]}
         c1="#0E6655"
         c2="#0B5345"
         d1="#9FE2BF"
         d2="#40E0D0"
-        scale="1.4"
-        class="header-icon" />
-      {index + 1}. {flt.original?.[index]?.name}
+        logo>
+        {index + 1}. {flt.original?.[index]?.name}
+      </Fa>
     {/snippet}
     {#snippet headerCollapsed(index)}
       {$_('ServiceChecks.type.options.' + flt.original?.[index]?.type)}:
@@ -138,10 +137,3 @@
 </CardBody>
 
 <Footer {submit} saveDisabled={!nav.formChanged || flt.invalid} />
-
-<style>
-  :global(.header-icon) {
-    margin-right: 8px;
-    margin-bottom: 5px;
-  }
-</style>
