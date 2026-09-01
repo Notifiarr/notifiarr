@@ -256,7 +256,7 @@
     {#if showTooltip}
       <div transition:slide>
         <Card body class="mt-1" color="warning" outline>
-          {#if !rest.disabled}
+          {#if envVar && !rest.disabled}
             <ul class="mb-0">
               <li><T id="phrases.EnvironmentVariable" variableName={env} /></li>
             </ul>
