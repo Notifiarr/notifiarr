@@ -64,11 +64,11 @@
 
   let {
     id,
-    label = $_(`${id}.label`),
-    placeholder = $bindable($_(`${id}.placeholder`)),
-    description = $_(`${id}.description`),
+    label,
+    placeholder = $bindable(),
+    description,
     type = 'text',
-    tooltip = $_(`${id}.tooltip`),
+    tooltip,
     value = $bindable(undefined),
     original = value,
     options = undefined,
@@ -87,6 +87,13 @@
 
   type Option = { value: string | number | boolean; name: string; disabled?: boolean }
 
+  const translated = (suffix: string, override?: string) => {
+    if (override !== undefined) return override === `${id}.${suffix}` ? '' : override
+    const key = `${id}.${suffix}`
+    const text = $_(key)
+    return text === key ? '' : text
+  }
+
   let showTooltip = $state(false)
   let revealed = $state(false)
   let changed = $derived(original !== null && !deepEqual(value, original))
@@ -98,7 +105,11 @@
         : type,
   )
   const passIcon = $derived(currType === 'password' ? EyeSlash : Eye)
-  let feedback = $state('')
+  const feedback = $derived(validate?.(id, value) ?? '')
+  const labelText = $derived(label ?? $_(`${id}.label`))
+  const placeholderText = $derived(translated('placeholder', placeholder))
+  const descriptionText = $derived(translated('description', description))
+  const tooltipText = $derived(translated('tooltip', tooltip))
   const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
   const env = $derived('DN_' + envVar?.toUpperCase())
   const hasEnv = $derived(!rest.disabled && !!envVar && !!$profile.environment?.[env])
@@ -155,14 +166,6 @@
     return options
   })
 
-  $effect(() => {
-    placeholder = placeholder == id + '.placeholder' ? '' : placeholder
-  })
-
-  $effect(() => {
-    feedback = validate?.(id, value) ?? ''
-  })
-
   function toggleTooltip(e: Event | undefined = undefined) {
     e?.preventDefault()
     showTooltip = !showTooltip
@@ -177,13 +180,13 @@
 <div class="input">
   <FormGroup>
     <Label for={id}>
-      {@html label}
+      {@html labelText}
       {#if badge}
         <Badge color="secondary" style="margin-left: 0.5rem;">{badge}</Badge>
       {/if}
     </Label>
     <InputGroup>
-      {#if tooltip != id + '.tooltip' || (envVar && !rest.disabled)}
+      {#if tooltipText || (envVar && !rest.disabled)}
         <Button
           type="button"
           color="secondary"
@@ -208,7 +211,7 @@
         bind:inner
         bind:value
         autocomplete="off"
-        {placeholder}
+        placeholder={placeholderText}
         {...rest}>
         {#if children}
           {@render children()}
@@ -269,12 +272,12 @@
               <p class="mt-2 mb-0"><T id="phrases.VariableDescription" /></p>
             {/if}
           {/if}
-          {#if tooltip != id + '.tooltip'}<p class="mt-2 mb-0">{@html tooltip}</p>{/if}
+          {#if tooltipText}<p class="mt-2 mb-0">{@html tooltipText}</p>{/if}
         </Card>
       </div>
     {/if}
 
-    {#if description}<small class="text-muted">{@html description}</small>{/if}
+    {#if descriptionText}<small class="text-muted">{@html descriptionText}</small>{/if}
     {@render msg?.()}
   </FormGroup>
 </div>
