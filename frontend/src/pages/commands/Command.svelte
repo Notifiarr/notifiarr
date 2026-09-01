@@ -138,14 +138,15 @@
     <p><b class="text-primary font-monospace">{form.command}</b></p>
     {#each form.argValues ?? [] as arg, i}
       <FormGroup floating>
-        <div slot="label">
-          <Badge>{i + 1}</Badge> &nbsp; <b class="text-primary font-monospace">{arg}</b>
-        </div>
         <Box
+          id="cmd-arg-{i}"
           tabindex={i + 1}
           bind:value={runArgs[i]}
           invalid={!checkRegex(runArgs[i], i)}
           feedback={$_('Commands.regexMismatch')} />
+        <label for="cmd-arg-{i}">
+          <Badge>{i + 1}</Badge> &nbsp; <b class="text-primary font-monospace">{arg}</b>
+        </label>
       </FormGroup>
     {/each}
     {#snippet footer()}

@@ -52,7 +52,8 @@
         indexed={false}
         bind:form={flt.instances[0]}
         original={flt.original[0]}
-        app={flt.app} />
+        app={flt.app}
+        validate={(id, value) => flt.validate(id, value, 0)} />
     {:else if !one}
       <Instances bind:flt Child={Instance}>
         {#snippet headerActive(index)}

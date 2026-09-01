@@ -136,11 +136,12 @@
       <ButtonGroup class="float-end">
         {#if get}
           <Button
+            type="button"
             id="refreshM"
             outline
             color="secondary"
             size="sm"
-            on:click={refresh}
+            onclick={refresh}
             aria-label={$_('Nodal.button.refresh')}
             title={$_('Nodal.button.refresh')}>
             <Fa
@@ -156,11 +157,12 @@
           </Popover>
           {#if resp && resp.ok}
             <Button
+              type="button"
               id="rawM"
               outline
               color="secondary"
               size="sm"
-              on:click={() => (showRaw = !showRaw)}>
+              onclick={() => (showRaw = !showRaw)}>
               <Fa i={ArrowsLeftRight} c1="steelblue" c2="firebrick" d2="pink" btn />
             </Button>
             <Popover target="rawM" trigger="hover" theme={$theme}>
@@ -170,11 +172,12 @@
         {/if}
 
         <Button
+          type="button"
           id="fullscreenM"
           outline
           color="secondary"
           size="sm"
-          on:click={() => (fullscreen = !fullscreen)}
+          onclick={() => (fullscreen = !fullscreen)}
           aria-label={$_('Nodal.button.fullscreen')}
           title={$_('Nodal.button.fullscreen')}>
           <Fa
@@ -189,13 +192,14 @@
         </Popover>
 
         <Button
+          type="button"
           id="closeM"
           outline
           color="secondary"
           size="sm"
           title={$_('buttons.Close')}
           aria-label={$_('buttons.Close')}
-          on:click={close}
+          onclick={close}
           {disabled}>
           <Fa i={X} c2="orange" d2="gold" btn />
         </Button>

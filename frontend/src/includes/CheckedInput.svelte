@@ -6,7 +6,6 @@
   import Checks from 'phosphor-svelte/lib/Checks'
   import CheckCircle from 'phosphor-svelte/lib/CheckCircle'
   import XCircle from 'phosphor-svelte/lib/XCircle'
-  import { get } from 'svelte/store'
   import type { App } from './formsTracker.svelte'
   import Input from './Input.svelte'
   import { delay, maxLength } from './util'
@@ -42,28 +41,27 @@
   let ok = $state(undefined as boolean | undefined)
   let body = $state('')
   let testing = $state(false)
+  const https = $derived(id === 'url' && form?.[id]?.toString()?.startsWith('https://'))
 
   const checkInstance = async (e: Event) => {
     e.preventDefault()
     if (!form) return
     body = ''
     testing = true
-
-    let p = ''
     try {
+      let p = ''
       if (params) p = `?${(await params()).toString()}`
       else await delay(300) // satisfying spinner.
+      const uri = 'checkInstance/' + app.name.toLowerCase() + '/' + index + p
+      const data = app.merge(index, form)
+      const res = await postUi(uri, JSON.stringify(data), false)
+      ok = res.ok
+      body = res.body
     } catch {
+      // params() can throw when extra query data is not ready.
+    } finally {
       testing = false
-      return
     }
-
-    const uri = 'checkInstance/' + app.name.toLowerCase() + '/' + index + p
-    const data = app.merge(index, form)
-    const res = await postUi(uri, JSON.stringify(data), false)
-    ok = res.ok
-    body = res.body
-    testing = false
   }
 </script>
 
@@ -72,11 +70,16 @@
     style="width:44px;"
     type="button"
     outline
-    title="Validate SSL certificate"
+    title={$_('phrases.ValidateSSL')}
+    aria-pressed={!!form?.['validSsl']}
     color="notifiarr"
     class={form?.['validSsl'] !== original?.['validSsl'] ? 'changed' : ''}
     onclick={() => form && (form['validSsl'] = !form['validSsl'])}>
-    <Box type="checkbox" bind:checked={form['validSsl']} />
+    <Box
+      type="checkbox"
+      checked={!!form['validSsl']}
+      tabindex={-1}
+      style="pointer-events:none" />
   </Button>
 {/snippet}
 
@@ -85,11 +88,16 @@
     style="width:44px;"
     type="button"
     outline
-    title="Run as shell command"
+    title={$_('phrases.RunAsShell')}
+    aria-pressed={!!form?.['shell']}
     color="notifiarr"
     class={form?.['shell'] !== original?.['shell'] ? 'changed' : ''}
     onclick={() => form && (form['shell'] = !form['shell'])}>
-    <Box type="checkbox" bind:checked={form['shell']} />
+    <Box
+      type="checkbox"
+      checked={!!form['shell']}
+      tabindex={-1}
+      style="pointer-events:none" />
   </Button>
 {/snippet}
 
@@ -100,8 +108,8 @@
       bind:value={form[id]}
       original={original?.[id] ?? undefined}
       disabled={app.disabled?.includes(id.toString())}
-      description={id === 'url' && form[id]?.toString()?.startsWith('https://')
-        ? get(_)('words.instance-options.validSsl.description')
+      description={https
+        ? $_('words.instance-options.validSsl.description')
         : rest.description}
       {envVar}
       {...rest}>
@@ -111,7 +119,7 @@
           style="width:44px;"
           type="button"
           outline
-          title="Check instance"
+          title={$_('phrases.CheckInstance')}
           color="notifiarr"
           disabled={testing || disabled}
           onclick={checkInstance}>
@@ -129,7 +137,7 @@
 
       <!-- If they type in an https:// url, add a checkbox to validate the SSL certificate. -->
       {#snippet post()}
-        {#if id === 'url' && form[id]?.startsWith('https://')}
+        {#if https}
           {@render validSsl()}
         {:else if id === 'command'}
           {@render shell()}
@@ -158,9 +166,3 @@
     </Input>
   </div>
 {/if}
-
-<style>
-  .checked-input :global(.changed) {
-    background-color: rgba(205, 92, 92, 0.322);
-  }
-</style>

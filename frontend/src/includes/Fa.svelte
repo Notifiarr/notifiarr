@@ -132,7 +132,14 @@
     flip === true || flip === 'h' || flip === 'horizontal' || flip === 'both',
   )
   const flipV = $derived(flip === 'v' || flip === 'vertical' || flip === 'both')
-  const handleClick = (e: Event) => (e.preventDefault(), onclick?.())
+  const handleClick = (e: Event) => {
+    if (onclick) {
+      e.preventDefault()
+      onclick()
+      return
+    }
+    if (!href || href === '#anotherPage') e.preventDefault()
+  }
 </script>
 
 {#snippet glyph()}
@@ -150,7 +157,7 @@
         'has-c1': !!primaryColor,
       },
     ]}
-    id={id != null ? 'fa-icon' + id : undefined}
+    id={id}
     style="--icon-c1: {primaryColor ??
       'currentColor'}; --icon-c2: {secondaryColor ??
       'currentColor'}; font-size: {size}; {style}">
