@@ -1,0 +1,5 @@
+# Generated / vendored
+package-lock.json
+dist
+node_modules
+src/includes/locale/*.json

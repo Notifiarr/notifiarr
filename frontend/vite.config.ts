@@ -1,5 +1,6 @@
-import { defineConfig } from 'vite'
+import { svelteTesting } from '@testing-library/svelte/vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -33,5 +34,12 @@ export default defineConfig({
         return { customElement: filename.endsWith('element.svelte') }
       },
     }),
+    svelteTesting(),
   ],
+  test: {
+    expect: { requireAssertions: true },
+    environment: 'jsdom',
+    include: ['src/**/*.{test,spec}.{js,ts}'],
+    setupFiles: ['./src/test-setup.ts'],
+  },
 })

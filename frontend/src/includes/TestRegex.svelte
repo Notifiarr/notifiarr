@@ -28,37 +28,37 @@
   let pattern = $state('')
 </script>
 
-<h4><T id={'RegexTester.RegularExpressionTester'} /></h4>
+<h4><T id="RegexTester.RegularExpressionTester" /></h4>
 <Input
-  id={'RegexTester.testRegex'}
+  id="RegexTester.testRegex"
   type="textarea"
   bind:value={test}
   rows={1}
-  original={null} />
+  showChanged={false} />
 <Input
-  id={'RegexTester.testPattern'}
+  id="RegexTester.testPattern"
   type="textarea"
   bind:value={pattern}
   rows={1}
-  original={null} />
+  showChanged={false} />
 
 {#if pattern && test}
   <div transition:slide>
     <Card color="info" outline>
-      <CardHeader><b class="mb-0"><T id={'RegexTester.TestResult'} /></b></CardHeader>
+      <CardHeader><b class="mb-0"><T id="RegexTester.TestResult" /></b></CardHeader>
       <CardBody>
         <Table size="sm" class="mb-0 pb-0" responsive>
           <tbody class="fit">
             <tr>
-              <th><T id={'RegexTester.Test'} /></th>
+              <th><T id="RegexTester.Test" /></th>
               <td>{pattern}</td>
             </tr>
             <tr>
-              <th><T id={'RegexTester.Expression'} /></th>
+              <th><T id="RegexTester.Expression" /></th>
               <td><span class="text-info">{test}</span></td>
             </tr>
             <tr>
-              <th><T id={'RegexTester.Result'} /></th>
+              <th><T id="RegexTester.Result" /></th>
               <td>{@html testRegex()}</td>
             </tr>
           </tbody>

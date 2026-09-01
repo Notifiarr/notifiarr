@@ -165,6 +165,13 @@
       "Welcome": "Welcome, {username}!"
     },
     "ShowMore": "Show more information",
+    "ShowPassword": "Show password",
+    "HidePassword": "Hide password",
+    "CheckInstance": "Check instance",
+    "ValidateSSL": "Validate SSL certificate",
+    "RunAsShell": "Run as shell command",
+    "FollowRedirects": "Follow redirects",
+    "BrowseFiles": "Browse files",
     "APIKey": {
       "title": "Provide API Key",
       "placeholder": "Global API key from notifiarr.com",

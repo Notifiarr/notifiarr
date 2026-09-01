@@ -15,7 +15,7 @@
   import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
   import WarningCircle from 'phosphor-svelte/lib/WarningCircle'
   import T, { _ } from './Translate.svelte'
-  import { onMount, type Snippet } from 'svelte'
+  import { type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
   import { slide } from 'svelte/transition'
   import { deepEqual } from './util'
@@ -38,6 +38,8 @@
     value?: any
     /** Optional original value. Used to check for changes.*/
     original?: any
+    /** When false, skip dirty highlighting. Defaults to true. */
+    showChanged?: boolean
     /** Optional badge to display on the input header. */
     badge?: string
     /** Optional options for select input. */
@@ -52,10 +54,10 @@
     children?: Snippet
     /** Optional message to display below the input. */
     msg?: Snippet
-    /** Optional inner value for binding. */
-    inner?: any
     /** When type is "timeout" this controls if -1 / disabled is an option. */
     noDisable?: boolean
+    /** Invert Enabled/Disabled select values (true = Disabled). Defaults to id ending in "disabled". */
+    invert?: boolean
     /** If this env var is set a notice is provided to the user as such. */
     envVar?: string
     /** Optional other attributes to apply to the input. */
@@ -64,13 +66,14 @@
 
   let {
     id,
-    label = $_(`${id}.label`),
-    placeholder = $bindable($_(`${id}.placeholder`)),
-    description = $_(`${id}.description`),
+    label,
+    placeholder = $bindable(),
+    description,
     type = 'text',
-    tooltip = $_(`${id}.tooltip`),
+    tooltip,
     value = $bindable(undefined),
     original = value,
+    showChanged = true,
     options = undefined,
     validate,
     pre,
@@ -78,45 +81,45 @@
     badge = '',
     post,
     msg,
-    inner = $bindable(),
     noDisable = false,
+    invert,
     envVar,
+    class: restClass,
     ...rest
   }: Props = $props()
 
   type Option = { value: string | number | boolean; name: string; disabled?: boolean }
 
+  const translated = (suffix: string, override?: string) => {
+    if (override !== undefined) return override === `${id}.${suffix}` ? '' : override
+    const key = `${id}.${suffix}`
+    const text = $_(key)
+    return text === key ? '' : text
+  }
+
   let showTooltip = $state(false)
-  let changed = $derived(original !== null && !deepEqual(value, original))
-  let currType = $derived(type)
-  let passIcon = $derived(currType === 'password' ? EyeSlash : Eye)
-  let feedback = $state('')
-  const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
+  let revealed = $state(false)
+  let changed = $derived(showChanged && original !== null && !deepEqual(value, original))
+  const currType = $derived(
+    type === 'interval' || type === 'timeout'
+      ? 'select'
+      : type === 'password' && revealed
+        ? 'text'
+        : type,
+  )
+  const passIcon = $derived(revealed ? EyeSlash : Eye)
+  const feedback = $derived(validate?.(id, value) ?? '')
+  const labelText = $derived(label ?? $_(`${id}.label`))
+  const placeholderText = $derived(translated('placeholder', placeholder))
+  const descriptionText = $derived(translated('description', description))
+  const tooltipText = $derived(translated('tooltip', tooltip))
+  const inputClass = $derived(feedback ? 'is-invalid' : changed ? 'is-valid' : '')
   const env = $derived('DN_' + envVar?.toUpperCase())
   const hasEnv = $derived(!rest.disabled && !!envVar && !!$profile.environment?.[env])
-
-  $effect(() => {
-    placeholder = placeholder == id + '.placeholder' ? '' : placeholder
-  })
-
-  $effect(() => {
-    feedback = validate?.(id, value) ?? ''
-  })
-
-  function toggleTooltip(e: Event | undefined = undefined) {
-    e?.preventDefault()
-    showTooltip = !showTooltip
-  }
-
-  function togglePassword(e: Event | undefined = undefined) {
-    e?.preventDefault()
-    currType = currType === 'password' ? 'text' : 'password'
-  }
-
-  onMount(() => {
+  const inverted = $derived(invert ?? id.endsWith('disabled'))
+  const selectOptions = $derived.by((): Option[] | undefined => {
     if (type === 'interval') {
-      currType = 'select'
-      options = [
+      return [
         { value: '0s', name: $_('words.select-option.ChecksDisabled') },
         { value: '1m0s', name: '1 ' + $_('words.select-option.minute') },
         { value: '2m0s', name: '2 ' + $_('words.select-option.minutes') },
@@ -134,10 +137,8 @@
         { value: '30m0s', name: '30 ' + $_('words.select-option.minutes') },
       ]
     }
-
     if (type === 'timeout') {
-      currType = 'select'
-      options = [
+      const opts: Option[] = [
         { value: '0s', name: $_('words.select-option.NoTimeout') },
         { value: '1s', name: '1 ' + $_('words.select-option.seconds') },
         { value: '2s', name: '2 ' + $_('words.select-option.seconds') },
@@ -158,30 +159,45 @@
         { value: '9m0s', name: '9 ' + $_('words.select-option.minutes') },
         { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
       ]
-      if (!noDisable)
-        options.unshift({
+      if (!noDisable) {
+        opts.unshift({
           value: '-1s',
           name: $_('words.select-option.InstanceDisabled'),
         })
+      }
+      return opts
     }
+    return options
   })
+
+  function toggleTooltip(e: Event | undefined = undefined) {
+    e?.preventDefault()
+    showTooltip = !showTooltip
+  }
+
+  function togglePassword(e: Event | undefined = undefined) {
+    e?.preventDefault()
+    revealed = !revealed
+  }
 </script>
 
 <div class="input">
   <FormGroup>
     <Label for={id}>
-      {@html label}
+      {@html labelText}
       {#if badge}
         <Badge color="secondary" style="margin-left: 0.5rem;">{badge}</Badge>
       {/if}
     </Label>
     <InputGroup>
-      {#if tooltip != id + '.tooltip' || (envVar && !rest.disabled)}
+      {#if tooltipText || (envVar && !rest.disabled)}
         <Button
+          type="button"
           color="secondary"
           onclick={toggleTooltip}
           outline
           style="width:44px;"
+          aria-expanded={showTooltip}
           title={$_('phrases.ShowMore')}>
           {#if showTooltip}
             <Fa i={UploadSimple} c1="dimgray" d1="gainsboro" btn />
@@ -195,42 +211,35 @@
       {@render pre?.()}
       <Input
         {id}
-        class="{inputClass} {changed ? 'changed' : ''}"
+        class={[inputClass, changed && 'changed', restClass]}
         type={currType as InputType}
-        bind:inner
         bind:value
-        bind:checked={value}
         autocomplete="off"
-        {placeholder}
+        placeholder={placeholderText}
+        aria-invalid={!!feedback}
+        aria-describedby={feedback ? `${id}-feedback` : undefined}
         {...rest}>
         {#if children}
           {@render children()}
-        {:else if options}
+        {:else if selectOptions}
           <!-- render provided options. -->
-          {#if !options.map(o => o.value).includes(value)}
+          {#if !selectOptions.map(o => o.value).includes(value)}
             <!-- If the current value is not in the options list, add it. -->
-            <option {value} selected>
+            <option {value}>
               {value} ({$_('words.select-option.custom')})
             </option>
           {/if}
           <!-- Create a select option list from `options` input. -->
-          {#each options as o}
-            <option value={o.value} selected={value === o.value} disabled={o.disabled}>
+          {#each selectOptions as o (o.value)}
+            <option value={o.value} disabled={o.disabled}>
               {o.name}
             </option>
           {/each}
         {:else if typeof value === 'boolean' && type === 'select'}
-          <!-- Create a boolean select-option list: Enabled/Disabled
-           If the name of the input ends with 'disabled', then the values are inverted.
-           -->
-          <option
-            value={id.endsWith('disabled') ? true : false}
-            selected={value === id.endsWith('disabled') ? true : false}>
+          <option value={inverted}>
             {$_('words.select-option.Disabled')}
           </option>
-          <option
-            value={id.endsWith('disabled') ? false : true}
-            selected={value === id.endsWith('disabled') ? false : true}>
+          <option value={!inverted}>
             {$_('words.select-option.Enabled')}
           </option>
         {/if}
@@ -243,18 +252,21 @@
           outline
           onclick={togglePassword}
           style="width:44px;"
-          title="Toggle password visibility">
+          aria-pressed={revealed}
+          title={$_(revealed ? 'phrases.HidePassword' : 'phrases.ShowPassword')}>
           <Fa i={passIcon} c1="royalblue" d1="orange" btn />
         </Button>
       {/if}
       {@render post?.()}
     </InputGroup>
-    <div class="text-danger">{feedback}</div>
+    {#if feedback}
+      <div class="text-danger" id="{id}-feedback">{feedback}</div>
+    {/if}
 
     {#if showTooltip}
       <div transition:slide>
         <Card body class="mt-1" color="warning" outline>
-          {#if !rest.disabled}
+          {#if envVar && !rest.disabled}
             <ul class="mb-0">
               <li><T id="phrases.EnvironmentVariable" variableName={env} /></li>
             </ul>
@@ -262,21 +274,17 @@
               <p class="mt-2 mb-0"><T id="phrases.VariableDescription" /></p>
             {/if}
           {/if}
-          {#if tooltip != id + '.tooltip'}<p class="mt-2 mb-0">{@html tooltip}</p>{/if}
+          {#if tooltipText}<p class="mt-2 mb-0">{@html tooltipText}</p>{/if}
         </Card>
       </div>
     {/if}
 
-    {#if description}<small class="text-muted">{@html description}</small>{/if}
+    {#if descriptionText}<small class="text-muted">{@html descriptionText}</small>{/if}
     {@render msg?.()}
   </FormGroup>
 </div>
 
 <style>
-  .input {
-    margin-bottom: 1rem;
-  }
-
   /** Allows textarea to be resized vertically on mobile. */
   .input :global(textarea) {
     resize: vertical;
@@ -287,8 +295,11 @@
     font-family: Verdana, Geneva, Tahoma, sans-serif;
   }
 
-  .input :global(.changed) {
-    background-color: rgba(205, 92, 92, 0.322);
+  /* Beat Bootstrap .form-control.is-valid / .form-select.is-valid. */
+  .input :global(.form-control.changed),
+  .input :global(.form-select.changed),
+  .input :global(.btn.changed) {
+    background-color: rgba(205, 92, 92, 0.322) !important;
   }
 
   .input :global(.input-group > .btn) {

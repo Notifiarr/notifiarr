@@ -21,7 +21,7 @@
   // Local state that syncs with profile store.
   let config = $state($profile.config)
   // Convert array to newline-separated string for textarea
-  let extraKeys = $derived($profile.config.extraKeys?.join('\n') ?? '')
+  let extraKeys = $state(config.extraKeys?.join('\n') ?? '')
   const rows = $derived(
     extraKeys.split('\n').length > 10 ? 10 : extraKeys.split('\n').length,
   )
@@ -33,7 +33,10 @@
   }
 
   const reset = (ok: boolean) => {
-    if (ok) config = $profile.config
+    if (ok) {
+      config = $profile.config
+      extraKeys = config.extraKeys?.join('\n') ?? ''
+    }
   }
 
   // Reset config when profile is updated (when reload button is clicked).
