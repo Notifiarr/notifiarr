@@ -3,7 +3,6 @@
   import Fa from './Fa.svelte'
   import Code from 'phosphor-svelte/lib/Code'
   import { _ } from './Translate.svelte'
-  import { get } from 'svelte/store'
   import type { Snippet } from 'svelte'
   type Props = {
     badge?: string
@@ -12,13 +11,10 @@
     description?: string | Snippet
     onclick?: () => void
   }
-  let {
-    badge = undefined,
-    page,
-    children,
-    description = get(_)('navigation.pageDescription.' + page.id),
-    onclick,
-  }: Props = $props()
+  let { badge = undefined, page, children, description, onclick }: Props = $props()
+
+  const fallback = $derived($_('navigation.pageDescription.' + page.id))
+  const missing = $derived('navigation.pageDescription.' + page.id)
 </script>
 
 <CardHeader>
@@ -34,8 +30,10 @@
       </a>
     {/if}
   </h2>
-  {#if typeof description === 'string' && description != 'navigation.pageDescription.' + page.id}
+  {#if typeof description === 'string' && description != missing}
     {@html description}
+  {:else if description === undefined && fallback != missing}
+    {@html fallback}
   {:else if typeof description !== 'string' && description !== undefined}
     {@render description()}
   {/if}
