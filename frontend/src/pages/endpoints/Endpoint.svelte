@@ -95,6 +95,7 @@
           {validate}>
           {#snippet post()}
             <Button
+              type="button"
               color="secondary"
               outline
               style="width:44px;"
