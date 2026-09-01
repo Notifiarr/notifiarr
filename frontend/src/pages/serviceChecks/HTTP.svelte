@@ -67,10 +67,20 @@
     return id ? (validate?.(id, value) ?? '') : ''
   }
 
-  const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
-    form.expect = (codes?.join?.(',') ?? '') + (validSsl ? ',SSL' : '')
-    codeFeedback = validate?.(app.id + '.http.codes', codes)
+  const codesFromSelect = (value: unknown): number[] => {
+    if (value == null) return []
+    const list = Array.isArray(value) ? value : [value]
+    return list.map(Number).filter(c => !Number.isNaN(c))
   }
+
+  const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
+    const list = Array.isArray(codes) ? codes : []
+    httpCheck.codes = list
+    form.expect = list.join(',') + (validSsl ? ',SSL' : '')
+    codeFeedback = validate?.(app.id + '.http.codes', list)
+  }
+
+  const onCodes = (value: unknown) => updateExpect(codesFromSelect(value), httpCheck.validSsl)
 
   const merge = (index: number) => app.merge(index, form)
 
@@ -80,9 +90,7 @@
     validate?.(app.id + '.http.codes', [200])
   })
 
-  $effect(() => {
-    updateExpect(httpCheck.codes, httpCheck.validSsl)
-  })
+  updateExpect()
 </script>
 
 <Col lg={6}>
@@ -119,11 +127,10 @@
         ? ''
         : 'changed ' + (httpCheck.codes?.length ? 'is-valid' : 'is-invalid')}"
       placeholder={$_(app.id + '.http.codes.label')}
-      bind:justValue={httpCheck.codes}
-      value={httpCheck.codes?.map?.(c => ({
-        label: httpCodes.find(h => h.value === c)?.label,
-        value: c,
-      }))}
+      valueMode="id"
+      bind:value={httpCheck.codes}
+      oninput={onCodes}
+      onclear={() => onCodes([])}
       multiple
       searchable
       clearable
