@@ -186,9 +186,3 @@
     </Row>
   </div>
 {/if}
-
-<style>
-  .endpoint :global(.changed) {
-    background-color: rgba(205, 92, 92, 0.322) !important;
-  }
-</style>

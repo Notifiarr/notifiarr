@@ -158,9 +158,3 @@
     </Input>
   </div>
 {/if}
-
-<style>
-  .checked-input :global(.changed) {
-    background-color: rgba(205, 92, 92, 0.322);
-  }
-</style>
