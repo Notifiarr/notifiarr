@@ -27,7 +27,7 @@
         <T id="{page.id}.footer" count={resp.body.split('\n').length} />
       </small>
     {/if}
-    <Button outline color="warning" size="sm" on:click={() => (wrap = !wrap)}>
+    <Button outline color="warning" size="sm" onclick={() => (wrap = !wrap)}>
       <T id="{page.id}.button.{wrap ? 'wrapOff' : 'wrapOn'}" />
     </Button>
   {/snippet}
