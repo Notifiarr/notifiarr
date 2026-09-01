@@ -103,8 +103,6 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          secrets: |
-            FONTAWESOME_PACKAGE_TOKEN=${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
           build-args: |
             BUILD_DATE=${{ env.DATE }}
             COMMIT=${{ env.COMMIT }}

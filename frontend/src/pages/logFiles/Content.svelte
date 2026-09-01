@@ -14,19 +14,13 @@
     ListGroupItem,
     Row,
   } from '@sveltestrap/sveltestrap'
-  import {
-    faSplotch as faColors,
-    faSpinner,
-    faQuestionCircle,
-  } from '@fortawesome/sharp-duotone-regular-svg-icons'
-  import {
-    faSplotch,
-    faArrowDownShortWide,
-    faArrowUpShortWide,
-    faArrowUpFromBracket,
-    faArrowProgress,
-    faArrowRightArrowLeft,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import CircleNotch from 'phosphor-svelte/lib/CircleNotch'
+  import Palette from 'phosphor-svelte/lib/Palette'
+  import SortDescending from 'phosphor-svelte/lib/SortDescending'
+  import SortAscending from 'phosphor-svelte/lib/SortAscending'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
+  import ArrowsLeftRight from 'phosphor-svelte/lib/ArrowsLeftRight'
+  import ArrowUDownLeft from 'phosphor-svelte/lib/ArrowUDownLeft'
   import { slide } from 'svelte/transition'
   import { delay, warning } from '../../includes/util'
   import { FileTail } from './tail.svelte'
@@ -123,7 +117,9 @@
 
 {#if !resp}
   <h3 class="text-success">
-    <Fa i={faSpinner} spin scale={1.2} /> &nbsp; <T id="phrases.Loading" />
+    <Fa i={CircleNotch} spin weight="bold" scale={1.2}>
+      <T id="phrases.Loading" />
+    </Fa>
   </h3>
 {:else if tail || resp.ok}
   {@const list = desc
@@ -140,8 +136,8 @@
           active={!desc}
           title={$_('LogFiles.ToggleLinesOrder')}>
           <Fa
-            i={desc ? faArrowUpShortWide : faArrowDownShortWide}
-            scale={1.5}
+            i={desc ? SortAscending : SortDescending}
+            btn
             c1="darkorange"
             c2="deeppink"
             d2="pink" />
@@ -154,11 +150,12 @@
           title={$_('LogFiles.ToggleColors')}>
           <Fa
             spin={adding || (tail && resp.ok)}
-            i={colors ? faColors : faSplotch}
+            i={Palette}
+            weight={colors ? 'bold' : 'fill'}
             c1="purple"
             c2="violet"
             d1="gold"
-            scale={1.5} />
+            btn />
         </Button>
         <!-- Line Count Input -->
         <Input
@@ -198,14 +195,9 @@
           style="width:44px;"
           title={$_('phrases.ShowMore')}>
           {#if showTooltip}
-            <Fa
-              i={faArrowUpFromBracket}
-              c1="gray"
-              d1="gainsboro"
-              c2="orange"
-              scale="1.5x" />
+            <Fa i={UploadSimple} c1="gray" d1="gainsboro" btn />
           {:else}
-            <Fa i={faQuestionCircle} c1="gray" d1="gainsboro" c2="orange" scale="1.5x" />
+            <Fa help btn />
           {/if}
         </Button>
         <!-- Highlight Input -->
@@ -214,15 +206,15 @@
         <Button
           outline
           onclick={() => (wrap = !wrap)}
+          active={wrap}
           aria-label={$_('LogFiles.ToggleLineWrap')}
           title={$_('LogFiles.ToggleLineWrap')}>
           <Fa
-            i={wrap ? faArrowProgress : faArrowRightArrowLeft}
+            i={wrap ? ArrowUDownLeft : ArrowsLeftRight}
+            weight="bold"
             c1="orange"
             d1="gold"
-            c2="darkorange"
-            d2="orange"
-            scale={1.5} />
+            btn />
         </Button>
       </InputGroup>
     </Col>

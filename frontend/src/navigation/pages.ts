@@ -24,7 +24,7 @@ import Languages, { page as LanguagesPage } from '../pages/stubs/Languages.svelt
 import TestAll, { page as TestAllPage } from '../pages/stubs/TestAllInstances.svelte'
 import Plex, { page as PlexPage } from '../pages/mediaApps/Plex.svelte'
 
-// Page structure for navigation with icons
+// Page structure for navigation.
 // 'id' (from page) is used for navigation AND translations.
 
 // Settings header in navigation menu.

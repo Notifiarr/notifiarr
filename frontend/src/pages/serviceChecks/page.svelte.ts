@@ -1,18 +1,10 @@
-import { faBuildingCircleCheck } from '@fortawesome/sharp-duotone-light-svg-icons'
 import type { Config, ServiceConfig } from '../../api/notifiarrConfig'
 import { deepCopy } from '../../includes/util'
 import { get } from 'svelte/store'
 import { profile } from '../../api/profile.svelte'
 import { _ } from '../../includes/Translate.svelte'
 
-export const page = {
-  id: 'Services',
-  i: faBuildingCircleCheck,
-  c1: 'steelblue',
-  c2: 'coral',
-  d1: 'wheat',
-  d2: 'blue',
-}
+export const page = { id: 'Services' }
 
 export const empty: ServiceConfig = {
   name: '',

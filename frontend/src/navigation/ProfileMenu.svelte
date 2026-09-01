@@ -13,7 +13,8 @@
   import { profile } from '../api/profile.svelte'
   import Fa from '../includes/Fa.svelte'
   import { Input } from '@sveltestrap/sveltestrap'
-  import { faStarship, faSun } from '@fortawesome/sharp-duotone-light-svg-icons'
+  import RocketLaunch from 'phosphor-svelte/lib/RocketLaunch'
+  import Sun from 'phosphor-svelte/lib/Sun'
   import { page as ProfilePage } from '../pages/profile/Index.svelte'
   import { page as LanguagesPage } from '../pages/stubs/Languages.svelte'
   import { closeSidebar } from './Index.svelte'
@@ -38,7 +39,6 @@
         active={nav.active(ProfilePage.id)}
         disabled={nav.active(ProfilePage.id)}
         onclick={e => nav.goto(e, ProfilePage.id)}>
-        <span class="nav-icon"><Fa {...ProfilePage} scale="1.2x" /></span>
         {$_('navigation.titles.' + ProfilePage.id)}
       </DropdownItem>
       <span class="lang-wrapper">
@@ -51,17 +51,14 @@
         </Input>
       </span>
       <DropdownItem class="nav-link-custom" onclick={e => nav.goto(e, LanguagesPage.id)}>
-        <span class="nav-icon"><Fa {...LanguagesPage} scale="1.2x" /></span>
         {$_(LanguagesPage.id + '.menuTitle')}
       </DropdownItem>
       <DropdownItem class="nav-link-custom" onclick={theme.toggle}>
         <Fa
-          i={faStarship}
-          d={faSun}
+          i={RocketLaunch}
+          d={Sun}
           c1="green"
-          c2="lightblue"
           d1="orange"
-          d2="fuchsia"
           scale="1.2x"
           class="me-3" />
         {theme.isDark ? $_('config.titles.Light') : $_('config.titles.Dark')}

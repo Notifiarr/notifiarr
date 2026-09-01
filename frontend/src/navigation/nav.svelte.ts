@@ -3,13 +3,12 @@ import { urlbase } from '../api/fetch'
 import type { Component } from 'svelte'
 import Landing from '../Landing.svelte'
 import { iequals, ltrim } from '../includes/util'
-import type { Props as FaProps } from '../includes/Fa.svelte'
 import { allPages, others } from './pages'
 import { closeSidebar } from './Index.svelte'
 import { modal } from './Modals.svelte'
 
 // Page represents the data to render a page link.
-export interface Page extends FaProps {
+export interface Page {
   id: string
   path?: string // optional override for URL path (defaults to id)
   type?: 'modal' | 'page'

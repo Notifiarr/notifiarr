@@ -111,9 +111,4 @@
     color: ivory !important;
   }
 
-  .sidebar-card-wrapper :global(.nav-icon) {
-    margin-right: 12px;
-    display: inline-flex;
-    width: 20px;
-  }
 </style>

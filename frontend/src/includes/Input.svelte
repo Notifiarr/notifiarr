@@ -10,15 +10,10 @@
     Label,
     type InputType,
   } from '@sveltestrap/sveltestrap'
-  import {
-    faEye,
-    faEyeSlash,
-    faArrowUpFromBracket,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
-  import {
-    faQuestionCircle,
-    faExclamationCircle,
-  } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import Eye from 'phosphor-svelte/lib/Eye'
+  import EyeSlash from 'phosphor-svelte/lib/EyeSlash'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
+  import WarningCircle from 'phosphor-svelte/lib/WarningCircle'
   import T, { _ } from './Translate.svelte'
   import { onMount, type Snippet } from 'svelte'
   import Fa from './Fa.svelte'
@@ -94,7 +89,7 @@
   let showTooltip = $state(false)
   let changed = $derived(original !== null && !deepEqual(value, original))
   let currType = $derived(type)
-  let passIcon = $derived(currType === 'password' ? faEyeSlash : faEye)
+  let passIcon = $derived(currType === 'password' ? EyeSlash : Eye)
   let feedback = $state('')
   const inputClass = $derived(!!feedback ? 'is-invalid' : changed ? 'is-valid' : '')
   const env = $derived('DN_' + envVar?.toUpperCase())
@@ -189,20 +184,11 @@
           style="width:44px;"
           title={$_('phrases.ShowMore')}>
           {#if showTooltip}
-            <Fa
-              i={faArrowUpFromBracket}
-              c1="dimgray"
-              d1="gainsboro"
-              c2="orange"
-              scale="1.5x" />
+            <Fa i={UploadSimple} c1="dimgray" d1="gainsboro" btn />
+          {:else if hasEnv}
+            <Fa i={WarningCircle} c1="red" d1="mediumvioletred" btn />
           {:else}
-            <Fa
-              i={hasEnv ? faExclamationCircle : faQuestionCircle}
-              c1="dimgray"
-              d1="gainsboro"
-              c2={hasEnv ? 'red' : 'orange'}
-              d2={hasEnv ? 'mediumvioletred' : 'orange'}
-              scale="1.5x" />
+            <Fa help btn />
           {/if}
         </Button>
       {/if}
@@ -258,13 +244,7 @@
           onclick={togglePassword}
           style="width:44px;"
           title="Toggle password visibility">
-          <Fa
-            i={passIcon}
-            c1="royalblue"
-            c2="orange"
-            d1="orange"
-            d2="dodgerblue"
-            scale="1.5x" />
+          <Fa i={passIcon} c1="royalblue" d1="orange" btn />
         </Button>
       {/if}
       {@render post?.()}
@@ -309,5 +289,13 @@
 
   .input :global(.changed) {
     background-color: rgba(205, 92, 92, 0.322);
+  }
+
+  .input :global(.input-group > .btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
   }
 </style>

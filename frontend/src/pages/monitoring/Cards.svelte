@@ -15,11 +15,9 @@
   import { Monitor as chk } from './page.svelte'
   import { slide } from 'svelte/transition'
   import Fa from '../../includes/Fa.svelte'
-  import {
-    faArrowDownToBracket,
-    faArrowUpFromBracket,
-    faRedo,
-  } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import DownloadSimple from 'phosphor-svelte/lib/DownloadSimple'
+  import UploadSimple from 'phosphor-svelte/lib/UploadSimple'
+  import ArrowClockwise from 'phosphor-svelte/lib/ArrowClockwise'
   import { theme } from '../../includes/theme.svelte'
 
   type Props = { showOutput: Record<string, boolean> }
@@ -29,7 +27,7 @@
 <div class="row cards-page">
   {#each chk.config?.results?.toSorted( (a, b) => a.name.localeCompare(b.name), ) ?? [] as result}
     {@const id = btoa(result.name + 'card').replace(/=/g, '')}
-    {@const icon = showOutput[id] ? faArrowUpFromBracket : faArrowDownToBracket}
+    {@const icon = showOutput[id] ? UploadSimple : DownloadSimple}
 
     <Col md="6" lg="6" xl="4" xxl="3">
       <Card color={chk.colors[result.state]} outline class="mt-3">
@@ -53,13 +51,12 @@
             color={chk.colors[result.state]}
             class="badge py-0 px-1">
             {chk.states[result.state]}</Button>
-          <ButtonGroup class="float-end" size="sm" style="margin-right: -10px;">
+          <ButtonGroup class="card-icons float-end" size="sm" style="margin-right: -10px;">
             <Button
               color="primary"
               outline
-              style="width: 2rem;"
               onclick={() => (showOutput[id] = !showOutput[id])}>
-              <Fa i={icon} c1="blue" d1="slateblue" scale="1.4" />
+              <Fa i={icon} c1="blue" d1="slateblue" logo />
             </Button>
             <Button
               color="primary"
@@ -67,11 +64,10 @@
               disabled={chk.checking[result.name]}
               onclick={e => chk.check(e, result.name)}>
               <Fa
-                i={faRedo}
+                i={ArrowClockwise}
                 spin={chk.checking[result.name]}
                 c1="seagreen"
-                c2="limegreen"
-                scale="1.4" />
+                logo />
             </Button>
           </ButtonGroup>
           <div style="clear:both"></div>
@@ -185,5 +181,13 @@
     margin-left: 0.3rem;
     font-size: 10px;
     vertical-align: top;
+  }
+
+  .cards-page :global(.card-icons > .btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    padding: 0;
   }
 </style>

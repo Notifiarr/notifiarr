@@ -5,7 +5,7 @@
   import { updateBackend, showMsg } from './Index.svelte'
   import { Button } from '@sveltestrap/sveltestrap'
   import { Spinner } from '@sveltestrap/sveltestrap'
-  import { faRotate } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import ArrowClockwise from 'phosphor-svelte/lib/ArrowClockwise'
   import Fa from '../includes/Fa.svelte'
   import Nodal from '../includes/Nodal.svelte'
 
@@ -51,7 +51,7 @@
 </script>
 
 <a href="#reload" onclick={e => (e.preventDefault(), (isOpen = true))} title="reload">
-  <Fa i={faRotate} c1="#33A000" c2="#33A5A4" class="me-2" spin={isOpen} />
+  <Fa i={ArrowClockwise} weight="bold" c1="#33A000" d1="#3cd2a5" class="me-2" spin={isOpen} />
 </a>
 
 <Nodal bind:isOpen title="phrases.ConfirmReload" follow={reset} disabled={reloading} esc>

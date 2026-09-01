@@ -1,13 +1,5 @@
 <script lang="ts" module>
-  import { faFlaskGear } from '@fortawesome/sharp-duotone-light-svg-icons'
-  export const page = {
-    id: 'Configuration',
-    i: faFlaskGear,
-    c1: 'slategray',
-    c2: 'darkgreen',
-    d1: 'gainsboro',
-    d2: 'lime',
-  }
+  export const page = { id: 'Configuration' }
 </script>
 
 <script lang="ts">
@@ -58,7 +50,8 @@
 </script>
 
 <Header
-  page={{ ...page, href: '#rawConfig', onclick: () => (isOpen = true) }}
+  {page}
+  onclick={() => (isOpen = true)}
   badge={$_('phrases.Version', { values: { version: config.version } })} />
 
 <CardBody class="pt-0 mt-0">

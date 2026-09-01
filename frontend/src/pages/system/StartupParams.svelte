@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Table } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
-  import { faSlidersH } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import SlidersHorizontal from 'phosphor-svelte/lib/SlidersHorizontal'
   import Header from '../../includes/Helem.svelte'
   import T from '../../includes/Translate.svelte'
 </script>
@@ -9,7 +9,7 @@
 <!-- Startup Parameters -->
 <Header
   id="StartupParams"
-  i={faSlidersH}
+  i={SlidersHorizontal}
   c1="darkseagreen"
   c2="lightseagreen"
   d1="darkcyan"

@@ -3,7 +3,8 @@
   import Storage from '../../system/Storage.svelte'
   import { age } from '../../../includes/util'
   import H from '../../../includes/Helem.svelte'
-  import { faHardDrive, faHeartPulse } from '@fortawesome/sharp-duotone-regular-svg-icons'
+  import Heartbeat from 'phosphor-svelte/lib/Heartbeat'
+  import HardDrive from 'phosphor-svelte/lib/HardDrive'
   import T from '../../../includes/Translate.svelte'
 
   type Props = {
@@ -55,7 +56,7 @@
 <H
   parent="Integrations.DriveData"
   id="driveInformation"
-  i={faHeartPulse}
+  i={Heartbeat}
   c1="darkblue"
   c2="lightblue"
   d1="cyan"
@@ -89,7 +90,7 @@
 <H
   parent="Integrations.DriveData"
   id="mdStatRaid"
-  i={faHardDrive}
+  i={HardDrive}
   c1="darkblue"
   c2="lightblue"
   d1="cyan"

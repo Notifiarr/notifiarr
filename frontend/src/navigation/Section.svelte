@@ -1,7 +1,6 @@
 <script lang="ts">
   import { Nav, NavItem, NavLink } from '@sveltestrap/sveltestrap'
   import { nav, type Page } from './nav.svelte'
-  import Fa from '../includes/Fa.svelte'
   import { urlbase } from '../api/fetch'
   import { _ } from '../includes/Translate.svelte'
   import { theme } from '../includes/theme.svelte'
@@ -22,10 +21,7 @@
           active={nav.active(page.path ?? page.id)}
           disabled={nav.active(page.path ?? page.id)}
           onclick={e => nav.goto(e, page.path ?? page.id)}>
-          <span class="nav-icon">
-            <Fa {...page} scale="1.4x" />
-          </span>
-          <span class="nav-text">{$_('navigation.titles.' + page.id)}</span>
+          {$_('navigation.titles.' + page.id)}
         </NavLink>
       </NavItem>
     {/each}

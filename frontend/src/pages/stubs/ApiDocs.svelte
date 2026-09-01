@@ -1,16 +1,5 @@
 <script lang="ts" module>
-  import {
-    faBook,
-    faExclamationTriangle,
-  } from '@fortawesome/sharp-duotone-light-svg-icons'
-  export const page = {
-    id: 'ApiDocs',
-    i: faBook,
-    c1: 'lightcoral',
-    c2: 'lightblue',
-    d1: 'lightblue',
-    d2: 'lightcoral',
-  }
+  export const page = { id: 'ApiDocs' }
 </script>
 
 <script lang="ts">
@@ -20,7 +9,8 @@
   import { urlbase } from '../../api/fetch'
   import { CardBody, Input } from '@sveltestrap/sveltestrap'
   import Fa from '../../includes/Fa.svelte'
-  import { faSpinner } from '@fortawesome/sharp-duotone-solid-svg-icons'
+  import Warning from 'phosphor-svelte/lib/Warning'
+  import CircleNotch from 'phosphor-svelte/lib/CircleNotch'
   import { profile } from '../../api/profile.svelte'
   import Header from '../../includes/Header.svelte'
 
@@ -155,12 +145,14 @@
   <CardBody>
     <h5>
       {#if loadError}
-        <Fa i={faExclamationTriangle} class="me-2" scale={1.5} c1="red" />
-        <T id="phrases.ERROR" /><br />
+        <Fa i={Warning} btn c1="red">
+          <T id="phrases.ERROR" />
+        </Fa><br />
         {loadError}
       {:else}
-        <Fa i={faSpinner} spin class="me-2" scale={1.5} c1="orange" />
-        <T id="phrases.Loading" />
+        <Fa i={CircleNotch} spin weight="bold" btn c1="orange">
+          <T id="phrases.Loading" />
+        </Fa>
       {/if}
     </h5>
   </CardBody>

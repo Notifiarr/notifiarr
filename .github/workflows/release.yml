@@ -28,8 +28,6 @@ jobs:
         with:
           go-version-file: 'go.mod'
       - name: go-generate
-        env:
-          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
         run: |
           # The API defs won't build without a dist folder, and the next step creates it for real.
           mkdir -p ./frontend/dist
@@ -98,7 +96,6 @@ jobs:
           echo "revision=${ITERATION}" >> $GITHUB_OUTPUT
       - name: Make Release v${{steps.vars.outputs.version}}-${{steps.vars.outputs.revision}}
         env:
-          FONTAWESOME_PACKAGE_TOKEN: ${{ secrets.FONTAWESOME_PACKAGE_TOKEN }}
           # Job-level CODESIGN_URL is only for the codesign step's if.
           # Make must not see it: signexe.sh would fail before the Action installs the CLI.
           CODESIGN_URL: ""

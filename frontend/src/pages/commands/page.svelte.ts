@@ -5,17 +5,10 @@ import { _ } from '../../includes/Translate.svelte'
 import { profile } from '../../api/profile.svelte'
 import type { Command } from '../../api/notifiarrConfig'
 import { deepCopy } from '../../includes/util'
-import { faTerminal, faCommand } from '@fortawesome/sharp-duotone-solid-svg-icons'
+import TerminalWindow from 'phosphor-svelte/lib/TerminalWindow'
 import { validate } from '../../includes/instanceValidator'
 
-export const page = {
-  id: 'Commands',
-  i: faTerminal,
-  c1: 'green',
-  c2: 'darkgreen',
-  d1: 'seagreen',
-  d2: 'green',
-}
+export const page = { id: 'Commands' }
 
 const empty: Command = {
   name: '',
@@ -52,7 +45,7 @@ export const app: App<Command> = {
   name: 'Commands',
   id: 'Commands',
   envPrefix: 'COMMANDS',
-  logo: faCommand,
+  logo: TerminalWindow,
   iconProps: { c1: 'darksalmon', d1: 'salmon', d2: 'tomato' },
   disabled: [],
   hidden: [],

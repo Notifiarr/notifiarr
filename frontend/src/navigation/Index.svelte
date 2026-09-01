@@ -104,7 +104,7 @@
 
 <style>
   .sidebar-col {
-    min-width: 230px;
+    min-width: 170px;
     max-width: fit-content;
   }
 
