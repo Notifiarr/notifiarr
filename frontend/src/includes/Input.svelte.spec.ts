@@ -44,7 +44,7 @@ describe('Input', () => {
     render(Input, { props: { id: 'test.plain', value: '', original: '' } })
 
     expect(screen.queryByTitle('Show more information')).toBeNull()
-    expect(screen.queryByText(/DN_UNDEFINED/)).toBeNull()
+    expect(screen.queryByText(/DN_undefined/)).toBeNull()
   })
 
   it('shows the env-var tooltip when envVar is set and the field is enabled', async () => {
@@ -76,7 +76,7 @@ describe('Input', () => {
   it('inverts Enabled/Disabled when invert is true', () => {
     render(Input, {
       props: {
-        id: 'apps.sonarr.disabled',
+        id: 'config.debug',
         type: 'select',
         value: true,
         original: true,
