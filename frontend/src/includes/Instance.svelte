@@ -42,14 +42,18 @@
 
   /** Array converted to newline-separated string for textarea. */
   let busIds: string = $state(form?.busIDs?.join('\n') ?? '')
-  /** Rows for textarea based on count of newlines. */
-  const rows = $derived(busIds.split('\n').length < 10 ? busIds.split('\n').length : 1)
-  // Update form variables if they existed prior to this effect.
-  $effect(() => {
-    // form.smiPath and form.busIDs only exist on Nvidia. form can be undefined while an
-    // instance accordion is closing after delete (this component is shared by Starr apps).
-    if (form && typeof form.smiPath !== 'undefined') form.busIDs = busIds.split(/\s+/)
-  })
+  const rows = $derived(Math.min(Math.max(busIds.split('\n').length, 1), 10))
+
+  function applyBusIds() {
+    if (!form || typeof form.smiPath === 'undefined') return
+    const ids = busIds.split(/\s+/).filter((id: string) => id.length)
+    form.busIDs = ids.length ? ids : ['']
+  }
+
+  function resetInstance() {
+    reset?.()
+    busIds = original?.busIDs?.join('\n') ?? ''
+  }
 
   /** Shorthand variable to set Col sizes for username and password inputs. */
   const hasToken = $derived(
@@ -253,6 +257,7 @@
             original={original?.busIDs?.join('\n') ?? ''}
             envVar={envPrefix + '_BUS_IDS'}
             disabled={app.disabled?.includes('busIds')}
+            oninput={applyBusIds}
             {validate} />
         </Col>
       {/if}
@@ -261,7 +266,7 @@
     <!-- Show an optional reset button if the form has changes. -->
     {#if reset && !deepEqual(form, original)}
       <div class="mb-2" transition:slide>
-        <Button color="primary" outline onclick={reset} class="float-end">
+        <Button color="primary" outline onclick={resetInstance} class="float-end">
           {$_('buttons.ResetForm')}
         </Button>
         &nbsp;
