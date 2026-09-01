@@ -201,7 +201,6 @@
         type={currType as InputType}
         bind:inner
         bind:value
-        bind:checked={value}
         autocomplete="off"
         {placeholder}
         {...rest}>
