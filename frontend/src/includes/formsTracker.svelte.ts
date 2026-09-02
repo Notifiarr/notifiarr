@@ -54,13 +54,11 @@ export type App<T> = {
 /**
  * FormListTracker is a class that tracks multiple forms (across accordions generally).
  * it keeps track of the original list of instances, the form-bound list of instances,
- * the removed instances, the invalid instances, and the feedback for the instances.
+ * the removed instances, and whether any instance is invalid.
  * @param instances - The form-bound list of instances in our tabs.
  * @param app - The app we're validating.
  */
 export class FormListTracker<T> {
-  /** List of invalid instances. */
-  private feedback: Record<number, Record<string, string | undefined>>
   /** The form-bound list of instances in our tabs. */
   public instances: T[]
   /** Count of deleted saved instances. Use .length for the Deleted badge. Indexes are not stable. */
@@ -69,7 +67,7 @@ export class FormListTracker<T> {
   public readonly original: T[]
   /** Data about the app we're validating. */
   public readonly app: App<T>
-  /** If any instance in the list has non-empty feedback the form is invalid. */
+  /** If any instance in the list fails validation the form is invalid. */
   public readonly invalid: boolean
   /** If the form has changed from the original values. */
   public readonly formChanged: boolean
@@ -80,15 +78,13 @@ export class FormListTracker<T> {
     this.instances = $state(deepCopy(instances ?? []))
     this.original = $state(deepCopy(instances ?? []))
     this.app = app
-    this.feedback = $state({})
     this.removed = $state([])
     this.active = $state(0)
     this.formChanged = $derived(
       this.removed.length > 0 || !deepEqual(this.instances, this.original),
     )
-    this.invalid = $derived(
-      Object.values(this.feedback).some(v => Object.values(v).some(v => !!v)),
-    )
+    // Must not write $state from validate(): Input derives feedback from it.
+    this.invalid = $derived(this.instances.some((_, i) => !this.isValid(i)))
   }
 
   /** Add a new instance to the list. */
@@ -111,8 +107,6 @@ export class FormListTracker<T> {
     }
     // Remove the instance from the form (delete the accordion).
     this.instances.splice(index, 1)
-    // Reset the feedback for the instance.
-    this.feedback = {}
     // Re-open a remaining instance. Never select index 0 on an empty list:
     // {#key flt.active} would remount children bound to undefined form and freeze the UI.
     this.active = this.instances.length
@@ -124,7 +118,6 @@ export class FormListTracker<T> {
   public resetAll = () => {
     this.instances = deepCopy(this.original)
     this.removed = []
-    this.validateAll()
   }
 
   /** Reset a single instance to the original values. Call this when reset button is clicked. */
@@ -132,31 +125,31 @@ export class FormListTracker<T> {
     this.instances[index] = deepCopy(this.original[index] ?? this.app.empty!)
   }
 
-  /** Validate all instances. Call this after a form has been submitted to re-validate any backend changes. */
-  private validateAll = () => {
-    this.instances.forEach((m, i) => {
-      Object.keys(m ?? {}).forEach(k => {
-        this.validate(this.app.id + '.' + k, m?.[k as keyof T], i)
-      })
-    })
-  }
-
   /** Check if an instance is valid.
    * @param index - The index of the current instance the instances list. (0)
    */
   public isValid = (index: number): boolean => {
-    return Object.values(this.feedback[index] ?? {}).every(v => !v)
+    const inst = this.instances[index]
+    if (inst == null) return true
+    const hidden = this.app.hidden ?? []
+    return Object.keys(inst).every(k => {
+      if (hidden.includes(k)) return true
+      return !this.app.validator?.(
+        this.app.id + '.' + k,
+        inst[k as keyof T],
+        index,
+        this.instances,
+      )
+    })
   }
 
-  /** Standard form validator for an integrated instance (plex, sonarr, etc)
+  /** Standard form validator for an integrated instance (plex, sonarr, etc).
+   * Pure: Input calls this from `$derived`, so it must not write `$state`.
    * @param id - The id of the form field. (anything.here.url)
    * @param value - The value of the form field. (http://localhost:8080)
    * @param index - The index of the current instance the instances list. (0)
-   * @updates The feedback for the instance.
    */
   public validate = (id: string, value: any, index: number): string | undefined => {
-    if (!this.feedback[index]) this.feedback[index] = {}
-    this.feedback[index][id] = this.app.validator?.(id, value, index, this.instances)
-    return this.feedback[index][id]
+    return this.app.validator?.(id, value, index, this.instances)
   }
 }

@@ -33,10 +33,12 @@
   }
 
   const reset = (ok: boolean) => {
-    if (ok) {
-      config = $profile.config
-      extraKeys = config.extraKeys?.join('\n') ?? ''
-    }
+    if (!ok) return
+    // Read the store once. Assigning `config` then reading `config.extraKeys` made
+    // `$effect(() => reset(!!profile.updated))` depend on the $state it just wrote.
+    const next = $profile.config
+    config = next
+    extraKeys = next.extraKeys?.join('\n') ?? ''
   }
 
   // Reset config when profile is updated (when reload button is clicked).

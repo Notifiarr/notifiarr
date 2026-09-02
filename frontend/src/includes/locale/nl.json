@@ -1194,7 +1194,7 @@
                 "placeholder": "/usr/bin/nvidia-smi"
             },
             "title": "Nvidia",
-            "description": "Deze integratie geeft Nvidia CUDA informatie weer in Snapshot-meldingen. Om deze functie in Docker te gebruiken, moet u de CUDA image gebruiken: <code>ghcr.io/notifiarr/notifiarr:cuda</code>"
+            "description": "Deze integratie toont Nvidia GPU-informatie in Snapshot-meldingen. In Docker gebruikt u de CUDA-image (<code>ghcr.io/notifiarr/notifiarr:cuda</code> of <code>golift/notifiarr:cuda</code>), installeert u de <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> op de host, en geeft u de GPU door met <code>--gpus all</code> of Compose <code>gpus: all</code>. Een CUDA-toolkitversie op de host is niet nodig."
         },
         "MySQL": {
             "host": {

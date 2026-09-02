@@ -1121,7 +1121,7 @@
                 "tooltip": "Il s'agit de l'identifiant de bus du GPU. Vous pouvez le trouver en exécutant <code>nvidia-smi</code> et en consultant la colonne <code>Bus Id</code>. Les cartes avec d'autres identifiants de bus sont ignorées dans l'instantané. En général, laissez ce champ vide. Ajoutez-en plusieurs avec des sauts de ligne."
             },
             "title": "Nvidia",
-            "description": "Cette intégration affiche les informations Nvidia CUDA dans les notifications Snapshot. Pour utiliser cette fonctionnalité dans Docker, vous devez utiliser l'image CUDA : <code>ghcr.io/notifiarr/notifiarr:cuda</code>",
+            "description": "Cette intégration affiche les informations GPU Nvidia dans les notifications Snapshot. Dans Docker, utilisez l'image CUDA (<code>ghcr.io/notifiarr/notifiarr:cuda</code> ou <code>golift/notifiarr:cuda</code>), installez le <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> sur l'hôte, et transmettez le GPU avec <code>--gpus all</code> ou Compose <code>gpus: all</code>. Une version du toolkit CUDA sur l'hôte n'est pas requise.",
             "disabled": {
                 "label": "Instantanés GPU",
                 "description": "Activer ou désactiver les instantanés GPU."

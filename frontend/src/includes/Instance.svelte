@@ -43,12 +43,22 @@
   /** Array converted to newline-separated string for textarea. */
   let busIds: string = $state(form?.busIDs?.join('\n') ?? '')
   const rows = $derived(Math.min(Math.max(busIds.split('\n').length, 1), 10))
+  // The Nvidia tab remounts `form` on profile reload. Seed from the new object
+  // instead of writing the previous textarea back over the reloaded bus IDs.
+  let busIdsForm: typeof form | undefined
 
-  function applyBusIds() {
+  $effect(() => {
     if (!form || typeof form.smiPath === 'undefined') return
+    if (form !== busIdsForm) {
+      busIdsForm = form
+      busIds = form.busIDs?.join('\n') ?? ''
+    }
     const ids = busIds.split(/\s+/).filter((id: string) => id.length)
-    form.busIDs = ids.length ? ids : ['']
-  }
+    const next = ids.length ? ids : ['']
+    // Only write when contents change. A new array every run retriggers this effect.
+    if (deepEqual(form.busIDs, next)) return
+    form.busIDs = next
+  })
 
   function resetInstance() {
     reset?.()
@@ -257,7 +267,6 @@
             original={original?.busIDs?.join('\n') ?? ''}
             envVar={envPrefix + '_BUS_IDS'}
             disabled={app.disabled?.includes('busIds')}
-            oninput={applyBusIds}
             {validate} />
         </Col>
       {/if}

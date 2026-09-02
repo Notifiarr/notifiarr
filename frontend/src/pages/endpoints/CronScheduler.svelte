@@ -3,9 +3,9 @@
   import T, { _ } from '../../includes/Translate.svelte'
   /** Call this from the validator method you pass in to the module to validate its values. */
   export const validator = (id: string, value: any): string => {
-    if (id.endsWith('daysOfWeek') && !value)
+    if (id.endsWith('daysOfWeek') && (!value || value.length === 0))
       return get(_)('scheduler.required.daysOfWeek')
-    if (id.endsWith('daysOfMonth') && !value)
+    if (id.endsWith('daysOfMonth') && (!value || value.length === 0))
       return get(_)('scheduler.required.daysOfMonth')
     if (id.endsWith('atTimes') && (!value || value.length === 0))
       return get(_)('scheduler.required.atTimes')

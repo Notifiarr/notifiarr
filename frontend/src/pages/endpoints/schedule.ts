@@ -3,6 +3,18 @@ import { get } from 'svelte/store'
 import type { CronJob } from '../../api/notifiarrConfig'
 import { _ } from '../../includes/Translate.svelte'
 
+/** CronScheduler only renders these fields for some frequencies. */
+export const cronFieldVisible = (
+  id: string,
+  frequency: Frequency | undefined,
+): boolean => {
+  if (frequency == null || frequency === Frequency.DeadCron) return false
+  if (id === 'atTimes') return true
+  if (id === 'daysOfWeek') return frequency === Frequency.Weekly
+  if (id === 'daysOfMonth') return frequency === Frequency.Monthly
+  return false
+}
+
 /** Pad a number with a leading zero. */
 const pad = (n: number) => n.toString().padStart(2, '0')
 
