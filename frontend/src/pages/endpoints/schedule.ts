@@ -15,15 +15,17 @@ export const cronTimes = (cron: CronJob): string[] => {
   return cron.atTimes?.map(t => t.map(l => pad(l)).join(':')) ?? []
 }
 
-/** The weekdays, localized. */
-export const weekdays = () => ({
-  [Weekday.Sunday]: get(_)('words.clock.days.Sunday'),
-  [Weekday.Monday]: get(_)('words.clock.days.Monday'),
-  [Weekday.Tuesday]: get(_)('words.clock.days.Tuesday'),
-  [Weekday.Wednesday]: get(_)('words.clock.days.Wednesday'),
-  [Weekday.Thursday]: get(_)('words.clock.days.Thursday'),
-  [Weekday.Friday]: get(_)('words.clock.days.Friday'),
-  [Weekday.Saturday]: get(_)('words.clock.days.Saturday'),
+/** The weekdays, localized. Pass `$_` from a component so labels update with locale. */
+export const weekdays = (
+  t: (id: string) => string = id => String(get(_)(id) ?? id),
+): Record<number, string> => ({
+  [Weekday.Sunday]: t('words.clock.days.Sunday'),
+  [Weekday.Monday]: t('words.clock.days.Monday'),
+  [Weekday.Tuesday]: t('words.clock.days.Tuesday'),
+  [Weekday.Wednesday]: t('words.clock.days.Wednesday'),
+  [Weekday.Thursday]: t('words.clock.days.Thursday'),
+  [Weekday.Friday]: t('words.clock.days.Friday'),
+  [Weekday.Saturday]: t('words.clock.days.Saturday'),
 })
 
 /** Turns a cron job into a human readable, localized string. */

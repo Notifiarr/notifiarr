@@ -35,15 +35,33 @@
     validate,
   }: ChildProps<ServiceConfig> = $props()
 
+  const selectId = (v: unknown): number | undefined => {
+    if (v && typeof v === 'object' && 'value' in v)
+      return selectId((v as { value: unknown }).value)
+    if (typeof v === 'number' && Number.isInteger(v)) return v
+    if (typeof v === 'string' && v.trim() !== '') {
+      const n = Number(v)
+      return Number.isInteger(n) ? n : undefined
+    }
+    return undefined
+  }
+
+  const selectIds = (value: unknown): number[] => {
+    if (value == null) return []
+    const list = Array.isArray(value) ? value : [value]
+    return list.map(selectId).filter((n): n is number => n !== undefined)
+  }
+
   const setData = (value: string, expect: string) => {
+    const tokens = expect
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
     return {
       url: value.split('|')[0] ?? '',
       headers: value.split('|').slice(1)?.join('\n') ?? '',
-      codes: expect
-        .split(',')
-        .map(Number)
-        .filter(c => !isNaN(c)),
-      validSsl: expect.split(',').includes('SSL') ?? false,
+      codes: selectIds(tokens.filter(s => s.toUpperCase() !== 'SSL')),
+      validSsl: tokens.some(s => s.toUpperCase() === 'SSL'),
     }
   }
 
@@ -68,9 +86,12 @@
   }
 
   const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
-    form.expect = (codes?.join?.(',') ?? '') + (validSsl ? ',SSL' : '')
-    codeFeedback = validate?.(app.id + '.http.codes', codes)
+    const list = selectIds(codes)
+    form.expect = [...list, ...(validSsl ? ['SSL'] : [])].join(',')
+    codeFeedback = validate?.(app.id + '.http.codes', list)
   }
+
+  const onCodes = (value: unknown) => updateExpect(selectIds(value), httpCheck.validSsl)
 
   const merge = (index: number) => app.merge(index, form)
 
@@ -80,6 +101,8 @@
     validate?.(app.id + '.http.codes', [200])
   })
 
+  // CheckedInput toggles validSsl on https URLs. Do not assign httpCheck.codes here
+  // (that fights bind:value); only rewrite the persisted expect string.
   $effect(() => {
     updateExpect(httpCheck.codes, httpCheck.validSsl)
   })
@@ -119,11 +142,9 @@
         ? ''
         : 'changed ' + (httpCheck.codes?.length ? 'is-valid' : 'is-invalid')}"
       placeholder={$_(app.id + '.http.codes.label')}
-      bind:justValue={httpCheck.codes}
-      value={httpCheck.codes?.map?.(c => ({
-        label: httpCodes.find(h => h.value === c)?.label,
-        value: c,
-      }))}
+      valueMode="id"
+      bind:value={httpCheck.codes}
+      oninput={onCodes}
       multiple
       searchable
       clearable

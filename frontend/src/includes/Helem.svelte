@@ -6,7 +6,7 @@
 
   type Props = {
     id: string
-    /** Image URL shorthand (same as `i` with a PNG/SVG import). */
+    /** Image URL shorthand (same as `i` with a PNG/SVG import). Not `Fa.logo`. */
     logo?: string
     i?: IconSource
     page?: string
