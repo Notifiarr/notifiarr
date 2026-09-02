@@ -1,5 +1,7 @@
 # Change this line.
 /notifiarr
+/dist/
+/.docker-build/
 /init/macos/*.app/Contents/MacOS/*
 # The rest is probably fine.
 /rsrc*.syso
@@ -37,9 +39,9 @@ MANUAL.html
 README
 README.html
 /*_manual.html
-/homebrew-mugs
 .secret*files.tar
 *key*
+!.github/scripts/macos_keychain.sh
 aur_deploy_key*
 .metadata.make
 /*-rendered.sh
