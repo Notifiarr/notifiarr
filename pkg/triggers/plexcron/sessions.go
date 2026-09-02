@@ -79,6 +79,10 @@ func (c *cmd) plexSessionTracker(ctx context.Context, current, previous *plex.Se
 	// data.Save("plexPreviousSessions", previous)
 	data.Save("plexCurrentSessions", current)
 
+	if c.sessionUpdated != nil {
+		c.sessionUpdated()
+	}
+
 	for _, currSess := range current.Sessions {
 		// make sure every session has a start time.
 		currSess.Player.StateTime.Time = now

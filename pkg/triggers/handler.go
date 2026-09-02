@@ -173,6 +173,8 @@ func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigg
 		return a.emptyplextrash(input, content)
 	case "mdblist", "TrigMDBListSync":
 		return a.mdblist(input)
+	case "qbitspeed", "TrigQbitSpeed":
+		return a.qbitspeed(input, content)
 	case "uploadlog", "TrigUploadFile":
 		return a.uploadlog(input, content)
 	case "reconfig", "TrigReconfig":
@@ -528,6 +530,36 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 	a.MDbList.Send(input)
 	return http.StatusOK, "MDBList library update started."
+}
+
+// @Description	Enable, disable, or reconcile qBittorrent alternative (turtle) speed limits.
+// @Summary		qBittorrent speed limits
+// @Tags			Triggers
+// @Produce		json
+// @Param			mode	path		string								false	"enable, disable, or empty to reconcile"
+// @Success		200		{object}	apps.APIResponse[string]	"success"
+// @Failure		501		{object}	apps.APIResponse[string]	"not enabled"
+// @Failure		404		{object}	string								"bad token or api key"
+// @Router			/trigger/qbitspeed [get]
+// @Router			/trigger/qbitspeed/{mode} [get]
+// @Security		ApiKeyAuth
+func (a *Actions) qbitspeed(input *common.ActionInput, content string) (int, string) {
+	if content != "" {
+		input.Args = []string{content}
+	}
+
+	if !a.QbitLimit.Send(input) {
+		return http.StatusNotImplemented, "qBittorrent speed limit is not enabled."
+	}
+
+	switch content {
+	case "enable":
+		return http.StatusOK, "qBittorrent alternative speed limits enable requested."
+	case "disable":
+		return http.StatusOK, "qBittorrent alternative speed limits disable requested."
+	default:
+		return http.StatusOK, "qBittorrent alternative speed limits reconcile requested."
+	}
 }
 
 // @Description	Uploads a log file to Notifiarr.com.

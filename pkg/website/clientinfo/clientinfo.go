@@ -61,14 +61,15 @@ type MuleryServer struct {
 }
 
 type Actions struct {
-	Plex      plex.WebsiteConfig `json:"plex"`      // Site Config for Plex.
-	Apps      AllAppConfigs      `json:"apps"`      // Site Config for Starr.
-	Dashboard DashConfig         `json:"dashboard"` // Site Config for Dashboard.
-	Sync      SyncConfig         `json:"sync"`      // Site Config for TRaSH Sync.
-	Mdblist   MdbListConfig      `json:"mdblist"`   // Site Config for MDB List.
-	Gaps      GapsConfig         `json:"gaps"`      // Site Config for Radarr Gaps.
-	Custom    []*CronConfig      `json:"custom"`    // Site config for Custom Crons.
-	Snapshot  snapshot.Config    `json:"snapshot"`  // Site Config for System Snapshot.
+	Plex         plex.WebsiteConfig `json:"plex"`         // Site Config for Plex.
+	Apps         AllAppConfigs      `json:"apps"`         // Site Config for Starr.
+	Dashboard    DashConfig         `json:"dashboard"`    // Site Config for Dashboard.
+	Sync         SyncConfig         `json:"sync"`         // Site Config for TRaSH Sync.
+	Mdblist      MdbListConfig      `json:"mdblist"`      // Site Config for MDB List.
+	Gaps         GapsConfig         `json:"gaps"`         // Site Config for Radarr Gaps.
+	Custom       []*CronConfig      `json:"custom"`       // Site config for Custom Crons.
+	Snapshot     snapshot.Config    `json:"snapshot"`     // Site Config for System Snapshot.
+	QbitThrottle QbitThrottleConfig `json:"qbitThrottle"` // Site Config for qBit turtle mode.
 }
 
 // CronConfig defines a custom GET timer from the website.
@@ -141,6 +142,15 @@ type AllAppConfigs struct {
 type GapsConfig struct {
 	Instances IntList       `json:"instances"`
 	Interval  cnfg.Duration `json:"interval"`
+}
+
+// QbitThrottleConfig is the website config for qBittorrent alternative speed limits.
+type QbitThrottleConfig struct {
+	Enabled   bool          `json:"enabled"`
+	Plex      bool          `json:"plex"`
+	Jellyfin  bool          `json:"jellyfin"`
+	Cooldown  cnfg.Duration `json:"cooldown"`
+	Instances IntList       `json:"instances"`
 }
 
 // IntList has a method to abstract lookups.
