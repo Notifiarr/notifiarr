@@ -428,12 +428,15 @@ jobs:
           packages: dist/
           rpmdists: el/6
           debdists: ubuntu/focal
-      - name: Deploy AUR notifiarr-bin
+      - name: Publish AUR
+        # After packagecloud so a dead aur.archlinux.org cannot skip deb/rpm.
+        # Binary notifiarr-bin (legacy_gz .linux.gz); do not add aur_sources.
+        # CI fails if those gz files are missing from dist (no silent skip).
         if: needs.channel.outputs.channel == 'release'
         env:
-          DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
-          REVISION: ${{ needs.channel.outputs.revision }}
-        run: bash init/archlinux/aur-deploy.sh
+          AUR_DEPLOY_KEY: ${{ secrets.AUR_DEPLOY_KEY }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash .github/scripts/aur_publish.sh dist
       - name: Upload to unstable.golift.io
         # Do not use env.CHANNEL: a step-level CHANNEL: unstable is visible to
         # this step's own `if:`, so nightly and tagged releases would run the

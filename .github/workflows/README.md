@@ -71,7 +71,7 @@ Auto-update **constructs URLs**; it does not scrape a directory listing. Do not 
 
 Linux GitHub matching is already weak (suffix is just `amd64`); in-place auto-update is Windows-only.
 
-**AUR `notifiarr-bin`** (`init/archlinux/PKGBUILD.template`) downloads those same GitHub `.linux.gz` names. Keep **binary** AUR: `--split` has no source tarball, and merge Publish is a silent no-op without `aur_sources`.
+**AUR `notifiarr-bin`** (`.github/scripts/aur_publish.sh`) downloads those same GitHub `.linux.gz` names. Keep **binary** AUR: `--split` has no source tarball, and merge Publish is a silent no-op without `aur_sources`.
 
 Historical Linux/FreeBSD `.gz` names are staged after `--split` by `.github/scripts/legacy_gz.sh` and injected into `artifacts.json` as Archive entries (`internal_type: 1`).
 
@@ -87,7 +87,7 @@ The app executable is `Contents/MacOS/Notifiarr` (`builds.binary: Notifiarr`). H
 
 - **Docker** — always `ghcr.io/notifiarr/notifiarr` and Hub `docker.io/golift/notifiarr` (`DOCKERHUB_PUBLISH=1`). Empty `DOCKERHUB_PASSWORD` fails the merge job. Platforms: `linux/amd64`, `linux/arm64` (no arm/v7). Three Dockerfiles (runtime COPY of the Pro binary): Alpine, Ubuntu (`-ubuntu`, MegaCli), CUDA (`-cuda`, MegaCli + `nvidia-smi`). The frontend never enters the image. `upload-artifact` zip stores files as `0644`; the merge job `chmod 0755`s `dist/linux/**/notifiarr` and each Dockerfile `COPY --chmod=755` so the image entrypoint is executable.
 - **GitHub Release** — tagged `v*` only (`release.disable: "{{ .IsNightly }}"`). macOS is the notarized `Notifiarr.dmg`. Windows assets are `notifiarr.amd64.exe.zip`. FreeBSD assets are pkgng `notifiarr-<version>.{amd64,i386,armhf}.txz` plus `.freebsd.gz`. Linux assets are `notifiarr.{amd64,386,arm,arm64}.linux.gz` plus nFPM deb/rpm/zst.
-- **AUR** — `init/archlinux/aur-deploy.sh` on the merge job, **release channel only**. Binary package `notifiarr-bin`. Do not add GoReleaser `aur_sources` (needs the source tarball on `--split`; merge Publish is a silent no-op).
+- **AUR** — tagged `CHANNEL=release` only, after packagecloud. Stable `vX.Y.Z` tags only (the script refuses a hyphenated pkgver). `.github/scripts/aur_publish.sh` hashes `dist/linux/notifiarr.*.linux.gz` from `legacy_gz.sh` (CI fails if those files are missing). Binary package `notifiarr-bin`. `pkgrel` defaults to `1`; re-publishing the same version needs `PKGREL` set higher or AUR helpers see a downgrade. Do not add GoReleaser `aur_sources` (`--split` fatals `no linux archives found`; merge Publish is a silent no-op). Skip nightly/unstable. nFPM `.pkg.tar.zst` on the GitHub Release is a separate binary package.
 - **packagecloud** — `golift/pkgs` vs `golift/unstable`. Skip when `CHANNEL=nightly`.
 - **unstable.golift.io** — only `CHANNEL=unstable` (tagged releases do **not** clobber testers). Script: `.github/scripts/unstable_upload.sh`. Upload overwrites by name. Empty `UNSTABLE_UPLOAD_KEY` fails in GitHub Actions.
 - **Homebrew** — none. Do not require `HOMEBREW_TAP_GITHUB_TOKEN`.

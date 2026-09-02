@@ -1,0 +1,34 @@
+# Claim packaged paths that are still root:root. Same helper on install and
+# upgrade so existing AUR trees left root:root get migrated, and a User=
+# override (often root:www-data, or a non-root uid) is left alone.
+# Skip symlinks. Always return 0 so a missing example cannot fail pacman.
+
+chown_if_root_root() {
+  [ -L "$1" ] && return 0
+  [ -e "$1" ] || return 0
+  ug="$(stat -c '%u %g' "$1" 2>/dev/null || stat -f '%u %g' "$1")"
+  [ "${ug}" = "0 0" ] || return 0
+  chown notifiarr:notifiarr "$1" || true
+}
+
+claim_packaged_config() {
+  if command -v systemd-sysusers >/dev/null; then
+    systemd-sysusers notifiarr.conf || true
+  fi
+  chown_if_root_root /etc/notifiarr
+  chown_if_root_root /etc/notifiarr/notifiarr.conf
+  chown_if_root_root /etc/notifiarr/notifiarr.conf.example
+  # Arch does not run tmpfiles on install; claim the log dir now so the
+  # daemon can write before the next boot. Skip if an admin already owns it.
+  chown_if_root_root /var/log/notifiarr
+}
+
+post_install() {
+  claim_packaged_config
+  return 0
+}
+
+post_upgrade() {
+  claim_packaged_config
+  return 0
+}

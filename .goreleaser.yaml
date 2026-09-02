@@ -221,6 +221,9 @@ source:
   name_template: '{{ .ProjectName }}-{{ .Version }}'
   prefix_template: '{{ .ProjectName }}-{{ .Version }}/'
 
+# AUR notifiarr-bin: .github/scripts/aur_publish.sh after continue --merge
+# (CHANNEL=release). Binary package; do not add aur_sources.
+
 archives:
   # pkg/update/check.go only matches assets ending in .exe.zip.
   # Linux/FreeBSD GitHub+AUR names are gzipped binaries staged after --split
@@ -270,6 +273,11 @@ nfpms:
       signature:
         key_file: "{{ .Env.GPG_SIGNING_KEY }}"
         type: origin
+    # nFPM maps scripts.postinstall to Arch post_install only. Upgrades must
+    # still claim leftover root:root configs (same script is idempotent).
+    archlinux:
+      scripts:
+        postupgrade: init/systemd/after-install.sh
     scripts:
       preinstall: init/systemd/before-install.sh
       postinstall: init/systemd/after-install.sh
@@ -336,6 +344,10 @@ nfpms:
       - src: init/systemd/notifiarr.service
         dst: /usr/lib/systemd/system/notifiarr.service
         type: config
+        file_info:
+          mode: 0644
+      - src: init/systemd/notifiarr.tmpfiles
+        dst: /usr/lib/tmpfiles.d/notifiarr.conf
         file_info:
           mode: 0644
       - src: init/linux/deb/usr/share/applications/notifiarr.desktop
