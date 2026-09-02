@@ -19,14 +19,15 @@ import (
 const TrigQbitSpeed common.TriggerName = "Reconciling qBittorrent alternative speed limits."
 
 const (
-	pollInterval = 15 * time.Second
-	jellyfinTTL  = 4 * time.Hour
-	defaultCool  = 30 * time.Second
-	playing      = "playing"
-	paused       = "paused"
-	movieType    = "movie"
-	episodeType  = "episode"
-	lanLocation  = "lan"
+	pollInterval     = 15 * time.Second
+	jellyfinTTL      = 4 * time.Hour
+	defaultCool      = 30 * time.Second
+	reconcileTimeout = time.Minute
+	playing          = "playing"
+	paused           = "paused"
+	movieType        = "movie"
+	episodeType      = "episode"
+	lanLocation      = "lan"
 )
 
 // Action contains the exported methods for this package.
@@ -39,6 +40,7 @@ type cmd struct {
 	plex          *plexcron.Action
 	mu            sync.Mutex
 	weEnabled     map[int]bool
+	leftAlone     map[int]bool
 	jellyfinUntil time.Time
 	lastDesired   time.Time
 }
@@ -49,6 +51,7 @@ func New(config *common.Config, plexCron *plexcron.Action) *Action {
 		Config:    config,
 		plex:      plexCron,
 		weEnabled: make(map[int]bool),
+		leftAlone: make(map[int]bool),
 	}}
 }
 
@@ -62,20 +65,35 @@ func (c *cmd) create(reqID string) {
 	var dur time.Duration
 
 	info := clientinfo.Get()
-	if info != nil && info.Actions.QbitThrottle.Enabled && c.hasQbit() {
+	enabled := info != nil && info.Actions.QbitThrottle.Enabled && c.hasQbit()
+
+	c.mu.Lock()
+	owned := c.hasOwned()
+	c.mu.Unlock()
+
+	switch {
+	case enabled:
 		dur = pollInterval
 		mnd.Log.Printf(reqID, "==> qBittorrent Speed Limit Timer Enabled, interval:%s cooldown:%s plex:%v jellyfin:%v",
 			dur, cooldown(info.Actions.QbitThrottle.Cooldown),
 			info.Actions.QbitThrottle.Plex, info.Actions.QbitThrottle.Jellyfin)
+	case owned && c.hasQbit():
+		dur = pollInterval
+		mnd.Log.Printf(reqID, "==> qBittorrent Speed Limit Timer restoring owned turtle mode, interval:%s", dur)
 	}
 
 	c.Add(&common.Action{
 		Key:  "TrigQbitSpeed",
 		Name: TrigQbitSpeed,
+		Hide: true, // 15s poll would spam Event Triggered.
 		Fn:   c.reconcile,
 		C:    make(chan *common.ActionInput, 1),
 		D:    cnfg.Duration{Duration: dur},
 	})
+
+	if !enabled && owned {
+		c.queue(&common.ActionInput{Type: website.EventUser, ReqID: reqID})
+	}
 }
 
 func (c *cmd) hasQbit() bool {
@@ -88,8 +106,28 @@ func (c *cmd) hasQbit() bool {
 	return false
 }
 
+func (c *cmd) hasOwned() bool {
+	for _, owned := range c.weEnabled {
+		if owned {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (c *cmd) ready() bool {
+	info := clientinfo.Get()
+
+	return info != nil && info.Actions.QbitThrottle.Enabled && c.hasQbit()
+}
+
 // Send queues a reconcile. Optional args: "enable" or "disable" (Jellyfin).
 func (a *Action) Send(input *common.ActionInput) bool {
+	if a == nil || a.cmd == nil || !a.cmd.ready() {
+		return false
+	}
+
 	return a.cmd.Exec(input, TrigQbitSpeed)
 }
 
@@ -99,13 +137,17 @@ func (a *Action) Kick() {
 		return
 	}
 
-	trig := a.cmd.Get(TrigQbitSpeed)
+	a.cmd.queue(&common.ActionInput{Type: website.EventHook, ReqID: mnd.ReqID()})
+}
+
+func (c *cmd) queue(input *common.ActionInput) {
+	trig := c.Get(TrigQbitSpeed)
 	if trig == nil || trig.C == nil {
 		return
 	}
 
 	select {
-	case trig.C <- &common.ActionInput{Type: website.EventHook, ReqID: mnd.ReqID()}:
+	case trig.C <- input:
 	default:
 	}
 }
@@ -114,12 +156,20 @@ func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
+	ctx, cancel := context.WithTimeout(ctx, reconcileTimeout)
+	defer cancel()
+
 	info := clientinfo.Get()
-	if info == nil || !info.Actions.QbitThrottle.Enabled || !c.hasQbit() {
+	if info == nil || !c.hasQbit() {
 		return
 	}
 
 	cfg := info.Actions.QbitThrottle
+	if !cfg.Enabled {
+		c.apply(ctx, input, cfg, false)
+		return
+	}
+
 	now := time.Now()
 	c.applyJellyfinArg(cfg, input.Args, now)
 
@@ -184,8 +234,12 @@ func (c *cmd) apply(ctx context.Context, input *common.ActionInput, cfg clientin
 	for idx := range c.Apps.Qbit {
 		instance := idx + 1
 		app := &c.Apps.Qbit[idx]
+		owned := c.weEnabled[instance]
+		// Empty Instances means every qBit instance; the website has no picker in v1.
+		selected := len(cfg.Instances) == 0 || cfg.Instances.Has(instance)
+		want, skipInst := instanceDesired(desired, selected, owned)
 
-		if !app.Enabled() || (len(cfg.Instances) > 0 && !cfg.Instances.Has(instance)) {
+		if !app.Enabled() || skipInst {
 			continue
 		}
 
@@ -196,10 +250,12 @@ func (c *cmd) apply(ctx context.Context, input *common.ActionInput, cfg clientin
 			continue
 		}
 
-		turtle, weOwn, skip := planTurtle(current, desired, c.weEnabled[instance])
-		c.weEnabled[instance] = weOwn
-
+		turtle, weOwn, skip := planTurtle(current, want, owned)
 		if skip {
+			if current && !owned {
+				c.logUnowned(input.ReqID, instance, app.URL)
+			}
+
 			continue
 		}
 
@@ -208,6 +264,9 @@ func (c *cmd) apply(ctx context.Context, input *common.ActionInput, cfg clientin
 				input.Type, instance, app.URL, turtle, err)
 			continue
 		}
+
+		c.weEnabled[instance] = weOwn
+		delete(c.leftAlone, instance)
 
 		mnd.Log.Printf(input.ReqID, "[%s requested] qBittorrent alternative speed limits (%d:%s) => %v",
 			input.Type, instance, app.URL, turtle)
@@ -243,7 +302,29 @@ func wanSession(session *plex.Session) bool {
 		return false
 	}
 
+	// Paused WAN sessions still count: the viewer is still in the stream.
 	return session.Player.State == playing || session.Player.State == paused
+}
+
+func (c *cmd) logUnowned(reqID string, instance int, url string) {
+	if c.leftAlone[instance] {
+		return
+	}
+
+	c.leftAlone[instance] = true
+	mnd.Log.Printf(reqID,
+		"qBittorrent alternative speed limits already on (%d:%s); leaving them (not enabled by this client)",
+		instance, url)
+}
+
+// instanceDesired is the per-instance want/skip before planTurtle.
+// Unselected instances we do not own are ignored; owned-but-unselected instances restore.
+func instanceDesired(desired, selected, owned bool) (bool, bool) {
+	if selected {
+		return desired, false
+	}
+
+	return false, !owned
 }
 
 // planTurtle decides whether to change turtle mode and whether we own the enable.

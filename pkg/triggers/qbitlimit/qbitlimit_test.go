@@ -99,6 +99,34 @@ func TestPlanTurtle(t *testing.T) {
 	}
 }
 
+func TestInstanceDesired(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		desired  bool
+		selected bool
+		owned    bool
+		want     bool
+		skip     bool
+	}{
+		{name: "selected want on", desired: true, selected: true, owned: false, want: true},
+		{name: "selected want off", desired: false, selected: true, owned: true, want: false},
+		{name: "unselected not ours", desired: true, selected: false, owned: false, skip: true},
+		{name: "unselected we own so restore", desired: true, selected: false, owned: true, want: false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			want, skip := instanceDesired(test.desired, test.selected, test.owned)
+			assert.Equal(t, test.want, want)
+			assert.Equal(t, test.skip, skip)
+		})
+	}
+}
+
 func TestCooldown(t *testing.T) {
 	t.Parallel()
 

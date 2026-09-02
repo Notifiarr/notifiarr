@@ -538,12 +538,19 @@ func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 // @Produce		json
 // @Param			mode	path		string								false	"enable, disable, or empty to reconcile"
 // @Success		200		{object}	apps.APIResponse[string]	"success"
+// @Failure		400		{object}	apps.APIResponse[string]	"invalid mode"
 // @Failure		501		{object}	apps.APIResponse[string]	"not enabled"
 // @Failure		404		{object}	string								"bad token or api key"
 // @Router			/trigger/qbitspeed [get]
 // @Router			/trigger/qbitspeed/{mode} [get]
 // @Security		ApiKeyAuth
 func (a *Actions) qbitspeed(input *common.ActionInput, content string) (int, string) {
+	switch content {
+	case "", "enable", "disable":
+	default:
+		return http.StatusBadRequest, "qBittorrent speed limit mode must be enable, disable, or empty."
+	}
+
 	if content != "" {
 		input.Args = []string{content}
 	}
