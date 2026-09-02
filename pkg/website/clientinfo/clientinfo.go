@@ -149,6 +149,7 @@ type QbitThrottleConfig struct {
 	Enabled   bool          `json:"enabled"`
 	Plex      bool          `json:"plex"`
 	Jellyfin  bool          `json:"jellyfin"`
+	Emby      bool          `json:"emby"`
 	Cooldown  cnfg.Duration `json:"cooldown"`
 	Instances IntList       `json:"instances"`
 }

@@ -74,9 +74,10 @@ func (c *cmd) create(reqID string) {
 	switch {
 	case enabled:
 		dur = pollInterval
-		mnd.Log.Printf(reqID, "==> qBittorrent Speed Limit Timer Enabled, interval:%s cooldown:%s plex:%v jellyfin:%v",
+		mnd.Log.Printf(reqID,
+			"==> qBittorrent Speed Limit Timer Enabled, interval:%s cooldown:%s plex:%v jellyfin:%v emby:%v",
 			dur, cooldown(info.Actions.QbitThrottle.Cooldown),
-			info.Actions.QbitThrottle.Plex, info.Actions.QbitThrottle.Jellyfin)
+			info.Actions.QbitThrottle.Plex, info.Actions.QbitThrottle.Jellyfin, info.Actions.QbitThrottle.Emby)
 	case owned && c.hasQbit():
 		dur = pollInterval
 		mnd.Log.Printf(reqID, "==> qBittorrent Speed Limit Timer restoring owned turtle mode, interval:%s", dur)
@@ -122,7 +123,7 @@ func (c *cmd) ready() bool {
 	return info != nil && info.Actions.QbitThrottle.Enabled && c.hasQbit()
 }
 
-// Send queues a reconcile. Optional args: "enable" or "disable" (Jellyfin).
+// Send queues a reconcile. Optional args: "enable" or "disable" (Jellyfin/Emby).
 func (a *Action) Send(input *common.ActionInput) bool {
 	if a == nil || a.cmd == nil || !a.cmd.ready() {
 		return false
@@ -189,7 +190,7 @@ func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
 }
 
 func (c *cmd) applyJellyfinArg(cfg clientinfo.QbitThrottleConfig, args []string, now time.Time) {
-	if len(args) == 0 || !cfg.Jellyfin {
+	if len(args) == 0 || (!cfg.Jellyfin && !cfg.Emby) {
 		return
 	}
 
@@ -202,7 +203,7 @@ func (c *cmd) applyJellyfinArg(cfg clientinfo.QbitThrottleConfig, args []string,
 }
 
 func (c *cmd) desired(ctx context.Context, cfg clientinfo.QbitThrottleConfig, now time.Time) bool {
-	if cfg.Jellyfin && !c.jellyfinUntil.IsZero() && now.Before(c.jellyfinUntil) {
+	if (cfg.Jellyfin || cfg.Emby) && !c.jellyfinUntil.IsZero() && now.Before(c.jellyfinUntil) {
 		return true
 	}
 
