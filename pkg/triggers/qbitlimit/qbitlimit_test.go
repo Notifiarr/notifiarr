@@ -133,3 +133,16 @@ func TestCooldown(t *testing.T) {
 	assert.Equal(t, defaultCool, cooldown(cnfg.Duration{}))
 	assert.Equal(t, time.Minute, cooldown(cnfg.Duration{Duration: time.Minute}))
 }
+
+func TestDropMissing(t *testing.T) {
+	t.Parallel()
+
+	owned := map[int]bool{1: true, 2: true, 3: false}
+	dropMissing(owned, []bool{true})
+	assert.True(t, owned[1])
+	assert.False(t, owned[2])
+	assert.False(t, owned[3])
+
+	dropMissing(owned, []bool{false})
+	assert.False(t, owned[1])
+}

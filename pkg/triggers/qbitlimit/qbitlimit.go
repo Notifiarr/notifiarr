@@ -68,6 +68,7 @@ func (c *cmd) create(reqID string) {
 	enabled := info != nil && info.Actions.QbitThrottle.Enabled && c.hasQbit()
 
 	c.mu.Lock()
+	c.dropGone()
 	owned := c.hasOwned()
 	c.mu.Unlock()
 
@@ -117,6 +118,34 @@ func (c *cmd) hasOwned() bool {
 	return false
 }
 
+// dropGone forgets ownership of qBit instances that were removed or disabled.
+func (c *cmd) dropGone() {
+	if c.Apps == nil {
+		return
+	}
+
+	live := make([]bool, len(c.Apps.Qbit))
+	for idx := range c.Apps.Qbit {
+		live[idx] = c.Apps.Qbit[idx].Enabled()
+	}
+
+	dropMissing(c.weEnabled, live)
+}
+
+// dropMissing removes ownership of instances that are gone or disabled.
+func dropMissing(weEnabled map[int]bool, enabled []bool) {
+	for instance, owned := range weEnabled {
+		if !owned {
+			continue
+		}
+
+		idx := instance - 1
+		if idx < 0 || idx >= len(enabled) || !enabled[idx] {
+			delete(weEnabled, instance)
+		}
+	}
+}
+
 func (c *cmd) ready() bool {
 	info := clientinfo.Get()
 
@@ -133,8 +162,9 @@ func (a *Action) Send(input *common.ActionInput) bool {
 }
 
 // Kick queues a non-blocking reconcile so Plex session updates cannot deadlock.
+// Must not take c.mu: GetSessions may call Kick while reconcile already holds it.
 func (a *Action) Kick() {
-	if a == nil || a.cmd == nil {
+	if a == nil || a.cmd == nil || !a.cmd.ready() {
 		return
 	}
 
@@ -161,13 +191,22 @@ func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
 	defer cancel()
 
 	info := clientinfo.Get()
-	if info == nil || !c.hasQbit() {
+	if info == nil {
+		return
+	}
+
+	c.dropGone()
+
+	if !c.hasQbit() {
 		return
 	}
 
 	cfg := info.Actions.QbitThrottle
 	if !cfg.Enabled {
-		c.apply(ctx, input, cfg, false)
+		if c.hasOwned() {
+			c.apply(ctx, input, cfg, false)
+		}
+
 		return
 	}
 
