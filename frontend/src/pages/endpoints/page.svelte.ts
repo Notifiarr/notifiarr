@@ -6,6 +6,7 @@ import { profile } from '../../api/profile.svelte'
 import { deepCopy } from '../../includes/util'
 import LinkSimple from 'phosphor-svelte/lib/LinkSimple'
 import { validator as cronValidator } from './CronScheduler.svelte'
+import { cronFieldVisible } from './schedule'
 
 export const page = { id: 'Endpoints' }
 
@@ -56,9 +57,12 @@ const validator = (
       : get(_)('phrases.URLMustBeginWithHttp')
   } else if (id === 'template') {
     return value ? '' : get(_)('Endpoints.template.required')
+  } else if (id === 'atTimes' || id === 'daysOfWeek' || id === 'daysOfMonth') {
+    if (!cronFieldVisible(id, instances[index]?.frequency)) return ''
+    return cronValidator(id, value)
   }
 
-  return cronValidator(id, value)
+  return ''
 }
 
 export const app: App<Endpoint> = {
