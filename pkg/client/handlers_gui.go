@@ -49,7 +49,7 @@ import (
 //	@contact.url	https://notifiarr.com/discord
 //	@license.name	MIT
 //	@license.url	https://github.com/Notifiarr/notifiarr/blob/main/LICENSE
-//	@BasePath		/ui
+//	@servers.url	/ui
 
 const fileSourceLogs = "logs"
 
@@ -1096,7 +1096,6 @@ func (c *Client) handleStopFileWatcher(response http.ResponseWriter, request *ht
 //	@Summary		Update configuration
 //	@Description	Updates the application configuration with new settings and optionally triggers a reload.
 //	@Tags			System
-//	@Accept			json
 //	@Produce		text/plain
 //	@Param			noreload	query		string				false	"set to 'true' to skip reload"
 //	@Param			config		body		configfile.Config	true	"Configuration data"

@@ -6,6 +6,7 @@ import { iequals, ltrim } from '../includes/util'
 import { allPages, others } from './pages'
 import { closeSidebar } from './Index.svelte'
 import { modal } from './Modals.svelte'
+import { pageSlideStarted } from './pageSlide'
 
 // Page represents the data to render a page link.
 export interface Page {
@@ -102,7 +103,9 @@ class Navigator {
 
   private setActivePage = (newPage: string): string => {
     const page = allPages.find(p => iequals(p.path ?? p.id, newPage))
-    this.ActivePage = page?.component || Landing
+    const next = page?.component || Landing
+    if (next !== this.ActivePage) pageSlideStarted()
+    this.ActivePage = next
     return (this.activePage = page ? (page.path ?? page.id) : '')
   }
 

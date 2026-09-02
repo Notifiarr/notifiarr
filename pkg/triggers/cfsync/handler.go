@@ -20,10 +20,9 @@ import (
 // @Summary		Retrieve custom format data from multiple Radarr instances.
 // @Tags			TRaSH,Radarr
 // @Produce		json
-// @Accept			json
 // @Param			request	body		TrashAggInput									true	"list of instances"
-// @Success		200		{object}	apps.APIResponse{message=[]RadarrTrashPayload}	"contains app info included appStatus"
-// @Failure		400		{object}	apps.APIResponse{message=string}				"bad input payload or missing app"
+// @Success		200		{object}	apps.APIResponse[[]cfsync.RadarrTrashPayload]	"contains app info included appStatus"
+// @Failure		400		{object}	apps.APIResponse[string]				"bad input payload or missing app"
 // @Failure		404		{object}	string											"bad token or api key"
 // @Router			/trash/radarr [post]
 // @Security		ApiKeyAuth
@@ -33,10 +32,9 @@ func _() {}
 // @Summary		Retrieve custom format data from multiple Lidarr instances.
 // @Tags			TRaSH,Lidarr
 // @Produce		json
-// @Accept			json
 // @Param			request	body		TrashAggInput									true	"list of instances"
-// @Success		200		{object}	apps.APIResponse{message=[]LidarrTrashPayload}	"contains app info included appStatus"
-// @Failure		400		{object}	apps.APIResponse{message=string}				"bad input payload or missing app"
+// @Success		200		{object}	apps.APIResponse[[]cfsync.LidarrTrashPayload]	"contains app info included appStatus"
+// @Failure		400		{object}	apps.APIResponse[string]				"bad input payload or missing app"
 // @Failure		404		{object}	string											"bad token or api key"
 // @Router			/trash/lidarr [post]
 // @Security		ApiKeyAuth
@@ -48,10 +46,9 @@ func _() {}
 //	@Summary		Retrieve custom format data from multiple Sonarr instances.
 //	@Tags			TRaSH,Sonarr
 //	@Produce		json
-//	@Accept			json
 //	@Param			request	body		TrashAggInput									true	"list of instances"
-//	@Success		200		{object}	apps.APIResponse{message=[]SonarrTrashPayload}	"contains app info included appStatus"
-//	@Failure		400		{object}	apps.APIResponse{message=string}				"bad input payload or missing app"
+//	@Success		200		{object}	apps.APIResponse[[]cfsync.SonarrTrashPayload]	"contains app info included appStatus"
+//	@Failure		400		{object}	apps.APIResponse[string]				"bad input payload or missing app"
 //	@Failure		404		{object}	string											"bad token or api key"
 //	@Router			/trash/sonarr [post]
 //	@Security		ApiKeyAuth

@@ -141,11 +141,11 @@ func (a *Apps) CheckAPIKey(next http.Handler) http.HandlerFunc {
 }
 
 // APIResponse is a standard response to our caller. JSON encoded blobs.
-type APIResponse struct {
+type APIResponse[T any] struct {
 	// The status always matches the HTTP response.
 	Status string `json:"status"`
 	// This message contains the request-specific response payload.
-	Msg any `json:"message"`
+	Msg T `json:"message"`
 }
 
 // Respond sends a standard response to our caller. JSON encoded blobs. Returns size of data sent.
@@ -174,7 +174,7 @@ func (a *Apps) Respond(reqID string, w http.ResponseWriter, stat int, msg any) i
 	json := json.NewEncoder(counter)
 	json.SetEscapeHTML(false)
 
-	err := json.Encode(&APIResponse{Status: statusTxt, Msg: msg})
+	err := json.Encode(&APIResponse[any]{Status: statusTxt, Msg: msg})
 	if err != nil {
 		mnd.Log.Errorf(reqID, "Sending JSON response failed. Status: %s, Error: %v, Message: %v", statusTxt, err, msg)
 	}

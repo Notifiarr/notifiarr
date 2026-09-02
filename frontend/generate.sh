@@ -6,15 +6,19 @@
 
 set -e
 
-# Generate the API docs.
-go run github.com/swaggo/swag/cmd/swag@latest i \
+# Generate OpenAPI 3 specs. swag v2 still names the files *_swagger.json.
+SWAG=github.com/swaggo/swag/v2/cmd/swag@v2.0.0-rc5
+
+go run ${SWAG} i --v3.1 \
     --parseDependency --instanceName api --outputTypes json \
     --parseInternal --tags !System,!Integrations,!Files --dir ../ -g main.go --output ./public
+mv ./public/api_swagger.json ./public/api_openapi.json
 
-# Generate the UI docs.
-go run github.com/swaggo/swag/cmd/swag@latest i \
+go run ${SWAG} i --v3.1 \
     --parseDependency --instanceName ui --outputTypes json \
     --parseInternal --tags System,Integrations,Files --dir ../ -g pkg/client/handlers_gui.go --output ./public
+mv ./public/ui_swagger.json ./public/ui_openapi.json
+rm -f ./public/api_swagger.json ./public/ui_swagger.json
 
 # Install dependencies.
 npm install
