@@ -12,12 +12,14 @@ fi
 sha512sum=sha512sum
 $sha512sum -v 2>/dev/null || sha512sum="shasum -a 512" # macos
 
+set -euo pipefail
+
 hash_file() {
   $sha512sum "$1" | awk '{print $1}'
 }
 
 find_gz() {
-  find dist -name "$1" 2>/dev/null | head -1
+  find dist -name "$1" -print -quit 2>/dev/null
 }
 
 hash_or_fetch() {
@@ -29,13 +31,13 @@ hash_or_fetch() {
     hash_file "$f"
   else
     echo "==> Fetching ${url}" >&2
-    curl -sL "$url" | $sha512sum | awk '{print $1}'
+    curl -sS --fail-with-body "$url" | $sha512sum | awk '{print $1}'
   fi
 }
 
 SOURCE_PATH="https://github.com/Notifiarr/notifiarr/archive/v${VERSION}.tar.gz"
 echo "==> Using URL: $SOURCE_PATH"
-SHA=$(curl -sL "$SOURCE_PATH" | $sha512sum | awk '{print $1}')
+SHA=$(curl -sS --fail-with-body "$SOURCE_PATH" | $sha512sum | awk '{print $1}')
 
 SHA_X64=$(hash_or_fetch notifiarr.amd64.linux.gz "https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.amd64.linux.gz")
 SHA_ARMHF=$(hash_or_fetch notifiarr.arm.linux.gz "https://github.com/Notifiarr/notifiarr/releases/download/v${VERSION}/notifiarr.arm.linux.gz")
@@ -52,8 +54,6 @@ push_it() {
   popd
   rm -rf release_repo
 }
-
-set -e
 
 if [[ -n $DEPLOY_KEY ]]; then
   mkdir "${HOME}/.ssh/"

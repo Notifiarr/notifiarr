@@ -20,8 +20,9 @@
       "automerge": true
     },
     {
-      "description": "Automerge GitHub Actions updates, including majors, when checks pass",
+      "description": "Automerge non-major GitHub Actions updates when checks pass",
       "matchManagers": ["github-actions"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
     },
     {
