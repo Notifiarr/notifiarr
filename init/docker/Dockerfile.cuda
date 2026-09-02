@@ -14,8 +14,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# GPU snapshots only need nvidia-smi from the host NVIDIA Container Toolkit.
+# Do not FROM nvidia/cuda: that image sets NVIDIA_REQUIRE_CUDA and refuses to
+# start on older host drivers. Notifiarr does not use the CUDA runtime.
+# NVIDIA_VISIBLE_DEVICES stays on :cuda only so :ubuntu is inert unless --gpus.
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=utility
+ENV DN_SNAPSHOT_NVIDIA_SMI_PATH=/usr/bin/nvidia-smi
 ENV TZ=UTC
-ENV PATH=/bin:/usr/bin:/sbin:/usr/sbin
+ENV PATH=/usr/local/nvidia/bin:/bin:/usr/bin:/sbin:/usr/sbin
 ENV USER=root
 
 EXPOSE 5454

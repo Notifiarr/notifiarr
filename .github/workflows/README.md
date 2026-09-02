@@ -9,7 +9,7 @@ Two workflows. `test-and-lint` (`codetests.yml`) runs tests and golangci-lint on
 | Trigger | CHANNEL | GoReleaser extra | What it publishes |
 |---|---|---|---|
 | Push tag `v*` | `release` | (none) | GitHub Release, Docker `:latest` + version tags, AUR `notifiarr-bin`, packagecloud `golift/pkgs` |
-| Push branch `unstable` | `unstable` | `--nightly` | Docker `:unstable` (+ `-ubuntu` / `-cuda` aliases of Ubuntu), packagecloud `golift/unstable`, [unstable.golift.io](https://unstable.golift.io/?dir=notifiarr) |
+| Push branch `unstable` | `unstable` | `--nightly` | Docker `:unstable` (+ `-cuda` / `-ubuntu`), packagecloud `golift/unstable`, [unstable.golift.io](https://unstable.golift.io/?dir=notifiarr) |
 | Cron `33 12 * * *` UTC, or `workflow_dispatch` on `main` | `nightly` | `--nightly` | Docker `:nightly` only |
 
 `workflow_dispatch` on any other ref is refused. Tagged and unstable publishes are **push** only.
@@ -85,7 +85,7 @@ The app executable is `Contents/MacOS/Notifiarr` (`builds.binary: Notifiarr`). H
 
 ## Merge destinations
 
-- **Docker** — always `ghcr.io/notifiarr/notifiarr` and Hub `docker.io/golift/notifiarr` (`DOCKERHUB_PUBLISH=1`). Empty `DOCKERHUB_PASSWORD` fails the merge job. Platforms: `linux/amd64`, `linux/arm64` (no arm/v7). Two Dockerfiles (runtime COPY of the Pro binary): Alpine, Ubuntu (`-ubuntu` and `-cuda` tags, MegaCli + host `nvidia-smi` via NVIDIA Container Toolkit). The frontend never enters the image. `upload-artifact` zip stores files as `0644`; the merge job `chmod 0755`s `dist/linux/**/notifiarr` and each Dockerfile `COPY --chmod=755` so the image entrypoint is executable.
+- **Docker** — always `ghcr.io/notifiarr/notifiarr` and Hub `docker.io/golift/notifiarr` (`DOCKERHUB_PUBLISH=1`). Empty `DOCKERHUB_PASSWORD` fails the merge job. Platforms: `linux/amd64`, `linux/arm64` (no arm/v7). Three Dockerfiles (runtime COPY of the Pro binary): Alpine, Ubuntu (`-ubuntu`, MegaCli), CUDA (`-cuda`, Ubuntu base + NVIDIA Container Toolkit env for host `nvidia-smi`; not `nvidia/cuda`). The frontend never enters the image. `upload-artifact` zip stores files as `0644`; the merge job `chmod 0755`s `dist/linux/**/notifiarr` and each Dockerfile `COPY --chmod=755` so the image entrypoint is executable.
 - **GitHub Release** — tagged `v*` only (`release.disable: "{{ .IsNightly }}"`). macOS is the notarized `Notifiarr.dmg`. Windows assets are `notifiarr.amd64.exe.zip`. FreeBSD assets are pkgng `notifiarr-<version>.{amd64,i386,armhf}.txz` plus `.freebsd.gz`. Linux assets are `notifiarr.{amd64,386,arm,arm64}.linux.gz` plus nFPM deb/rpm/zst.
 - **AUR** — tagged `CHANNEL=release` only, after packagecloud. Stable `vX.Y.Z` tags only (the script refuses a hyphenated pkgver). `.github/scripts/aur_publish.sh` hashes `dist/linux/notifiarr.*.linux.gz` from `legacy_gz.sh` (CI fails if those files are missing). Binary package `notifiarr-bin`. `pkgrel` defaults to `1`; re-publishing the same version needs `PKGREL` set higher or AUR helpers see a downgrade. Do not add GoReleaser `aur_sources` (`--split` fatals `no linux archives found`; merge Publish is a silent no-op). Skip nightly/unstable. nFPM `.pkg.tar.zst` on the GitHub Release is a separate binary package.
 - **packagecloud** — `golift/pkgs` vs `golift/unstable`. Skip when `CHANNEL=nightly`.

@@ -719,7 +719,7 @@
         },
         "Nvidia": {
             "title": "",
-            "description": "",
+            "description": "Diese Integration zeigt Nvidia-GPU-Infos in Snapshot-Benachrichtigungen an. Unter Docker verwenden Sie das CUDA-Image (<code>ghcr.io/notifiarr/notifiarr:cuda</code> oder <code>golift/notifiarr:cuda</code>), installieren Sie das <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> auf dem Host und übergeben Sie die GPU mit <code>--gpus all</code> oder Compose <code>gpus: all</code>. Ein CUDA-Toolkit auf dem Host ist nicht erforderlich.",
             "disabled": {
                 "description": "",
                 "label": ""

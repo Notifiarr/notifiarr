@@ -4,8 +4,8 @@ services:
     container_name: notifiarr
     hostname: notifiarr
     image: golift/notifiarr
-    # Nvidia GPU snapshots: host needs NVIDIA drivers + NVIDIA Container Toolkit.
-    # :cuda is an alias of :ubuntu (same image). Alpine :latest is not recommended.
+    # Nvidia GPU snapshots: use :cuda (Ubuntu + NVIDIA env). Host needs NVIDIA
+    # drivers + NVIDIA Container Toolkit. Alpine :latest is not recommended.
     # image: golift/notifiarr:cuda
     # gpus: all
     # Docker run equivalent: --gpus all
