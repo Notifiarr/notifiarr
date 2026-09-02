@@ -77,4 +77,23 @@ describe('svelte-check machine parser', () => {
       "::warning file=frontend/imported-file.svelte,line=0,col=37::Component has unused export property 'prop'.",
     )
   })
+
+  it('JSON-unescapes quoted file and message fields', () => {
+    const file = 'node_modules/@zerodevx/svelte-toast/dist/stores.d.ts'
+    const msg = `Namespace "svelte/store" has no exported member 'Invalidator'.`
+    const line = `1590680326283 ERROR ${JSON.stringify(file)} 91:122 ${JSON.stringify(msg)}`
+    const { diagnostics } = parseMachine(line + '\n')
+    expect(diagnostics).toEqual([{ kind: 'ERROR', file, line: 91, col: 122, msg }])
+    const ann = formatAnnotation(diagnostics[0])
+    expect(ann).toContain('Namespace "svelte/store"')
+    expect(ann).not.toContain('\\"')
+  })
+
+  it('turns escaped newlines into GitHub %0A', () => {
+    const msg = 'first\nsecond'
+    const line = `1 ERROR ${JSON.stringify('a.svelte')} 1:1 ${JSON.stringify(msg)}`
+    const { diagnostics } = parseMachine(line)
+    expect(diagnostics[0].msg).toBe(msg)
+    expect(formatAnnotation(diagnostics[0])).toContain('first%0Asecond')
+  })
 })

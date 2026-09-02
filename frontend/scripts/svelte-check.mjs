@@ -9,10 +9,14 @@ import { fileURLToPath } from 'node:url'
 const frontend = path.resolve(import.meta.dirname, '..')
 const warnIgnore = 'options_missing_custom_element:ignore'
 
-const diagRe = /^(\d+) (ERROR|WARNING) "([^"]+)" (\d+):(\d+) "(.*)"$/
+const quoted = '"(?:[^"\\\\]|\\\\.)*"'
+const diagRe = new RegExp(
+  `^(\\d+) (ERROR|WARNING) (${quoted}) (\\d+):(\\d+) (${quoted})$`,
+)
 const completedRe =
   /^(\d+) COMPLETED (\d+) FILES (\d+) ERRORS (\d+) WARNINGS(?: (\d+) FILES_WITH_PROBLEMS)?/
-const failureRe = /^(\d+) FAILURE "(.*)"$/
+const failureRe = new RegExp(`^(\\d+) FAILURE (${quoted})$`)
+const maxBuffer = 256 * 1024 * 1024
 
 export function parseMachine(text) {
   const diagnostics = []
@@ -24,10 +28,10 @@ export function parseMachine(text) {
     if (m) {
       diagnostics.push({
         kind: m[2],
-        file: m[3],
+        file: JSON.parse(m[3]),
         line: Number(m[4]),
         col: Number(m[5]),
-        msg: m[6].replace(/\\n/g, ' '),
+        msg: JSON.parse(m[6]),
       })
       continue
     }
@@ -43,7 +47,7 @@ export function parseMachine(text) {
       continue
     }
     m = line.match(failureRe)
-    if (m) failure = m[2]
+    if (m) failure = JSON.parse(m[2])
   }
   return { diagnostics, completed, failure }
 }
@@ -63,7 +67,11 @@ export function formatAnnotation(diag) {
 }
 
 function run(bin, args) {
-  return spawnSync(process.execPath, [bin, ...args], { cwd: frontend, encoding: 'utf8' })
+  return spawnSync(process.execPath, [bin, ...args], {
+    cwd: frontend,
+    encoding: 'utf8',
+    maxBuffer,
+  })
 }
 
 function report({ diagnostics, completed, failure }) {
