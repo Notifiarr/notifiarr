@@ -76,8 +76,92 @@
     const style = document.createElement('style')
     style.id = 'nr-openapi-grow'
     style.textContent =
-      ':host,.body,.main-content{height:auto!important;max-height:none!important;overflow:visible!important}'
+      ':host{height:auto!important;max-height:none!important;overflow:hidden!important;' +
+      'border-bottom-left-radius:var(--bs-card-inner-border-radius,0.375rem);' +
+      'border-bottom-right-radius:var(--bs-card-inner-border-radius,0.375rem)}' +
+      '.body,.main-content,.m-endpoint,summary{height:auto!important;max-height:none!important;' +
+      'overflow:visible!important;overflow-anchor:none!important}'
     root.appendChild(style)
+  }
+
+  let unlockScroll: (() => void) | undefined
+
+  const lockScroll = (el: RapiDocEl) => {
+    unlockScroll?.()
+    let pinned = window.scrollY
+    let freeze = 0
+    const html = document.documentElement
+    const prevAnchor = html.style.overflowAnchor
+    html.style.overflowAnchor = 'none'
+
+    const inside = (node: Node | null) => {
+      if (!node) return false
+      const root = node.getRootNode()
+      return root === el.shadowRoot || el.contains(node) || node === el
+    }
+
+    const restore = () => {
+      if (window.scrollY !== pinned) window.scrollTo(0, pinned)
+    }
+
+    const onUserScroll = () => {
+      if (freeze) {
+        restore()
+        return
+      }
+      pinned = window.scrollY
+    }
+    window.addEventListener('scroll', onUserScroll, { passive: true })
+
+    const origIntoView = Element.prototype.scrollIntoView
+    Element.prototype.scrollIntoView = function (
+      this: Element,
+      arg?: boolean | ScrollIntoViewOptions,
+    ) {
+      if (inside(this)) return
+      origIntoView.call(this, arg as boolean)
+    }
+
+    const origFocus = HTMLElement.prototype.focus
+    HTMLElement.prototype.focus = function (this: HTMLElement, opts?: FocusOptions) {
+      origFocus.call(this, inside(this) ? { ...opts, preventScroll: true } : opts)
+    }
+
+    const hold = () => {
+      freeze++
+      pinned = freeze === 1 ? window.scrollY : pinned
+      el.style.minHeight = `${el.offsetHeight}px`
+      restore()
+      const start = performance.now()
+      const tick = () => {
+        restore()
+        if (performance.now() - start < 400) {
+          requestAnimationFrame(tick)
+          return
+        }
+        el.style.minHeight = ''
+        freeze--
+      }
+      requestAnimationFrame(tick)
+    }
+
+    el.addEventListener('click', hold, true)
+    el.addEventListener('toggle', hold, true)
+
+    const ro = new ResizeObserver(restore)
+    ro.observe(el)
+
+    unlockScroll = () => {
+      window.removeEventListener('scroll', onUserScroll)
+      Element.prototype.scrollIntoView = origIntoView
+      HTMLElement.prototype.focus = origFocus
+      el.removeEventListener('click', hold, true)
+      el.removeEventListener('toggle', hold, true)
+      ro.disconnect()
+      el.style.minHeight = ''
+      html.style.overflowAnchor = prevAnchor
+      unlockScroll = undefined
+    }
   }
 
   const attachViewer = (node: HTMLElement) => {
@@ -87,6 +171,7 @@
       applyTheme(el)
     })
     return () => {
+      unlockScroll?.()
       if (viewer === el) viewer = undefined
     }
   }
@@ -118,6 +203,7 @@
         applyTheme(viewer)
         viewer.loadSpec(spec)
         growHost(viewer)
+        lockScroll(viewer)
         applyTheme(viewer)
       }
       ready = true
@@ -127,7 +213,10 @@
     }
   }
 
-  onDestroy(() => fetchAbort?.abort())
+  onDestroy(() => {
+    fetchAbort?.abort()
+    unlockScroll?.()
+  })
 
   onMount(async () => {
     await tick()
@@ -185,14 +274,28 @@
     allow-spec-file-load="false"
     allow-spec-file-download="false"
     allow-server-selection="false"
+    update-route="false"
     load-fonts="false"
     show-method-in-nav-bar="as-colored-text"
   ></rapi-doc>
 </div>
 
 <style>
+  :global(.card:has(.openapi-wrap)) {
+    overflow: hidden;
+  }
+
+  .openapi-wrap {
+    overflow: hidden;
+    border-bottom-left-radius: var(--bs-card-inner-border-radius, 0.375rem);
+    border-bottom-right-radius: var(--bs-card-inner-border-radius, 0.375rem);
+  }
+
   .openapi-host {
     display: block;
     width: 100%;
+    overflow: hidden;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
   }
 </style>
