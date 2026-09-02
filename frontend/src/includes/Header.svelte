@@ -13,8 +13,8 @@
   }
   let { badge = undefined, page, children, description, onclick }: Props = $props()
 
-  const fallback = $derived($_('navigation.pageDescription.' + page.id))
-  const missing = $derived('navigation.pageDescription.' + page.id)
+  const key = $derived('navigation.pageDescription.' + page.id)
+  const fallback = $derived($_(key))
 </script>
 
 <CardHeader>
@@ -30,9 +30,9 @@
       </a>
     {/if}
   </h2>
-  {#if typeof description === 'string' && description != missing}
+  {#if typeof description === 'string' && description != key}
     {@html description}
-  {:else if description === undefined && fallback != missing}
+  {:else if description === undefined && fallback != key}
     {@html fallback}
   {:else if typeof description !== 'string' && description !== undefined}
     {@render description()}
