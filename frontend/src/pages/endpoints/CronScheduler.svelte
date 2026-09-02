@@ -101,21 +101,13 @@
     return list.map(selectId).filter((n): n is number => n !== undefined)
   }
 
-  /** oninput receives the new value after bind updates (select, chip X, and usually full clear). */
+  /** oninput receives the new value after bind updates (select, chip X, and full clear). */
   const daysChanged = (value: unknown) => {
     const list = idsFromSelect(value)
     if (cron.frequency === Frequency.Weekly) cron.daysOfWeek = list
     else if (cron.frequency === Frequency.Monthly) cron.daysOfMonth = list
     sortDays()
     validateDays(0)
-  }
-
-  /**
-   * handleClear calls onclear(previousValue) *before* value = undefined, so bind still
-   * has the old days. Chip X calls onclear(removedItem) *after* bind already dropped it.
-   */
-  const daysCleared = (cleared: unknown) => {
-    if (Array.isArray(cleared)) daysChanged(null)
   }
 
   export const reset = () => {
@@ -247,7 +239,6 @@
 
   {#if cron.frequency === Frequency.Weekly}
     <Select
-      onclear={daysCleared}
       oninput={daysChanged}
       class="form-control multiselect {cron.daysOfWeek?.length &&
       deepEqual(cron.daysOfWeek, original.daysOfWeek)
@@ -264,7 +255,6 @@
     <span class="text-danger">{feedback['daysOfWeek']}</span>
   {:else if cron.frequency === Frequency.Monthly}
     <Select
-      onclear={daysCleared}
       oninput={daysChanged}
       class="form-control multiselect {cron.daysOfMonth?.length &&
       deepEqual(cron.daysOfMonth, original.daysOfMonth)

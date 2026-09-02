@@ -60,8 +60,8 @@
     return {
       url: value.split('|')[0] ?? '',
       headers: value.split('|').slice(1)?.join('\n') ?? '',
-      codes: selectIds(tokens.filter(s => s !== 'SSL')),
-      validSsl: tokens.includes('SSL'),
+      codes: selectIds(tokens.filter(s => s.toUpperCase() !== 'SSL')),
+      validSsl: tokens.some(s => s.toUpperCase() === 'SSL'),
     }
   }
 
