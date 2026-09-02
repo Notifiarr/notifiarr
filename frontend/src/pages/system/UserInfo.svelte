@@ -30,11 +30,7 @@
       }
     }
     if (user?.patron) {
-      return {
-        i: user.devAllowed ? BugBeetle : Butterfly,
-        c1: 'orange',
-        c2: 'wheat',
-      }
+      return { i: user.devAllowed ? BugBeetle : Butterfly, c1: 'orange', c2: 'wheat' }
     }
     if (user?.devAllowed) {
       return { i: Bird, c1: 'purple', c2: 'coral' }
