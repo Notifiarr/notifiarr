@@ -459,6 +459,11 @@ dockers_v2:
       - "v{{ .Version }}-ubuntu"
       - "{{ .Major }}.{{ .Minor }}-ubuntu"
       - "{{ .Major }}-ubuntu"
+      - cuda
+      - "{{ .Version }}-cuda"
+      - "v{{ .Version }}-cuda"
+      - "{{ .Major }}.{{ .Minor }}-cuda"
+      - "{{ .Major }}-cuda"
     platforms: *docker_platforms
     labels: &docker_labels_ubuntu
       org.opencontainers.image.created: "{{ .Date }}"
@@ -483,6 +488,11 @@ dockers_v2:
       - "v{{ .Version }}-ubuntu"
       - "{{ .Major }}.{{ .Minor }}-ubuntu"
       - "{{ .Major }}-ubuntu"
+      - cuda
+      - "{{ .Version }}-cuda"
+      - "v{{ .Version }}-cuda"
+      - "{{ .Major }}.{{ .Minor }}-cuda"
+      - "{{ .Major }}-cuda"
     platforms: *docker_platforms
     labels: *docker_labels_ubuntu
   - id: notifiarr-ubuntu-unstable
@@ -493,6 +503,7 @@ dockers_v2:
       - ghcr.io/notifiarr/notifiarr
     tags:
       - unstable-ubuntu
+      - unstable-cuda
     platforms: *docker_platforms
     labels: *docker_labels_ubuntu
   - id: notifiarr-ubuntu-unstable-hub
@@ -503,6 +514,7 @@ dockers_v2:
       - docker.io/golift/notifiarr
     tags:
       - unstable-ubuntu
+      - unstable-cuda
     platforms: *docker_platforms
     labels: *docker_labels_ubuntu
   - id: notifiarr-ubuntu-nightly
@@ -513,6 +525,7 @@ dockers_v2:
       - ghcr.io/notifiarr/notifiarr
     tags:
       - nightly-ubuntu
+      - nightly-cuda
     platforms: *docker_platforms
     labels: *docker_labels_ubuntu
   - id: notifiarr-ubuntu-nightly-hub
@@ -523,86 +536,9 @@ dockers_v2:
       - docker.io/golift/notifiarr
     tags:
       - nightly-ubuntu
+      - nightly-cuda
     platforms: *docker_platforms
     labels: *docker_labels_ubuntu
-  - id: notifiarr-cuda-release
-    disable: '{{ ne .Env.CHANNEL "release" }}'
-    dockerfile: init/docker/Dockerfile.cuda
-    ids: [notifiarr]
-    images:
-      - ghcr.io/notifiarr/notifiarr
-    tags:
-      - cuda
-      - "{{ .Version }}-cuda"
-      - "v{{ .Version }}-cuda"
-      - "{{ .Major }}.{{ .Minor }}-cuda"
-      - "{{ .Major }}-cuda"
-    platforms: *docker_platforms
-    labels: &docker_labels_cuda
-      org.opencontainers.image.created: "{{ .Date }}"
-      org.opencontainers.image.title: Notifiarr with CUDA
-      org.opencontainers.image.revision: "{{ .FullCommit }}"
-      org.opencontainers.image.version: "{{ .Version }}"
-      org.opencontainers.image.documentation: https://notifiarr.wiki
-      org.opencontainers.image.description: Official Client for Notifiarr.com
-      org.opencontainers.image.url: https://notifiarr.com
-      org.opencontainers.image.source: "{{ .GitURL }}"
-      org.opencontainers.image.vendor: Go Lift
-      org.opencontainers.image.licenses: MIT
-  - id: notifiarr-cuda-release-hub
-    disable: '{{ or (ne .Env.CHANNEL "release") (not (isEnvSet "DOCKERHUB_PUBLISH")) }}'
-    dockerfile: init/docker/Dockerfile.cuda
-    ids: [notifiarr]
-    images:
-      - docker.io/golift/notifiarr
-    tags:
-      - cuda
-      - "{{ .Version }}-cuda"
-      - "v{{ .Version }}-cuda"
-      - "{{ .Major }}.{{ .Minor }}-cuda"
-      - "{{ .Major }}-cuda"
-    platforms: *docker_platforms
-    labels: *docker_labels_cuda
-  - id: notifiarr-cuda-unstable
-    disable: '{{ ne .Env.CHANNEL "unstable" }}'
-    dockerfile: init/docker/Dockerfile.cuda
-    ids: [notifiarr]
-    images:
-      - ghcr.io/notifiarr/notifiarr
-    tags:
-      - unstable-cuda
-    platforms: *docker_platforms
-    labels: *docker_labels_cuda
-  - id: notifiarr-cuda-unstable-hub
-    disable: '{{ or (ne .Env.CHANNEL "unstable") (not (isEnvSet "DOCKERHUB_PUBLISH")) }}'
-    dockerfile: init/docker/Dockerfile.cuda
-    ids: [notifiarr]
-    images:
-      - docker.io/golift/notifiarr
-    tags:
-      - unstable-cuda
-    platforms: *docker_platforms
-    labels: *docker_labels_cuda
-  - id: notifiarr-cuda-nightly
-    disable: '{{ ne .Env.CHANNEL "nightly" }}'
-    dockerfile: init/docker/Dockerfile.cuda
-    ids: [notifiarr]
-    images:
-      - ghcr.io/notifiarr/notifiarr
-    tags:
-      - nightly-cuda
-    platforms: *docker_platforms
-    labels: *docker_labels_cuda
-  - id: notifiarr-cuda-nightly-hub
-    disable: '{{ or (ne .Env.CHANNEL "nightly") (not (isEnvSet "DOCKERHUB_PUBLISH")) }}'
-    dockerfile: init/docker/Dockerfile.cuda
-    ids: [notifiarr]
-    images:
-      - docker.io/golift/notifiarr
-    tags:
-      - nightly-cuda
-    platforms: *docker_platforms
-    labels: *docker_labels_cuda
 
 checksum:
   name_template: checksums.sha256.txt

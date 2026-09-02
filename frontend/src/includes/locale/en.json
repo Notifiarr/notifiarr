@@ -617,7 +617,7 @@
     },
     "Nvidia": {
       "title": "Nvidia",
-      "description": "This integration displays Nvidia CUDA info in Snapshot notifications. To use this feature in Docker, you must use the CUDA image: <code>ghcr.io/notifiarr/notifiarr:cuda</code>",
+      "description": "This integration displays Nvidia GPU info in Snapshot notifications. In Docker, use the Ubuntu image (<code>ghcr.io/notifiarr/notifiarr:ubuntu</code> or the <code>:cuda</code> alias), install the <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> on the host, and pass the GPU in with <code>--gpus all</code> or Compose <code>gpus: all</code>. A host CUDA toolkit version is not required.",
       "disabled": {
         "label": "GPU Snapshots",
         "description": "Enable or disable GPU snapshots."
