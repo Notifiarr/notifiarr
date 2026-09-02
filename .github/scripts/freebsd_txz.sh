@@ -55,8 +55,10 @@ fix_pkg() {
   mv "${tmp}/c.json" "${tmp}/+COMPACT_MANIFEST"
   mv "${tmp}/m.json" "${tmp}/+MANIFEST"
   list=$(mktemp)
-  { printf '%s\n' +COMPACT_MANIFEST +MANIFEST; (cd "${tmp}" && find usr -type f | sort); } > "${list}"
-  tar --owner=0 --group=0 --numeric-owner -Jcf "${pkg}" -C "${tmp}" \
+  # fpm lists files and empty dirs as leaves. A files-only walk drops
+  # /usr/local/var/log/notifiarr; the rc script cannot create it as notifiarr.
+  { printf '%s\n' +COMPACT_MANIFEST +MANIFEST; (cd "${tmp}" && find usr \( -type f -o -type d -empty \) | sort); } > "${list}"
+  tar --owner=0 --group=0 --numeric-owner --no-recursion -Jcf "${pkg}" -C "${tmp}" \
     --files-from "${list}" --transform 's|^\([^+]\)|/\1|'
   rm -rf "${tmp}" "${list}"
 }
