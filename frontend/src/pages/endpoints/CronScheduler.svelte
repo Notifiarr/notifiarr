@@ -218,8 +218,7 @@
 
   {#if cron.frequency === Frequency.Weekly}
     <Select
-      onclear={daysChanged}
-      onchange={daysChanged}
+      oninput={daysChanged}
       class="form-control multiselect {cron.daysOfWeek?.length &&
       deepEqual(cron.daysOfWeek, original.daysOfWeek)
         ? ''
@@ -235,8 +234,7 @@
     <span class="text-danger">{feedback['daysOfWeek']}</span>
   {:else if cron.frequency === Frequency.Monthly}
     <Select
-      onclear={daysChanged}
-      onchange={daysChanged}
+      oninput={daysChanged}
       class="form-control multiselect {cron.daysOfMonth?.length &&
       deepEqual(cron.daysOfMonth, original.daysOfMonth)
         ? ''

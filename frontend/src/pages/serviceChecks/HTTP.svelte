@@ -73,14 +73,13 @@
     return list.map(Number).filter(c => !Number.isNaN(c))
   }
 
-  const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
+  const updateExpect = (codes = httpCheck.codes) => {
     const list = Array.isArray(codes) ? codes : []
     httpCheck.codes = list
-    form.expect = list.join(',') + (validSsl ? ',SSL' : '')
     codeFeedback = validate?.(app.id + '.http.codes', list)
   }
 
-  const onCodes = (value: unknown) => updateExpect(codesFromSelect(value), httpCheck.validSsl)
+  const onCodes = (value: unknown) => updateExpect(codesFromSelect(value))
 
   const merge = (index: number) => app.merge(index, form)
 
@@ -91,6 +90,13 @@
   })
 
   updateExpect()
+
+  // CheckedInput toggles validSsl on https URLs. Sync form.expect from codes + SSL
+  // without rewriting codes (that would fight bind:value).
+  $effect(() => {
+    const codes = httpCheck.codes ?? []
+    form.expect = codes.join(',') + (httpCheck.validSsl ? ',SSL' : '')
+  })
 </script>
 
 <Col lg={6}>
@@ -130,7 +136,6 @@
       valueMode="id"
       bind:value={httpCheck.codes}
       oninput={onCodes}
-      onclear={() => onCodes([])}
       multiple
       searchable
       clearable
