@@ -20,7 +20,6 @@ jobs:
         run: npm ci
       - name: svelte-check
         run: npm run check
-        continue-on-error: true
       - name: eslint
         run: npm run lint
       - name: prettier
