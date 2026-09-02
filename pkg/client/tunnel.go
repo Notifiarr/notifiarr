@@ -285,7 +285,6 @@ func (c *Client) pingTunnel(ctx context.Context, idx int, socket string, inCh ch
 //	@Summary		Save tunnel preferences
 //	@Description	Saves the user's preferred primary and backup tunnel server selections.
 //	@Tags			System
-//	@Accept			json
 //	@Produce		text/plain
 //	@Param			tunnels	body		object{PrimaryTunnel=string,BackupTunnel=[]string}	true	"Tunnel configuration"
 //	@Success		200		{string}	string												"success message"

@@ -211,7 +211,6 @@ func (c *Client) handleProfileNoAPIKey(resp http.ResponseWriter, req *http.Reque
 //	@Summary		Update user profile
 //	@Description	Updates login credentials, authentication settings, and upstream trusted networks.
 //	@Tags			System
-//	@Accept			json
 //	@Produce		text/plain
 //	@Param			profile	body		ProfilePost	true	"Profile update data"
 //	@Success		200		{string}	string		"success message"

@@ -5,7 +5,7 @@ import { defineConfig } from 'vitest/config'
 // https://vite.dev/config/
 export default defineConfig({
   build: {
-    chunkSizeWarningLimit: 2000,
+    chunkSizeWarningLimit: 1000,
     sourcemap: false,
     rolldownOptions: {
       output: {

@@ -22,7 +22,6 @@ import (
 //	@Description	Accepts a Plex webhook; when conditions are satisfied sends a notification to the website,
 //	@Description	and may include snapshot data and/or fetched session data. Does not require X-API-Key header.
 //	@Tags			Plex
-//	@Accept			json
 //	@Produce		text/plain
 //	@Param			token	query		string					true	"Plex Token or Client API Key"
 //	@Param			POST	body		plex.IncomingWebhook	true	"webhook payload"

@@ -14,90 +14,91 @@
   import { profile } from '../../api/profile.svelte'
   import Header from '../../includes/Header.svelte'
 
-  const apiDocs = [
-    { id: 'api', file: 'api_swagger.json', path: 'api' },
-    { id: 'ui', file: 'ui_swagger.json', path: 'ui' },
+  type SpecDoc = { id: string; file: string; path: string }
+
+  interface RapiDocEl extends HTMLElement {
+    loadSpec: (spec: Record<string, unknown> | string) => void
+    theme: string
+    bgColor: string
+    textColor: string
+  }
+
+  const apiDocs: SpecDoc[] = [
+    { id: 'api', file: 'api_openapi.json', path: 'api' },
+    { id: 'ui', file: 'ui_openapi.json', path: 'ui' },
   ]
 
   let loadError = $state('')
   let doc = $state(apiDocs[0])
-  let ui = $state<any>()
-
-  // Keep the last fetched spec. Swagger UI's internal state.json often drops
-  // `swagger`/`openapi`; rewriting from that triggers the missing-version error.
-  let currentSpec: Record<string, any> | undefined
+  let ready = $state(false)
+  let viewer = $state<RapiDocEl | undefined>()
   let loadSeq = 0
   let fetchAbort: AbortController | undefined
-  let uiInit: Promise<any> | undefined
+  let uiInit: Promise<void> | undefined
 
-  // https://github.com/swagger-api/swagger-ui/issues/5981
-  const UrlMutatorPlugin = (system: any) => ({
-    rootInjects: {
-      setBasePath: (basePath: string) => {
-        if (doc.id === 'api')
-          system.preauthorizeApiKey('ApiKeyAuth', $profile.config.apiKey)
-        if (!currentSpec) return
-        currentSpec = { ...currentSpec, basePath }
-        return system.specActions.updateJsonSpec(currentSpec)
-      },
-    },
-  })
+  const palette = $derived(
+    theme.isDark
+      ? { theme: 'dark', bg: '#212529', fg: '#dee2e6' }
+      : { theme: 'light', bg: '#ffffff', fg: '#212529' },
+  )
 
-  // Swagger UI 5 requires info.version. Stamp it from golift.io/version (profile).
   const specVersion = () =>
     [$profile.version, $profile.revision].filter(Boolean).join('-') || '0.0.0'
 
-  const stampSpec = (spec: any) => ({
+  const stampSpec = (spec: Record<string, unknown>, selected: SpecDoc) => ({
     ...spec,
-    info: { ...spec.info, version: specVersion() },
+    info: {
+      ...((spec.info as Record<string, unknown> | undefined) ?? {}),
+      version: specVersion(),
+    },
+    servers: [{ url: $urlbase + selected.path }],
   })
 
-  const fetchSpec = async (
-    selected: (typeof apiDocs)[number],
-    signal: AbortSignal,
-  ) => {
+  const fetchSpec = async (selected: SpecDoc, signal: AbortSignal) => {
     const res = await fetch($urlbase + selected.file, { signal })
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`)
-    return stampSpec(await res.json())
+    return stampSpec((await res.json()) as Record<string, unknown>, selected)
   }
 
-  const showSpec = (
-    spec: Record<string, any>,
-    selected: (typeof apiDocs)[number],
-  ) => {
-    currentSpec = spec
-    ui?.specActions.updateJsonSpec(spec)
-    ui?.setBasePath($urlbase + selected.path)
+  const applyTheme = (el: RapiDocEl) => {
+    const { theme: name, bg, fg } = palette
+    el.setAttribute('theme', name)
+    el.setAttribute('bg-color', bg)
+    el.setAttribute('text-color', fg)
+    el.theme = name
+    el.bgColor = bg
+    el.textColor = fg
   }
 
-  const ensureUi = async (
-    spec: Record<string, any>,
-    selected: (typeof apiDocs)[number],
-    seq: number,
-  ) => {
-    uiInit ??= (async () => {
-      await import('swagger-ui/dist/swagger-ui.css')
-      const SwaggerUI = await import('swagger-ui')
-      return SwaggerUI.default({
-        spec,
-        plugins: [UrlMutatorPlugin],
-        defaultModelsExpandDepth: 0,
-        dom_id: '#swagger-ui-container',
-        onComplete: () => {
-          if (seq !== loadSeq || !ui) return
-          ui.setBasePath($urlbase + selected.path)
-        },
-      })
-    })()
+  const growHost = (el: HTMLElement) => {
+    const root = el.shadowRoot
+    if (!root || root.getElementById('nr-openapi-grow')) return
+    const style = document.createElement('style')
+    style.id = 'nr-openapi-grow'
+    style.textContent =
+      ':host,.body,.main-content{height:auto!important;max-height:none!important;overflow:visible!important}'
+    root.appendChild(style)
+  }
 
+  const attachViewer = (node: HTMLElement) => {
+    const el = node as RapiDocEl
+    viewer = el
+    $effect(() => {
+      applyTheme(el)
+    })
+    return () => {
+      if (viewer === el) viewer = undefined
+    }
+  }
+
+  const ensureUi = async () => {
+    uiInit ??= import('rapidoc').then(() => undefined)
     try {
-      ui = await uiInit
+      await uiInit
     } catch (error) {
       uiInit = undefined
       throw error
     }
-    if (seq !== loadSeq) return
-    showSpec(spec, selected)
   }
 
   const loadSelected = async () => {
@@ -107,10 +108,19 @@
     fetchAbort = new AbortController()
     const { signal } = fetchAbort
     loadError = ''
+    ready = false
     try {
       const spec = await fetchSpec(selected, signal)
       if (seq !== loadSeq) return
-      await ensureUi(spec, selected, seq)
+      await ensureUi()
+      if (seq !== loadSeq) return
+      if (viewer) {
+        applyTheme(viewer)
+        viewer.loadSpec(spec)
+        growHost(viewer)
+        applyTheme(viewer)
+      }
+      ready = true
     } catch (error) {
       if (signal.aborted || seq !== loadSeq) return
       loadError = error instanceof Error ? error.message : `${error}`
@@ -141,99 +151,48 @@
   </ul>
 </Header>
 
-<div id="swagger-ui-container" class:dark-mode={theme.isDark}>
-  <CardBody>
-    <h5>
-      {#if loadError}
-        <Fa i={Warning} btn c1="red">
-          <T id="phrases.ERROR" />
-        </Fa><br />
-        {loadError}
-      {:else}
-        <Fa i={CircleNotch} spin weight="bold" btn c1="orange">
-          <T id="phrases.Loading" />
-        </Fa>
-      {/if}
-    </h5>
-  </CardBody>
+<div class="openapi-wrap">
+  {#if loadError || !ready}
+    <CardBody>
+      <h5>
+        {#if loadError}
+          <Fa i={Warning} btn c1="red">
+            <T id="phrases.ERROR" />
+          </Fa><br />
+          {loadError}
+        {:else}
+          <Fa i={CircleNotch} spin weight="bold" btn c1="orange">
+            <T id="phrases.Loading" />
+          </Fa>
+        {/if}
+      </h5>
+    </CardBody>
+  {/if}
+  <rapi-doc
+    {@attach attachViewer}
+    class={['openapi-host', loadError || !ready ? 'd-none' : '']}
+    theme={palette.theme}
+    bg-color={palette.bg}
+    text-color={palette.fg}
+    primary-color="#2fa582"
+    render-style="view"
+    layout="column"
+    allow-try="false"
+    allow-authentication="false"
+    show-header="false"
+    show-info="false"
+    allow-spec-url-load="false"
+    allow-spec-file-load="false"
+    allow-spec-file-download="false"
+    allow-server-selection="false"
+    load-fonts="false"
+    show-method-in-nav-bar="as-colored-text"
+  ></rapi-doc>
 </div>
 
 <style>
-  #swagger-ui-container :global(.swagger-ui .info *),
-  #swagger-ui-container :global(.opblock-tag),
-  #swagger-ui-container :global(.opblock-summary-description),
-  #swagger-ui-container :global(.opblock-description-wrapper *),
-  #swagger-ui-container :global(.opblock-section-header *),
-  #swagger-ui-container :global(.response-col_status),
-  #swagger-ui-container :global(.responses-inner h4),
-  #swagger-ui-container :global(.responses-inner h5),
-  #swagger-ui-container :global(td),
-  #swagger-ui-container :global(th),
-  #swagger-ui-container :global(.model),
-  #swagger-ui-container :global(.btn),
-  #swagger-ui-container :global(.parameter__name),
-  #swagger-ui-container :global(.parameter__type) {
-    color: var(--bs-body-color) !important;
-  }
-
-  #swagger-ui-container :global(.wrapper) {
-    max-width: none !important;
-  }
-
-  #swagger-ui-container :global(input),
-  #swagger-ui-container :global(select),
-  #swagger-ui-container :global(.content-type) {
-    color: black !important;
-  }
-
-  #swagger-ui-container :global(.model-box-control),
-  #swagger-ui-container :global(.models-control),
-  #swagger-ui-container :global(.opblock-summary-control) {
-    color: var(--bs-tertiary-color) !important;
-  }
-
-  #swagger-ui-container :global(.prop-type) {
-    color: var(--bs-primary) !important;
-  }
-
-  #swagger-ui-container :global(.response-col_status .response-undocumented),
-  #swagger-ui-container :global(.model-title) {
-    color: var(--bs-secondary-color) !important;
-  }
-
-  #swagger-ui-container :global(.swagger-ui .info a),
-  #swagger-ui-container :global(button.tablinks) {
-    color: #2fa582 !important;
-  }
-
-  #swagger-ui-container :global(.swagger-ui .info a):hover,
-  #swagger-ui-container :global(button.tablinks):hover {
-    color: #3cd2a5 !important;
-  }
-
-  #swagger-ui-container :global(.dark-mode .swagger-ui .info a) {
-    color: #3cd2a5 !important;
-  }
-
-  #swagger-ui-container :global(.dark-mode .swagger-ui .info a):hover {
-    color: #2fa582 !important;
-  }
-
-  #swagger-ui-container :global(.scheme-container) {
-    background: none !important;
-  }
-
-  #swagger-ui-container :global(.opblock-section-header) {
-    margin: 0 !important;
-    background: none !important;
-  }
-
-  #swagger-ui-container :global(h4) {
-    border: none !important;
-  }
-
-  #swagger-ui-container :global(.information-container),
-  #swagger-ui-container :global(.scheme-container) {
-    display: none !important;
+  .openapi-host {
+    display: block;
+    width: 100%;
   }
 </style>

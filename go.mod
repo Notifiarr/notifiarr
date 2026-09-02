@@ -33,7 +33,7 @@ require (
 	github.com/shirou/gopsutil/v4 v4.26.8
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.12.1
-	github.com/swaggo/swag v1.16.6
+	github.com/swaggo/swag/v2 v2.0.0-rc5
 	golang.org/x/crypto v0.55.0
 	golang.org/x/mod v0.40.0
 	golang.org/x/sys v0.47.0
@@ -91,6 +91,7 @@ require (
 	github.com/jaypipes/pcidb v1.1.1 // indirect
 	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/josephspurrier/goversioninfo v1.7.0 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/lestrrat-go/strftime v1.2.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20260802145828-341c2f0c90b5 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
@@ -114,6 +115,7 @@ require (
 	github.com/spf13/afero v1.15.0 // indirect
 	github.com/sshaman1101/dcompress v0.0.0-20200109162717-50436a6332de // indirect
 	github.com/stangelandcl/ppmd v0.1.1 // indirect
+	github.com/sv-tools/openapi v0.4.0 // indirect
 	github.com/therootcompany/xz v1.0.1 // indirect
 	github.com/tklauser/go-sysconf v0.4.0 // indirect
 	github.com/tklauser/numcpus v0.12.0 // indirect
