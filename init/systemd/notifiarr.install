@@ -18,6 +18,9 @@ claim_packaged_config() {
   chown_if_root_root /etc/notifiarr
   chown_if_root_root /etc/notifiarr/notifiarr.conf
   chown_if_root_root /etc/notifiarr/notifiarr.conf.example
+  # Arch does not run tmpfiles on install; claim the log dir now so the
+  # daemon can write before the next boot. Skip if an admin already owns it.
+  chown_if_root_root /var/log/notifiarr
 }
 
 post_install() {

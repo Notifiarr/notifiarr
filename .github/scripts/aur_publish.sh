@@ -5,7 +5,9 @@
 # --split fatals "no linux archives found", merge Publish is a silent no-op.
 #
 # Usage: aur_publish.sh [dist]
-# Env: AUR_DEPLOY_KEY (required to push), VERSION, TAG, CHANNEL, DRY_RUN=1
+# Env: AUR_DEPLOY_KEY (required to push), VERSION, TAG, CHANNEL, DRY_RUN=1, PKGREL
+# AUR is stable vX.Y.Z tags only. pkgrel defaults to 1; re-publish the same
+# version with PKGREL bumped or AUR helpers treat it as a downgrade.
 set -euo pipefail
 
 dir="${1:-dist}"
@@ -43,7 +45,7 @@ if [ -z "${version}" ] || [ "${version}" = unknown ] || [ "${version}" = unstabl
   exit 1
 fi
 if [[ ! ${version} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  echo "refusing AUR pkgver '${version}' (want x.y.z)" >&2
+  echo "refusing AUR pkgver '${version}' (stable x.y.z tags only)" >&2
   exit 1
 fi
 
@@ -116,7 +118,7 @@ sum_amd64="$(hash_gz notifiarr.amd64.linux.gz "${url_amd64}")"
 sum_arm="$(hash_gz notifiarr.arm.linux.gz "${url_arm}")"
 sum_arm64="$(hash_gz notifiarr.arm64.linux.gz "${url_arm64}")"
 sum_386="$(hash_gz notifiarr.386.linux.gz "${url_386}")"
-pkgver="${version//-/_}"
+pkgver="${version}"
 
 stage="$(mktemp -d "${TMPDIR:-/tmp}/notifiarr-aur.XXXXXX")"
 cleanup() {
@@ -189,11 +191,7 @@ package() {
   install -D -m 644 "init/systemd/\${appname}.service" "\${pkgdir}/usr/lib/systemd/system/\${appname}.service"
   echo "u \${appname} - \\"\${appname} daemon\\"" > "\${appname}.sysusers"
   install -D -m 644 "\${appname}.sysusers" "\${pkgdir}/usr/lib/sysusers.d/\${appname}.conf"
-  printf '%s\n' \
-    "# Log dir only. Do not chown /etc/notifiarr; tmpfiles runs on every boot." \
-    "d /var/log/notifiarr 0755 notifiarr notifiarr -" \
-    > "\${appname}.tmpfiles"
-  install -D -m 644 "\${appname}.tmpfiles" "\${pkgdir}/usr/lib/tmpfiles.d/\${appname}.conf"
+  install -D -m 644 "init/systemd/\${appname}.tmpfiles" "\${pkgdir}/usr/lib/tmpfiles.d/\${appname}.conf"
 }
 EOF
 
