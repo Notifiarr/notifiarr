@@ -73,13 +73,18 @@
     return list.map(Number).filter(c => !Number.isNaN(c))
   }
 
-  const updateExpect = (codes = httpCheck.codes) => {
-    const list = Array.isArray(codes) ? codes : []
-    httpCheck.codes = list
+  const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
+    const list = Array.isArray(codes)
+      ? codes
+      : codes == null
+        ? []
+        : [Number(codes)].filter(n => !Number.isNaN(n))
+    form.expect = list.join(',') + (validSsl ? ',SSL' : '')
     codeFeedback = validate?.(app.id + '.http.codes', list)
   }
 
-  const onCodes = (value: unknown) => updateExpect(codesFromSelect(value))
+  const onCodes = (value: unknown) =>
+    updateExpect(codesFromSelect(value), httpCheck.validSsl)
 
   const merge = (index: number) => app.merge(index, form)
 
@@ -89,13 +94,10 @@
     validate?.(app.id + '.http.codes', [200])
   })
 
-  updateExpect()
-
-  // CheckedInput toggles validSsl on https URLs. Sync form.expect from codes + SSL
-  // without rewriting codes (that would fight bind:value).
+  // CheckedInput toggles validSsl on https URLs. Do not assign httpCheck.codes here
+  // (that fights bind:value); only rewrite the persisted expect string.
   $effect(() => {
-    const codes = httpCheck.codes ?? []
-    form.expect = codes.join(',') + (httpCheck.validSsl ? ',SSL' : '')
+    updateExpect(httpCheck.codes, httpCheck.validSsl)
   })
 </script>
 
