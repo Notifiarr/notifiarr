@@ -19,8 +19,7 @@ jobs:
       - name: npm ci
         run: npm ci
       - name: svelte-check
-        working-directory: .
-        run: bash .github/scripts/svelte-check.sh
+        run: npm run check
       - name: eslint
         run: npm run lint
       - name: prettier
