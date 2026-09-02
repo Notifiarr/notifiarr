@@ -1,5 +1,37 @@
 <script lang="ts" module>
+  import { get } from 'svelte/store'
+  import { urlbase as urlBaseStore } from '../../api/fetch'
+
   export const page = { id: 'ApiDocs' }
+
+  let uiInit: Promise<void> | undefined
+
+  const ensureUi = async () => {
+    uiInit ??= import('rapidoc').then(() => undefined)
+    try {
+      await uiInit
+    } catch (error) {
+      uiInit = undefined
+      throw error
+    }
+  }
+
+  const warmDocs = () => {
+    void ensureUi()
+    const base = get(urlBaseStore)
+    for (const file of ['api_openapi.json', 'ui_openapi.json']) {
+      const link = document.createElement('link')
+      link.rel = 'prefetch'
+      link.as = 'fetch'
+      link.href = base + file
+      document.head.appendChild(link)
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    if ('requestIdleCallback' in window) requestIdleCallback(warmDocs, { timeout: 4000 })
+    else setTimeout(warmDocs, 1500)
+  }
 </script>
 
 <script lang="ts">
@@ -31,10 +63,10 @@
   let loadError = $state('')
   let doc = $state(apiDocs[0])
   let ready = $state(false)
+  let showViewer = $state(false)
   let viewer = $state<RapiDocEl | undefined>()
   let loadSeq = 0
   let fetchAbort: AbortController | undefined
-  let uiInit: Promise<void> | undefined
 
   const palette = $derived(
     theme.isDark
@@ -71,17 +103,32 @@
   }
 
   const growHost = (el: HTMLElement) => {
-    const root = el.shadowRoot
-    if (!root || root.getElementById('nr-openapi-grow')) return
-    const style = document.createElement('style')
-    style.id = 'nr-openapi-grow'
-    style.textContent =
-      ':host{height:auto!important;max-height:none!important;overflow:hidden!important;' +
-      'border-bottom-left-radius:var(--bs-card-inner-border-radius,0.375rem);' +
-      'border-bottom-right-radius:var(--bs-card-inner-border-radius,0.375rem)}' +
-      '.body,.main-content,.m-endpoint,summary{height:auto!important;max-height:none!important;' +
-      'overflow:visible!important;overflow-anchor:none!important}'
-    root.appendChild(style)
+    el.style.setProperty('height', 'auto', 'important')
+    el.style.setProperty('max-height', 'none', 'important')
+    const inject = () => {
+      const root = el.shadowRoot
+      if (!root) return false
+      if (root.getElementById('nr-openapi-grow')) return true
+      const style = document.createElement('style')
+      style.id = 'nr-openapi-grow'
+      style.textContent =
+        ':host{height:auto!important;max-height:none!important;min-height:0!important;' +
+        'overflow:hidden!important;flex:none!important;' +
+        'border-bottom-left-radius:var(--bs-card-inner-border-radius,0.375rem)!important;' +
+        'border-bottom-right-radius:var(--bs-card-inner-border-radius,0.375rem)!important}' +
+        '.body,.main-content,.m-endpoint,summary{height:auto!important;max-height:none!important;' +
+        'overflow:visible!important;overflow-anchor:none!important}' +
+        '.main-content{border-bottom-left-radius:inherit;border-bottom-right-radius:inherit}'
+      root.appendChild(style)
+      return true
+    }
+    if (inject()) return
+    let frames = 0
+    const retry = () => {
+      if (inject() || ++frames > 60) return
+      requestAnimationFrame(retry)
+    }
+    requestAnimationFrame(retry)
   }
 
   let unlockScroll: (() => void) | undefined
@@ -167,22 +214,13 @@
   const attachViewer = (node: HTMLElement) => {
     const el = node as RapiDocEl
     viewer = el
+    growHost(el)
     $effect(() => {
       applyTheme(el)
     })
     return () => {
       unlockScroll?.()
       if (viewer === el) viewer = undefined
-    }
-  }
-
-  const ensureUi = async () => {
-    uiInit ??= import('rapidoc').then(() => undefined)
-    try {
-      await uiInit
-    } catch (error) {
-      uiInit = undefined
-      throw error
     }
   }
 
@@ -195,12 +233,18 @@
     loadError = ''
     ready = false
     try {
-      const spec = await fetchSpec(selected, signal)
+      const specP = fetchSpec(selected, signal)
+      const uiP = ensureUi()
+      const spec = await specP
       if (seq !== loadSeq) return
-      await ensureUi()
+      await uiP
+      if (seq !== loadSeq) return
+      showViewer = true
+      await tick()
       if (seq !== loadSeq) return
       if (viewer) {
         applyTheme(viewer)
+        growHost(viewer)
         viewer.loadSpec(spec)
         growHost(viewer)
         lockScroll(viewer)
@@ -220,6 +264,7 @@
 
   onMount(async () => {
     await tick()
+    await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
     await loadSelected()
   })
 </script>
@@ -257,45 +302,61 @@
       </h5>
     </CardBody>
   {/if}
-  <rapi-doc
-    {@attach attachViewer}
-    class={['openapi-host', loadError || !ready ? 'd-none' : '']}
-    theme={palette.theme}
-    bg-color={palette.bg}
-    text-color={palette.fg}
-    primary-color="#2fa582"
-    render-style="view"
-    layout="column"
-    allow-try="false"
-    allow-authentication="false"
-    show-header="false"
-    show-info="false"
-    allow-spec-url-load="false"
-    allow-spec-file-load="false"
-    allow-spec-file-download="false"
-    allow-server-selection="false"
-    update-route="false"
-    load-fonts="false"
-    show-method-in-nav-bar="as-colored-text"
-  ></rapi-doc>
+  {#if showViewer}
+    <rapi-doc
+      {@attach attachViewer}
+      class={['openapi-host', ready && !loadError ? 'is-ready' : 'is-pending']}
+      style="height:auto!important;max-height:none!important;min-height:0!important"
+      theme={palette.theme}
+      bg-color={palette.bg}
+      text-color={palette.fg}
+      primary-color="#2fa582"
+      render-style="view"
+      layout="column"
+      allow-try="false"
+      allow-authentication="false"
+      show-header="false"
+      show-info="false"
+      allow-spec-url-load="false"
+      allow-spec-file-load="false"
+      allow-spec-file-download="false"
+      allow-server-selection="false"
+      update-route="false"
+      load-fonts="false"
+      show-method-in-nav-bar="as-colored-text"></rapi-doc>
+  {/if}
 </div>
 
 <style>
-  :global(.card:has(.openapi-wrap)) {
-    overflow: hidden;
-  }
-
+  /* Clip RapiDoc, not the card. overflow:hidden on .card squares the teal outline. */
   .openapi-wrap {
-    overflow: hidden;
+    position: relative;
+    height: auto;
+    min-height: 0;
+    overflow: clip;
     border-bottom-left-radius: var(--bs-card-inner-border-radius, 0.375rem);
     border-bottom-right-radius: var(--bs-card-inner-border-radius, 0.375rem);
   }
 
   .openapi-host {
-    display: block;
+    display: block !important;
     width: 100%;
-    overflow: hidden;
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: clip;
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
+  }
+
+  /* RapiDoc's :host { height:100% } must not take layout space until it is ready. */
+  .openapi-host.is-pending {
+    position: absolute !important;
+    width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
   }
 </style>

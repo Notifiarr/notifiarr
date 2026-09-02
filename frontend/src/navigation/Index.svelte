@@ -22,8 +22,11 @@
   import Nodal from '../includes/Nodal.svelte'
 
   const magicNumber = 1005
-  // windowWidth is used for sidebar collapse state.
-  let windowWidth = $state(magicNumber - 1)
+  // windowWidth is used for sidebar collapse state. Default desktop so the first
+  // paint does not stack a mobile drawer above the content card.
+  let windowWidth = $state(
+    typeof window !== 'undefined' ? window.innerWidth : magicNumber + 1,
+  )
   const isMobile = $derived(windowWidth <= magicNumber)
   // Desktop: stretch the sticky sidebar to the content height.
   let contentHeight = $state(0)
@@ -77,7 +80,7 @@
 <Col style="width: 1%;">
   <Card class="mb-2" outline color="notifiarr" theme={$theme}>
     {#key nav.ActivePage}
-      <div bind:clientHeight={contentHeight} transition:slide>
+      <div bind:clientHeight={contentHeight}>
         <nav.ActivePage />
       </div>
     {/key}

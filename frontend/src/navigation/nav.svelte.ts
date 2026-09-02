@@ -15,17 +15,27 @@ export interface Page {
   component: Component
 }
 
+const pageFromURL = (): string => {
+  if (typeof window === 'undefined') return ''
+  const parts = ltrim(window.location.pathname, get(urlbase)).split('/')
+  return parts[0] ?? ''
+}
+
 class Navigator {
   /** This is the current page component on screen. */
   public ActivePage: Component = $state(Landing)
   /** This is the current page id on screen. */
   private activePage = $state('')
+
+  constructor() {
+    this.setActivePage(pageFromURL())
+  }
   /** This is set to true if any form has changes. */
   public formChanged = $state(false)
   /** This is set to the page id if there are unsaved changes. */
   public showUnsavedAlert = $state('')
   /** This is used to force a navigation event even if there are unsaved changes. */
-  public forceEvent = { type: 'force', preventDefault: () => { } } as Event
+  public forceEvent = { type: 'force', preventDefault: () => {} } as Event
 
   /** Call this in the onMount function of the parent component to set the initial page. */
   public onMount = () => {
