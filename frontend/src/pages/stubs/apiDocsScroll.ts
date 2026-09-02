@@ -33,13 +33,13 @@ export const lockWindowScroll = (el: HTMLElement): (() => void) => {
     this: Element,
     arg?: boolean | ScrollIntoViewOptions,
   ) {
-    if (inside(this)) return
+    if (inside(this) && freeze) return
     origIntoView.call(this, arg as boolean)
   }
 
   const origFocus = HTMLElement.prototype.focus
   HTMLElement.prototype.focus = function (this: HTMLElement, opts?: FocusOptions) {
-    origFocus.call(this, inside(this) ? { ...opts, preventScroll: true } : opts)
+    origFocus.call(this, inside(this) && freeze ? { ...opts, preventScroll: true } : opts)
   }
 
   const hold = () => {

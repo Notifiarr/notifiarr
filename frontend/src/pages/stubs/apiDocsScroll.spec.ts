@@ -83,4 +83,28 @@ describe('lockWindowScroll', () => {
     expect(scrollTo).not.toHaveBeenCalled()
     el.remove()
   })
+
+  it('lets RapiDoc scrollIntoView through after the expand settle', () => {
+    vi.useFakeTimers()
+    const intoView = vi.fn()
+    Element.prototype.scrollIntoView = intoView
+
+    const el = mountHost()
+    const child = document.createElement('div')
+    el.appendChild(child)
+    mockScroll(240)
+    const unlock = lockWindowScroll(el)
+
+    el.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+    intoView.mockClear()
+    child.scrollIntoView()
+    expect(intoView).not.toHaveBeenCalled()
+
+    vi.advanceTimersByTime(500)
+    child.scrollIntoView()
+    expect(intoView).toHaveBeenCalled()
+
+    unlock()
+    el.remove()
+  })
 })

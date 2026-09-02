@@ -1,7 +1,4 @@
 <script lang="ts" module>
-  import { get } from 'svelte/store'
-  import { urlbase as urlBaseStore } from '../../api/fetch'
-
   export const page = { id: 'ApiDocs' }
 
   let uiInit: Promise<void> | undefined
@@ -14,23 +11,6 @@
       uiInit = undefined
       throw error
     }
-  }
-
-  const warmDocs = () => {
-    void ensureUi()
-    const base = get(urlBaseStore)
-    for (const file of ['api_openapi.json', 'ui_openapi.json']) {
-      const link = document.createElement('link')
-      link.rel = 'prefetch'
-      link.as = 'fetch'
-      link.href = base + file
-      document.head.appendChild(link)
-    }
-  }
-
-  if (typeof window !== 'undefined') {
-    if ('requestIdleCallback' in window) requestIdleCallback(warmDocs, { timeout: 4000 })
-    else setTimeout(warmDocs, 1500)
   }
 </script>
 
@@ -167,10 +147,11 @@
     try {
       const specP = fetchSpec(selected, signal)
       const uiP = ensureUi()
-      const spec = await specP
+      const settled = await Promise.allSettled([specP, uiP])
       if (seq !== loadSeq) return
-      await uiP
-      if (seq !== loadSeq) return
+      if (settled[0].status === 'rejected') throw settled[0].reason
+      if (settled[1].status === 'rejected') throw settled[1].reason
+      const spec = settled[0].value
       showViewer = true
       await tick()
       if (seq !== loadSeq) return
