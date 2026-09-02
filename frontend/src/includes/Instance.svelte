@@ -52,7 +52,6 @@
     if (form !== busIdsForm) {
       busIdsForm = form
       busIds = form.busIDs?.join('\n') ?? ''
-      return
     }
     const ids = busIds.split(/\s+/).filter((id: string) => id.length)
     const next = ids.length ? ids : ['']
