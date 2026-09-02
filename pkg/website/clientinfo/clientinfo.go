@@ -145,11 +145,11 @@ type GapsConfig struct {
 }
 
 // QbitThrottleConfig is the website config for qBittorrent alternative speed limits.
+// Plex WAN is detected on this client. Jellyfin and Emby are website-only: the site
+// sends trigger/qbitspeed/{enable|disable} and this client does not distinguish apps.
 type QbitThrottleConfig struct {
 	Enabled   bool          `json:"enabled"`
 	Plex      bool          `json:"plex"`
-	Jellyfin  bool          `json:"jellyfin"`
-	Emby      bool          `json:"emby"`
 	Cooldown  cnfg.Duration `json:"cooldown"`
 	Instances IntList       `json:"instances"`
 }

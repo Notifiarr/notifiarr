@@ -20,7 +20,7 @@ const TrigQbitSpeed common.TriggerName = "Reconciling qBittorrent alternative sp
 
 const (
 	pollInterval     = 15 * time.Second
-	jellyfinTTL      = 4 * time.Hour
+	remoteTTL        = 4 * time.Hour
 	defaultCool      = 30 * time.Second
 	reconcileTimeout = time.Minute
 	playing          = "playing"
@@ -37,12 +37,12 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
-	plex          *plexcron.Action
-	mu            sync.Mutex
-	weEnabled     map[int]bool
-	leftAlone     map[int]bool
-	jellyfinUntil time.Time
-	lastDesired   time.Time
+	plex        *plexcron.Action
+	mu          sync.Mutex
+	weEnabled   map[int]bool
+	leftAlone   map[int]bool
+	remoteUntil time.Time
+	lastDesired time.Time
 }
 
 // New configures the library.
@@ -75,10 +75,8 @@ func (c *cmd) create(reqID string) {
 	switch {
 	case enabled:
 		dur = pollInterval
-		mnd.Log.Printf(reqID,
-			"==> qBittorrent Speed Limit Timer Enabled, interval:%s cooldown:%s plex:%v jellyfin:%v emby:%v",
-			dur, cooldown(info.Actions.QbitThrottle.Cooldown),
-			info.Actions.QbitThrottle.Plex, info.Actions.QbitThrottle.Jellyfin, info.Actions.QbitThrottle.Emby)
+		mnd.Log.Printf(reqID, "==> qBittorrent Speed Limit Timer Enabled, interval:%s cooldown:%s plex:%v",
+			dur, cooldown(info.Actions.QbitThrottle.Cooldown), info.Actions.QbitThrottle.Plex)
 	case owned && c.hasQbit():
 		dur = pollInterval
 		mnd.Log.Printf(reqID, "==> qBittorrent Speed Limit Timer restoring owned turtle mode, interval:%s", dur)
@@ -152,7 +150,7 @@ func (c *cmd) ready() bool {
 	return info != nil && info.Actions.QbitThrottle.Enabled && c.hasQbit()
 }
 
-// Send queues a reconcile. Optional args: "enable" or "disable" (Jellyfin/Emby).
+// Send queues a reconcile. Optional args: "enable" or "disable" (website remote playback).
 func (a *Action) Send(input *common.ActionInput) bool {
 	if a == nil || a.cmd == nil || !a.cmd.ready() {
 		return false
@@ -211,7 +209,7 @@ func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
 	}
 
 	now := time.Now()
-	c.applyJellyfinArg(cfg, input.Args, now)
+	c.applyRemoteArg(input, now)
 
 	desired := c.desired(ctx, cfg, now)
 	if desired {
@@ -228,21 +226,26 @@ func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
 	c.apply(ctx, input, cfg, false)
 }
 
-func (c *cmd) applyJellyfinArg(cfg clientinfo.QbitThrottleConfig, args []string, now time.Time) {
-	if len(args) == 0 || (!cfg.Jellyfin && !cfg.Emby) {
+func (c *cmd) applyRemoteArg(input *common.ActionInput, now time.Time) {
+	if len(input.Args) == 0 {
 		return
 	}
 
-	switch args[0] {
+	switch input.Args[0] {
 	case "enable":
-		c.jellyfinUntil = now.Add(jellyfinTTL)
+		c.remoteUntil = now.Add(remoteTTL)
+		mnd.Log.Printf(input.ReqID, "[%s requested] Remote playback active; qBittorrent alternative speed limits wanted",
+			input.Type)
 	case "disable":
-		c.jellyfinUntil = time.Time{}
+		c.remoteUntil = time.Time{}
+		mnd.Log.Printf(input.ReqID,
+			"[%s requested] Remote playback ended; qBittorrent alternative speed limits will restore after cooldown",
+			input.Type)
 	}
 }
 
 func (c *cmd) desired(ctx context.Context, cfg clientinfo.QbitThrottleConfig, now time.Time) bool {
-	if (cfg.Jellyfin || cfg.Emby) && !c.jellyfinUntil.IsZero() && now.Before(c.jellyfinUntil) {
+	if !c.remoteUntil.IsZero() && now.Before(c.remoteUntil) {
 		return true
 	}
 
