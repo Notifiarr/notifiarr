@@ -17,6 +17,7 @@
   import { theme } from '../includes/theme.svelte'
   import { slide } from 'svelte/transition'
   import { onMount, tick } from 'svelte'
+  import { pageSlideFinished, pageSlideMs } from './pageSlide'
   import Sidebar from './Sidebar.svelte'
   import Modals from './Modals.svelte'
   import Nodal from '../includes/Nodal.svelte'
@@ -80,7 +81,10 @@
 <Col style="width: 1%;">
   <Card class="mb-2" outline color="notifiarr" theme={$theme}>
     {#key nav.ActivePage}
-      <div bind:clientHeight={contentHeight} transition:slide>
+      <div
+        bind:clientHeight={contentHeight}
+        transition:slide={{ duration: pageSlideMs }}
+        onintroend={pageSlideFinished}>
         <nav.ActivePage />
       </div>
     {/key}

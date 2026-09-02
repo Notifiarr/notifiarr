@@ -26,6 +26,7 @@
   import { profile } from '../../api/profile.svelte'
   import Header from '../../includes/Header.svelte'
   import { lockWindowScroll } from './apiDocsScroll'
+  import { afterPageSlide } from '../../navigation/pageSlide'
 
   type SpecDoc = { id: string; file: string; path: string }
 
@@ -176,6 +177,7 @@
   })
 
   onMount(async () => {
+    await afterPageSlide()
     await tick()
     await new Promise<void>(resolve => requestAnimationFrame(() => resolve()))
     await loadSelected()

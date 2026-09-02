@@ -6,6 +6,7 @@ import { iequals, ltrim } from '../includes/util'
 import { allPages, others } from './pages'
 import { closeSidebar } from './Index.svelte'
 import { modal } from './Modals.svelte'
+import { pageSlideStarted } from './pageSlide'
 
 // Page represents the data to render a page link.
 export interface Page {
@@ -15,21 +16,11 @@ export interface Page {
   component: Component
 }
 
-const pageFromURL = (): string => {
-  if (typeof window === 'undefined') return ''
-  const parts = ltrim(window.location.pathname, get(urlbase)).split('/')
-  return parts[0] ?? ''
-}
-
 class Navigator {
   /** This is the current page component on screen. */
   public ActivePage: Component = $state(Landing)
   /** This is the current page id on screen. */
   private activePage = $state('')
-
-  constructor() {
-    this.setActivePage(pageFromURL())
-  }
   /** This is set to true if any form has changes. */
   public formChanged = $state(false)
   /** Pending destination while the unsaved-changes modal is open.
@@ -112,7 +103,9 @@ class Navigator {
 
   private setActivePage = (newPage: string): string => {
     const page = allPages.find(p => iequals(p.path ?? p.id, newPage))
-    this.ActivePage = page?.component || Landing
+    const next = page?.component || Landing
+    if (next !== this.ActivePage) pageSlideStarted()
+    this.ActivePage = next
     return (this.activePage = page ? (page.path ?? page.id) : '')
   }
 
