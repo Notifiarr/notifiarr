@@ -64,7 +64,13 @@
     feedback['atTimes'] = validate?.('cron.atTimes', cron.atTimes?.length ?? 0) ?? ''
   }
 
-  let dayVal = Object.entries(weekdays).map(([v, label]) => ({ label, value: Number(v) }))
+  const dayItems = $derived(
+    Object.entries(weekdays($_)).map(([v, label]) => ({ label, value: Number(v) })),
+  )
+  const monthItems = Array.from({ length: 31 }, (_, i) => ({
+    value: i + 1,
+    label: `${i + 1}`,
+  }))
 
   const validateDays = (subtract: number) => {
     if (cron.frequency === Frequency.Weekly) {
@@ -78,11 +84,30 @@
     }
   }
 
-  const clear = (e: any) => {
-    let cleared = e.detail
-    if (!Array.isArray(cleared)) cleared = [cleared]
-    validateDays(cleared.length)
+  const selectId = (v: unknown): number | undefined => {
+    if (v && typeof v === 'object' && 'value' in v)
+      return selectId((v as { value: unknown }).value)
+    if (typeof v === 'number' && Number.isInteger(v)) return v
+    if (typeof v === 'string' && v.trim() !== '') {
+      const n = Number(v)
+      return Number.isInteger(n) ? n : undefined
+    }
+    return undefined
+  }
+
+  const idsFromSelect = (value: unknown): number[] => {
+    if (value == null) return []
+    const list = Array.isArray(value) ? value : [value]
+    return list.map(selectId).filter((n): n is number => n !== undefined)
+  }
+
+  /** oninput receives the new value after bind updates (select, chip X, and full clear). */
+  const daysChanged = (value: unknown) => {
+    const list = idsFromSelect(value)
+    if (cron.frequency === Frequency.Weekly) cron.daysOfWeek = list
+    else if (cron.frequency === Frequency.Monthly) cron.daysOfMonth = list
     sortDays()
+    validateDays(0)
   }
 
   export const reset = () => {
@@ -96,16 +121,27 @@
     cron.daysOfMonth = cron.daysOfMonth?.sort((a, b) => a - b)
   }
 
+  const timeLabel = (v: unknown): string => {
+    if (typeof v === 'string') return v
+    if (v && typeof v === 'object' && 'value' in v)
+      return String((v as { value: unknown }).value)
+    return String(v ?? '')
+  }
+
+  const parseClock = (label: string): number[] => {
+    let v = label
+    if (v.length === 2) v = '0:0:' + v
+    else if (v.length === 5) v = '0:' + v
+    return v.split(':').map(Number)
+  }
+
   /** Remove a time from the list of times. */
-  const deleteTime = (e: CustomEvent<any>) => {
-    let value = e.detail
-    if (!Array.isArray(value)) value = [e.detail]
-    for (let v of value) {
-      v = v.value
-      if (v.length === 2) v = '0:0:' + v
-      if (v.length === 5) v = '0:' + v
+  const deleteTime = (cleared: unknown) => {
+    const items = Array.isArray(cleared) ? cleared : [cleared]
+    for (const item of items) {
+      const t = parseClock(timeLabel(item))
       cron.atTimes = cron.atTimes
-        ?.filter(t => !deepEqual(t, v.split(':').map(Number)))
+        ?.filter(existing => !deepEqual(existing, t))
         .sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2])
     }
   }
@@ -135,7 +171,7 @@
 
   {#snippet timeInput(idx: number, max: number, disabled: boolean)}
     <Input type="select" bind:value={newTime[idx]} min={0} {max} {disabled} class="tp">
-      {#each Array.from({ length: max }, (_, i) => i) as i}
+      {#each Array.from({ length: max }, (_, i) => i) as i (i)}
         <option value={i}>{i.toString().padStart(2, '0')}</option>
       {/each}
     </Input>
@@ -174,7 +210,7 @@
             <!-- Input box with times. Used to delete them (by clicking the x). -->
             <div class="time-container p-0">
               <Select
-                on:input={() =>
+                oninput={() =>
                   (feedback['atTimes'] =
                     validate?.('cron.atTimes', cron.atTimes?.length ?? 0) ?? '')}
                 class="multiselect {cron.atTimes?.length &&
@@ -187,7 +223,7 @@
                 multiFullItemClearable={false}
                 inputAttributes={{ readonly: true }}
                 placeholder="⬅ {$_('scheduler.AddATime')}"
-                on:clear={deleteTime}
+                onclear={deleteTime}
                 value={cronTimes(cron)} />
             </div>
           </td>
@@ -203,43 +239,43 @@
 
   {#if cron.frequency === Frequency.Weekly}
     <Select
-      on:clear={clear}
-      on:change={() => (sortDays(), validateDays(0))}
+      oninput={daysChanged}
       class="form-control multiselect {cron.daysOfWeek?.length &&
       deepEqual(cron.daysOfWeek, original.daysOfWeek)
         ? ''
         : 'changed ' + (cron.daysOfWeek?.length ? 'is-valid' : 'is-invalid')}"
       placeholder={$_('scheduler.daysOfWeek')}
-      bind:justValue={cron.daysOfWeek}
-      value={cron.daysOfWeek?.map(d => ({ value: d, label: weekdays()[d] })) ?? undefined}
+      valueMode="id"
+      bind:value={cron.daysOfWeek}
       multiple
       searchable
       clearable
-      items={dayVal}>
-      <div slot="empty"><p class="text-center mt-3">{$_('scheduler.empty')}</p></div>
-    </Select>
+      items={dayItems}
+      {empty} />
     <span class="text-danger">{feedback['daysOfWeek']}</span>
   {:else if cron.frequency === Frequency.Monthly}
     <Select
-      on:clear={clear}
-      on:change={() => (sortDays(), validateDays(0))}
+      oninput={daysChanged}
       class="form-control multiselect {cron.daysOfMonth?.length &&
       deepEqual(cron.daysOfMonth, original.daysOfMonth)
         ? ''
         : 'changed ' + (cron.daysOfMonth?.length ? 'is-valid' : 'is-invalid')}"
       placeholder={$_('scheduler.daysOfMonth')}
-      bind:justValue={cron.daysOfMonth}
-      value={cron.daysOfMonth?.map(d => ({ value: d, label: `${d}` })) ?? undefined}
+      valueMode="id"
+      bind:value={cron.daysOfMonth}
       multiple
       searchable
       clearable
       placeholderAlwaysShow={true}
-      items={Array.from({ length: 31 }, (_, i) => i + 1)}>
-      <div slot="empty"><p class="text-center mt-3">{$_('scheduler.empty')}</p></div>
-    </Select>
+      items={monthItems}
+      {empty} />
     <span class="text-danger">{feedback['daysOfMonth']}</span>
   {/if}
 </div>
+
+{#snippet empty()}
+  <p class="text-center mt-3">{$_('scheduler.empty')}</p>
+{/snippet}
 
 <style>
   /* Make the stuff match other pages. */

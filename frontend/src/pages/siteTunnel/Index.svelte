@@ -72,7 +72,7 @@
   <h4><T id="SiteTunnel.phrases.PrimaryTunnel" /></h4>
   <Table size="sm" hover={true} borderless>
     <tbody class="primary-tunnels">
-      {#each $profile.clientInfo?.user.mulery ?? [] as mule, idx}
+      {#each $profile.clientInfo?.user.mulery ?? [] as mule, idx (mule?.socket)}
         <tr
           onclick={() => (primaryTunnel = mule?.socket)}
           style="cursor:pointer;"
@@ -82,8 +82,7 @@
               type="radio"
               style="cursor:pointer;"
               bind:group={primaryTunnel}
-              value={mule?.socket}
-              checked={primaryTunnel === mule?.socket} />
+              value={mule?.socket} />
           </td>
           <td class="location">{mule?.location}</td>
           <td style="width:1%;" class="text-info">{pingOutput[idx]}</td>
@@ -112,8 +111,8 @@
       bind:value={backupTunnel}
       placeholder={$_('SiteTunnel.phrases.SelectTunnel')}
       class={backupTunnel != $profile.clientInfo?.user.tunnels?.[1] ? 'changed' : ''}>
-      {#each $profile.clientInfo?.user.mulery ?? [] as mule}
-        <option selected={backupTunnel === mule!.socket} value={mule!.socket}>
+      {#each $profile.clientInfo?.user.mulery ?? [] as mule (mule?.socket)}
+        <option value={mule!.socket}>
           {mule?.location} &nbsp; {mule?.socket}
         </option>
       {/each}
