@@ -104,4 +104,24 @@ describe('Input', () => {
     expect(select.value).toBe('true')
     expect(select.selectedOptions[0].textContent?.trim()).toBe('Enabled')
   })
+
+  it('derives validation feedback without mutating caller state', () => {
+    const seen: string[] = []
+    render(Input, {
+      props: {
+        id: 'test.plain',
+        value: 'bad',
+        original: 'bad',
+        validate: (_id: string, value: string) => {
+          seen.push(value)
+          return value === 'bad' ? 'nope' : ''
+        },
+      },
+    })
+
+    expect(screen.getByText('nope')).toBeTruthy()
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true')
+    expect(seen).toContain('bad')
+  })
 })
+
