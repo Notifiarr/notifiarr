@@ -65,7 +65,7 @@
   }
 
   const dayItems = $derived(
-    Object.entries(weekdays()).map(([v, label]) => ({ label, value: Number(v) })),
+    Object.entries(weekdays($_)).map(([v, label]) => ({ label, value: Number(v) })),
   )
   const monthItems = Array.from({ length: 31 }, (_, i) => ({
     value: i + 1,
@@ -84,10 +84,21 @@
     }
   }
 
+  const selectId = (v: unknown): number | undefined => {
+    if (v && typeof v === 'object' && 'value' in v)
+      return selectId((v as { value: unknown }).value)
+    if (typeof v === 'number' && Number.isInteger(v)) return v
+    if (typeof v === 'string' && v.trim() !== '') {
+      const n = Number(v)
+      return Number.isInteger(n) ? n : undefined
+    }
+    return undefined
+  }
+
   const idsFromSelect = (value: unknown): number[] => {
     if (value == null) return []
     const list = Array.isArray(value) ? value : [value]
-    return list.map(Number).filter(n => !Number.isNaN(n))
+    return list.map(selectId).filter((n): n is number => n !== undefined)
   }
 
   /** oninput receives the new value after bind updates (select, chip X, and usually full clear). */

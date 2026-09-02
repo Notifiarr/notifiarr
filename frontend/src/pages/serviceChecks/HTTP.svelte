@@ -35,15 +35,33 @@
     validate,
   }: ChildProps<ServiceConfig> = $props()
 
+  const selectId = (v: unknown): number | undefined => {
+    if (v && typeof v === 'object' && 'value' in v)
+      return selectId((v as { value: unknown }).value)
+    if (typeof v === 'number' && Number.isInteger(v)) return v
+    if (typeof v === 'string' && v.trim() !== '') {
+      const n = Number(v)
+      return Number.isInteger(n) ? n : undefined
+    }
+    return undefined
+  }
+
+  const selectIds = (value: unknown): number[] => {
+    if (value == null) return []
+    const list = Array.isArray(value) ? value : [value]
+    return list.map(selectId).filter((n): n is number => n !== undefined)
+  }
+
   const setData = (value: string, expect: string) => {
+    const tokens = expect
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean)
     return {
       url: value.split('|')[0] ?? '',
       headers: value.split('|').slice(1)?.join('\n') ?? '',
-      codes: expect
-        .split(',')
-        .map(Number)
-        .filter(c => !isNaN(c)),
-      validSsl: expect.split(',').includes('SSL') ?? false,
+      codes: selectIds(tokens.filter(s => s !== 'SSL')),
+      validSsl: tokens.includes('SSL'),
     }
   }
 
@@ -67,24 +85,13 @@
     return id ? (validate?.(id, value) ?? '') : ''
   }
 
-  const codesFromSelect = (value: unknown): number[] => {
-    if (value == null) return []
-    const list = Array.isArray(value) ? value : [value]
-    return list.map(Number).filter(c => !Number.isNaN(c))
-  }
-
   const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
-    const list = Array.isArray(codes)
-      ? codes
-      : codes == null
-        ? []
-        : [Number(codes)].filter(n => !Number.isNaN(n))
-    form.expect = list.join(',') + (validSsl ? ',SSL' : '')
+    const list = selectIds(codes)
+    form.expect = [...list, ...(validSsl ? ['SSL'] : [])].join(',')
     codeFeedback = validate?.(app.id + '.http.codes', list)
   }
 
-  const onCodes = (value: unknown) =>
-    updateExpect(codesFromSelect(value), httpCheck.validSsl)
+  const onCodes = (value: unknown) => updateExpect(selectIds(value), httpCheck.validSsl)
 
   const merge = (index: number) => app.merge(index, form)
 
