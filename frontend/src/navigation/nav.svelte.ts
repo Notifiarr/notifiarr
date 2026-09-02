@@ -22,10 +22,11 @@ class Navigator {
   private activePage = $state('')
   /** This is set to true if any form has changes. */
   public formChanged = $state(false)
-  /** This is set to the page id if there are unsaved changes. */
-  public showUnsavedAlert = $state('')
+  /** Pending destination while the unsaved-changes modal is open.
+   * `null` means closed. `''` is the landing page (Notifiarr Client title). */
+  public showUnsavedAlert = $state<string | null>(null)
   /** This is used to force a navigation event even if there are unsaved changes. */
-  public forceEvent = { type: 'force', preventDefault: () => { } } as Event
+  public forceEvent = { type: 'force', preventDefault: () => {} } as Event
 
   /** Call this in the onMount function of the parent component to set the initial page. */
   public onMount = () => {
@@ -65,7 +66,7 @@ class Navigator {
       return
     }
 
-    this.showUnsavedAlert = ''
+    this.showUnsavedAlert = null
     this.formChanged = false
     pid = this.setActivePage(pid)
     closeSidebar()

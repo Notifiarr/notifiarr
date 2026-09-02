@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/svelte'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Config } from '../api/notifiarrConfig'
 import { profile } from '../api/profile.svelte'
+import { FormListTracker, type App } from './formsTracker.svelte'
 import Input from './Input.svelte'
 
 vi.mock('../api/profile.svelte', async () => {
@@ -9,9 +11,9 @@ vi.mock('../api/profile.svelte', async () => {
 })
 
 function setProfile(environment: Record<string, string>) {
-  ;(profile as unknown as { set: (v: { environment: Record<string, string> }) => void }).set({
-    environment,
-  })
+  ;(
+    profile as unknown as { set: (v: { environment: Record<string, string> }) => void }
+  ).set({ environment })
 }
 
 describe('Input', () => {
@@ -105,23 +107,30 @@ describe('Input', () => {
     expect(select.selectedOptions[0].textContent?.trim()).toBe('Enabled')
   })
 
-  it('derives validation feedback without mutating caller state', () => {
-    const seen: string[] = []
+  it('derives validation feedback from a FormListTracker without mutating $state', () => {
+    type Row = { name: string }
+    const app: App<Row> = {
+      id: 'Test.App',
+      name: 'Test',
+      logo: '',
+      envPrefix: 'TEST',
+      empty: { name: '' },
+      merge: () => ({}) as Config,
+      validator: (_id, value) => (value === 'bad' ? 'nope' : ''),
+    }
+    const flt = new FormListTracker([{ name: 'bad' }], app)
+
     render(Input, {
       props: {
-        id: 'test.plain',
+        id: 'Test.App.name',
         value: 'bad',
         original: 'bad',
-        validate: (_id: string, value: string) => {
-          seen.push(value)
-          return value === 'bad' ? 'nope' : ''
-        },
+        validate: (id: string, value: string) => flt.validate(id, value, 0),
       },
     })
 
     expect(screen.getByText('nope')).toBeTruthy()
     expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true')
-    expect(seen).toContain('bad')
+    expect(flt.invalid).toBe(true)
   })
 })
-

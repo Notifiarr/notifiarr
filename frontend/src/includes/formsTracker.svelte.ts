@@ -131,9 +131,16 @@ export class FormListTracker<T> {
   public isValid = (index: number): boolean => {
     const inst = this.instances[index]
     if (inst == null) return true
-    return Object.keys(inst).every(
-      k => !this.app.validator?.(this.app.id + '.' + k, inst[k as keyof T], index, this.instances),
-    )
+    const hidden = this.app.hidden ?? []
+    return Object.keys(inst).every(k => {
+      if (hidden.includes(k)) return true
+      return !this.app.validator?.(
+        this.app.id + '.' + k,
+        inst[k as keyof T],
+        index,
+        this.instances,
+      )
+    })
   }
 
   /** Standard form validator for an integrated instance (plex, sonarr, etc).

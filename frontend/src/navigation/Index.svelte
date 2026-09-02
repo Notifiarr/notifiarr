@@ -87,16 +87,18 @@
 <!-- This uses global variables to show a modal whenever any (connected)
      form has changes and you might lose them by navigating away. -->
 <Nodal
-  isOpen={nav.showUnsavedAlert !== ''}
+  isOpen={nav.showUnsavedAlert !== null}
   title="navigation.titles.UnsavedChanges"
-  follow={() => (nav.showUnsavedAlert = '')}
+  follow={() => (nav.showUnsavedAlert = null)}
   esc>
   <T id="phrases.LeavePage" />
   {#snippet footer()}
-    <Button color="primary" onclick={() => (nav.showUnsavedAlert = '')}>
+    <Button color="primary" onclick={() => (nav.showUnsavedAlert = null)}>
       <T id="buttons.NoStayHere" />
     </Button>
-    <Button color="danger" onclick={() => nav.goto(nav.forceEvent, nav.showUnsavedAlert)}>
+    <Button
+      color="danger"
+      onclick={() => nav.goto(nav.forceEvent, nav.showUnsavedAlert ?? '')}>
       <T id="buttons.YesDeleteMyChanges" />
     </Button>
   {/snippet}

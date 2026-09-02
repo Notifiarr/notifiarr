@@ -40,4 +40,25 @@ describe('FormListTracker', () => {
     expect(flt.instances[0].name).toBe('ok')
     expect(flt.invalid).toBe(false)
   })
+
+  it('skips hidden keys when aggregating validity', () => {
+    type Downloader = Row & { apiKey: string }
+    const hiddenApp: App<Downloader> = {
+      ...app,
+      hidden: ['apiKey'],
+      empty: { name: 'ok', url: 'http://x', apiKey: '' },
+      validator: (id, value) => {
+        if (id.endsWith('.apiKey') && (value?.length ?? 0) < 32)
+          return 'api key too short'
+        return ''
+      },
+    }
+    const flt = new FormListTracker(
+      [{ name: 'ok', url: 'http://x', apiKey: '' }],
+      hiddenApp,
+    )
+    expect(flt.validate('Test.App.apiKey', '', 0)).toBe('api key too short')
+    expect(flt.isValid(0)).toBe(true)
+    expect(flt.invalid).toBe(false)
+  })
 })
