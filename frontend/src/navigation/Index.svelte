@@ -15,7 +15,7 @@
   import T, { _ } from '../includes/Translate.svelte'
   import { nav } from './nav.svelte'
   import { theme } from '../includes/theme.svelte'
-  import { slide } from 'svelte/transition'
+  import { fade, slide } from 'svelte/transition'
   import { onMount, tick } from 'svelte'
   import Sidebar from './Sidebar.svelte'
   import Modals from './Modals.svelte'
@@ -30,10 +30,13 @@
   const isMobile = $derived(windowWidth <= magicNumber)
   // Desktop: stretch the sticky sidebar to the content height.
   let contentHeight = $state(0)
+  // First page paints immediately; later navigations fade in the same slot.
+  let pageFade = $state(false)
 
   onMount(async () => {
     await tick()
     await nav.onMount()
+    pageFade = true
   })
 
   // Close the overlay only when crossing desktop → mobile, not on every
@@ -79,11 +82,16 @@
 <!-- Content Area -->
 <Col style="width: 1%;">
   <Card class="mb-2" outline color="notifiarr" theme={$theme}>
-    {#key nav.ActivePage}
-      <div bind:clientHeight={contentHeight} out:slide>
-        <nav.ActivePage />
-      </div>
-    {/key}
+    <div class="page-stack" bind:clientHeight={contentHeight}>
+      {#key nav.ActivePage}
+        <div
+          class="page-layer"
+          in:fade={pageFade ? { duration: 180 } : { duration: 0 }}
+          out:fade={{ duration: 180 }}>
+          <nav.ActivePage />
+        </div>
+      {/key}
+    </div>
   </Card>
 </Col>
 
@@ -109,6 +117,15 @@
   .sidebar-col {
     min-width: 170px;
     max-width: fit-content;
+  }
+
+  /* Outgoing and incoming pages share one cell so they fade instead of stacking. */
+  .page-stack {
+    display: grid;
+  }
+
+  .page-layer {
+    grid-area: 1 / 1;
   }
 
   /* Mobile styles for menu toggler. */
