@@ -80,7 +80,7 @@
 <Col style="width: 1%;">
   <Card class="mb-2" outline color="notifiarr" theme={$theme}>
     {#key nav.ActivePage}
-      <div bind:clientHeight={contentHeight} transition:slide>
+      <div bind:clientHeight={contentHeight} out:slide>
         <nav.ActivePage />
       </div>
     {/key}
