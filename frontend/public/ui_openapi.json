@@ -958,6 +958,9 @@
                     "plex": {
                         "$ref": "#/components/schemas/plex.WebsiteConfig"
                     },
+                    "qbitThrottle": {
+                        "$ref": "#/components/schemas/clientinfo.QbitThrottleConfig"
+                    },
                     "snapshot": {
                         "$ref": "#/components/schemas/snapshot.Config"
                     },
@@ -1235,6 +1238,28 @@
                     },
                     "php": {
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "clientinfo.QbitThrottleConfig": {
+                "description": "Site Config for qBit turtle mode.",
+                "properties": {
+                    "cooldown": {
+                        "$ref": "#/components/schemas/cnfg.Duration"
+                    },
+                    "enabled": {
+                        "type": "boolean"
+                    },
+                    "instances": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "plex": {
+                        "type": "boolean"
                     }
                 },
                 "type": "object"

@@ -18529,6 +18529,138 @@
                 ]
             }
         },
+        "/trigger/qbitspeed": {
+            "get": {
+                "description": "Enable, disable, or reconcile qBittorrent alternative (turtle) speed limits.",
+                "parameters": [
+                    {
+                        "description": "enable, disable, or empty to reconcile",
+                        "in": "path",
+                        "name": "mode",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "success"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid mode"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "501": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "not enabled"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "qBittorrent speed limits",
+                "tags": [
+                    "Triggers"
+                ]
+            }
+        },
+        "/trigger/qbitspeed/{mode}": {
+            "get": {
+                "description": "Enable, disable, or reconcile qBittorrent alternative (turtle) speed limits.",
+                "parameters": [
+                    {
+                        "description": "enable, disable, or empty to reconcile",
+                        "in": "path",
+                        "name": "mode",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "success"
+                    },
+                    "400": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "invalid mode"
+                    },
+                    "404": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "bad token or api key"
+                    },
+                    "501": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "not enabled"
+                    }
+                },
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "summary": "qBittorrent speed limits",
+                "tags": [
+                    "Triggers"
+                ]
+            }
+        },
         "/trigger/reconfig": {
             "get": {
                 "description": "Reconfigures actions based on website settings.",
