@@ -1,27 +1,35 @@
 package commands
 
 import (
+	"regexp"
 	"slices"
 	"strings"
 )
+
+// psParamName is a PowerShell parameter token that must stay unquoted so it
+// binds like `powershell.exe -File script.ps1 -Force`. Quoted `'-Force'` is a
+// string and lands positionally. The pattern is tight: no whitespace, quote, or
+// `$` can reach the synthesized -Command string.
+var psParamName = regexp.MustCompile(`^-[A-Za-z][A-Za-z0-9]*(:[^'"$\s]+)?$`)
 
 // wrapPowerShell makes powershell.exe -File failures visible to cmd.Run().
 // Windows PowerShell treats cmdlet errors (Start-Process, etc.) as non-terminating,
 // so powershell.exe -File exits 0 and custom commands show 0 failures.
 // Rewriting -File into -Command with $ErrorActionPreference='Stop' turns those
-// into a non-zero process exit. Existing -Command / -EncodedCommand is left alone.
+// into a non-zero process exit. Existing host-level -Command / -EncodedCommand
+// (before -File) is left alone; switches after -File belong to the script.
 func wrapPowerShell(args []string) []string {
 	if len(args) < 2 || !isPowerShell(args[0]) {
 		return args
 	}
 
 	flags := args[1:]
-	if hasPSSwitch(flags, "command", "c", "encodedcommand", "e", "ec") {
+	fileIdx := indexPSSwitch(flags, "file", "f")
+	if fileIdx < 0 || fileIdx+1 >= len(flags) {
 		return args
 	}
 
-	fileIdx := indexPSSwitch(flags, "file", "f")
-	if fileIdx < 0 || fileIdx+1 >= len(flags) {
+	if hasPSSwitch(flags[:fileIdx], "command", "c", "encodedcommand", "e", "ec") {
 		return args
 	}
 
@@ -35,11 +43,11 @@ func wrapPowerShell(args []string) []string {
 
 	var cmd strings.Builder
 	cmd.WriteString("$ErrorActionPreference='Stop'; & ")
-	cmd.WriteString(psQuote(script))
+	cmd.WriteString(psScript(script))
 
 	for _, arg := range extra {
 		cmd.WriteByte(' ')
-		cmd.WriteString(psQuote(arg))
+		cmd.WriteString(psArg(arg))
 	}
 
 	return append(append([]string{args[0]}, kept...), "-Command", cmd.String())
@@ -79,4 +87,22 @@ func indexPSSwitch(args []string, names ...string) int {
 
 func psQuote(s string) string {
 	return "'" + strings.ReplaceAll(s, "'", "''") + "'"
+}
+
+// psScript keeps -File path resolution: a bare name is found in the current
+// directory by -File, but the call operator needs an explicit relative path.
+func psScript(s string) string {
+	if strings.ContainsAny(s, `/\:`) || strings.HasPrefix(s, ".") {
+		return psQuote(s)
+	}
+
+	return psQuote("./" + s)
+}
+
+func psArg(arg string) string {
+	if psParamName.MatchString(arg) {
+		return arg
+	}
+
+	return psQuote(arg)
 }

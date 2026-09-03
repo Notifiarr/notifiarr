@@ -73,6 +73,60 @@ func TestWrapPowerShellFileExtras(t *testing.T) {
 	}
 }
 
+func TestWrapPowerShellFileBinding(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		in   []string
+		want []string
+	}{
+		{
+			name: "named parameter stays bare",
+			in:   []string{"powershell.exe", "-File", `C:\build.ps1`, "-Task", "Default"},
+			want: []string{
+				"powershell.exe", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & 'C:\build.ps1' -Task 'Default'`,
+			},
+		},
+		{
+			name: "bare script name gets a relative path",
+			in:   []string{"powershell.exe", "-File", "restart.ps1"},
+			want: []string{
+				"powershell.exe", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & './restart.ps1'`,
+			},
+		},
+		{
+			name: "script arg minus c still wraps",
+			in:   []string{"pwsh", "-File", "build.ps1", "-c", "Release"},
+			want: []string{
+				"pwsh", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & './build.ps1' -c 'Release'`,
+			},
+		},
+		{
+			name: "already relative script is unchanged",
+			in:   []string{"powershell.exe", "-File", `.\restart.ps1`},
+			want: []string{
+				"powershell.exe", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & '.\restart.ps1'`,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := wrapPowerShell(test.in)
+			if !slices.Equal(got, test.want) {
+				t.Fatalf("wrapPowerShell() = %#v, want %#v", got, test.want)
+			}
+		})
+	}
+}
+
 func TestWrapPowerShellSkip(t *testing.T) {
 	t.Parallel()
 
