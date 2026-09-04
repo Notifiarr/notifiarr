@@ -117,8 +117,8 @@
   /** Sort the days every time the form changes. */
   const sortDays = () => {
     // Sort the values displayed in text.
-    cron.daysOfWeek = cron.daysOfWeek?.sort((a, b) => a - b)
-    cron.daysOfMonth = cron.daysOfMonth?.sort((a, b) => a - b)
+    cron.daysOfWeek = cron.daysOfWeek?.sort((a, b) => a - b) ?? null
+    cron.daysOfMonth = cron.daysOfMonth?.sort((a, b) => a - b) ?? null
   }
 
   const timeLabel = (v: unknown): string => {
@@ -140,9 +140,10 @@
     const items = Array.isArray(cleared) ? cleared : [cleared]
     for (const item of items) {
       const t = parseClock(timeLabel(item))
-      cron.atTimes = cron.atTimes
-        ?.filter(existing => !deepEqual(existing, t))
-        .sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2])
+      cron.atTimes =
+        cron.atTimes
+          ?.filter(existing => !deepEqual(existing, t))
+          .sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]) ?? null
     }
   }
 </script>

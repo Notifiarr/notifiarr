@@ -149,8 +149,13 @@ export const escapeHtml = (unsafe: string) => {
     .replaceAll("'", '&#039;')
 }
 
+/** Drops the null holes from a possibly-null list, for use in {#each} blocks. */
+export const present = <T>(
+  xs: readonly (T | null | undefined)[] | null | undefined,
+): T[] => (xs ?? []).filter((x): x is T => x != null)
+
 /** Count the items nested in an object, or the number of keys in an object. */
-export const mapLength = (map: Record<string, any | null> | undefined): number => {
+export const mapLength = (map: Record<string, any | null> | null | undefined): number => {
   if (!map) return 0
   let count = 0
   for (const key in map) {

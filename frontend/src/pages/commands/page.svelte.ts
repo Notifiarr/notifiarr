@@ -17,6 +17,7 @@ const empty: Command = {
   log: false,
   notify: false,
   args: 0,
+  argValues: null,
   timeout: '10s',
   command: '',
 }

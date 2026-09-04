@@ -27,7 +27,7 @@
 
   let filter = $state('')
 
-  const sift = (rows?: TriggerInfo[]): TriggerInfo[] =>
+  const sift = (rows?: TriggerInfo[] | null): TriggerInfo[] =>
     rows?.filter(row => val(row).toLowerCase().includes(filter.toLowerCase())) ?? []
 </script>
 

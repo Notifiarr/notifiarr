@@ -8,7 +8,7 @@
   import Footer from '../../includes/Footer.svelte'
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
-  import { warning } from '../../includes/util'
+  import { warning, present } from '../../includes/util'
   import Fa from '../../includes/Fa.svelte'
   import { nav } from '../../navigation/nav.svelte'
   import { getUi } from '../../api/fetch'
@@ -53,6 +53,8 @@
 
   const primaryChanged = (socket: any, primary: any): boolean =>
     socket == primary && $profile.clientInfo?.user.tunnels?.[0] != socket
+
+  const mulery = $derived(present($profile.clientInfo?.user.mulery))
 </script>
 
 <Header {page} />
@@ -72,21 +74,21 @@
   <h4><T id="SiteTunnel.phrases.PrimaryTunnel" /></h4>
   <Table size="sm" hover={true} borderless>
     <tbody class="primary-tunnels">
-      {#each $profile.clientInfo?.user.mulery ?? [] as mule, idx (mule?.socket)}
+      {#each mulery as mule, idx (mule.socket)}
         <tr
-          onclick={() => (primaryTunnel = mule?.socket)}
+          onclick={() => (primaryTunnel = mule.socket)}
           style="cursor:pointer;"
-          class:changed={primaryChanged(mule!.socket, primaryTunnel)}>
+          class:changed={primaryChanged(mule.socket, primaryTunnel)}>
           <td style="width:30px;">
             <Input
               type="radio"
               style="cursor:pointer;"
               bind:group={primaryTunnel}
-              value={mule?.socket} />
+              value={mule.socket} />
           </td>
-          <td class="location">{mule?.location}</td>
+          <td class="location">{mule.location}</td>
           <td style="width:1%;" class="text-info">{pingOutput[idx]}</td>
-          <td class="shrink-column">{mule?.socket}</td>
+          <td class="shrink-column">{mule.socket}</td>
         </tr>
       {/each}
     </tbody>
@@ -111,9 +113,9 @@
       bind:value={backupTunnel}
       placeholder={$_('SiteTunnel.phrases.SelectTunnel')}
       class={backupTunnel != $profile.clientInfo?.user.tunnels?.[1] ? 'changed' : ''}>
-      {#each $profile.clientInfo?.user.mulery ?? [] as mule (mule?.socket)}
-        <option value={mule!.socket}>
-          {mule?.location} &nbsp; {mule?.socket}
+      {#each mulery as mule (mule.socket)}
+        <option value={mule.socket}>
+          {mule.location} &nbsp; {mule.socket}
         </option>
       {/each}
     </Input>
