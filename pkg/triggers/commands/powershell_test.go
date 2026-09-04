@@ -127,6 +127,60 @@ func TestWrapPowerShellFileBinding(t *testing.T) {
 	}
 }
 
+func TestWrapPowerShellColonValues(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		in   []string
+		want []string
+	}{
+		{
+			name: "colon value is quoted",
+			in:   []string{"powershell.exe", "-File", "echoarg.ps1", "-A:x;[Environment]::Exit(42)"},
+			want: []string{
+				"powershell.exe", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & './echoarg.ps1' -A:'x;[Environment]::Exit(42)'`,
+			},
+		},
+		{
+			name: "colon path value is quoted",
+			in:   []string{"pwsh", "-File", `C:\build.ps1`, `-Path:C:\build\out`},
+			want: []string{
+				"pwsh", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & 'C:\build.ps1' -Path:'C:\build\out'`,
+			},
+		},
+		{
+			name: "colon bool stays a bool",
+			in:   []string{"powershell.exe", "-File", "run.ps1", "-Force:$true"},
+			want: []string{
+				"powershell.exe", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & './run.ps1' -Force:$true`,
+			},
+		},
+		{
+			name: "dotfile script gets a relative path",
+			in:   []string{"powershell.exe", "-File", ".hidden.ps1"},
+			want: []string{
+				"powershell.exe", "-NonInteractive", "-Command",
+				`$ErrorActionPreference='Stop'; & './.hidden.ps1'`,
+			},
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+
+			got := wrapPowerShell(test.in)
+			if !slices.Equal(got, test.want) {
+				t.Fatalf("wrapPowerShell() = %#v, want %#v", got, test.want)
+			}
+		})
+	}
+}
+
 func TestWrapPowerShellSkip(t *testing.T) {
 	t.Parallel()
 

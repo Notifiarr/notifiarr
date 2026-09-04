@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-// psParamName is a PowerShell parameter token that must stay unquoted so it
+// psParamName is a PowerShell parameter name that must stay unquoted so it
 // binds like `powershell.exe -File script.ps1 -Force`. Quoted `'-Force'` is a
-// string and lands positionally. The pattern is tight: no whitespace, quote, or
-// `$` can reach the synthesized -Command string.
-var psParamName = regexp.MustCompile(`^-[A-Za-z][A-Za-z0-9]*(:[^'"$\s]+)?$`)
+// string and lands positionally. Colon values are quoted separately so `;|&()`
+// cannot splice into the synthesized -Command string.
+var psParamName = regexp.MustCompile(`^-[A-Za-z][A-Za-z0-9]*$`)
 
 // wrapPowerShell makes powershell.exe -File failures visible to cmd.Run().
 // Windows PowerShell treats cmdlet errors (Start-Process, etc.) as non-terminating,
@@ -92,7 +92,7 @@ func psQuote(s string) string {
 // psScript keeps -File path resolution: a bare name is found in the current
 // directory by -File, but the call operator needs an explicit relative path.
 func psScript(s string) string {
-	if strings.ContainsAny(s, `/\:`) || strings.HasPrefix(s, ".") {
+	if strings.ContainsAny(s, `/\:`) {
 		return psQuote(s)
 	}
 
@@ -100,9 +100,22 @@ func psScript(s string) string {
 }
 
 func psArg(arg string) string {
+	if name, value, ok := strings.Cut(arg, ":"); ok && psParamName.MatchString(name) {
+		return name + ":" + psColonValue(value)
+	}
+
 	if psParamName.MatchString(arg) {
 		return arg
 	}
 
 	return psQuote(arg)
+}
+
+func psColonValue(value string) string {
+	switch strings.ToLower(value) {
+	case "$true", "$false", "$null":
+		return value
+	default:
+		return psQuote(value)
+	}
 }
