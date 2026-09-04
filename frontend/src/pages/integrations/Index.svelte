@@ -36,12 +36,12 @@
   app: 'sonarr' | 'radarr' | 'readarr' | 'lidarr' | 'prowlarr',
 )}
   {#each config[app] ?? [] as status, index}
-    {#if config[app]}
-      {@const queue = app == 'prowlarr' ? undefined : (resp?.[app]?.queue?.[index] ?? undefined)}
+    {#if config[app]?.[index]}
+      {@const queue =
+        app == 'prowlarr' ? undefined : (resp?.[app]?.queue?.[index] ?? undefined)}
       {@const queueAge = app == 'prowlarr' ? undefined : resp?.[app]?.queueAge?.[index]}
       <!-- make a slider in the ui control these values -->
       <Col class="mb-2" sm={12} md={6} xxl={4}>
-        {#if config[app][index]}
         <Starr
           {app}
           {index}
@@ -52,7 +52,6 @@
           statusAge={resp?.[app]?.statusAge?.[index]}
           dashboard={app == 'prowlarr' ? undefined : present(resp?.dashboard?.[app])}
           dashboardAge={resp?.dashboardAge} />
-        {/if}
       </Col>
     {/if}
   {/each}
@@ -64,16 +63,14 @@
   app: 'deluge' | 'nzbget' | 'qbit' | 'rtorrent' | 'sabnzbd' | 'transmission',
 )}
   {#each config[app] ?? [] as status, index}
-    {#if config[app]}
+    {#if config[app]?.[index]}
       <Col class="mb-2" sm={12} md={6} xxl={4}>
-        {#if config[app][index]}
         <Downloader
           {app}
           {index}
           config={config[app][index]}
           dashboard={present(resp?.dashboard?.[app])}
           dashboardAge={resp?.dashboardAge} />
-        {/if}
       </Col>
     {/if}
   {/each}

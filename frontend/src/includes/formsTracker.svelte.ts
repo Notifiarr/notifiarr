@@ -74,7 +74,10 @@ export class FormListTracker<T> {
   /** The active instance tab. */
   public active: number | undefined
 
-  constructor(instances: readonly (T | null | undefined)[] | null | undefined, app: App<T>) {
+  constructor(
+    instances: readonly (T | null | undefined)[] | null | undefined,
+    app: App<T>,
+  ) {
     const list = (instances ?? []).filter((x): x is T => x != null)
     this.instances = $state(deepCopy(list))
     this.original = $state(deepCopy(list))

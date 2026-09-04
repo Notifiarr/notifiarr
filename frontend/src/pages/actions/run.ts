@@ -3,7 +3,7 @@ import { getUi, type BackendResponse } from '../../api/fetch'
 import { type CronJob, type TriggerInfo } from '../../api/notifiarrConfig'
 import { profile } from '../../api/profile.svelte'
 import { reload } from '../../header/Reload.svelte'
-import { age, warning } from '../../includes/util'
+import { age, warning, present } from '../../includes/util'
 import { _ } from '../../includes/Translate.svelte'
 import { cronDesc } from '../endpoints/schedule'
 
@@ -20,11 +20,13 @@ const reloadClient = async () => {
 export const option = (info: TriggerInfo): string => {
   if (info.key == 'TrigCustomCommand')
     // This one requires a hash of the command.
-    return get(profile).config.commands?.find(c => c?.name == info.name)?.hash || 'rip'
+    return (
+      present(get(profile).config.commands).find(c => c.name == info.name)?.hash || 'rip'
+    )
 
   if (info.key == 'TrigCustomCronTimer')
     // This one requires the index of the cron.
-    return `${get(profile).siteCrons?.findIndex(cron => info.name.endsWith(`'${cron?.name}'`))}`
+    return `${present(get(profile).siteCrons).findIndex(cron => info.name.endsWith(`'${cron.name}'`))}`
 
   if (info.key == 'TrigEndpointURL')
     // This one requires the name of the endpoint.

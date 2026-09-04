@@ -148,6 +148,7 @@
       </thead>
       <tbody class="table-body">
         {#each present(sessions?.sessions) as session}
+          {@const mediaList = present(session.Media)}
           <tr>
             <td title="uid: {session.User.id}" style="border-right: none;">
               <img
@@ -176,9 +177,9 @@
             </td>
 
             <td>
-              {#each present(session.Media) as media, idx}
+              {#each mediaList as media, idx}
                 {media.container}({media.videoCodec} @ {media.videoResolution} / {media.videoFrameRate},
-                {media.audioCodec} * {media.audioChannels}){#if idx < present(session.Media).length - 1};{/if}
+                {media.audioCodec} * {media.audioChannels}){#if idx < mediaList.length - 1};{/if}
               {/each}
             </td>
             <td>
