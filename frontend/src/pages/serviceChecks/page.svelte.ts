@@ -1,4 +1,4 @@
-import type { Config, ServiceConfig } from '../../api/notifiarrConfig'
+import { CheckType, type Config, type ServiceConfig } from '../../api/notifiarrConfig'
 import { deepCopy } from '../../includes/util'
 import { get } from 'svelte/store'
 import { profile } from '../../api/profile.svelte'
@@ -10,7 +10,7 @@ export const empty: ServiceConfig = {
   name: '',
   interval: '5m0s',
   timeout: '10s',
-  type: 'http',
+  type: CheckType.http,
   value: '',
   expect: '200',
   tags: {},

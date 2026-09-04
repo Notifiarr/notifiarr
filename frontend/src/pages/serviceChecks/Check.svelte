@@ -2,7 +2,7 @@
   import Input from '../../includes/Input.svelte'
   import { Col, Row } from '@sveltestrap/sveltestrap'
   import { _ } from '../../includes/Translate.svelte'
-  import { type ServiceConfig } from '../../api/notifiarrConfig'
+  import { CheckType, type ServiceConfig } from '../../api/notifiarrConfig'
   import type { ChildProps } from '../../includes/Instances.svelte'
   import { profile } from '../../api/profile.svelte'
   import { slide } from 'svelte/transition'
@@ -61,31 +61,37 @@
           original={original?.type}
           {onchange}
           {validate}
-          options={['process', 'http', 'tcp', 'ping', 'icmp'].map(type => ({
+          options={[
+            CheckType.process,
+            CheckType.http,
+            CheckType.tcp,
+            CheckType.ping,
+            CheckType.icmp,
+          ].map(type => ({
             name: $_(`ServiceChecks.type.options.${type}`),
             value: type,
-            disabled: type === 'ping' && $profile.isWindows,
+            disabled: type === CheckType.ping && $profile.isWindows,
           }))} />
       </Col>
     </Row>
 
-    {#if form.type === 'http'}
+    {#if form.type === CheckType.http}
       <div class="row" transition:slide>
         <Http {form} {original} {app} {index} {validate} bind:this={pages.http} />
       </div>
-    {:else if form.type === 'process'}
+    {:else if form.type === CheckType.process}
       <div class="row" transition:slide>
         <Proc {form} {original} {app} {index} {validate} bind:this={pages.process} />
       </div>
-    {:else if form.type === 'icmp'}
+    {:else if form.type === CheckType.icmp}
       <div class="row" transition:slide>
         <Ping {form} {original} {app} {index} {validate} bind:this={pages.icmp} />
       </div>
-    {:else if form.type === 'ping'}
+    {:else if form.type === CheckType.ping}
       <div class="row" transition:slide>
         <Ping {form} {original} {app} {index} {validate} bind:this={pages.ping} />
       </div>
-    {:else if form.type === 'tcp'}
+    {:else if form.type === CheckType.tcp}
       <div class="row" transition:slide>
         <Tcp {form} {original} {app} {index} {validate} bind:this={pages.tcp} />
       </div>
