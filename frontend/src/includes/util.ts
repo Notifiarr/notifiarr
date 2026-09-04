@@ -150,7 +150,12 @@ export const escapeHtml = (unsafe: string) => {
 }
 
 /** Count the items nested in an object, or the number of keys in an object. */
-export const mapLength = (map: Record<string, any | null> | undefined): number => {
+export const present = <T>(xs: readonly (T | null | undefined)[] | null | undefined): T[] =>
+  (xs ?? []).filter((x): x is T => x != null)
+
+export const mapLength = (
+  map: Record<string, any | null> | null | undefined,
+): number => {
   if (!map) return 0
   let count = 0
   for (const key in map) {

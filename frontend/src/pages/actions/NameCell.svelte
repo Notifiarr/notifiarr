@@ -14,7 +14,7 @@
 <Popover target={id + 'label'} trigger="hover" theme={$thm}>
   <code>{row.key}</code><br />
   {#if row.key == 'TrigCustomCronTimer'}
-    {$profile.siteCrons?.find(c => row.name.endsWith("'" + c.name + "'"))?.description}
+    {$profile.siteCrons?.find(c => row.name.endsWith("'" + c?.name + "'"))?.description}
   {:else}
     {row.name}
   {/if}

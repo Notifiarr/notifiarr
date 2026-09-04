@@ -46,45 +46,45 @@ export enum Frequency {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Integrations>
  */
 export interface Integrations {
-  snapshot?: Snapshot;
+  snapshot: null | Snapshot;
   snapshotAge: Date;
-  plex?: PMSInfo;
+  plex: null | PMSInfo;
   plexAge: Date;
-  sessions?: Sessions;
+  sessions: null | Sessions;
   sessionsAge: Date;
-  dashboard?: States;
+  dashboard: null | States;
   dashboardAge: Date;
-  tautulliUsers?: Users;
+  tautulliUsers: null | Users;
   tautulliUsersAge: Date;
-  tautulli?: Info;
+  tautulli: null | Info;
   tautulliAge: Date;
   lidarr: {
-    status?: SystemStatus[];
-    statusAge?: Date[];
-    queue?: Queue[];
-    queueAge?: Date[];
+    status: null | (null | SystemStatus)[];
+    statusAge: null | Date[];
+    queue: null | (null | Queue)[];
+    queueAge: null | Date[];
   };
   radarr: {
-    status?: RadarrSystemStatus[];
-    statusAge?: Date[];
-    queue?: RadarrQueue[];
-    queueAge?: Date[];
+    status: null | (null | RadarrSystemStatus)[];
+    statusAge: null | Date[];
+    queue: null | (null | RadarrQueue)[];
+    queueAge: null | Date[];
   };
   readarr: {
-    status?: ReadarrSystemStatus[];
-    statusAge?: Date[];
-    queue?: ReadarrQueue[];
-    queueAge?: Date[];
+    status: null | (null | ReadarrSystemStatus)[];
+    statusAge: null | Date[];
+    queue: null | (null | ReadarrQueue)[];
+    queueAge: null | Date[];
   };
   sonarr: {
-    status?: SonarrSystemStatus[];
-    statusAge?: Date[];
-    queue?: SonarrQueue[];
-    queueAge?: Date[];
+    status: null | (null | SonarrSystemStatus)[];
+    statusAge: null | Date[];
+    queue: null | (null | SonarrQueue)[];
+    queueAge: null | Date[];
   };
   prowlarr: {
-    status?: ProwlarrSystemStatus[];
-    statusAge?: Date[];
+    status: null | (null | ProwlarrSystemStatus)[];
+    statusAge: null | Date[];
   };
 };
 
@@ -100,25 +100,25 @@ export interface Snapshot {
     memFree: number;
     memUsed: number;
     memTotal: number;
-    temperatures?: Record<string, number>;
+    temperatures?: null | Record<string, number>;
     users: number;
     cpuTime: TimesStat;
   };
-  raid?: RaidData;
-  driveAges?: Record<string, number>;
-  driveTemps?: Record<string, number>;
-  driveHealth?: Record<string, string>;
-  diskUsage?: Record<string, null | Partition>;
-  quotas?: Record<string, null | Partition>;
-  zfsPools?: Record<string, null | Partition>;
-  ioTop?: IOTopData;
-  ioStat?: IoStatDisk[];
-  ioStat2?: Record<string, IOCountersStat>;
-  processes?: Process[];
-  mysql?: Record<string, null | MySQLServerData>;
-  nvidia?: NvidiaOutput[];
-  ipmiSensors?: IPMISensor[];
-  synology?: Synology;
+  raid?: null | RaidData;
+  driveAges?: null | Record<string, number>;
+  driveTemps?: null | Record<string, number>;
+  driveHealth?: null | Record<string, string>;
+  diskUsage?: null | Record<string, null | Partition>;
+  quotas?: null | Record<string, null | Partition>;
+  zfsPools?: null | Record<string, null | Partition>;
+  ioTop?: null | IOTopData;
+  ioStat?: null | (null | IoStatDisk)[];
+  ioStat2?: null | Record<string, IOCountersStat>;
+  processes?: null | (null | Process)[];
+  mysql?: null | Record<string, null | MySQLServerData>;
+  nvidia?: null | (null | NvidiaOutput)[];
+  ipmiSensors: null | (null | IPMISensor)[];
+  synology?: null | Synology;
 };
 
 /**
@@ -130,15 +130,42 @@ export interface InfoStat {
   hostname: string;
   uptime: number;
   bootTime: number;
+  /**
+   * number of processes
+   */
   procs: number;
+  /**
+   * ex: freebsd, linux
+   */
   os: string;
+  /**
+   * ex: ubuntu, linuxmint
+   */
   platform: string;
+  /**
+   * ex: debian, rhel
+   */
   platformFamily: string;
+  /**
+   * version of the complete OS
+   */
   platformVersion: string;
+  /**
+   * version of the OS kernel (if available)
+   */
   kernelVersion: string;
+  /**
+   * native cpu architecture queried at runtime, as returned by `uname -m` or empty string in case of error
+   */
   kernelArch: string;
   virtualizationSystem: string;
+  /**
+   * guest or host
+   */
   virtualizationRole: string;
+  /**
+   * ex: uuid
+   */
   hostId: string;
 };
 
@@ -176,7 +203,7 @@ export interface TimesStat {
  */
 export interface RaidData {
   mdstat?: string;
-  megacli?: MegaCLI[];
+  megacli?: null | (null | MegaCLI)[];
 };
 
 /**
@@ -187,7 +214,7 @@ export interface MegaCLI {
   drive: string;
   target: string;
   adapter: string;
-  data?: Record<string, string>;
+  data: null | Record<string, string>;
 };
 
 /**
@@ -195,14 +222,20 @@ export interface MegaCLI {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Partition>
  */
 export interface Partition {
+  /**
+   * Mount point or display name.
+   */
   name: string;
+  /**
+   * Block device path (e.g. /dev/sda1); empty for ZFS pools.
+   */
   device?: string;
   total: number;
   free: number;
   used: number;
   fsType?: string;
   readOnly?: boolean;
-  opts?: string[];
+  opts?: null | string[];
 };
 
 /**
@@ -214,7 +247,7 @@ export interface IOTopData {
   totalWrite: number;
   currentRead: number;
   currentWrite: number;
-  procs?: IOTopProc[];
+  procs: null | (null | IOTopProc)[];
 };
 
 /**
@@ -296,8 +329,8 @@ export interface Process {
  */
 export interface MySQLServerData {
   name: string;
-  processes?: MySQLProcess[];
-  globalstatus?: Record<string, null | any>;
+  processes: null | (null | MySQLProcess)[];
+  globalstatus: null | Record<string, null | any>;
 };
 
 /**
@@ -308,25 +341,15 @@ export interface MySQLProcess {
   id: number;
   user: string;
   host: string;
-  db: NullString;
+  db: any;
   command: string;
   time: number;
   state: string;
-  info: NullString;
+  info: any;
+  /**
+   * mariadb
+   */
   progress: number;
-};
-
-/**
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.NullString>
- */
-export interface NullString extends SqlNullString {};
-
-/**
- * @see golang: <database/sql.NullString>
- */
-export interface SqlNullString {
-  String: string;
-  Valid: boolean;
 };
 
 /**
@@ -361,12 +384,27 @@ export interface IPMISensor {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Synology>
  */
 export interface Synology {
+  /**
+   * 254263
+   */
   last_admin_login_build: string;
+  /**
+   * Synology DiskStation
+   */
   manager: string;
+  /**
+   * Synology Inc.
+   */
   vender: string;
+  /**
+   * DS1517+
+   */
   upnpmodelname: string;
+  /**
+   * 6.2.3
+   */
   udc_check_state: string;
-  ha?: Record<string, string>;
+  ha: null | Record<string, string>;
 };
 
 /**
@@ -384,7 +422,7 @@ export interface PMSInfo {
   companionProxy: boolean;
   countryCode: string;
   diagnostics: string;
-  Directory?: Directory[];
+  Directory: null | (null | Directory)[];
   eventStream: boolean;
   friendlyName: string;
   hubSearch: boolean;
@@ -446,7 +484,7 @@ export interface Directory {
 export interface Sessions {
   server: string;
   hostId: string;
-  sessions?: Session[];
+  sessions: null | (null | Session)[];
 };
 
 /**
@@ -504,9 +542,9 @@ export interface Session {
     id: string;
     location: string;
   };
-  Guid?: GUID[];
-  Media?: Media[];
-  Rating?: Rating[];
+  Guid?: null | (null | GUID)[];
+  Media?: null | (null | Media)[];
+  Rating?: null | (null | Rating)[];
 };
 
 /**
@@ -534,7 +572,10 @@ export interface Player {
   profile: string;
   remotePublicAddress: string;
   state: string;
-  stateTime: StructDur;
+  /**
+   * this is not a plex item. We calculate this.
+   */
+  stateTime: any;
   title: string;
   userID: number;
   vendor: string;
@@ -543,11 +584,6 @@ export interface Player {
   local: boolean;
   secure: boolean;
 };
-
-/**
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex.structDur>
- */
-export interface StructDur extends Date {};
 
 /**
  * Transcode is part of a Plex Session.
@@ -609,7 +645,7 @@ export interface Media {
   videoResolution: string;
   width: number;
   selected: boolean;
-  Part?: MediaPart[];
+  Part: null | (null | MediaPart)[];
 };
 
 /**
@@ -633,7 +669,7 @@ export interface MediaPart {
   optimizedForStreaming: boolean;
   videoProfile: string;
   width: number;
-  Stream?: MediaStream[];
+  Stream: null | (null | MediaStream)[];
 };
 
 /**
@@ -691,16 +727,16 @@ export interface Rating {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/dashboard.States>
  */
 export interface States {
-  lidarr?: State[];
-  radarr?: State[];
-  readarr?: State[];
-  sonarr?: State[];
-  nzbget?: State[];
-  rtorrent?: State[];
-  qbit?: State[];
-  deluge?: State[];
-  sabnzbd?: State[];
-  transmission?: State[];
+  lidarr: null | (null | State)[];
+  radarr: null | (null | State)[];
+  readarr: null | (null | State)[];
+  sonarr: null | (null | State)[];
+  nzbget: null | (null | State)[];
+  rtorrent: null | (null | State)[];
+  qbit: null | (null | State)[];
+  deluge: null | (null | State)[];
+  sabnzbd: null | (null | State)[];
+  transmission: null | (null | State)[];
   plexSessions?: any;
 };
 
@@ -718,9 +754,12 @@ export interface State {
   size: number;
   percent?: number;
   upcoming?: number;
-  next?: Sortable[];
-  latest?: Sortable[];
+  next?: null | (null | Sortable)[];
+  latest?: null | (null | Sortable)[];
   onDisk?: number;
+  /**
+   * How long it took.
+   */
   elapsed: string;
   name: string;
   /**
@@ -781,7 +820,7 @@ export interface Users {
   response: {
     result: string;
     message: string;
-    data?: TautulliUser[];
+    data: null | TautulliUser[];
   };
 };
 
@@ -797,19 +836,43 @@ export interface TautulliUser {
   thumb: string;
   email: string;
   server_token: string;
-  shared_libraries?: string[];
+  shared_libraries: null | string[];
   filter_all: string;
   filter_movies: string;
   filter_tv: string;
   filter_music: string;
   filter_photos: string;
+  /**
+   * 1,0 (bool)
+   */
   is_active: number;
+  /**
+   * 1,0 (bool)
+   */
   is_admin: number;
+  /**
+   * 1,0 (bool)
+   */
   is_home_user: number;
+  /**
+   * 1,0 (bool)
+   */
   is_allow_sync: number;
+  /**
+   * 1,0 (bool)
+   */
   is_restricted: number;
+  /**
+   * 1,0 (bool)
+   */
   do_notify: number;
+  /**
+   * 1,0 (bool)
+   */
   keep_history: number;
+  /**
+   * 1,0 (bool)
+   */
   allow_guest: number;
 };
 
@@ -875,7 +938,7 @@ export interface Queue {
   sortKey: string;
   sortDirection: string;
   totalRecords: number;
-  records?: QueueRecord[];
+  records: null | (null | QueueRecord)[];
 };
 
 /**
@@ -886,7 +949,7 @@ export interface QueueRecord {
   downloadClientHasPostImportCategory: boolean;
   artistId: number;
   albumId: number;
-  quality?: Quality;
+  quality: null | Quality;
   size: number;
   title: string;
   sizeleft: number;
@@ -894,7 +957,7 @@ export interface QueueRecord {
   estimatedCompletionTime: Date;
   status: string;
   trackedDownloadStatus: string;
-  statusMessages?: StatusMessage[];
+  statusMessages: null | (null | StatusMessage)[];
   downloadId: string;
   protocol: string;
   downloadClient: string;
@@ -914,10 +977,13 @@ export interface QueueRecord {
 export interface Quality {
   name?: string;
   id?: number;
-  quality?: BaseQuality;
-  items?: Quality[];
+  quality?: null | BaseQuality;
+  items?: null | (null | Quality)[];
   allowed: boolean;
-  revision?: QualityRevision;
+  /**
+   * Not sure which app had this....
+   */
+  revision?: null | QualityRevision;
 };
 
 /**
@@ -948,7 +1014,7 @@ export interface QualityRevision {
  */
 export interface StatusMessage {
   title: string;
-  messages?: string[];
+  messages: null | string[];
 };
 
 /**
@@ -997,7 +1063,7 @@ export interface RadarrQueue {
   sortKey: string;
   sortDirection: string;
   totalRecords: number;
-  records?: RadarrQueueRecord[];
+  records: null | (null | RadarrQueueRecord)[];
 };
 
 /**
@@ -1007,9 +1073,9 @@ export interface RadarrQueue {
 export interface RadarrQueueRecord {
   downloadClientHasPostImportCategory: boolean;
   movieId: number;
-  languages?: Value[];
-  quality?: Quality;
-  customFormats?: CustomFormatOutput[];
+  languages: null | (null | Value)[];
+  quality: null | Quality;
+  customFormats: null | (null | CustomFormatOutput)[];
   size: number;
   title: string;
   sizeleft: number;
@@ -1018,7 +1084,7 @@ export interface RadarrQueueRecord {
   status: string;
   trackedDownloadStatus: string;
   trackedDownloadState: string;
-  statusMessages?: StatusMessage[];
+  statusMessages: null | (null | StatusMessage)[];
   downloadId: string;
   protocol: string;
   downloadClient: string;
@@ -1045,7 +1111,7 @@ export interface CustomFormatOutput {
   id: number;
   name: string;
   includeCustomFormatWhenRenaming: boolean;
-  specifications?: CustomFormatOutputSpec[];
+  specifications: null | (null | CustomFormatOutputSpec)[];
 };
 
 /**
@@ -1059,7 +1125,7 @@ export interface CustomFormatOutputSpec {
   infoLink: string;
   negate: boolean;
   required: boolean;
-  fields?: FieldOutput[];
+  fields: null | (null | FieldOutput)[];
 };
 
 /**
@@ -1078,7 +1144,7 @@ export interface FieldOutput {
   type?: string;
   privacy: string;
   value?: any;
-  selectOptions?: SelectOption[];
+  selectOptions?: null | (null | SelectOption)[];
 };
 
 /**
@@ -1141,7 +1207,7 @@ export interface ReadarrQueue {
   sortKey: string;
   sortDirection: string;
   totalRecords: number;
-  records?: ReadarrQueueRecord[];
+  records: null | (null | ReadarrQueueRecord)[];
 };
 
 /**
@@ -1152,7 +1218,7 @@ export interface ReadarrQueueRecord {
   downloadClientHasPostImportCategory: boolean;
   authorId: number;
   bookId: number;
-  quality?: Quality;
+  quality: null | Quality;
   size: number;
   title: string;
   sizeleft: number;
@@ -1161,7 +1227,7 @@ export interface ReadarrQueueRecord {
   status: string;
   trackedDownloadStatus?: string;
   trackedDownloadState?: string;
-  statusMessages?: StatusMessage[];
+  statusMessages?: null | (null | StatusMessage)[];
   downloadId?: string;
   protocol: string;
   downloadClient?: string;
@@ -1217,7 +1283,7 @@ export interface SonarrQueue {
   sortKey: string;
   sortDirection: string;
   totalRecords: number;
-  records?: SonarrQueueRecord[];
+  records: null | (null | SonarrQueueRecord)[];
 };
 
 /**
@@ -1229,8 +1295,8 @@ export interface SonarrQueueRecord {
   id: number;
   seriesId: number;
   episodeId: number;
-  language?: Value;
-  quality?: Quality;
+  language: null | Value;
+  quality: null | Quality;
   size: number;
   title: string;
   sizeleft: number;
@@ -1239,7 +1305,7 @@ export interface SonarrQueueRecord {
   status: string;
   trackedDownloadStatus: string;
   trackedDownloadState: string;
-  statusMessages?: StatusMessage[];
+  statusMessages: null | (null | StatusMessage)[];
   downloadId: string;
   protocol: string;
   downloadClient: string;
@@ -1294,7 +1360,7 @@ export interface ProwlarrSystemStatus {
 export interface Profile {
   username: string;
   config: Config;
-  clientInfo?: ClientInfo;
+  clientInfo: null | ClientInfo;
   isWindows: boolean;
   isLinux: boolean;
   isDarwin: boolean;
@@ -1302,36 +1368,36 @@ export interface Profile {
   isUnstable: boolean;
   isFreeBsd: boolean;
   isSynology: boolean;
-  headers?: Record<string, null | string[]>;
+  headers: null | Record<string, null | string[]>;
   fortune: string;
   upstreamIp: string;
   upstreamAllowed: boolean;
   upstreamHeader: string;
   upstreamType: AuthType;
-  languages?: Record<string, null | Record<string, LocalizedLanguage>>;
-  triggers?: TriggerInfo[];
-  timers?: TriggerInfo[];
-  schedules?: TriggerInfo[];
-  siteCrons?: Timer[];
-  plexInfo?: PMSInfo;
+  languages: null | Record<string, null | Record<string, LocalizedLanguage>>;
+  triggers: null | TriggerInfo[];
+  timers: null | TriggerInfo[];
+  schedules: null | TriggerInfo[];
+  siteCrons: null | (null | Timer)[];
+  plexInfo: null | PMSInfo;
   plexAge: Date;
   /**
    * LoggedIn is only used by the front end. Backend does not set or use it.
    */
   loggedIn: boolean;
   updated: Date;
-  flags?: Flags;
+  flags: null | Flags;
   dynamic: boolean;
   webauth: boolean;
   msg?: string;
-  logFileInfo?: LogFileInfos;
-  configFileInfo?: LogFileInfos;
+  logFileInfo: null | LogFileInfos;
+  configFileInfo: null | LogFileInfos;
   expvar: AllData;
-  hostInfo?: InfoStat;
-  disks?: Record<string, null | Partition>;
+  hostInfo: null | InfoStat;
+  disks: null | Record<string, null | Partition>;
   proxyAllow: boolean;
   started: Date;
-  cmdList?: CmdconfigConfig[];
+  cmdList: null | (null | CmdconfigConfig)[];
   program: string;
   version: string;
   revision: string;
@@ -1342,7 +1408,7 @@ export interface Profile {
   os: string;
   arch: string;
   binary: string;
-  environment?: Record<string, string>;
+  environment: null | Record<string, string>;
   docker: boolean;
   uid: number;
   gid: number;
@@ -1352,7 +1418,7 @@ export interface Profile {
   netmask: string;
   md5: string;
   activeTunnel: string;
-  tunnelPoolStats?: Record<string, null | PoolSize>;
+  tunnelPoolStats: null | Record<string, null | PoolSize>;
   apiKeyValid: boolean;
   apiKeyError?: string;
 };
@@ -1368,18 +1434,18 @@ export interface Config extends LogConfig, AppsConfig {
   noCompress: boolean;
   sslCertFile: string;
   sslKeyFile: string;
-  upstreams?: string[];
+  upstreams: null | string[];
   autoUpdate: string;
   unstableCh: boolean;
   timeout: string;
   retries: number;
   snapshot: SnapshotConfig;
   services: ServicesConfig;
-  service?: ServiceConfig[];
+  service: null | ServiceConfig[];
   apt: boolean;
-  watchFiles?: WatchFile[];
-  endpoints?: Endpoint[];
-  commands?: Command[];
+  watchFiles: null | (null | WatchFile)[];
+  endpoints: null | (null | Endpoint)[];
+  commands: null | (null | Command)[];
   version: number;
 };
 
@@ -1388,19 +1454,61 @@ export interface Config extends LogConfig, AppsConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Config>
  */
 export interface SnapshotConfig extends Plugins {
+  /**
+   * total run time allowed.
+   */
   timeout: string;
+  /**
+   * how often to send snaps (cron).
+   */
   interval: string;
-  zfsPools?: string[];
+  /**
+   * zfs pools to monitor.
+   */
+  zfsPools: null | string[];
+  /**
+   * use sudo for smartctl commands.
+   */
   useSudo: boolean;
+  /**
+   * include mdstat and/or megaraid.
+   */
   monitorRaid: boolean;
+  /**
+   * smartctl commands.
+   */
   monitorDrives: boolean;
+  /**
+   * get disk usage.
+   */
   monitorSpace: boolean;
+  /**
+   * usage for all drives?
+   */
   allDrives: boolean;
+  /**
+   * usage for user quotas?
+   */
   quotas: boolean;
+  /**
+   * number of processes to include from ioTop
+   */
   ioTop: number;
+  /**
+   * number of processes to include from top (cpu usage)
+   */
   psTop: number;
+  /**
+   * number of processes to include from mysql servers.
+   */
   myTop: number;
+  /**
+   * get ipmi sensor info.
+   */
   ipmi: boolean;
+  /**
+   * use sudo to get ipmi sensor info.
+   */
   ipmiSudo: boolean;
 };
 
@@ -1409,8 +1517,8 @@ export interface SnapshotConfig extends Plugins {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/snapshot.Plugins>
  */
 export interface Plugins {
-  nvidia?: NvidiaConfig;
-  mysql?: MySQLConfig[];
+  nvidia: NvidiaConfig;
+  mysql: null | MySQLConfig[];
 };
 
 /**
@@ -1419,7 +1527,7 @@ export interface Plugins {
  */
 export interface NvidiaConfig {
   smiPath: string;
-  busIDs?: string[];
+  busIDs: null | string[];
   disabled: boolean;
 };
 
@@ -1453,13 +1561,34 @@ export interface ServicesConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.ServiceConfig>
  */
 export interface ServiceConfig {
+  /**
+   * Radarr
+   */
   name: string;
+  /**
+   * http
+   */
   type: string;
+  /**
+   * http://some.url
+   */
   value: string;
+  /**
+   * 200
+   */
   expect: string;
+  /**
+   * 10s
+   */
   timeout: string;
+  /**
+   * 1m
+   */
   interval: string;
-  tags?: Record<string, null | any>;
+  /**
+   * copied to Metadata.
+   */
+  tags: null | Record<string, null | any>;
 };
 
 /**
@@ -1483,14 +1612,20 @@ export interface WatchFile {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig.Endpoint>
  */
 export interface Endpoint extends CronJob {
-  query?: Record<string, null | string[]>;
-  header?: Record<string, null | string[]>;
+  query: null | Record<string, null | string[]>;
+  header: null | Record<string, null | string[]>;
   template: string;
   name: string;
   url: string;
   method: string;
   body: string;
+  /**
+   * redirects
+   */
   follow: boolean;
+  /**
+   * https only
+   */
   validSsl: boolean;
   timeout: string;
 };
@@ -1519,19 +1654,19 @@ export interface CronJob {
    * AtTimes is a list of 'hours, minutes, seconds' to schedule for Daily/Weekly/Monthly frequencies.
    * Also used in Minutely and Hourly schedules, a bit awkwardly.
    */
-  atTimes?: number[][];
+  atTimes: null | number[][];
   /**
    * DaysOfWeek is a list of days to schedule. 0-6. 0 = Sunday.
    */
-  daysOfWeek?: Weekday[];
+  daysOfWeek: null | Weekday[];
   /**
    * DaysOfMonth is a list of days to schedule. 1 to 31 or -31 to -1 to count backward.
    */
-  daysOfMonth?: number[];
+  daysOfMonth: null | number[];
   /**
    * Months to schedule. 1 to 12. 1 = January.
    */
-  months?: number[];
+  months: null | number[];
 };
 
 /**
@@ -1556,7 +1691,7 @@ export interface CmdconfigConfig {
    * Args and ArgValues are not config items. They are calculated on startup.
    */
   args: number;
-  argValues?: string[];
+  argValues: null | string[];
 };
 
 /**
@@ -1570,7 +1705,7 @@ export interface LogConfig {
   httpLog: string;
   logFiles: number;
   logFileMb: number;
-  fileMode: number;
+  fileMode: string;
   debug: boolean;
   trace: boolean;
   quiet: boolean;
@@ -1582,17 +1717,17 @@ export interface LogConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.AppsConfig>
  */
 export interface AppsConfig extends BaseConfig {
-  sonarr?: StarrConfig[];
-  radarr?: StarrConfig[];
-  lidarr?: StarrConfig[];
-  readarr?: StarrConfig[];
-  prowlarr?: StarrConfig[];
-  deluge?: DelugeConfig[];
-  qbit?: QbitConfig[];
-  rtorrent?: RtorrentConfig[];
-  sabnzbd?: SabNZBConfig[];
-  nzbget?: NZBGetConfig[];
-  transmission?: XmissionConfig[];
+  sonarr?: null | StarrConfig[];
+  radarr?: null | StarrConfig[];
+  lidarr?: null | StarrConfig[];
+  readarr?: null | StarrConfig[];
+  prowlarr?: null | StarrConfig[];
+  deluge?: null | DelugeConfig[];
+  qbit?: null | QbitConfig[];
+  rtorrent?: null | RtorrentConfig[];
+  sabnzbd?: null | SabNZBConfig[];
+  nzbget?: null | NZBGetConfig[];
+  transmission?: null | XmissionConfig[];
   tautulli: TautulliConfig;
   plex: PlexConfig;
 };
@@ -1602,7 +1737,7 @@ export interface AppsConfig extends BaseConfig {
  */
 export interface BaseConfig {
   apiKey: string;
-  extraKeys?: string[];
+  extraKeys: null | string[];
   urlbase: string;
   maxBody: number;
   serial: boolean;
@@ -1767,8 +1902,8 @@ export interface ClientInfo {
     dateFormat: PHPDate;
     stopLogs: boolean;
     tunnelUrl: string;
-    tunnels?: string[];
-    mulery?: MuleryServer[];
+    tunnels: null | string[];
+    mulery: null | (null | MuleryServer)[];
   };
   actions: Actions;
   integrityCheck: boolean;
@@ -1788,8 +1923,17 @@ export interface PHPDate {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.MuleryServer>
  */
 export interface MuleryServer {
+  /**
+   * ex: "https://africa.notifiarr.com/"
+   */
   tunnel: string;
+  /**
+   * ex: "wss://africa.notifiarr.com/register"
+   */
   socket: string;
+  /**
+   * ex: "Nairobi, Kenya, Africa"
+   */
   location: string;
 };
 
@@ -1797,13 +1941,37 @@ export interface MuleryServer {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.Actions>
  */
 export interface Actions {
+  /**
+   * Site Config for Plex.
+   */
   plex: WebsiteConfig;
+  /**
+   * Site Config for Starr.
+   */
   apps: AllAppConfigs;
+  /**
+   * Site Config for Dashboard.
+   */
   dashboard: DashConfig;
+  /**
+   * Site Config for TRaSH Sync.
+   */
   sync: SyncConfig;
+  /**
+   * Site Config for MDB List.
+   */
   mdblist: MdbListConfig;
+  /**
+   * Site Config for Radarr Gaps.
+   */
   gaps: GapsConfig;
-  custom?: CronConfig[];
+  /**
+   * Site config for Custom Crons.
+   */
+  custom: null | (null | CronConfig)[];
+  /**
+   * Site Config for System Snapshot.
+   */
   snapshot: SnapshotConfig;
 };
 
@@ -1827,11 +1995,11 @@ export interface WebsiteConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.AllAppConfigs>
  */
 export interface AllAppConfigs {
-  lidarr?: AppConfig[];
-  prowlarr?: AppConfig[];
-  radarr?: AppConfig[];
-  readarr?: AppConfig[];
-  sonarr?: AppConfig[];
+  lidarr: null | (null | AppConfig)[];
+  prowlarr: null | (null | AppConfig)[];
+  radarr: null | (null | AppConfig)[];
+  readarr: null | (null | AppConfig)[];
+  sonarr: null | (null | AppConfig)[];
 };
 
 /**
@@ -1853,6 +2021,9 @@ export interface AppConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.DashConfig>
  */
 export interface DashConfig {
+  /**
+   * how often to fire.
+   */
   interval: string;
   deluge: boolean;
   lidarr: boolean;
@@ -1872,13 +2043,34 @@ export interface DashConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.SyncConfig>
  */
 export interface SyncConfig {
+  /**
+   * how often to fire.
+   */
   interval: string;
-  lidarrInstances?: number[];
-  radarrInstances?: number[];
-  sonarrInstances?: number[];
-  lidarrSync?: string[];
-  sonarrSync?: string[];
-  radarrSync?: string[];
+  /**
+   * which instance IDs we sync
+   */
+  lidarrInstances: null | number[];
+  /**
+   * which instance IDs we sync
+   */
+  radarrInstances: null | number[];
+  /**
+   * which instance IDs we sync
+   */
+  sonarrInstances: null | number[];
+  /**
+   * items in sync.
+   */
+  lidarrSync: null | string[];
+  /**
+   * items in sync.
+   */
+  sonarrSync: null | string[];
+  /**
+   * items in sync.
+   */
+  radarrSync: null | string[];
 };
 
 /**
@@ -1886,9 +2078,18 @@ export interface SyncConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.MdbListConfig>
  */
 export interface MdbListConfig {
+  /**
+   * how often to fire.
+   */
   interval: string;
-  radarr?: number[];
-  sonarr?: number[];
+  /**
+   * which instance IDs we sync
+   */
+  radarr: null | number[];
+  /**
+   * which instance IDs we sync
+   */
+  sonarr: null | number[];
 };
 
 /**
@@ -1896,7 +2097,7 @@ export interface MdbListConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.GapsConfig>
  */
 export interface GapsConfig {
-  instances?: number[];
+  instances: null | number[];
   interval: string;
 };
 
@@ -1906,8 +2107,17 @@ export interface GapsConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/website/clientinfo.CronConfig>
  */
 export interface CronConfig {
+  /**
+   * name of action.
+   */
   name: string;
+  /**
+   * how often to GET this URI.
+   */
   interval: string;
+  /**
+   * endpoint for the URI.
+   */
   endpoint: string;
   description: string;
 };
@@ -1942,7 +2152,7 @@ export interface TriggerInfo {
   name: string;
   key: string;
   interval?: number;
-  cron?: CronJob;
+  cron?: null | CronJob;
   runs: number;
   kind: string;
 };
@@ -1969,9 +2179,9 @@ export interface Flags {
   reset: boolean;
   curl: string;
   configFile: string;
-  extraConf?: string[];
+  extraConf: null | string[];
   envPrefix: string;
-  headers?: string[];
+  headers: null | string[];
 };
 
 /**
@@ -1979,9 +2189,9 @@ export interface Flags {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/logs.LogFileInfos>
  */
 export interface LogFileInfos {
-  dirs?: string[];
+  dirs: null | string[];
   size: number;
-  list?: LogFileInfo[];
+  list: null | (null | LogFileInfo)[];
 };
 
 /**
@@ -2003,15 +2213,15 @@ export interface LogFileInfo {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/mnd.AllData>
  */
 export interface AllData {
-  logFiles?: Record<string, null | any>;
-  apiHits?: Record<string, null | any>;
-  httpRequests?: Record<string, null | any>;
-  timerEvents?: Record<string, null | Record<string, null | any>>;
-  timerCounts?: Record<string, null | any>;
-  website?: Record<string, null | any>;
-  serviceChecks?: Record<string, null | Record<string, null | any>>;
-  apps?: Record<string, null | Record<string, null | any>>;
-  fileWatcher?: Record<string, null | any>;
+  logFiles: null | Record<string, null | any>;
+  apiHits: null | Record<string, null | any>;
+  httpRequests: null | Record<string, null | any>;
+  timerEvents: null | Record<string, null | Record<string, null | any>>;
+  timerCounts: null | Record<string, null | any>;
+  website: null | Record<string, null | any>;
+  serviceChecks: null | Record<string, null | Record<string, null | any>>;
+  apps: null | Record<string, null | Record<string, null | any>>;
+  fileWatcher: null | Record<string, null | any>;
 };
 
 /**
@@ -2034,7 +2244,7 @@ export interface PoolSize {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.ServicesConfig>
  */
 export interface ClientServicesConfig {
-  results?: CheckResult[];
+  results: null | (null | CheckResult)[];
   running: boolean;
   disabled: boolean;
 };
@@ -2044,20 +2254,39 @@ export interface ClientServicesConfig {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.CheckResult>
  */
 export interface CheckResult {
+  /**
+   * "Radarr"
+   */
   name: string;
+  /**
+   * 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
+   */
   state: number;
-  output?: Output;
+  /**
+   * metadata message must never be nil.
+   */
+  output: any;
+  /**
+   * http, tcp, ping
+   */
   type: string;
+  /**
+   * when it was checked, rounded to Microseconds
+   */
   time: Date;
+  /**
+   * how long it has been in this state, rounded to Microseconds
+   */
   since: Date;
+  /**
+   * interval in seconds
+   */
   interval: number;
-  metadata?: Record<string, null | any>;
+  /**
+   * arbitrary info about the service or result.
+   */
+  metadata: null | Record<string, null | any>;
 };
-
-/**
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.Output>
- */
-export interface Output {};
 
 /**
  * ProfilePost is the data sent to the profile POST endpoint when updating the trust profile.
@@ -2083,14 +2312,14 @@ export interface Stats {
   last: string;
   lastCmd: string;
   lastTime: Date;
-  lastArgs?: string[];
+  lastArgs: null | string[];
 };
 
 /**
- * ApiResponse is a standard response to our caller. JSON encoded blobs.
- * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.ApiResponse>
+ * APIResponse is a standard response to our caller. JSON encoded blobs.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/apps.APIResponse>
  */
-export interface ApiResponse {
+export interface APIResponse {
   /**
    * The status always matches the HTTP response.
    */
@@ -2107,19 +2336,19 @@ export interface ApiResponse {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/checkapp.CheckAllOutput>
  */
 export interface CheckAllOutput {
-  Sonarr?: TestResult[];
-  Radarr?: TestResult[];
-  Readarr?: TestResult[];
-  Lidarr?: TestResult[];
-  Prowlarr?: TestResult[];
-  Plex?: TestResult[];
-  Tautulli?: TestResult[];
-  NZBGet?: TestResult[];
-  Deluge?: TestResult[];
-  Qbittorrent?: TestResult[];
-  Rtorrent?: TestResult[];
-  Transmission?: TestResult[];
-  SabNZB?: TestResult[];
+  Sonarr: null | TestResult[];
+  Radarr: null | TestResult[];
+  Readarr: null | TestResult[];
+  Lidarr: null | TestResult[];
+  Prowlarr: null | TestResult[];
+  Plex: null | TestResult[];
+  Tautulli: null | TestResult[];
+  NZBGet: null | TestResult[];
+  Deluge: null | TestResult[];
+  Qbittorrent: null | TestResult[];
+  Rtorrent: null | TestResult[];
+  Transmission: null | TestResult[];
+  SabNZB: null | TestResult[];
   timeMS: number;
   elapsed: number;
   workers: number;
@@ -2141,48 +2370,65 @@ export interface TestResult {
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.BrowseDir>
  */
 export interface BrowseDir {
+  /**
+   * Filepath separator.
+   */
   sep: string;
+  /**
+   * Current directory path.
+   */
   path: string;
+  /**
+   * Parent directory path.
+   */
   mom: string;
-  dirs?: string[];
-  files?: string[];
+  /**
+   * Directories in the current directory.
+   */
+  dirs: null | string[];
+  /**
+   * Files in the current directory.
+   */
+  files: null | string[];
+  /**
+   * Error message.
+   */
   error: string;
 };
 
 // Packages parsed:
-//   1. database/sql
-//   2. github.com/Notifiarr/notifiarr/frontend
-//   3. github.com/Notifiarr/notifiarr/pkg/apps
-//   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
-//   5. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
-//   6. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
-//   7. github.com/Notifiarr/notifiarr/pkg/checkapp
-//   8. github.com/Notifiarr/notifiarr/pkg/client
-//   9. github.com/Notifiarr/notifiarr/pkg/configfile
-//  10. github.com/Notifiarr/notifiarr/pkg/logs
-//  11. github.com/Notifiarr/notifiarr/pkg/mnd
-//  12. github.com/Notifiarr/notifiarr/pkg/services
-//  13. github.com/Notifiarr/notifiarr/pkg/snapshot
-//  14. github.com/Notifiarr/notifiarr/pkg/triggers/commands
-//  15. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
-//  16. github.com/Notifiarr/notifiarr/pkg/triggers/common
-//  17. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
-//  18. github.com/Notifiarr/notifiarr/pkg/triggers/crontimer
-//  19. github.com/Notifiarr/notifiarr/pkg/triggers/dashboard
-//  20. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
-//  21. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
-//  22. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
-//  23. github.com/shirou/gopsutil/v4/cpu
-//  24. github.com/shirou/gopsutil/v4/disk
-//  25. github.com/shirou/gopsutil/v4/host
-//  26. github.com/shirou/gopsutil/v4/load
-//  27. golift.io/deluge
-//  28. golift.io/mulery/client
-//  29. golift.io/nzbget
-//  30. golift.io/qbit
-//  31. golift.io/starr
-//  32. golift.io/starr/lidarr
-//  33. golift.io/starr/prowlarr
-//  34. golift.io/starr/radarr
-//  35. golift.io/starr/readarr
-//  36. golift.io/starr/sonarr
+//   1. github.com/Notifiarr/notifiarr/frontend
+//   2. github.com/Notifiarr/notifiarr/pkg/apps
+//   3. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex
+//   4. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/sabnzbd
+//   5. github.com/Notifiarr/notifiarr/pkg/apps/apppkg/tautulli
+//   6. github.com/Notifiarr/notifiarr/pkg/checkapp
+//   7. github.com/Notifiarr/notifiarr/pkg/client
+//   8. github.com/Notifiarr/notifiarr/pkg/configfile
+//   9. github.com/Notifiarr/notifiarr/pkg/logs
+//  10. github.com/Notifiarr/notifiarr/pkg/mnd
+//  11. github.com/Notifiarr/notifiarr/pkg/services
+//  12. github.com/Notifiarr/notifiarr/pkg/snapshot
+//  13. github.com/Notifiarr/notifiarr/pkg/triggers/commands
+//  14. github.com/Notifiarr/notifiarr/pkg/triggers/commands/cmdconfig
+//  15. github.com/Notifiarr/notifiarr/pkg/triggers/common
+//  16. github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler
+//  17. github.com/Notifiarr/notifiarr/pkg/triggers/crontimer
+//  18. github.com/Notifiarr/notifiarr/pkg/triggers/dashboard
+//  19. github.com/Notifiarr/notifiarr/pkg/triggers/endpoints/epconfig
+//  20. github.com/Notifiarr/notifiarr/pkg/triggers/filewatch
+//  21. github.com/Notifiarr/notifiarr/pkg/website/clientinfo
+//  22. github.com/shirou/gopsutil/v4/cpu
+//  23. github.com/shirou/gopsutil/v4/disk
+//  24. github.com/shirou/gopsutil/v4/host
+//  25. github.com/shirou/gopsutil/v4/load
+//  26. golift.io/deluge
+//  27. golift.io/mulery/client
+//  28. golift.io/nzbget
+//  29. golift.io/qbit
+//  30. golift.io/starr
+//  31. golift.io/starr/lidarr
+//  32. golift.io/starr/prowlarr
+//  33. golift.io/starr/radarr
+//  34. golift.io/starr/readarr
+//  35. golift.io/starr/sonarr

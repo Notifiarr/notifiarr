@@ -13,7 +13,8 @@
   import { slide } from 'svelte/transition'
   import Nodal from '../../includes/Nodal.svelte'
 
-  let { file, list = $bindable() }: { file: LogFileInfo; list: LogFileInfo[] } = $props()
+  let { file, list = $bindable() }: { file: LogFileInfo; list: (LogFileInfo | null)[] } =
+    $props()
 
   let showTooltip = $state(false)
   let showDelModal = $state(false)
@@ -24,7 +25,7 @@
     const resp = await getUi(`deleteFile/logs/${file.id}`, false)
     if (resp.ok) {
       success($_('LogFiles.deleteSuccess', { values: { file: file.path } }))
-      list = list.filter(f => f.id !== file.id)
+      list = list.filter(f => f?.id !== file.id)
     } else {
       warning($_('LogFiles.deleteError', { values: { error: resp.body } }))
     }

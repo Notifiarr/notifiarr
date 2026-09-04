@@ -20,11 +20,11 @@ const reloadClient = async () => {
 export const option = (info: TriggerInfo): string => {
   if (info.key == 'TrigCustomCommand')
     // This one requires a hash of the command.
-    return get(profile).config.commands?.find(c => c.name == info.name)?.hash || 'rip'
+    return get(profile).config.commands?.find(c => c?.name == info.name)?.hash || 'rip'
 
   if (info.key == 'TrigCustomCronTimer')
     // This one requires the index of the cron.
-    return `${get(profile).siteCrons?.findIndex(cron => info.name.endsWith(`'${cron.name}'`))}`
+    return `${get(profile).siteCrons?.findIndex(cron => info.name.endsWith(`'${cron?.name}'`))}`
 
   if (info.key == 'TrigEndpointURL')
     // This one requires the name of the endpoint.

@@ -7,7 +7,7 @@
   import T, { _ } from '../../includes/Translate.svelte'
   import Header from '../../includes/Header.svelte'
   import { profile } from '../../api/profile.svelte'
-  import { formatBytes, since } from '../../includes/util'
+  import { formatBytes, since, present } from '../../includes/util'
   import FileInfo from './FileInfo.svelte'
   import type { LogFileInfo } from '../../api/notifiarrConfig'
   import Fa from '../../includes/Fa.svelte'
@@ -33,7 +33,7 @@
 
   $effect(() => {
     // This deactivates a file that gets deleted.
-    if (!$profile.logFileInfo?.list?.find(f => f.id == activeFile?.id)) {
+    if (!$profile.logFileInfo?.list?.find(f => f?.id == activeFile?.id)) {
       activeFile = null
     }
   })
@@ -74,7 +74,7 @@
           </thead>
 
           <tbody>
-            {#each $profile.logFileInfo?.list ?? [] as file}
+            {#each present($profile.logFileInfo?.list) as file}
               {@const isActive = activeFile?.id === file.id || activeTail?.id === file.id}
               {@const vals = { values: { fileName: file.name } }}
               <tr

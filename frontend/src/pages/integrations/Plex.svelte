@@ -2,7 +2,7 @@
   import { profile } from '../../api/profile.svelte'
   import type { PMSInfo, Sessions } from '../../api/notifiarrConfig'
   import { Card, Table, CardHeader } from '@sveltestrap/sveltestrap'
-  import { age } from '../../includes/util'
+  import { age, present } from '../../includes/util'
   import Modal from './Modal.svelte'
   import { color, getLogo } from './data'
   import T, { _ } from '../../includes/Translate.svelte'
@@ -147,7 +147,7 @@
         </tr>
       </thead>
       <tbody class="table-body">
-        {#each sessions?.sessions ?? [] as session}
+        {#each present(sessions?.sessions) as session}
           <tr>
             <td title="uid: {session.User.id}" style="border-right: none;">
               <img
@@ -176,9 +176,9 @@
             </td>
 
             <td>
-              {#each session.Media ?? [] as media, idx}
+              {#each present(session.Media) as media, idx}
                 {media.container}({media.videoCodec} @ {media.videoResolution} / {media.videoFrameRate},
-                {media.audioCodec} * {media.audioChannels}){#if idx < session.Media!.length - 1};{/if}
+                {media.audioCodec} * {media.audioChannels}){#if idx < present(session.Media).length - 1};{/if}
               {/each}
             </td>
             <td>
