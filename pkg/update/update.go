@@ -19,7 +19,6 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -27,9 +26,10 @@ import (
 )
 
 const (
-	downloadTimeout  = 5 * time.Minute
-	backupTimeFormat = "060102T150405"
-	dotExe           = ".exe"
+	downloadTimeout   = 5 * time.Minute
+	backupTimeFormat  = "060102T150405"
+	dotExe            = ".exe"
+	parentWaitTimeout = 75 * time.Second
 )
 
 // Command is the input data to perform an in-place update.
@@ -66,40 +66,10 @@ func Restart(ctx context.Context, cmd *Command, waitForPid int) error {
 	return nil
 }
 
-func waitForPidToExit(pid int) {
-	const (
-		sleepTime = 500 * time.Millisecond
-		loopCount = 150 // 75 seconds
-	)
-
-	for range loopCount {
-		if !isPidRunning(pid) {
-			break
-		}
-
-		time.Sleep(sleepTime)
-	}
-}
-
-func isPidRunning(pid int) bool {
-	process, err := os.FindProcess(pid)
-	if err != nil {
-		return false
-	}
-
-	_ = process.Release()
-
-	if mnd.IsWindows {
-		return true
-	}
-
-	return process.Signal(syscall.Signal(0)) == nil
-}
-
 // Now downloads the new file to a temp name in the same folder as the running file.
 // Moves the running file to a backup name in the same folder.
 // Moves the new file to the same location that the running file was at.
-// Triggers another invocation of the app that sleeps 5 seconds then restarts.
+// Triggers another invocation of the app that waits for this process to exit, then restarts.
 // The running app must exit after this returns!
 // The restart command can trigger the above Restart() procedure.
 // And that procedure relaunches the app; this allows "in-place" upgrades.
