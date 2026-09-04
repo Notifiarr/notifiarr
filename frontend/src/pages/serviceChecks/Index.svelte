@@ -11,7 +11,7 @@
   import { FormListTracker } from '../../includes/formsTracker.svelte'
   import { profile } from '../../api/profile.svelte'
   import { nav } from '../../navigation/nav.svelte'
-  import type { ServiceConfig } from '../../api/notifiarrConfig'
+  import { CheckType, type ServiceConfig } from '../../api/notifiarrConfig'
   import { get } from 'svelte/store'
   import type { App } from '../../includes/formsTracker.svelte'
   import { type IconSource } from '../../includes/Fa.svelte'
@@ -52,13 +52,13 @@
         }
       })
       return val ? found : get(_)('phrases.NameMustNotBeEmpty')
-    } else if (c?.[idx]?.type === 'http') {
+    } else if (c?.[idx]?.type === CheckType.http) {
       return httpValidator(id, val)
-    } else if (c?.[idx]?.type === 'process') {
+    } else if (c?.[idx]?.type === CheckType.process) {
       return processValidator(id, val)
-    } else if (['ping', 'icmp'].includes(c?.[idx]?.type)) {
+    } else if (c?.[idx]?.type === CheckType.ping || c?.[idx]?.type === CheckType.icmp) {
       return pingValidator(id, val)
-    } else if (c?.[idx]?.type === 'tcp') {
+    } else if (c?.[idx]?.type === CheckType.tcp) {
       return tcpValidator(id, val)
     } else {
       return ''
@@ -85,12 +85,12 @@
   })
 
   // Shown next to the check name in each accordion header.
-  const icons: Record<string, IconSource> = {
-    http: Globe,
-    process: Cpu,
-    ping: PingPong,
-    icmp: PingPong,
-    tcp: PlugsConnected,
+  const icons: Record<CheckType, IconSource> = {
+    [CheckType.http]: Globe,
+    [CheckType.process]: Cpu,
+    [CheckType.ping]: PingPong,
+    [CheckType.icmp]: PingPong,
+    [CheckType.tcp]: PlugsConnected,
   }
 </script>
 
@@ -118,9 +118,10 @@
   <!-- Services Section -->
   <Instances {flt} Child={Check} deleteButton={app.id + '.DeleteCheck'}>
     {#snippet headerActive(index)}
+      {@const type = flt.original?.[index]?.type}
       <Fa
-        flip={flt.original?.[index]?.type === 'icmp'}
-        i={icons[flt.original?.[index]?.type]}
+        flip={type === CheckType.icmp}
+        i={type && icons[type]}
         c1="#0E6655"
         c2="#0B5345"
         d1="#9FE2BF"
