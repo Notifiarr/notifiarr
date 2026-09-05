@@ -1,10 +1,10 @@
 # Contributing to Notifiarr
 
-Notifiarr is a Go 1.27.0 and Svelte client for Notifiarr.com. Contributions should fit the existing client, integrations, service checks, web UI, and platform packaging structure.
+Notifiarr is a Go and Svelte client for Notifiarr.com. Contributions should fit the existing client, integrations, service checks, web UI, and platform packaging structure.
 
 ## Development setup
 
-1. Install Go 1.27.0, as required by `go.mod`.
+1. Install the latest Go, as required by `go.mod`.
 2. Install the frontend tools required by `frontend/package.json` and ensure `npm` is available. `make generate` runs `npm install` and `npm run build` through `frontend/generate.sh`.
 3. Run `make generate` from the repository root before building or testing generated API and frontend output.
 
