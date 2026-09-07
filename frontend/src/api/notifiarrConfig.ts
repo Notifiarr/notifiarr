@@ -42,6 +42,29 @@ export enum Frequency {
 };
 
 /**
+ * CheckType locks us into a few specific types of checks.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.CheckType>
+ */
+export enum CheckType {
+  http    = "http",
+  tcp     = "tcp",
+  ping    = "ping",
+  icmp    = "icmp",
+  process = "process",
+};
+
+/**
+ * CheckState represents the current state of a service check.
+ * @see golang: <github.com/Notifiarr/notifiarr/pkg/services.CheckState>
+ */
+export enum CheckState {
+  OK       = 0,
+  Warning  = 1,
+  Critical = 2,
+  Unknown  = 3,
+};
+
+/**
  * Integrations is the data returned by the UI integrations endpoint.
  * @see golang: <github.com/Notifiarr/notifiarr/pkg/client.Integrations>
  */
@@ -341,11 +364,11 @@ export interface MySQLProcess {
   id: number;
   user: string;
   host: string;
-  db: any;
+  db: string;
   command: string;
   time: number;
   state: string;
-  info: any;
+  info: string;
   /**
    * mariadb
    */
@@ -1568,7 +1591,7 @@ export interface ServiceConfig {
   /**
    * http
    */
-  type: string;
+  type: CheckType;
   /**
    * http://some.url
    */
@@ -2261,15 +2284,15 @@ export interface CheckResult {
   /**
    * 0 = OK, 1 = Warn, 2 = Crit, 3 = Unknown
    */
-  state: number;
+  state: CheckState;
   /**
    * metadata message must never be nil.
    */
-  output: any;
+  output?: string;
   /**
    * http, tcp, ping
    */
-  type: string;
+  type: CheckType;
   /**
    * when it was checked, rounded to Microseconds
    */

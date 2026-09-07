@@ -2,7 +2,7 @@ import { getUi } from '../../api/fetch'
 import { delay, success, warning } from '../../includes/util'
 import { get } from 'svelte/store'
 import { _ } from 'svelte-i18n'
-import type { ClientServicesConfig as ServicesConfig } from '../../api/notifiarrConfig'
+import { CheckState, type ClientServicesConfig as ServicesConfig } from '../../api/notifiarrConfig'
 
 export const page = { id: 'Monitoring' }
 
@@ -11,17 +11,17 @@ class Mon {
   public checking = $state<Record<string, boolean>>({})
   public config = $state<ServicesConfig>({ results: [], running: true, disabled: false })
 
-  public states: Record<number, string> = {
-    0: 'OK',
-    1: 'Warning',
-    2: 'Critical',
-    3: 'Unknown',
+  public states: Record<CheckState, string> = {
+    [CheckState.OK]: 'OK',
+    [CheckState.Warning]: 'Warning',
+    [CheckState.Critical]: 'Critical',
+    [CheckState.Unknown]: 'Unknown',
   }
-  public colors: Record<number, string> = {
-    0: 'success',
-    1: 'warning',
-    2: 'danger',
-    3: 'info',
+  public colors: Record<CheckState, string> = {
+    [CheckState.OK]: 'success',
+    [CheckState.Warning]: 'warning',
+    [CheckState.Critical]: 'danger',
+    [CheckState.Unknown]: 'info',
   }
 
   public updateBackend = async (e: Event) => {

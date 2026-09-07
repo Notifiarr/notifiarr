@@ -15,6 +15,8 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/checkapp"
 	"github.com/Notifiarr/notifiarr/pkg/client"
 	"github.com/Notifiarr/notifiarr/pkg/configfile"
+	"github.com/Notifiarr/notifiarr/pkg/services"
+	"github.com/Notifiarr/notifiarr/pkg/snapshot"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/commands"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common/scheduler"
 	"golift.io/cnfg"
@@ -41,8 +43,12 @@ func main() {
 		},
 		Docs: docs,
 		Overrides: goty.Overrides{
-			cnfg.Duration{}:                 {Type: "string"},
-			reflect.TypeFor[time.Weekday](): {Comment: "The day of the week."},
+			cnfg.Duration{}: {Type: "string"},
+			// JSON is always a quoted string, including the sentinel "NULL".
+			snapshot.NullString{}: {Type: "string"},
+			// JSON is the check output string; fields are *Output so override the pointer.
+			reflect.TypeFor[*services.Output](): {Type: "string", Optional: true},
+			reflect.TypeFor[time.Weekday]():     {Comment: "The day of the week."},
 		},
 	})
 
@@ -70,6 +76,19 @@ func main() {
 		{Name: "Daily", Value: scheduler.Daily},
 		{Name: "Weekly", Value: scheduler.Weekly},
 		{Name: "Monthly", Value: scheduler.Monthly},
+	})
+	goat.Enums([]goty.Enum{
+		{Name: "http", Value: services.CheckHTTP},
+		{Name: "tcp", Value: services.CheckTCP},
+		{Name: "ping", Value: services.CheckPING},
+		{Name: "icmp", Value: services.CheckICMP},
+		{Name: "process", Value: services.CheckPROC},
+	})
+	goat.Enums([]goty.Enum{
+		{Name: "OK", Value: services.StateOK},
+		{Name: "Warning", Value: services.StateWarning},
+		{Name: "Critical", Value: services.StateCritical},
+		{Name: "Unknown", Value: services.StateUnknown},
 	})
 	log.Println("==> parsing config structs")
 	goat.Parse(
