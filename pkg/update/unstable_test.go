@@ -45,10 +45,10 @@ func TestGetUnstableDecodesJSON(t *testing.T) {
 func TestGetUnstableNonJSONBody(t *testing.T) {
 	t.Parallel()
 
-	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
-		w.Header().Set("Content-Type", "text/plain")
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("error code: 522"))
+	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		writer.Header().Set("Content-Type", "text/plain")
+		writer.WriteHeader(http.StatusOK)
+		_, _ = writer.Write([]byte("error code: 522"))
 	}))
 	t.Cleanup(srv.Close)
 
@@ -56,4 +56,19 @@ func TestGetUnstableNonJSONBody(t *testing.T) {
 	require.Error(t, err)
 	require.Contains(t, err.Error(), "decoding")
 	require.Contains(t, err.Error(), "invalid character 'e'")
+}
+
+func TestGetUnstableNonOKStatus(t *testing.T) {
+	t.Parallel()
+
+	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		writer.Header().Set("Content-Type", "text/plain")
+		writer.WriteHeader(http.StatusBadGateway)
+		_, _ = writer.Write([]byte("error code: 522"))
+	}))
+	t.Cleanup(srv.Close)
+
+	_, err := GetUnstable(context.Background(), srv.URL+"/notifiarr.amd64.exe.zip")
+	require.ErrorIs(t, err, ErrBadStatus)
+	require.Contains(t, err.Error(), "502")
 }

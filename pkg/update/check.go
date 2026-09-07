@@ -26,8 +26,8 @@ var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
 
 // Custom errors.
 var (
-	ErrNoFile       = errors.New("no downloadable file found in release")
-	ErrBodyTooLarge = errors.New("response body too large")
+	ErrNoFile    = errors.New("no downloadable file found in release")
+	ErrBadStatus = errors.New("unexpected http status")
 )
 
 // LatestGH is where we find the latest release.
@@ -74,7 +74,7 @@ func GetRelease(ctx context.Context, uri string) (*GitHubReleasesLatest, error) 
 	defer resp.Body.Close()
 
 	var release GitHubReleasesLatest
-	if err = decodeJSONBody(ctx, resp, uri, &release); err != nil {
+	if err = decodeJSONBody(ctx, resp, uri, &release, githubJSONLimit); err != nil {
 		return nil, err
 	}
 
@@ -82,35 +82,42 @@ func GetRelease(ctx context.Context, uri string) (*GitHubReleasesLatest, error) 
 }
 
 const (
-	maxDecodeBody = 1 << 20
-	maxLogBody    = 4 << 10
+	unstableJSONLimit = 1024
+	githubJSONLimit   = 1024 * 1024
 )
 
-func decodeJSONBody(ctx context.Context, resp *http.Response, uri string, dest any) error {
-	body, err := io.ReadAll(io.LimitReader(resp.Body, maxDecodeBody+1))
+func decodeJSONBody(ctx context.Context, resp *http.Response, uri string, dest any, maxBody int) error {
+	body, err := io.ReadAll(io.LimitReader(resp.Body, int64(maxBody)))
 	if err != nil {
 		return fmt.Errorf("reading %s response: %w", uri, err)
 	}
 
-	if len(body) > maxDecodeBody {
-		return fmt.Errorf("%w: %s", ErrBodyTooLarge, uri)
+	if resp.StatusCode != http.StatusOK {
+		logUpdateBody(ctx, resp, uri, body, nil)
+		return fmt.Errorf("%w: %s: %d", ErrBadStatus, uri, resp.StatusCode)
 	}
 
 	if err = json.Unmarshal(body, dest); err != nil {
-		logged := body
-		if len(logged) > maxLogBody {
-			logged = logged[:maxLogBody]
-		}
-
-		if mnd.Log != nil {
-			mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] decoding %s: status %d type %q body %q: %v",
-				uri, resp.StatusCode, resp.Header.Get("Content-Type"), logged, err)
-		}
-
+		logUpdateBody(ctx, resp, uri, body, err)
 		return fmt.Errorf("decoding %s response: %w", uri, err)
 	}
 
 	return nil
+}
+
+func logUpdateBody(ctx context.Context, resp *http.Response, uri string, body []byte, decodeErr error) {
+	if mnd.Log == nil {
+		return
+	}
+
+	if decodeErr != nil {
+		mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] decoding %s: status %d type %q body %q: %v",
+			uri, resp.StatusCode, resp.Header.Get("Content-Type"), body, decodeErr)
+		return
+	}
+
+	mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] %s: status %d type %q body %q",
+		uri, resp.StatusCode, resp.Header.Get("Content-Type"), body)
 }
 
 // FillUpdate compares a current version with the latest GitHub release.
