@@ -2,7 +2,6 @@ package update
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"runtime"
@@ -75,8 +74,8 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 	}
 	defer resp.Body.Close()
 
-	if err = json.NewDecoder(resp.Body).Decode(&release); err != nil {
-		return nil, fmt.Errorf("decoding %s response: %w", uri, err)
+	if err = decodeJSONBody(ctx, resp, uri, &release, unstableJSONLimit); err != nil {
+		return nil, err
 	}
 
 	release.Time, _ = time.Parse(time.RFC1123, resp.Header.Get("Last-Modified"))
