@@ -188,22 +188,24 @@ func TestGetUnstableDoesNotRetryNotFound(t *testing.T) {
 	require.Equal(t, int32(1), hits.Load())
 }
 
-func TestGetUnstableOversized5xxDoesNotRetry(t *testing.T) {
+func TestGetUnstableRetriesOversizedCloudflarePage(t *testing.T) {
 	t.Parallel()
 
 	var hits atomic.Int32
 
-	body := strings.Repeat("A", unstableJSONLimit+1)
+	// Live Cloudflare error pages are several KB (measured ~8 KB), well past unstableJSONLimit.
+	body := strings.Repeat("A", 8313)
 
 	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
 		hits.Add(1)
-		writer.Header().Set("Content-Type", "text/plain")
-		writer.WriteHeader(http.StatusBadGateway)
+		writer.Header().Set("Content-Type", "text/html")
+		writer.WriteHeader(cloudflareOriginDown)
 		_, _ = writer.Write([]byte(body))
 	}))
 	t.Cleanup(srv.Close)
 
 	_, err := GetUnstable(context.Background(), srv.URL+"/notifiarr.amd64.exe.zip")
-	require.ErrorIs(t, err, ErrBodyTooLarge)
-	require.Equal(t, int32(1), hits.Load())
+	require.ErrorIs(t, err, ErrBadStatus)
+	require.Contains(t, err.Error(), "521")
+	require.Equal(t, int32(versionCheckAttempts), hits.Load())
 }
