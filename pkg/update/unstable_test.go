@@ -187,3 +187,23 @@ func TestGetUnstableDoesNotRetryNotFound(t *testing.T) {
 	require.Contains(t, err.Error(), "404")
 	require.Equal(t, int32(1), hits.Load())
 }
+
+func TestGetUnstableOversized5xxDoesNotRetry(t *testing.T) {
+	t.Parallel()
+
+	var hits atomic.Int32
+
+	body := strings.Repeat("A", unstableJSONLimit+1)
+
+	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		writer.Header().Set("Content-Type", "text/plain")
+		writer.WriteHeader(http.StatusBadGateway)
+		_, _ = writer.Write([]byte(body))
+	}))
+	t.Cleanup(srv.Close)
+
+	_, err := GetUnstable(context.Background(), srv.URL+"/notifiarr.amd64.exe.zip")
+	require.ErrorIs(t, err, ErrBodyTooLarge)
+	require.Equal(t, int32(1), hits.Load())
+}

@@ -103,14 +103,14 @@ func decodeJSONBody(ctx context.Context, resp *http.Response, uri string, dest a
 		return fmt.Errorf("reading %s response: %w", uri, err)
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		logUpdateBody(ctx, resp, uri, body, nil)
-		return &httpStatusError{URI: uri, Status: resp.StatusCode}
-	}
-
 	if len(body) > maxBody {
 		logUpdateBody(ctx, resp, uri, body, ErrBodyTooLarge)
 		return fmt.Errorf("%w: %s (%d bytes)", ErrBodyTooLarge, uri, len(body))
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		logUpdateBody(ctx, resp, uri, body, nil)
+		return &httpStatusError{URI: uri, Status: resp.StatusCode}
 	}
 
 	if err = json.Unmarshal(body, dest); err != nil {
