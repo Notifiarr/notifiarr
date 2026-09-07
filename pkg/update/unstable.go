@@ -74,7 +74,7 @@ func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
 	}
 	defer resp.Body.Close()
 
-	if err = decodeJSONBody(ctx, resp, uri, &release); err != nil {
+	if err = decodeJSONBody(ctx, resp, uri, &release, unstableJSONLimit); err != nil {
 		return nil, err
 	}
 
