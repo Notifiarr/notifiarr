@@ -6,13 +6,25 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/stretchr/testify/require"
 )
+
+const cloudflareOriginDown = 521 // Cloudflare 521: web server is down.
+
+func TestMain(m *testing.M) {
+	orig := versionCheckRetry
+	versionCheckRetry = 0
+	code := m.Run()
+	versionCheckRetry = orig
+	os.Exit(code)
+}
 
 type captureLog struct {
 	mnd.Logger
@@ -91,7 +103,10 @@ func TestGetUnstableNonJSONBody(t *testing.T) { //nolint:paralleltest
 func TestGetUnstableNonOKStatus(t *testing.T) {
 	t.Parallel()
 
+	var hits atomic.Int32
+
 	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
 		writer.Header().Set("Content-Type", "text/plain")
 		writer.WriteHeader(http.StatusBadGateway)
 		_, _ = writer.Write([]byte("error code: 522"))
@@ -101,6 +116,7 @@ func TestGetUnstableNonOKStatus(t *testing.T) {
 	_, err := GetUnstable(context.Background(), srv.URL+"/notifiarr.amd64.exe.zip")
 	require.ErrorIs(t, err, ErrBadStatus)
 	require.Contains(t, err.Error(), "502")
+	require.Equal(t, int32(versionCheckAttempts), hits.Load())
 }
 
 func TestGetUnstableBodyTooLarge(t *testing.T) { //nolint:paralleltest
@@ -123,4 +139,51 @@ func TestGetUnstableBodyTooLarge(t *testing.T) { //nolint:paralleltest
 	require.Contains(t, clog.msg, `type "text/plain"`)
 	require.Contains(t, clog.msg, strings.Repeat("A", maxLogBody))
 	require.NotContains(t, clog.msg, uniqueTail)
+}
+
+func TestGetUnstableRetriesCloudflare521(t *testing.T) {
+	t.Parallel()
+
+	var hits atomic.Int32
+
+	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		if hits.Add(1) < versionCheckAttempts {
+			writer.Header().Set("Content-Type", "text/plain")
+			writer.WriteHeader(cloudflareOriginDown)
+			_, _ = writer.Write([]byte("error code: 521"))
+			return
+		}
+
+		writer.Header().Set("Content-Type", "text/plain")
+		writer.Header().Set("Last-Modified", "Mon, 07 Sep 2026 00:24:33 GMT")
+		_ = json.NewEncoder(writer).Encode(map[string]any{
+			"version":  "0.9.8",
+			"revision": 3416,
+			"size":     14075099,
+		})
+	}))
+	t.Cleanup(srv.Close)
+
+	got, err := GetUnstable(context.Background(), srv.URL+"/notifiarr.amd64.exe.zip")
+	require.NoError(t, err)
+	require.Equal(t, int32(versionCheckAttempts), hits.Load())
+	require.Equal(t, "0.9.8", got.Ver)
+	require.Equal(t, 3416, got.Rev)
+}
+
+func TestGetUnstableDoesNotRetryNotFound(t *testing.T) {
+	t.Parallel()
+
+	var hits atomic.Int32
+
+	srv := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		hits.Add(1)
+		writer.WriteHeader(http.StatusNotFound)
+	}))
+	t.Cleanup(srv.Close)
+
+	_, err := GetUnstable(context.Background(), srv.URL+"/notifiarr.amd64.exe.zip")
+	require.ErrorIs(t, err, ErrBadStatus)
+	require.Contains(t, err.Error(), "404")
+	require.Equal(t, int32(1), hits.Load())
 }

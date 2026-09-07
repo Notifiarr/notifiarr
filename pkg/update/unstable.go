@@ -54,31 +54,18 @@ func CheckUnstable(ctx context.Context, app string, revision string) (*Update, e
 
 // GetUnstable returns an unstable release. See CheckUnstable for an example on how to use it.
 func GetUnstable(ctx context.Context, uri string) (*UnstableFile, error) {
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
 	// we use stamp to bust the cloudflare cache.
 	// If you remove or rename `stamp` then also update decompressFile().
 	stamp := "?stamp=" + time.Now().UTC().Format("2006-01-02-15")
 	release := UnstableFile{File: uri + stamp}
 	uri += ".txt" + stamp
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
+	err := doVersionCheck(ctx, uri, &release, unstableJSONLimit, func(resp *http.Response) {
+		release.Time, _ = time.Parse(time.RFC1123, resp.Header.Get("Last-Modified"))
+	})
 	if err != nil {
-		return nil, fmt.Errorf("requesting %s: %w", uri, err)
-	}
-
-	resp, err := (&http.Client{}).Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("querying %s: %w", uri, err)
-	}
-	defer resp.Body.Close()
-
-	if err = decodeJSONBody(ctx, resp, uri, &release, unstableJSONLimit); err != nil {
 		return nil, err
 	}
-
-	release.Time, _ = time.Parse(time.RFC1123, resp.Header.Get("Last-Modified"))
 
 	return &release, nil
 }
