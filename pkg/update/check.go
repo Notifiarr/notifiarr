@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"runtime"
 	"strings"
@@ -25,7 +26,8 @@ var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
 
 // Custom errors.
 var (
-	ErrNoFile = errors.New("no downloadable file found in release")
+	ErrNoFile       = errors.New("no downloadable file found in release")
+	ErrBodyTooLarge = errors.New("response body too large")
 )
 
 // LatestGH is where we find the latest release.
@@ -72,11 +74,43 @@ func GetRelease(ctx context.Context, uri string) (*GitHubReleasesLatest, error) 
 	defer resp.Body.Close()
 
 	var release GitHubReleasesLatest
-	if err = json.NewDecoder(resp.Body).Decode(&release); err != nil {
-		return nil, fmt.Errorf("decoding github response: %w", err)
+	if err = decodeJSONBody(ctx, resp, uri, &release); err != nil {
+		return nil, err
 	}
 
 	return &release, nil
+}
+
+const (
+	maxDecodeBody = 1 << 20
+	maxLogBody    = 4 << 10
+)
+
+func decodeJSONBody(ctx context.Context, resp *http.Response, uri string, dest any) error {
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxDecodeBody+1))
+	if err != nil {
+		return fmt.Errorf("reading %s response: %w", uri, err)
+	}
+
+	if len(body) > maxDecodeBody {
+		return fmt.Errorf("%w: %s", ErrBodyTooLarge, uri)
+	}
+
+	if err = json.Unmarshal(body, dest); err != nil {
+		logged := body
+		if len(logged) > maxLogBody {
+			logged = logged[:maxLogBody]
+		}
+
+		if mnd.Log != nil {
+			mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] decoding %s: status %d type %q body %q: %v",
+				uri, resp.StatusCode, resp.Header.Get("Content-Type"), logged, err)
+		}
+
+		return fmt.Errorf("decoding %s response: %w", uri, err)
+	}
+
+	return nil
 }
 
 // FillUpdate compares a current version with the latest GitHub release.
