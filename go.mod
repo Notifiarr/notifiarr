@@ -40,11 +40,11 @@ require (
 	golang.org/x/text v0.41.0
 	golang.org/x/time v0.15.0
 	golift.io/cache v1.1.0
-	golift.io/cnfg v0.2.5
+	golift.io/cnfg v0.3.0
 	golift.io/cnfgfile v0.0.0-20240713024420-a5436d84eb48
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
-	golift.io/goty v0.0.4
+	golift.io/goty v0.0.5
 	golift.io/mulery v0.0.11
 	golift.io/nzbget v0.1.6
 	golift.io/qbit v0.0.0-20260820074458-65c1b2bfc5c7

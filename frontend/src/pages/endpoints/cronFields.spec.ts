@@ -16,9 +16,12 @@ const weekly = (daysOfWeek: number[]): Endpoint => ({
   interval: 0,
   timeout: '0s',
   validSsl: true,
+  query: null,
+  header: null,
   atTimes: [[0, 0, 0]],
   daysOfWeek,
   daysOfMonth: [],
+  months: null,
 })
 
 describe('cronFieldVisible', () => {

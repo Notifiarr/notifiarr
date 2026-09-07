@@ -65,7 +65,9 @@ const isClientLogPath = (path: string): boolean => {
     p.config?.httpLog,
     p.config?.debugLog,
     p.config?.services?.logFile,
-    ...(p.logFileInfo?.list ?? []).filter(f => f.used).map(f => f.path),
+    ...(p.logFileInfo?.list ?? [])
+      .filter((f): f is NonNullable<typeof f> => !!f?.used)
+      .map(f => f.path),
   ]
 
   return candidates.some(

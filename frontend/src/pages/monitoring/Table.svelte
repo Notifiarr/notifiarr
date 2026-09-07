@@ -3,7 +3,7 @@
   import T, { _, datetime } from '../../includes/Translate.svelte'
   import ArrowClockwise from 'phosphor-svelte/lib/ArrowClockwise'
   import Fa from '../../includes/Fa.svelte'
-  import { age, since } from '../../includes/util'
+  import { age, since, present } from '../../includes/util'
   import { profile } from '../../api/profile.svelte'
   import { Monitor as chk } from './page.svelte'
   import { theme } from '../../includes/theme.svelte'
@@ -56,7 +56,7 @@
   </thead>
 
   <tbody>
-    {#each chk.config?.results?.toSorted( (a, b) => a.name.localeCompare(b.name), ) ?? [] as result}
+    {#each present(chk.config?.results).toSorted((a, b) => a.name.localeCompare(b.name)) as result}
       {@const id = btoa(result.name + 'table').replace(/=/g, '')}
       <tr>
         <td class="fw-bold">

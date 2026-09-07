@@ -77,7 +77,7 @@ export class FileBrowser {
     // Makes navigating out of an error state easier.
     this.wd.mom = this.wd.path
     this.wd.path = this.selected
-    this.wd.dirs = this.wd.files = undefined
+    this.wd.dirs = this.wd.files = null
     this.respErr = resp.body
   }
 }

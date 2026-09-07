@@ -10,7 +10,7 @@
     ButtonGroup,
   } from '@sveltestrap/sveltestrap'
   import T, { _, datetime } from '../../includes/Translate.svelte'
-  import { age, since } from '../../includes/util'
+  import { age, since, present } from '../../includes/util'
   import { profile } from '../../api/profile.svelte'
   import { Monitor as chk } from './page.svelte'
   import { slide } from 'svelte/transition'
@@ -25,7 +25,7 @@
 </script>
 
 <div class="row cards-page">
-  {#each chk.config?.results?.toSorted( (a, b) => a.name.localeCompare(b.name), ) ?? [] as result}
+  {#each present(chk.config?.results).toSorted((a, b) => a.name.localeCompare(b.name)) as result}
     {@const id = btoa(result.name + 'card').replace(/=/g, '')}
     {@const icon = showOutput[id] ? UploadSimple : DownloadSimple}
 

@@ -21,6 +21,12 @@ const empty: Endpoint = {
   interval: 0,
   timeout: '0s',
   validSsl: true,
+  query: null,
+  header: null,
+  atTimes: null,
+  daysOfWeek: null,
+  daysOfMonth: null,
+  months: null,
 }
 
 const merge = (index: number, form: Endpoint): Config => {
