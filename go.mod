@@ -9,7 +9,7 @@ require (
 	github.com/dsnet/compress v0.0.1
 	github.com/energye/systray v1.0.3
 	github.com/go-co-op/gocron/v2 v2.22.0
-	github.com/go-sql-driver/mysql v1.10.0
+	github.com/go-sql-driver/mysql v1.10.1
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/schema v1.4.1
