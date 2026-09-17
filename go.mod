@@ -40,7 +40,7 @@ require (
 	golang.org/x/text v0.42.0
 	golang.org/x/time v0.16.0
 	golift.io/cache v1.1.0
-	golift.io/cnfg v0.3.0
+	golift.io/cnfg v0.4.0
 	golift.io/cnfgfile v0.0.0-20240713024420-a5436d84eb48
 	golift.io/datacounter v1.0.4
 	golift.io/deluge v0.10.1
