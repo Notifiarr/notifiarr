@@ -51,7 +51,7 @@ require (
 	golift.io/rotatorr v0.0.0-20260908070935-a77ea24793b3
 	golift.io/starr v1.4.1
 	golift.io/version v0.0.2
-	golift.io/xtractr v0.6.0
+	golift.io/xtractr v0.6.1
 	modernc.org/sqlite v1.59.0
 )
 
@@ -59,7 +59,7 @@ require (
 	filippo.io/edwards25519 v1.2.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/Unpackerr/iso9660 v0.0.3 // indirect
-	github.com/andybalholm/brotli v1.2.2 // indirect
+	github.com/andybalholm/brotli v1.2.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bodgit/plumbing v1.3.0 // indirect
 	github.com/bodgit/sevenzip v1.6.5 // indirect
