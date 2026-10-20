@@ -41,7 +41,7 @@
     "typescript": "~5.9.0",
     "typescript-eslint": "^8.60.1",
     "vite": "^8.0.0",
-    "vitest": "^4.1.8"
+    "vitest": "^5.0.0"
   },
   "dependencies": {
     "@sveltestrap/sveltestrap": "^7.1.0",
