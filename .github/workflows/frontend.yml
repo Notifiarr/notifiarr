@@ -24,6 +24,7 @@ jobs:
         run: npm run lint
       - name: prettier
         run: npm run format:check
-        continue-on-error: true
       - name: vitest
         run: npm test
+      - name: vite build
+        run: npm run build
