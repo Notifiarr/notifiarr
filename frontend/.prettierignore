@@ -3,3 +3,6 @@ package-lock.json
 dist
 node_modules
 src/includes/locale/*.json
+public/api_openapi.json
+public/ui_openapi.json
+src/api/notifiarrConfig.ts

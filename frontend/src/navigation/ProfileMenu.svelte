@@ -57,13 +57,7 @@
         {$_(LanguagesPage.id + '.menuTitle')}
       </DropdownItem>
       <DropdownItem class="nav-link-custom" onclick={theme.toggle}>
-        <Fa
-          i={RocketLaunch}
-          d={Sun}
-          c1="green"
-          d1="orange"
-          scale="1.2x"
-          class="me-3" />
+        <Fa i={RocketLaunch} d={Sun} c1="green" d1="orange" scale="1.2x" class="me-3" />
         {theme.isDark ? $_('config.titles.Light') : $_('config.titles.Dark')}
         <Input
           disabled

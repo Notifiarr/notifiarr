@@ -14,7 +14,9 @@ class ThemeClass {
   constructor() {
     this.theme = readable('dark', set => {
       this.change = (theme: string) => (
-        set(theme), this.setVars(theme), Cookies.set(cookieName, theme)
+        set(theme),
+        this.setVars(theme),
+        Cookies.set(cookieName, theme)
       )
       this.change(Cookies.get(cookieName) ?? 'dark')
     })
@@ -34,7 +36,8 @@ class ThemeClass {
    *  This will go away once we have multiple themes.
    */
   public toggle = (e: Event) => (
-    e.preventDefault(), theme.change(this.isDark ? 'light' : 'dark')
+    e.preventDefault(),
+    theme.change(this.isDark ? 'light' : 'dark')
   )
 }
 
