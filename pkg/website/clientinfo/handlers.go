@@ -378,6 +378,10 @@ func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, son
 			stat, err := app.GetSystemStatusContext(ctx)
 			data.SaveWithID("sonarrStatus", idx, stat)
 
+			if err == nil && stat != nil {
+				c.Sonarr[idx].SetVersion(stat.Version)
+			}
+
 			son[idx] = &SonarrConTest{conTest: c.getConTest(reqID, "Sonarr", app.Name, idx+1, err), Status: stat}
 		})
 	}
