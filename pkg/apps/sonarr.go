@@ -126,7 +126,7 @@ func getSonarr(r *http.Request) Sonarr {
 	return r.Context().Value(starr.Sonarr).(Sonarr) //nolint:forcetypeassert
 }
 
-func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
+func (a *AppsConfig) setupSonarr(ctx context.Context) ([]Sonarr, error) {
 	output := make([]Sonarr, len(a.Sonarr))
 
 	for idx := range a.Sonarr {
@@ -152,7 +152,7 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 		meta := &sonarrMeta{}
 		output[idx] = Sonarr{
 			StarrConfig: a.Sonarr[idx],
-			Sonarr:      selectSonarrAPI(sonarr.New(&app.Config), app, idx, meta),
+			Sonarr:      selectSonarrAPI(ctx, sonarr.New(&app.Config), app, idx, meta),
 			meta:        meta,
 		}
 
@@ -166,12 +166,17 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 
 // selectSonarrAPI probes system status once. Sonarr 5 uses the v5 client.
 // A failed probe stays on v3 and leaves the version empty.
-func selectSonarrAPI(client *sonarr.Sonarr, app *StarrConfig, idx int, meta *sonarrMeta) *sonarr.Sonarr {
+func selectSonarrAPI(
+	ctx context.Context,
+	client *sonarr.Sonarr,
+	app *StarrConfig,
+	idx int,
+	meta *sonarrMeta,
+) *sonarr.Sonarr {
 	if client == nil || !app.Enabled() {
 		return client
 	}
 
-	ctx := context.Background()
 	if app.Timeout.Duration > 0 {
 		var cancel context.CancelFunc
 

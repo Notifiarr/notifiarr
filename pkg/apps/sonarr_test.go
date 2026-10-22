@@ -238,7 +238,7 @@ func setupOneSonarr(t *testing.T, appURL string) Sonarr {
 		Name:    "TV",
 		Timeout: cnfg.Duration{Duration: time.Second},
 	}}}
-	got, err := cfg.setupSonarr()
+	got, err := cfg.setupSonarr(t.Context())
 	require.NoError(t, err)
 	require.Len(t, got, 1)
 
