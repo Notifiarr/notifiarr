@@ -49,7 +49,7 @@
     "bootstrap": "^5.3.6",
     "crypto-js": "^4.2.0",
     "phosphor-svelte": "^3.1.1",
-    "rapidoc": "^9.3.8",
+    "rapidoc": "^11.0.0",
     "svelte-i18n": "^4.0.1",
     "svelte-select": "^6.0.0",
     "svelte-table": "^0.6.5"
