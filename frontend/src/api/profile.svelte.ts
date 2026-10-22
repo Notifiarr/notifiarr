@@ -21,7 +21,7 @@ class ConfigProfile {
   /** Display an error message (form feedback) to the user after calling one of the update methods. */
   public formError = $state('')
 
-  constructor () {
+  constructor() {
     this.profile = writable<Profile>({} as Profile)
     setInterval(() => (this.now = Date.now()), 1234)
   }
@@ -130,10 +130,11 @@ class ConfigProfile {
 
   public async setApiKey(apiKey: string): Promise<string | null> {
     try {
-      const response = await fetchWithTimeout('?setApiKey=true', {
-        method: 'PUT',
-        headers: { 'X-Api-Key': apiKey },
-      }, 15000)
+      const response = await fetchWithTimeout(
+        '?setApiKey=true',
+        { method: 'PUT', headers: { 'X-Api-Key': apiKey } },
+        15000,
+      )
       if (!response.ok) return `${await response.text()}`
       return null
     } catch (err) {

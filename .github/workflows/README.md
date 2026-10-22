@@ -118,4 +118,4 @@ Set on the `Notifiarr/notifiarr` repo (or org, granted to this public repo). `.g
 
 The Alpine Docker base image is pinned as `alpine:<tag>@sha256:<digest>`. Renovate keeps Action and Dockerfile digest pins current (`helpers:pinGitHubActionDigestsToSemver`; Dockerfile `pinDigests`).
 
-Renovate automerges Go and Docker non-major updates, and GitHub Actions updates including majors, after a 7-day release age when checks pass.
+Renovate automerges Go, Docker, and npm non-major updates, and GitHub Actions updates including majors, after a 7-day release age when checks pass. npm majors stay open for review.
