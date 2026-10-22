@@ -36,6 +36,22 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+func TestSetVersionSelectsAPI(t *testing.T) {
+	t.Parallel()
+
+	client := sonarr.NewV5(starr.New("k", "http://sonarr", time.Second))
+	app := Sonarr{Sonarr: client}
+	app.SetVersion("not-a-version")
+	require.Equal(t, sonarr.APIv5, app.APIVersion())
+
+	app.SetVersion("4.0.20.3014")
+	require.Equal(t, sonarr.APIver, app.APIVersion())
+
+	app.SetVersion("5.0.0.2742")
+	require.Equal(t, sonarr.APIv5, app.APIVersion())
+	require.Equal(t, "5.0.0.2742", app.Version())
+}
+
 func TestSonarrTagLabel(t *testing.T) {
 	t.Parallel()
 

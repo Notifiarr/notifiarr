@@ -114,12 +114,39 @@ func (s Sonarr) Version() string {
 }
 
 // SetVersion records a Sonarr server version for the next client check-in.
+// A parsed major of 5 or more switches this client to the v5 API. A parsed
+// older major switches it back to v3. An empty or unparsed version does not
+// change the API. Copies of this client see the switch.
 func (s *Sonarr) SetVersion(version string) {
 	if s.meta == nil {
 		s.meta = &sonarrMeta{}
 	}
 
 	s.meta.set(version)
+	s.useServerAPI(version)
+}
+
+// useServerAPI points the shared Sonarr client at v5 or v3 when the major version crosses 5.
+func (s Sonarr) useServerAPI(version string) {
+	if s.Sonarr == nil {
+		return
+	}
+
+	major := sonarrMajor(version)
+	if major <= 0 {
+		return
+	}
+
+	want := sonarr.APIver
+	if major >= sonarrV5Major {
+		want = sonarr.APIv5
+	}
+
+	if s.APIVersion() == want {
+		return
+	}
+
+	s.UseAPI(want)
 }
 
 func getSonarr(r *http.Request) Sonarr {

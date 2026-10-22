@@ -87,8 +87,38 @@ func TestGetSonarrVersionRefreshesCheckIn(t *testing.T) {
 
 	require.Equal(t, "/api/v3/system/status", path)
 	require.Equal(t, "5.0.0.2742", cfg.Sonarr[0].Version())
+	require.Equal(t, sonarr.APIv5, cfg.Sonarr[0].APIVersion())
 	require.True(t, stats[0].Up)
 	require.Equal(t, "5.0.0.2742", stats[0].Status.Version)
+}
+
+func TestGetSonarrVersionSwitchesBackToV3(t *testing.T) {
+	t.Parallel()
+
+	var path string
+
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		path = req.URL.Path
+		_, _ = writer.Write([]byte(`{"version":"4.0.20.3014"}`))
+	}))
+	t.Cleanup(server.Close)
+
+	instance := testSonarr(server.URL)
+	instance.Sonarr = instance.WithAPI(sonarr.APIv5)
+	instance.SetVersion("5.0.0.2742")
+
+	cfg := &Config{Apps: &apps.Apps{Sonarr: []apps.Sonarr{instance}}}
+
+	var wait sync.WaitGroup
+
+	stats := make([]*SonarrConTest, 1)
+	cfg.getSonarrVersion(context.Background(), &wait, cfg.Sonarr, stats)
+	wait.Wait()
+
+	require.Equal(t, "/api/v5/system/status", path)
+	require.Equal(t, "4.0.20.3014", cfg.Sonarr[0].Version())
+	require.Equal(t, sonarr.APIver, cfg.Sonarr[0].APIVersion())
+	require.Equal(t, sonarr.APIver, instance.APIVersion())
 }
 
 func TestGetSonarrVersionKeepsCachedVersionOnFailure(t *testing.T) {
@@ -100,8 +130,11 @@ func TestGetSonarrVersionKeepsCachedVersionOnFailure(t *testing.T) {
 	}))
 	t.Cleanup(server.Close)
 
-	cfg := &Config{Apps: &apps.Apps{Sonarr: []apps.Sonarr{testSonarr(server.URL)}}}
-	cfg.Sonarr[0].SetVersion("4.0.20.3014")
+	instance := testSonarr(server.URL)
+	instance.Sonarr = instance.WithAPI(sonarr.APIv5)
+	instance.SetVersion("5.0.0.2742")
+
+	cfg := &Config{Apps: &apps.Apps{Sonarr: []apps.Sonarr{instance}}}
 
 	var wait sync.WaitGroup
 
@@ -109,7 +142,8 @@ func TestGetSonarrVersionKeepsCachedVersionOnFailure(t *testing.T) {
 	cfg.getSonarrVersion(context.Background(), &wait, cfg.Sonarr, stats)
 	wait.Wait()
 
-	require.Equal(t, "4.0.20.3014", cfg.Sonarr[0].Version())
+	require.Equal(t, "5.0.0.2742", cfg.Sonarr[0].Version())
+	require.Equal(t, sonarr.APIv5, cfg.Sonarr[0].APIVersion())
 	require.False(t, stats[0].Up)
 }
 
