@@ -56,7 +56,7 @@
   </thead>
 
   <tbody>
-    {#each present(chk.config?.results).toSorted((a, b) => a.name.localeCompare(b.name)) as result}
+    {#each present(chk.config?.results).toSorted( (a, b) => a.name.localeCompare(b.name) ) as result}
       {@const id = btoa(result.name + 'table').replace(/=/g, '')}
       <tr>
         <td class="fw-bold">

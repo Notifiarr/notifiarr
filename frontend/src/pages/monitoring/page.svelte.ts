@@ -2,7 +2,10 @@ import { getUi } from '../../api/fetch'
 import { delay, success, warning } from '../../includes/util'
 import { get } from 'svelte/store'
 import { _ } from 'svelte-i18n'
-import { CheckState, type ClientServicesConfig as ServicesConfig } from '../../api/notifiarrConfig'
+import {
+  CheckState,
+  type ClientServicesConfig as ServicesConfig,
+} from '../../api/notifiarrConfig'
 
 export const page = { id: 'Monitoring' }
 

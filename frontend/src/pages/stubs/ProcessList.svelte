@@ -4,10 +4,7 @@
   import { Button } from '@sveltestrap/sveltestrap'
   import T from '../../includes/Translate.svelte'
   import Nodal from '../../includes/Nodal.svelte'
-  export const page = {
-    type: 'modal' as const,
-    id: 'ProcessList',
-  }
+  export const page = { type: 'modal' as const, id: 'ProcessList' }
 </script>
 
 <script lang="ts">

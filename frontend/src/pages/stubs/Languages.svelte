@@ -3,10 +3,7 @@
   import Nodal from '../../includes/Nodal.svelte'
   import T from '../../includes/Translate.svelte'
 
-  export const page = {
-    type: 'modal' as const,
-    id: 'Languages',
-  }
+  export const page = { type: 'modal' as const, id: 'Languages' }
 </script>
 
 <script lang="ts">

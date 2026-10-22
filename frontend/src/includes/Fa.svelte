@@ -157,9 +157,8 @@
         'has-c1': !!primaryColor,
       },
     ]}
-    id={id}
-    style="--icon-c1: {primaryColor ??
-      'currentColor'}; --icon-c2: {secondaryColor ??
+    {id}
+    style="--icon-c1: {primaryColor ?? 'currentColor'}; --icon-c2: {secondaryColor ??
       'currentColor'}; font-size: {size}; {style}">
     {#if src}
       <img {src} alt="" />

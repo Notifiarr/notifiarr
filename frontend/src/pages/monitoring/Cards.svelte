@@ -25,7 +25,7 @@
 </script>
 
 <div class="row cards-page">
-  {#each present(chk.config?.results).toSorted((a, b) => a.name.localeCompare(b.name)) as result}
+  {#each present(chk.config?.results).toSorted( (a, b) => a.name.localeCompare(b.name) ) as result}
     {@const id = btoa(result.name + 'card').replace(/=/g, '')}
     {@const icon = showOutput[id] ? UploadSimple : DownloadSimple}
 
@@ -51,7 +51,10 @@
             color={chk.colors[result.state]}
             class="badge py-0 px-1">
             {chk.states[result.state]}</Button>
-          <ButtonGroup class="card-icons float-end" size="sm" style="margin-right: -10px;">
+          <ButtonGroup
+            class="card-icons float-end"
+            size="sm"
+            style="margin-right: -10px;">
             <Button
               color="primary"
               outline
