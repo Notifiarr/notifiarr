@@ -59,7 +59,7 @@ Change the inputs, regenerate, and commit the outputs. Do not hand-edit these fi
 | --- | --- |
 | `frontend/locales.go` | `frontend/src/includes/locale/*.json`, via `frontend/generate.sh` |
 | `frontend/public/api_openapi.json` and `frontend/public/ui_openapi.json` | Swagger comments, via `frontend/generate.sh`. UI tags are `System`, `Integrations`, and `Files`. Every other tag is the API spec. |
-| `frontend/src/api/notifiarrConfig.ts` | Go config types, via `go generate ./frontend/src/api`. That script runs `go mod vendor` so it can read dependency docs, then deletes `vendor/`. |
+`frontend/src/api/notifiarrConfig.ts` | Go config types, via `go generate ./frontend/src/api`. That script runs `go mod vendor` so it can read dependency docs, then removes the temporary `vendor/` directory if it did not already exist.
 
 ## Layout
 
