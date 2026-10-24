@@ -2,11 +2,14 @@
 package apps
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -66,9 +69,84 @@ func (a *Apps) sonarrHandlers() { //nolint:funlen
 	a.HandleAPIpath(starr.Sonarr, "/delete/{episodeFileID:[0-9]+}", sonarrDeleteEpisode, "DELETE")
 }
 
+// sonarrV5Major is the Sonarr release that needs the v5 API. Same boundary as sonarr.ForServer.
+const sonarrV5Major = 5
+
+// sonarrMeta holds the server version learned from system status.
+// Copies of Sonarr share this pointer, so a later /version poll updates the check-in.
+type sonarrMeta struct {
+	mu      sync.Mutex
+	version string
+}
+
+func (m *sonarrMeta) get() string {
+	if m == nil {
+		return ""
+	}
+
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	return m.version
+}
+
+func (m *sonarrMeta) set(version string) {
+	if m == nil {
+		return
+	}
+
+	m.mu.Lock()
+	m.version = version
+	m.mu.Unlock()
+}
+
 type Sonarr struct {
 	StarrApp       `json:"-" toml:"-" xml:"-"`
 	*sonarr.Sonarr `json:"-" toml:"-" xml:"-"`
+
+	meta *sonarrMeta
+}
+
+// Version returns the Sonarr server version cached from the last successful /version poll.
+// Empty until that poll succeeds.
+func (s Sonarr) Version() string {
+	return s.meta.get()
+}
+
+// SetVersion records a Sonarr server version for the next client check-in.
+// A parsed major of 5 or more switches this client to the v5 API. A parsed
+// older major switches it back to v3. An empty or unparsed version does not
+// change the API. Copies of this client see the switch.
+func (s *Sonarr) SetVersion(version string) {
+	if s.meta == nil {
+		s.meta = &sonarrMeta{}
+	}
+
+	s.meta.set(version)
+	s.useServerAPI(version)
+}
+
+// useServerAPI points the shared Sonarr client at v5 or v3 when the major version crosses 5.
+func (s Sonarr) useServerAPI(version string) {
+	if s.Sonarr == nil {
+		return
+	}
+
+	major := sonarrMajor(version)
+	if major <= 0 {
+		return
+	}
+
+	want := sonarr.APIver
+	if major >= sonarrV5Major {
+		want = sonarr.APIv5
+	}
+
+	if s.APIVersion() == want {
+		return
+	}
+
+	s.UseAPI(want)
 }
 
 func getSonarr(r *http.Request) Sonarr {
@@ -97,9 +175,11 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 		}
 
 		app.URL = strings.TrimRight(app.URL, "/")
+
 		output[idx] = Sonarr{
 			StarrConfig: a.Sonarr[idx],
 			Sonarr:      sonarr.New(&app.Config),
+			meta:        &sonarrMeta{},
 		}
 
 		if app.Deletes > 0 {
@@ -108,6 +188,55 @@ func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 	}
 
 	return output, nil
+}
+
+func sonarrMajor(version string) int {
+	version = strings.TrimSpace(version)
+	version = strings.TrimPrefix(version, "v")
+	version = strings.TrimPrefix(version, "V")
+	head, _, _ := strings.Cut(version, ".")
+
+	major, err := strconv.Atoi(head)
+	if err != nil {
+		return 0
+	}
+
+	return major
+}
+
+// fillSonarrSeriesIdentity copies language and seasonType from the current series
+// when the update body omits them, so Sonarr does not default them to English / official.
+func fillSonarrSeriesIdentity(ctx context.Context, app Sonarr, series *sonarr.AddSeriesInput) error {
+	if series == nil || (series.Language != nil && series.SeasonType != "") {
+		return nil
+	}
+
+	current, err := app.GetSeriesByIDContext(ctx, series.ID)
+	if err != nil {
+		return fmt.Errorf("series %d: %w", series.ID, err)
+	}
+
+	if series.Language == nil {
+		series.Language = current.Language
+	}
+
+	if series.SeasonType == "" {
+		series.SeasonType = current.SeasonType
+	}
+
+	return nil
+}
+
+// sonarrTagLabel lowercases a tag and replaces characters Sonarr rejects with '-'.
+// Sonarr accepts ^[a-z0-9-]+$ and stores the lowercase form.
+func sonarrTagLabel(label string) string {
+	return strings.Map(func(r rune) rune {
+		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' {
+			return r
+		}
+
+		return '-'
+	}, strings.ToLower(label))
 }
 
 // @Description	Adds a new Series to Sonarr.
@@ -348,7 +477,9 @@ func sonarrStatusCommand(req *http.Request) (int, any) {
 func sonarrLangProfiles(req *http.Request) (int, any) {
 	// Get the profiles from sonarr.
 	profiles, err := getSonarr(req).GetLanguageProfilesContext(req.Context())
-	if err != nil {
+	if errors.Is(err, sonarr.ErrUnsupported) {
+		return http.StatusOK, map[int64]string{}
+	} else if err != nil {
 		return apiError(http.StatusInternalServerError, "getting language profiles", err)
 	}
 
@@ -965,8 +1096,9 @@ func sonarrGetTags(req *http.Request) (int, any) {
 // @Security		ApiKeyAuth
 func sonarrUpdateTag(req *http.Request) (int, any) {
 	id, _ := strconv.Atoi(mux.Vars(req)["tid"])
+	label := sonarrTagLabel(mux.Vars(req)["label"])
 
-	tag, err := getSonarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: mux.Vars(req)["label"]})
+	tag, err := getSonarr(req).UpdateTagContext(req.Context(), &starr.Tag{ID: id, Label: label})
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "updating tag", err)
 	}
@@ -986,7 +1118,7 @@ func sonarrUpdateTag(req *http.Request) (int, any) {
 // @Router			/sonarr/{instance}/tag/{label} [put]
 // @Security		ApiKeyAuth
 func sonarrSetTag(req *http.Request) (int, any) {
-	tag, err := getSonarr(req).AddTagContext(req.Context(), &starr.Tag{Label: mux.Vars(req)["label"]})
+	tag, err := getSonarr(req).AddTagContext(req.Context(), &starr.Tag{Label: sonarrTagLabel(mux.Vars(req)["label"])})
 	if err != nil {
 		return apiError(http.StatusServiceUnavailable, "setting tag", err)
 	}
@@ -1012,6 +1144,10 @@ func sonarrUpdateSeries(req *http.Request) (int, any) {
 	err := json.NewDecoder(req.Body).Decode(&series)
 	if err != nil {
 		return apiError(http.StatusBadRequest, "decoding payload", err)
+	}
+
+	if err = fillSonarrSeriesIdentity(req.Context(), getSonarr(req), &series); err != nil {
+		return apiError(http.StatusServiceUnavailable, "getting series", err)
 	}
 
 	moveFiles := mux.Vars(req)["moveFiles"] == strconv.FormatBool(true)
