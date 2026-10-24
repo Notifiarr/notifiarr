@@ -172,7 +172,7 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 	}
 
 	// Make sure each app has a sane timeout.
-	if result.Apps, err = apps.New(ctx, &c.AppsConfig); err != nil {
+	if result.Apps, err = apps.New(&c.AppsConfig); err != nil {
 		return nil, fmt.Errorf("setting up app: %w", err)
 	}
 

@@ -107,8 +107,8 @@ type Sonarr struct {
 	meta *sonarrMeta
 }
 
-// Version returns the Sonarr server version cached for the client check-in.
-// Empty when the instance was down at probe time.
+// Version returns the Sonarr server version cached from the last successful /version poll.
+// Empty until that poll succeeds.
 func (s Sonarr) Version() string {
 	return s.meta.get()
 }
@@ -153,7 +153,7 @@ func getSonarr(r *http.Request) Sonarr {
 	return r.Context().Value(starr.Sonarr).(Sonarr) //nolint:forcetypeassert
 }
 
-func (a *AppsConfig) setupSonarr(ctx context.Context) ([]Sonarr, error) {
+func (a *AppsConfig) setupSonarr() ([]Sonarr, error) {
 	output := make([]Sonarr, len(a.Sonarr))
 
 	for idx := range a.Sonarr {
@@ -176,11 +176,10 @@ func (a *AppsConfig) setupSonarr(ctx context.Context) ([]Sonarr, error) {
 
 		app.URL = strings.TrimRight(app.URL, "/")
 
-		meta := &sonarrMeta{}
 		output[idx] = Sonarr{
 			StarrConfig: a.Sonarr[idx],
-			Sonarr:      selectSonarrAPI(ctx, sonarr.New(&app.Config), app, idx, meta),
-			meta:        meta,
+			Sonarr:      sonarr.New(&app.Config),
+			meta:        &sonarrMeta{},
 		}
 
 		if app.Deletes > 0 {
@@ -189,45 +188,6 @@ func (a *AppsConfig) setupSonarr(ctx context.Context) ([]Sonarr, error) {
 	}
 
 	return output, nil
-}
-
-// selectSonarrAPI probes system status once. Sonarr 5 uses the v5 client.
-// A failed probe stays on v3 and leaves the version empty.
-func selectSonarrAPI(
-	ctx context.Context,
-	client *sonarr.Sonarr,
-	app *StarrConfig,
-	idx int,
-	meta *sonarrMeta,
-) *sonarr.Sonarr {
-	if client == nil || !app.Enabled() {
-		return client
-	}
-
-	if app.Timeout.Duration > 0 {
-		var cancel context.CancelFunc
-
-		ctx, cancel = context.WithTimeout(ctx, app.Timeout.Duration)
-		defer cancel()
-	}
-
-	status, err := client.GetSystemStatusContext(ctx)
-	if err != nil {
-		if mnd.Log != nil {
-			mnd.Log.Errorf("startup", "Sonarr instance %d (%s) version probe failed, using API v3: %v",
-				idx+1, app.Name, err)
-		}
-
-		return client
-	}
-
-	meta.set(status.Version)
-
-	if sonarrMajor(status.Version) >= sonarrV5Major {
-		return client.WithAPI(sonarr.APIv5)
-	}
-
-	return client
 }
 
 func sonarrMajor(version string) int {

@@ -127,8 +127,10 @@ func (c *Config) InfoHandler(r *http.Request) (int, any) {
 //	@Router			/version [get]
 //	@Security		ApiKeyAuth
 func (c *Config) VersionHandler(r *http.Request) (int, any) {
+	// Poll first so a Sonarr version learned here is already cached when Info copies config.apps.
+	status := c.appStatsForVersion(r.Context())
 	output := c.Info(r.Context(), false)
-	output.AppsStatus = c.appStatsForVersion(r.Context())
+	output.AppsStatus = status
 
 	return http.StatusOK, output
 }
@@ -147,9 +149,10 @@ func (c *Config) VersionHandler(r *http.Request) (int, any) {
 //	@Router			/version/{app}/{instance} [get]
 //	@Security		ApiKeyAuth
 func (c *Config) VersionHandlerInstance(r *http.Request) (int, any) {
-	output := c.Info(r.Context(), false)
 	instance, _ := strconv.Atoi(mux.Vars(r)["instance"])
-	output.AppsStatus = c.appStatsForVersionInstance(r.Context(), mux.Vars(r)["app"], instance)
+	status := c.appStatsForVersionInstance(r.Context(), mux.Vars(r)["app"], instance)
+	output := c.Info(r.Context(), false)
+	output.AppsStatus = status
 
 	return http.StatusOK, output
 }
@@ -239,6 +242,10 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 		if instance <= len(c.Sonarr) && c.Apps.Sonarr[idx].Enabled() {
 			stat, err := c.Apps.Sonarr[idx].GetSystemStatusContext(ctx)
 			data.SaveWithID(app+mnd.Status, idx, stat)
+
+			if err == nil && stat != nil {
+				c.Sonarr[idx].SetVersion(stat.Version)
+			}
 
 			return &AppStatuses{Sonarr: []*SonarrConTest{{c.getConTest(reqID, app, c.Apps.Sonarr[idx].Name, instance, err), stat}}}
 		}

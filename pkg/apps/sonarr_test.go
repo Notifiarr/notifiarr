@@ -61,52 +61,18 @@ func TestSonarrTagLabel(t *testing.T) {
 	require.Equal(t, "a--b", sonarrTagLabel("a__b"))
 }
 
-func TestSetupSonarrSelectsAPI(t *testing.T) {
+func TestSetupSonarrDoesNotProbe(t *testing.T) {
 	t.Parallel()
 
-	t.Run("v5", func(t *testing.T) {
-		t.Parallel()
+	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
+		t.Errorf("setup contacted Sonarr: %s %s", req.Method, req.URL.Path)
+		writer.WriteHeader(http.StatusInternalServerError)
+	}))
+	t.Cleanup(server.Close)
 
-		var paths []string
-
-		server := sonarrStatusServer(t, &paths, `{"version":"5.0.0.2742"}`)
-		got := setupOneSonarr(t, server.URL)
-		require.Equal(t, sonarr.APIv5, got.APIVersion())
-		require.Equal(t, "5.0.0.2742", got.Version())
-
-		_, err := got.GetQualityProfilesContext(context.Background())
-		require.NoError(t, err)
-		require.Equal(t, []string{"/api/v3/system/status", "/api/v5/qualityProfile"}, paths)
-	})
-
-	t.Run("v4", func(t *testing.T) {
-		t.Parallel()
-
-		var paths []string
-
-		server := sonarrStatusServer(t, &paths, `{"version":"4.0.20.3014"}`)
-		got := setupOneSonarr(t, server.URL)
-		require.Equal(t, sonarr.APIver, got.APIVersion())
-		require.Equal(t, "4.0.20.3014", got.Version())
-
-		_, err := got.GetQualityProfilesContext(context.Background())
-		require.NoError(t, err)
-		require.Equal(t, []string{"/api/v3/system/status", "/api/v3/qualityProfile"}, paths)
-	})
-
-	t.Run("probe failure stays on v3", func(t *testing.T) {
-		t.Parallel()
-
-		server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
-			writer.WriteHeader(http.StatusInternalServerError)
-			_, _ = writer.Write([]byte(`{"message":"nope"}`))
-		}))
-		t.Cleanup(server.Close)
-
-		got := setupOneSonarr(t, server.URL)
-		require.Equal(t, sonarr.APIver, got.APIVersion())
-		require.Empty(t, got.Version())
-	})
+	got := setupOneSonarr(t, server.URL)
+	require.Equal(t, sonarr.APIver, got.APIVersion())
+	require.Empty(t, got.Version())
 }
 
 func TestSonarrUpdateSeriesKeepsLanguage(t *testing.T) {
@@ -225,26 +191,6 @@ func TestSonarrQualityProfileKeepsItemSizes(t *testing.T) {
 	require.Contains(t, got, `"preferredSize":0`)
 }
 
-func sonarrStatusServer(t *testing.T, paths *[]string, status string) *httptest.Server {
-	t.Helper()
-
-	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, req *http.Request) {
-		*paths = append(*paths, req.URL.Path)
-
-		switch req.URL.Path {
-		case "/api/v3/system/status":
-			_, _ = writer.Write([]byte(status))
-		case "/api/v3/qualityProfile", "/api/v5/qualityProfile":
-			_, _ = writer.Write([]byte(`[]`))
-		default:
-			writer.WriteHeader(http.StatusNotFound)
-		}
-	}))
-	t.Cleanup(server.Close)
-
-	return server
-}
-
 func setupOneSonarr(t *testing.T, appURL string) Sonarr {
 	t.Helper()
 
@@ -254,7 +200,7 @@ func setupOneSonarr(t *testing.T, appURL string) Sonarr {
 		Name:    "TV",
 		Timeout: cnfg.Duration{Duration: time.Second},
 	}}}
-	got, err := cfg.setupSonarr(t.Context())
+	got, err := cfg.setupSonarr()
 	require.NoError(t, err)
 	require.Len(t, got, 1)
 

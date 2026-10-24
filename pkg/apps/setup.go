@@ -6,7 +6,6 @@
 package apps
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/http"
@@ -193,7 +192,7 @@ func CheckURLs(config *AppsConfig) error { //nolint:cyclop,gocognit,funlen
 
 // New creates request interfaces and sets the timeout for each server.
 // This is part of the config/startup init.
-func New(ctx context.Context, config *AppsConfig) (*Apps, error) { //nolint:cyclop,funlen
+func New(config *AppsConfig) (*Apps, error) { //nolint:cyclop,funlen
 	var err error
 
 	apps := &Apps{
@@ -223,7 +222,7 @@ func New(ctx context.Context, config *AppsConfig) (*Apps, error) { //nolint:cycl
 		return nil, err
 	}
 
-	apps.Sonarr, err = config.setupSonarr(ctx)
+	apps.Sonarr, err = config.setupSonarr()
 	if err != nil {
 		return nil, err
 	}
