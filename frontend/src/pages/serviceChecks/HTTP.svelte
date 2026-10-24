@@ -71,8 +71,11 @@
 
   let codeFeedback = $state<string | undefined>(undefined)
 
-  const updateValue = (id: string, value: any): string => {
-    form.value = [
+  // Input calls validate from `$derived`. Writing form.value there throws
+  // state_unsafe_mutation, so persist the split fields from an effect.
+  const syncValue = () => {
+    if (!form) return
+    const next = [
       httpCheck.url.trim(),
       httpCheck.headers
         .split('\n')
@@ -81,13 +84,14 @@
     ]
       .filter(v => v.trim())
       .join('|')
-
-    return id ? (validate?.(id, value) ?? '') : ''
+    if (form.value !== next) form.value = next
   }
 
   const updateExpect = (codes = httpCheck.codes, validSsl = httpCheck.validSsl) => {
+    if (!form) return
     const list = selectIds(codes)
-    form.expect = [...list, ...(validSsl ? ['SSL'] : [])].join(',')
+    const next = [...list, ...(validSsl ? ['SSL'] : [])].join(',')
+    if (form.expect !== next) form.expect = next
     codeFeedback = validate?.(app.id + '.http.codes', list)
   }
 
@@ -104,6 +108,7 @@
   // CheckedInput toggles validSsl on https URLs. Do not assign httpCheck.codes here
   // (that fights bind:value); only rewrite the persisted expect string.
   $effect(() => {
+    syncValue()
     updateExpect(httpCheck.codes, httpCheck.validSsl)
   })
 </script>
@@ -116,7 +121,7 @@
     {index}
     bind:form={httpCheck}
     original={originalHttp}
-    validate={updateValue} />
+    {validate} />
 </Col>
 
 <Col lg={6}>
@@ -127,7 +132,7 @@
     envVar={`${app.envPrefix}_${index}_VALUE`}
     bind:value={httpCheck.headers}
     original={originalHttp.headers}
-    validate={updateValue}
+    {validate}
     badge={$_('Endpoints.badge.header', {
       values: { count: httpCheck.headers.split('\n').filter(h => h.trim()).length ?? 0 },
     })} />
