@@ -319,6 +319,8 @@ golift.io/starr v1.4.2-0.20261022051616-61b83f734fee h1:VI4hAEoiRiPa4Di/05FEb/66
 golift.io/starr v1.4.2-0.20261022051616-61b83f734fee/go.mod h1:UFkyD2tt3OXn2xQ0wtFHOq194SW7c/A0dANuRCuuJRg=
 golift.io/starr v1.4.2-0.20261022061854-b46c165d5e43 h1:dbTPLCp5pYZdbUovmYHF4lonEWa0beeHaCJrs38PQmM=
 golift.io/starr v1.4.2-0.20261022061854-b46c165d5e43/go.mod h1:UFkyD2tt3OXn2xQ0wtFHOq194SW7c/A0dANuRCuuJRg=
+golift.io/starr v1.4.2-0.20261025024817-63dfb0eb1aab h1:yjZ6JE4d+v2izvzGC58if0YFzJOizla3Go0VrcoxStc=
+golift.io/starr v1.4.2-0.20261025024817-63dfb0eb1aab/go.mod h1:UFkyD2tt3OXn2xQ0wtFHOq194SW7c/A0dANuRCuuJRg=
 golift.io/udf v0.1.0 h1:arzc1C6Ko9MR2lvpZuZ1WXceGkUxsTOvxg3NIiX6iiA=
 golift.io/udf v0.1.0/go.mod h1:rw8k1sEHRzKZJCgBFfSPolPb0CpyS0apwoeOwwQQM6o=
 golift.io/version v0.0.2 h1:i0gXRuSDHKs4O0sVDUg4+vNIuOxYoXhaxspftu2FRTE=
