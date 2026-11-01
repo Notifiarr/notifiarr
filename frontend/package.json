@@ -27,7 +27,7 @@
     "@tsconfig/svelte": "^5.0.4",
     "@types/crypto-js": "^4.2.2",
     "@types/js-cookie": "^3.0.6",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.0.0",
     "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-svelte": "^3.23.1",
