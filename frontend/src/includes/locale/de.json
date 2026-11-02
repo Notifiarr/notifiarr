@@ -1,1498 +1,1869 @@
 {
     "phrases": {
-        "UpdatingBackEnd": "",
-        "LeavePage": "",
+        "UpdatingBackEnd": "Backend wird aktualisiert...",
+        "LeavePage": "Willst du diese Seite wirklich verlassen?",
         "Changed": "Geändert",
-        "New": "",
-        "Invalid": "",
-        "DeleteInstance": "",
-        "DeletedNumber": "",
-        "ItsGone": "",
-        "FailedToUpdateBackEnd": "",
-        "ConfigurationSavedReloading": "",
-        "ConfigurationSaved": "",
-        "SavingConfiguration": "",
-        "Version": "",
-        "Every12Hours": "",
+        "New": "Neu",
+        "Invalid": "Ungültig",
+        "DeleteInstance": "Instanz löschen",
+        "DeletedNumber": "{number} gelöscht",
+        "ItsGone": "Weg ist es! Vergiss nicht zu speichern.",
+        "FailedToUpdateBackEnd": "Backend konnte nicht aktualisiert werden: {error}",
+        "ConfigurationSavedReloading": "Konfiguration gespeichert! Client wird neu geladen...",
+        "ConfigurationSaved": "Konfiguration vor {timeDuration} gespeichert!",
+        "SavingConfiguration": "Konfiguration wird gespeichert...",
+        "Version": "Version {version}",
+        "Every12Hours": "Alle 12 Stunden",
         "Landing": {
-            "SelectASection": "",
-            "Welcome": ""
+            "SelectASection": "Wähle einen Bereich im Navigationsmenü aus, um zu starten.",
+            "Welcome": "Willkommen, {username}!"
         },
-        "UpdateBackend": "",
-        "TryRefreshingThePage": "",
-        "Every6Hours": "",
-        "Every3Hours": "",
+        "UpdateBackend": "Backend aktualisieren",
+        "TryRefreshingThePage": "Versuche, die Seite neu zu laden.",
+        "Every6Hours": "Alle 6 Stunden",
+        "Every3Hours": "Alle 3 Stunden",
         "ConfirmReloadBody": "Willst du den Client wirklich neu laden?",
-        "ReloadSuccess": "",
+        "ReloadSuccess": "Erfolgreich neu geladen! Der Client wurde neu geladen.",
         "APIKeyMustBeCountCharactersOrLonger": "API-Schlüssel muss {count} Zeichen oder länger sein.",
-        "TokenMustBeCountCharacters": "",
-        "Reloading": "",
-        "FailedToReload": "",
-        "ConfirmReload": "",
-        "ConfirmShutdown": "",
+        "TokenMustBeCountCharacters": "Token muss {count} Zeichen oder länger sein.",
+        "Reloading": "Wird neu geladen...",
+        "FailedToReload": "Neu laden fehlgeschlagen: {error}",
+        "ConfirmReload": "Neu laden bestätigen",
+        "ConfirmShutdown": "Herunterfahren bestätigen",
         "ConfirmShutdownBody": "Willst du den Client wirklich herunterfahren? Du musst ihn dann auf dem Host, auf dem er läuft, neu starten.",
-        "ShutdownSuccess": "",
-        "FailedToShutdown": "",
-        "LoginHelp": "",
-        "LoginHelpBody": "",
-        "ERROR": "",
-        "LoggingIn": "",
-        "LoggedIn": "",
-        "Loading": "",
-        "BackEndUpdated": "",
-        "ReloadCheckTimedOut": "",
-        "URLMustBeginWithHttp": "",
-        "NameMustNotBeEmpty": "",
-        "HostMustNotBeEmpty": "",
-        "UsernameMustNotBeEmpty": "",
-        "NameInUseByInstance": ""
+        "ShutdownSuccess": "Herunterfahren erfolgreich! Der Client wurde angehalten.",
+        "FailedToShutdown": "Herunterfahren fehlgeschlagen: {error} - Versuche, die Seite neu zu laden.",
+        "LoginHelp": "Hilfe zur Anmeldung",
+        "LoginHelpBody": "Wenn du dich zum ersten Mal anmeldest, verwende deine E-Mail-Adresse und dein Passwort von notifiarr.com. Ein lokales Passwort kannst du nach der Anmeldung festlegen. Wenn du dein lokales Passwort vergessen hast, siehe die Wiki-Seite <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">vergessene Passwörter</a>.",
+        "ERROR": "FEHLER",
+        "LoggingIn": "Anmeldung läuft...",
+        "LoggedIn": "Angemeldet!",
+        "Loading": "Wird geladen...",
+        "BackEndUpdated": "Backend vor {timeDuration} aktualisiert.",
+        "ReloadCheckTimedOut": "Die Prüfung, ob der Server neu geladen wurde, hat nach 20 Versuchen das Timeout erreicht",
+        "URLMustBeginWithHttp": "Die URL muss mit http:// oder https:// beginnen.",
+        "NameMustNotBeEmpty": "Der Name darf nicht leer sein.",
+        "HostMustNotBeEmpty": "Der Host darf nicht leer sein.",
+        "UsernameMustNotBeEmpty": "Der Benutzername darf nicht leer sein.",
+        "NameInUseByInstance": "Dieser Name wird bereits von Instanz {number} verwendet.",
+        "ToggleSpoilerVisibility": "Klicke, um die Spoiler-Sichtbarkeit umzuschalten.",
+        "EnvironmentVariable": "Name der Umgebungsvariable: <code>{variableName}</code>",
+        "VariableDescription": "<span class=\"text-warning\">Hinweis:</span> Dieser Konfigurationswert stammt aus einer Umgebungsvariable. Wenn du den Wert hier änderst, wird der neue Wert in die Konfigurationsdatei geschrieben, er wird aber nicht wirksam. Beim nächsten Klick auf Speichern wird er ersetzt. Ändere den Wert, indem du die Umgebungsvariable anpasst oder sie aus der Umgebung entfernst.",
+        "EveryDuration": "Alle {timeDuration}",
+        "APIKeyMustBeCountCharacters": "API-Schlüssel muss {count} Zeichen lang sein.",
+        "InvalidAPIKey": "Ungültiger Notifiarr-API-Schlüssel — aktualisiere ihn in der Konfiguration.",
+        "ShowMore": "Mehr Informationen anzeigen",
+        "ShowPassword": "Passwort anzeigen",
+        "HidePassword": "Passwort ausblenden",
+        "CheckInstance": "Instanz prüfen",
+        "ValidateSSL": "SSL-Zertifikat validieren",
+        "RunAsShell": "Als Shell-Befehl ausführen",
+        "FollowRedirects": "Weiterleitungen folgen",
+        "BrowseFiles": "Dateien durchsuchen",
+        "APIKey": {
+            "title": "API-Schlüssel angeben",
+            "placeholder": "Globaler API-Schlüssel von notifiarr.com",
+            "setMsg": "API-Schlüssel erfolgreich gesetzt!",
+            "Setting": "API-Schlüssel wird gesetzt...",
+            "description": "Der Notifiarr-Client benötigt einen gültigen API-Schlüssel, um zu funktionieren. Mit diesem Schlüssel authentifiziert er sich bei der Notifiarr-Website, um Aktualisierungen zu empfangen und Benachrichtigungen zu senden. Ohne ihn funktioniert der Client nicht. Bitte gib deinen API-Schlüssel unten ein."
+        }
     },
     "config": {
         "command": {
             "name": {
-                "description": "",
-                "label": "",
-                "required": ""
+                "description": "Name des Befehls.",
+                "label": "Name",
+                "required": "Ein Befehl ist erforderlich."
             }
         },
         "httpLog": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "HTTP-Protokolldatei",
+            "description": "Pfad zur HTTP-Protokolldatei oder zum Ordner.",
+            "placeholder": "/path/to/http-notifiarr.log",
+            "tooltip": "Wenn du hier einen Pfad angibst, schreibt die Anwendung die HTTP-Protokolle in eine eigene Datei. Das Format entspricht dem Apache-Log. Sehr empfohlen. Wenn du einen Ordner ohne Dateinamen angibst, erstellt die Anwendung im Ordner eine Datei namens Notifiarr.http.log."
         },
         "logFiles": {
-            "description": "",
-            "tooltip": "",
-            "label": ""
+            "description": "Anzahl der aufzubewahrenden Protokolldateien.",
+            "tooltip": "Bei 0 oder 1 ist die Rotation der Protokolldateien deaktiviert. Diese Einstellung gilt für alle Protokolldateien und behält von jeder so viele auf dem Datenträger.",
+            "label": "Anzahl der Protokolldateien"
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Timeout",
+            "description": "Das ist das Timeout für API-Anfragen an Notifiarr.com."
         },
         "fileMode": {
-            "description": "",
-            "label": "",
-            "tooltip": ""
+            "description": "Das ist der Unix-Dateimodus beim Schreiben neuer Protokolldateien.",
+            "label": "Unix-Dateimodus der Protokolldatei",
+            "tooltip": "Empfohlene Werte nach zunehmender Offenheit: 0600, 0640, 0644"
         },
         "services": {
             "disabled": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Zustandsprüfungen",
+                "description": "Zustandsprüfungen aktivieren oder deaktivieren.",
+                "tooltip": "Aktiviere oder deaktiviere hier die Überwachung für alle Zustandsprüfungen."
             },
             "interval": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Aktualisierungsintervall",
+                "description": "Aktualisierungsintervall für Zustandsprüfungen.",
+                "tooltip": "Legt fest, wie oft zusammengefasste Ergebnisse der Zustandsprüfungen an Notifiarr.com gesendet werden. Ändert sich der Zustand einer Zustandsprüfung, wird das immer sofort gesendet."
             },
             "logFile": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "placeholder": ""
+                "label": "Protokolldatei der Dienste",
+                "description": "Pfad zur Protokolldatei der Dienste oder zum Ordner.",
+                "tooltip": "Die Protokolldatei speichert die Ergebnisse der Zustandsprüfungen. Bleibt das Feld leer, wird die Ausgabe der Zustandsprüfungen in die Anwendungsprotokolldatei geschrieben. Wenn du einen Ordner ohne Dateinamen angibst, erstellt die Anwendung im Ordner eine Datei namens Notifiarr.services.log.",
+                "placeholder": "/path/to/services-notifiarr.log"
             }
         },
         "ui": {
             "language": {
-                "label": "",
-                "description": ""
+                "label": "Sprache",
+                "description": "Sprache der Anwendungsoberfläche."
             },
             "darkMode": {
-                "label": "",
-                "description": ""
+                "label": "Dunkelmodus",
+                "description": "Dunkelmodus aktivieren oder deaktivieren."
             }
         },
         "titles": {
-            "Endpoint": "",
-            "Command": "",
-            "SSLConfiguration": "",
-            "Services": "",
-            "Logging": "",
-            "System": "",
-            "WatchFile": "",
-            "Light": "",
-            "Configuration": "",
-            "General": "",
-            "Network": "",
+            "Endpoint": "Endpunkt",
+            "Command": "Befehl",
+            "SSLConfiguration": "SSL-Konfiguration",
+            "Services": "Dienste",
+            "Logging": "Protokollierung",
+            "System": "System",
+            "WatchFile": "Datei überwachen",
+            "Light": "Hell",
+            "Configuration": "Konfiguration",
+            "General": "Allgemein",
+            "Network": "Netzwerk",
             "Dark": "Dunkel"
         },
         "snapshot": {
             "timeout": {
-                "description": "",
-                "label": ""
+                "description": "Timeout für Snapshot-Vorgänge.",
+                "label": "Timeout"
             }
         },
         "sslKeyFile": {
-            "description": "",
-            "tooltip": "",
-            "label": "",
-            "placeholder": ""
+            "description": "Pfad zur SSL-Schlüsseldatei.",
+            "tooltip": "Diese Anwendung kann HTTPS bereitstellen. Aktiviere das, indem du einen Pfad zur Zertifikatsdatei und einen Pfad zur Schlüsseldatei angibst.",
+            "label": "SSL-Schlüsseldatei",
+            "placeholder": "/path/to/ssl-key.pem"
         },
         "sslCertFile": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "SSL-Zertifikatsdatei",
+            "description": "Pfad zur SSL-Zertifikatsdatei.",
+            "placeholder": "/path/to/ssl-cert.pem",
+            "tooltip": "Diese Anwendung kann HTTPS bereitstellen. Aktiviere das, indem du einen Pfad zur Zertifikatsdatei und einen Pfad zur Schlüsseldatei angibst."
         },
         "debug": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Debug-Protokollierung",
+            "description": "Debug-Protokollierung aktivieren oder deaktivieren.",
+            "tooltip": "Wenn du Debug aktivierst, werden deutlich mehr Daten ins Protokoll geschrieben. Steuere die Größe der Nutzdaten über die Einstellung Maximale Body-Größe."
         },
         "noUploads": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Uploads ablehnen",
+            "description": "<b>Deaktiviert</b> erlaubt Administratoren von Notifiarr.com, diesen Client Protokolldateien auf die Website hochladen zu lassen. <b>Aktiviert</b> verhindert das Hochladen von Protokolldateien.",
+            "tooltip": "Diese Einstellung steuert, ob die Website Notifiarr.com und Notifiarr-Administratoren diesen Client veranlassen können, Protokolldateien auf die Website hochzuladen. Manchmal müssen wir bei der Fehlersuche Protokolleinträge sehen, und über diesen Auslöser kann der Client die Anwendungs- und Debug-Protokolldateien hochladen."
         },
         "logFileMb": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Größe der Protokolldatei",
+            "description": "Maximale Größe der Protokolldatei vor der Rotation.",
+            "tooltip": "Wenn die Rotation aktiviert ist (Anzahl der Protokolldateien höher als 1), legt diese Einstellung fest, wie groß eine Datei sein muss, damit die Rotation startet."
         },
         "bindAddr": {
-            "description": "",
-            "placeholder": "",
+            "description": "IP und Port, auf denen die App lauscht. Verwende 0.0.0.0, um auf allen Schnittstellen zu lauschen.",
+            "placeholder": "0.0.0.0:5454",
             "label": "Adresse verknüpfen"
         },
         "errors": {
-            "InvalidCreds": "",
-            "LoginRequestTimedOut": "",
-            "LoginFailed": "",
-            "ProfileReqTimedOut": "",
+            "InvalidCreds": "Ungültiger Benutzername oder ungültiges Passwort.",
+            "LoginRequestTimedOut": "Die Anmeldeanfrage hat das Timeout erreicht",
+            "LoginFailed": "Anmeldung fehlgeschlagen: {error}",
+            "ProfileReqTimedOut": "Die Profilanfrage hat das Timeout erreicht",
             "AnUnknownErrorOccurred": "Ein unbekannter Fehler ist aufgetreten",
-            "ConfigUpdateFailed": "",
-            "PleaseEnterBothUsernameAndPassword": ""
+            "ConfigUpdateFailed": "Aktualisierung der Konfiguration fehlgeschlagen: {error}",
+            "PleaseEnterBothUsernameAndPassword": "Bitte gib sowohl Benutzername als auch Passwort ein.",
+            "SetAPIKeyFailed": "API-Schlüssel konnte nicht gesetzt werden: {error}"
         },
         "apiKey": {
             "label": "API-Schlüssel",
             "description": "API-Schlüssel vom deinem Notifiarr.com Konto.",
-            "tooltip": "",
-            "placeholder": ""
+            "tooltip": "Finde ihn, indem du dich bei Notifiarr.com anmeldest, zu Profil und dann zu API-Schlüssel gehst.",
+            "placeholder": "Gib hier deinen API-Schlüssel ein"
         },
         "extraKeys": {
-            "label": "",
+            "label": "Zusätzliche Schlüssel",
             "description": "Zusätzliche API-Schlüssel für Integrationen von Drittanbietern. Aufteilen auf neue Zeile.",
-            "placeholder": ""
+            "placeholder": "Einer pro Zeile..."
         },
         "quiet": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Stille Protokollierung",
+            "description": "Stille Protokollierung aktivieren oder deaktivieren.",
+            "tooltip": "Wenn du Stille aktivierst, gibt die App nichts auf stdout aus. Das ist nützlich, wenn eine Protokolldatei aktiv ist und die Protokolle nicht zusätzlich in einen Start-Daemon strömen sollen."
         },
         "logFile": {
             "label": "Anwendungsprotokolldatei",
-            "description": "",
-            "placeholder": ""
+            "description": "Pfad zur Anwendungsprotokolldatei oder zum Ordner.",
+            "placeholder": "/path/to/notifiarr.log",
+            "tooltip": "Wenn du einen Ordner ohne Dateinamen angibst, erstellt die Anwendung im Ordner eine Datei namens Notifiarr.log."
         },
         "debugLog": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Debug-Protokolldatei",
+            "description": "Pfad zur Debug-Protokolldatei oder zum Ordner.",
+            "placeholder": "/path/to/debug-notifiarr.log",
+            "tooltip": "Wenn du hier einen Pfad angibst, schreibt die Anwendung die Debug-Protokolle in eine eigene Datei. Ist das Feld leer, werden Debug-Protokolle in die Anwendungsprotokolldatei geschrieben. Wenn du einen Ordner ohne Dateinamen angibst, erstellt die Anwendung im Ordner eine Datei namens Notifiarr.debug.log."
         },
         "maxBody": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Maximale Body-Größe",
+            "description": "Maximale Body-Größe für HTTP-Anfragen.",
+            "tooltip": "Wenn Debug aktiviert ist, begrenzt diese Einstellung, wie viele Nutzdaten ins Protokoll geschrieben werden, an Notifiarr.com oder von dort."
         },
         "service": {
             "name": {
-                "description": "",
-                "label": ""
+                "description": "Name des Dienstes.",
+                "label": "Name"
             }
         },
         "watchFile": {
             "path": {
-                "label": "",
-                "description": ""
+                "label": "Dateipfad",
+                "description": "Pfad zur Datei, die überwacht werden soll."
             }
         },
         "endpoint": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Name",
+                "description": "Name des Endpunkts."
             }
         },
         "urlbase": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "URL-Basis",
+            "description": "Diese Anwendung stellt HTTP standardmäßig unter / bereit. Du kannst das ändern, indem du hier etwas anderes eingibst.",
+            "placeholder": "/notifiarr/",
+            "tooltip": "Beispiel: /notifiarr/"
         },
         "hostId": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Host-ID",
+            "description": "Der Parameter Host-ID identifiziert diese Client-Installation eindeutig.",
+            "tooltip": "Es wird davon abgeraten, diesen Wert zu ändern; er sollte automatisch ermittelt werden. Kopiere diesen Wert nicht in eine andere Installation des Notifiarr-Clients."
         },
         "serial": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Parallele Threads",
+            "description": "Wenn du diese Einstellung deaktivierst, verwendet die Anwendung weniger Goroutinen (Threads), wenn sie Daten von konfigurierten Anwendungen sammelt.",
+            "tooltip": "Verteilt die CPU-Auslastung und senkt den Speicherbedarf."
         },
         "retries": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Wiederholungen",
+            "description": "Manchmal schlagen Verbindungen zu Notifiarr.com fehl. Das legt fest, wie oft jede Anfrage bei Fehlern versucht wird.",
+            "tooltip": "Standard: 4 (der Wert 0 verwendet den Standardwert 4)"
         },
         "apt": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "APT-Hook",
+            "description": "Die Debian- (und Ubuntu-)Pakete von Notifiarr enthalten eine APT-Integration.",
+            "tooltip": "Die Debian- (und Ubuntu-)Pakete von Notifiarr enthalten eine APT-Integration. Diese Integration wird bei jedem Ausführen eines <b class=\"text-warning\">apt</b>-Befehls aufgerufen. Setze dieses Feld zum Aktivieren auf Aktiviert und <b>aktiviere dann die Paketmanager-Integration auf Notifiarr.com.</b> Diese Funktion setzt nicht voraus, dass der Client läuft; es genügt, dass das deb-Paket des Clients installiert ist. Das funktioniert nicht unter RHEL oder auf Nicht-Debian-Linux."
         },
         "autoUpdate": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Automatische Aktualisierung",
+            "description": "Legt fest, wie oft die Anwendung nach Aktualisierungen sucht. Wird eine gefunden, wird sie automatisch installiert.",
+            "tooltip": "Das funktioniert nur unter Windows."
         },
         "unstableCh": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Unstable-Kanal",
+            "description": "Wenn du den Unstable-Aktualisierungskanal aktivierst, sucht die Anwendung automatische Aktualisierungen auf der Unstable-Website statt auf GitHub.",
+            "tooltip": "Nur für Benutzer mit Entwicklerzugang verfügbar."
+        },
+        "trace": {
+            "label": "Trace-Protokollierung",
+            "description": "Trace-Protokollierung aktivieren oder deaktivieren.",
+            "tooltip": "Wenn du Trace aktivierst, wird der Ausführungsablauf sehr ausführlich ins Protokoll geschrieben. Für tiefgehende Fehlersuche."
         }
     },
     "profile": {
         "phrase": {
-            "EnterCurrentPassword": "",
-            "ProxyAuthDisabled": "",
-            "PasswordOnlyUsed": "",
-            "HeaderOnlyUsed": "",
-            "AuthTypeChange": "",
-            "Addit": "",
-            "ShowMoreDesc": "",
-            "ProfileUpdated": "",
-            "SeeWikiForAuthProxyHelp": "",
-            "ShowMeMore": "",
-            "ShowMeLess": ""
+            "EnterCurrentPassword": "Gib dein aktuelles Passwort ein, um Änderungen vorzunehmen.",
+            "ProxyAuthDisabled": "Die Proxy-Authentifizierung ist deaktiviert, weil dein Upstream ({upstreamIp}) nicht in der Liste der erlaubten Upstreams steht.",
+            "PasswordOnlyUsed": "Benutzername und Passwort werden nur verwendet, wenn der Authentifizierungstyp auf Passwort gesetzt ist.",
+            "HeaderOnlyUsed": "Der Auth-Header wird nur verwendet, wenn der Authentifizierungstyp auf Header oder Kein Passwort gesetzt ist.",
+            "AuthTypeChange": "Wenn sich der Authentifizierungstyp ändert, melde dich ab, um den Vorgang abzuschließen.",
+            "Addit": "Füge ihn hinzu.",
+            "ShowMoreDesc": "Derzeit werden drei Authentifizierungstypen unterstützt. Auth-Proxy und Kein Passwort sind nur verfügbar, wenn die aktuelle Anfrage von einer gültigen, konfigurierten Upstream-IP-Adresse kommt.",
+            "ProfileUpdated": "Profil vor {timeDuration} erfolgreich aktualisiert!",
+            "SeeWikiForAuthProxyHelp": "Siehe <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">das Wiki</a> für eine Anleitung zum Einrichten eines Authentifizierungsproxys.",
+            "ShowMeMore": "Zeig mir mehr.",
+            "ShowMeLess": "Zeig mir weniger."
         },
         "newPass": {
-            "placeholder": "",
-            "description": "",
-            "label": ""
+            "placeholder": "mindestens 9 Zeichen",
+            "description": "Dein neues Passwort für die Anmeldung",
+            "label": "Neues Passwort"
         },
         "username": {
-            "description": "",
-            "label": "",
-            "placeholder": ""
+            "description": "Dein Benutzername für die Anmeldung",
+            "label": "Benutzername",
+            "placeholder": "Standard: admin"
         },
         "authType": {
             "options": {
-                "noauth": "",
-                "password": "",
-                "header": ""
+                "noauth": "Kein Passwort (gefährlich)",
+                "password": "Passwort: lokaler Benutzername",
+                "header": "Auth-Proxy: Header",
+                "website": "Website-Zugangsdaten"
             },
             "label": "Authentifizierungstyp",
-            "description": "",
+            "description": "Wähle, wie du dich beim Client authentifizierst",
             "option_desc": {
-                "password": "",
-                "header": "",
-                "noauth": ""
+                "password": "Das ist der Standard-Authentifizierungstyp. Wähle die Option Passwort, um dich bei dieser Anwendung mit einem konfigurierten Benutzernamen und Passwort anzumelden. Es wird nur 1 Benutzername und 1 Passwort unterstützt. Wenn du diese Option wählst, musst du die Felder Benutzername und Neues Passwort ausfüllen. Wenn das der aktuelle Authentifizierungstyp ist, musst du zum Ändern auch das Feld Aktuelles Passwort ausfüllen.",
+                "header": "Wähle diese Option, um dich bei dieser Anwendung über einen HTTP-Header anzumelden, der einen Benutzernamen enthält. Das wird allgemein Proxy-Authentifizierung genannt. Wir haben <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">eine Wiki-Seite</a> mit einer Anleitung, Nginx für diese Funktion zu konfigurieren. Wenn du diese Option wählst, musst du auch einen Header für den Auth-Proxy auswählen. Werden keine Header angezeigt, hat der Upstream-Proxy keine gültigen Header übermittelt.",
+                "noauth": "Diese Konfiguration wird nicht empfohlen. Der Authentifizierungstyp Kein Passwort erlaubt jede Anfrage von jeder konfigurierten <code>Upstream-IP</code>. Er funktioniert auch mit einem Auth-Proxy, der den Benutzernamen setzt. Steht im angegebenen Header kein Benutzername, wird standardmäßig admin verwendet.",
+                "website": "Wähle diese Option, um dich bei dieser Anwendung mit den Zugangsdaten der Website anzumelden. Damit kannst du dich beim Client mit deiner E-Mail-Adresse oder deinem Benutzernamen und Passwort von Notifiarr.com anmelden. Dein Passwort ist immer geschützt und wird verschlüsselt, bevor es an den Client übertragen wird."
             }
         },
         "upstreams": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Upstreams",
+            "description": "Vertrauenswürdige Proxy-IP oder CIDR-Netze. Trenne Netze mit Leerzeichen.",
+            "placeholder": "127.0.0.1 ::1",
+            "tooltip": "Wenn der Notifiarr-Client hinter einem Reverse-Proxy steht (swag, nginx usw.), solltest du die IP dieses Proxys hier eintragen. Du kannst auch ganze Netze angeben. Das steuert, welche IP in die Protokolldatei des Webservers geschrieben wird: die des Anfragenden oder die aus dem Header <span class=\"text-warning\">X-Forwarded-For</span>. Erforderlich, wenn ein Anfrage-Header für die Authentifizierung verwendet wird oder die Authentifizierung deaktiviert ist."
         },
         "title": {
             "Authentication": "Authentifizierung",
             "Authorization": "Autorisierung"
         },
         "header": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Auth-Header",
+            "description": "Wähle den Header, der deinen Benutzernamen enthält",
+            "tooltip": "Zeigt Header an, die der Client oder der Upstream für die Proxy-Authentifizierung bereitstellt. Diese Auswahl gilt, wenn der Authentifizierungstyp auf Header oder Kein Passwort gesetzt ist. Wähle den Header, der deinen richtigen Benutzernamen anzeigt. Bei Kein Passwort setzt der Header den Benutzernamen, ist aber nicht erforderlich."
         },
         "password": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Aktuelles Passwort",
+            "description": "Gib dein aktuelles Passwort ein, um Änderungen vorzunehmen",
+            "placeholder": "Aktuelles Passwort eingeben"
         }
     },
     "StarrApps": {
         "Prowlarr": {
             "password": {
-                "placeholder": "",
-                "label": "",
-                "description": ""
+                "placeholder": "Passwort",
+                "label": "Passwort",
+                "description": "Passwort für die Prowlarr Instanz."
             },
             "username": {
-                "description": "",
-                "label": "",
-                "placeholder": "",
-                "tooltip": ""
+                "description": "Benutzername für die Prowlarr Instanz.",
+                "label": "Benutzername",
+                "placeholder": "admin",
+                "tooltip": "Benutzername und Passwort brauchst du nur, wenn du Datenbanksicherungen prüfen willst, denn die lassen sich nicht über die API herunterladen."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Prowlarr Instanz.",
+                "placeholder": "http://prowlarr.server.tv:9696"
             },
-            "title": "",
+            "title": "Prowlarr",
             "addInstance": "Prowlarr Instanz hinzufügen",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Prowlarr Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "apiKey": {
                 "label": "API-Schlüssel",
                 "description": "API-Schlüssel für die Prowlarr Instanz",
-                "placeholder": ""
+                "placeholder": "prowlarr-API-Schlüssel"
             }
         },
         "Radarr": {
-            "title": "",
+            "title": "Radarr",
             "password": {
-                "description": "",
-                "label": "",
-                "placeholder": ""
+                "description": "Passwort für die Radarr Instanz.",
+                "label": "Passwort",
+                "placeholder": "Passwort"
             },
             "addInstance": "Radarr Instanz hinzufügen",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Radarr Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Radarr Instanz.",
+                "placeholder": "http://radarr.server.tv:7878"
             },
             "apiKey": {
                 "label": "API-Schlüssel",
                 "description": "API-Schlüssel für die Radarr Instanz.",
-                "placeholder": ""
+                "placeholder": "radarr-API-Schlüssel"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Benutzername",
+                "description": "Benutzername für die Radarr Instanz.",
                 "placeholder": "admin",
-                "tooltip": ""
+                "tooltip": "Benutzername und Passwort brauchst du nur, wenn du Datenbanksicherungen prüfen willst, denn die lassen sich nicht über die API herunterladen."
             }
         },
         "Readarr": {
             "username": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
+                "label": "Benutzername",
+                "description": "Benutzername für die Readarr Instanz.",
+                "tooltip": "Benutzername und Passwort brauchst du nur, wenn du Datenbanksicherungen prüfen willst, denn die lassen sich nicht über die API herunterladen.",
                 "placeholder": "admin"
             },
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Readarr Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Readarr Instanz.",
+                "placeholder": "http://readarr.server.tv:8787"
             },
             "apiKey": {
                 "label": "API-Schlüssel",
                 "description": "API-Schlüssel für die Readarr Instanz.",
-                "placeholder": ""
+                "placeholder": "readarr-API-Schlüssel"
             },
-            "title": "",
+            "title": "Readarr",
             "addInstance": "Readarr Instanz hinzufügen",
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die Readarr Instanz.",
+                "placeholder": "Passwort"
             }
         },
         "Sonarr": {
             "apiKey": {
                 "description": "API-Schlüssel für die Sonarr Instanz.",
                 "label": "API-Schlüssel",
-                "placeholder": ""
+                "placeholder": "sonarr-API-Schlüssel"
             },
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Sonarr Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Sonarr Instanz.",
+                "placeholder": "http://sonarr.server.tv:8989"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Benutzername",
+                "description": "Benutzername für die Sonarr Instanz.",
                 "placeholder": "admin",
-                "tooltip": ""
+                "tooltip": "Benutzername und Passwort brauchst du nur, wenn du Datenbanksicherungen prüfen willst, denn die lassen sich nicht über die API herunterladen."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die Sonarr Instanz.",
+                "placeholder": "Passwort"
             },
-            "title": "",
+            "title": "Sonarr",
             "addInstance": "Sonarr Instanz hinzufügen"
         },
         "Lidarr": {
             "apiKey": {
                 "label": "API-Schlüssel",
                 "description": "API-Schlüssel für die Lidarr Instanz",
-                "placeholder": ""
+                "placeholder": "lidarr-API-Schlüssel"
             },
-            "title": "",
+            "title": "Lidarr",
             "addInstance": "Lidarr Instanz hinzufügen",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Lidarr Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "url": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "URL der Lidarr Instanz.",
+                "placeholder": "http://lidarr.server.tv:8686",
+                "label": "URL"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Benutzername",
+                "description": "Benutzername für die Lidarr Instanz.",
                 "placeholder": "admin",
-                "tooltip": ""
+                "tooltip": "Benutzername und Passwort brauchst du nur, wenn du Datenbanksicherungen prüfen willst, denn die lassen sich nicht über die API herunterladen."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die Lidarr Instanz.",
+                "placeholder": "Passwort"
             }
         }
     },
     "Downloaders": {
         "Qbittorrent": {
-            "title": "",
+            "title": "Qbittorrent",
             "addInstance": "Qbittorrent Instanz hinzufügen",
             "name": {
-                "description": "",
-                "label": "",
-                "placeholder": ""
+                "description": "Name der Qbittorrent Instanz.",
+                "label": "Instanzname",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "username": {
-                "placeholder": "",
-                "label": "",
-                "description": ""
+                "placeholder": "admin",
+                "label": "Benutzername",
+                "description": "Benutzername für die Qbittorrent Instanz."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Qbittorrent Instanz.",
+                "placeholder": "http://qbittorrent.server.tv:8080"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die Qbittorrent Instanz.",
+                "placeholder": "Passwort"
             }
         },
         "SabNZB": {
-            "title": "",
+            "title": "SabNZB",
             "addInstance": "SabNZB Instanz hinzufügen",
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der SabNZB Instanz.",
+                "placeholder": "http://sabnzb.server.tv:8080"
             },
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der SabNZB Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "apiKey": {
                 "label": "API-Schlüssel",
                 "description": "API-Schlüssel für die SabNZB Instanz.",
-                "placeholder": ""
+                "placeholder": "sabnzb-API-Schlüssel"
             }
         },
         "Rtorrent": {
             "addInstance": "Rtorrent Instanz hinzufügen",
-            "title": "",
+            "title": "Rtorrent",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Rtorrent Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die Rtorrent Instanz.",
+                "placeholder": "Passwort"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Rtorrent Instanz.",
+                "placeholder": "http://rtorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Benutzername",
+                "description": "Benutzername für die Rtorrent Instanz.",
+                "placeholder": "admin"
             }
         },
         "Transmission": {
             "username": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "Benutzername für die Transmission Instanz.",
+                "placeholder": "admin",
+                "label": "Benutzername"
             },
-            "title": "",
+            "title": "Transmission",
             "addInstance": "Transmission Instanz hinzufügen",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Transmission Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Transmission Instanz. Sie <b>muss</b> das Suffix <code>/transmission/rpc</code> enthalten.",
+                "placeholder": "http://transmission.server.tv:9091"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die Transmission Instanz.",
+                "placeholder": "Passwort"
             }
         },
         "Deluge": {
-            "title": "",
-            "addInstance": "",
+            "title": "Deluge",
+            "addInstance": "Deluge Instanz hinzufügen",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der Deluge Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der Deluge Instanz.",
+                "placeholder": "http://deluge.server.tv:8112"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die Deluge Instanz.",
+                "placeholder": "Passwort"
             }
         },
         "NZBGet": {
-            "title": "",
+            "title": "NZBGet",
             "addInstance": "NZBGet Instanz hinzufügen",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instanzname",
+                "description": "Name der NZBGet Instanz.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL der NZBGet Instanz.",
+                "placeholder": "http://nzbget.server.tv:6789"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Benutzername",
+                "description": "Benutzername für die NZBGet Instanz.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für die NZBGet Instanz.",
+                "placeholder": "Passwort"
             }
         }
     },
     "words": {
         "clock": {
             "short": {
-                "m": "",
-                "ms": "",
-                "s": "",
-                "h": "",
-                "d": "",
-                "w": ""
+                "m": "{minutes}min",
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
+                "h": "{hours}h",
+                "d": "{days}T",
+                "w": "{weeks}W"
             },
             "days": {
-                "Sunday": "",
-                "Monday": "",
-                "Tuesday": "",
-                "Wednesday": "",
-                "Thursday": "",
-                "Friday": "",
-                "Saturday": ""
+                "Sunday": "Sonntag",
+                "Monday": "Montag",
+                "Tuesday": "Dienstag",
+                "Wednesday": "Mittwoch",
+                "Thursday": "Donnerstag",
+                "Friday": "Freitag",
+                "Saturday": "Samstag"
             },
-            "ago": "",
-            "format": ""
+            "ago": "vor {timeDuration}",
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}"
         },
         "select-option": {
-            "Enabled": "",
-            "Disabled": "",
-            "minute": "",
-            "hour": "",
-            "hours": "",
-            "second": "",
-            "seconds": "",
-            "megabytes": "",
-            "bytes": "",
+            "Enabled": "Aktiviert",
+            "Disabled": "Deaktiviert",
+            "minute": "Minute",
+            "hour": "Stunde",
+            "hours": "Stunden",
+            "second": "Sekunde",
+            "seconds": "Sekunden",
+            "megabytes": "Megabytes",
+            "bytes": "Byte",
             "Daily": "Täglich",
-            "custom": "",
-            "Off": "",
-            "minutes": "",
-            "InstanceDisabled": "",
-            "NoTimeout": "",
-            "ChecksDisabled": ""
+            "custom": "benutzerdefiniert",
+            "Off": "Aus",
+            "minutes": "Minuten",
+            "InstanceDisabled": "Instanz deaktiviert",
+            "NoTimeout": "Kein Timeout",
+            "ChecksDisabled": "Prüfungen deaktiviert",
+            "Information": "Information"
         },
         "instance-options": {
             "validSsl": {
-                "label": "",
-                "description": ""
+                "label": "SSL-Zertifikat validieren",
+                "description": "Wenn du das Kästchen aktivierst, wird geprüft, ob die Instanz ein gültiges SSL-Zertifikat verwendet."
             },
             "deletes": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "countPerHour": ""
+                "label": "Inhalt löschen",
+                "description": "Begrenzt, wie viele Löschanfragen pro Stunde an diese Instanz gesendet werden dürfen.",
+                "tooltip": "Legt fest, wie viele Löschanfragen pro Stunde erlaubt sind. Ein Wert von 0 deaktiviert das Senden von Löschanfragen. Das bezieht sich auf das Löschen von Medien, kann aber auch andere Aktionen umfassen. Diese Drosselung soll verhindern, dass Angreifer deine Inhalte vernichten.",
+                "countPerHour": "{count} pro Stunde"
             },
             "interval": {
-                "label": "",
-                "description": ""
+                "label": "Intervall der Zustandsprüfung",
+                "description": "Wie oft die Erreichbarkeit der Instanz geprüft wird."
             },
             "timeout": {
-                "label": "",
-                "description": ""
+                "label": "Anfrage-Timeout",
+                "description": "Wie lange auf eine Antwort der Instanz gewartet wird."
             }
         },
         "bytes": {
             "short": {
-                "B": "",
-                "KB": "",
-                "MB": "",
-                "GB": "",
-                "TB": ""
+                "B": "{bytes} B",
+                "KB": "{bytes} KB",
+                "MB": "{bytes} MB",
+                "GB": "{bytes} GB",
+                "TB": "{bytes} TB"
             }
         }
     },
     "RegexTester": {
-        "Test": "",
-        "RegularExpressionTester": "",
+        "Test": "Test",
+        "RegularExpressionTester": "Tester für reguläre Ausdrücke",
         "testPattern": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Testmuster",
+            "description": "Beispielzeichenfolge oder Protokollzeile, an der der reguläre Ausdruck geprüft wird.",
+            "placeholder": "[INFO] 2025-05-25 16:20:01 - Das ist eine Testprotokollzeile."
         },
         "testRegex": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Testausdruck",
+            "description": "Ausdruck, der mit dem Testmuster abgeglichen wird.",
+            "placeholder": "GET .*some/path"
         },
-        "TestResult": "",
-        "Expression": "",
-        "Result": "",
-        "NoMatch": ""
+        "TestResult": "Testergebnis",
+        "Expression": "Ausdruck",
+        "Result": "Ergebnis",
+        "NoMatch": "Keine Übereinstimmung"
     },
     "SnapshotApps": {
         "MySQL": {
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Benutzername",
+                "description": "Benutzername für den MySQL-Server.",
+                "placeholder": "root"
             },
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Servername",
+                "description": "Name des MySQL-Servers.",
+                "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
             },
             "host": {
-                "placeholder": "",
-                "label": "",
-                "description": ""
+                "placeholder": "127.0.0.1",
+                "label": "Host",
+                "description": "Host oder IP-Adresse des MySQL-Servers."
             },
             "port": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Port",
+                "description": "Port des MySQL-Servers.",
+                "placeholder": "3306"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Passwort",
+                "description": "Passwort für den MySQL-Server.",
+                "placeholder": "Passwort"
             },
             "addInstance": "MySQL-Server hinzufügen",
-            "title": "",
-            "description": ""
+            "title": "MySQL",
+            "description": "Du kannst MySQL-Zugangsdaten zur Konfiguration deines Notifiarr-Clients hinzufügen, um den Zustand des MySQL-Dienstes als Snapshot zu erfassen. Diese Funktion erfasst die Daten von <code>SHOW PROCESSLIST</code> und <code>SHOW STATUS</code>. Zugriff auf eine Datenbank ist nicht erforderlich. Beispiel-Grant: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>"
         },
         "Nvidia": {
-            "title": "",
+            "title": "Nvidia",
             "description": "Diese Integration zeigt Nvidia-GPU-Infos in Snapshot-Benachrichtigungen an. Unter Docker verwenden Sie das CUDA-Image (<code>ghcr.io/notifiarr/notifiarr:cuda</code> oder <code>golift/notifiarr:cuda</code>), installieren Sie das <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> auf dem Host und übergeben Sie die GPU mit <code>--gpus all</code> oder Compose <code>gpus: all</code>. Ein CUDA-Toolkit auf dem Host ist nicht erforderlich.",
             "disabled": {
-                "description": "",
-                "label": ""
+                "description": "GPU-Snapshots aktivieren oder deaktivieren.",
+                "label": "GPU-Snapshots"
             },
             "busIds": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Bus-IDs",
+                "description": "Kommagetrennte Liste von Bus-IDs, die im Snapshot erfasst werden.",
+                "placeholder": "0000:00:00.0,0000:00:00.1",
+                "tooltip": "Das ist die Bus-ID der GPU. Du findest sie, indem du <code>nvidia-smi</code> ausführst und in die Spalte <code>Bus Id</code> schaust. Karten mit anderen Bus-IDs werden im Snapshot ignoriert. Im Normalfall lässt du das Feld einfach leer. Mehrere Einträge fügst du mit Zeilenumbrüchen hinzu."
             },
             "smiPath": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "placeholder": ""
+                "label": "nvidia-smi-Pfad",
+                "description": "Pfad zum Befehl nvidia-smi.",
+                "tooltip": "Wenn nvidia-smi (unter Windows nvidia-smi.exe) nicht in der Umgebungsvariable PATH liegt, kannst du hier den vollständigen Pfad zur Binärdatei angeben.",
+                "placeholder": "/usr/bin/nvidia-smi"
             }
         }
     },
     "FileWatcher": {
         "regex": {
-            "required": "",
-            "tooltip": "",
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "required": "Regex ist erforderlich",
+            "tooltip": "Ausdrücke werden automatisch in ein Wildcard-Muster eingeschlossen: <code>.*</code> Verwende deshalb weder <code>^</code> noch <code>$</code> in deinem Ausdruck. Setze <code>(?i)</code> als Präfix davor, damit der reguläre Ausdruck Groß- und Kleinschreibung ignoriert.",
+            "label": "Regulärer Ausdruck",
+            "description": "Regex für den Abgleich mit der Datei.",
+            "placeholder": "GET.*some/path"
         },
         "skip": {
-            "description": "",
-            "label": "",
-            "placeholder": ""
+            "description": "Alles, was auf diesen Ausdruck passt, wird ignoriert.",
+            "label": "Ausdrücke überspringen",
+            "placeholder": "GET.*some/path"
         },
         "poll": {
-            "tooltip": "",
-            "label": "",
-            "description": ""
+            "tooltip": "Dateisystemereignisse funktionieren auf manchen Systemen nicht. Wenn nichts erkannt wird, schalte das ein, um das Abfrageintervall der Datei zu aktivieren.",
+            "label": "Datei-Polling",
+            "description": "Datei auf Änderungen abfragen."
         },
-        "title": "",
-        "description": "",
-        "addInstance": "",
-        "DeleteWatcher": "",
+        "title": "Überwachte Dateien",
+        "description": "Du musst auf der Notifiarr-Website die Protokollüberwachung aktivieren und einen Kanal auswählen, damit das funktioniert!",
+        "addInstance": "Weitere Datei überwachen",
+        "DeleteWatcher": "Überwachung löschen",
         "badges": {
-            "CurrentlyWatching": "",
-            "WatcherStopped": ""
+            "CurrentlyWatching": "Wird überwacht",
+            "WatcherStopped": "Überwachung gestoppt"
         },
         "buttons": {
-            "StopWatcher": "",
-            "StartWatcher": ""
+            "StopWatcher": "Überwachung stoppen",
+            "StartWatcher": "Überwachung starten"
         },
         "titles": {
-            "RegularExpressionTester": "",
-            "Expression": "",
-            "TestString": ""
+            "RegularExpressionTester": "Tester für reguläre Ausdrücke",
+            "Expression": "Ausdruck",
+            "TestString": "Testzeichenfolge"
         },
         "path": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "required": ""
+            "label": "Dateipfad",
+            "description": "Pfad zur Datei, die überwacht werden soll. Absolute Pfade werden empfohlen.",
+            "placeholder": "/var/log/nginx/access.log",
+            "required": "Pfad ist erforderlich",
+            "clientLog": "Die eigene Protokolldatei des Clients kann nicht überwacht werden; das würde eine Schleife erzeugen. Client-Fehler werden bereits als client_error_log gesendet."
         },
         "disabled": {
             "label": "Aktiv",
-            "description": ""
+            "description": "Diese Überwachung deaktivieren."
         },
         "pipe": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "FIFO-Pipe",
+            "description": "Der Pfad ist eine benannte FIFO-Pipe.",
+            "tooltip": "Aktiviere das, wenn die überwachte Datei eine benannte FIFO-Pipe ist. Das brauchst du wahrscheinlich nicht."
         },
         "mustExist": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Datei muss existieren",
+            "description": "Datei nicht überwachen, wenn sie fehlt.",
+            "tooltip": "Wenn du das aktivierst, wird die Datei nicht überwacht, falls sie beim Start der Anwendung nicht existiert. Dateien zu überwachen, die es nicht gibt, ist noch fehlerhaft und funktioniert möglicherweise gar nicht."
         },
         "logMatch": {
-            "description": "",
-            "tooltip": "",
-            "label": ""
+            "description": "Gefundene Zeilen ins Notifiarr-Protokoll schreiben.",
+            "tooltip": "Wenn du das aktivierst, wird die gefundene Zeile ins Notifiarr-Protokoll geschrieben. Das hilft bei der Fehlersuche, kann das Protokoll aber stark füllen.",
+            "label": "Treffer protokollieren"
         }
     },
     "metrics": {
         "apiHits": {
-            "empty": "",
+            "empty": "Noch keine API-Anfragen.",
             "title": "API-Anfragen",
-            "description": ""
+            "description": "Zähler eingehender API-Anfragen."
         },
         "website": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Website-Anfragen",
+            "description": "Anfragen an Notifiarr.com.",
+            "empty": "Noch keine Website-Anfragen."
         },
         "timerEvents": {
-            "empty": "",
-            "title": "",
-            "description": ""
+            "empty": "Noch keine ausgelösten Aktionen.",
+            "title": "Ausgelöste Aktionen",
+            "description": "Ausgeführte Auslöser, Timer und Zeitpläne."
         },
-        "CountersReset": "",
+        "CountersReset": "Die Zähler auf dieser Seite werden zurückgesetzt, wenn die Anwendung beendet wird. Die Anwendung stellt diese Zähler über Prometheus bereit. Du kannst sie scrapen und mit dem <a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">Grafana-Dashboard für den Notifiarr-Client</a> darstellen.",
         "ApplicationUptime": "Anwendungsbetriebszeit:  <b>{timeDuration}</b>",
         "logFiles": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Protokolldateien",
+            "description": "Zähler der Protokolldateien.",
+            "empty": "Keine Protokolldateien gefunden."
         },
         "httpRequests": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "HTTP-Anfragen",
+            "description": "Statistik eingehender HTTP-Anfragen. Das schließt Anfragen über den Websocket-Tunnel ein.",
+            "empty": "Noch keine HTTP-Anfragen."
         },
         "fileWatcher": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Dateiüberwachung",
+            "description": "Statistik der Dateiüberwachung.",
+            "empty": "Keine Dateiüberwachungen konfiguriert."
         },
         "apps": {
             "title": "Anwendungsanfragen",
-            "description": "",
-            "empty": ""
+            "description": "Statistik der Anwendungsanfragen. Diese Zähler enthalten keine Zustandsprüfungen.",
+            "empty": "Noch keine Anwendungsanfragen."
         }
     },
     "monitoring": {
-        "EnableOnConfig": "",
-        "ChecksDisabled": "",
-        "ChecksStopped": "",
-        "checkInitiated": "",
-        "cardsView": "",
-        "classicView": "",
-        "hideAllOutputs": "",
+        "EnableOnConfig": "Aktiviere Zustandsprüfungen auf der Seite <go-to page=\"services\">Dienste</go-to>.",
+        "ChecksDisabled": "Zustandsprüfungen: Deaktiviert",
+        "ChecksStopped": "Zustandsprüfungen: Pausiert",
+        "checkInitiated": "Zustandsprüfung gestartet.",
+        "cardsView": "Kartenansicht",
+        "classicView": "Klassische Ansicht",
+        "hideAllOutputs": "Alle Ausgaben ausblenden",
         "check": {
-            "typeExpect": "",
+            "typeExpect": "Typ/Erwartung",
             "since": {
-                "tooltip": "",
-                "description": "",
-                "short": "",
-                "title": ""
+                "tooltip": "Wie lange der Dienst schon in diesem Zustand ist.",
+                "description": "Dienst ist in diesem Zustand seit",
+                "short": "Seit",
+                "title": "Zeit in diesem Zustand: {timeDuration}"
             },
             "interval": {
-                "short": "",
-                "title": "",
-                "tooltip": ""
+                "short": "Intervall",
+                "title": "Prüfintervall",
+                "tooltip": "Wie oft dieser Dienst geprüft wird."
             },
-            "name": "",
+            "name": "Dienstname",
             "state": {
-                "short": "",
-                "title": ""
+                "short": "Zustand",
+                "title": "Zähler der Dienstprüfungen"
             },
             "last": {
-                "short": "",
-                "title": "",
-                "tooltip": "",
-                "description": ""
+                "short": "Zuletzt",
+                "title": "Letzte Prüfung: vor {timeDuration}",
+                "tooltip": "Wie lange die letzte Prüfung dieses Dienstes her ist.",
+                "description": "Dienst zuletzt geprüft um"
             },
-            "output": ""
+            "output": "Ausgabe der letzten Prüfung"
         },
-        "ConfigureServices": "",
-        "StartChecks": "",
-        "StopChecks": "",
-        "stopFailed": "",
-        "startFailed": "",
-        "recheckFailed": "",
-        "nextRefresh": "",
-        "refreshInterval": "",
-        "showAllOutputs": ""
+        "ConfigureServices": "Zustandsprüfungen für konfigurierte Integrationen aktivierst du, indem du ihnen auf der jeweiligen Konfigurationsseite ein Prüfintervall gibst. Einige dieser Prüfungen stammen von der Seite <go-to page=\"starrapps\">Starr-Apps</go-to>, der Seite <go-to page=\"downloaders\">Download Anwendung</go-to> oder der Seite <go-to page=\"mediaapps\">Medien-Apps</go-to>. Die übrigen angezeigten Zustandsprüfungen findest du auf der <go-to page=\"services\">Seite Dienste</go-to>.",
+        "StartChecks": "Zustandsprüfungen fortsetzen",
+        "StopChecks": "Zustandsprüfungen pausieren",
+        "stopFailed": "Zustandsprüfungen konnten nicht pausiert werden.",
+        "startFailed": "Zustandsprüfungen konnten nicht fortgesetzt werden.",
+        "recheckFailed": "Erneute Zustandsprüfung fehlgeschlagen.",
+        "nextRefresh": "Nächste Aktualisierung in {timeDuration}.",
+        "refreshInterval": "Aktualisierungsintervall",
+        "showAllOutputs": "Alle Ausgaben anzeigen"
     },
     "ServiceChecks": {
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "URL",
+            "description": "URL des überwachten Dienstes.",
+            "placeholder": "https://my.site"
         },
         "ping": {
             "count": {
-                "description": "",
-                "placeholder": "",
-                "required": "",
-                "label": ""
+                "description": "Anzahl der zu sendenden Pakete.",
+                "placeholder": "10",
+                "required": "Eine Paketanzahl größer als null ist erforderlich.",
+                "label": "Anzahl"
             },
             "value": {
-                "description": "",
-                "placeholder": "",
+                "description": "Gib einen Host oder eine IP ein, um die Erreichbarkeit zu prüfen.",
+                "placeholder": "127.0.0.1",
                 "required": "Ein Host oder IP-Adresse ist erforderlich.",
-                "label": "",
-                "tooltip": ""
+                "label": "Host oder IP",
+                "tooltip": "Eine IP-Adresse ist generell empfehlenswert. Wenn du auch DNS prüfen willst, verwende einen Hostnamen. Das Format ist <code>host</code> oder <code>10.11.12.13</code>. Es dürfen keine Leerzeichen oder zusätzlichen Zeichen vorkommen. Damit UDP-Prüfungen unter Linux funktionieren, musst du sie mit diesem Befehl aktivieren: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Damit ICMP-Prüfungen unter Linux funktionieren, musst du der Binärdatei notifiarr mit diesem Befehl Capabilities geben: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Am einfachsten gehen beide in Docker, wenn du den privilegierten Modus aktivierst; Capabilities kannst du aber auch setzen."
             },
             "minimum": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "required": ""
+                "label": "Minimum",
+                "description": "Mindestanzahl der Pakete, die ankommen müssen.",
+                "placeholder": "10",
+                "required": "Eine Mindestanzahl an Paketen größer als null ist erforderlich."
             },
             "interval": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Intervall",
+                "description": "Intervall zwischen den Paketen in Millisekunden.",
+                "placeholder": "100"
             }
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Name der Prüfung",
+            "description": "Eindeutiger Name des überwachten Dienstes.",
+            "placeholder": "benutzerdefinierter Name für Benachrichtigungen",
+            "tooltip": "Der Name des überwachten Dienstes. Er identifiziert den Dienst in Benachrichtigungen. Jeder Dienst braucht einen eindeutigen Namen."
         },
-        "description": "",
-        "processListLink": "",
+        "description": "Mit diesem Formular konfigurierst du Zustandsprüfungen. Füge hier keine Starr-, Medien-, Snapshot- oder Download-Apps hinzu. Gib ihnen stattdessen auf der jeweiligen Konfigurationsseite ein Prüfintervall. Sieh dir <go-to page=\"ProcessList\">hier die Liste der laufenden Prozesse</go-to> an und nutze sie als Anregung für Prozessprüfungen.",
+        "processListLink": "Sieh dir hier die Liste der laufenden Prozesse an.",
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Prüf-Timeout",
+            "description": "Wie lange auf den Abschluss der Dienstprüfung gewartet wird."
         },
         "type": {
-            "label": "",
-            "description": "",
+            "label": "Prüftyp",
+            "description": "Die Art der durchzuführenden Prüfung.",
             "options": {
-                "process": "",
-                "http": "",
-                "icmp": "",
-                "tcp": "",
-                "ping": ""
+                "process": "Prozessprüfung",
+                "http": "HTTP-URL-Prüfung",
+                "icmp": "ICMP-Ping-Prüfung",
+                "tcp": "TCP-Port-Erreichbarkeit",
+                "ping": "UDP-Ping-Prüfung"
             },
-            "tooltip": ""
+            "tooltip": "Mit der Prozessprüfung überwachst du, ob ein Prozess läuft. Mit der HTTP-URL-Prüfung überwachst du, ob eine URL erreichbar ist. Mit der TCP-Port-Prüfung überwachst du die Erreichbarkeit eines TCP-Ports. Beide Ping-Prüfungen überwachen, ob eine IP oder ein Host erreichbar ist."
         },
         "http": {
             "headers": {
-                "placeholder": "",
-                "label": "",
-                "description": ""
+                "placeholder": "Content-Type: application/json",
+                "label": "HTTP-Header",
+                "description": "HTTP-Anfrage-Header, 1 pro Zeile."
             },
             "codes": {
-                "label": "",
-                "description": "",
-                "required": ""
+                "label": "Zulässige Antwortcodes",
+                "description": "Jeder Code hier gilt als zulässig. Antwortet der Dienst mit einem anderen Code, wird eine Benachrichtigung erzeugt.",
+                "required": "Mindestens ein erwarteter Antwortcode ist erforderlich."
             }
         },
         "tcp": {
             "value": {
-                "tooltip": "",
+                "tooltip": "Eine IP-Adresse ist generell empfehlenswert. Wenn du auch DNS prüfen willst, verwende einen Hostnamen. Das Format ist <code>Host:Port</code>. Es dürfen keine Leerzeichen oder zusätzlichen Zeichen vorkommen.",
                 "required": "Ein Host und Port getrennt durch ein Doppelpunkt sind erforderlich.",
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Host und Port",
+                "description": "Gib Host:Port oder IP:Port ein, um die Erreichbarkeit zu prüfen.",
+                "placeholder": "127.0.0.1:22"
             }
         },
         "process": {
             "value": {
-                "tooltip": "",
+                "tooltip": "Name des zu prüfenden Prozesses. So heißt der Prozess in der Prozessliste. An beiden Enden des Werts wird mit einem Platzhalter verglichen, deshalb passt ein genauerer Wert besser.",
                 "required": "Ein Prozessname ist erforderlich.",
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Prozessabgleich",
+                "description": "Name des zu prüfenden Prozesses.",
+                "placeholder": "notifiarr"
             },
             "running": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Läuft",
+                "description": "Alarm senden, wenn der Prozess läuft.",
+                "tooltip": "Wenn du das auswählst, gibt es einen Alarm für einen ungesunden Zustand, sobald der Prozess läuft. Wähle das, wenn du eine Benachrichtigung brauchst, sobald der Prozess startet."
             },
             "restarts": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Neustarts",
+                "description": "Alarm senden, wenn der Prozess neu gestartet wurde.",
+                "tooltip": "Wenn du das auswählst, gibt es einen Alarm für einen ungesunden Zustand, wenn der Prozess neu gestartet wurde. Wähle das, wenn du eine Benachrichtigung brauchst, sobald sich die PID ändert."
             },
             "minimum": {
-                "label": "",
-                "description": "",
-                "required": "",
-                "tooltip": ""
+                "label": "Minimum",
+                "description": "Mindestanzahl laufender Prozesse, die zum Wert passen müssen.",
+                "required": "Eine Mindestanzahl an Prozessen größer als null ist erforderlich.",
+                "tooltip": "Wenn du 2 eingibst, bekommst du eine Benachrichtigung, sobald weniger als 2 Prozesse laufen. So wirst du gewarnt, wenn zu wenige Prozesse laufen."
             },
             "maximum": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Maximum",
+                "description": "Höchstanzahl laufender Prozesse, die zum Wert passen dürfen.",
+                "tooltip": "Wenn du 2 eingibst, bekommst du eine Benachrichtigung, sobald mehr als 2 Prozesse laufen. So wirst du gewarnt, wenn zu viele Prozesse laufen."
             }
         },
-        "title": "",
-        "DeleteCheck": "",
-        "addInstance": "",
+        "title": "Zustandsprüfungen",
+        "DeleteCheck": "Zustandsprüfung löschen",
+        "addInstance": "Zustandsprüfung erstellen",
         "interval": {
-            "label": "",
-            "description": ""
+            "label": "Prüfintervall",
+            "description": "Wie oft der Dienst geprüft wird."
         }
     },
     "system": {
         "StorageData": {
-            "Total": "",
-            "title": "",
-            "Used": "",
-            "Free": "",
-            "FS": "",
-            "ro": ""
+            "Total": "Gesamt",
+            "title": "Speicherdaten",
+            "Used": "Belegt",
+            "Free": "Frei",
+            "FS": "FS",
+            "ro": "ro",
+            "Device": "Gerät",
+            "Mount": "Einhängepunkt"
         },
         "BuildInformation": {
-            "title": "",
-            "Branch": "",
-            "BuildUser": "",
-            "BuildDate": "",
-            "GoVersion": "",
-            "Integrity": ""
+            "title": "Build-Informationen",
+            "Branch": "Branch",
+            "BuildUser": "Build-Benutzer",
+            "BuildDate": "Build-Datum",
+            "GoVersion": "Go-Version",
+            "Integrity": "Integrität"
         },
         "OperatingSystem": {
-            "title": "",
-            "Hostname": "",
-            "UniqueID": "",
-            "Platform": "",
-            "KernelVersion": "",
-            "VirtualizationSystem": ""
+            "title": "Betriebssystem",
+            "Hostname": "Hostname",
+            "UniqueID": "Eindeutige ID",
+            "Platform": "Plattform",
+            "KernelVersion": "Kernel-Version",
+            "VirtualizationSystem": "Virtualisierungssystem"
         },
         "ClientInformation": {
             "title": "Client Informationen",
             "Application": "Anwendung",
-            "Version": "",
-            "Started": "",
-            "Uptime": ""
+            "Version": "Version",
+            "Started": "Gestartet",
+            "Uptime": "Betriebszeit"
         },
         "NetworkInformation": {
-            "title": "",
-            "IPAddress": "",
-            "Gateway": "",
-            "Netmask": "",
-            "Interface": ""
+            "title": "Netzwerkinformationen",
+            "IPAddress": "IP-Adresse",
+            "Gateway": "Gateway",
+            "Netmask": "Netzmaske",
+            "Interface": "Schnittstelle"
         },
         "StartupParams": {
-            "title": "",
-            "BinaryPath": "",
-            "ConfigFile": "",
-            "EnvironmentPrefix": "",
-            "ExtraConfigFiles": "",
-            "CustomAssets": "",
-            "GroupID": "",
-            "IPAddress": "",
-            "UserID": ""
+            "title": "Startparameter",
+            "BinaryPath": "Binärpfad",
+            "ConfigFile": "Konfigurationsdatei",
+            "EnvironmentPrefix": "Präfix für Umgebungsvariablen",
+            "ExtraConfigFiles": "Zusätzliche Konfigurationsdateien",
+            "CustomAssets": "Benutzerdefinierte Assets",
+            "GroupID": "Gruppen-ID",
+            "IPAddress": "IP-Adresse",
+            "UserID": "Benutzer-ID"
         },
         "UserInformation": {
-            "title": "",
-            "Patron": "",
-            "Subscriber": "",
-            "AbsoluteBadAss": "",
-            "YesYesYouAre": "",
-            "HellaAwesome": "",
-            "YoureSoGifted": "",
-            "DateFormat": ""
+            "title": "Benutzerinformationen",
+            "Patron": "Patron",
+            "Subscriber": "Abonnent",
+            "AbsoluteBadAss": "Absolut legendär",
+            "YesYesYouAre": "Ja, das bist du! 💚",
+            "HellaAwesome": "Mächtig großartig",
+            "YoureSoGifted": "Du bist so begabt, und wir lieben dich! 💜",
+            "DateFormat": "Datumsformat",
+            "InvalidAPIKey": "Nicht bei Notifiarr angemeldet; der API-Schlüssel wurde abgelehnt."
         },
         "EnvironmentVariables": {
-            "title": ""
+            "title": "Umgebungsvariablen"
         }
     },
     "MediaApps": {
         "Plex": {
             "url": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "URL des Plex-Servers.",
+                "placeholder": "http://plex.server.tv:32400",
+                "label": "URL"
             },
             "token": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Token",
+                "description": "Token für den Plex-Server.",
+                "placeholder": "pl3x-to_Ken",
+                "tooltip": "Eine Anleitung, wie du dein Plex-Token findest, steht in <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">diesem Plex-Artikel</a>."
             },
-            "title": "",
-            "description": "",
+            "title": "Plex",
+            "description": "Die Plex-Integration ist umfangreich, und viele Einstellungen werden auf der <a href=\"https://notifiarr.com/\" target=\"_blank\">Notifiarr.com-Website</a> konfiguriert.",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Servername",
+                "description": "Name des Plex-Servers.",
+                "placeholder": "Wird vom Server automatisch gesetzt",
+                "tooltip": "Der Name des Plex Media Servers wird in Benachrichtigungen, Protokollen und Zustandsprüfungen verwendet. Er wird vom Plex-Server automatisch gesetzt."
             }
         },
         "Tautulli": {
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL des Tautulli-Dienstes.",
+                "placeholder": "http://tautulli.server.tv:8181"
             },
             "apiKey": {
                 "description": "API-Schlüssel für den Tautulli Dienst.",
                 "label": "API-Schlüssel",
-                "placeholder": ""
+                "placeholder": "tautulli-API-Schlüssel"
             },
-            "description": "",
+            "description": "Tautulli bietet eine Funktion, mit der du deinen Plex-Benutzern eigene Benutzernamen geben kannst. Wenn du den Notifiarr-Client mit Tautulli verbindest, werden diese eigenen Benutzernamen in den Benachrichtigungen deines Chat-Servers angezeigt. Ist das nicht aktiviert, werden stattdessen Plex-Benutzernamen oder E-Mail-Adressen verwendet. Das ist völlig optional. Die Notifiarr-Website bietet dieselbe Funktion und erlaubt dir, Plex-Benutzer eigenen Namen zuzuordnen. Du kannst hier auch eine Tautulli-Instanz hinzufügen, nur um sie mit Zustandsprüfungen zu überwachen.",
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Tautulli-Name",
+                "description": "Name des Tautulli-Dienstes."
             },
-            "title": ""
+            "title": "Tautulli"
         }
     },
     "Actions": {
         "triggers": {
             "TrigDashboard": {
-                "button": "",
-                "label": "",
-                "success": ""
+                "button": "Dashboard aktualisieren",
+                "label": "Dashboard-Aktualisierung",
+                "success": "Dashboard-Aktualisierung gestartet."
             },
             "TrigCFSyncLidarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Synchronisierung von Profil und Format bei Lidarr",
+                "button": "Alle Lidarr Instanzen synchronisieren",
+                "success": "Synchronisierung von Profil und Format bei Lidarr gestartet."
             },
             "TrigProwlarrCorrupt": {
-                "button": "",
-                "success": "",
-                "label": ""
+                "button": "Prowlarr prüfen",
+                "success": "Prüfung auf Beschädigung der Prowlarr-Datenbank gestartet.",
+                "label": "Beschädigung der Prowlarr-Datenbank"
             },
             "TrigLidarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Beschädigung der Lidarr-Datenbank",
+                "button": "Lidarr prüfen",
+                "success": "Prüfung auf Beschädigung der Lidarr-Datenbank gestartet."
             },
             "TrigLidarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Datenbanksicherungen von Lidarr",
+                "button": "Lidarr prüfen",
+                "success": "Prüfung der Datenbanksicherungen von Lidarr gestartet."
             },
             "TrigSonarrBackup": {
-                "button": "",
-                "label": "",
-                "success": ""
+                "button": "Sonarr prüfen",
+                "label": "Datenbanksicherungen von Sonarr",
+                "success": "Prüfung der Datenbanksicherungen von Sonarr gestartet."
             },
             "TrigStuckItems": {
-                "success": "",
-                "label": "",
-                "button": ""
+                "success": "Prüfung hängender Elemente gestartet.",
+                "label": "Prüfung hängender Elemente",
+                "button": "Nach hängenden Elementen suchen"
             },
             "TrigPlexEmptyTrash": {
-                "label": ""
+                "label": "Plex-Papierkorb leeren"
             },
             "TrigUploadFile": {
-                "label": "",
-                "button": "",
-                "success": "",
+                "label": "Protokolldatei auf die Website hochgeladen",
+                "button": "Protokoll jetzt hochladen",
+                "success": "Protokolldatei auf die Website hochgeladen.",
                 "options": {
-                    "choose": "",
+                    "choose": "Wähle eine Datei zum Hochladen.",
                     "app": "Anwendungsprotokolldatei.",
-                    "debug": "",
-                    "http": ""
+                    "debug": "Debug-Protokolldatei.",
+                    "http": "HTTP-Protokolldatei."
                 }
             },
             "TrigPlexSessions": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Plex-Sitzungen erfassen",
+                "button": "Sitzungen jetzt erfassen",
+                "success": "Plex-Sitzungen erfasst."
             },
             "TrigPlexSessionsCheck": {
-                "label": ""
+                "label": "Beendete Plex-Sitzungen prüfen"
             },
             "TrigMDBListSync": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "MDB-Listenabgleich",
+                "button": "MDB-Liste synchronisieren",
+                "success": "MDB-Listenabgleich gestartet."
             },
             "TrigCollectionGaps": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Sammlungslücken",
+                "button": "Sammlungslücken prüfen",
+                "success": "Prüfung der Sammlungslücken gestartet."
             },
             "TrigCFSyncRadarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Synchronisierung von Profil und Format bei Radarr",
+                "button": "Alle Radarr Instanzen synchronisieren",
+                "success": "Synchronisierung von Profil und Format bei Radarr gestartet."
             },
             "TrigStop": {
-                "label": "",
-                "button": ""
+                "label": "Client wird neu geladen",
+                "button": "Client neu laden"
             },
             "TrigSnapshot": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Snapshot-Erfassung",
+                "button": "Snapshot aktualisieren",
+                "success": "Snapshot-Erfassung gestartet."
             },
             "TrigRadarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Beschädigung der Radarr-Datenbank",
+                "button": "Radarr prüfen",
+                "success": "Prüfung auf Beschädigung der Radarr-Datenbank gestartet."
             },
             "TrigReadarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Beschädigung der Readarr-Datenbank",
+                "button": "Readarr prüfen",
+                "success": "Prüfung auf Beschädigung der Readarr-Datenbank gestartet."
             },
             "TrigSonarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Beschädigung der Sonarr-Datenbank",
+                "button": "Sonarr prüfen",
+                "success": "Prüfung auf Beschädigung der Sonarr-Datenbank gestartet."
             },
             "TrigProwlarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Datenbanksicherungen von Prowlarr",
+                "button": "Prowlarr prüfen",
+                "success": "Prüfung der Datenbanksicherungen von Prowlarr gestartet."
             },
             "TrigRadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Datenbanksicherungen von Radarr",
+                "button": "Radarr prüfen",
+                "success": "Prüfung der Datenbanksicherungen von Radarr gestartet."
             },
             "TrigReadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Datenbanksicherungen von Readarr",
+                "button": "Readarr prüfen",
+                "success": "Prüfung der Datenbanksicherungen von Readarr gestartet."
             },
             "TrigUpCheck": {
-                "label": ""
+                "label": "Erreichbarkeitsprüfung vom Client zur Website"
             },
             "TrigEndpointURL": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Endpunkt-URL an die Website weitergeleitet: {name}",
+                "button": "Endpunkt ausführen",
+                "success": "Weiterleitung der Endpunkt-URL gestartet."
             },
             "TrigCustomCommand": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Benutzerdefinierter Befehl: {name}",
+                "button": "Befehl ausführen",
+                "success": "Benutzerdefinierter Befehl gestartet."
             },
             "TrigAutoUpdate": {
-                "label": ""
+                "label": "Prüfung der automatischen Aktualisierung"
             },
             "TrigCFSyncLidarrInt": {
-                "label": ""
+                "label": "Synchronisierung benutzerdefinierter Formate pro Lidarr Instanz"
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
+                "label": "Synchronisierung benutzerdefinierter Formate pro Radarr Instanz"
             },
             "TrigCustomCronTimer": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Website-Timer: {name}",
+                "button": "Timer jetzt ausführen",
+                "success": "Website-Timer gestartet."
             },
             "TrigDownloadingItems": {
-                "label": ""
+                "label": "Downloads / fertige Elemente"
             },
             "TrigLidarrQueue": {
-                "label": ""
+                "label": "Warteschlangen-Cache für Lidarr"
             },
             "TrigRadarrQueue": {
-                "label": ""
+                "label": "Warteschlangen-Cache für Radarr"
             },
             "TrigReadarrQueue": {
-                "label": ""
+                "label": "Warteschlangen-Cache für Readarr"
             },
             "TrigSonarrQueue": {
-                "label": ""
+                "label": "Warteschlangen-Cache für Sonarr"
             },
             "TrigPollSite": {
-                "label": ""
+                "label": "Website-Poller"
+            },
+            "TrigCFSyncSonarr": {
+                "label": "Synchronisierung von Profil und Format bei Sonarr",
+                "button": "Alle Sonarr Instanzen synchronisieren",
+                "success": "Synchronisierung von Profil und Format bei Sonarr gestartet."
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "Synchronisierung benutzerdefinierter Formate pro Sonarr Instanz"
             }
         },
         "titles": {
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": "",
-            "Counter": "",
-            "Interval": "",
-            "Schedule": ""
+            "Triggers": "Auslöser",
+            "Timers": "Timer",
+            "Schedules": "Zeitpläne",
+            "SiteCrons": "Website-Timer",
+            "Counter": "Zähler",
+            "Interval": "Intervall",
+            "Schedule": "Zeitplan",
+            "Trigger": "Auslöser",
+            "Timer": "Timer",
+            "Type": "Typ",
+            "When": "Wann",
+            "Action": "Aktion",
+            "Never": "Nie",
+            "Filter": "Filter"
         },
         "descriptions": {
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": ""
+            "Triggers": "Diese Aktionen haben keinen Timer und keinen Zeitplan.",
+            "Timers": "Diese Aktionen haben einen Timer.",
+            "Schedules": "Diese Aktionen haben einen Zeitplan.",
+            "SiteCrons": "Diese Aktionen legt die Website an, damit die Timer nicht mehr dort verfolgt werden müssen."
         }
     },
     "buttons": {
-        "Login": "",
-        "Confirm": "",
+        "Login": "Anmelden",
+        "Confirm": "Bestätigen",
         "Close": "Schliessen",
-        "SaveChanges": "",
+        "SaveChanges": "Änderungen speichern",
         "Cancel": "Abbrechen",
-        "Save": "",
-        "Execute": "",
-        "HideMenu": "",
-        "ShowMenu": "",
-        "ShowOutput": "",
-        "HideOutput": "",
-        "RefreshOutput": "",
-        "ResetForm": "",
-        "SaveConfiguration": "",
-        "NoStayHere": "",
-        "YesDeleteMyChanges": ""
+        "Save": "Speichern",
+        "Execute": "Ausführen",
+        "HideMenu": "Menü ausblenden",
+        "ShowMenu": "Menü anzeigen",
+        "ShowOutput": "Ausgabe anzeigen",
+        "HideOutput": "Ausgabe ausblenden",
+        "RefreshOutput": "Ausgabe aktualisieren",
+        "ResetForm": "Formular zurücksetzen",
+        "SaveConfiguration": "Konfiguration speichern",
+        "NoStayHere": "Nein! Hier bleiben",
+        "YesDeleteMyChanges": "Ja! Meine Änderungen löschen",
+        "Create": "Erstellen",
+        "Go": "Los",
+        "Menu": "Menü",
+        "CreateFolder": "Ordner erstellen",
+        "CreateFile": "Datei erstellen"
     },
     "navigation": {
         "titles": {
-            "Metrics": "",
-            "LogFiles": "",
-            "Settings": "",
-            "Insights": "",
-            "Configuration": "",
-            "SiteTunnel": "",
-            "StarrApps": "",
+            "Metrics": "Metriken",
+            "LogFiles": "Protokolldateien",
+            "Settings": "Einstellungen",
+            "Insights": "Einblicke",
+            "Configuration": "Konfiguration",
+            "SiteTunnel": "Site-Tunnel",
+            "StarrApps": "Starr-Apps",
             "Downloaders": "Download Anwendung",
-            "MediaApps": "",
-            "SnapshotApps": "",
-            "FileWatcher": "",
-            "Endpoints": "",
-            "Commands": "",
-            "Services": "",
-            "Integrations": "",
-            "Monitoring": "",
-            "System": "",
-            "TrustProfile": "",
-            "Landing": "",
-            "UnsavedChanges": "",
-            "Actions": "Aktionen"
+            "MediaApps": "Medien-Apps",
+            "SnapshotApps": "Snapshot-Apps",
+            "FileWatcher": "Dateiüberwachung",
+            "Endpoints": "Endpunkte",
+            "Commands": "Befehle",
+            "Services": "Dienste",
+            "Integrations": "Integrationen",
+            "Monitoring": "Überwachung",
+            "System": "System",
+            "TrustProfile": "Vertrauensprofil",
+            "Landing": "Notifiarr-Startseite",
+            "UnsavedChanges": "Ungespeicherte Änderungen",
+            "Actions": "Aktionen",
+            "Plex": "Plex-Webhooks",
+            "ApiDocs": "Client-API-Dokumentation"
         },
         "pageDescription": {
-            "Configuration": "",
-            "StarrApps": "",
-            "Downloaders": "",
-            "MediaApps": "",
-            "SnapshotApps": "",
-            "FileWatcher": "",
-            "Endpoints": "",
-            "Commands": "",
-            "Services": "",
-            "Integrations": "",
-            "TrustProfile": "",
-            "Landing": "",
-            "Monitoring": "",
-            "Metrics": "",
-            "LogFiles": "",
-            "System": "",
-            "SiteTunnel": "",
-            "Actions": ""
+            "Configuration": "Konfiguriere hier die Einstellungen deines Notifiarr-Clients.",
+            "StarrApps": "Starr-Integrationen einrichten.",
+            "Downloaders": "Download-Clients verwalten.",
+            "MediaApps": "Mediaplayer und zugehörige Dienste verwalten.",
+            "SnapshotApps": "Die meisten Snapshot-Konfigurationen befinden sich auf der Website Notifiarr.com. Unten findest du die Plugin-Einstellungen der Anwendung für die Snapshot-Funktion.",
+            "FileWatcher": "Überwache Dateiänderungen und löse Aktionen aus! Dieser Notifiarr-Client kann (Protokoll-)Dateien auf Zeilen überwachen, die einem regulären Ausdruck entsprechen. Das ähnelt <code>tail -f file | grep string</code> und erlaubt dir, Benachrichtigungen zu senden, wenn zum Beispiel eine neue Zeile in eine Protokolldatei geschrieben wird, die einem regulären Ausdruck entspricht.",
+            "Endpoints": "URLs der Relay-Endpunkte und ihre Zeitpläne konfigurieren.",
+            "Commands": "Benutzerdefinierte Befehle und Skripte einrichten und ausführen.",
+            "Services": "Die Notifiarr-Client-Anwendung kann Dienste per HTTP-Prüfung, TCP-Port-Prüfung oder darüber überwachen, ob ein Prozess läuft (oder nicht läuft). <b>Die Zustandsprüfungen des Clients arbeiten mit der Notifiarr.com-Netzwerkintegration.</b>",
+            "Integrations": "Diese Seite zeigt Daten, die diese Client-Anwendung für die verschiedenen konfigurierten Integrationen im Arbeitsspeicher zwischengespeichert hat.",
+            "TrustProfile": "Lege fest, wie du dich bei dieser Notifiarr-Client-Anwendung anmeldest.",
+            "Landing": "Das ist der großartigste Ort auf der Erde!",
+            "Monitoring": "Ergebnisse der Zustandsprüfungen für Dienste und Netzwerk anzeigen.",
+            "Metrics": "Summen der Metriken für Client-Konfigurationen anzeigen.",
+            "LogFiles": "Protokolldateien des Clients anzeigen, mitverfolgen, herunterladen und hochladen.",
+            "System": "System- und Client-Informationen anzeigen.",
+            "SiteTunnel": "Dieser Client hält über einen <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery-Tunnel</a> eine dauerhafte Websocket-Verbindung zu notifiarr.com aufrecht. Über diesen Tunnel kann die Website Anfragen an deinen Client senden, ohne dass ein Port geöffnet oder eine statische IP vorhanden sein muss. Auf dieser Seite wählst du den primären Tunnel und den Tunnel, der als Sicherung dient, falls der primäre nicht mehr erreichbar ist.",
+            "Actions": "Hier findest du interne Aktionen des Notifiarr-Clients. Sie werden von Timern, Zeitplänen und Ereignissen der Website oder eines Chat-Servers ausgeführt. Sie sind normalerweise der Fehlersuche vorbehalten, du kannst sie in dieser Oberfläche aber auch manuell auslösen.",
+            "Plex": "Informationen zur Fehlersuche bei Plex-Webhooks."
         }
     },
     "Commands": {
-        "description": "",
-        "Executions": "",
+        "description": "Befehle werden vom Client (dem Backend) ausgeführt. Du kannst sie in dieser Oberfläche oder von einem Chat-Server auslösen. Wenn du einen Befehl änderst, musst du die Konfiguration speichern, bevor du ihn über die Weboberfläche ausführen kannst.",
+        "Executions": "Ausführungen: {count}",
         "command": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Befehl",
+            "description": "Auszuführender Befehl.",
+            "placeholder": "echo 'Hello, world!'",
+            "tooltip": "Das ist der Befehl, der beim Auslösen ausgeführt wird.<br />Klicke auf das Doppelhaken-Symbol, um den Befehl sofort auszuführen. Wenn er fertig ist, klicke auf Ausgabe aktualisieren und auf Ausgabe anzeigen, um die Ergebnisse zu sehen.<br /><br />Aktiviere das Kästchen, um den Befehl in einer Shell auszuführen. Unter Windows läuft der Befehl dann mit <code>cmd.exe</code>, auf anderen Betriebssystemen mit <code>/bin/bash</code>. Das ist nützlich für Befehle, die Shell-Funktionen wie Pipes und Umleitungen brauchen. Eigene Positionsargumente legst du in diesem Format fest: <code>({regex})</code> – ein regulärer Ausdruck in geschweiften und runden Klammern, z. B. <code>({[a-z]})</code>. Diese Argumente füllt die Person aus, die den Befehl ausführt, entweder in dieser Weboberfläche oder auf deinem Chat-Server. Hat ein Befehl ein Argument, ist es erforderlich; hat er mehrere, sind alle erforderlich.<br /><br /> <h5>Beispiele</h5>Befehl mit zwei Argumenten: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />Mit dem Befehl oben kann jemand jede Kombination von <code>ls -la</code> auf <code>/tmp</code>, <code>/</code>, <code>/home</code> oder <code>/lib</code> ausführen.",
+            "required": "Befehl ist erforderlich"
         },
         "notify": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Benachrichtigen",
+            "description": "Benachrichtigung senden, nachdem der Befehl ausgeführt wurde.",
+            "tooltip": "Du erhältst eine Benachrichtigung mit der Ausgabe des Befehls."
         },
         "log": {
-            "tooltip": "",
-            "label": "",
-            "description": ""
+            "tooltip": "Schreibe die Befehlsausgabe in die Anwendungsprotokolldatei dieses Clients.",
+            "label": "Ausgabe protokollieren",
+            "description": "Befehlsausgabe protokollieren."
         },
-        "title": "",
-        "addInstance": "",
-        "DeleteCommand": "",
-        "Failures": "",
-        "LastExecution": "",
-        "neverExecuted": "",
-        "enterCommandArguments": "",
-        "commandRequiresArguments": "",
-        "noOutput": "",
-        "refreshed": "",
-        "regexMismatch": "",
+        "title": "Befehlsliste",
+        "addInstance": "Befehl erstellen",
+        "DeleteCommand": "Befehl löschen",
+        "Failures": "Fehlschläge: {count}",
+        "LastExecution": "Letzte Ausführung",
+        "neverExecuted": "nie ausgeführt",
+        "enterCommandArguments": "Befehlsargumente eingeben",
+        "commandRequiresArguments": "Dieser Befehl benötigt {count, plural, =1 {ein Argument. Gib es unten ein.} other {# Argumente. Gib sie unten ein.}}",
+        "noOutput": "Noch keine Ausgabe. Führe den Befehl aus und klicke dann auf Aktualisieren.",
+        "refreshed": "vor {timeDuration} aktualisiert",
+        "regexMismatch": "Das Argument entspricht nicht dem regulären Ausdruck.",
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Name",
+            "description": "Name des Befehls. Erscheint im Protokoll und in Benachrichtigungen.",
+            "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Maximale Laufzeit",
+            "description": "Wie lange der Befehl laufen darf, bevor er beendet wird."
         }
     },
     "SiteTunnel": {
         "phrases": {
-            "Connecting": "",
-            "PrimaryTunnel": "",
+            "Connecting": "Verbindet",
+            "PrimaryTunnel": "Primärer Tunnel",
             "BackupTunnel": "Backup-Tunnel",
-            "Ping": "",
-            "Pinging": "",
+            "Ping": "Tunnel anpingen",
+            "Pinging": "Wird angepingt ...",
             "ActiveTunnel": "Aktiver Tunnel: {tunnel}",
-            "TunnelStats": "",
-            "Disconnects": "",
-            "ConnectionPoolSize": "",
-            "Idle": "",
-            "Running": "",
-            "LastConnection": "",
-            "LastActiveCheck": "",
-            "SocketURLActive": "",
-            "SocketURLInactive": "",
-            "SelectTunnel": "",
-            "TunnelsSaved": "",
-            "TunnelStatsStale": ""
+            "TunnelStats": "Tunnel-Statistiken",
+            "Disconnects": "Verbindungsabbrüche",
+            "ConnectionPoolSize": "Größe des Verbindungspools",
+            "Idle": "Leerlauf",
+            "Running": "Läuft",
+            "LastConnection": "Letzte Verbindung",
+            "LastActiveCheck": "Letzte Aktivitätsprüfung",
+            "SocketURLActive": "Socket-URL (aktiv)",
+            "SocketURLInactive": "Socket-URL (inaktiv)",
+            "SelectTunnel": "Tunnel auswählen",
+            "TunnelsSaved": "Tunnel vor {timeDuration} gespeichert!",
+            "TunnelStatsStale": "Die Daten oben sind immer veraltet. Klicke zum Aktualisieren auf den Link Backend aktualisieren in der Kopfzeile der Seite."
         },
-        "subText": ""
+        "subText": "Klicke auf die Schaltfläche <span class=\"text-success\">Tunnel anpingen</span> und wähle den Tunnel mit der kürzesten Antwortzeit als primären Tunnel. Wähle einen anderen schnellen Tunnel als Sicherung."
     },
     "scheduler": {
-        "daysOfMonth": "",
+        "daysOfMonth": "Monatstage",
         "required": {
-            "daysOfWeek": "",
-            "daysOfMonth": "",
-            "atTimes": ""
+            "daysOfWeek": "Mindestens ein Wochentag muss ausgewählt sein.",
+            "daysOfMonth": "Mindestens ein Monatstag muss ausgewählt sein.",
+            "atTimes": "Mindestens eine Uhrzeit für den Zeitplan muss ausgewählt sein."
         },
-        "title": "",
-        "daysOfWeek": "",
-        "frequency": "",
-        "selectAFrequency": "",
+        "title": "Zeitplan",
+        "daysOfWeek": "Wochentage",
+        "frequency": "Häufigkeit",
+        "selectAFrequency": "Wähle eine Häufigkeit, um einen Zeitplan zu erstellen.",
         "AddATime": "Uhrzeit hinzufügen",
-        "empty": "",
+        "empty": "Wenn es jeden Tag laufen soll, wähle die Häufigkeit Täglich.",
         "ops": {
-            "noSchedule": "",
-            "minutely": "",
-            "hourly": "",
+            "noSchedule": "Kein Zeitplan",
+            "minutely": "Minütlich",
+            "hourly": "Stündlich",
             "daily": "Täglich",
-            "weekly": "",
-            "monthly": ""
+            "weekly": "Wöchentlich",
+            "monthly": "Monatlich"
         },
         "times": {
-            "noneSelected": "",
-            "noDaysSelected": "",
-            "everyMinute": "",
-            "everyHour": "",
-            "everyDay": "",
-            "everyWeek": "",
-            "everyMonth": ""
+            "noneSelected": "(keine ausgewählt)",
+            "noDaysSelected": "(keine Tage ausgewählt)",
+            "everyMinute": "{count, plural, =1 {Ein Mal} other {# Mal}} jede Minute zu den Sekunden {times}",
+            "everyHour": "{count, plural, =1 {Ein Mal} other {# Mal}} jede Stunde um Minute:Sekunden {times}",
+            "everyDay": "{count, plural, =1 {Ein Mal} other {# Mal}} jeden Tag zu den Uhrzeiten {times}",
+            "everyWeek": "{count, plural, =1 {Ein Mal} other {# Mal}} jede Woche an {daysOfWeek} zu den Uhrzeiten {times}",
+            "everyMonth": "{count, plural, =1 {Ein Mal} other {# Mal}} jeden Monat an den Tagen {daysOfMonth} zu den Uhrzeiten {times}"
         }
     },
     "Endpoints": {
         "template": {
-            "required": "",
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "required": "Eine Vorlage ist erforderlich. Gib 'test' ein, wenn du nicht sicher bist.",
+            "label": "Payload-Vorlage",
+            "description": "Payload in diese Vorlage einlesen.",
+            "placeholder": "pihole",
+            "tooltip": "Die Website nutzt die Vorlage, um aus dem Payload eine Chat-Benachrichtigung zu machen. Verfügbare Vorlagen findest du auf <a href=\"https://notifiarr.com/\" target=\"_blank\">der Website</a>, eigene legst du dort unter <code>Integrationen: Endpunkte</code> an."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Anfrage-Timeout",
+            "description": "Wie lange auf den Abschluss der HTTP-Anfrage gewartet wird."
         },
         "header": {
-            "description": "",
-            "label": "",
-            "placeholder": "",
-            "tooltip": ""
+            "description": "HTTP-Anfrage-Header, 1 pro Zeile.",
+            "label": "HTTP-Header",
+            "placeholder": "Content-Type: application/json",
+            "tooltip": "Die HTTP-Anfrage-Header werden unverändert an die URL gesendet. Das Format muss pro Zeile <code>Schlüssel: Wert</code> sein. Leerzeichen und Doppelpunkt sind erforderlich. Ungültige Werte werden ignoriert und überzählige Leerzeichen entfernt."
         },
-        "title": "",
+        "title": "Relay-URLs",
         "addInstance": "Relay-URL hinzufügen",
-        "DeleteEndpoint": "",
+        "DeleteEndpoint": "URL löschen",
         "badge": {
-            "header": "",
-            "query": "",
-            "body": ""
+            "header": "{count, plural, =1 {1 Header} other {# Header}}",
+            "query": "{count, plural, =1 {1 Abfrage} other {# Abfragen}}",
+            "body": "{count, plural, =1 {1 Zeichen} other {# Zeichen}}"
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Name",
+            "description": "Name der Relay-URL.",
+            "placeholder": "benutzerdefinierter Name für Benachrichtigungen"
         },
         "method": {
-            "label": "",
-            "description": ""
+            "label": "Methode",
+            "description": "HTTP-Anfrage"
         },
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Relay-URL",
+            "description": "URL des entfernten Dienstes, deren Antwort an die Website weitergeleitet wird.",
+            "placeholder": "https://pihole.myhome.lan/api/stats"
         },
         "query": {
-            "label": "",
-            "description": "",
+            "label": "Abfrageparameter",
+            "description": "Abfrageparameter, die an die URL angehängt werden, 1 pro Zeile.",
             "placeholder": "API-Schlüssel=1234567890",
-            "tooltip": ""
+            "tooltip": "Die Abfrageparameter werden an die URL angehängt. Das Format muss pro Zeile <code>Schlüssel=Wert</code> sein. Ungültige Werte werden ignoriert und überzählige Leerzeichen entfernt. Setze das Zeichen <code>?</code> oder ein Und-Zeichen (<code>&</code>) nicht an den Anfang einer Zeile. Schlüssel und Werte werden automatisch URL-kodiert."
         },
         "body": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Anfrage-Body",
+            "description": "Der Body, der bei POST-, PUT- und PATCH-Anfragen an die URL gesendet wird.",
+            "placeholder": "{\"message\": \"Hallo, Welt!\"}"
         }
     },
     "LogFiles": {
         "AddMoreLines": "Mehr Linien hinzufügen",
         "button": {
-            "add": "Hinzufügen"
+            "add": "Hinzufügen",
+            "download": "Herunterladen",
+            "upload": "Hochladen",
+            "delete": "Löschen",
+            "reload": "Neu laden",
+            "tooltip": "Die Schaltfläche <b>Herunterladen</b> speichert die Datei auf deinem Computer. Die Schaltfläche <b>Hochladen</b> lädt die Datei auf den Server von Notifiarr.com hoch. Hochgeladene Dateien sehen nur Administratoren. Die Schaltfläche <b>Löschen</b> löscht die Datei von deiner Festplatte. Dateien in Verwendung können nicht gelöscht werden. In Verwendung heißt, dass diese Anwendung gerade Protokolleinträge hineinschreibt."
         },
         "titles": {
-            "Age": "Alter"
+            "Age": "Alter",
+            "Name": "Dateiname",
+            "Bytes": "Byte",
+            "InUse": "In Verwendung",
+            "Mode": "Modus",
+            "Owner": "Eigentümer",
+            "Path": "Pfad",
+            "Date": "Datum",
+            "FileList": "Dateiliste",
+            "Details": "Details",
+            "FileContent": "Dateiinhalt",
+            "FollowingFile": "Datei wird mitverfolgt",
+            "LineCount": "Zeilenanzahl",
+            "OpenFile": "Datei {fileName} öffnen",
+            "TailFile": "Datei {fileName} mitverfolgen",
+            "Tailing": "Wird mitverfolgt"
         },
-        "deleteConfirm": "Willst du diese Datei wirklich löschen? Das kann nicht rückgängig gemacht werden."
+        "deleteConfirm": "Willst du diese Datei wirklich löschen? Das kann nicht rückgängig gemacht werden.",
+        "Error": "Fehler beim Laden der Protokolldatei: {error}",
+        "DeleteFile": "{filePath} löschen",
+        "deleteError": "Fehler beim Löschen der Protokolldatei: {error}",
+        "deleteSuccess": "Protokolldatei gelöscht: {file}",
+        "uploadError": "Fehler beim Hochladen der Protokolldatei: {error}",
+        "uploadSuccess": "Protokolldatei wird hochgeladen: {file}",
+        "NoFileSelected": "Keine Datei ausgewählt.",
+        "SelectFile": "Wähle eine Datei, um zu sehen, was drinsteht!",
+        "FilesInDirs": "{fileCount} Dateien in {dirCount} Ordnern",
+        "ToggleLinesOrder": "Zeilenreihenfolge umschalten",
+        "ToggleColors": "Standardfarben umschalten",
+        "Reload": "Protokolldatei neu laden",
+        "Highlight": "Hervorheben",
+        "ToggleLineWrap": "Zeilenumbruch umschalten",
+        "FollowTooltip": "Die Schaltflächen in dieser Spalte verfolgen eine Datei live mit, während sie beschrieben wird.",
+        "Tooltip": "<ol><li>Die erste orange Schaltfläche links schaltet die Reihenfolge der Zeilen in der Datei um. Standardmäßig stehen sie absteigend in der Schreibreihenfolge. Ein Klick dreht die Datei um und zeigt sie rückwärts. Das passt gut, wenn du eine Datei mitverfolgst, die gerade beschrieben wird.</li><li>Die zweite violette Schaltfläche schaltet die eingebauten Farben zur Zeilenhervorhebung um. Sie dreht sich auch, solange etwas passiert.</li><li>Das Zahlenfeld gibt an, wie viele Zeilen geladen oder hinzugefügt werden. Beim Mitverfolgen einer Datei begrenzt die Zahl, wie viele Zeilen angezeigt werden.</li><li>Ein Klick auf Hinzufügen fügt diese Anzahl Zeilen oben in der Datei an und nutzt die bisherige Zeilenzahl als Versatz. Hinzufügen ist bei Dateien in Verwendung deaktiviert, weil nicht erkennbar ist, wie viele Zeilen seit der letzten Aktualisierung geschrieben wurden. Beim Mitverfolgen von Dateien in Verwendung ersetzt eine Anzeige die Schaltfläche Hinzufügen.</li><li>Ein Klick auf Neu laden lädt diese Anzahl Zeilen vom Ende der Datei neu.</li><li>Mit dem Feld Hervorheben hebst du bestimmten Text hervor.</li><li>Die letzte Schaltfläche schaltet den Zeilenumbruch um.</li></ol>"
+    },
+    "Nodal": {
+        "button": {
+            "refresh": "Seitendaten aktualisieren",
+            "fullscreen": "Vollbild umschalten",
+            "raw": "Rohdaten umschalten"
+        },
+        "noResponse": "Keine Antwortdaten."
+    },
+    "ProcessList": {
+        "title": "Liste der laufenden Prozesse",
+        "error": "Fehler beim Laden der Prozessliste: {error}",
+        "noData": "Keine Prozessliste zurückgegeben.",
+        "footer": "{count} Prozesse gefunden.",
+        "button": {
+            "wrapOn": "Zeilenumbruch einschalten",
+            "wrapOff": "Zeilenumbruch ausschalten"
+        }
+    },
+    "ClientInfo": {
+        "title": "Start-Payload",
+        "error": "Fehler beim Laden des Start-Payloads: {error}",
+        "noData": "Kein Start-Payload zurückgegeben.",
+        "description": "Das ist der Payload, den Notifiarr.com beim Start an den Client geschickt hat. Er enthält die Konfiguration des Clients und weitere Informationen."
+    },
+    "Integrations": {
+        "titles": {
+            "Size": "Größe",
+            "DashboardAge": "Dashboard-Alter",
+            "CacheAge": "Cache-Alter",
+            "StatusAge": "Status-Alter",
+            "Version": "Version",
+            "Branch": "Branch",
+            "BuildTime": "Build-Zeit"
+        },
+        "DriveData": {
+            "title": "Laufwerksdaten",
+            "driveInformation": {
+                "title": "Laufwerksinformationen"
+            },
+            "mdStatRaid": {
+                "title": "MDStat-RAID"
+            },
+            "titles": {
+                "Drive": "Laufwerk",
+                "Temp": "Temperatur",
+                "Health": "Gesundheit",
+                "Age": "Alter",
+                "Setting": "Einstellung",
+                "Value": "Wert"
+            }
+        },
+        "Snapshot": {
+            "title": "Rohe Snapshot-Daten",
+            "Age": "Snapshot-Alter",
+            "Data": "Snapshot-Daten",
+            "Latest": "Neuester Snapshot",
+            "System": "System-Snapshot",
+            "titles": {
+                "CPUPercent": "CPU-Prozent",
+                "MemoryFree": "Freier Arbeitsspeicher",
+                "MemoryUsed": "Belegter Arbeitsspeicher",
+                "MemoryTotal": "Arbeitsspeicher gesamt",
+                "UserCPUTime": "Benutzer-CPU-Zeit",
+                "SystemCPUTime": "System-CPU-Zeit",
+                "IdleCPUTime": "CPU-Zeit im Leerlauf",
+                "NvidiaGPUs": "Nvidia-GPUs",
+                "MySQLServers": "MySQL-Server",
+                "IPMISensors": "IPMI-Sensoren",
+                "Synology": "Synology",
+                "RaidConfigs": "RAID-Konfigurationen",
+                "ZFSPools": "ZFS-Pools",
+                "Processes": "Prozesse",
+                "DriveTemps": "Laufwerkstemperaturen",
+                "DriveHealth": "Laufwerksgesundheit",
+                "DiskUsage": "Datenträgerbelegung",
+                "DiskQuotas": "Datenträgerquoten",
+                "IOTop": "IO Top",
+                "IOStat": "IO Stat",
+                "IOStat2": "IO Stat 2"
+            }
+        },
+        "starrTitles": {
+            "QueueAge": "Alter der Warteschlange",
+            "QueueSize": "Größe der Warteschlange",
+            "Elapsed": "Verstrichen",
+            "Shows": "Serien",
+            "Episodes": "Episoden",
+            "Movies": "Filme",
+            "Books": "Bücher",
+            "Editions": "Ausgaben",
+            "Tracks": "Stücke",
+            "Artists": "Künstler",
+            "OnDisk": "Auf dem Datenträger",
+            "Missing": "Fehlend"
+        },
+        "downloadTitles": {
+            "Downloads": "Downloads",
+            "Incomplete": "Unvollständig",
+            "Downloading": "Wird heruntergeladen",
+            "Paused": "Pausiert",
+            "TotalSize": "Gesamtgröße",
+            "Errors": "Fehler",
+            "Downloaded": "Heruntergeladen",
+            "Uploading": "Wird hochgeladen",
+            "Uploaded": "Hochgeladen",
+            "Seeding": "Verteilen",
+            "Month": "Monat",
+            "Week": "Woche",
+            "Day": "Tag"
+        },
+        "lidarrDashboard": {
+            "title": "Rohes Lidarr-Dashboard"
+        },
+        "radarrDashboard": {
+            "title": "Rohes Radarr-Dashboard"
+        },
+        "readarrDashboard": {
+            "title": "Rohes Readarr-Dashboard"
+        },
+        "sonarrDashboard": {
+            "title": "Rohes Sonarr-Dashboard"
+        },
+        "delugeDashboard": {
+            "title": "Rohes Deluge-Dashboard"
+        },
+        "nzbgetDashboard": {
+            "title": "Rohes NZBGet-Dashboard"
+        },
+        "qbitDashboard": {
+            "title": "Rohes QBit-Dashboard"
+        },
+        "rtorrentDashboard": {
+            "title": "Rohes rTorrent-Dashboard"
+        },
+        "transmissionDashboard": {
+            "title": "Rohes Transmission-Dashboard"
+        },
+        "sabnzbdDashboard": {
+            "title": "Rohes SabNZBD-Dashboard"
+        },
+        "sonarrQueue": {
+            "title": "Rohe Sonarr-Warteschlange"
+        },
+        "radarrQueue": {
+            "title": "Rohe Radarr-Warteschlange"
+        },
+        "readarrQueue": {
+            "title": "Rohe Readarr-Warteschlange"
+        },
+        "lidarrQueue": {
+            "title": "Rohe Lidarr-Warteschlange"
+        },
+        "prowlarrStatus": {
+            "title": "Rohe Prowlarr-Informationen"
+        },
+        "radarrStatus": {
+            "title": "Rohe Radarr-Informationen"
+        },
+        "readarrStatus": {
+            "title": "Rohe Readarr-Informationen"
+        },
+        "sonarrStatus": {
+            "title": "Rohe Sonarr-Informationen"
+        },
+        "lidarrStatus": {
+            "title": "Rohe Lidarr-Informationen"
+        },
+        "tautulliStatus": {
+            "title": "Rohe Tautulli-Informationen"
+        },
+        "tautulliUsers": {
+            "title": "Tautulli-Benutzer"
+        },
+        "tautulliUsersJson": {
+            "title": "Rohe Tautulli-Benutzer"
+        },
+        "plexStatus": {
+            "title": "Informationen zum Plex Media Server"
+        },
+        "plexSessions": {
+            "title": "Aktuelle Sitzungen des Plex Media Servers",
+            "footer": "Zeigt die aktuellen Plex-Sitzungen, nicht die zwischengespeicherten Daten. Die zwischengespeicherten Daten siehst du im Fenster mit dem rohen JSON."
+        },
+        "plexSessionsJson": {
+            "title": "Rohe Sitzungen des Plex Media Servers"
+        },
+        "mediaTitles": {
+            "Country": "Land",
+            "PushNotifications": "Push-Benachrichtigungen",
+            "PlexPass": "Plex Pass",
+            "ServerOwner": "Serverbesitzer",
+            "Sessions": "Sitzungen",
+            "SessionsAge": "Alter der Sitzungen",
+            "Users": "Benutzer",
+            "User": "Benutzer",
+            "PlexUsername": "Plex-Benutzername",
+            "CustomName": "Benutzerdefinierter Name",
+            "Email": "E-Mail",
+            "Session": "Sitzung",
+            "Complete": "Abgeschlossen",
+            "Encoding": "Kodierung",
+            "Title": "Titel"
+        },
+        "phrases": {
+            "NoCachedSessions": "Keine Sitzungen zwischengespeichert.",
+            "NoPlexData": "Keine Daten der Plex-Integration.",
+            "StateForTime": "{state} seit {timeDuration}"
+        }
+    },
+    "Languages": {
+        "menuTitle": "Hilfe zur Sprache",
+        "title": "Unterstützung für Lokalisierung",
+        "body": "Diese Anwendung gibt es in mehreren Sprachen. Die Sprache änderst du über die Sprachauswahl im Profilmenü. Für manche Sprachen gibt es keine aktiven Übersetzer, deshalb können Übersetzungen unvollständig sein. Wenn du beim Übersetzen helfen willst, <a href=\"https://notifiarr.com/discord\" target=\"_blank\">besuch uns auf Discord</a>. Geh in den Kanal <code>#role-request</code> und tippe <code>!roleTranslate</code>. Damit bekommst du Zugang zum Kanal <code>#translate</code>. Tritt dort bei und sag, dass du mitmachen willst."
+    },
+    "ApiDocs": {
+        "Choose": "API zum Anzeigen wählen",
+        "Contrast": "Bitte melde Kontrastprobleme auf dieser Seite.",
+        "BasePath": "<b>Basispfad</b>: <code>{basePath}</code>",
+        "api": {
+            "title": "Private API ({basePath})",
+            "body": "Das ist die API-Spezifikation für die Website Notifiarr.com. Die Website nutzt diese API, um mit dem Client zu sprechen."
+        },
+        "ui": {
+            "title": "Weboberfläche ({basePath})",
+            "body": "Diese Spezifikation beschreibt die Methoden, mit denen das Frontend des Notifiarr-Clients mit dem Backend spricht. Du benutzt das Frontend gerade."
+        }
+    },
+    "TestAllInstances": {
+        "title": "Alle Instanzen testen",
+        "Instance": "Instanz",
+        "Message": "Meldung",
+        "Status": "Status",
+        "Updated": "<b>Test aktualisiert</b>: <code>{timeDuration}</code>",
+        "TestElapsed": "<b>Testdauer</b>: <code>{timeDuration}</code>",
+        "Concurrency": "<b>Parallelität</b>: <code>{workerCount}</code>",
+        "Tested": "<b>Getestete Instanzen</b>: <code>{testCount}</code>",
+        "clickRefresh": "Klicke zum erneuten Testen auf Aktualisieren oben rechts.",
+        "footer": "Mit diesem Werkzeug zur Fehlersuche prüfst du, ob alle deine Instanzen erreichbar und richtig konfiguriert sind. Das Timeout ist fest auf 15 Sekunden gesetzt, ungefähr so lange wartet auch die Website auf eine Antwort."
+    },
+    "FileBrowser": {
+        "tooltip": {
+            "Go": "<code>cd {path}</code><br />In den angegebenen Pfad wechseln.",
+            "SelectPath": "Pfad auswählen: <code>{path}</code>",
+            "Up": "<code>cd ..</code><br />In den übergeordneten Ordner wechseln."
+        },
+        "FilterFiles": "Dateien filtern",
+        "CreateFileIn": "Die Datei wird in diesem Pfad erstellt: <code>{path}</code>",
+        "CreateFolderIn": "Der Ordner wird in diesem Pfad erstellt: <code>{path}</code>",
+        "Files": "Dateien: {count}",
+        "Folders": "Ordner: {count}",
+        "FilesFiltered": "Dateien: {count}, gefiltert: {filtered}",
+        "FoldersFiltered": "Ordner: {count}, gefiltert: {filtered}",
+        "Selected": "Ausgewählt: <code>{path}</code>",
+        "Created": "Erstellt: {path}",
+        "Creating": "Wird erstellt...",
+        "InvalidPath": "Ungültiger Pfad. Keine Schrägstriche verwenden (<code>/</code> oder <code>\\</code>).",
+        "FilterFilesDesc": "Mit dem Dateifilter durchsuchst du schnell die angezeigten Dateien. Nützlich bei Ordnern mit vielen Dateien. Mit der Schaltfläche <code>Menü</code> erstellst du einen neuen Ordner oder eine neue Datei. Um eine Datei auszuwählen, die es noch nicht gibt, tippe sie in die Leiste <code>Pfad</code> und klicke auf den grünen Haken. Alternativ erstellst du sie über den Menüpunkt <code>Datei erstellen</code>."
+    },
+    "Plex": {
+        "URLNotConfigured": "Die Plex-URL ist nicht konfiguriert. <go-to page=\"mediaApps\" subPage=\"plex\">Hier konfigurieren</go-to>.",
+        "TokenNotConfigured": "Das Plex-Token ist nicht konfiguriert. <go-to page=\"mediaApps\" subPage=\"plex\">Hier konfigurieren</go-to>.",
+        "Disabled": "Plex ist administrativ deaktiviert. <go-to page=\"mediaApps\" subPage=\"plex\">Hier aktivieren</go-to>.",
+        "WaitingForWebhooks": "Warte auf Plex-Webhooks...",
+        "WebhooksReceived": "Empfangene Webhooks: <code>{count}</code>",
+        "NoStatus": "Es sind keine Informationen zum Plex Media Server zwischengespeichert. Das kann heißen, dass die Plex-URL oder das Token ungültig ist oder das Timeout zu kurz ist. Sieh in den <go-to page=\"logFiles\">Anwendungsprotokollen</go-to> nach weiteren Informationen.",
+        "WebhookNote": "<p>Hast du den <a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">Plex-Webhook</a> schon eingerichtet?</p><p>Wenn der Webhook-Zähler nicht steigt, während du eine Serie pausierst und abspielst, starte den Plex Media Server neu. Wenn das nicht hilft, sieh in den <go-to page=\"logFiles\">HTTP-Protokollen</go-to> nach ungültigen Anfragen. Wenn du keine siehst, ist in Plex vielleicht die falsche Webhook-URL eingetragen. Sie sollte so aussehen: <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>, das muss aber nicht exakt stimmen und hängt von deiner Serverkonfiguration ab.</p> Manche Web-Anbieter sperren den Zugriff auf die URI <code>{urlbase}plex</code>. Deshalb nimmt diese Anwendung einen Plex-Webhook auch an der URI <code>{urlbase}</code> und an <code>{urlbase}api/plex/post</code> an. Wir bieten diese Flexibilität, damit die Benachrichtigungen stabil bleiben.",
+        "WebsiteSettings": "Website-Einstellungen",
+        "AccountMap": "Kontenzuordnung",
+        "ActivityDelay": "Aktivitätsverzögerung",
+        "WebhookCoolDown": "Webhook-Abklingzeit",
+        "SessionsInterval": "Sitzungsintervall",
+        "MoviesFinished": "Beendete Filme",
+        "SeriesFinished": "Beendete Serien",
+        "NoActivity": "Keine Aktivität"
     }
 }
