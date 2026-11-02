@@ -25,12 +25,16 @@ export const Flags: Record<string, string> = {
   pl: '🇵🇱',
   pt: '🇵🇹',
   sv: '🇸🇪',
-  zh_Hant: '🇹🇼',
-  zh_Hans: '🇨🇳',
+  'zh-Hant': '🇹🇼',
+  'zh-Hans': '🇨🇳',
 }
 
-/** Intl rejects underscores, so the zh_Hant catalog is formatted as zh-Hant. */
-const bcp47 = (code: string) => code.replaceAll('_', '-')
+/** en-US becomes en. zh-Hant stays whole because that catalog includes the script. */
+const catalog = (input: string) => {
+  const tag = input.toLowerCase()
+  if (tag === 'zh-hant' || tag.startsWith('zh-hant-')) return 'zh-Hant'
+  return input.split('-')[0]
+}
 
 class Locale {
   // We support English primarily, so make that the default and fallback.
@@ -41,9 +45,10 @@ class Locale {
   public readonly current = $derived(this.curr)
 
   constructor() {
-    // We only support language codes, not country codes. Maybe one day.
-    const init = nav.getQuery('lang') || getLocaleFromNavigator() || this.fallbackLocale
-    this.init(init?.split('-')[0], this.fallbackLocale)
+    // Regional tags collapse to the language. zh-Hant is kept whole.
+    const requested =
+      nav.getQuery('lang') || getLocaleFromNavigator() || this.fallbackLocale
+    this.init(catalog(requested), this.fallbackLocale)
   }
 
   /** Use this to change the UI locale (translated language). */
@@ -51,12 +56,9 @@ class Locale {
     if (!newLocale) return
 
     try {
-      newLocale = newLocale.split('-')[0]
-      await register(
-        bcp47(newLocale),
-        async () => await import(`../locale/${newLocale}.json`),
-      )
-      await lang.set(bcp47(newLocale))
+      newLocale = catalog(newLocale)
+      await register(newLocale, async () => await import(`../locale/${newLocale}.json`))
+      await lang.set(newLocale)
       await nav.setQuery('lang', (this.curr = newLocale))
     } catch (e) {
       this.error(`Error registering selected locale ${newLocale}: ${e}`)
@@ -65,28 +67,16 @@ class Locale {
 
   private init = async (initial: string, fallback: string) => {
     try {
-      await register(
-        bcp47(initial),
-        async () => await import(`../locale/${initial}.json`),
-      )
-      await register(
-        bcp47(fallback),
-        async () => await import(`../locale/${fallback}.json`),
-      )
-      await init({ fallbackLocale: bcp47(fallback), initialLocale: bcp47(initial) })
+      await register(initial, async () => await import(`../locale/${initial}.json`))
+      await register(fallback, async () => await import(`../locale/${fallback}.json`))
+      await init({ fallbackLocale: fallback, initialLocale: initial })
       this.curr = initial
     } catch (e) {
       this.error(`Error registering browser locale ${initial}: ${e}`)
       // Load default locale.
       try {
-        await register(
-          bcp47(fallback),
-          async () => await import(`../locale/${fallback}.json`),
-        )
-        await init({
-          fallbackLocale: bcp47(fallback),
-          initialLocale: bcp47((this.curr = fallback)),
-        })
+        await register(fallback, async () => await import(`../locale/${fallback}.json`))
+        await init({ fallbackLocale: fallback, initialLocale: (this.curr = fallback) })
       } catch (e) {
         this.error(`Error registering default locale ${fallback}: ${e}`)
       }
