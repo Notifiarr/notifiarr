@@ -583,7 +583,7 @@
             },
             "url": {
                 "label": "URL",
-                "description": "URL dell'istanza di Transmission.",
+                "description": "URL dell'istanza di Transmission. <b>Deve</b> includere il suffisso <code>/transmission/rpc</code>.",
                 "placeholder": "http://transmission.server.tv:9091"
             },
             "username": {
@@ -660,7 +660,7 @@
             "description": "Comando da eseguire.",
             "placeholder": "echo 'Hello, world!'",
             "tooltip": "Questo è il comando che viene eseguito quando viene attivato.<br />Clicca l'icona della doppia spunta per eseguire il comando subito. Quando finisce, clicca Aggiorna Output e Mostra Output per vedere i risultati.<br /><br />Seleziona la casella per racchiudere il comando in una shell. Su Windows il comando viene eseguito con <code>cmd.exe</code> e sugli altri sistemi operativi con <code>/bin/bash</code>. È utile per i comandi che richiedono funzioni della shell come pipe e reindirizzamenti. Gli argomenti posizionali personalizzati si definiscono con questo formato: <code>({regex})</code>, cioè un'espressione regolare racchiusa tra parentesi graffe e tonde, ad es. <code>({[a-z]})</code>. Questi argomenti possono essere compilati da chi esegue il comando, in questa interfaccia web o sul tuo server di chat. Se un comando ha un argomento, è obbligatorio; se ne ha più di uno, sono tutti obbligatori.<br /><br /> <h5>Esempi</h5>Comando con due argomenti: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />Il comando sopra permette qualsiasi combinazione di <code>ls -la</code> su <code>/tmp</code>, <code>/</code>, <code>/home</code> o <code>/lib</code>.",
-            "required": "Comando è rischiesto"
+            "required": "Comando è richiesto"
         },
         "notify": {
             "label": "Notifica",
@@ -1243,8 +1243,8 @@
         },
         "phrase": {
             "ShowMoreDesc": "Attualmente sono supportati tre tipi di autenticazione. Proxy di Autenticazione e Nessuna Password sono disponibili solo se la richiesta attuale proviene da un indirizzo IP upstream valido e configurato.",
-            "PasswordOnlyUsed": "Username e Password sono utilizzati solamente se Modalità Autenticazione è impostato su Password",
-            "HeaderOnlyUsed": "L'header di autenticazione è utilizzato solamente se Modalità Autenticazione è impostato su Header o Nessuna Password.",
+            "PasswordOnlyUsed": "Username e Password sono utilizzati solamente se Modalità Autenticazione è impostata su Password",
+            "HeaderOnlyUsed": "L'header di autenticazione è utilizzato solamente se Modalità Autenticazione è impostata su Header o Nessuna Password.",
             "AuthTypeChange": "Se Modalità Autenticazione cambia, esci per completare la procedura.",
             "ProfileUpdated": "Profilo aggiornato correttamente {timeDuration} fa!",
             "EnterCurrentPassword": "Inserisci la tua password attuale per effettuare le modifiche.",
@@ -1265,7 +1265,7 @@
             },
             "option_desc": {
                 "password": "Questo è il tipo di autenticazione predefinito. Seleziona l'opzione Password per accedere a questa applicazione con uno username e una password configurati. È supportata una sola coppia di username e password. Quando selezioni questa opzione devi compilare i campi Username e Nuova Password. Se questo è il tipo di autenticazione attuale devi compilare anche il campo Password Attuale per fare le modifiche.",
-                "header": "Selezionare questa opzione per accedere all'applicazione utilizzando un header HTTP che contiene un username. Questa procedura è comunemente nota come autenticazione proxy. Abbiamo <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">una pagina wiki</a> che fornisce istruzioni per configurare Nginx per questa funzione. Quando si seleziona questa opzione, è necessario selezionare anche un header per il proxy di autenticazione. Se non vengono visualizzate header, significa che il proxy upstream non ha fornito intestazioni valide.",
+                "header": "Selezionare questa opzione per accedere all'applicazione utilizzando un header HTTP che contiene un username. Questa procedura è comunemente nota come autenticazione proxy. Abbiamo <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">una pagina wiki</a> che fornisce istruzioni per configurare Nginx per questa funzione. Quando si seleziona questa opzione, è necessario selezionare anche un header per il proxy di autenticazione. Se non vengono visualizzati header, significa che il proxy upstream non ha fornito intestazioni valide.",
                 "noauth": "Questa configurazione non è consigliata. Il tipo di autenticazione Senza password consente qualsiasi richiesta proveniente da qualsiasi <code>IP upstream</code> configurato. Funziona anche con un proxy di autenticazione per impostare il nome utente. Se nell'header fornito non è presente alcun username, il valore predefinito è admin.",
                 "website": "Seleziona questa opzione per accedere a questa applicazione usando le credenziali del sito. Puoi accedere al client con l'indirizzo email oppure con lo username e la password di Notifiarr.com. La tua password è sempre al sicuro e viene cifrata prima di essere trasmessa al client."
             }
@@ -1279,7 +1279,7 @@
         "header": {
             "label": "Header di Autenticazione",
             "description": "Seleziona l'header contenente il tuo username",
-            "tooltip": "Visualizza gli header forniti dal client o dall'upstream che possono essere utilizzate per l'autenticazione proxy. Questa selezione viene utilizzata se il tipo di autenticazione è impostato su Header o Nessuna password. Scegliere l'header che visualizza l'username corretto. Quando si utilizza Nessuna password, l'header viene utilizzata per impostare l'username ma non è obbligatoria."
+            "tooltip": "Visualizza gli header forniti dal client o dall'upstream che possono essere utilizzati per l'autenticazione proxy. Questa selezione viene utilizzata se il tipo di autenticazione è impostato su Header o Nessuna password. Scegliere l'header che visualizza l'username corretto. Quando si utilizza Nessuna password, l'header viene utilizzato per impostare l'username ma non è obbligatorio."
         },
         "username": {
             "label": "Username",
