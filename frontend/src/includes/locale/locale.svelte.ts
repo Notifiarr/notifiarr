@@ -29,6 +29,9 @@ export const Flags: Record<string, string> = {
   zh_Hans: '🇨🇳',
 }
 
+/** Intl rejects underscores, so the zh_Hant catalog is formatted as zh-Hant. */
+const bcp47 = (code: string) => code.replaceAll('_', '-')
+
 class Locale {
   // We support English primarily, so make that the default and fallback.
   private readonly fallbackLocale = 'en'
@@ -49,8 +52,11 @@ class Locale {
 
     try {
       newLocale = newLocale.split('-')[0]
-      await register(newLocale, async () => await import(`../locale/${newLocale}.json`))
-      await lang.set(newLocale)
+      await register(
+        bcp47(newLocale),
+        async () => await import(`../locale/${newLocale}.json`),
+      )
+      await lang.set(bcp47(newLocale))
       await nav.setQuery('lang', (this.curr = newLocale))
     } catch (e) {
       this.error(`Error registering selected locale ${newLocale}: ${e}`)
@@ -59,16 +65,28 @@ class Locale {
 
   private init = async (initial: string, fallback: string) => {
     try {
-      await register(initial, async () => await import(`../locale/${initial}.json`))
-      await register(fallback, async () => await import(`../locale/${fallback}.json`))
-      await init({ fallbackLocale: fallback, initialLocale: initial })
+      await register(
+        bcp47(initial),
+        async () => await import(`../locale/${initial}.json`),
+      )
+      await register(
+        bcp47(fallback),
+        async () => await import(`../locale/${fallback}.json`),
+      )
+      await init({ fallbackLocale: bcp47(fallback), initialLocale: bcp47(initial) })
       this.curr = initial
     } catch (e) {
       this.error(`Error registering browser locale ${initial}: ${e}`)
       // Load default locale.
       try {
-        await register(fallback, async () => await import(`../locale/${fallback}.json`))
-        await init({ fallbackLocale: fallback, initialLocale: (this.curr = fallback) })
+        await register(
+          bcp47(fallback),
+          async () => await import(`../locale/${fallback}.json`),
+        )
+        await init({
+          fallbackLocale: bcp47(fallback),
+          initialLocale: bcp47((this.curr = fallback)),
+        })
       } catch (e) {
         this.error(`Error registering default locale ${fallback}: ${e}`)
       }
