@@ -128,7 +128,16 @@
             "title": "Geef de API-sleutel op.",
             "Setting": "API-sleutel instellen...",
             "description": "De Notifiarr client vereist een geldige API-sleutel om te functioneren. Deze sleutel wordt gebruikt om te authenticeren bij de Notifiarr website, zodat u updates kunt ontvangen en meldingen kunt verzenden. De cliënt werkt niet zonder deze sleutel, dus voer hieronder uw API-sleutel in."
-        }
+        },
+        "APIKeyMustBeCountCharacters": "De API-sleutel moet {count} tekens lang zijn.",
+        "InvalidAPIKey": "Ongeldige Notifiarr API-sleutel — werk deze bij in Configuratie.",
+        "ShowPassword": "Wachtwoord tonen",
+        "HidePassword": "Wachtwoord verbergen",
+        "CheckInstance": "Instantie controleren",
+        "ValidateSSL": "SSL certificaat valideren",
+        "RunAsShell": "Als shell-opdracht uitvoeren",
+        "FollowRedirects": "Omleidingen volgen",
+        "BrowseFiles": "Bestanden doorbladeren"
     },
     "navigation": {
         "pageDescription": {
@@ -500,7 +509,8 @@
             "Subscriber": "Abonnee",
             "AbsoluteBadAss": "Absoluut stoer",
             "YesYesYouAre": "Ja, ja dat ben je! 💚",
-            "HellaAwesome": "Hoi geweldenaar"
+            "HellaAwesome": "Hoi geweldenaar",
+            "InvalidAPIKey": "Niet ingelogd bij Notifiarr; de API-sleutel is geweigerd."
         },
         "ClientInformation": {
             "Uptime": "Uptime",
@@ -1153,7 +1163,8 @@
             "label": "Bestandspad",
             "description": "Pad naar het te bewaken bestand. Aanbevolen absolute padnamen.",
             "placeholder": "/var/log/nginx/access.log",
-            "required": "Pad is vereist"
+            "required": "Pad is vereist",
+            "clientLog": "Het eigen logbestand van de client kan niet worden gevolgd; dat zou een lus veroorzaken. Clientfouten worden al verzonden als client_error_log."
         },
         "skip": {
             "description": "Alles wat aan deze expressie voldoet, wordt genegeerd.",
@@ -1543,7 +1554,7 @@
             "FileContent": "Bestandsinhoud",
             "FileList": "Bestandslijst",
             "Name": "Bestandsnaam",
-            "TailFile": "Volg bestand {bestandsnaam}",
+            "TailFile": "Volg bestand {fileName}",
             "Tailing": "Volgen",
             "InUse": "In gebruik",
             "Mode": "Modus",
@@ -1569,8 +1580,8 @@
         "uploadError": "Fout bij het uploaden van het logbestand: {error}",
         "FilesInDirs": "{fileCount} bestanden in {dirCount} mappen",
         "Highlight": "Hoogtepunt",
-        "deleteSuccess": "Logbestand verwijderd: {bestand}",
-        "uploadSuccess": "Log bestand uploaden: {bestand}",
+        "deleteSuccess": "Logbestand verwijderd: {file}",
+        "uploadSuccess": "Log bestand uploaden: {file}",
         "NoFileSelected": "Geen bestand geselecteerd.",
         "Reload": "Logbestand opnieuw laden",
         "SelectFile": "Selecteer een bestand om te zien wat erin staat!",
@@ -1582,7 +1593,7 @@
     },
     "ProcessList": {
         "footer": "{count} processen gevonden.",
-        "error": "Fout bij het laden van de proceslijst: {fout}",
+        "error": "Fout bij het laden van de proceslijst: {error}",
         "noData": "Geen proceslijst geretourneerd.",
         "title": "Lijst met actieve processen",
         "button": {
@@ -1591,7 +1602,7 @@
         }
     },
     "ClientInfo": {
-        "error": "Fout bij het laden van de opstart payload: {fout}",
+        "error": "Fout bij het laden van de opstart payload: {error}",
         "title": "Opstart Payload",
         "description": "Dit is de payload die bij het opstarten door Notifiarr.com naar de client is verzonden. Deze bevat de configuratie van de client en andere informatie.",
         "noData": "Geen opstart payload geretourneerd."
@@ -1820,23 +1831,23 @@
         "Updated": "<b>Test bijgewerkt</b>: <code>{timeDuration}</code>"
     },
     "FileBrowser": {
-        "FilesFiltered": "Bestanden: {aantal}, gefilterd: {gefilterd}",
+        "FilesFiltered": "Bestanden: {count}, gefilterd: {filtered}",
         "InvalidPath": "Ongeldig pad opgegeven. Gebruik geen schuine strepen (<code>/</code> of <code>\\</code>).",
         "FilterFilesDesc": "Gebruik het bestandsfilter om snel in de lijst met weergegeven bestanden te zoeken. Handig bij mappen met veel bestanden. Gebruik de knop <code>Menu</code> om een nieuwe map of een nieuw bestand aan te maken. Om een bestand te selecteren dat niet bestaat, typt u het in de balk <code>Pad</code> en klikt u op de groene vink knop. U kunt ook het menu-item <code>Bestand aanmaken</code> gebruiken om het aan te maken.",
         "tooltip": {
             "Up": "<code>cd ..</code><br />Ga naar de bovenliggende map.",
-            "Go": "<code>cd {pad}</code><br />Ga naar het opgegeven pad.",
-            "SelectPath": "Selecteer pad: <code>{pad}</code>"
+            "Go": "<code>cd {path}</code><br />Ga naar het opgegeven pad.",
+            "SelectPath": "Selecteer pad: <code>{path}</code>"
         },
-        "Created": "Aangemaakt: {pad}",
+        "Created": "Aangemaakt: {path}",
         "Creating": "Bezig met maken...",
         "Files": "Bestanden: {count}",
         "FilterFiles": "Bestanden filteren",
         "Folders": "Mappen: {count}",
         "FoldersFiltered": "Mappen: {count}, gefilterd: {filtered}",
-        "Selected": "Geselecteerd: <code>{pad}</code>",
-        "CreateFileIn": "Het bestand wordt aangemaakt in het pad: <code>{pad}</code>",
-        "CreateFolderIn": "De map wordt aangemaakt in het pad: <code>{pad}</code>"
+        "Selected": "Geselecteerd: <code>{path}</code>",
+        "CreateFileIn": "Het bestand wordt aangemaakt in het pad: <code>{path}</code>",
+        "CreateFolderIn": "De map wordt aangemaakt in het pad: <code>{path}</code>"
     },
     "Plex": {
         "WebhookNote": "<p>Heb je de Plex Webhook al <a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">geconfigureerd</a>?</p><p>Als de webhook-teller niet omhoog gaat wanneer je een programma pauzeert en afspeelt, start dan Plex Media Server opnieuw op. Als dat niet werkt, controleer dan de <go-to page=\"logFiles\">http-logs</go-to> op ongeldige verzoeken. Als u geen ongeldige verzoeken ziet, kan dit betekenen dat u de verkeerde webhook-URL in Plex hebt geconfigureerd. Deze moet er als volgt uitzien: <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>, maar dit is mogelijk niet nauwkeurig en hangt af van uw serverconfiguratie. </p> Sommige internetproviders blokkeren de toegang tot de <code>{urlbase}plex</code> URI, dus deze applicatie accepteert ook een Plex-webhook op de <code>{urlbase}</code> URI en op <code>{urlbase}api/plex/post</code>. We bieden veelzijdigheid om stabiele meldingen te garanderen.",
