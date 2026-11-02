@@ -1541,7 +1541,7 @@
             "everyMinute": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co minutę w sekundach {times}",
             "everyHour": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co godzinę o minucie:sekundach {times}",
             "everyDay": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} codziennie o godzinach {times}",
-            "everyWeek": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co tydzień w dniach: {daysOfWeek} o godzinach {times}",
+            "everyWeek": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co tydzień: {daysOfWeek} o godzinach {times}",
             "everyMonth": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co miesiąc w dniach {daysOfMonth} o godzinach {times}"
         }
     },
