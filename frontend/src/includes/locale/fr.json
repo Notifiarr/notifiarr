@@ -181,7 +181,8 @@
             "LoginFailed": "Échec de la connexion: {error}",
             "AnUnknownErrorOccurred": "Une erreur inconnue s'est produite",
             "ConfigUpdateFailed": "Échec de la mise à jour de la configuration: {error}",
-            "PleaseEnterBothUsernameAndPassword": "Veuillez saisir à la fois le nom d'utilisateur et le mot de passe."
+            "PleaseEnterBothUsernameAndPassword": "Veuillez saisir à la fois le nom d'utilisateur et le mot de passe.",
+            "SetAPIKeyFailed": "Échec de la définition de la clé API : {error}"
         },
         "apiKey": {
             "placeholder": "Entrez votre clé API ici",
@@ -232,7 +233,8 @@
         "logFile": {
             "label": "Fichier journal d'application",
             "description": "Chemin vers le fichier journal de l'application.",
-            "placeholder": "/chemin/vers/notifiarr.log"
+            "placeholder": "/chemin/vers/notifiarr.log",
+            "tooltip": "Si vous indiquez un dossier sans nom de fichier, l'application créera dans ce dossier un fichier nommé Notifiarr.log."
         },
         "httpLog": {
             "label": "Fichier journal HTTP",
@@ -353,6 +355,11 @@
             "label": "Canal instable",
             "description": "L'activation du canal de mises à jour instables obligera l'application à vérifier le site Web instable pour les mises à jour automatiques au lieu de GitHub.",
             "tooltip": "Uniquement disponible pour les utilisateurs disposant d'un accès développeur."
+        },
+        "trace": {
+            "label": "Journalisation de trace",
+            "description": "Activer ou désactiver la journalisation de trace.",
+            "tooltip": "L'activation de la trace écrira dans le journal un déroulement d'exécution très détaillé. À utiliser pour un débogage approfondi."
         }
     },
     "navigation": {
@@ -377,7 +384,9 @@
             "TrustProfile": "Profil de confiance",
             "Landing": "Notifiarr Accueil",
             "UnsavedChanges": "Modifications non enregistrées",
-            "Actions": "Actions"
+            "Actions": "Actions",
+            "Plex": "Webhooks Plex",
+            "ApiDocs": "Documentation de l'API du client"
         },
         "pageDescription": {
             "Configuration": "Configurez ici les paramètres de votre client Notifiarr.",
@@ -397,7 +406,8 @@
             "TrustProfile": "Configurez la manière dont vous vous connectez à cette application client Notifiarr.",
             "Landing": "C'est le plus bel endroit sur Terre !",
             "SiteTunnel": "Ce client maintient une connexion websocket persistante à notifiarr.com via un <a href=\"https://github.com/golift/mulery\" target=\"_blank\">tunnel Mulery</a>. Ce tunnel permet au site web d'adresser des requêtes à votre client sans avoir à ouvrir de port ni à utiliser d'adresse IP statique. Cette page vous permet de sélectionner votre tunnel principal et celui que vous souhaitez utiliser comme tunnel de secours en cas d'inaccessibilité du tunnel principal.",
-            "Actions": "Retrouvez ici les actions internes du client Notifiarr. Elles sont exécutées par des minuteurs, des planifications et des événements provenant du site web ou d'un serveur de chat. Généralement réservées au dépannage, vous pouvez les déclencher manuellement dans cette interface."
+            "Actions": "Retrouvez ici les actions internes du client Notifiarr. Elles sont exécutées par des minuteurs, des planifications et des événements provenant du site web ou d'un serveur de chat. Généralement réservées au dépannage, vous pouvez les déclencher manuellement dans cette interface.",
+            "Plex": "Informations pour le dépannage des webhooks Plex."
         }
     },
     "words": {
@@ -458,7 +468,8 @@
             "custom": "coutume",
             "ChecksDisabled": "Vérifications désactivées",
             "InstanceDisabled": "Instance désactivée",
-            "NoTimeout": "Pas de délai d'attente"
+            "NoTimeout": "Pas de délai d'attente",
+            "Information": "Informations"
         },
         "bytes": {
             "short": {
@@ -695,9 +706,9 @@
             "noDaysSelected": "(aucun jour sélectionné)",
             "everyMinute": "{count, plural, =1 {Une fois} other {# fois}} toutes les minutes à secondes {times}",
             "everyHour": "{count, plural, =1 {Une fois} other {# fois}} toutes les heures à minute:secondes {times}",
-            "everyDay": "{compte, pluriel, =1 {Une fois} other {# fois}} tous les jours à des moments {times}",
+            "everyDay": "{count, plural, =1 {Une fois} other {# fois}} tous les jours à des moments {times}",
             "everyWeek": "{count, plural, =1 {Une fois} other {# fois}} chaque semaine les {daysOfWeek} à des moments {times}",
-            "everyMonth": "{count, plural, =1 {Une fois} autre {# fois}} chaque mois les jours {daysOfMonth} à des moments {times}"
+            "everyMonth": "{count, plural, =1 {Une fois} other {# fois}} chaque mois les jours {daysOfMonth} à des moments {times}"
         },
         "title": "Calendrier",
         "daysOfWeek": "Jours de la semaine",
@@ -818,7 +829,27 @@
         "LoginHelpBody": "Si vous avez oublié votre mot de passe, veuillez consulter la page wiki <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">mots de passe oubliés</a>. Si c'est votre première connexion, vous trouverez votre mot de passe dans le fichier journal du client. Si vous avez fourni une clé API au client avant de le démarrer pour la première fois, votre mot de passe est la clé API.",
         "Loading": "Chargement...",
         "BackEndUpdated": "Back-end mis à jour il y a {timeDuration}.",
-        "ShowMore": "Afficher plus d'informations"
+        "ShowMore": "Afficher plus d'informations",
+        "ToggleSpoilerVisibility": "Cliquez pour afficher ou masquer le spoiler.",
+        "EnvironmentVariable": "Nom de la variable d'environnement : <code>{variableName}</code>",
+        "VariableDescription": "<span class=\"text-warning\">Attention :</span> Cette valeur de configuration provient d'une variable d'environnement. Si vous la modifiez ici, la nouvelle valeur sera écrite dans le fichier de configuration, mais elle ne prendra pas effet. La prochaine fois que vous cliquerez sur Sauvegarder, elle sera remplacée. Pour modifier la valeur ici, changez la valeur de la variable d'environnement, ou retirez la variable de l'environnement.",
+        "EveryDuration": "Toutes les {timeDuration}",
+        "APIKeyMustBeCountCharacters": "La clé API doit comporter {count} caractères.",
+        "InvalidAPIKey": "Clé API Notifiarr invalide — mettez-la à jour dans Configuration.",
+        "ShowPassword": "Afficher le mot de passe",
+        "HidePassword": "Masquer le mot de passe",
+        "CheckInstance": "Vérifier l'instance",
+        "ValidateSSL": "Valider le certificat SSL",
+        "RunAsShell": "Exécuter en tant que commande shell",
+        "FollowRedirects": "Suivre les redirections",
+        "BrowseFiles": "Parcourir les fichiers",
+        "APIKey": {
+            "title": "Saisissez la clé API",
+            "placeholder": "Clé API globale de notifiarr.com",
+            "setMsg": "Clé API définie avec succès !",
+            "Setting": "Définition de la clé API...",
+            "description": "Le client Notifiarr a besoin d'une clé API valide pour fonctionner. Cette clé sert à s'authentifier auprès du site web Notifiarr pour recevoir les mises à jour et envoyer des notifications. Le client ne fonctionnera pas sans elle. Veuillez saisir votre clé API ci-dessous."
+        }
     },
     "Downloaders": {
         "Qbittorrent": {
@@ -972,7 +1003,12 @@
         "Close": "Fermer",
         "SaveChanges": "Enregistrer les modifications",
         "SaveConfiguration": "Enregistrer la configuration",
-        "ResetForm": "Formulaire de réinitialisation"
+        "ResetForm": "Formulaire de réinitialisation",
+        "Create": "Créer",
+        "Go": "Aller",
+        "Menu": "Menu",
+        "CreateFolder": "Créer un dossier",
+        "CreateFile": "Créer un fichier"
     },
     "profile": {
         "phrase": {
@@ -998,12 +1034,14 @@
             "options": {
                 "password": "Mot de passe : nom d'utilisateur local",
                 "header": "Proxy d'authentification : en-tête",
-                "noauth": "Pas de mot de passe (danger)"
+                "noauth": "Pas de mot de passe (danger)",
+                "website": "Identifiants du site web"
             },
             "option_desc": {
                 "password": "Il s'agit du type d'authentification par défaut. Sélectionnez l'option Mot de passe pour vous connecter à cette application avec un nom d'utilisateur et un mot de passe configurés. Un seul nom d'utilisateur et mot de passe sont acceptés. Lorsque vous sélectionnez cette option, vous devez renseigner les champs Nom d'utilisateur et Nouveau mot de passe. S'il s'agit du type d'authentification actuel, vous devez également renseigner le champ Mot de passe actuel pour effectuer des modifications.",
                 "header": "Sélectionnez cette option pour vous connecter à cette application à l'aide d'un en-tête HTTP contenant un nom d'utilisateur. Cette authentification est communément appelée authentification par proxy. <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">Une page wiki</a> explique comment configurer Nginx pour cette fonctionnalité. Lorsque vous sélectionnez cette option, vous devez également sélectionner un en-tête pour le proxy d'authentification. Si aucun en-tête n'est affiché, cela signifie qu'aucun en-tête valide n'a été fourni par le proxy en amont.",
-                "noauth": "Cette configuration n'est pas recommandée. L'authentification sans mot de passe autorise toute requête provenant de n'importe quelle adresse IP en amont configurée. Elle fonctionne également avec un proxy d'authentification pour définir le nom d'utilisateur. Si aucun nom d'utilisateur n'est indiqué dans l'en-tête fourni, la valeur par défaut est admin."
+                "noauth": "Cette configuration n'est pas recommandée. L'authentification sans mot de passe autorise toute requête provenant de n'importe quelle adresse IP en amont configurée. Elle fonctionne également avec un proxy d'authentification pour définir le nom d'utilisateur. Si aucun nom d'utilisateur n'est indiqué dans l'en-tête fourni, la valeur par défaut est admin.",
+                "website": "Sélectionnez cette option pour vous connecter à cette application avec les identifiants du site web. Vous pourrez ainsi vous connecter au client à l'aide de votre adresse e-mail ou de votre nom d'utilisateur, et du mot de passe de Notifiarr.com. Votre mot de passe est toujours protégé et chiffré avant d'être transmis au client."
             }
         },
         "upstreams": {
@@ -1058,7 +1096,8 @@
             "name": {
                 "label": "Nom du serveur",
                 "description": "Nom du serveur Plex.",
-                "placeholder": "Défini automatiquement par le serveur"
+                "placeholder": "Défini automatiquement par le serveur",
+                "tooltip": "Le nom du Plex Media Server est utilisé dans les notifications, les journaux et les contrôles de santé. Il est défini automatiquement par le serveur Plex."
             },
             "url": {
                 "label": "URL",
@@ -1191,7 +1230,8 @@
             "label": "Chemin du fichier",
             "description": "Chemin d'accès au fichier à surveiller. Recommander des noms de chemin absolus.",
             "placeholder": "/var/log/nginx/access.log",
-            "required": "Le chemin est requis"
+            "required": "Le chemin est requis",
+            "clientLog": "Impossible de surveiller le propre fichier journal du client : cela créerait une boucle. Les erreurs du client sont déjà envoyées en tant que client_error_log."
         },
         "disabled": {
             "label": "Actif",
@@ -1255,7 +1295,9 @@
             "Used": "Utilisé",
             "Free": "Gratuit",
             "FS": "FS",
-            "ro": "calme"
+            "ro": "calme",
+            "Device": "Périphérique",
+            "Mount": "Point de montage"
         },
         "NetworkInformation": {
             "title": "Informations sur le réseau",
@@ -1283,7 +1325,8 @@
             "YesYesYouAre": "Oui, oui, tu l'es ! 💚",
             "HellaAwesome": "Super génial",
             "YoureSoGifted": "Tu es tellement doué, et nous t'aimons ! 💜",
-            "DateFormat": "Format de date"
+            "DateFormat": "Format de date",
+            "InvalidAPIKey": "Non connecté à Notifiarr ; la clé API a été rejetée."
         },
         "EnvironmentVariables": {
             "title": "Variables d'environnement"
@@ -1320,7 +1363,14 @@
             "SiteCrons": "Minuteries de sites Web",
             "Counter": "Comptoir",
             "Interval": "Intervalle",
-            "Schedule": "Calendrier"
+            "Schedule": "Calendrier",
+            "Trigger": "Déclencheur",
+            "Timer": "Minuterie",
+            "Type": "Type",
+            "When": "Quand",
+            "Action": "Action",
+            "Never": "Jamais",
+            "Filter": "Filtre"
         },
         "descriptions": {
             "Triggers": "Ces actions n’ont pas de minuterie ni de calendrier.",
@@ -1526,7 +1576,7 @@
         "DeleteFile": "Supprimer {filePath}",
         "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce fichier ? Cette action est irréversible.",
         "deleteError": "Erreur lors de la suppression du fichier journal: {error}",
-        "deleteSuccess": "Fichier journal supprimé: {fichier}",
+        "deleteSuccess": "Fichier journal supprimé: {file}",
         "uploadError": "Erreur lors du téléchargement du fichier journal: {error}",
         "uploadSuccess": "Téléchargement du fichier journal: {file}",
         "NoFileSelected": "Aucun fichier sélectionné.",
@@ -1544,8 +1594,10 @@
     "Nodal": {
         "button": {
             "refresh": "Actualiser les données de la page",
-            "fullscreen": "Basculer en plein écran"
-        }
+            "fullscreen": "Basculer en plein écran",
+            "raw": "Basculer les données brutes"
+        },
+        "noResponse": "Aucune donnée de réponse."
     },
     "ProcessList": {
         "title": "Liste des processus en cours d'exécution",
@@ -1562,5 +1614,256 @@
         "error": "Erreur lors du chargement de la charge utile de démarrage: {error}",
         "noData": "Aucune charge utile de démarrage n'a été renvoyée.",
         "description": "Il s'agit de la charge utile envoyée au client par Notifiarr.com lors de son démarrage. Elle contient la configuration du client et d'autres informations."
+    },
+    "Integrations": {
+        "titles": {
+            "Size": "Taille",
+            "DashboardAge": "Âge du tableau de bord",
+            "CacheAge": "Âge du cache",
+            "StatusAge": "Âge du statut",
+            "Version": "Version",
+            "Branch": "Branche",
+            "BuildTime": "Date de compilation"
+        },
+        "DriveData": {
+            "title": "Données des disques",
+            "driveInformation": {
+                "title": "Informations sur les disques"
+            },
+            "mdStatRaid": {
+                "title": "RAID MDStat"
+            },
+            "titles": {
+                "Drive": "Disque",
+                "Temp": "Température",
+                "Health": "Santé",
+                "Age": "Âge",
+                "Setting": "Paramètre",
+                "Value": "Valeur"
+            }
+        },
+        "Snapshot": {
+            "title": "Données brutes du Snapshot",
+            "Age": "Âge du Snapshot",
+            "Data": "Données du Snapshot",
+            "Latest": "Dernier Snapshot",
+            "System": "Snapshot système",
+            "titles": {
+                "CPUPercent": "Pourcentage CPU",
+                "MemoryFree": "Mémoire libre",
+                "MemoryUsed": "Mémoire utilisée",
+                "MemoryTotal": "Mémoire totale",
+                "UserCPUTime": "Temps CPU utilisateur",
+                "SystemCPUTime": "Temps CPU système",
+                "IdleCPUTime": "Temps CPU inactif",
+                "NvidiaGPUs": "GPU Nvidia",
+                "MySQLServers": "Serveurs MySQL",
+                "IPMISensors": "Capteurs IPMI",
+                "Synology": "Synology",
+                "RaidConfigs": "Configurations RAID",
+                "ZFSPools": "Pools ZFS",
+                "Processes": "Processus",
+                "DriveTemps": "Températures des disques",
+                "DriveHealth": "Santé des disques",
+                "DiskUsage": "Utilisation des disques",
+                "DiskQuotas": "Quotas de disque",
+                "IOTop": "IO Top",
+                "IOStat": "IO Stat",
+                "IOStat2": "IO Stat 2"
+            }
+        },
+        "starrTitles": {
+            "QueueAge": "Âge de la file d'attente",
+            "QueueSize": "Taille de la file d'attente",
+            "Elapsed": "Temps écoulé",
+            "Shows": "Séries",
+            "Episodes": "Épisodes",
+            "Movies": "Films",
+            "Books": "Livres",
+            "Editions": "Éditions",
+            "Tracks": "Pistes",
+            "Artists": "Artistes",
+            "OnDisk": "Sur le disque",
+            "Missing": "Manquants"
+        },
+        "downloadTitles": {
+            "Downloads": "Téléchargements",
+            "Incomplete": "Incomplets",
+            "Downloading": "Téléchargement",
+            "Paused": "En pause",
+            "TotalSize": "Taille totale",
+            "Errors": "Erreurs",
+            "Downloaded": "Téléchargé",
+            "Uploading": "Téléversement",
+            "Uploaded": "Téléversé",
+            "Seeding": "Partage",
+            "Month": "Mois",
+            "Week": "Semaine",
+            "Day": "Jour"
+        },
+        "lidarrDashboard": {
+            "title": "Tableau de bord brut Lidarr"
+        },
+        "radarrDashboard": {
+            "title": "Tableau de bord brut Radarr"
+        },
+        "readarrDashboard": {
+            "title": "Tableau de bord brut Readarr"
+        },
+        "sonarrDashboard": {
+            "title": "Tableau de bord brut Sonarr"
+        },
+        "delugeDashboard": {
+            "title": "Tableau de bord brut Deluge"
+        },
+        "nzbgetDashboard": {
+            "title": "Tableau de bord brut NZBGet"
+        },
+        "qbitDashboard": {
+            "title": "Tableau de bord brut QBit"
+        },
+        "rtorrentDashboard": {
+            "title": "Tableau de bord brut rTorrent"
+        },
+        "transmissionDashboard": {
+            "title": "Tableau de bord brut Transmission"
+        },
+        "sabnzbdDashboard": {
+            "title": "Tableau de bord brut SabNZBD"
+        },
+        "sonarrQueue": {
+            "title": "File d'attente brute Sonarr"
+        },
+        "radarrQueue": {
+            "title": "File d'attente brute Radarr"
+        },
+        "readarrQueue": {
+            "title": "File d'attente brute Readarr"
+        },
+        "lidarrQueue": {
+            "title": "File d'attente brute Lidarr"
+        },
+        "prowlarrStatus": {
+            "title": "Informations brutes Prowlarr"
+        },
+        "radarrStatus": {
+            "title": "Informations brutes Radarr"
+        },
+        "readarrStatus": {
+            "title": "Informations brutes Readarr"
+        },
+        "sonarrStatus": {
+            "title": "Informations brutes Sonarr"
+        },
+        "lidarrStatus": {
+            "title": "Informations brutes Lidarr"
+        },
+        "tautulliStatus": {
+            "title": "Informations brutes Tautulli"
+        },
+        "tautulliUsers": {
+            "title": "Utilisateurs Tautulli"
+        },
+        "tautulliUsersJson": {
+            "title": "Utilisateurs Tautulli bruts"
+        },
+        "plexStatus": {
+            "title": "Informations Plex Media Server"
+        },
+        "plexSessions": {
+            "title": "Sessions Plex Media Server en cours",
+            "footer": "Affichage des sessions Plex en cours, et non des données en cache. Consultez la fenêtre modale JSON brut pour les données en cache."
+        },
+        "plexSessionsJson": {
+            "title": "Sessions Plex Media Server brutes"
+        },
+        "mediaTitles": {
+            "Country": "Pays",
+            "PushNotifications": "Notifications push",
+            "PlexPass": "Plex Pass",
+            "ServerOwner": "Propriétaire du serveur",
+            "Sessions": "Sessions",
+            "SessionsAge": "Âge des sessions",
+            "Users": "Utilisateurs",
+            "User": "Utilisateur",
+            "PlexUsername": "Nom d'utilisateur Plex",
+            "CustomName": "Nom personnalisé",
+            "Email": "E-mail",
+            "Session": "Session",
+            "Complete": "Terminé",
+            "Encoding": "Encodage",
+            "Title": "Titre"
+        },
+        "phrases": {
+            "NoCachedSessions": "Aucune session en cache.",
+            "NoPlexData": "Aucune donnée d'intégration Plex.",
+            "StateForTime": "{state} depuis {timeDuration}"
+        }
+    },
+    "Languages": {
+        "menuTitle": "Aide sur les langues",
+        "title": "Prise en charge de la localisation",
+        "body": "Cette application est disponible en plusieurs langues. Vous pouvez changer de langue en cliquant sur le sélecteur de langue dans le menu du profil. Certaines langues n'ont pas de traducteurs actifs, certaines traductions peuvent donc être incomplètes. Si vous souhaitez aider à traduire l'application, veuillez <a href=\"https://notifiarr.com/discord\" target=\"_blank\">nous rendre visite sur Discord</a>. Rendez-vous dans le salon <code>#role-request</code> et saisissez <code>!roleTranslate</code>. Cela vous donne accès au salon <code>#translate</code>. Rejoignez-le et faites-nous part de votre intérêt."
+    },
+    "ApiDocs": {
+        "Choose": "Choisissez une API à afficher",
+        "Contrast": "Veuillez signaler tout problème de contraste sur cette page.",
+        "BasePath": "<b>Chemin de base</b> : <code>{basePath}</code>",
+        "api": {
+            "title": "API privée ({basePath})",
+            "body": "Il s'agit de la spécification d'API du site web Notifiarr.com. Le site web utilise cette API pour interagir avec le client."
+        },
+        "ui": {
+            "title": "Interface web ({basePath})",
+            "body": "Cette spécification décrit les méthodes utilisées par le frontend du client Notifiarr pour interagir avec le backend. Vous utilisez le frontend en ce moment."
+        }
+    },
+    "TestAllInstances": {
+        "title": "Tester toutes les instances",
+        "Instance": "Instance",
+        "Message": "Message",
+        "Status": "Statut",
+        "Updated": "<b>Test mis à jour</b> : <code>{timeDuration}</code>",
+        "TestElapsed": "<b>Durée du test</b> : <code>{timeDuration}</code>",
+        "Concurrency": "<b>Parallélisme</b> : <code>{workerCount}</code>",
+        "Tested": "<b>Instances testées</b> : <code>{testCount}</code>",
+        "clickRefresh": "Cliquez sur le bouton d'actualisation en haut à droite pour tester à nouveau.",
+        "footer": "Utilisez cet outil de dépannage pour vérifier que toutes vos instances sont accessibles et correctement configurées. Le délai d'attente est codé en dur à 15 secondes, une durée proche de celle pendant laquelle le site web attend une réponse."
+    },
+    "FileBrowser": {
+        "tooltip": {
+            "Go": "<code>cd {path}</code><br />Changer de répertoire vers le chemin indiqué.",
+            "SelectPath": "Sélectionner le chemin : <code>{path}</code>",
+            "Up": "<code>cd ..</code><br />Changer de répertoire vers le dossier parent."
+        },
+        "FilterFiles": "Filtrer les fichiers",
+        "CreateFileIn": "Le fichier sera créé dans le chemin : <code>{path}</code>",
+        "CreateFolderIn": "Le dossier sera créé dans le chemin : <code>{path}</code>",
+        "Files": "Fichiers : {count}",
+        "Folders": "Dossiers : {count}",
+        "FilesFiltered": "Fichiers : {count}, filtrés : {filtered}",
+        "FoldersFiltered": "Dossiers : {count}, filtrés : {filtered}",
+        "Selected": "Sélectionné : <code>{path}</code>",
+        "Created": "Créé : {path}",
+        "Creating": "Création...",
+        "InvalidPath": "Chemin non valide. N'incluez pas de barres obliques (<code>/</code> ou <code>\\</code>).",
+        "FilterFilesDesc": "Utilisez le filtre de fichiers pour rechercher rapidement dans la liste des fichiers affichés. Utile pour les dossiers contenant beaucoup de fichiers. Utilisez le bouton <code>Menu</code> pour créer un nouveau dossier ou un nouveau fichier. Pour sélectionner un fichier qui n'existe pas, saisissez-le dans la barre <code>Chemin</code> et cliquez sur le bouton vert avec la coche. Vous pouvez aussi utiliser l'entrée de menu <code>Créer un fichier</code> pour le créer."
+    },
+    "Plex": {
+        "URLNotConfigured": "L'URL Plex n'est pas configurée. <go-to page=\"mediaApps\" subPage=\"plex\">Configurez-la ici</go-to>.",
+        "TokenNotConfigured": "Le jeton Plex n'est pas configuré. <go-to page=\"mediaApps\" subPage=\"plex\">Configurez-le ici</go-to>.",
+        "Disabled": "Plex est désactivé par l'administrateur. <go-to page=\"mediaApps\" subPage=\"plex\">Activez-le ici</go-to>.",
+        "WaitingForWebhooks": "En attente des webhooks Plex...",
+        "WebhooksReceived": "Webhooks reçus : <code>{count}</code>",
+        "NoStatus": "Aucune information sur Plex Media Server n'est en cache. Cela peut signifier que l'URL ou le jeton Plex n'est pas valide, ou que le délai d'attente est trop court. Consultez les <go-to page=\"logFiles\">journaux de l'application</go-to> pour en savoir plus.",
+        "WebhookNote": "<p>Avez-vous déjà <a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">configuré le webhook Plex</a> ?</p><p>Si le compteur de webhooks n'augmente pas lorsque vous mettez en pause puis relancez la lecture d'un contenu, essayez de redémarrer Plex Media Server. Si cela ne fonctionne pas, consultez les <go-to page=\"logFiles\">journaux HTTP</go-to> pour y trouver des requêtes non valides. Si vous n'en voyez aucune, l'URL du webhook configurée dans Plex est peut-être incorrecte. Elle devrait ressembler à ceci : <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>, mais cette valeur peut être inexacte et dépend de la configuration de votre serveur.</p> Certains fournisseurs web bloquent l'accès à l'URI <code>{urlbase}plex</code>. Cette application accepte donc aussi un webhook Plex à l'URI <code>{urlbase}</code> et à <code>{urlbase}api/plex/post</code>. Nous proposons cette polyvalence afin de garantir des notifications stables.",
+        "WebsiteSettings": "Paramètres du site web",
+        "AccountMap": "Correspondance des comptes",
+        "ActivityDelay": "Délai d'activité",
+        "WebhookCoolDown": "Temporisation des webhooks",
+        "SessionsInterval": "Intervalle des sessions",
+        "MoviesFinished": "Films terminés",
+        "SeriesFinished": "Séries terminées",
+        "NoActivity": "Aucune activité"
     }
 }
