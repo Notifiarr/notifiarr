@@ -138,3 +138,7 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.12.1 // indirect
 )
+
+// Go 1.24 and later opens Linux listen sockets with Multipath TCP, the
+// socket type used by the published CVE-2026-98432 exploit.
+godebug multipathtcp=0
