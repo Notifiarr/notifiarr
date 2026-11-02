@@ -1329,6 +1329,7 @@
     },
     "buttons": {
         "Login": "Anmelden",
+        "LoginTitle": "Anmelden",
         "Confirm": "Bestätigen",
         "Close": "Schliessen",
         "SaveChanges": "Änderungen speichern",

@@ -1080,6 +1080,7 @@
     },
     "buttons": {
         "Login": "Login",
+        "LoginTitle": "Login",
         "Confirm": "Conferma",
         "Cancel": "Annulla",
         "Save": "Salva",

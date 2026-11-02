@@ -72,6 +72,7 @@
   },
   "buttons": {
     "Login": "Login",
+    "LoginTitle": "Login",
     "Confirm": "Confirm",
     "Cancel": "Cancel",
     "Create": "Create",

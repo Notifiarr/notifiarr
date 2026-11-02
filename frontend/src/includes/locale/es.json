@@ -1402,6 +1402,7 @@
     },
     "buttons": {
         "Login": "Iniciar sesión",
+        "LoginTitle": "Iniciar sesión",
         "Confirm": "Confirmar",
         "SaveConfiguration": "Guardar configuración",
         "ResetForm": "Restablecer formulario",

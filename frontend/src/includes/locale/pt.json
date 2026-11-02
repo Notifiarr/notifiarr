@@ -738,6 +738,7 @@
     "buttons": {
         "ResetForm": "Repor formulário",
         "Login": "Iniciar sessão",
+        "LoginTitle": "Iniciar sessão",
         "Confirm": "Confirmar",
         "Cancel": "Cancelar",
         "Save": "Guardar",

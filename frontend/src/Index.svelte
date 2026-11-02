@@ -16,10 +16,15 @@
   import MainHeader from './header/Index.svelte'
   import Login from './Login.svelte'
   import APIKey from './APIKey.svelte'
+
+  const documentTitle = $derived(
+    ($profile.loggedIn ? '' : `${$isReady ? $_('buttons.LoginTitle') : 'Login'} - `) +
+      'Notifiarr Client',
+  )
 </script>
 
 <svelte:head>
-  <title>{$profile.loggedIn ? '' : `Login - `}Notifiarr Client</title>
+  <title>{documentTitle}</title>
   <link rel="icon" type="image/svg+xml" href={logo} />
 </svelte:head>
 
