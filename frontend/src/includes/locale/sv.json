@@ -1414,6 +1414,7 @@
     },
     "buttons": {
         "Login": "Logga in",
+        "LoginTitle": "Logga in",
         "Confirm": "Bekräfta",
         "Cancel": "Avbryt",
         "Save": "Spara",

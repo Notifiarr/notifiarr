@@ -1157,6 +1157,7 @@
     },
     "buttons": {
         "Login": "登入",
+        "LoginTitle": "登入",
         "Save": "儲存",
         "Close": "關閉",
         "SaveChanges": "儲存變更",
