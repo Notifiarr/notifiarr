@@ -706,9 +706,9 @@
             "noDaysSelected": "(aucun jour sélectionné)",
             "everyMinute": "{count, plural, =1 {Une fois} other {# fois}} toutes les minutes à secondes {times}",
             "everyHour": "{count, plural, =1 {Une fois} other {# fois}} toutes les heures à minute:secondes {times}",
-            "everyDay": "{compte, pluriel, =1 {Une fois} other {# fois}} tous les jours à des moments {times}",
+            "everyDay": "{count, plural, =1 {Une fois} other {# fois}} tous les jours à des moments {times}",
             "everyWeek": "{count, plural, =1 {Une fois} other {# fois}} chaque semaine les {daysOfWeek} à des moments {times}",
-            "everyMonth": "{count, plural, =1 {Une fois} autre {# fois}} chaque mois les jours {daysOfMonth} à des moments {times}"
+            "everyMonth": "{count, plural, =1 {Une fois} other {# fois}} chaque mois les jours {daysOfMonth} à des moments {times}"
         },
         "title": "Calendrier",
         "daysOfWeek": "Jours de la semaine",
