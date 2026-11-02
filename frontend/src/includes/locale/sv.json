@@ -966,7 +966,7 @@
         "mustExist": {
             "label": "Filen måste finnas",
             "description": "Hoppa över bevakning om filen saknas.",
-            "tooltip": "Om du aktiverar det här hoppas bevakningen över om filen inte finns när programmet startar. Att bevaka filer som inte finns är fortfarande buggigt och kanske inte fungerar alls."
+            "tooltip": "Om du aktiverar det här hoppar bevakningen över om filen inte finns när programmet startar. Att bevaka filer som inte finns är fortfarande buggigt och kanske inte fungerar alls."
         },
         "logMatch": {
             "label": "Logga träffar",
