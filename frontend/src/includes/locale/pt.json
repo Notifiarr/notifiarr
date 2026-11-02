@@ -1,1488 +1,1869 @@
 {
     "system": {
         "ClientInformation": {
-            "title": "",
-            "Application": "",
-            "Version": "",
-            "Started": "",
-            "Uptime": ""
+            "title": "Informação do cliente",
+            "Application": "Aplicação",
+            "Version": "Versão",
+            "Started": "Iniciado",
+            "Uptime": "Tempo de atividade"
         },
         "UserInformation": {
-            "Patron": "",
-            "title": "",
-            "Subscriber": "",
-            "AbsoluteBadAss": "",
-            "YesYesYouAre": "",
-            "HellaAwesome": "",
-            "YoureSoGifted": "",
-            "DateFormat": ""
+            "Patron": "Patron",
+            "title": "Informação do utilizador",
+            "Subscriber": "Subscritor",
+            "AbsoluteBadAss": "Absolutamente incrível",
+            "YesYesYouAre": "Sim, é mesmo! 💚",
+            "HellaAwesome": "Mesmo espetacular",
+            "YoureSoGifted": "Que talento, e adoramos! 💜",
+            "DateFormat": "Formato da data",
+            "InvalidAPIKey": "Sem sessão iniciada no Notifiarr; a chave de API foi rejeitada."
         },
         "BuildInformation": {
-            "title": "",
-            "Branch": "",
-            "BuildUser": "",
-            "BuildDate": "",
-            "GoVersion": "",
-            "Integrity": ""
+            "title": "Informação da compilação",
+            "Branch": "Ramo",
+            "BuildUser": "Utilizador da compilação",
+            "BuildDate": "Data da compilação",
+            "GoVersion": "Versão do Go",
+            "Integrity": "Integridade"
         },
         "OperatingSystem": {
-            "title": "",
-            "Hostname": "",
-            "UniqueID": "",
-            "Platform": "",
-            "KernelVersion": "",
-            "VirtualizationSystem": ""
+            "title": "Sistema operativo",
+            "Hostname": "Nome do host",
+            "UniqueID": "ID único",
+            "Platform": "Plataforma",
+            "KernelVersion": "Versão do kernel",
+            "VirtualizationSystem": "Sistema de virtualização"
         },
         "StorageData": {
-            "title": "",
-            "Total": "",
-            "Used": "",
-            "Free": "",
-            "FS": "",
-            "ro": ""
+            "title": "Dados de armazenamento",
+            "Total": "Total",
+            "Used": "Utilizado",
+            "Free": "Livre",
+            "FS": "FS",
+            "ro": "ro",
+            "Device": "Dispositivo",
+            "Mount": "Montagem"
         },
         "NetworkInformation": {
-            "title": "",
-            "IPAddress": "",
-            "Gateway": "",
-            "Netmask": "",
-            "Interface": ""
+            "title": "Informação de rede",
+            "IPAddress": "Endereço IP",
+            "Gateway": "Gateway",
+            "Netmask": "Máscara de rede",
+            "Interface": "Interface"
         },
         "StartupParams": {
-            "title": "",
-            "BinaryPath": "",
-            "ConfigFile": "",
-            "EnvironmentPrefix": "",
-            "ExtraConfigFiles": "",
-            "CustomAssets": "",
-            "UserID": "",
-            "GroupID": "",
-            "IPAddress": ""
+            "title": "Parâmetros de arranque",
+            "BinaryPath": "Caminho do binário",
+            "ConfigFile": "Ficheiro de configuração",
+            "EnvironmentPrefix": "Prefixo de ambiente",
+            "ExtraConfigFiles": "Ficheiros de configuração extra",
+            "CustomAssets": "Recursos personalizados",
+            "UserID": "ID de utilizador",
+            "GroupID": "ID de grupo",
+            "IPAddress": "Endereço IP"
         },
         "EnvironmentVariables": {
-            "title": ""
+            "title": "Variáveis de ambiente"
         }
     },
     "phrases": {
         "Landing": {
-            "SelectASection": "",
-            "Welcome": ""
+            "SelectASection": "Selecione uma secção no menu de navegação para começar.",
+            "Welcome": "Bem-vindo, {username}!"
         },
-        "BackEndUpdated": "",
-        "LoggedIn": "",
-        "ERROR": "",
-        "LoggingIn": "",
-        "Loading": "",
-        "UpdateBackend": "",
-        "UpdatingBackEnd": "",
-        "FailedToUpdateBackEnd": "",
-        "TryRefreshingThePage": "",
-        "ConfigurationSavedReloading": "",
-        "Every12Hours": "",
-        "Every6Hours": "",
-        "Every3Hours": "",
-        "Reloading": "",
-        "FailedToReload": "",
-        "ConfirmReload": "",
-        "ConfirmReloadBody": "",
-        "ReloadSuccess": "",
-        "ReloadCheckTimedOut": "",
-        "ConfirmShutdown": "",
-        "ConfirmShutdownBody": "",
-        "ShutdownSuccess": "",
-        "FailedToShutdown": "",
-        "LoginHelp": "",
-        "Changed": "",
-        "New": "",
-        "Invalid": "",
-        "DeleteInstance": "",
-        "DeletedNumber": "",
-        "ItsGone": "",
-        "URLMustBeginWithHttp": "",
-        "NameMustNotBeEmpty": "",
-        "HostMustNotBeEmpty": "",
-        "UsernameMustNotBeEmpty": "",
-        "NameInUseByInstance": "",
-        "APIKeyMustBeCountCharactersOrLonger": "",
-        "TokenMustBeCountCharacters": "",
-        "LeavePage": "",
-        "ConfigurationSaved": "",
-        "Version": "",
-        "SavingConfiguration": "",
-        "LoginHelpBody": ""
+        "BackEndUpdated": "Back-end atualizado há {timeDuration}.",
+        "LoggedIn": "Sessão iniciada!",
+        "ERROR": "ERRO",
+        "LoggingIn": "A iniciar sessão...",
+        "Loading": "A carregar...",
+        "UpdateBackend": "Atualizar o back-end",
+        "UpdatingBackEnd": "A atualizar o back-end...",
+        "FailedToUpdateBackEnd": "Falha ao atualizar o back-end: {error}",
+        "TryRefreshingThePage": "Tente atualizar a página.",
+        "ConfigurationSavedReloading": "Configuração guardada! A recarregar o cliente...",
+        "Every12Hours": "A cada 12 horas",
+        "Every6Hours": "A cada 6 horas",
+        "Every3Hours": "A cada 3 horas",
+        "Reloading": "A recarregar...",
+        "FailedToReload": "Falha ao recarregar: {error}",
+        "ConfirmReload": "Confirmar recarregamento",
+        "ConfirmReloadBody": "Tem a certeza de que pretende recarregar o cliente?",
+        "ReloadSuccess": "Recarregamento concluído! Cliente recarregado.",
+        "ReloadCheckTimedOut": "A verificação de recarregamento do servidor excedeu o tempo limite após 20 tentativas",
+        "ConfirmShutdown": "Confirmar encerramento",
+        "ConfirmShutdownBody": "Tem a certeza de que pretende encerrar o cliente? Será necessário reiniciá-lo no host onde está a ser executado.",
+        "ShutdownSuccess": "Encerramento concluído! Cliente parado.",
+        "FailedToShutdown": "Falha ao encerrar: {error} — Tente recarregar a página.",
+        "LoginHelp": "Ajuda para iniciar sessão",
+        "Changed": "Alterado",
+        "New": "Novo",
+        "Invalid": "Inválido",
+        "DeleteInstance": "Eliminar instância",
+        "DeletedNumber": "Eliminado {number}",
+        "ItsGone": "Desapareceu! Não se esqueça de guardar.",
+        "URLMustBeginWithHttp": "O URL tem de começar por http:// ou https://",
+        "NameMustNotBeEmpty": "O nome não pode estar vazio.",
+        "HostMustNotBeEmpty": "O host não pode estar vazio.",
+        "UsernameMustNotBeEmpty": "O nome de utilizador não pode estar vazio.",
+        "NameInUseByInstance": "Este nome está a ser utilizado pela instância {number}.",
+        "APIKeyMustBeCountCharactersOrLonger": "A chave de API tem de ter {count} caracteres ou mais.",
+        "TokenMustBeCountCharacters": "O token tem de ter {count} caracteres ou mais.",
+        "LeavePage": "Pretende mesmo sair desta página?",
+        "ConfigurationSaved": "Configuração guardada há {timeDuration}!",
+        "Version": "Versão {version}",
+        "SavingConfiguration": "A guardar a configuração...",
+        "LoginHelpBody": "Se esta for a primeira vez que inicia sessão, utilize o endereço de correio eletrónico e a palavra-passe de notifiarr.com. Pode definir uma palavra-passe local depois de iniciar sessão. Se se esqueceu da palavra-passe local, consulte a página da wiki sobre <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">palavras-passe esquecidas</a>.",
+        "ToggleSpoilerVisibility": "Clique para alternar a visibilidade do conteúdo oculto.",
+        "EnvironmentVariable": "Nome da variável de ambiente: <code>{variableName}</code>",
+        "VariableDescription": "<span class=\"text-warning\">Aviso:</span> Este valor de configuração deriva de uma variável de ambiente. Se o alterar aqui, o novo valor é escrito no ficheiro de configuração, mas não tem efeito. Da próxima vez que clicar em guardar, será substituído. Altere o valor aqui ao mudar o valor da variável de ambiente ou ao remover a variável do ambiente.",
+        "EveryDuration": "A cada {timeDuration}",
+        "APIKeyMustBeCountCharacters": "A chave de API tem de ter {count} caracteres.",
+        "InvalidAPIKey": "Chave de API do Notifiarr inválida — atualize-a em Configuração.",
+        "ShowMore": "Mostrar mais informação",
+        "ShowPassword": "Mostrar palavra-passe",
+        "HidePassword": "Ocultar palavra-passe",
+        "CheckInstance": "Verificar instância",
+        "ValidateSSL": "Validar certificado SSL",
+        "RunAsShell": "Executar como comando de shell",
+        "FollowRedirects": "Seguir redirecionamentos",
+        "BrowseFiles": "Explorar ficheiros",
+        "APIKey": {
+            "title": "Indicar a chave de API",
+            "placeholder": "Chave de API global de notifiarr.com",
+            "setMsg": "Chave de API definida com sucesso!",
+            "Setting": "A definir a chave de API...",
+            "description": "O cliente Notifiarr precisa de uma chave de API válida para funcionar. Esta chave é utilizada para autenticar no site Notifiarr, receber atualizações e enviar notificações. O cliente não funciona sem ela; introduza a chave de API abaixo."
+        }
     },
     "Commands": {
-        "description": "",
-        "addInstance": "",
-        "DeleteCommand": "",
-        "title": "",
-        "Executions": "",
-        "Failures": "",
-        "LastExecution": "",
-        "neverExecuted": "",
-        "enterCommandArguments": "",
-        "commandRequiresArguments": "",
-        "noOutput": "",
-        "refreshed": "",
-        "regexMismatch": "",
+        "description": "Os comandos são executados pelo cliente (o back-end). Podem ser desencadeados nesta interface ou num servidor de chat. Se modificar um comando, tem de guardar a configuração antes de o poder executar na interface web.",
+        "addInstance": "Criar comando",
+        "DeleteCommand": "Eliminar comando",
+        "title": "Lista de comandos",
+        "Executions": "Execuções: {count}",
+        "Failures": "Falhas: {count}",
+        "LastExecution": "Última execução",
+        "neverExecuted": "nunca executado",
+        "enterCommandArguments": "Introduzir argumentos do comando",
+        "commandRequiresArguments": "Este comando requer {count, plural, =1 {um argumento. Introduza-o abaixo.} other {# argumentos. Introduza-os abaixo.}}",
+        "noOutput": "Ainda não há saída. Tente executar o comando e depois clique em atualizar.",
+        "refreshed": "atualizado há {timeDuration}",
+        "regexMismatch": "O argumento não corresponde à expressão regular.",
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nome",
+            "description": "Nome do comando. Aparece no registo e nas notificações.",
+            "placeholder": "nome personalizado para notificações"
         },
         "command": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Comando",
+            "description": "Comando a executar.",
+            "placeholder": "echo 'Hello, world!'",
+            "tooltip": "Este é o comando que será executado quando for desencadeado.<br />Clique no ícone de dupla verificação para executar o comando agora. Quando terminar, clique em atualizar e em mostrar saída para ver os resultados.<br /><br />Marque a caixa para envolver o comando numa shell. No Windows, o comando é executado com <code>cmd.exe</code> e, nos outros sistemas operativos, com <code>/bin/bash</code>. É útil para comandos que precisam de funcionalidades da shell, como pipes e redirecionamentos. Podem definir-se argumentos posicionais personalizados com este formato: <code>({regex})</code> — uma expressão regular entre chavetas e parênteses, por exemplo <code>({[a-z]})</code>. Estes argumentos podem ser preenchidos por quem executa o comando, nesta interface web ou no servidor de chat. Se um comando tiver um argumento, este é obrigatório; se tiver vários, são todos obrigatórios.<br /><br /> <h5>Exemplos</h5>Comando com dois argumentos: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />O comando acima permite qualquer combinação de <code>ls -la</code> em <code>/tmp</code>, <code>/</code>, <code>/home</code> ou <code>/lib</code>.",
+            "required": "O comando é obrigatório"
         },
         "notify": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Notificar",
+            "description": "Enviar uma notificação depois de o comando ser executado.",
+            "tooltip": "Receber uma notificação com a saída do comando."
         },
         "log": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Registar saída",
+            "description": "Registar a saída do comando.",
+            "tooltip": "Registar a saída do comando no registo da aplicação deste cliente."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Duração máxima de execução",
+            "description": "Tempo que o comando pode executar antes de ser terminado."
         }
     },
     "monitoring": {
-        "ConfigureServices": "",
-        "EnableOnConfig": "",
+        "ConfigureServices": "As verificações de estado das integrações configuradas ativam-se ao definir um intervalo de verificação nas respetivas páginas de configuração. Algumas destas verificações vêm da página <go-to page=\"starrapps\">Aplicações Starr</go-to>, da página <go-to page=\"downloaders\">Aplicações de transferência</go-to> ou da página <go-to page=\"mediaapps\">Aplicações multimédia</go-to>. As restantes verificações de estado apresentadas encontram-se na <go-to page=\"services\">página Serviços</go-to>.",
+        "EnableOnConfig": "Ative as verificações de estado na página <go-to page=\"services\">Serviços</go-to>.",
         "check": {
             "last": {
-                "short": "",
-                "title": "",
-                "tooltip": "",
-                "description": ""
+                "short": "Última",
+                "title": "Última verificação: há {timeDuration}",
+                "tooltip": "Há quanto tempo este serviço foi verificado.",
+                "description": "Serviço verificado pela última vez em"
             },
-            "name": "",
+            "name": "Nome do serviço",
             "state": {
-                "short": "",
-                "title": ""
+                "short": "Estado",
+                "title": "Contadores de verificação do serviço"
             },
-            "typeExpect": "",
+            "typeExpect": "Tipo/Esperado",
             "since": {
-                "short": "",
-                "title": "",
-                "tooltip": "",
-                "description": ""
+                "short": "Desde",
+                "title": "Tempo neste estado: {timeDuration}",
+                "tooltip": "Há quanto tempo o serviço está neste estado.",
+                "description": "O serviço está neste estado desde"
             },
             "interval": {
-                "short": "",
-                "title": "",
-                "tooltip": ""
+                "short": "Intervalo",
+                "title": "Intervalo de verificação",
+                "tooltip": "Frequência com que este serviço é verificado."
             },
-            "output": ""
+            "output": "Saída da última verificação"
         },
-        "StartChecks": "",
-        "ChecksDisabled": "",
-        "ChecksStopped": "",
-        "StopChecks": "",
-        "stopFailed": "",
-        "startFailed": "",
-        "recheckFailed": "",
-        "checkInitiated": "",
-        "nextRefresh": "",
-        "refreshInterval": "",
-        "cardsView": "",
-        "classicView": "",
-        "hideAllOutputs": "",
-        "showAllOutputs": ""
+        "StartChecks": "Retomar verificações de estado",
+        "ChecksDisabled": "Verificações de estado: Desativado",
+        "ChecksStopped": "Verificações de estado: Em pausa",
+        "StopChecks": "Pausar verificações de estado",
+        "stopFailed": "Falha ao pausar as verificações de estado.",
+        "startFailed": "Falha ao retomar as verificações de estado.",
+        "recheckFailed": "Falha ao repetir a verificação de estado.",
+        "checkInitiated": "Verificação de estado iniciada.",
+        "nextRefresh": "Próxima atualização dentro de {timeDuration}.",
+        "refreshInterval": "Intervalo de atualização",
+        "cardsView": "Vista de cartões",
+        "classicView": "Vista clássica",
+        "hideAllOutputs": "Ocultar todas as saídas",
+        "showAllOutputs": "Mostrar todas as saídas"
     },
     "ServiceChecks": {
-        "description": "",
-        "title": "",
-        "DeleteCheck": "",
-        "addInstance": "",
-        "processListLink": "",
+        "description": "Utilize este formulário para configurar verificações de estado. Não adicione aqui aplicações Starr, multimédia, Snapshot ou de transferência. Em vez disso, defina um intervalo de verificação nas respetivas páginas de configuração. Veja a <go-to page=\"ProcessList\">lista de processos em execução aqui</go-to> e utilize-a como inspiração ao criar verificações de processos.",
+        "title": "Verificações de estado",
+        "DeleteCheck": "Eliminar verificação de estado",
+        "addInstance": "Criar verificação de estado",
+        "processListLink": "Ver aqui a lista de processos em execução.",
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Tempo limite da verificação",
+            "description": "Tempo de espera até a verificação do serviço concluir."
         },
         "interval": {
-            "label": "",
-            "description": ""
+            "label": "Intervalo de verificação",
+            "description": "Frequência da verificação do serviço."
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Nome da verificação",
+            "description": "Nome único do serviço monitorizado.",
+            "placeholder": "nome personalizado para notificações",
+            "tooltip": "Nome do serviço monitorizado. É utilizado para identificar o serviço nas notificações. Cada serviço tem de ter um nome único."
         },
         "type": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
+            "label": "Tipo de verificação",
+            "description": "Tipo de verificação a efetuar.",
+            "tooltip": "O tipo Verificação de processo permite monitorizar se um processo está em execução. O tipo Verificação de URL HTTP permite monitorizar a acessibilidade de um URL. O tipo Acessibilidade de porta TCP permite monitorizar a conectividade de uma porta TCP. Ambos os tipos de verificação de ping permitem monitorizar a acessibilidade de um IP ou host.",
             "options": {
-                "process": "",
-                "http": "",
-                "tcp": "",
-                "ping": "",
-                "icmp": ""
+                "process": "Verificação de processo",
+                "http": "Verificação de URL HTTP",
+                "tcp": "Acessibilidade de porta TCP",
+                "ping": "Verificação de ping UDP",
+                "icmp": "Verificação de ping ICMP"
             }
         },
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "URL",
+            "description": "URL do serviço monitorizado.",
+            "placeholder": "https://my.site"
         },
         "http": {
             "headers": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Cabeçalhos HTTP",
+                "description": "Cabeçalhos do pedido HTTP, 1 por linha.",
+                "placeholder": "Content-Type: application/json"
             },
             "codes": {
-                "label": "",
-                "description": "",
-                "required": ""
+                "label": "Códigos de resposta aceitáveis",
+                "description": "Qualquer código aqui é considerado aceitável. Se o serviço responder com outro código, é gerada uma notificação.",
+                "required": "É necessário pelo menos um código de resposta esperado."
             }
         },
         "tcp": {
             "value": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": "",
-                "required": ""
+                "label": "Host e porta",
+                "description": "Introduza host:port ou host:ip para verificar a conectividade.",
+                "placeholder": "127.0.0.1:22",
+                "tooltip": "Recomenda-se, em geral, um endereço IP. Se também quiser testar o DNS, utilize um nome de host. O formato é <code>host:port</code>. Não deve haver espaços nem carateres extra.",
+                "required": "São obrigatórios um host e uma porta separados por dois pontos."
             }
         },
         "ping": {
             "value": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": "",
-                "required": ""
+                "label": "Host ou IP",
+                "description": "Introduza o host ou o IP para verificar a acessibilidade.",
+                "placeholder": "127.0.0.1",
+                "tooltip": "Recomenda-se, em geral, um endereço IP. Se também quiser testar o DNS, utilize um nome de host. O formato é <code>host</code> ou <code>10.11.12.13</code>. Não deve haver espaços nem carateres extra. Para permitir verificações UDP no Linux, tem de as ativar com este comando: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Para permitir verificações ICMP no Linux, tem de atribuir capacidades ao binário notifiarr com este comando: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. A forma mais simples de fazer ambos funcionarem no Docker é ativar o modo privilegiado, mas também pode definir capacidades.",
+                "required": "É necessário um host ou um endereço IP."
             },
             "count": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "required": ""
+                "label": "Contagem",
+                "description": "Número de pacotes a enviar.",
+                "placeholder": "10",
+                "required": "É necessária uma contagem de pacotes superior a zero."
             },
             "minimum": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "required": ""
+                "label": "Mínimo",
+                "description": "Número mínimo de pacotes que têm de ser recebidos.",
+                "placeholder": "10",
+                "required": "É necessário um número mínimo de pacotes superior a zero."
             },
             "interval": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Intervalo",
+                "description": "Intervalo em milissegundos entre pacotes.",
+                "placeholder": "100"
             }
         },
         "process": {
             "value": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": "",
-                "required": ""
+                "label": "Correspondência de processo",
+                "description": "Nome do processo a verificar.",
+                "placeholder": "notifiarr",
+                "tooltip": "Nome do processo a verificar. É o nome do processo tal como aparece na lista de processos. É utilizada uma correspondência com caráter universal em ambas as extremidades do valor indicado, por isso quanto mais específicos forem os argumentos, melhor será a correspondência.",
+                "required": "É necessário um nome de processo."
             },
             "running": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Em execução",
+                "description": "Enviar um alerta se o processo estiver em execução.",
+                "tooltip": "Selecionar esta opção desencadeia um alerta de estado anómalo se o processo estiver em execução. Selecione-a se precisar de uma notificação quando o processo arranca."
             },
             "restarts": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Reinícios",
+                "description": "Enviar um alerta se o processo tiver reiniciado.",
+                "tooltip": "Selecionar esta opção desencadeia um alerta de estado anómalo se se detetar que o processo reiniciou. Selecione-a se precisar de uma notificação quando o PID mudar."
             },
             "minimum": {
-                "label": "",
-                "description": "",
-                "required": "",
-                "tooltip": ""
+                "label": "Mínimo",
+                "description": "Número mínimo de processos em execução que têm de corresponder ao valor.",
+                "required": "É necessário um número mínimo de processos superior a zero.",
+                "tooltip": "Se introduzir 2, recebe uma notificação quando houver menos de 2 processos em execução. Utilize isto para ser alertado quando houver processos a menos."
             },
             "maximum": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Máximo",
+                "description": "Número máximo de processos em execução que podem corresponder ao valor.",
+                "tooltip": "Se introduzir 2, recebe uma notificação quando houver mais de 2 processos em execução. Utilize isto para ser alertado quando houver processos a mais."
             }
         }
     },
     "navigation": {
         "titles": {
-            "TrustProfile": "",
-            "Settings": "",
-            "SiteTunnel": "",
-            "Commands": "",
-            "Services": "",
-            "Insights": "",
-            "Configuration": "",
-            "StarrApps": "",
-            "Downloaders": "",
-            "MediaApps": "",
-            "SnapshotApps": "",
-            "FileWatcher": "",
-            "Endpoints": "",
-            "Integrations": "",
-            "Monitoring": "",
-            "Metrics": "",
-            "LogFiles": "",
-            "System": "",
-            "Landing": "",
-            "UnsavedChanges": "",
-            "Actions": ""
+            "TrustProfile": "Perfil de confiança",
+            "Settings": "Definições",
+            "SiteTunnel": "Túnel do site",
+            "Commands": "Comandos",
+            "Services": "Serviços",
+            "Insights": "Análises",
+            "Configuration": "Configuração",
+            "StarrApps": "Aplicações Starr",
+            "Downloaders": "Aplicações de transferência",
+            "MediaApps": "Aplicações multimédia",
+            "SnapshotApps": "Aplicações Snapshot",
+            "FileWatcher": "Monitor de ficheiros",
+            "Endpoints": "Endpoints",
+            "Integrations": "Integrações",
+            "Monitoring": "Monitorização",
+            "Metrics": "Métricas",
+            "LogFiles": "Ficheiros de registo",
+            "System": "Sistema",
+            "Landing": "Início do Notifiarr",
+            "UnsavedChanges": "Alterações não guardadas",
+            "Actions": "Ações",
+            "Plex": "Webhooks do Plex",
+            "ApiDocs": "Documentação da API do cliente"
         },
         "pageDescription": {
-            "SnapshotApps": "",
-            "Commands": "",
-            "Configuration": "",
-            "StarrApps": "",
-            "Downloaders": "",
-            "MediaApps": "",
-            "FileWatcher": "",
-            "Endpoints": "",
-            "Services": "",
-            "Integrations": "",
-            "Monitoring": "",
-            "Metrics": "",
-            "LogFiles": "",
-            "System": "",
-            "TrustProfile": "",
-            "Landing": "",
-            "SiteTunnel": "",
-            "Actions": ""
+            "SnapshotApps": "A maior parte das configurações de Snapshot está no site Notifiarr.com. Abaixo estão as definições de plugins de aplicação da funcionalidade Snapshot.",
+            "Commands": "Configurar e executar comandos e scripts personalizados.",
+            "Configuration": "Configure aqui as definições do cliente Notifiarr.",
+            "StarrApps": "Configurar as integrações Starr.",
+            "Downloaders": "Gerir os clientes de transferência.",
+            "MediaApps": "Gerir leitores multimédia e serviços relacionados.",
+            "FileWatcher": "Monitorize alterações em ficheiros e desencadeie ações! Este cliente Notifiarr pode monitorizar ficheiros (de registo) à procura de linhas que correspondam a uma expressão regular. É semelhante a <code>tail -f file | grep string</code> e permite enviar notificações quando, por exemplo, é escrita uma nova linha num ficheiro de registo que corresponde a uma expressão regular.",
+            "Endpoints": "Configurar os URLs dos endpoints de retransmissão e os respetivos agendamentos.",
+            "Services": "A aplicação cliente Notifiarr pode monitorizar serviços através de verificações HTTP, verificações de portas TCP ou verificações de processos em execução (e que não estão em execução). <b>As verificações de estado do cliente funcionam com a integração de rede do Notifiarr.com.</b>",
+            "Integrations": "Esta página mostra os dados que esta aplicação cliente tem em cache na memória para as várias integrações configuradas.",
+            "Monitoring": "Ver os resultados das verificações de estado de serviços e de rede.",
+            "Metrics": "Ver os totais de métricas das configurações do cliente.",
+            "LogFiles": "Ver, seguir, transferir e carregar ficheiros de registo do cliente.",
+            "System": "Ver informação do sistema e do cliente.",
+            "TrustProfile": "Configure a forma de iniciar sessão nesta aplicação cliente Notifiarr.",
+            "Landing": "Este é o melhor lugar do mundo!",
+            "SiteTunnel": "Este cliente mantém uma ligação websocket persistente a notifiarr.com através de um <a href=\"https://github.com/golift/mulery\" target=\"_blank\">túnel Mulery</a>. Este túnel permite que o site faça pedidos ao cliente sem ser necessário abrir uma porta ou ter um IP estático. Nesta página pode selecionar o túnel principal e o túnel de reserva, caso o principal fique inacessível.",
+            "Actions": "Aqui encontram-se as ações internas do cliente Notifiarr. São executadas por temporizadores, agendamentos e eventos do site ou de um servidor de chat. Embora se destinem sobretudo a diagnóstico, pode desencadeá-las manualmente nesta interface.",
+            "Plex": "Informação para diagnosticar os webhooks do Plex."
         }
     },
     "config": {
         "errors": {
-            "InvalidCreds": "",
-            "LoginRequestTimedOut": "",
-            "LoginFailed": "",
-            "ProfileReqTimedOut": "",
-            "AnUnknownErrorOccurred": "",
-            "ConfigUpdateFailed": "",
-            "PleaseEnterBothUsernameAndPassword": ""
+            "InvalidCreds": "Nome de utilizador ou palavra-passe inválidos.",
+            "LoginRequestTimedOut": "O pedido de início de sessão excedeu o tempo limite",
+            "LoginFailed": "Falha no início de sessão: {error}",
+            "ProfileReqTimedOut": "O pedido de perfil excedeu o tempo limite",
+            "AnUnknownErrorOccurred": "Ocorreu um erro desconhecido",
+            "ConfigUpdateFailed": "Falha ao atualizar a configuração: {error}",
+            "PleaseEnterBothUsernameAndPassword": "Introduza o nome de utilizador e a palavra-passe.",
+            "SetAPIKeyFailed": "Falha ao definir a chave de API: {error}"
         },
         "bindAddr": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Endereço de escuta",
+            "description": "IP e porta em que a aplicação fica à escuta. Utilize 0.0.0.0 para escutar em todas as interfaces.",
+            "placeholder": "0.0.0.0:5454"
         },
         "sslKeyFile": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Ficheiro de chave SSL",
+            "description": "Caminho para o ficheiro de chave SSL.",
+            "placeholder": "/path/to/ssl-key.pem",
+            "tooltip": "Esta aplicação pode servir HTTPS. Ative-o ao indicar o caminho do ficheiro de certificado e o caminho do ficheiro de chave."
         },
         "maxBody": {
-            "tooltip": "",
-            "label": "",
-            "description": ""
+            "tooltip": "Com a depuração ativada, esta definição limita a quantidade de dados de payload escritos no registo, de ou para Notifiarr.com.",
+            "label": "Tamanho máximo do corpo",
+            "description": "Tamanho máximo do corpo dos pedidos HTTP."
         },
         "logFileMb": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Tamanho do ficheiro de registo",
+            "description": "Tamanho máximo do ficheiro de registo antes da rotação.",
+            "tooltip": "Com a rotação ativada (quando o número de ficheiros de registo é superior a 1), esta definição controla o tamanho que um ficheiro tem de atingir para desencadear a rotação."
         },
         "titles": {
-            "Configuration": "",
-            "General": "",
-            "Network": "",
-            "System": "",
-            "WatchFile": "",
-            "Endpoint": "",
-            "Command": "",
-            "SSLConfiguration": "",
-            "Services": "",
-            "Logging": "",
-            "Dark": "",
-            "Light": ""
+            "Configuration": "Configuração",
+            "General": "Geral",
+            "Network": "Rede",
+            "System": "Sistema",
+            "WatchFile": "Monitorizar ficheiro",
+            "Endpoint": "Endpoint",
+            "Command": "Comando",
+            "SSLConfiguration": "Configuração SSL",
+            "Services": "Serviços",
+            "Logging": "Registo",
+            "Dark": "Escuro",
+            "Light": "Claro"
         },
         "apiKey": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
-            "placeholder": ""
+            "label": "Chave de API",
+            "description": "Chave de API da conta Notifiarr.com.",
+            "tooltip": "Encontre-a ao iniciar sessão em Notifiarr.com: vá a Perfil e depois a Chaves de API.",
+            "placeholder": "Introduza aqui a chave de API"
         },
         "extraKeys": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Chaves extra",
+            "description": "Chaves de API adicionais para integrações de terceiros. Separe-as por linhas.",
+            "placeholder": "Uma por linha..."
         },
         "sslCertFile": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Ficheiro de certificado SSL",
+            "description": "Caminho para o ficheiro de certificado SSL.",
+            "placeholder": "/path/to/ssl-cert.pem",
+            "tooltip": "Esta aplicação pode servir HTTPS. Ative-o ao indicar o caminho do ficheiro de certificado e o caminho do ficheiro de chave."
         },
         "debug": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Registo de depuração",
+            "description": "Ativar ou desativar o registo de depuração.",
+            "tooltip": "Ativar a depuração escreve muito mais dados no registo. Utilize as definições de tamanho máximo do corpo para controlar o tamanho dos dados."
         },
         "quiet": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Registo silencioso",
+            "description": "Ativar ou desativar o registo silencioso.",
+            "tooltip": "Ativar o modo silencioso faz com que a aplicação não escreva nada em stdout. É útil quando um ficheiro de registo está ativado e não se pretende que os registos inundem também um daemon de arranque."
         },
         "logFile": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Ficheiro de registo da aplicação",
+            "description": "Caminho para o ficheiro ou pasta de registo da aplicação.",
+            "placeholder": "/path/to/notifiarr.log",
+            "tooltip": "Se indicar uma pasta sem nome de ficheiro, a aplicação cria nessa pasta um ficheiro com o nome Notifiarr.log."
         },
         "httpLog": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Ficheiro de registo HTTP",
+            "description": "Caminho para o ficheiro ou pasta de registo HTTP.",
+            "placeholder": "/path/to/http-notifiarr.log",
+            "tooltip": "Definir aqui um caminho de ficheiro de registo faz com que a aplicação escreva os registos HTTP num ficheiro dedicado. O formato é o de registo do Apache. Muito recomendado. Se indicar uma pasta sem nome de ficheiro, a aplicação cria nessa pasta um ficheiro com o nome Notifiarr.http.log."
         },
         "debugLog": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
-            "placeholder": ""
+            "label": "Ficheiro de registo de depuração",
+            "description": "Caminho para o ficheiro ou pasta de registo de depuração.",
+            "tooltip": "Definir aqui um caminho de ficheiro de registo faz com que a aplicação escreva os registos de depuração num ficheiro dedicado. Quando isto não está definido, os registos de depuração são escritos no ficheiro de registo da aplicação. Se indicar uma pasta sem nome de ficheiro, a aplicação cria nessa pasta um ficheiro com o nome Notifiarr.debug.log.",
+            "placeholder": "/path/to/debug-notifiarr.log"
         },
         "logFiles": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Número de ficheiros de registo",
+            "description": "Número de ficheiros de registo a manter.",
+            "tooltip": "Quando esta definição é 0 ou 1, a rotação de ficheiros de registo fica desativada. Aplica-se a todos os ficheiros de registo e mantém esta quantidade de cada um em disco."
         },
         "noUploads": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Recusar carregamentos",
+            "description": "<b>Desativado</b> permite que os administradores de Notifiarr.com façam este cliente carregar ficheiros de registo para o site. <b>Ativado</b> impede o carregamento de ficheiros de registo.",
+            "tooltip": "Esta definição controla a capacidade do site Notifiarr.com e dos administradores do Notifiarr de fazer este cliente carregar ficheiros de registo para o site. Por vezes é necessário ver entradas de registo ao diagnosticar problemas, e este mecanismo permite que o cliente carregue os ficheiros de registo da aplicação e de depuração."
         },
         "snapshot": {
             "timeout": {
-                "label": "",
-                "description": ""
+                "label": "Tempo limite",
+                "description": "Tempo limite das operações de Snapshot."
             }
         },
         "services": {
             "disabled": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Verificações de estado",
+                "description": "Ativar ou desativar as verificações de estado.",
+                "tooltip": "Desative ou ative aqui a monitorização de todas as verificações de estado."
             },
             "interval": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Intervalo de atualização",
+                "description": "Intervalo de atualização das verificações de estado.",
+                "tooltip": "Controla a frequência com que os resultados agregados das verificações de estado são enviados para Notifiarr.com. Se o estado de uma verificação mudar, o envio é sempre imediato."
             },
             "logFile": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "placeholder": ""
+                "label": "Ficheiro de registo dos serviços",
+                "description": "Caminho para o ficheiro ou pasta de registo dos serviços.",
+                "tooltip": "O ficheiro de registo guarda os resultados das verificações de estado. Se ficar por definir, a saída das verificações de estado é escrita no ficheiro de registo da aplicação. Se indicar uma pasta sem nome de ficheiro, a aplicação cria nessa pasta um ficheiro com o nome Notifiarr.services.log.",
+                "placeholder": "/path/to/services-notifiarr.log"
             }
         },
         "ui": {
             "darkMode": {
-                "label": "",
-                "description": ""
+                "label": "Modo escuro",
+                "description": "Ativar ou desativar o modo escuro."
             },
             "language": {
-                "label": "",
-                "description": ""
+                "label": "Idioma",
+                "description": "Idioma da interface da aplicação."
             }
         },
         "watchFile": {
             "path": {
-                "label": "",
-                "description": ""
+                "label": "Caminho do ficheiro",
+                "description": "Caminho do ficheiro a monitorizar."
             }
         },
         "endpoint": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Nome",
+                "description": "Nome do endpoint."
             }
         },
         "command": {
             "name": {
-                "label": "",
-                "description": "",
-                "required": ""
+                "label": "Nome",
+                "description": "Nome do comando.",
+                "required": "É necessário um comando."
             }
         },
         "unstableCh": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Canal instável",
+            "description": "Ativar o canal de atualizações instáveis faz com que a aplicação procure atualizações automáticas no site instável, em vez do GitHub.",
+            "tooltip": "Disponível apenas para utilizadores com acesso de programador."
         },
         "service": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Nome",
+                "description": "Nome do serviço."
             }
         },
         "urlbase": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Base do URL",
+            "description": "Por predefinição, esta aplicação serve HTTP em /. Pode alterar isso ao escrever aqui outro valor.",
+            "placeholder": "/notifiarr/",
+            "tooltip": "Exemplo: /notifiarr/"
         },
         "hostId": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "ID do host",
+            "description": "O parâmetro ID do host identifica de forma única esta instalação do cliente.",
+            "tooltip": "Não se recomenda alterar este valor; deve ser obtido automaticamente. Não copie este valor para outra instalação do cliente Notifiarr."
         },
         "serial": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Threads paralelas",
+            "description": "Desativar esta definição faz com que a aplicação utilize menos goroutines (threads) ao recolher dados das aplicações configuradas.",
+            "tooltip": "Distribui a utilização de CPU e reduz o consumo de memória."
         },
         "retries": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Tentativas",
+            "description": "Por vezes as ligações a Notifiarr.com falham. Controla quantas vezes cada pedido é tentado em caso de falha.",
+            "tooltip": "Predefinição: 4 (o valor 0 usa a predefinição de 4)"
         },
         "apt": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Hook APT",
+            "description": "Os pacotes Notifiarr para Debian (e Ubuntu) incluem uma integração APT.",
+            "tooltip": "Os pacotes Notifiarr para Debian (e Ubuntu) incluem uma integração APT. Esta integração é invocada sempre que é executado um comando <b class=\"text-warning\">apt</b>. Para a ativar, defina este campo como Ativado e, em seguida, <b>ative a integração do gestor de pacotes em Notifiarr.com.</b> Esta funcionalidade não exige que o cliente esteja em execução; basta que o pacote deb do cliente esteja instalado. Não funciona em RHEL nem em Linux que não seja Debian."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Tempo limite",
+            "description": "Este é o tempo limite dos pedidos de API a Notifiarr.com."
         },
         "fileMode": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Modo Unix do ficheiro de registo",
+            "description": "Este é o modo de ficheiro Unix utilizado ao criar novos ficheiros de registo.",
+            "tooltip": "Valores recomendados por ordem de abertura: 0600, 0640, 0644"
         },
         "autoUpdate": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Atualização automática",
+            "description": "Frequência com que a aplicação procura atualizações. Quando encontra uma, instala-a automaticamente.",
+            "tooltip": "Isto só funciona no Windows."
+        },
+        "trace": {
+            "label": "Registo de rastreio",
+            "description": "Ativar ou desativar o registo de rastreio.",
+            "tooltip": "Ativar o rastreio escreve no registo um fluxo de execução muito detalhado. Utilize-o para depuração aprofundada."
         }
     },
     "words": {
         "select-option": {
-            "Enabled": "",
-            "Disabled": "",
-            "minute": "",
-            "minutes": "",
-            "hour": "",
-            "hours": "",
-            "second": "",
-            "seconds": "",
-            "InstanceDisabled": "",
-            "Off": "",
-            "megabytes": "",
-            "bytes": "",
-            "Daily": "",
-            "custom": "",
-            "NoTimeout": "",
-            "ChecksDisabled": ""
+            "Enabled": "Ativado",
+            "Disabled": "Desativado",
+            "minute": "minuto",
+            "minutes": "minutos",
+            "hour": "hora",
+            "hours": "horas",
+            "second": "segundo",
+            "seconds": "segundos",
+            "InstanceDisabled": "Instância desativada",
+            "Off": "Desligado",
+            "megabytes": "megabytes",
+            "bytes": "bytes",
+            "Daily": "Diário",
+            "custom": "personalizado",
+            "NoTimeout": "Sem tempo limite",
+            "ChecksDisabled": "Verificações desativadas",
+            "Information": "Informação"
         },
         "instance-options": {
             "deletes": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "countPerHour": ""
+                "label": "Eliminar conteúdo",
+                "description": "Limita o número de pedidos de eliminação que podem ser enviados a esta instância numa hora.",
+                "tooltip": "Controla quantos pedidos de eliminação são permitidos por hora. O valor 0 desativa o envio de pedidos de eliminação. Refere-se a eliminações de multimédia, mas pode incluir outras ações. É um limite para impedir que intrusos destruam o conteúdo.",
+                "countPerHour": "{count} por hora"
             },
             "interval": {
-                "label": "",
-                "description": ""
+                "label": "Intervalo de verificação de estado",
+                "description": "Frequência da verificação de acessibilidade da instância."
             },
             "timeout": {
-                "label": "",
-                "description": ""
+                "label": "Tempo limite do pedido",
+                "description": "Tempo de espera por uma resposta da instância."
             },
             "validSsl": {
-                "label": "",
-                "description": ""
+                "label": "Validar certificado SSL",
+                "description": "Marcar esta opção garante que a instância utiliza um certificado SSL válido."
             }
         },
         "clock": {
             "short": {
-                "ms": "",
-                "s": "",
-                "m": "",
-                "h": "",
-                "d": "",
-                "w": ""
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
+                "m": "{minutes}m",
+                "h": "{hours}h",
+                "d": "{days}d",
+                "w": "{weeks}w"
             },
-            "ago": "",
+            "ago": "há {timeDuration}",
             "days": {
-                "Sunday": "",
-                "Monday": "",
-                "Tuesday": "",
-                "Wednesday": "",
-                "Thursday": "",
-                "Friday": "",
-                "Saturday": ""
+                "Sunday": "Domingo",
+                "Monday": "Segunda-feira",
+                "Tuesday": "Terça-feira",
+                "Wednesday": "Quarta-feira",
+                "Thursday": "Quinta-feira",
+                "Friday": "Sexta-feira",
+                "Saturday": "Sábado"
             },
-            "format": ""
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}"
         },
         "bytes": {
             "short": {
-                "B": "",
-                "KB": "",
-                "MB": "",
-                "GB": "",
-                "TB": ""
+                "B": "{bytes} B",
+                "KB": "{bytes} KB",
+                "MB": "{bytes} MB",
+                "GB": "{bytes} GB",
+                "TB": "{bytes} TB"
             }
         }
     },
     "RegexTester": {
         "testRegex": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Expressão de teste",
+            "description": "Expressão a comparar com o padrão de teste.",
+            "placeholder": "GET .*some/path"
         },
-        "TestResult": "",
-        "Test": "",
-        "Expression": "",
-        "Result": "",
-        "NoMatch": "",
-        "RegularExpressionTester": "",
+        "TestResult": "Resultado do teste",
+        "Test": "Testar",
+        "Expression": "Expressão",
+        "Result": "Resultado",
+        "NoMatch": "Sem correspondência",
+        "RegularExpressionTester": "Testador de expressões regulares",
         "testPattern": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Padrão de teste",
+            "description": "Cadeia ou linha de registo de exemplo para testar a expressão regular.",
+            "placeholder": "[INFO] 2025-05-25 16:20:01 - Esta é uma linha de registo de teste."
         }
     },
     "SnapshotApps": {
         "MySQL": {
             "host": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Host",
+                "description": "Host ou endereço IP do servidor MySQL.",
+                "placeholder": "127.0.0.1"
             },
-            "title": "",
-            "description": "",
-            "addInstance": "",
+            "title": "MySQL",
+            "description": "Pode adicionar credenciais MySQL à configuração do cliente Notifiarr para fazer um Snapshot do estado do serviço MySQL. Esta funcionalidade recolhe os dados de <code>SHOW PROCESSLIST</code> e <code>SHOW STATUS</code>. Não é necessário acesso a uma base de dados. Exemplo de GRANT: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
+            "addInstance": "Adicionar servidor MySQL",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome do servidor",
+                "description": "Nome do servidor MySQL.",
+                "placeholder": "nome personalizado para notificações"
             },
             "port": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Porta",
+                "description": "Porta do servidor MySQL.",
+                "placeholder": "3306"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador do servidor MySQL.",
+                "placeholder": "root"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe do servidor MySQL.",
+                "placeholder": "palavra-passe"
             }
         },
         "Nvidia": {
-            "title": "",
+            "title": "Nvidia",
             "description": "Esta integração mostra informações da GPU Nvidia nas notificações Snapshot. No Docker, use a imagem CUDA (<code>ghcr.io/notifiarr/notifiarr:cuda</code> ou <code>golift/notifiarr:cuda</code>), instale o <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> no host e passe a GPU com <code>--gpus all</code> ou Compose <code>gpus: all</code>. Não é necessária uma versão do toolkit CUDA no host.",
             "disabled": {
-                "label": "",
-                "description": ""
+                "label": "Snapshots da GPU",
+                "description": "Ativar ou desativar os Snapshots da GPU."
             },
             "busIds": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "IDs de bus",
+                "description": "Lista de IDs de bus, separados por vírgulas, a incluir no Snapshot.",
+                "placeholder": "0000:00:00.0,0000:00:00.1",
+                "tooltip": "Este é o ID de bus da GPU. Pode encontrá-lo ao executar <code>nvidia-smi</code> e consultar a coluna <code>Bus Id</code>. Placas com outros IDs de bus são ignoradas no Snapshot. Em geral, deixe isto em branco. Adicione vários, um por linha."
             },
             "smiPath": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Caminho do nvidia-smi",
+                "description": "Caminho para o comando nvidia-smi.",
+                "placeholder": "/usr/bin/nvidia-smi",
+                "tooltip": "Se o nvidia-smi (nvidia-smi.exe no Windows) não estiver na variável de ambiente PATH, pode indicar aqui o caminho completo do binário."
             }
         }
     },
     "buttons": {
-        "ResetForm": "",
-        "Login": "",
-        "Confirm": "",
-        "Cancel": "",
-        "Save": "",
-        "Close": "",
-        "SaveChanges": "",
-        "SaveConfiguration": "",
-        "Execute": "",
-        "HideMenu": "",
-        "ShowMenu": "",
-        "ShowOutput": "",
-        "HideOutput": "",
-        "RefreshOutput": "",
-        "NoStayHere": "",
-        "YesDeleteMyChanges": ""
+        "ResetForm": "Repor formulário",
+        "Login": "Iniciar sessão",
+        "Confirm": "Confirmar",
+        "Cancel": "Cancelar",
+        "Save": "Guardar",
+        "Close": "Fechar",
+        "SaveChanges": "Guardar alterações",
+        "SaveConfiguration": "Guardar configuração",
+        "Execute": "Executar",
+        "HideMenu": "Ocultar menu",
+        "ShowMenu": "Mostrar menu",
+        "ShowOutput": "Mostrar saída",
+        "HideOutput": "Ocultar saída",
+        "RefreshOutput": "Atualizar saída",
+        "NoStayHere": "Não! Ficar aqui",
+        "YesDeleteMyChanges": "Sim! Eliminar as minhas alterações",
+        "Create": "Criar",
+        "Go": "Ir",
+        "Menu": "Menu",
+        "CreateFolder": "Criar pasta",
+        "CreateFile": "Criar ficheiro"
     },
     "StarrApps": {
         "Radarr": {
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Radarr.",
+                "placeholder": "http://radarr.server.tv:7878"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Radarr",
+            "addInstance": "Adicionar instância Radarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Radarr.",
+                "placeholder": "nome personalizado para notificações"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chave de API",
+                "description": "Chave de API da instância Radarr.",
+                "placeholder": "radarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Radarr.",
+                "placeholder": "admin",
+                "tooltip": "Só é necessário um nome de utilizador e uma palavra-passe para verificar cópias de segurança da base de dados, pois estas não podem ser transferidas através da API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Radarr.",
+                "placeholder": "palavra-passe"
             }
         },
         "Sonarr": {
             "name": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "Nome da instância Sonarr.",
+                "placeholder": "nome personalizado para notificações",
+                "label": "Nome da instância"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Sonarr.",
+                "placeholder": "http://sonarr.server.tv:8989"
             },
             "username": {
-                "placeholder": "",
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "placeholder": "admin",
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Sonarr.",
+                "tooltip": "Só é necessário um nome de utilizador e uma palavra-passe para verificar cópias de segurança da base de dados, pois estas não podem ser transferidas através da API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Sonarr.",
+                "placeholder": "palavra-passe"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Sonarr",
+            "addInstance": "Adicionar instância Sonarr",
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chave de API",
+                "description": "Chave de API da instância Sonarr.",
+                "placeholder": "sonarr-api-key"
             }
         },
         "Lidarr": {
-            "title": "",
-            "addInstance": "",
+            "title": "Lidarr",
+            "addInstance": "Adicionar instância Lidarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Lidarr.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Lidarr.",
+                "placeholder": "http://lidarr.server.tv:8686"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chave de API",
+                "description": "Chave de API da instância Lidarr.",
+                "placeholder": "lidarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Lidarr.",
+                "placeholder": "admin",
+                "tooltip": "Só é necessário um nome de utilizador e uma palavra-passe para verificar cópias de segurança da base de dados, pois estas não podem ser transferidas através da API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Lidarr.",
+                "placeholder": "palavra-passe"
             }
         },
         "Readarr": {
-            "title": "",
-            "addInstance": "",
+            "title": "Readarr",
+            "addInstance": "Adicionar instância Readarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Readarr.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Readarr.",
+                "placeholder": "http://readarr.server.tv:8787"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chave de API",
+                "description": "Chave de API da instância Readarr.",
+                "placeholder": "readarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Readarr.",
+                "placeholder": "admin",
+                "tooltip": "Só é necessário um nome de utilizador e uma palavra-passe para verificar cópias de segurança da base de dados, pois estas não podem ser transferidas através da API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Readarr.",
+                "placeholder": "palavra-passe"
             }
         },
         "Prowlarr": {
-            "title": "",
-            "addInstance": "",
+            "title": "Prowlarr",
+            "addInstance": "Adicionar instância Prowlarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Prowlarr.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Prowlarr.",
+                "placeholder": "http://prowlarr.server.tv:9696"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chave de API",
+                "description": "Chave de API da instância Prowlarr.",
+                "placeholder": "prowlarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Prowlarr.",
+                "placeholder": "admin",
+                "tooltip": "Só é necessário um nome de utilizador e uma palavra-passe para verificar cópias de segurança da base de dados, pois estas não podem ser transferidas através da API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Prowlarr.",
+                "placeholder": "palavra-passe"
             }
         }
     },
     "Endpoints": {
         "body": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Corpo do pedido",
+            "description": "Corpo enviado para o URL nos pedidos POST, PUT e PATCH.",
+            "placeholder": "{\"message\": \"Hello, world!\"}"
         },
         "method": {
-            "label": "",
-            "description": ""
+            "label": "Método",
+            "description": "Pedido HTTP"
         },
-        "title": "",
-        "addInstance": "",
-        "DeleteEndpoint": "",
+        "title": "URLs de retransmissão",
+        "addInstance": "Adicionar URL de retransmissão",
+        "DeleteEndpoint": "Eliminar URL",
         "badge": {
-            "header": "",
-            "query": "",
-            "body": ""
+            "header": "{count, plural, =1 {1 cabeçalho} other {# cabeçalhos}}",
+            "query": "{count, plural, =1 {1 consulta} other {# consultas}}",
+            "body": "{count, plural, =1 {1 caráter} other {# carateres}}"
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nome",
+            "description": "Nome do URL de retransmissão.",
+            "placeholder": "nome personalizado para notificações"
         },
         "template": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": "",
-            "required": ""
+            "label": "Modelo de payload",
+            "description": "Interpretar o payload com este modelo.",
+            "placeholder": "pihole",
+            "tooltip": "O modelo é utilizado pelo site para determinar como transformar o payload numa notificação de chat. Encontre uma lista de modelos disponíveis ou crie o seu em <a href=\"https://notifiarr.com/\" target=\"_blank\">o site</a>, em <code>Integrações: Endpoints</code>.",
+            "required": "É necessário um modelo. Introduza 'test' se não tiver a certeza do que escrever."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Tempo limite do pedido",
+            "description": "Tempo de espera até o pedido HTTP concluir."
         },
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "URL de retransmissão",
+            "description": "URL do serviço remoto que é retransmitido para o site.",
+            "placeholder": "https://pihole.myhome.lan/api/stats"
         },
         "header": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Cabeçalhos HTTP",
+            "description": "Cabeçalhos do pedido HTTP, 1 por linha.",
+            "placeholder": "Content-Type: application/json",
+            "tooltip": "Os cabeçalhos do pedido HTTP são enviados para o URL tal como estão. O formato tem de ser <code>key: value</code> por linha. O espaço e os dois pontos são obrigatórios. Os valores inválidos são ignorados e os espaços extra são removidos."
         },
         "query": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Parâmetros de consulta",
+            "description": "Parâmetros de consulta a adicionar ao URL, 1 por linha.",
+            "placeholder": "apiKey=1234567890",
+            "tooltip": "Os parâmetros de consulta são acrescentados ao URL. O formato tem de ser <code>key=value</code> por linha. Os valores inválidos são ignorados e os espaços extra são removidos. Não inclua o caráter <code>?</code> nem o e comercial (<code>&</code>) no início de uma linha. As chaves e os valores são automaticamente codificados para URL."
         }
     },
     "profile": {
         "username": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nome de utilizador",
+            "description": "Nome de utilizador de início de sessão",
+            "placeholder": "Predefinição: admin"
         },
         "title": {
-            "Authentication": "",
-            "Authorization": ""
+            "Authentication": "Autenticação",
+            "Authorization": "Autorização"
         },
         "phrase": {
-            "ShowMoreDesc": "",
-            "PasswordOnlyUsed": "",
-            "HeaderOnlyUsed": "",
-            "AuthTypeChange": "",
-            "ProfileUpdated": "",
-            "EnterCurrentPassword": "",
-            "ProxyAuthDisabled": "",
-            "Addit": "",
-            "SeeWikiForAuthProxyHelp": "",
-            "ShowMeMore": "",
-            "ShowMeLess": ""
+            "ShowMoreDesc": "São atualmente suportados três tipos de autenticação. O proxy de autenticação e Sem palavra-passe só estão disponíveis se o pedido atual vier de um endereço IP upstream válido e configurado.",
+            "PasswordOnlyUsed": "O nome de utilizador e a palavra-passe só são utilizados se o tipo de autenticação estiver definido como Palavra-passe.",
+            "HeaderOnlyUsed": "O cabeçalho de autenticação só é utilizado se o tipo de autenticação estiver definido como Cabeçalho ou Sem palavra-passe.",
+            "AuthTypeChange": "Se o tipo de autenticação mudar, termine a sessão para concluir o processo.",
+            "ProfileUpdated": "Perfil atualizado com sucesso há {timeDuration}!",
+            "EnterCurrentPassword": "Introduza a palavra-passe atual para efetuar alterações.",
+            "ProxyAuthDisabled": "A autenticação por proxy está desativada porque o upstream ({upstreamIp}) não consta da lista de upstreams permitidos.",
+            "Addit": "Adicionar.",
+            "SeeWikiForAuthProxyHelp": "Consulte <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">a wiki</a> para obter instruções sobre a configuração de um proxy de autenticação.",
+            "ShowMeMore": "Mostrar mais.",
+            "ShowMeLess": "Mostrar menos."
         },
         "authType": {
-            "label": "",
-            "description": "",
+            "label": "Tipo de autenticação",
+            "description": "Selecione a forma de autenticação no cliente",
             "options": {
-                "password": "",
-                "header": "",
-                "noauth": ""
+                "password": "Palavra-passe: nome de utilizador local",
+                "header": "Proxy de autenticação: cabeçalho",
+                "noauth": "Sem palavra-passe (perigo)",
+                "website": "Credenciais do site"
             },
             "option_desc": {
-                "password": "",
-                "header": "",
-                "noauth": ""
+                "password": "Este é o tipo de autenticação predefinido. Selecione a opção Palavra-passe para iniciar sessão nesta aplicação com um nome de utilizador e uma palavra-passe configurados. Só é suportado 1 nome de utilizador e 1 palavra-passe. Ao selecionar esta opção, tem de preencher os campos de nome de utilizador e de nova palavra-passe. Se este for o tipo de autenticação atual, também tem de preencher o campo da palavra-passe atual para efetuar alterações.",
+                "header": "Selecione esta opção para iniciar sessão nesta aplicação através de um cabeçalho HTTP que contém um nome de utilizador. É habitualmente conhecida como autenticação por proxy. Temos <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">uma página da wiki</a> com instruções para configurar o Nginx para esta funcionalidade. Ao selecionar esta opção, também tem de selecionar um cabeçalho para o proxy de autenticação. Se não forem apresentados cabeçalhos, o proxy upstream não forneceu cabeçalhos válidos.",
+                "noauth": "Esta configuração não é recomendada. O tipo de autenticação Sem palavra-passe permite qualquer pedido de qualquer <code>IP upstream</code> configurado. Também funciona com um proxy de autenticação para definir o nome de utilizador. Se o cabeçalho fornecido não tiver nome de utilizador, a predefinição é admin.",
+                "website": "Selecione esta opção para iniciar sessão nesta aplicação com as credenciais do site. Permite iniciar sessão no cliente com o endereço de correio eletrónico ou o nome de utilizador e a palavra-passe de Notifiarr.com. A palavra-passe está sempre protegida e é cifrada antes de ser transmitida ao cliente."
             }
         },
         "upstreams": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Upstreams",
+            "description": "IP de proxy de confiança ou redes CIDR. Separe as redes com espaços.",
+            "placeholder": "127.0.0.1 ::1",
+            "tooltip": "Se o cliente Notifiarr estiver atrás de um proxy inverso (swag, nginx, etc.), deve adicionar aqui o IP desse proxy. Também pode indicar redes completas. Isto controla que IP é escrito no ficheiro de registo do servidor web: o do requerente ou o cabeçalho <span class=\"text-warning\">X-Forwarded-For</span>. Obrigatório ao utilizar um cabeçalho de pedido para autenticação, ou quando a autenticação está desativada."
         },
         "header": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Cabeçalho de autenticação",
+            "description": "Selecione o cabeçalho que contém o nome de utilizador",
+            "tooltip": "Mostra cabeçalhos fornecidos pelo cliente ou pelo upstream que podem ser utilizados para autenticação por proxy. Esta seleção é utilizada se o tipo de autenticação estiver definido como Cabeçalho ou Sem palavra-passe. Escolha o cabeçalho que apresenta o nome de utilizador correto. Com Sem palavra-passe, o cabeçalho define o nome de utilizador, mas não é obrigatório."
         },
         "password": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Palavra-passe atual",
+            "description": "Introduza a palavra-passe atual para efetuar alterações",
+            "placeholder": "Introduza a palavra-passe atual"
         },
         "newPass": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nova palavra-passe",
+            "description": "Nova palavra-passe de início de sessão",
+            "placeholder": "mínimo de 9 caracteres"
         }
     },
     "MediaApps": {
         "Plex": {
-            "title": "",
-            "description": "",
+            "title": "Plex",
+            "description": "A integração com o Plex é abrangente e muitas das definições são configuradas no <a href=\"https://notifiarr.com/\" target=\"_blank\">site Notifiarr.com</a>.",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome do servidor",
+                "description": "Nome do servidor Plex.",
+                "placeholder": "Definido automaticamente pelo servidor",
+                "tooltip": "O nome do Plex Media Server é utilizado em notificações, registos e verificações de estado. É definido automaticamente pelo servidor Plex."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL do servidor Plex.",
+                "placeholder": "http://plex.server.tv:32400"
             },
             "token": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Token",
+                "description": "Token do servidor Plex.",
+                "placeholder": "pl3x-to_Ken",
+                "tooltip": "Pode encontrar instruções para localizar o token do Plex <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">neste artigo do Plex</a>."
             }
         },
         "Tautulli": {
-            "title": "",
-            "description": "",
+            "title": "Tautulli",
+            "description": "O Tautulli tem uma funcionalidade que permite atribuir nomes de utilizador personalizados aos utilizadores do Plex. Ao integrar o cliente Notifiarr com o Tautulli, esses nomes de utilizador personalizados aparecem nas notificações do servidor de chat. Quando não está ativado, são utilizados os nomes de utilizador ou os endereços de correio eletrónico do Plex. É totalmente opcional. O site Notifiarr também oferece esta funcionalidade e permite associar utilizadores do Plex a nomes personalizados. Também pode adicionar aqui uma instância Tautulli apenas para a monitorizar com verificações de estado.",
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Nome do Tautulli",
+                "description": "Nome do serviço Tautulli."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL do serviço Tautulli.",
+                "placeholder": "http://tautulli.server.tv:8181"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chave de API",
+                "description": "Chave de API do serviço Tautulli.",
+                "placeholder": "tautulli-api-key"
             }
         }
     },
     "Downloaders": {
         "Qbittorrent": {
-            "title": "",
-            "addInstance": "",
+            "title": "Qbittorrent",
+            "addInstance": "Adicionar instância Qbittorrent",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Qbittorrent.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Qbittorrent.",
+                "placeholder": "http://qbittorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Qbittorrent.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Qbittorrent.",
+                "placeholder": "palavra-passe"
             }
         },
         "Rtorrent": {
-            "title": "",
-            "addInstance": "",
+            "title": "Rtorrent",
+            "addInstance": "Adicionar instância Rtorrent",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Rtorrent.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Rtorrent.",
+                "placeholder": "http://rtorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Rtorrent.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Rtorrent.",
+                "placeholder": "palavra-passe"
             }
         },
         "Transmission": {
-            "title": "",
-            "addInstance": "",
+            "title": "Transmission",
+            "addInstance": "Adicionar instância Transmission",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Transmission.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Transmission. <b>Tem</b> de incluir o sufixo <code>/transmission/rpc</code>.",
+                "placeholder": "http://transmission.server.tv:9091"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância Transmission.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Transmission.",
+                "placeholder": "palavra-passe"
             }
         },
         "Deluge": {
-            "title": "",
-            "addInstance": "",
+            "title": "Deluge",
+            "addInstance": "Adicionar instância Deluge",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância Deluge.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância Deluge.",
+                "placeholder": "http://deluge.server.tv:8112"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância Deluge.",
+                "placeholder": "palavra-passe"
             }
         },
         "SabNZB": {
-            "title": "",
-            "addInstance": "",
+            "title": "SabNZB",
+            "addInstance": "Adicionar instância SabNZB",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância SabNZB.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância SabNZB.",
+                "placeholder": "http://sabnzb.server.tv:8080"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Chave de API",
+                "description": "Chave de API da instância SabNZB.",
+                "placeholder": "sabnzb-api-key"
             }
         },
         "NZBGet": {
-            "title": "",
-            "addInstance": "",
+            "title": "NZBGet",
+            "addInstance": "Adicionar instância NZBGet",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome da instância",
+                "description": "Nome da instância NZBGet.",
+                "placeholder": "nome personalizado para notificações"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL da instância NZBGet.",
+                "placeholder": "http://nzbget.server.tv:6789"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nome de utilizador",
+                "description": "Nome de utilizador da instância NZBGet.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Palavra-passe",
+                "description": "Palavra-passe da instância NZBGet.",
+                "placeholder": "palavra-passe"
             }
         }
     },
     "FileWatcher": {
         "mustExist": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "O ficheiro tem de existir",
+            "description": "Não monitorizar o ficheiro se não existir.",
+            "tooltip": "Ativar esta opção faz com que o ficheiro não seja monitorizado se não existir quando a aplicação arranca. Monitorizar ficheiros que não existem continua a ter falhas e pode não funcionar de todo."
         },
-        "title": "",
-        "description": "",
-        "addInstance": "",
-        "DeleteWatcher": "",
+        "title": "Ficheiros monitorizados",
+        "description": "Tem de ativar a funcionalidade de monitor de registos e escolher um canal no site Notifiarr para isto funcionar!",
+        "addInstance": "Monitorizar outro ficheiro",
+        "DeleteWatcher": "Eliminar monitor",
         "badges": {
-            "CurrentlyWatching": "",
-            "WatcherStopped": ""
+            "CurrentlyWatching": "A monitorizar",
+            "WatcherStopped": "Monitor parado"
         },
         "buttons": {
-            "StopWatcher": "",
-            "StartWatcher": ""
+            "StopWatcher": "Parar monitor",
+            "StartWatcher": "Iniciar monitor"
         },
         "titles": {
-            "RegularExpressionTester": "",
-            "Expression": "",
-            "TestString": ""
+            "RegularExpressionTester": "Testador de expressões regulares",
+            "Expression": "Expressão",
+            "TestString": "Cadeia de teste"
         },
         "path": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "required": ""
+            "label": "Caminho do ficheiro",
+            "description": "Caminho do ficheiro a monitorizar. Recomendam-se caminhos absolutos.",
+            "placeholder": "/var/log/nginx/access.log",
+            "required": "O caminho é obrigatório",
+            "clientLog": "Não é possível monitorizar o próprio ficheiro de registo do cliente; isso criaria um ciclo. Os erros do cliente já são enviados como client_error_log."
         },
         "disabled": {
-            "label": "",
-            "description": ""
+            "label": "Ativo",
+            "description": "Desativar este monitor."
         },
         "regex": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
-            "placeholder": "",
-            "required": ""
+            "label": "Expressão regular",
+            "description": "Expressão regular a comparar com o ficheiro.",
+            "tooltip": "As expressões são automaticamente envolvidas num correspondedor universal: <code>.*</code>, por isso não utilize <code>^</code> nem <code>$</code> na expressão. Utilize <code>(?i)</code> como prefixo para tornar as expressões regulares insensíveis a maiúsculas e minúsculas.",
+            "placeholder": "GET.*some/path",
+            "required": "A expressão regular é obrigatória"
         },
         "skip": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Expressões a ignorar",
+            "description": "Tudo o que corresponder a esta expressão é ignorado.",
+            "placeholder": "GET.*some/path"
         },
         "poll": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Sondagem do ficheiro",
+            "description": "Sondar o ficheiro à procura de alterações.",
+            "tooltip": "Os eventos do sistema de ficheiros não funcionam em alguns sistemas. Se nada estiver a corresponder, ative isto para utilizar o intervalo de sondagem do ficheiro."
         },
         "pipe": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Pipe FIFO",
+            "description": "O caminho é um pipe FIFO com nome.",
+            "tooltip": "Ative isto se o ficheiro que está a monitorizar for um pipe FIFO com nome. Provavelmente não precisa disto."
         },
         "logMatch": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Registar correspondências",
+            "description": "Escrever as linhas correspondentes no registo do Notifiarr.",
+            "tooltip": "Ativar esta opção escreve a linha correspondente no registo do Notifiarr. É útil para depuração, mas pode ser ruidoso."
         }
     },
     "SiteTunnel": {
-        "subText": "",
+        "subText": "Clique no botão <span class=\"text-success\">Fazer ping aos túneis</span> e selecione como principal o túnel com o tempo de resposta mais baixo. Selecione outro túnel rápido como reserva.",
         "phrases": {
-            "PrimaryTunnel": "",
-            "BackupTunnel": "",
-            "Ping": "",
-            "Pinging": "",
-            "ActiveTunnel": "",
-            "TunnelStats": "",
-            "Disconnects": "",
-            "ConnectionPoolSize": "",
-            "Connecting": "",
-            "Idle": "",
-            "Running": "",
-            "LastConnection": "",
-            "LastActiveCheck": "",
-            "SocketURLActive": "",
-            "SocketURLInactive": "",
-            "SelectTunnel": "",
-            "TunnelsSaved": "",
-            "TunnelStatsStale": ""
+            "PrimaryTunnel": "Túnel principal",
+            "BackupTunnel": "Túnel de reserva",
+            "Ping": "Fazer ping aos túneis",
+            "Pinging": "A fazer ping...",
+            "ActiveTunnel": "Túnel ativo: {tunnel}",
+            "TunnelStats": "Estatísticas do túnel",
+            "Disconnects": "Desconexões",
+            "ConnectionPoolSize": "Tamanho do conjunto de ligações",
+            "Connecting": "A ligar",
+            "Idle": "Ocioso",
+            "Running": "Em execução",
+            "LastConnection": "Última ligação",
+            "LastActiveCheck": "Última verificação ativa",
+            "SocketURLActive": "URL do socket (ativo)",
+            "SocketURLInactive": "URL do socket (inativo)",
+            "SelectTunnel": "Selecionar um túnel",
+            "TunnelsSaved": "Túneis guardados há {timeDuration}!",
+            "TunnelStatsStale": "Os dados acima estão sempre desatualizados. Para os atualizar, clique na ligação Atualizar o back-end no cabeçalho da página."
         }
     },
     "scheduler": {
-        "title": "",
-        "daysOfWeek": "",
-        "daysOfMonth": "",
-        "frequency": "",
-        "selectAFrequency": "",
-        "AddATime": "",
-        "empty": "",
+        "title": "Agendamento",
+        "daysOfWeek": "Dias da semana",
+        "daysOfMonth": "Dias do mês",
+        "frequency": "Frequência",
+        "selectAFrequency": "Selecione uma frequência para criar um agendamento.",
+        "AddATime": "Adicionar uma hora",
+        "empty": "Se pretende executar todos os dias, selecione a frequência Diário.",
         "required": {
-            "daysOfWeek": "",
-            "daysOfMonth": "",
-            "atTimes": ""
+            "daysOfWeek": "Tem de selecionar pelo menos um dia da semana.",
+            "daysOfMonth": "Tem de selecionar pelo menos um dia do mês.",
+            "atTimes": "Tem de selecionar pelo menos uma hora para executar o agendamento."
         },
         "ops": {
-            "noSchedule": "",
-            "minutely": "",
-            "hourly": "",
-            "daily": "",
-            "weekly": "",
-            "monthly": ""
+            "noSchedule": "Sem agendamento",
+            "minutely": "A cada minuto",
+            "hourly": "De hora a hora",
+            "daily": "Diário",
+            "weekly": "Semanal",
+            "monthly": "Mensal"
         },
         "times": {
-            "noneSelected": "",
-            "noDaysSelected": "",
-            "everyMinute": "",
-            "everyHour": "",
-            "everyDay": "",
-            "everyWeek": "",
-            "everyMonth": ""
+            "noneSelected": "(nenhum selecionado)",
+            "noDaysSelected": "(nenhum dia selecionado)",
+            "everyMinute": "{count, plural, =1 {Uma vez} other {# vezes}} por minuto, nos segundos {times}",
+            "everyHour": "{count, plural, =1 {Uma vez} other {# vezes}} por hora, em minuto:segundos {times}",
+            "everyDay": "{count, plural, =1 {Uma vez} other {# vezes}} por dia, às horas {times}",
+            "everyWeek": "{count, plural, =1 {Uma vez} other {# vezes}} por semana, em {daysOfWeek}, às horas {times}",
+            "everyMonth": "{count, plural, =1 {Uma vez} other {# vezes}} por mês, nos dias {daysOfMonth}, às horas {times}"
         }
     },
     "metrics": {
-        "CountersReset": "",
-        "ApplicationUptime": "",
+        "CountersReset": "Os contadores desta página são repostos quando a aplicação termina. A aplicação expõe estes contadores através do Prometheus. Pode recolhê-los e utilizar o <a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">painel Grafana do cliente Notifiarr</a> para os visualizar.",
+        "ApplicationUptime": "Tempo de atividade da aplicação: &nbsp;<b>{timeDuration}</b>",
         "logFiles": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Ficheiros de registo",
+            "description": "Contadores de ficheiros de registo.",
+            "empty": "Nenhum ficheiro de registo encontrado."
         },
         "apiHits": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Pedidos de API",
+            "description": "Contadores de pedidos de API recebidos.",
+            "empty": "Ainda não há pedidos de API."
         },
         "httpRequests": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Pedidos HTTP",
+            "description": "Estatísticas de pedidos HTTP recebidos. Inclui pedidos do túnel websocket.",
+            "empty": "Ainda não há pedidos HTTP."
         },
         "website": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Pedidos ao site",
+            "description": "Pedidos a Notifiarr.com.",
+            "empty": "Ainda não há pedidos ao site."
         },
         "fileWatcher": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Monitor de ficheiros",
+            "description": "Estatísticas do monitor de ficheiros.",
+            "empty": "Nenhum monitor de ficheiros configurado."
         },
         "apps": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Pedidos a aplicações",
+            "description": "Estatísticas de pedidos a aplicações. Estes contadores não incluem verificações de estado.",
+            "empty": "Ainda não há pedidos a aplicações."
         },
         "timerEvents": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Ações desencadeadas",
+            "description": "Acionadores, temporizadores e agendamentos executados.",
+            "empty": "Ainda não há ações desencadeadas."
         }
     },
     "Actions": {
         "titles": {
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": "",
-            "Counter": "",
-            "Interval": "",
-            "Schedule": ""
+            "Triggers": "Acionadores",
+            "Timers": "Temporizadores",
+            "Schedules": "Agendamentos",
+            "SiteCrons": "Temporizadores do site",
+            "Counter": "Contador",
+            "Interval": "Intervalo",
+            "Schedule": "Agendamento",
+            "Trigger": "Acionador",
+            "Timer": "Temporizador",
+            "Type": "Tipo",
+            "When": "Quando",
+            "Action": "Ação",
+            "Never": "Nunca",
+            "Filter": "Filtro"
         },
         "descriptions": {
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": ""
+            "Triggers": "Estas ações não têm temporizador nem agendamento.",
+            "Timers": "Estas ações têm um temporizador.",
+            "Schedules": "Estas ações têm um agendamento.",
+            "SiteCrons": "Estas ações são criadas pelo site para delegar o acompanhamento dos temporizadores."
         },
         "triggers": {
             "TrigPlexEmptyTrash": {
-                "label": ""
+                "label": "Esvaziar o lixo do Plex"
             },
             "TrigUploadFile": {
-                "label": "",
-                "button": "",
-                "success": "",
+                "label": "Ficheiro de registo carregado para o site",
+                "button": "Carregar registo agora",
+                "success": "Ficheiro de registo carregado para o site.",
                 "options": {
-                    "choose": "",
-                    "app": "",
-                    "debug": "",
-                    "http": ""
+                    "choose": "Escolha um ficheiro para carregar.",
+                    "app": "Ficheiro de registo da aplicação.",
+                    "debug": "Ficheiro de registo de depuração.",
+                    "http": "Ficheiro de registo HTTP."
                 }
             },
             "TrigPlexSessions": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Recolher sessões do Plex",
+                "button": "Recolher sessões agora",
+                "success": "Sessões do Plex recolhidas."
             },
             "TrigPlexSessionsCheck": {
-                "label": ""
+                "label": "Verificar sessões do Plex terminadas"
             },
             "TrigDashboard": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Atualização do painel",
+                "button": "Atualizar painel",
+                "success": "Atualização do painel iniciada."
             },
             "TrigMDBListSync": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Sincronização da lista MDB",
+                "button": "Sincronizar lista MDB",
+                "success": "Sincronização da lista MDB iniciada."
             },
             "TrigCollectionGaps": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Lacunas da coleção",
+                "button": "Verificar lacunas da coleção",
+                "success": "Verificação de lacunas da coleção iniciada."
             },
             "TrigCFSyncLidarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Sincronização de perfis e formatos Lidarr",
+                "button": "Sincronizar todas as instâncias Lidarr",
+                "success": "Sincronização de perfis e formatos Lidarr iniciada."
             },
             "TrigCFSyncRadarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Sincronização de perfis e formatos Radarr",
+                "button": "Sincronizar todas as instâncias Radarr",
+                "success": "Sincronização de perfis e formatos Radarr iniciada."
             },
             "TrigStop": {
-                "label": "",
-                "button": ""
+                "label": "Recarregamentos do cliente",
+                "button": "Recarregar cliente"
             },
             "TrigSnapshot": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Recolha de Snapshot",
+                "button": "Atualizar Snapshot",
+                "success": "Recolha de Snapshot iniciada."
             },
             "TrigProwlarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Corrupção da base de dados Prowlarr",
+                "button": "Verificar Prowlarr",
+                "success": "Verificação de corrupção da base de dados Prowlarr iniciada."
             },
             "TrigLidarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Corrupção da base de dados Lidarr",
+                "button": "Verificar Lidarr",
+                "success": "Verificação de corrupção da base de dados Lidarr iniciada."
             },
             "TrigRadarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Corrupção da base de dados Radarr",
+                "button": "Verificar Radarr",
+                "success": "Verificação de corrupção da base de dados Radarr iniciada."
             },
             "TrigReadarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Corrupção da base de dados Readarr",
+                "button": "Verificar Readarr",
+                "success": "Verificação de corrupção da base de dados Readarr iniciada."
             },
             "TrigSonarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Corrupção da base de dados Sonarr",
+                "button": "Verificar Sonarr",
+                "success": "Verificação de corrupção da base de dados Sonarr iniciada."
             },
             "TrigProwlarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Cópias de segurança da base de dados Prowlarr",
+                "button": "Verificar Prowlarr",
+                "success": "Verificação das cópias de segurança da base de dados Prowlarr iniciada."
             },
             "TrigLidarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Cópias de segurança da base de dados Lidarr",
+                "button": "Verificar Lidarr",
+                "success": "Verificação das cópias de segurança da base de dados Lidarr iniciada."
             },
             "TrigRadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Cópias de segurança da base de dados Radarr",
+                "button": "Verificar Radarr",
+                "success": "Verificação das cópias de segurança da base de dados Radarr iniciada."
             },
             "TrigReadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Cópias de segurança da base de dados Readarr",
+                "button": "Verificar Readarr",
+                "success": "Verificação das cópias de segurança da base de dados Readarr iniciada."
             },
             "TrigSonarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Cópias de segurança da base de dados Sonarr",
+                "button": "Verificar Sonarr",
+                "success": "Verificação das cópias de segurança da base de dados Sonarr iniciada."
             },
             "TrigUpCheck": {
-                "label": ""
+                "label": "Verificação de ligação do cliente ao site"
             },
             "TrigEndpointURL": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "URL de endpoint retransmitido para o site: {name}",
+                "button": "Executar endpoint",
+                "success": "Retransmissão do URL do endpoint iniciada."
             },
             "TrigCustomCommand": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Comando personalizado: {name}",
+                "button": "Executar comando",
+                "success": "Comando personalizado iniciado."
             },
             "TrigAutoUpdate": {
-                "label": ""
+                "label": "Verificação de atualização automática"
             },
             "TrigCFSyncLidarrInt": {
-                "label": ""
+                "label": "Sincronização de formatos personalizados Lidarr por instância"
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
+                "label": "Sincronização de formatos personalizados Radarr por instância"
             },
             "TrigCustomCronTimer": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Temporizador do site: {name}",
+                "button": "Executar temporizador agora",
+                "success": "Temporizador do site iniciado."
             },
             "TrigDownloadingItems": {
-                "label": ""
+                "label": "Itens a transferir / concluídos"
             },
             "TrigLidarrQueue": {
-                "label": ""
+                "label": "Cache da fila Lidarr"
             },
             "TrigRadarrQueue": {
-                "label": ""
+                "label": "Cache da fila Radarr"
             },
             "TrigReadarrQueue": {
-                "label": ""
+                "label": "Cache da fila Readarr"
             },
             "TrigSonarrQueue": {
-                "label": ""
+                "label": "Cache da fila Sonarr"
             },
             "TrigStuckItems": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Verificação de itens presos",
+                "button": "Verificar itens presos",
+                "success": "Verificação de itens presos iniciada."
             },
             "TrigPollSite": {
-                "label": ""
+                "label": "Sondador do site"
+            },
+            "TrigCFSyncSonarr": {
+                "label": "Sincronização de perfis e formatos Sonarr",
+                "button": "Sincronizar todas as instâncias Sonarr",
+                "success": "Sincronização de perfis e formatos Sonarr iniciada."
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "Sincronização de formatos personalizados Sonarr por instância"
             }
         }
+    },
+    "LogFiles": {
+        "titles": {
+            "Name": "Nome do ficheiro",
+            "Age": "Idade",
+            "Bytes": "Bytes",
+            "InUse": "Em utilização",
+            "Mode": "Modo",
+            "Owner": "Proprietário",
+            "Path": "Caminho",
+            "Date": "Data",
+            "FileList": "Lista de ficheiros",
+            "Details": "Detalhes",
+            "FileContent": "Conteúdo do ficheiro",
+            "FollowingFile": "A seguir o ficheiro",
+            "LineCount": "Número de linhas",
+            "OpenFile": "Abrir ficheiro {fileName}",
+            "TailFile": "Seguir ficheiro {fileName}",
+            "Tailing": "A seguir"
+        },
+        "button": {
+            "download": "Transferir",
+            "upload": "Carregar",
+            "delete": "Eliminar",
+            "add": "Adicionar",
+            "reload": "Recarregar",
+            "tooltip": "O botão <b>Transferir</b> transfere o ficheiro para o seu computador. O botão <b>Carregar</b> carrega o ficheiro para o servidor Notifiarr.com. Só os administradores podem ver os ficheiros carregados. O botão <b>Eliminar</b> elimina o ficheiro do disco. Os ficheiros em utilização não podem ser eliminados. Em utilização significa que esta aplicação está a escrever entradas de registo nesse ficheiro."
+        },
+        "Error": "Erro ao carregar o ficheiro de registo: {error}",
+        "DeleteFile": "Eliminar {filePath}",
+        "deleteConfirm": "Tem a certeza de que pretende eliminar este ficheiro? Esta ação não pode ser anulada.",
+        "deleteError": "Erro ao eliminar o ficheiro de registo: {error}",
+        "deleteSuccess": "Ficheiro de registo eliminado: {file}",
+        "uploadError": "Erro ao carregar o ficheiro de registo: {error}",
+        "uploadSuccess": "A carregar o ficheiro de registo: {file}",
+        "NoFileSelected": "Nenhum ficheiro selecionado.",
+        "SelectFile": "Selecione um ficheiro para ver o que contém!",
+        "FilesInDirs": "{fileCount} ficheiros em {dirCount} pastas",
+        "ToggleLinesOrder": "Alternar a ordem das linhas",
+        "ToggleColors": "Alternar as cores predefinidas",
+        "AddMoreLines": "Adicionar mais linhas",
+        "Reload": "Recarregar ficheiro de registo",
+        "Highlight": "Realçar",
+        "ToggleLineWrap": "Alternar a quebra de linha",
+        "FollowTooltip": "Os botões desta coluna seguem ativamente um ficheiro à medida que é escrito.",
+        "Tooltip": "<ol><li>O primeiro botão laranja à esquerda alterna a ordem das linhas do ficheiro. Por predefinição, a ordem é descendente, pela ordem em que são escritas. Clicar no botão inverte o ficheiro. Isto funciona bem ao seguir um ficheiro que está a ser escrito.</li><li>O segundo botão roxo alterna as cores de realce de linha incorporadas. Também gira quando algo está a acontecer.</li><li>O campo numérico indica quantas linhas carregar ou adicionar. Ao seguir um ficheiro, o número limita quantas linhas são apresentadas.</li><li>Clicar no botão Adicionar acrescenta esse número de linhas ao topo do ficheiro, usando a contagem de linhas existente como deslocamento. O botão Adicionar fica desativado em ficheiros em utilização, porque é impossível saber quantas linhas foram escritas desde a última atualização. Ao seguir ficheiros em utilização, o botão Adicionar é substituído por um indicador.</li><li>Clicar no botão Recarregar recarrega o número de linhas a partir do fim do ficheiro.</li><li>Utilize o campo de realce para destacar texto específico.</li><li>O último botão alterna a quebra de linha.</li></ol>"
+    },
+    "Nodal": {
+        "button": {
+            "refresh": "Atualizar dados da página",
+            "fullscreen": "Alternar ecrã inteiro",
+            "raw": "Alternar dados em bruto"
+        },
+        "noResponse": "Sem dados de resposta."
+    },
+    "ProcessList": {
+        "title": "Lista de processos em execução",
+        "error": "Erro ao carregar a lista de processos: {error}",
+        "noData": "Nenhuma lista de processos devolvida.",
+        "footer": "{count} processos encontrados.",
+        "button": {
+            "wrapOn": "Ativar quebra de linha",
+            "wrapOff": "Desativar quebra de linha"
+        }
+    },
+    "ClientInfo": {
+        "title": "Payload de arranque",
+        "error": "Erro ao carregar o payload de arranque: {error}",
+        "noData": "Nenhum payload de arranque devolvido.",
+        "description": "Este é o payload enviado ao cliente por Notifiarr.com quando arrancou. Contém a configuração do cliente e outra informação."
+    },
+    "Integrations": {
+        "titles": {
+            "Size": "Tamanho",
+            "DashboardAge": "Idade do painel",
+            "CacheAge": "Idade da cache",
+            "StatusAge": "Idade do estado",
+            "Version": "Versão",
+            "Branch": "Ramo",
+            "BuildTime": "Hora da compilação"
+        },
+        "DriveData": {
+            "title": "Dados dos discos",
+            "driveInformation": {
+                "title": "Informação do disco"
+            },
+            "mdStatRaid": {
+                "title": "RAID MDStat"
+            },
+            "titles": {
+                "Drive": "Disco",
+                "Temp": "Temp.",
+                "Health": "Saúde",
+                "Age": "Idade",
+                "Setting": "Definição",
+                "Value": "Valor"
+            }
+        },
+        "Snapshot": {
+            "title": "Dados de Snapshot em bruto",
+            "Age": "Idade do Snapshot",
+            "Data": "Dados do Snapshot",
+            "Latest": "Snapshot mais recente",
+            "System": "Snapshot do sistema",
+            "titles": {
+                "CPUPercent": "Percentagem de CPU",
+                "MemoryFree": "Memória livre",
+                "MemoryUsed": "Memória utilizada",
+                "MemoryTotal": "Memória total",
+                "UserCPUTime": "Tempo de CPU em modo de utilizador",
+                "SystemCPUTime": "Tempo de CPU em modo de sistema",
+                "IdleCPUTime": "Tempo de CPU ocioso",
+                "NvidiaGPUs": "GPUs Nvidia",
+                "MySQLServers": "Servidores MySQL",
+                "IPMISensors": "Sensores IPMI",
+                "Synology": "Synology",
+                "RaidConfigs": "Configurações RAID",
+                "ZFSPools": "Pools ZFS",
+                "Processes": "Processos",
+                "DriveTemps": "Temperaturas dos discos",
+                "DriveHealth": "Saúde dos discos",
+                "DiskUsage": "Utilização de disco",
+                "DiskQuotas": "Quotas de disco",
+                "IOTop": "IO Top",
+                "IOStat": "IO Stat",
+                "IOStat2": "IO Stat 2"
+            }
+        },
+        "starrTitles": {
+            "QueueAge": "Idade da fila",
+            "QueueSize": "Tamanho da fila",
+            "Elapsed": "Decorrido",
+            "Shows": "Séries",
+            "Episodes": "Episódios",
+            "Movies": "Filmes",
+            "Books": "Livros",
+            "Editions": "Edições",
+            "Tracks": "Faixas",
+            "Artists": "Artistas",
+            "OnDisk": "Em disco",
+            "Missing": "Em falta"
+        },
+        "downloadTitles": {
+            "Downloads": "Transferências",
+            "Incomplete": "Incompletas",
+            "Downloading": "A transferir",
+            "Paused": "Em pausa",
+            "TotalSize": "Tamanho total",
+            "Errors": "Erros",
+            "Downloaded": "Transferido",
+            "Uploading": "A enviar",
+            "Uploaded": "Enviado",
+            "Seeding": "A semear",
+            "Month": "Mês",
+            "Week": "Semana",
+            "Day": "Dia"
+        },
+        "lidarrDashboard": {
+            "title": "Painel em bruto do Lidarr"
+        },
+        "radarrDashboard": {
+            "title": "Painel em bruto do Radarr"
+        },
+        "readarrDashboard": {
+            "title": "Painel em bruto do Readarr"
+        },
+        "sonarrDashboard": {
+            "title": "Painel em bruto do Sonarr"
+        },
+        "delugeDashboard": {
+            "title": "Painel em bruto do Deluge"
+        },
+        "nzbgetDashboard": {
+            "title": "Painel em bruto do NZBGet"
+        },
+        "qbitDashboard": {
+            "title": "Painel em bruto do QBit"
+        },
+        "rtorrentDashboard": {
+            "title": "Painel em bruto do rTorrent"
+        },
+        "transmissionDashboard": {
+            "title": "Painel em bruto do Transmission"
+        },
+        "sabnzbdDashboard": {
+            "title": "Painel em bruto do SabNZBD"
+        },
+        "sonarrQueue": {
+            "title": "Fila em bruto do Sonarr"
+        },
+        "radarrQueue": {
+            "title": "Fila em bruto do Radarr"
+        },
+        "readarrQueue": {
+            "title": "Fila em bruto do Readarr"
+        },
+        "lidarrQueue": {
+            "title": "Fila em bruto do Lidarr"
+        },
+        "prowlarrStatus": {
+            "title": "Informação em bruto do Prowlarr"
+        },
+        "radarrStatus": {
+            "title": "Informação em bruto do Radarr"
+        },
+        "readarrStatus": {
+            "title": "Informação em bruto do Readarr"
+        },
+        "sonarrStatus": {
+            "title": "Informação em bruto do Sonarr"
+        },
+        "lidarrStatus": {
+            "title": "Informação em bruto do Lidarr"
+        },
+        "tautulliStatus": {
+            "title": "Informação em bruto do Tautulli"
+        },
+        "tautulliUsers": {
+            "title": "Utilizadores do Tautulli"
+        },
+        "tautulliUsersJson": {
+            "title": "Utilizadores do Tautulli em bruto"
+        },
+        "plexStatus": {
+            "title": "Informação do Plex Media Server"
+        },
+        "plexSessions": {
+            "title": "Sessões atuais do Plex Media Server",
+            "footer": "A mostrar as sessões atuais do Plex, não os dados em cache. Consulte a janela de JSON em bruto para ver os dados em cache."
+        },
+        "plexSessionsJson": {
+            "title": "Sessões do Plex Media Server em bruto"
+        },
+        "mediaTitles": {
+            "Country": "País",
+            "PushNotifications": "Notificações push",
+            "PlexPass": "Plex Pass",
+            "ServerOwner": "Proprietário do servidor",
+            "Sessions": "Sessões",
+            "SessionsAge": "Idade das sessões",
+            "Users": "Utilizadores",
+            "User": "Utilizador",
+            "PlexUsername": "Nome de utilizador do Plex",
+            "CustomName": "Nome personalizado",
+            "Email": "E-mail",
+            "Session": "Sessão",
+            "Complete": "Concluído",
+            "Encoding": "Codificação",
+            "Title": "Título"
+        },
+        "phrases": {
+            "NoCachedSessions": "Nenhuma sessão em cache.",
+            "NoPlexData": "Não há dados da integração Plex.",
+            "StateForTime": "{state} há {timeDuration}"
+        }
+    },
+    "Languages": {
+        "menuTitle": "Ajuda do idioma",
+        "title": "Suporte de localização",
+        "body": "Esta aplicação está disponível em vários idiomas. Pode mudar o idioma ao clicar no seletor de idioma no menu do perfil. Alguns idiomas não têm tradutores ativos, por isso algumas traduções podem estar incompletas. Se quiser ajudar a traduzir a aplicação, <a href=\"https://notifiarr.com/discord\" target=\"_blank\">visite-nos no Discord</a>. Entre no canal <code>#role-request</code> e escreva <code>!roleTranslate</code>. Isso dá acesso ao canal <code>#translate</code>. Junte-se lá e manifeste o seu interesse."
+    },
+    "ApiDocs": {
+        "Choose": "Escolha uma API para ver",
+        "Contrast": "Comunique quaisquer problemas de contraste nesta página.",
+        "BasePath": "<b>Caminho base</b>: <code>{basePath}</code>",
+        "api": {
+            "title": "API privada ({basePath})",
+            "body": "Esta é a especificação da API do site Notifiarr.com. O site utiliza esta API para interagir com o cliente."
+        },
+        "ui": {
+            "title": "Interface web ({basePath})",
+            "body": "Esta especificação descreve os métodos utilizados pela interface do cliente Notifiarr para interagir com o back-end. Está a utilizar a interface neste momento."
+        }
+    },
+    "TestAllInstances": {
+        "title": "Testar todas as instâncias",
+        "Instance": "Instância",
+        "Message": "Mensagem",
+        "Status": "Estado",
+        "Updated": "<b>Teste atualizado</b>: <code>{timeDuration}</code>",
+        "TestElapsed": "<b>Tempo do teste</b>: <code>{timeDuration}</code>",
+        "Concurrency": "<b>Concorrência</b>: <code>{workerCount}</code>",
+        "Tested": "<b>Instâncias testadas</b>: <code>{testCount}</code>",
+        "clickRefresh": "Clique no botão de atualizar, no canto superior direito, para testar novamente.",
+        "footer": "Utilize esta ferramenta de diagnóstico para verificar se todas as instâncias estão acessíveis e corretamente configuradas. O tempo limite está fixo em 15 segundos, próximo do tempo que o site espera por uma resposta."
+    },
+    "FileBrowser": {
+        "tooltip": {
+            "Go": "<code>cd {path}</code><br />Mudar para o caminho indicado.",
+            "SelectPath": "Selecionar caminho: <code>{path}</code>",
+            "Up": "<code>cd ..</code><br />Mudar para a pasta superior."
+        },
+        "FilterFiles": "Filtrar ficheiros",
+        "CreateFileIn": "O ficheiro será criado no caminho: <code>{path}</code>",
+        "CreateFolderIn": "A pasta será criada no caminho: <code>{path}</code>",
+        "Files": "Ficheiros: {count}",
+        "Folders": "Pastas: {count}",
+        "FilesFiltered": "Ficheiros: {count}, filtrados: {filtered}",
+        "FoldersFiltered": "Pastas: {count}, filtradas: {filtered}",
+        "Selected": "Selecionado: <code>{path}</code>",
+        "Created": "Criado: {path}",
+        "Creating": "A criar...",
+        "InvalidPath": "Caminho inválido. Não inclua barras (<code>/</code> ou <code>\\</code>).",
+        "FilterFilesDesc": "Utilize o filtro de ficheiros para pesquisar rapidamente a lista de ficheiros apresentados. É útil em pastas com muitos ficheiros. Utilize o botão <code>Menu</code> para criar uma nova pasta ou um novo ficheiro. Para selecionar um ficheiro que não existe, escreva-o na barra <code>Caminho</code> e clique no botão de visto verde. Em alternativa, utilize o item de menu <code>Criar ficheiro</code> para o criar."
+    },
+    "Plex": {
+        "URLNotConfigured": "O URL do Plex não está configurado. <go-to page=\"mediaApps\" subPage=\"plex\">Configure aqui</go-to>.",
+        "TokenNotConfigured": "O token do Plex não está configurado. <go-to page=\"mediaApps\" subPage=\"plex\">Configure aqui</go-to>.",
+        "Disabled": "O Plex está desativado administrativamente. <go-to page=\"mediaApps\" subPage=\"plex\">Ative aqui</go-to>.",
+        "WaitingForWebhooks": "A aguardar webhooks do Plex...",
+        "WebhooksReceived": "Webhooks recebidos: <code>{count}</code>",
+        "NoStatus": "Não há informação do Plex Media Server em cache. Isto pode significar que o URL ou o token do Plex é inválido, ou que o tempo limite é demasiado curto. Consulte os <go-to page=\"logFiles\">registos da aplicação</go-to> para mais informação.",
+        "WebhookNote": "<p>Já <a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">configurou o webhook do Plex</a>?</p><p>Se o contador de webhooks não aumentar quando pausa e reproduz um conteúdo, tente reiniciar o Plex Media Server. Se isso não resultar, verifique os <go-to page=\"logFiles\">registos HTTP</go-to> à procura de pedidos inválidos. Se não vir nenhum, pode significar que o URL do webhook configurado no Plex está errado. Deve ter este aspeto: <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>, mas pode não ser exato e depende da configuração do servidor.</p> Alguns fornecedores de Internet bloqueiam o acesso ao URI <code>{urlbase}plex</code>, por isso esta aplicação também aceita um webhook do Plex no URI <code>{urlbase}</code> e em <code>{urlbase}api/plex/post</code>. Oferecemos versatilidade para garantir notificações estáveis.",
+        "WebsiteSettings": "Definições do site",
+        "AccountMap": "Mapa de contas",
+        "ActivityDelay": "Atraso da atividade",
+        "WebhookCoolDown": "Tempo de espera do webhook",
+        "SessionsInterval": "Intervalo das sessões",
+        "MoviesFinished": "Filmes concluídos",
+        "SeriesFinished": "Séries concluídas",
+        "NoActivity": "Sem atividade"
     }
 }
