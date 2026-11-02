@@ -1,1488 +1,1869 @@
 {
     "phrases": {
-        "NameInUseByInstance": "",
-        "ConfirmReloadBody": "",
-        "New": "",
-        "Invalid": "",
+        "NameInUseByInstance": "Ta nazwa jest używana przez instancję {number}.",
+        "ConfirmReloadBody": "Na pewno chcesz wczytać klienta ponownie?",
+        "New": "Nowe",
+        "Invalid": "Nieprawidłowe",
         "Landing": {
-            "SelectASection": "",
-            "Welcome": ""
+            "SelectASection": "Wybierz sekcję z menu nawigacji, aby zacząć.",
+            "Welcome": "Witaj, {username}!"
         },
-        "UpdatingBackEnd": "",
-        "TryRefreshingThePage": "",
-        "Version": "",
-        "Every12Hours": "",
-        "Every6Hours": "",
-        "Every3Hours": "",
-        "Reloading": "",
-        "FailedToReload": "",
-        "ReloadSuccess": "",
-        "ReloadCheckTimedOut": "",
-        "ConfirmShutdown": "",
-        "ConfirmShutdownBody": "",
-        "ShutdownSuccess": "",
-        "FailedToShutdown": "",
-        "LoginHelp": "",
-        "Changed": "",
-        "DeleteInstance": "",
-        "DeletedNumber": "",
-        "ItsGone": "",
-        "URLMustBeginWithHttp": "",
-        "NameMustNotBeEmpty": "",
-        "ERROR": "",
-        "LoggingIn": "",
-        "LoggedIn": "",
-        "UpdateBackend": "",
-        "Loading": "",
-        "BackEndUpdated": "",
-        "FailedToUpdateBackEnd": "",
-        "ConfigurationSavedReloading": "",
-        "ConfigurationSaved": "",
-        "SavingConfiguration": "",
-        "ConfirmReload": "",
-        "HostMustNotBeEmpty": "",
-        "UsernameMustNotBeEmpty": "",
-        "APIKeyMustBeCountCharactersOrLonger": "",
-        "TokenMustBeCountCharacters": "",
-        "LeavePage": "",
-        "LoginHelpBody": ""
+        "UpdatingBackEnd": "Aktualizowanie backendu...",
+        "TryRefreshingThePage": "Spróbuj odświeżyć stronę.",
+        "Version": "Wersja {version}",
+        "Every12Hours": "Co 12 godzin",
+        "Every6Hours": "Co 6 godzin",
+        "Every3Hours": "Co 3 godziny",
+        "Reloading": "Ponowne wczytywanie...",
+        "FailedToReload": "Nie udało się wczytać ponownie: {error}",
+        "ReloadSuccess": "Ponowne wczytanie się udało! Klient został wczytany ponownie.",
+        "ReloadCheckTimedOut": "Sprawdzenie ponownego wczytania serwera przekroczyło limit czasu po 20 próbach",
+        "ConfirmShutdown": "Potwierdź wyłączenie",
+        "ConfirmShutdownBody": "Na pewno chcesz wyłączyć klienta? Musisz uruchomić go ponownie na hoście, na którym działa.",
+        "ShutdownSuccess": "Wyłączenie się udało! Klient został zatrzymany.",
+        "FailedToShutdown": "Nie udało się wyłączyć: {error} - spróbuj odświeżyć stronę.",
+        "LoginHelp": "Pomoc przy logowaniu",
+        "Changed": "Zmieniono",
+        "DeleteInstance": "Usuń instancję",
+        "DeletedNumber": "Usunięto {number}",
+        "ItsGone": "Już zniknęło! Nie zapomnij zapisać.",
+        "URLMustBeginWithHttp": "URL musi zaczynać się od http:// lub https://",
+        "NameMustNotBeEmpty": "Nazwa nie może być pusta.",
+        "ERROR": "BŁĄD",
+        "LoggingIn": "Logowanie...",
+        "LoggedIn": "Zalogowano!",
+        "UpdateBackend": "Aktualizuj backend",
+        "Loading": "Wczytywanie...",
+        "BackEndUpdated": "Backend zaktualizowano {timeDuration} temu.",
+        "FailedToUpdateBackEnd": "Nie udało się zaktualizować backendu: {error}",
+        "ConfigurationSavedReloading": "Konfiguracja zapisana! Ponowne wczytywanie klienta...",
+        "ConfigurationSaved": "Konfiguracja zapisana {timeDuration} temu!",
+        "SavingConfiguration": "Zapisywanie konfiguracji...",
+        "ConfirmReload": "Potwierdź ponowne wczytanie",
+        "HostMustNotBeEmpty": "Host nie może być pusty.",
+        "UsernameMustNotBeEmpty": "Nazwa użytkownika nie może być pusta.",
+        "APIKeyMustBeCountCharactersOrLonger": "Liczba znaków klucza API musi wynosić co najmniej {count}.",
+        "TokenMustBeCountCharacters": "Liczba znaków tokenu musi wynosić co najmniej {count}.",
+        "LeavePage": "Naprawdę chcesz opuścić tę stronę?",
+        "LoginHelpBody": "Jeśli logujesz się po raz pierwszy, użyj adresu e-mail i hasła z notifiarr.com. Lokalne hasło możesz ustawić po zalogowaniu. Jeśli nie pamiętasz lokalnego hasła, zajrzyj na stronę wiki <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">zapomniane hasła</a>.",
+        "ToggleSpoilerVisibility": "Kliknij, aby przełączyć widoczność spoilera.",
+        "EnvironmentVariable": "Nazwa zmiennej środowiskowej: <code>{variableName}</code>",
+        "VariableDescription": "<span class=\"text-warning\">Uwaga:</span> Ta wartość konfiguracji pochodzi ze zmiennej środowiskowej. Zmiana tutaj zapisze nową wartość do pliku konfiguracji, ale nie zacznie obowiązywać. Przy następnym kliknięciu Zapisz zostanie zastąpiona. Zmień tę wartość, zmieniając zmienną środowiskową albo usuwając ją ze środowiska.",
+        "EveryDuration": "Co {timeDuration}",
+        "APIKeyMustBeCountCharacters": "Liczba znaków klucza API musi wynosić {count}.",
+        "InvalidAPIKey": "Nieprawidłowy klucz API Notifiarr — zaktualizuj go w Konfiguracji.",
+        "ShowMore": "Pokaż więcej informacji",
+        "ShowPassword": "Pokaż hasło",
+        "HidePassword": "Ukryj hasło",
+        "CheckInstance": "Sprawdź instancję",
+        "ValidateSSL": "Weryfikuj certyfikat SSL",
+        "RunAsShell": "Uruchom jako polecenie powłoki",
+        "FollowRedirects": "Podążaj za przekierowaniami",
+        "BrowseFiles": "Przeglądaj pliki",
+        "APIKey": {
+            "title": "Podaj klucz API",
+            "placeholder": "Globalny klucz API z notifiarr.com",
+            "setMsg": "Klucz API został ustawiony!",
+            "Setting": "Ustawianie klucza API...",
+            "description": "Klient Notifiarr wymaga prawidłowego klucza API. Ten klucz służy do uwierzytelniania na stronie Notifiarr, żeby odbierać aktualizacje i wysyłać powiadomienia. Bez niego klient nie działa, więc wpisz klucz API poniżej."
+        }
     },
     "navigation": {
         "titles": {
-            "Settings": "",
-            "Insights": "",
-            "Configuration": "",
-            "SiteTunnel": "",
-            "StarrApps": "",
-            "Downloaders": "",
-            "MediaApps": "",
-            "SnapshotApps": "",
-            "FileWatcher": "",
-            "Integrations": "",
-            "Monitoring": "",
-            "Metrics": "",
-            "LogFiles": "",
-            "System": "",
-            "TrustProfile": "",
-            "Landing": "",
-            "UnsavedChanges": "",
-            "Endpoints": "",
-            "Commands": "",
-            "Services": "",
-            "Actions": ""
+            "Settings": "Ustawienia",
+            "Insights": "Analizy",
+            "Configuration": "Konfiguracja",
+            "SiteTunnel": "Tunel witryny",
+            "StarrApps": "Aplikacje Starr",
+            "Downloaders": "Aplikacje pobierania",
+            "MediaApps": "Aplikacje multimedialne",
+            "SnapshotApps": "Aplikacje Snapshot",
+            "FileWatcher": "Obserwator plików",
+            "Integrations": "Integracje",
+            "Monitoring": "Monitorowanie",
+            "Metrics": "Metryki",
+            "LogFiles": "Pliki dziennika",
+            "System": "System",
+            "TrustProfile": "Profil zaufania",
+            "Landing": "Strona główna Notifiarr",
+            "UnsavedChanges": "Niezapisane zmiany",
+            "Endpoints": "Punkty końcowe",
+            "Commands": "Polecenia",
+            "Services": "Usługi",
+            "Actions": "Akcje",
+            "Plex": "Webhooki Plex",
+            "ApiDocs": "Dokumentacja API klienta"
         },
         "pageDescription": {
-            "Services": "",
-            "Integrations": "",
-            "Monitoring": "",
-            "Landing": "",
-            "Configuration": "",
-            "StarrApps": "",
-            "Downloaders": "",
-            "MediaApps": "",
-            "SnapshotApps": "",
-            "FileWatcher": "",
-            "Endpoints": "",
-            "Commands": "",
-            "Metrics": "",
-            "LogFiles": "",
-            "System": "",
-            "TrustProfile": "",
-            "SiteTunnel": "",
-            "Actions": ""
+            "Services": "Aplikacja klienta Notifiarr potrafi monitorować usługi przez sprawdzenia HTTP, sprawdzenia portów TCP albo sprawdzenia, czy proces działa (albo nie działa). <b>Sprawdzanie kondycji klienta współpracuje z integracją sieciową Notifiarr.com.</b>",
+            "Integrations": "Ta strona pokazuje dane, które ta aplikacja kliencka trzyma w pamięci dla skonfigurowanych integracji.",
+            "Monitoring": "Zobacz wyniki sprawdzania kondycji usług i sieci.",
+            "Landing": "To najlepsze miejsce na Ziemi!",
+            "Configuration": "Tutaj konfigurujesz ustawienia klienta Notifiarr.",
+            "StarrApps": "Skonfiguruj integracje Starr.",
+            "Downloaders": "Zarządzaj klientami pobierania.",
+            "MediaApps": "Zarządzaj odtwarzaczami multimediów i powiązanymi usługami.",
+            "SnapshotApps": "Większość konfiguracji Snapshot jest na stronie Notifiarr.com. Poniżej znajdziesz ustawienia „wtyczek” aplikacji dla funkcji Snapshot.",
+            "FileWatcher": "Obserwuj zmiany plików i uruchamiaj akcje! Ten klient Notifiarr może obserwować pliki dziennika i szukać wierszy pasujących do wyrażenia regularnego. Działa to podobnie do <code>tail -f file | grep string</code> i pozwala wysyłać powiadomienia, gdy na przykład w pliku dziennika pojawi się nowy wiersz pasujący do wyrażenia regularnego.",
+            "Endpoints": "Skonfiguruj adresy URL punktów końcowych przekaźnika i ich harmonogramy.",
+            "Commands": "Skonfiguruj i uruchamiaj własne polecenia i skrypty.",
+            "Metrics": "Zobacz sumy metryk konfiguracji klienta.",
+            "LogFiles": "Przeglądaj, śledź, pobieraj i wysyłaj pliki dziennika klienta.",
+            "System": "Zobacz informacje o systemie i kliencie.",
+            "TrustProfile": "Skonfiguruj sposób logowania do tej aplikacji klienta Notifiarr.",
+            "SiteTunnel": "Ten klient utrzymuje stałe połączenie websocket z notifiarr.com przez <a href=\"https://github.com/golift/mulery\" target=\"_blank\">tunel Mulery</a>. Ten tunel pozwala witrynie wysyłać żądania do twojego klienta bez otwierania portu i bez stałego adresu IP. Na tej stronie wybierasz tunel główny oraz tunel zapasowy na wypadek, gdy główny stanie się niedostępny.",
+            "Actions": "Tutaj znajdziesz wewnętrzne akcje klienta Notifiarr. Uruchamiają je zegary, harmonogramy i zdarzenia ze strony albo z czatu. Zwykle służą do diagnostyki, ale możesz uruchomić je ręcznie w tym interfejsie.",
+            "Plex": "Informacje do rozwiązywania problemów z webhookami Plex."
         }
     },
     "words": {
         "instance-options": {
             "timeout": {
-                "label": "",
-                "description": ""
+                "label": "Limit czasu żądania",
+                "description": "Jak długo czekać na odpowiedź instancji."
             },
             "validSsl": {
-                "label": "",
-                "description": ""
+                "label": "Weryfikuj certyfikat SSL",
+                "description": "Zaznaczenie sprawia, że klient sprawdza, czy instancja używa prawidłowego certyfikatu SSL."
             },
             "interval": {
-                "label": "",
-                "description": ""
+                "label": "Interwał sprawdzania kondycji",
+                "description": "Jak często sprawdzać dostępność instancji."
             },
             "deletes": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "countPerHour": ""
+                "label": "Usuń treść",
+                "description": "Ogranicza liczbę żądań usunięcia, które można wysłać do tej instancji w ciągu godziny.",
+                "tooltip": "Określa, ile żądań usunięcia jest dozwolonych na godzinę. Wartość 0 wyłącza możliwość wysyłania żądań usunięcia. Dotyczy usuwania multimediów, ale może obejmować też inne działania. To ograniczenie ma powstrzymać napastników przed zniszczeniem twoich treści.",
+                "countPerHour": "{count} na godzinę"
             }
         },
         "select-option": {
-            "Enabled": "",
-            "Disabled": "",
-            "minute": "",
-            "minutes": "",
-            "hour": "",
-            "hours": "",
-            "second": "",
-            "seconds": "",
-            "megabytes": "",
-            "bytes": "",
-            "Off": "",
-            "Daily": "",
-            "custom": "",
-            "InstanceDisabled": "",
-            "NoTimeout": "",
-            "ChecksDisabled": ""
+            "Enabled": "Włączone",
+            "Disabled": "Wyłączone",
+            "minute": "minuta",
+            "minutes": "minuty",
+            "hour": "godzina",
+            "hours": "godziny",
+            "second": "sekunda",
+            "seconds": "sekundy",
+            "megabytes": "megabajty",
+            "bytes": "bajty",
+            "Off": "Wył.",
+            "Daily": "Codziennie",
+            "custom": "niestandardowy",
+            "InstanceDisabled": "Instancja wyłączona",
+            "NoTimeout": "Bez limitu czasu",
+            "ChecksDisabled": "Sprawdzanie wyłączone",
+            "Information": "Informacje"
         },
         "clock": {
             "days": {
-                "Sunday": "",
-                "Monday": "",
-                "Tuesday": "",
-                "Wednesday": "",
-                "Thursday": "",
-                "Friday": "",
-                "Saturday": ""
+                "Sunday": "Niedziela",
+                "Monday": "Poniedziałek",
+                "Tuesday": "Wtorek",
+                "Wednesday": "Środa",
+                "Thursday": "Czwartek",
+                "Friday": "Piątek",
+                "Saturday": "Sobota"
             },
             "short": {
-                "ms": "",
-                "s": "",
-                "m": "",
-                "h": "",
-                "d": "",
-                "w": ""
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
+                "m": "{minutes}min",
+                "h": "{hours}godz",
+                "d": "{days}d",
+                "w": "{weeks}tyg"
             },
-            "ago": "",
-            "format": ""
+            "ago": "{timeDuration} temu",
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}"
         },
         "bytes": {
             "short": {
-                "B": "",
-                "KB": "",
-                "MB": "",
-                "GB": "",
-                "TB": ""
+                "B": "{bytes} B",
+                "KB": "{bytes} KB",
+                "MB": "{bytes} MB",
+                "GB": "{bytes} GB",
+                "TB": "{bytes} TB"
             }
         }
     },
     "system": {
         "UserInformation": {
-            "Patron": "",
-            "title": "",
-            "YesYesYouAre": "",
-            "HellaAwesome": "",
-            "YoureSoGifted": "",
-            "Subscriber": "",
-            "AbsoluteBadAss": "",
-            "DateFormat": ""
+            "Patron": "Patron",
+            "title": "Informacje o użytkowniku",
+            "YesYesYouAre": "Tak, właśnie tak! 💚",
+            "HellaAwesome": "Mega ekstra",
+            "YoureSoGifted": "Masz niesamowity talent i kochamy cię! 💜",
+            "Subscriber": "Subskrybent",
+            "AbsoluteBadAss": "Absolutny kozak",
+            "DateFormat": "Format daty",
+            "InvalidAPIKey": "Nie zalogowano do Notifiarr; klucz API został odrzucony."
         },
         "BuildInformation": {
-            "BuildUser": "",
-            "Branch": "",
-            "title": "",
-            "BuildDate": "",
-            "GoVersion": "",
-            "Integrity": ""
+            "BuildUser": "Użytkownik kompilacji",
+            "Branch": "Gałąź",
+            "title": "Informacje o kompilacji",
+            "BuildDate": "Data kompilacji",
+            "GoVersion": "Wersja Go",
+            "Integrity": "Integralność"
         },
         "StorageData": {
-            "Used": "",
-            "Free": "",
-            "ro": "",
-            "title": "",
-            "Total": "",
-            "FS": ""
+            "Used": "Zajęte",
+            "Free": "Wolne",
+            "ro": "ro",
+            "title": "Dane dysków",
+            "Total": "Razem",
+            "FS": "FS",
+            "Device": "Urządzenie",
+            "Mount": "Punkt montowania"
         },
         "StartupParams": {
-            "ConfigFile": "",
-            "EnvironmentPrefix": "",
-            "ExtraConfigFiles": "",
-            "CustomAssets": "",
-            "UserID": "",
-            "GroupID": "",
-            "IPAddress": "",
-            "title": "",
-            "BinaryPath": ""
+            "ConfigFile": "Plik konfiguracji",
+            "EnvironmentPrefix": "Prefiks środowiska",
+            "ExtraConfigFiles": "Dodatkowe pliki konfiguracji",
+            "CustomAssets": "Własne zasoby",
+            "UserID": "ID użytkownika",
+            "GroupID": "ID grupy",
+            "IPAddress": "Adres IP",
+            "title": "Parametry uruchomienia",
+            "BinaryPath": "Ścieżka pliku binarnego"
         },
         "ClientInformation": {
-            "Application": "",
-            "Version": "",
-            "Started": "",
-            "title": "",
-            "Uptime": ""
+            "Application": "Aplikacja",
+            "Version": "Wersja",
+            "Started": "Uruchomiono",
+            "title": "Informacje o kliencie",
+            "Uptime": "Czas działania"
         },
         "NetworkInformation": {
-            "Interface": "",
-            "title": "",
-            "IPAddress": "",
-            "Gateway": "",
-            "Netmask": ""
+            "Interface": "Interfejs",
+            "title": "Informacje o sieci",
+            "IPAddress": "Adres IP",
+            "Gateway": "Brama",
+            "Netmask": "Maska sieci"
         },
         "OperatingSystem": {
-            "title": "",
-            "Hostname": "",
-            "UniqueID": "",
-            "Platform": "",
-            "KernelVersion": "",
-            "VirtualizationSystem": ""
+            "title": "System operacyjny",
+            "Hostname": "Nazwa hosta",
+            "UniqueID": "Unikalny ID",
+            "Platform": "Platforma",
+            "KernelVersion": "Wersja jądra",
+            "VirtualizationSystem": "System wirtualizacji"
         },
         "EnvironmentVariables": {
-            "title": ""
+            "title": "Zmienne środowiskowe"
         }
     },
     "StarrApps": {
         "Radarr": {
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Radarr.",
+                "placeholder": "własna nazwa do powiadomień"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Radarr",
+            "addInstance": "Dodaj instancję Radarr",
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Radarr.",
+                "placeholder": "http://radarr.server.tv:7878"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Klucz API",
+                "description": "Klucz API instancji Radarr.",
+                "placeholder": "radarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Radarr.",
+                "placeholder": "admin",
+                "tooltip": "Nazwa użytkownika i hasło są potrzebne tylko wtedy, gdy chcesz sprawdzać kopie zapasowe bazy danych, bo nie da się ich pobrać przez API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Radarr.",
+                "placeholder": "hasło"
             }
         },
         "Sonarr": {
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Klucz API",
+                "description": "Klucz API instancji Sonarr.",
+                "placeholder": "sonarr-api-key"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Sonarr.",
+                "placeholder": "http://sonarr.server.tv:8989"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Sonarr",
+            "addInstance": "Dodaj instancję Sonarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Sonarr.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Sonarr.",
+                "placeholder": "admin",
+                "tooltip": "Nazwa użytkownika i hasło są potrzebne tylko wtedy, gdy chcesz sprawdzać kopie zapasowe bazy danych, bo nie da się ich pobrać przez API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Sonarr.",
+                "placeholder": "hasło"
             }
         },
         "Lidarr": {
             "apiKey": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "Klucz API instancji Lidarr.",
+                "placeholder": "lidarr-api-key",
+                "label": "Klucz API"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Lidarr.",
+                "placeholder": "admin",
+                "tooltip": "Nazwa użytkownika i hasło są potrzebne tylko wtedy, gdy chcesz sprawdzać kopie zapasowe bazy danych, bo nie da się ich pobrać przez API."
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Lidarr",
+            "addInstance": "Dodaj instancję Lidarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Lidarr.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Lidarr.",
+                "placeholder": "http://lidarr.server.tv:8686"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Lidarr.",
+                "placeholder": "hasło"
             }
         },
         "Prowlarr": {
             "url": {
-                "description": "",
-                "label": "",
-                "placeholder": ""
+                "description": "URL instancji Prowlarr.",
+                "label": "URL",
+                "placeholder": "http://prowlarr.server.tv:9696"
             },
             "username": {
-                "tooltip": "",
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "tooltip": "Nazwa użytkownika i hasło są potrzebne tylko wtedy, gdy chcesz sprawdzać kopie zapasowe bazy danych, bo nie da się ich pobrać przez API.",
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Prowlarr.",
+                "placeholder": "admin"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Prowlarr",
+            "addInstance": "Dodaj instancję Prowlarr",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Prowlarr.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Klucz API",
+                "description": "Klucz API instancji Prowlarr.",
+                "placeholder": "prowlarr-api-key"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Prowlarr.",
+                "placeholder": "hasło"
             }
         },
         "Readarr": {
             "name": {
-                "description": "",
-                "label": "",
-                "placeholder": ""
+                "description": "Nazwa instancji Readarr.",
+                "label": "Nazwa instancji",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Klucz API",
+                "description": "Klucz API instancji Readarr.",
+                "placeholder": "readarr-api-key"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Readarr",
+            "addInstance": "Dodaj instancję Readarr",
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Readarr.",
+                "placeholder": "http://readarr.server.tv:8787"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Readarr.",
+                "placeholder": "admin",
+                "tooltip": "Nazwa użytkownika i hasło są potrzebne tylko wtedy, gdy chcesz sprawdzać kopie zapasowe bazy danych, bo nie da się ich pobrać przez API."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Readarr.",
+                "placeholder": "hasło"
             }
         }
     },
     "config": {
         "titles": {
-            "Services": "",
-            "Logging": "",
-            "Dark": "",
-            "Light": "",
-            "Configuration": "",
-            "General": "",
-            "Network": "",
-            "System": "",
-            "WatchFile": "",
-            "Endpoint": "",
-            "Command": "",
-            "SSLConfiguration": ""
+            "Services": "Usługi",
+            "Logging": "Dziennik",
+            "Dark": "Ciemny",
+            "Light": "Jasny",
+            "Configuration": "Konfiguracja",
+            "General": "Ogólne",
+            "Network": "Sieć",
+            "System": "System",
+            "WatchFile": "Obserwuj plik",
+            "Endpoint": "Punkt końcowy",
+            "Command": "Polecenie",
+            "SSLConfiguration": "Konfiguracja SSL"
         },
         "debug": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Dziennik debugowania",
+            "description": "Włącz lub wyłącz dziennik debugowania.",
+            "tooltip": "Włączenie debugowania zapisze do dziennika znacznie więcej danych. Użyj ustawienia maksymalnego rozmiaru treści, aby ograniczyć wielkość ładunków."
         },
         "quiet": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Cichy dziennik",
+            "description": "Włącz lub wyłącz cichy dziennik.",
+            "tooltip": "Włączenie trybu cichego sprawia, że aplikacja nic nie wypisuje na stdout. Przydaje się, gdy plik dziennika jest włączony i nie chcesz, żeby dziennik zalewał też demona startowego."
         },
         "logFile": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Plik dziennika aplikacji",
+            "description": "Ścieżka do pliku lub folderu dziennika aplikacji.",
+            "placeholder": "/path/to/notifiarr.log",
+            "tooltip": "Jeśli podasz folder bez nazwy pliku, aplikacja utworzy w nim plik o nazwie Notifiarr.log."
         },
         "services": {
             "disabled": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Sprawdzanie kondycji",
+                "description": "Włącz lub wyłącz sprawdzanie kondycji.",
+                "tooltip": "Tutaj wyłączasz albo włączasz monitorowanie wszystkich sprawdzeń kondycji."
             },
             "interval": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Interwał aktualizacji",
+                "description": "Interwał aktualizacji sprawdzania kondycji.",
+                "tooltip": "Określa, jak często zbiorcze wyniki sprawdzania kondycji są wysyłane do Notifiarr.com. Jeśli stan sprawdzenia się zmieni, wynik jest zawsze wysyłany od razu."
             },
             "logFile": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "placeholder": ""
+                "label": "Plik dziennika usług",
+                "description": "Ścieżka do pliku lub folderu dziennika usług.",
+                "tooltip": "Plik dziennika służy do przechowywania wyników sprawdzania kondycji. Jeśli zostawisz to puste, wynik sprawdzania kondycji trafia do pliku dziennika aplikacji. Jeśli podasz folder bez nazwy pliku, aplikacja utworzy w nim plik o nazwie Notifiarr.services.log.",
+                "placeholder": "/path/to/services-notifiarr.log"
             }
         },
         "command": {
             "name": {
-                "label": "",
-                "description": "",
-                "required": ""
+                "label": "Nazwa",
+                "description": "Nazwa polecenia.",
+                "required": "Polecenie jest wymagane."
             }
         },
         "service": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Nazwa",
+                "description": "Nazwa usługi."
             }
         },
         "autoUpdate": {
-            "description": "",
-            "tooltip": "",
-            "label": ""
+            "description": "Jak często aplikacja sprawdza aktualizacje. Gdy jakąś znajdzie, zainstaluje ją automatycznie.",
+            "tooltip": "Działa tylko w systemie Windows.",
+            "label": "Automatyczna aktualizacja"
         },
         "unstableCh": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Kanał niestabilny",
+            "description": "Włączenie kanału niestabilnych aktualizacji sprawi, że aplikacja będzie sprawdzać niestabilną stronę pod kątem automatycznych aktualizacji zamiast GitHub.",
+            "tooltip": "Dostępne tylko dla użytkowników z dostępem deweloperskim."
         },
         "errors": {
-            "InvalidCreds": "",
-            "LoginRequestTimedOut": "",
-            "LoginFailed": "",
-            "ProfileReqTimedOut": "",
-            "AnUnknownErrorOccurred": "",
-            "ConfigUpdateFailed": "",
-            "PleaseEnterBothUsernameAndPassword": ""
+            "InvalidCreds": "Nieprawidłowa nazwa użytkownika lub hasło.",
+            "LoginRequestTimedOut": "Upłynął limit czasu żądania logowania",
+            "LoginFailed": "Logowanie nie powiodło się: {error}",
+            "ProfileReqTimedOut": "Upłynął limit czasu żądania profilu",
+            "AnUnknownErrorOccurred": "Wystąpił nieznany błąd",
+            "ConfigUpdateFailed": "Aktualizacja konfiguracji nie powiodła się: {error}",
+            "PleaseEnterBothUsernameAndPassword": "Wpisz nazwę użytkownika i hasło.",
+            "SetAPIKeyFailed": "Nie udało się ustawić klucza API: {error}"
         },
         "apiKey": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
-            "placeholder": ""
+            "label": "Klucz API",
+            "description": "Klucz API z twojego konta Notifiarr.com.",
+            "tooltip": "Znajdziesz go po zalogowaniu na Notifiarr.com: wejdź w Profil, a potem w Klucze API.",
+            "placeholder": "Wpisz tutaj klucz API"
         },
         "extraKeys": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Dodatkowe klucze",
+            "description": "Dodatkowe klucze API do integracji zewnętrznych. Oddzielaj je nowymi wierszami.",
+            "placeholder": "Po jednym w wierszu..."
         },
         "bindAddr": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Adres nasłuchu",
+            "description": "Adres IP i port, na których aplikacja będzie nasłuchiwać. Użyj 0.0.0.0, aby nasłuchiwać na wszystkich interfejsach.",
+            "placeholder": "0.0.0.0:5454"
         },
         "sslKeyFile": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Plik klucza SSL",
+            "description": "Ścieżka do pliku klucza SSL.",
+            "placeholder": "/path/to/ssl-key.pem",
+            "tooltip": "Ta aplikacja może udostępniać HTTPS. Włącz to, podając ścieżkę pliku certyfikatu i ścieżkę pliku klucza."
         },
         "sslCertFile": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Plik certyfikatu SSL",
+            "description": "Ścieżka do pliku certyfikatu SSL.",
+            "placeholder": "/path/to/ssl-cert.pem",
+            "tooltip": "Ta aplikacja może udostępniać HTTPS. Włącz to, podając ścieżkę pliku certyfikatu i ścieżkę pliku klucza."
         },
         "httpLog": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Plik dziennika HTTP",
+            "description": "Ścieżka do pliku lub folderu dziennika HTTP.",
+            "placeholder": "/path/to/http-notifiarr.log",
+            "tooltip": "Podanie tutaj ścieżki pliku dziennika sprawi, że aplikacja zapisze dzienniki HTTP do osobnego pliku. Format pliku to dziennik apache. Zdecydowanie zalecane. Jeśli podasz folder bez nazwy pliku, aplikacja utworzy w nim plik o nazwie Notifiarr.http.log."
         },
         "debugLog": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Plik dziennika debugowania",
+            "description": "Ścieżka do pliku lub folderu dziennika debugowania.",
+            "placeholder": "/path/to/debug-notifiarr.log",
+            "tooltip": "Podanie tutaj ścieżki pliku dziennika sprawi, że aplikacja zapisze dzienniki debugowania do osobnego pliku. Gdy to pole jest puste, dzienniki debugowania trafiają do pliku dziennika aplikacji. Jeśli podasz folder bez nazwy pliku, aplikacja utworzy w nim plik o nazwie Notifiarr.debug.log."
         },
         "maxBody": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Maksymalny rozmiar treści",
+            "description": "Maksymalny rozmiar treści żądań HTTP.",
+            "tooltip": "Gdy debugowanie jest włączone, to ustawienie ogranicza ilość danych ładunku zapisywanych do dziennika, do Notifiarr.com i z Notifiarr.com."
         },
         "logFileMb": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Rozmiar pliku dziennika",
+            "description": "Maksymalny rozmiar pliku dziennika przed rotacją.",
+            "tooltip": "Gdy rotacja jest włączona (liczba plików dziennika większa niż 1), to ustawienie określa, jak duży musi być plik, aby uruchomić rotację."
         },
         "logFiles": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Liczba plików dziennika",
+            "description": "Liczba przechowywanych plików dziennika.",
+            "tooltip": "Gdy to ustawienie ma wartość 0 lub 1, rotacja plików dziennika jest wyłączona. Dotyczy wszystkich plików dziennika i tyle kopii każdego z nich zostanie na dysku."
         },
         "noUploads": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Blokuj wysyłanie",
+            "description": "<b>Wyłączone</b> pozwala administratorom Notifiarr.com nakazać temu klientowi wysłanie plików dziennika na stronę. <b>Włączone</b> blokuje wysyłanie plików dziennika.",
+            "tooltip": "To ustawienie steruje tym, czy strona Notifiarr.com i administratorzy Notifiarr mogą nakazać temu klientowi wysłanie plików dziennika na stronę. Czasem podczas diagnozowania problemów musimy zobaczyć wpisy dziennika, a ten wyzwalacz pozwala nam kazać klientowi wysłać pliki dziennika aplikacji i debugowania."
         },
         "snapshot": {
             "timeout": {
-                "label": "",
-                "description": ""
+                "label": "Limit czasu",
+                "description": "Limit czasu operacji Snapshot."
             }
         },
         "ui": {
             "darkMode": {
-                "label": "",
-                "description": ""
+                "label": "Tryb ciemny",
+                "description": "Włącz lub wyłącz tryb ciemny."
             },
             "language": {
-                "label": "",
-                "description": ""
+                "label": "Język",
+                "description": "Język interfejsu aplikacji."
             }
         },
         "watchFile": {
             "path": {
-                "label": "",
-                "description": ""
+                "label": "Ścieżka pliku",
+                "description": "Ścieżka pliku do obserwowania."
             }
         },
         "endpoint": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Nazwa",
+                "description": "Nazwa punktu końcowego."
             }
         },
         "urlbase": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Baza URL",
+            "description": "Ta aplikacja domyślnie udostępnia HTTP pod /. Możesz to zmienić, wpisując tutaj coś innego.",
+            "placeholder": "/notifiarr/",
+            "tooltip": "Przykład: /notifiarr/"
         },
         "hostId": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "ID hosta",
+            "description": "Parametr ID hosta jednoznacznie identyfikuje tę instalację klienta.",
+            "tooltip": "Nie zaleca się zmiany tej wartości; powinna zostać znaleziona automatycznie. Nie kopiuj jej do innej instalacji klienta Notifiarr."
         },
         "serial": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Wątki równoległe",
+            "description": "Wyłączenie tego ustawienia sprawi, że aplikacja użyje mniej procedur goroutine (wątków) podczas zbierania danych ze skonfigurowanych aplikacji.",
+            "tooltip": "Rozkłada użycie CPU i zmniejsza zużycie pamięci."
         },
         "retries": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Ponowienia",
+            "description": "Czasem połączenia z Notifiarr.com się nie udają. To określa, ile razy każde żądanie zostanie ponowione w razie niepowodzenia.",
+            "tooltip": "Domyślnie: 4 (wartość 0 oznacza domyślne 4)"
         },
         "apt": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Hak APT",
+            "description": "Pakiety Notifiarr dla Debiana (i Ubuntu) zawierają integrację APT.",
+            "tooltip": "Pakiety Notifiarr dla Debiana (i Ubuntu) zawierają integrację APT. Ta integracja uruchamia się przy każdym poleceniu <b class=\"text-warning\">apt</b>. Aby ją włączyć, ustaw to pole na Włączone, a następnie <b>włącz integrację menedżera pakietów na Notifiarr.com.</b> Ta funkcja nie wymaga działającego klienta; wystarczy zainstalowany pakiet deb klienta. Nie działa na RHEL ani na Linuksie innym niż Debian."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Limit czasu",
+            "description": "To limit czasu żądań API do Notifiarr.com."
         },
         "fileMode": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Tryb uniksowy pliku dziennika",
+            "description": "To uniksowy tryb pliku używany przy zapisie nowych plików dziennika.",
+            "tooltip": "Zalecane wartości w kolejności rosnącej otwartości: 0600, 0640, 0644"
+        },
+        "trace": {
+            "label": "Dziennik śledzenia",
+            "description": "Włącz lub wyłącz dziennik śledzenia.",
+            "tooltip": "Włączenie śledzenia zapisze do dziennika bardzo szczegółowy przebieg wykonania. Używaj do głębokiego debugowania."
         }
     },
     "buttons": {
-        "SaveConfiguration": "",
-        "ResetForm": "",
-        "Execute": "",
-        "HideMenu": "",
-        "ShowMenu": "",
-        "ShowOutput": "",
-        "HideOutput": "",
-        "RefreshOutput": "",
-        "NoStayHere": "",
-        "YesDeleteMyChanges": "",
-        "Login": "",
-        "Confirm": "",
-        "Cancel": "",
-        "Save": "",
-        "Close": "",
-        "SaveChanges": ""
+        "SaveConfiguration": "Zapisz konfigurację",
+        "ResetForm": "Resetuj formularz",
+        "Execute": "Wykonaj",
+        "HideMenu": "Ukryj menu",
+        "ShowMenu": "Pokaż menu",
+        "ShowOutput": "Pokaż wynik",
+        "HideOutput": "Ukryj wynik",
+        "RefreshOutput": "Odśwież wynik",
+        "NoStayHere": "Nie! Zostań tutaj",
+        "YesDeleteMyChanges": "Tak! Usuń moje zmiany",
+        "Login": "Zaloguj",
+        "Confirm": "Potwierdź",
+        "Cancel": "Anuluj",
+        "Save": "Zapisz",
+        "Close": "Zamknij",
+        "SaveChanges": "Zapisz zmiany",
+        "Create": "Utwórz",
+        "Go": "Idź",
+        "Menu": "Menu",
+        "CreateFolder": "Utwórz folder",
+        "CreateFile": "Utwórz plik"
     },
     "Commands": {
-        "description": "",
-        "title": "",
-        "addInstance": "",
-        "DeleteCommand": "",
-        "Executions": "",
-        "Failures": "",
-        "LastExecution": "",
-        "neverExecuted": "",
-        "enterCommandArguments": "",
-        "commandRequiresArguments": "",
-        "noOutput": "",
-        "refreshed": "",
-        "regexMismatch": "",
+        "description": "Polecenia wykonuje klient (backend). Możesz je wyzwolić z tego interfejsu albo z czatu. Jeśli zmienisz polecenie, musisz zapisać konfigurację, zanim uruchomisz je z interfejsu WWW.",
+        "title": "Lista poleceń",
+        "addInstance": "Utwórz polecenie",
+        "DeleteCommand": "Usuń polecenie",
+        "Executions": "Wykonania: {count}",
+        "Failures": "Niepowodzenia: {count}",
+        "LastExecution": "Ostatnie wykonanie",
+        "neverExecuted": "nigdy niewykonane",
+        "enterCommandArguments": "Wpisz argumenty polecenia",
+        "commandRequiresArguments": "To polecenie wymaga {count, plural, one {# argument. Wpisz go poniżej.} few {# argumenty. Wpisz je poniżej.} many {# argumentów. Wpisz je poniżej.} other {# argumentu. Wpisz je poniżej.}}",
+        "noOutput": "Jeszcze nie ma wyniku. Spróbuj wykonać polecenie, a potem kliknij odświeżanie.",
+        "refreshed": "odświeżono {timeDuration} temu",
+        "regexMismatch": "Argument nie pasuje do wyrażenia regularnego.",
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nazwa",
+            "description": "Nazwa polecenia. Pojawia się w dzienniku i w powiadomieniach.",
+            "placeholder": "własna nazwa do powiadomień"
         },
         "command": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Polecenie",
+            "description": "Polecenie do uruchomienia.",
+            "placeholder": "echo 'Cześć, świecie!'",
+            "tooltip": "To polecenie zostanie wykonane po wyzwoleniu.<br />Kliknij ikonę podwójnego haczyka, aby uruchomić polecenie od razu. Gdy się skończy, kliknij Odśwież wynik, a potem Pokaż wynik, żeby zobaczyć rezultaty.<br /><br />Zaznacz pole, aby opakować polecenie w powłokę. W systemie Windows polecenie uruchomi się przez <code>cmd.exe</code>, a w innych systemach przez <code>/bin/bash</code>. Przydaje się to przy poleceniach, które potrzebują funkcji powłoki, takich jak potoki i przekierowania. Własne argumenty pozycyjne możesz zdefiniować w formacie: <code>({regex})</code> — to wyrażenie regularne w nawiasach klamrowych i okrągłych, np. <code>({[a-z]})</code>. Te argumenty uzupełnia osoba uruchamiająca polecenie, albo w tym interfejsie WWW, albo na czacie. Jeśli polecenie ma argument, jest on wymagany; jeśli ma kilka argumentów, wymagane są wszystkie.<br /><br /> <h5>Przykłady</h5>Polecenie z dwoma argumentami: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />Powyższe polecenie pozwoli wykonać dowolną kombinację <code>ls -la</code> na <code>/tmp</code>, <code>/</code>, <code>/home</code> albo <code>/lib</code>.",
+            "required": "Polecenie jest wymagane"
         },
         "notify": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Powiadom",
+            "description": "Wyślij powiadomienie po wykonaniu polecenia.",
+            "tooltip": "Otrzymasz powiadomienie z wynikiem polecenia."
         },
         "log": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Zapisuj wynik",
+            "description": "Zapisuj wynik polecenia do dziennika.",
+            "tooltip": "Zapisuj wynik polecenia do dziennika aplikacji tego klienta."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Maksymalny czas działania",
+            "description": "Jak długo polecenie może działać, zanim zostanie przerwane."
         }
     },
     "monitoring": {
-        "ConfigureServices": "",
-        "EnableOnConfig": "",
+        "ConfigureServices": "Sprawdzanie kondycji skonfigurowanych integracji włączasz, nadając im interwał sprawdzania na ich stronach konfiguracji. Część tych sprawdzeń pochodzi ze strony <go-to page=\"starrapps\">Aplikacje Starr</go-to>, ze strony <go-to page=\"downloaders\">Aplikacje pobierania</go-to> albo ze strony <go-to page=\"mediaapps\">Aplikacje multimedialne</go-to>. Pozostałe sprawdzenia kondycji znajdziesz na stronie <go-to page=\"services\">Usługi</go-to>.",
+        "EnableOnConfig": "Włącz sprawdzanie kondycji na stronie <go-to page=\"services\">Usługi</go-to>.",
         "check": {
-            "output": "",
-            "name": "",
+            "output": "Wynik ostatniego sprawdzenia",
+            "name": "Nazwa usługi",
             "state": {
-                "short": "",
-                "title": ""
+                "short": "Stan",
+                "title": "Liczniki sprawdzeń usługi"
             },
-            "typeExpect": "",
+            "typeExpect": "Typ/oczekiwane",
             "last": {
-                "short": "",
-                "title": "",
-                "tooltip": "",
-                "description": ""
+                "short": "Ostatnie",
+                "title": "Ostatnie sprawdzenie: {timeDuration} temu",
+                "tooltip": "Jak dawno sprawdzono tę usługę.",
+                "description": "Usługę ostatnio sprawdzono o"
             },
             "since": {
-                "short": "",
-                "title": "",
-                "tooltip": "",
-                "description": ""
+                "short": "Od",
+                "title": "Czas w tym stanie: {timeDuration}",
+                "tooltip": "Jak długo usługa jest w tym stanie.",
+                "description": "Usługa jest w tym stanie od"
             },
             "interval": {
-                "short": "",
-                "title": "",
-                "tooltip": ""
+                "short": "Interwał",
+                "title": "Interwał sprawdzania",
+                "tooltip": "Jak często ta usługa jest sprawdzana."
             }
         },
-        "ChecksDisabled": "",
-        "ChecksStopped": "",
-        "StartChecks": "",
-        "StopChecks": "",
-        "stopFailed": "",
-        "startFailed": "",
-        "recheckFailed": "",
-        "checkInitiated": "",
-        "nextRefresh": "",
-        "refreshInterval": "",
-        "cardsView": "",
-        "classicView": "",
-        "hideAllOutputs": "",
-        "showAllOutputs": ""
+        "ChecksDisabled": "Sprawdzanie kondycji: Wyłączone",
+        "ChecksStopped": "Sprawdzanie kondycji: wstrzymane",
+        "StartChecks": "Wznów sprawdzanie kondycji",
+        "StopChecks": "Wstrzymaj sprawdzanie kondycji",
+        "stopFailed": "Nie udało się wstrzymać sprawdzania kondycji.",
+        "startFailed": "Nie udało się wznowić sprawdzania kondycji.",
+        "recheckFailed": "Nie udało się ponowić sprawdzania kondycji.",
+        "checkInitiated": "Rozpoczęto sprawdzanie kondycji.",
+        "nextRefresh": "Następne odświeżenie za {timeDuration}.",
+        "refreshInterval": "Interwał odświeżania",
+        "cardsView": "Widok kart",
+        "classicView": "Widok klasyczny",
+        "hideAllOutputs": "Ukryj wszystkie wyniki",
+        "showAllOutputs": "Pokaż wszystkie wyniki"
     },
     "ServiceChecks": {
-        "description": "",
-        "title": "",
-        "DeleteCheck": "",
-        "addInstance": "",
-        "processListLink": "",
+        "description": "Użyj tego formularza, aby skonfigurować sprawdzanie kondycji. Nie dodawaj tutaj aplikacji Starr, multimediów, Snapshot ani pobierania. Zamiast tego nadaj im interwał sprawdzania na ich stronach konfiguracji. Zobacz <go-to page=\"ProcessList\">listę działających procesów</go-to> i korzystaj z niej przy tworzeniu sprawdzeń procesów.",
+        "title": "Sprawdzanie kondycji",
+        "DeleteCheck": "Usuń sprawdzenie kondycji",
+        "addInstance": "Utwórz sprawdzenie kondycji",
+        "processListLink": "Zobacz tutaj listę działających procesów.",
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Limit czasu sprawdzenia",
+            "description": "Jak długo czekać na zakończenie sprawdzenia usługi."
         },
         "interval": {
-            "label": "",
-            "description": ""
+            "label": "Interwał sprawdzania",
+            "description": "Jak często sprawdzać usługę."
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Nazwa sprawdzenia",
+            "description": "Unikalna nazwa monitorowanej usługi.",
+            "placeholder": "własna nazwa do powiadomień",
+            "tooltip": "Nazwa monitorowanej usługi. Służy do rozpoznania usługi w powiadomieniach. Każda usługa musi mieć unikalną nazwę."
         },
         "type": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
+            "label": "Typ sprawdzenia",
+            "description": "Typ wykonywanego sprawdzenia.",
+            "tooltip": "Sprawdzenie procesu pozwala monitorować, czy proces działa. Sprawdzenie URL HTTP pozwala monitorować dostępność URL. Dostępność portu TCP pozwala monitorować łączność portu TCP. Sprawdzenie ping UDP i Sprawdzenie ping ICMP pozwalają monitorować dostępność adresu IP albo hosta.",
             "options": {
-                "process": "",
-                "http": "",
-                "tcp": "",
-                "ping": "",
-                "icmp": ""
+                "process": "Sprawdzenie procesu",
+                "http": "Sprawdzenie URL HTTP",
+                "tcp": "Dostępność portu TCP",
+                "ping": "Sprawdzenie ping UDP",
+                "icmp": "Sprawdzenie ping ICMP"
             }
         },
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "URL",
+            "description": "URL monitorowanej usługi.",
+            "placeholder": "https://my.site"
         },
         "http": {
             "headers": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nagłówki HTTP",
+                "description": "Nagłówki żądania HTTP, 1 w wierszu.",
+                "placeholder": "Content-Type: application/json"
             },
             "codes": {
-                "label": "",
-                "description": "",
-                "required": ""
+                "label": "Akceptowalne kody odpowiedzi",
+                "description": "Każdy kod z tej listy jest uznawany za akceptowalny. Jeśli usługa odpowie innym kodem, powstanie powiadomienie.",
+                "required": "Wymagany jest co najmniej jeden oczekiwany kod odpowiedzi."
             }
         },
         "tcp": {
             "value": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": "",
-                "required": ""
+                "label": "Host i port",
+                "description": "Wpisz host:port albo host:ip, aby sprawdzić łączność.",
+                "placeholder": "127.0.0.1:22",
+                "tooltip": "Zwykle zalecany jest adres IP. Jeśli chcesz też sprawdzić DNS, użyj nazwy hosta. Format to <code>host:port</code>. Nie powinno być spacji ani dodatkowych znaków.",
+                "required": "Wymagane są host i port rozdzielone dwukropkiem."
             }
         },
         "ping": {
             "value": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": "",
-                "required": ""
+                "label": "Host albo IP",
+                "description": "Wpisz host albo adres IP, aby sprawdzić dostępność.",
+                "placeholder": "127.0.0.1",
+                "tooltip": "Zwykle zalecany jest adres IP. Jeśli chcesz też sprawdzić DNS, użyj nazwy hosta. Format to <code>host</code> albo <code>10.11.12.13</code>. Nie powinno być spacji ani dodatkowych znaków. Aby sprawdzenia UDP działały w Linuksie, musisz je włączyć tym poleceniem: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. Aby sprawdzenia ICMP działały w Linuksie, musisz nadać plikowi binarnemu notifiarr uprawnienia tym poleceniem: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Najprościej sprawić, by oba działały w Dockerze, to włączyć tryb uprzywilejowany, ale możesz też ustawić uprawnienia.",
+                "required": "Wymagany jest host albo adres IP."
             },
             "count": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "required": ""
+                "label": "Liczba",
+                "description": "Liczba pakietów do wysłania.",
+                "placeholder": "10",
+                "required": "Wymagana jest liczba pakietów większa od zera."
             },
             "minimum": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "required": ""
+                "label": "Minimum",
+                "description": "Minimalna liczba pakietów, które muszą zostać odebrane.",
+                "placeholder": "10",
+                "required": "Wymagane jest minimum pakietów większe od zera."
             },
             "interval": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Interwał",
+                "description": "Interwał w milisekundach między pakietami.",
+                "placeholder": "100"
             }
         },
         "process": {
             "value": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": "",
-                "required": ""
+                "label": "Dopasowanie procesu",
+                "description": "Nazwa procesu do sprawdzenia.",
+                "placeholder": "notifiarr",
+                "tooltip": "Nazwa procesu do sprawdzenia. To nazwa procesu taka, jak na liście procesów. Na obu końcach podanej wartości używane jest dopasowanie wieloznaczne, więc im dokładniejsze argumenty, tym lepsze dopasowanie.",
+                "required": "Nazwa procesu jest wymagana."
             },
             "running": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Działa",
+                "description": "Wyślij alert, jeśli proces działa.",
+                "tooltip": "Wybranie tego wywoła alert o złej kondycji, gdy proces zostanie znaleziony jako działający. Wybierz tę opcję, jeśli potrzebujesz powiadomienia, gdy proces się uruchomi."
             },
             "restarts": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Restarty",
+                "description": "Wyślij alert, jeśli proces został uruchomiony ponownie.",
+                "tooltip": "Wybranie tego wywoła alert o złej kondycji, gdy okaże się, że proces został uruchomiony ponownie. Wybierz tę opcję, jeśli potrzebujesz powiadomienia, gdy zmieni się PID."
             },
             "minimum": {
-                "label": "",
-                "description": "",
-                "required": "",
-                "tooltip": ""
+                "label": "Minimum",
+                "description": "Minimalna liczba działających procesów, które muszą pasować do wartości.",
+                "required": "Wymagane jest minimum procesów większe od zera.",
+                "tooltip": "Jeśli wpiszesz 2, dostaniesz powiadomienie, gdy działa mniej niż 2 procesy. Użyj tego, aby dostać alert, gdy procesów jest za mało."
             },
             "maximum": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Maksimum",
+                "description": "Maksymalna liczba działających procesów, które mogą pasować do wartości.",
+                "tooltip": "Jeśli wpiszesz 2, dostaniesz powiadomienie, gdy działa więcej niż 2 procesy. Użyj tego, aby dostać alert, gdy procesów jest za dużo."
             }
         }
     },
     "MediaApps": {
         "Tautulli": {
-            "title": "",
-            "description": "",
+            "title": "Tautulli",
+            "description": "Tautulli ma funkcję, która pozwala nadawać użytkownikom Plex własne nazwy. Po połączeniu klienta Notifiarr z Tautulli te własne nazwy pojawią się w powiadomieniach na czacie. Gdy jest wyłączone, używane są nazwy użytkowników Plex albo adresy e-mail. To całkowicie opcjonalne. Strona Notifiarr oferuje tę samą funkcję i pozwala mapować użytkowników Plex na własne nazwy. Możesz też dodać tutaj instancję Tautulli tylko po to, żeby monitorować ją sprawdzaniem kondycji.",
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Nazwa Tautulli",
+                "description": "Nazwa usługi Tautulli."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL usługi Tautulli.",
+                "placeholder": "http://tautulli.server.tv:8181"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Klucz API",
+                "description": "Klucz API usługi Tautulli.",
+                "placeholder": "tautulli-api-key"
             }
         },
         "Plex": {
-            "title": "",
-            "description": "",
+            "title": "Plex",
+            "description": "Integracja Plex jest rozbudowana, a wiele ustawień konfiguruje się na <a href=\"https://notifiarr.com/\" target=\"_blank\">stronie Notifiarr.com</a>.",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa serwera",
+                "description": "Nazwa serwera Plex.",
+                "placeholder": "Ustawiane automatycznie przez serwer",
+                "tooltip": "Nazwa Plex Media Server jest używana w powiadomieniach, dziennikach i sprawdzaniu kondycji. Ustawia ją automatycznie serwer Plex."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL serwera Plex.",
+                "placeholder": "http://plex.server.tv:32400"
             },
             "token": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Token",
+                "description": "Token serwera Plex.",
+                "placeholder": "pl3x-to_Ken",
+                "tooltip": "Instrukcję, jak znaleźć token Plex, znajdziesz w <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">tym artykule Plex</a>."
             }
         }
     },
     "profile": {
         "phrase": {
-            "AuthTypeChange": "",
-            "ProfileUpdated": "",
-            "EnterCurrentPassword": "",
-            "ProxyAuthDisabled": "",
-            "Addit": "",
-            "ShowMeMore": "",
-            "ShowMoreDesc": "",
-            "PasswordOnlyUsed": "",
-            "HeaderOnlyUsed": "",
-            "SeeWikiForAuthProxyHelp": "",
-            "ShowMeLess": ""
+            "AuthTypeChange": "Jeśli zmienisz typ uwierzytelniania, wyloguj się, aby dokończyć proces.",
+            "ProfileUpdated": "Profil zaktualizowano {timeDuration} temu!",
+            "EnterCurrentPassword": "Wpisz bieżące hasło, aby wprowadzić zmiany.",
+            "ProxyAuthDisabled": "Uwierzytelnianie przez proxy jest wyłączone, ponieważ twój upstream ({upstreamIp}) nie jest na liście dozwolonych upstreamów.",
+            "Addit": "Dodaj go.",
+            "ShowMeMore": "Pokaż więcej.",
+            "ShowMoreDesc": "Obsługiwane są obecnie trzy typy uwierzytelniania. Proxy uwierzytelniania i Brak hasła są dostępne tylko wtedy, gdy bieżące żądanie pochodzi z prawidłowego, skonfigurowanego adresu IP upstream.",
+            "PasswordOnlyUsed": "Nazwa użytkownika i hasło są używane tylko wtedy, gdy typ uwierzytelniania jest ustawiony na Hasło.",
+            "HeaderOnlyUsed": "Nagłówek uwierzytelniania jest używany tylko wtedy, gdy typ uwierzytelniania jest ustawiony na Nagłówek albo Brak hasła.",
+            "SeeWikiForAuthProxyHelp": "Zobacz <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wiki</a>, aby przeczytać instrukcję konfiguracji proxy uwierzytelniania.",
+            "ShowMeLess": "Pokaż mniej."
         },
         "authType": {
             "option_desc": {
-                "header": "",
-                "password": "",
-                "noauth": ""
+                "header": "Wybierz tę opcję, aby logować się do tej aplikacji nagłówkiem HTTP zawierającym nazwę użytkownika. To powszechnie nazywane uwierzytelnianie przez proxy. Mamy <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">stronę wiki</a> z instrukcją konfiguracji Nginx dla tej funkcji. Po wybraniu tej opcji musisz też wybrać nagłówek dla proxy uwierzytelniania. Jeśli nie widać żadnych nagłówków, upstream nie przekazał żadnego prawidłowego nagłówka.",
+                "password": "To domyślny typ uwierzytelniania. Wybierz opcję Hasło, aby logować się do tej aplikacji skonfigurowaną nazwą użytkownika i hasłem. Obsługiwana jest tylko 1 nazwa użytkownika i 1 hasło. Po wybraniu tej opcji musisz wypełnić pola nazwy użytkownika i nowego hasła. Jeśli to jest bieżący typ uwierzytelniania, musisz też wypełnić pole bieżącego hasła, żeby wprowadzić zmiany.",
+                "noauth": "Ta konfiguracja nie jest zalecana. Typ uwierzytelniania Brak hasła przepuszcza każde żądanie z dowolnego skonfigurowanego <code>IP upstream</code>. Działa też z proxy uwierzytelniania, które ustawia nazwę użytkownika. Jeśli w podanym nagłówku nie ma nazwy użytkownika, domyślnie jest to admin.",
+                "website": "Wybierz tę opcję, aby logować się do tej aplikacji danymi z witryny. Dzięki temu logujesz się do klienta adresem e-mail albo nazwą użytkownika i hasłem z Notifiarr.com. Twoje hasło jest zawsze bezpieczne i szyfrowane, zanim trafi do klienta."
             },
             "options": {
-                "header": "",
-                "password": "",
-                "noauth": ""
+                "header": "Proxy uwierzytelniania: nagłówek",
+                "password": "Hasło: lokalna nazwa użytkownika",
+                "noauth": "Brak hasła (niebezpieczne)",
+                "website": "Dane logowania witryny"
             },
-            "label": "",
-            "description": ""
+            "label": "Typ uwierzytelniania",
+            "description": "Wybierz sposób uwierzytelniania w kliencie"
         },
         "upstreams": {
-            "label": "",
-            "placeholder": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Upstreamy",
+            "placeholder": "127.0.0.1 ::1",
+            "description": "Zaufane adresy IP proxy lub sieci CIDR. Oddzielaj sieci spacjami.",
+            "tooltip": "Jeśli klient Notifiarr stoi za odwrotnym proxy (swag, nginx itd.), dodaj tutaj adres IP tego proxy. Możesz też podać całe sieci. To określa, który adres IP trafia do pliku dziennika serwera WWW: adres żądającego albo nagłówek <span class=\"text-warning\">X-Forwarded-For</span>. Wymagane, gdy do uwierzytelniania używasz nagłówka żądania albo gdy uwierzytelnianie jest wyłączone."
         },
         "title": {
-            "Authentication": "",
-            "Authorization": ""
+            "Authentication": "Uwierzytelnianie",
+            "Authorization": "Autoryzacja"
         },
         "header": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Nagłówek uwierzytelniania",
+            "description": "Wybierz nagłówek zawierający twoją nazwę użytkownika",
+            "tooltip": "Tutaj widać nagłówki przekazane przez klienta albo upstream, których można użyć do uwierzytelniania przez proxy. Ten wybór jest używany, gdy typ uwierzytelniania to Nagłówek albo Brak hasła. Wybierz nagłówek, który pokazuje właściwą nazwę użytkownika. Przy opcji Brak hasła nagłówek ustawia nazwę użytkownika, ale nie jest wymagany."
         },
         "username": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nazwa użytkownika",
+            "description": "Twoja nazwa użytkownika do logowania",
+            "placeholder": "Domyślnie: admin"
         },
         "password": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Bieżące hasło",
+            "description": "Wpisz bieżące hasło, aby wprowadzić zmiany",
+            "placeholder": "Wpisz bieżące hasło"
         },
         "newPass": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nowe hasło",
+            "description": "Twoje nowe hasło do logowania",
+            "placeholder": "Minimum 9 znaków"
         }
     },
     "SnapshotApps": {
         "MySQL": {
             "name": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "Nazwa serwera MySQL.",
+                "placeholder": "własna nazwa do powiadomień",
+                "label": "Nazwa serwera"
             },
             "host": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Host",
+                "description": "Host albo adres IP serwera MySQL.",
+                "placeholder": "127.0.0.1"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do serwera MySQL.",
+                "placeholder": "hasło"
             },
-            "title": "",
-            "description": "",
-            "addInstance": "",
+            "title": "MySQL",
+            "description": "Możesz dodać dane logowania MySQL do konfiguracji klienta Notifiarr, aby robić Snapshot kondycji usługi MySQL. Ta funkcja zapisuje w Snapshot dane <code>SHOW PROCESSLIST</code> i <code>SHOW STATUS</code>. Dostęp do bazy danych nie jest wymagany. Przykładowy grant: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
+            "addInstance": "Dodaj serwer MySQL",
             "port": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Port",
+                "description": "Port serwera MySQL.",
+                "placeholder": "3306"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika serwera MySQL.",
+                "placeholder": "root"
             }
         },
         "Nvidia": {
-            "title": "",
-            "description": "",
+            "title": "Nvidia",
+            "description": "Ta integracja pokazuje informacje o GPU Nvidia w powiadomieniach Snapshot. W Dockerze użyj obrazu CUDA (<code>ghcr.io/notifiarr/notifiarr:cuda</code> lub <code>golift/notifiarr:cuda</code>), zainstaluj na hoście <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> i przekaż GPU przez <code>--gpus all</code> albo w Compose <code>gpus: all</code>. Wersja zestawu CUDA na hoście nie jest wymagana.",
             "disabled": {
-                "label": "",
-                "description": ""
+                "label": "Snapshoty GPU",
+                "description": "Włącz lub wyłącz snapshoty GPU."
             },
             "busIds": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "ID magistrali",
+                "description": "Lista ID magistrali do Snapshot, rozdzielana przecinkami.",
+                "placeholder": "0000:00:00.0,0000:00:00.1",
+                "tooltip": "To ID magistrali GPU. Znajdziesz je, uruchamiając <code>nvidia-smi</code> i patrząc na kolumnę <code>Bus Id</code>. Karty z innymi ID magistrali są w Snapshot pomijane. Zwykle zostaw to puste. Wiele wartości dodawaj w nowych wierszach."
             },
             "smiPath": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Ścieżka nvidia-smi",
+                "description": "Ścieżka do polecenia nvidia-smi.",
+                "placeholder": "/usr/bin/nvidia-smi",
+                "tooltip": "Jeśli nvidia-smi (nvidia-smi.exe w systemie Windows) nie jest w zmiennej PATH, możesz tutaj podać pełną ścieżkę do pliku binarnego."
             }
         }
     },
     "Downloaders": {
         "Rtorrent": {
             "password": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "Hasło do instancji Rtorrent.",
+                "placeholder": "hasło",
+                "label": "Hasło"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Rtorrent",
+            "addInstance": "Dodaj instancję Rtorrent",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Rtorrent.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Rtorrent.",
+                "placeholder": "http://rtorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Rtorrent.",
+                "placeholder": "admin"
             }
         },
         "Transmission": {
-            "title": "",
-            "addInstance": "",
+            "title": "Transmission",
+            "addInstance": "Dodaj instancję Transmission",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Transmission.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "username": {
-                "placeholder": "",
-                "label": "",
-                "description": ""
+                "placeholder": "admin",
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Transmission."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Transmission. <b>Musi</b> zawierać sufiks <code>/transmission/rpc</code>.",
+                "placeholder": "http://transmission.server.tv:9091"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Transmission.",
+                "placeholder": "hasło"
             }
         },
         "Qbittorrent": {
-            "title": "",
-            "addInstance": "",
+            "title": "Qbittorrent",
+            "addInstance": "Dodaj instancję Qbittorrent",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Qbittorrent.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Qbittorrent.",
+                "placeholder": "http://qbittorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji Qbittorrent.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Qbittorrent.",
+                "placeholder": "hasło"
             }
         },
         "Deluge": {
-            "title": "",
-            "addInstance": "",
+            "title": "Deluge",
+            "addInstance": "Dodaj instancję Deluge",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji Deluge.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji Deluge.",
+                "placeholder": "http://deluge.server.tv:8112"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji Deluge.",
+                "placeholder": "hasło"
             }
         },
         "SabNZB": {
-            "title": "",
-            "addInstance": "",
+            "title": "SabNZB",
+            "addInstance": "Dodaj instancję SabNZB",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji SabNZB.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji SabNZB.",
+                "placeholder": "http://sabnzb.server.tv:8080"
             },
             "apiKey": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Klucz API",
+                "description": "Klucz API instancji SabNZB.",
+                "placeholder": "sabnzb-api-key"
             }
         },
         "NZBGet": {
-            "title": "",
-            "addInstance": "",
+            "title": "NZBGet",
+            "addInstance": "Dodaj instancję NZBGet",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa instancji",
+                "description": "Nazwa instancji NZBGet.",
+                "placeholder": "własna nazwa do powiadomień"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL instancji NZBGet.",
+                "placeholder": "http://nzbget.server.tv:6789"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Nazwa użytkownika",
+                "description": "Nazwa użytkownika instancji NZBGet.",
+                "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Hasło",
+                "description": "Hasło do instancji NZBGet.",
+                "placeholder": "hasło"
             }
         }
     },
     "Endpoints": {
         "query": {
-            "tooltip": "",
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "tooltip": "Parametry zapytania są dopisywane do URL. Format musi być <code>key=value</code> w każdym wierszu. Nieprawidłowe wartości są ignorowane, a dodatkowe spacje obcinane. Nie dodawaj na początku wiersza znaku <code>?</code> ani ampersandu (<code>&</code>). Klucze i wartości są automatycznie kodowane jako URL.",
+            "label": "Parametry zapytania",
+            "description": "Parametry zapytania dodawane do URL, 1 w wierszu.",
+            "placeholder": "apiKey=1234567890"
         },
         "body": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Treść żądania",
+            "description": "Treść wysyłana pod URL dla żądań POST, PUT i PATCH.",
+            "placeholder": "{\"message\": \"Cześć, świecie!\"}"
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nazwa",
+            "description": "Nazwa adresu URL przekaźnika.",
+            "placeholder": "własna nazwa do powiadomień"
         },
-        "title": "",
-        "addInstance": "",
-        "DeleteEndpoint": "",
+        "title": "Adresy URL przekaźnika",
+        "addInstance": "Dodaj URL przekaźnika",
+        "DeleteEndpoint": "Usuń URL",
         "badge": {
-            "header": "",
-            "query": "",
-            "body": ""
+            "header": "{count, plural, one {# nagłówek} few {# nagłówki} many {# nagłówków} other {# nagłówka}}",
+            "query": "{count, plural, one {# zapytanie} few {# zapytania} many {# zapytań} other {# zapytania}}",
+            "body": "{count, plural, one {# znak} few {# znaki} many {# znaków} other {# znaku}}"
         },
         "template": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": "",
-            "required": ""
+            "label": "Szablon ładunku",
+            "description": "Przetwórz ładunek według tego szablonu.",
+            "placeholder": "pihole",
+            "tooltip": "Szablon służy stronie do ustalenia, jak zamienić ładunek w powiadomienie na czacie. Listę dostępnych szablonów znajdziesz albo utworzysz własny na <a href=\"https://notifiarr.com/\" target=\"_blank\">stronie</a> @ <code>Integracje: Punkty końcowe</code>.",
+            "required": "Szablon jest wymagany. Wpisz „test”, jeśli nie wiesz, co wpisać."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Limit czasu żądania",
+            "description": "Jak długo czekać na zakończenie żądania HTTP."
         },
         "method": {
-            "label": "",
-            "description": ""
+            "label": "Metoda",
+            "description": "Żądanie HTTP"
         },
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "URL przekaźnika",
+            "description": "URL zdalnej usługi, który jest przekazywany na stronę.",
+            "placeholder": "https://pihole.myhome.lan/api/stats"
         },
         "header": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Nagłówki HTTP",
+            "description": "Nagłówki żądania HTTP, 1 w wierszu.",
+            "placeholder": "Content-Type: application/json",
+            "tooltip": "Nagłówki żądania HTTP są wysyłane pod URL bez zmian. Format musi być <code>key: value</code> w każdym wierszu. Spacja i dwukropek są wymagane. Nieprawidłowe wartości są ignorowane, a dodatkowe spacje obcinane."
         }
     },
     "Actions": {
         "titles": {
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": "",
-            "Counter": "",
-            "Interval": "",
-            "Schedule": ""
+            "Triggers": "Wyzwalacze",
+            "Timers": "Zegary",
+            "Schedules": "Harmonogramy",
+            "SiteCrons": "Zegary witryny",
+            "Counter": "Licznik",
+            "Interval": "Interwał",
+            "Schedule": "Harmonogram",
+            "Trigger": "Wyzwalacz",
+            "Timer": "Zegar",
+            "Type": "Typ",
+            "When": "Kiedy",
+            "Action": "Akcja",
+            "Never": "Nigdy",
+            "Filter": "Filtr"
         },
         "descriptions": {
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": ""
+            "Triggers": "Te akcje nie mają zegara ani harmonogramu.",
+            "Timers": "Te akcje mają zegar.",
+            "Schedules": "Te akcje mają harmonogram.",
+            "SiteCrons": "Te akcje tworzy strona, aby przenieść śledzenie zegarów."
         },
         "triggers": {
             "TrigRadarrCorrupt": {
-                "button": "",
-                "label": "",
-                "success": ""
+                "button": "Sprawdź Radarr",
+                "label": "Uszkodzenie bazy danych Radarr",
+                "success": "Rozpoczęto sprawdzanie uszkodzenia bazy danych Radarr."
             },
             "TrigPlexEmptyTrash": {
-                "label": ""
+                "label": "Opróżnij kosz Plex"
             },
             "TrigUploadFile": {
-                "label": "",
-                "button": "",
-                "success": "",
+                "label": "Plik dziennika wysłany na stronę",
+                "button": "Wyślij dziennik teraz",
+                "success": "Plik dziennika wysłany na stronę.",
                 "options": {
-                    "choose": "",
-                    "app": "",
-                    "debug": "",
-                    "http": ""
+                    "choose": "Wybierz plik do wysłania.",
+                    "app": "Plik dziennika aplikacji.",
+                    "debug": "Plik dziennika debugowania.",
+                    "http": "Plik dziennika HTTP."
                 }
             },
             "TrigPlexSessions": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Zbierz sesje Plex",
+                "button": "Zbierz sesje teraz",
+                "success": "Zebrano sesje Plex."
             },
             "TrigPlexSessionsCheck": {
-                "label": ""
+                "label": "Sprawdź zakończone sesje Plex"
             },
             "TrigDashboard": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Aktualizacja panelu",
+                "button": "Aktualizuj panel",
+                "success": "Rozpoczęto aktualizację panelu."
             },
             "TrigMDBListSync": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Synchronizacja listy MDB",
+                "button": "Synchronizuj listę MDB",
+                "success": "Rozpoczęto synchronizację listy MDB."
             },
             "TrigCollectionGaps": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Luki w kolekcji",
+                "button": "Sprawdź luki w kolekcji",
+                "success": "Rozpoczęto sprawdzanie luk w kolekcji."
             },
             "TrigCFSyncLidarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Synchronizacja profilu i formatu Lidarr",
+                "button": "Synchronizuj wszystkie instancje Lidarr",
+                "success": "Rozpoczęto synchronizację profilu i formatu Lidarr."
             },
             "TrigCFSyncRadarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Synchronizacja profilu i formatu Radarr",
+                "button": "Synchronizuj wszystkie instancje Radarr",
+                "success": "Rozpoczęto synchronizację profilu i formatu Radarr."
             },
             "TrigStop": {
-                "label": "",
-                "button": ""
+                "label": "Ponowne wczytania klienta",
+                "button": "Wczytaj klienta ponownie"
             },
             "TrigSnapshot": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Zbieranie Snapshot",
+                "button": "Aktualizuj Snapshot",
+                "success": "Rozpoczęto zbieranie Snapshot."
             },
             "TrigProwlarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Uszkodzenie bazy danych Prowlarr",
+                "button": "Sprawdź Prowlarr",
+                "success": "Rozpoczęto sprawdzanie uszkodzenia bazy danych Prowlarr."
             },
             "TrigLidarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Uszkodzenie bazy danych Lidarr",
+                "button": "Sprawdź Lidarr",
+                "success": "Rozpoczęto sprawdzanie uszkodzenia bazy danych Lidarr."
             },
             "TrigReadarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Uszkodzenie bazy danych Readarr",
+                "button": "Sprawdź Readarr",
+                "success": "Rozpoczęto sprawdzanie uszkodzenia bazy danych Readarr."
             },
             "TrigSonarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Uszkodzenie bazy danych Sonarr",
+                "button": "Sprawdź Sonarr",
+                "success": "Rozpoczęto sprawdzanie uszkodzenia bazy danych Sonarr."
             },
             "TrigProwlarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Kopie zapasowe bazy danych Prowlarr",
+                "button": "Sprawdź Prowlarr",
+                "success": "Rozpoczęto sprawdzanie kopii zapasowych bazy danych Prowlarr."
             },
             "TrigLidarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Kopie zapasowe bazy danych Lidarr",
+                "button": "Sprawdź Lidarr",
+                "success": "Rozpoczęto sprawdzanie kopii zapasowych bazy danych Lidarr."
             },
             "TrigRadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Kopie zapasowe bazy danych Radarr",
+                "button": "Sprawdź Radarr",
+                "success": "Rozpoczęto sprawdzanie kopii zapasowych bazy danych Radarr."
             },
             "TrigReadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Kopie zapasowe bazy danych Readarr",
+                "button": "Sprawdź Readarr",
+                "success": "Rozpoczęto sprawdzanie kopii zapasowych bazy danych Readarr."
             },
             "TrigSonarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Kopie zapasowe bazy danych Sonarr",
+                "button": "Sprawdź Sonarr",
+                "success": "Rozpoczęto sprawdzanie kopii zapasowych bazy danych Sonarr."
             },
             "TrigUpCheck": {
-                "label": ""
+                "label": "Sprawdzenie dostępności klienta wobec strony"
             },
             "TrigEndpointURL": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "URL punktu końcowego przekazany na stronę: {name}",
+                "button": "Uruchom punkt końcowy",
+                "success": "Rozpoczęto przekazywanie URL punktu końcowego."
             },
             "TrigCustomCommand": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Własne polecenie: {name}",
+                "button": "Uruchom polecenie",
+                "success": "Rozpoczęto własne polecenie."
             },
             "TrigAutoUpdate": {
-                "label": ""
+                "label": "Sprawdzenie automatycznej aktualizacji"
             },
             "TrigCFSyncLidarrInt": {
-                "label": ""
+                "label": "Synchronizacja własnego formatu Lidarr dla instancji"
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
+                "label": "Synchronizacja własnego formatu Radarr dla instancji"
             },
             "TrigCustomCronTimer": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Zegar witryny: {name}",
+                "button": "Uruchom zegar teraz",
+                "success": "Rozpoczęto zegar witryny."
             },
             "TrigDownloadingItems": {
-                "label": ""
+                "label": "Pobierane / ukończone elementy"
             },
             "TrigLidarrQueue": {
-                "label": ""
+                "label": "Bufor kolejki Lidarr"
             },
             "TrigRadarrQueue": {
-                "label": ""
+                "label": "Bufor kolejki Radarr"
             },
             "TrigReadarrQueue": {
-                "label": ""
+                "label": "Bufor kolejki Readarr"
             },
             "TrigSonarrQueue": {
-                "label": ""
+                "label": "Bufor kolejki Sonarr"
             },
             "TrigStuckItems": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Sprawdzenie utkniętych elementów",
+                "button": "Sprawdź utknięte elementy",
+                "success": "Rozpoczęto sprawdzanie utkniętych elementów."
             },
             "TrigPollSite": {
-                "label": ""
+                "label": "Odpytywanie strony"
+            },
+            "TrigCFSyncSonarr": {
+                "label": "Synchronizacja profilu i formatu Sonarr",
+                "button": "Synchronizuj wszystkie instancje Sonarr",
+                "success": "Rozpoczęto synchronizację profilu i formatu Sonarr."
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "Synchronizacja własnego formatu Sonarr dla instancji"
             }
         }
     },
     "RegexTester": {
         "testPattern": {
-            "description": "",
-            "placeholder": "",
-            "label": ""
+            "description": "Przykładowy ciąg albo wiersz dziennika, na którym sprawdzisz wyrażenie regularne.",
+            "placeholder": "[INFO] 2025-05-25 16:20:01 - To jest testowy wiersz dziennika.",
+            "label": "Wzorzec testowy"
         },
         "testRegex": {
-            "description": "",
-            "placeholder": "",
-            "label": ""
+            "description": "Wyrażenie dopasowywane do wzorca testowego.",
+            "placeholder": "GET .*some/path",
+            "label": "Wyrażenie testowe"
         },
-        "TestResult": "",
-        "Test": "",
-        "Expression": "",
-        "Result": "",
-        "NoMatch": "",
-        "RegularExpressionTester": ""
+        "TestResult": "Wynik testu",
+        "Test": "Testuj",
+        "Expression": "Wyrażenie",
+        "Result": "Wynik",
+        "NoMatch": "Brak dopasowania",
+        "RegularExpressionTester": "Tester wyrażeń regularnych"
     },
     "metrics": {
         "httpRequests": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Żądania HTTP",
+            "description": "Statystyki przychodzących żądań HTTP. Obejmują też żądania tunelu websocket.",
+            "empty": "Jeszcze nie ma żądań HTTP."
         },
-        "CountersReset": "",
-        "ApplicationUptime": "",
+        "CountersReset": "Liczniki na tej stronie zerują się po zakończeniu aplikacji. Aplikacja udostępnia te liczniki przez Prometheus. Możesz je zbierać i oglądać na <a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">panelu Grafana klienta Notifiarr</a>.",
+        "ApplicationUptime": "Czas działania aplikacji: &nbsp;<b>{timeDuration}</b>",
         "logFiles": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Pliki dziennika",
+            "description": "Liczniki plików dziennika.",
+            "empty": "Nie znaleziono plików dziennika."
         },
         "apiHits": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Żądania API",
+            "description": "Liczniki przychodzących żądań API.",
+            "empty": "Jeszcze nie ma żądań API."
         },
         "website": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Żądania do strony",
+            "description": "Żądania do Notifiarr.com.",
+            "empty": "Jeszcze nie ma żądań do strony."
         },
         "fileWatcher": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Obserwator plików",
+            "description": "Statystyki obserwatora plików.",
+            "empty": "Nie skonfigurowano obserwatorów plików."
         },
         "apps": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Żądania aplikacji",
+            "description": "Statystyki żądań aplikacji. Te liczniki nie obejmują sprawdzania kondycji.",
+            "empty": "Jeszcze nie ma żądań aplikacji."
         },
         "timerEvents": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Wyzwolone akcje",
+            "description": "Wykonane wyzwalacze, zegary i harmonogramy.",
+            "empty": "Jeszcze nie ma wyzwolonych akcji."
         }
     },
     "SiteTunnel": {
-        "subText": "",
+        "subText": "Kliknij przycisk <span class=\"text-success\">Pinguj tunele</span> i jako główny wybierz tunel z najkrótszym czasem odpowiedzi. Jako zapasowy wybierz inny szybki tunel.",
         "phrases": {
-            "PrimaryTunnel": "",
-            "BackupTunnel": "",
-            "Ping": "",
-            "Pinging": "",
-            "ActiveTunnel": "",
-            "TunnelStats": "",
-            "Disconnects": "",
-            "ConnectionPoolSize": "",
-            "Connecting": "",
-            "Idle": "",
-            "Running": "",
-            "LastConnection": "",
-            "LastActiveCheck": "",
-            "SocketURLActive": "",
-            "SocketURLInactive": "",
-            "SelectTunnel": "",
-            "TunnelsSaved": "",
-            "TunnelStatsStale": ""
+            "PrimaryTunnel": "Tunel główny",
+            "BackupTunnel": "Tunel zapasowy",
+            "Ping": "Pinguj tunele",
+            "Pinging": "Pingowanie...",
+            "ActiveTunnel": "Aktywny tunel: {tunnel}",
+            "TunnelStats": "Statystyki tunelu",
+            "Disconnects": "Rozłączenia",
+            "ConnectionPoolSize": "Rozmiar puli połączeń",
+            "Connecting": "Łączenie",
+            "Idle": "Bezczynny",
+            "Running": "Działa",
+            "LastConnection": "Ostatnie połączenie",
+            "LastActiveCheck": "Ostatnie aktywne sprawdzenie",
+            "SocketURLActive": "URL gniazda (aktywny)",
+            "SocketURLInactive": "URL gniazda (nieaktywny)",
+            "SelectTunnel": "Wybierz tunel",
+            "TunnelsSaved": "Tunele zapisano {timeDuration} temu!",
+            "TunnelStatsStale": "Dane powyżej są zawsze nieaktualne. Aby je odświeżyć, kliknij łącze aktualizacji backendu w nagłówku strony."
         }
     },
     "FileWatcher": {
-        "title": "",
-        "description": "",
-        "addInstance": "",
-        "DeleteWatcher": "",
+        "title": "Obserwowane pliki",
+        "description": "Musisz włączyć funkcję obserwatora dziennika i wybrać kanał na stronie Notifiarr, żeby to działało!",
+        "addInstance": "Obserwuj kolejny plik",
+        "DeleteWatcher": "Usuń obserwatora",
         "badges": {
-            "CurrentlyWatching": "",
-            "WatcherStopped": ""
+            "CurrentlyWatching": "Aktualnie obserwuje",
+            "WatcherStopped": "Obserwator zatrzymany"
         },
         "buttons": {
-            "StopWatcher": "",
-            "StartWatcher": ""
+            "StopWatcher": "Zatrzymaj obserwatora",
+            "StartWatcher": "Uruchom obserwatora"
         },
         "titles": {
-            "RegularExpressionTester": "",
-            "Expression": "",
-            "TestString": ""
+            "RegularExpressionTester": "Tester wyrażeń regularnych",
+            "Expression": "Wyrażenie",
+            "TestString": "Ciąg testowy"
         },
         "path": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "required": ""
+            "label": "Ścieżka pliku",
+            "description": "Ścieżka pliku do obserwowania. Zalecane są ścieżki bezwzględne.",
+            "placeholder": "/var/log/nginx/access.log",
+            "required": "Ścieżka jest wymagana",
+            "clientLog": "Nie możesz obserwować własnego pliku dziennika klienta; powstałaby pętla. Błędy klienta są już wysyłane jako client_error_log."
         },
         "disabled": {
-            "label": "",
-            "description": ""
+            "label": "Aktywny",
+            "description": "Wyłącz tego obserwatora."
         },
         "regex": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
-            "placeholder": "",
-            "required": ""
+            "label": "Wyrażenie regularne",
+            "description": "Wyrażenie dopasowywane do pliku.",
+            "tooltip": "Wyrażenia są automatycznie opakowywane dopasowaniem wieloznacznym: <code>.*</code>, więc nie używaj w wyrażeniu <code>^</code> ani <code>$</code>. Użyj <code>(?i)</code> jako prefiksu, aby wyrażenie ignorowało wielkość liter.",
+            "placeholder": "GET.*some/path",
+            "required": "Wyrażenie regularne jest wymagane"
         },
         "skip": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Wyrażenia pomijane",
+            "description": "Wszystko, co pasuje do tego wyrażenia, jest ignorowane.",
+            "placeholder": "GET.*some/path"
         },
         "poll": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Odpytywanie pliku",
+            "description": "Odpytuj plik o zmiany.",
+            "tooltip": "Zdarzenia systemu plików nie działają na niektórych systemach. Jeśli nic się nie dopasowuje, włącz to, aby uruchomić interwał odpytywania pliku."
         },
         "pipe": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Potok FIFO",
+            "description": "Ścieżka jest nazwanym potokiem FIFO.",
+            "tooltip": "Włącz to, jeśli obserwowany plik jest nazwanym potokiem FIFO. Raczej tego nie potrzebujesz."
         },
         "mustExist": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Plik musi istnieć",
+            "description": "Pomiń obserwowanie pliku, jeśli go nie ma.",
+            "tooltip": "Włączenie tego pominie obserwowanie pliku, jeśli nie istnieje przy starcie aplikacji. Obserwowanie plików, które nie istnieją, wciąż jest wadliwe i może w ogóle nie działać."
         },
         "logMatch": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Zapisuj dopasowania",
+            "description": "Zapisuj dopasowane wiersze do dziennika Notifiarr.",
+            "tooltip": "Włączenie tego zapisze dopasowany wiersz do dziennika Notifiarr. Przydaje się do debugowania, ale może być głośne."
         }
     },
     "scheduler": {
-        "title": "",
-        "daysOfWeek": "",
-        "daysOfMonth": "",
-        "frequency": "",
-        "selectAFrequency": "",
-        "AddATime": "",
-        "empty": "",
+        "title": "Harmonogram",
+        "daysOfWeek": "Dni tygodnia",
+        "daysOfMonth": "Dni miesiąca",
+        "frequency": "Częstotliwość",
+        "selectAFrequency": "Wybierz częstotliwość, aby utworzyć harmonogram.",
+        "AddATime": "Dodaj godzinę",
+        "empty": "Jeśli chcesz uruchamiać codziennie, wybierz częstotliwość Codziennie.",
         "required": {
-            "daysOfWeek": "",
-            "daysOfMonth": "",
-            "atTimes": ""
+            "daysOfWeek": "Musisz wybrać co najmniej jeden dzień tygodnia.",
+            "daysOfMonth": "Musisz wybrać co najmniej jeden dzień miesiąca.",
+            "atTimes": "Musisz wybrać co najmniej jedną godzinę uruchomienia harmonogramu."
         },
         "ops": {
-            "noSchedule": "",
-            "minutely": "",
-            "hourly": "",
-            "daily": "",
-            "weekly": "",
-            "monthly": ""
+            "noSchedule": "Bez harmonogramu",
+            "minutely": "Co minutę",
+            "hourly": "Co godzinę",
+            "daily": "Codziennie",
+            "weekly": "Co tydzień",
+            "monthly": "Co miesiąc"
         },
         "times": {
-            "noneSelected": "",
-            "noDaysSelected": "",
-            "everyMinute": "",
-            "everyHour": "",
-            "everyDay": "",
-            "everyWeek": "",
-            "everyMonth": ""
+            "noneSelected": "(nic nie wybrano)",
+            "noDaysSelected": "(nie wybrano dni)",
+            "everyMinute": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co minutę w sekundach {times}",
+            "everyHour": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co godzinę o minucie:sekundach {times}",
+            "everyDay": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} codziennie o godzinach {times}",
+            "everyWeek": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co tydzień w {daysOfWeek} o godzinach {times}",
+            "everyMonth": "{count, plural, one {# raz} few {# razy} many {# razy} other {# raza}} co miesiąc w dniach {daysOfMonth} o godzinach {times}"
         }
+    },
+    "LogFiles": {
+        "titles": {
+            "Name": "Nazwa pliku",
+            "Age": "Wiek",
+            "Bytes": "Bajty",
+            "InUse": "W użyciu",
+            "Mode": "Tryb",
+            "Owner": "Właściciel",
+            "Path": "Ścieżka",
+            "Date": "Data",
+            "FileList": "Lista plików",
+            "Details": "Szczegóły",
+            "FileContent": "Treść pliku",
+            "FollowingFile": "Śledzony plik",
+            "LineCount": "Liczba wierszy",
+            "OpenFile": "Otwórz plik {fileName}",
+            "TailFile": "Śledź plik {fileName}",
+            "Tailing": "Śledzenie"
+        },
+        "button": {
+            "download": "Pobierz",
+            "upload": "Wyślij",
+            "delete": "Usuń",
+            "add": "Dodaj",
+            "reload": "Wczytaj ponownie",
+            "tooltip": "Przycisk <b>Pobierz</b> pobiera plik na twój komputer. Przycisk <b>Wyślij</b> wysyła plik na serwer Notifiarr.com. Wysłane pliki widzą tylko administratorzy. Przycisk <b>Usuń</b> usuwa plik z dysku. Plików w użyciu nie da się usunąć. W użyciu oznacza, że ta aplikacja właśnie zapisuje do niego wpisy dziennika."
+        },
+        "Error": "Błąd wczytywania pliku dziennika: {error}",
+        "DeleteFile": "Usuń {filePath}",
+        "deleteConfirm": "Na pewno chcesz usunąć ten plik? Tej operacji nie można cofnąć.",
+        "deleteError": "Błąd usuwania pliku dziennika: {error}",
+        "deleteSuccess": "Usunięto plik dziennika: {file}",
+        "uploadError": "Błąd wysyłania pliku dziennika: {error}",
+        "uploadSuccess": "Wysyłanie pliku dziennika: {file}",
+        "NoFileSelected": "Nie wybrano pliku.",
+        "SelectFile": "Wybierz plik, żeby zobaczyć, co w nim jest!",
+        "FilesInDirs": "Pliki: {fileCount}, foldery: {dirCount}",
+        "ToggleLinesOrder": "Przełącz kolejność wierszy",
+        "ToggleColors": "Przełącz domyślne kolory",
+        "AddMoreLines": "Dodaj więcej wierszy",
+        "Reload": "Wczytaj plik dziennika ponownie",
+        "Highlight": "Wyróżnienie",
+        "ToggleLineWrap": "Przełącz zawijanie wierszy",
+        "FollowTooltip": "Przyciski w tej kolumnie na bieżąco śledzą plik, gdy jest do niego dopisywany.",
+        "Tooltip": "<ol><li>Pierwszy pomarańczowy przycisk po lewej przełącza kolejność wierszy w pliku. Domyślnie są malejąco, w kolejności zapisu. Kliknięcie przycisku odwraca plik. Dobrze działa to przy śledzeniu pliku, do którego trwa zapis.</li><li>Drugi fioletowy przycisk przełącza wbudowane kolory wyróżnienia wierszy. Kręci się też, gdy coś się dzieje.</li><li>Pole liczby określa, ile wierszy wczytać albo dodać. Przy śledzeniu pliku liczba ogranicza, ile wierszy jest wyświetlanych.</li><li>Kliknięcie przycisku Dodaj dodaje tyle wierszy na górze pliku, używając bieżącej liczby wierszy jako przesunięcia. Przycisk Dodaj jest wyłączony dla plików w użyciu, bo nie da się ustalić, ile wierszy dopisano od ostatniej aktualizacji. Przy śledzeniu plików w użyciu przycisk Dodaj zastępuje wskaźnik.</li><li>Kliknięcie przycisku Wczytaj ponownie wczytuje podaną liczbę wierszy od końca pliku.</li><li>Użyj pola wyróżnienia, aby wyeksponować konkretny tekst.</li><li>Ostatni przycisk przełącza zawijanie wierszy.</li></ol>"
+    },
+    "Nodal": {
+        "button": {
+            "refresh": "Odśwież dane strony",
+            "fullscreen": "Przełącz pełny ekran",
+            "raw": "Przełącz surowe dane"
+        },
+        "noResponse": "Brak danych odpowiedzi."
+    },
+    "ProcessList": {
+        "title": "Lista działających procesów",
+        "error": "Błąd wczytywania listy procesów: {error}",
+        "noData": "Nie zwrócono listy procesów.",
+        "footer": "Znalezione procesy: {count}",
+        "button": {
+            "wrapOn": "Włącz zawijanie wierszy",
+            "wrapOff": "Wyłącz zawijanie wierszy"
+        }
+    },
+    "ClientInfo": {
+        "title": "Ładunek startowy",
+        "error": "Błąd wczytywania ładunku startowego: {error}",
+        "noData": "Nie zwrócono ładunku startowego.",
+        "description": "To ładunek wysłany do klienta z Notifiarr.com przy starcie. Zawiera konfigurację klienta i inne informacje."
+    },
+    "Integrations": {
+        "titles": {
+            "Size": "Rozmiar",
+            "DashboardAge": "Wiek panelu",
+            "CacheAge": "Wiek pamięci podręcznej",
+            "StatusAge": "Wiek statusu",
+            "Version": "Wersja",
+            "Branch": "Gałąź",
+            "BuildTime": "Czas kompilacji"
+        },
+        "DriveData": {
+            "title": "Dane dysków",
+            "driveInformation": {
+                "title": "Informacje o dysku"
+            },
+            "mdStatRaid": {
+                "title": "RAID MDStat"
+            },
+            "titles": {
+                "Drive": "Dysk",
+                "Temp": "Temperatura",
+                "Health": "Kondycja",
+                "Age": "Wiek",
+                "Setting": "Ustawienie",
+                "Value": "Wartość"
+            }
+        },
+        "Snapshot": {
+            "title": "Surowe dane Snapshot",
+            "Age": "Wiek Snapshot",
+            "Data": "Dane Snapshot",
+            "Latest": "Najnowszy Snapshot",
+            "System": "Snapshot systemu",
+            "titles": {
+                "CPUPercent": "Procent CPU",
+                "MemoryFree": "Wolna pamięć",
+                "MemoryUsed": "Użyta pamięć",
+                "MemoryTotal": "Pamięć razem",
+                "UserCPUTime": "Czas CPU użytkownika",
+                "SystemCPUTime": "Czas CPU systemu",
+                "IdleCPUTime": "Czas bezczynności CPU",
+                "NvidiaGPUs": "GPU Nvidia",
+                "MySQLServers": "Serwery MySQL",
+                "IPMISensors": "Czujniki IPMI",
+                "Synology": "Synology",
+                "RaidConfigs": "Konfiguracje RAID",
+                "ZFSPools": "Pule ZFS",
+                "Processes": "Procesy",
+                "DriveTemps": "Temperatury dysków",
+                "DriveHealth": "Kondycja dysków",
+                "DiskUsage": "Użycie dysku",
+                "DiskQuotas": "Limity dyskowe",
+                "IOTop": "Szczyt IO",
+                "IOStat": "Statystyki IO",
+                "IOStat2": "Statystyki IO 2"
+            }
+        },
+        "starrTitles": {
+            "QueueAge": "Wiek kolejki",
+            "QueueSize": "Rozmiar kolejki",
+            "Elapsed": "Upłynęło",
+            "Shows": "Seriale",
+            "Episodes": "Odcinki",
+            "Movies": "Filmy",
+            "Books": "Książki",
+            "Editions": "Wydania",
+            "Tracks": "Utwory",
+            "Artists": "Wykonawcy",
+            "OnDisk": "Na dysku",
+            "Missing": "Brakujące"
+        },
+        "downloadTitles": {
+            "Downloads": "Pobierania",
+            "Incomplete": "Nieukończone",
+            "Downloading": "Pobieranie",
+            "Paused": "Wstrzymane",
+            "TotalSize": "Rozmiar łączny",
+            "Errors": "Błędy",
+            "Downloaded": "Pobrano",
+            "Uploading": "Wysyłanie",
+            "Uploaded": "Wysłano",
+            "Seeding": "Seedowanie",
+            "Month": "Miesiąc",
+            "Week": "Tydzień",
+            "Day": "Dzień"
+        },
+        "lidarrDashboard": {
+            "title": "Surowy panel Lidarr"
+        },
+        "radarrDashboard": {
+            "title": "Surowy panel Radarr"
+        },
+        "readarrDashboard": {
+            "title": "Surowy panel Readarr"
+        },
+        "sonarrDashboard": {
+            "title": "Surowy panel Sonarr"
+        },
+        "delugeDashboard": {
+            "title": "Surowy panel Deluge"
+        },
+        "nzbgetDashboard": {
+            "title": "Surowy panel NZBGet"
+        },
+        "qbitDashboard": {
+            "title": "Surowy panel QBit"
+        },
+        "rtorrentDashboard": {
+            "title": "Surowy panel rTorrent"
+        },
+        "transmissionDashboard": {
+            "title": "Surowy panel Transmission"
+        },
+        "sabnzbdDashboard": {
+            "title": "Surowy panel SabNZBD"
+        },
+        "sonarrQueue": {
+            "title": "Surowa kolejka Sonarr"
+        },
+        "radarrQueue": {
+            "title": "Surowa kolejka Radarr"
+        },
+        "readarrQueue": {
+            "title": "Surowa kolejka Readarr"
+        },
+        "lidarrQueue": {
+            "title": "Surowa kolejka Lidarr"
+        },
+        "prowlarrStatus": {
+            "title": "Surowe informacje Prowlarr"
+        },
+        "radarrStatus": {
+            "title": "Surowe informacje Radarr"
+        },
+        "readarrStatus": {
+            "title": "Surowe informacje Readarr"
+        },
+        "sonarrStatus": {
+            "title": "Surowe informacje Sonarr"
+        },
+        "lidarrStatus": {
+            "title": "Surowe informacje Lidarr"
+        },
+        "tautulliStatus": {
+            "title": "Surowe informacje Tautulli"
+        },
+        "tautulliUsers": {
+            "title": "Użytkownicy Tautulli"
+        },
+        "tautulliUsersJson": {
+            "title": "Surowe dane użytkowników Tautulli"
+        },
+        "plexStatus": {
+            "title": "Informacje Plex Media Server"
+        },
+        "plexSessions": {
+            "title": "Bieżące sesje Plex Media Server",
+            "footer": "Wyświetlane są bieżące sesje Plex, a nie dane z pamięci podręcznej. Dane z pamięci podręcznej zobaczysz w oknie surowego JSON."
+        },
+        "plexSessionsJson": {
+            "title": "Surowe sesje Plex Media Server"
+        },
+        "mediaTitles": {
+            "Country": "Kraj",
+            "PushNotifications": "Powiadomienia push",
+            "PlexPass": "Plex Pass",
+            "ServerOwner": "Właściciel serwera",
+            "Sessions": "Sesje",
+            "SessionsAge": "Wiek sesji",
+            "Users": "Użytkownicy",
+            "User": "Użytkownik",
+            "PlexUsername": "Nazwa użytkownika Plex",
+            "CustomName": "Własna nazwa",
+            "Email": "E-mail",
+            "Session": "Sesja",
+            "Complete": "Ukończono",
+            "Encoding": "Kodowanie",
+            "Title": "Tytuł"
+        },
+        "phrases": {
+            "NoCachedSessions": "Brak sesji w pamięci podręcznej.",
+            "NoPlexData": "Brak danych integracji Plex.",
+            "StateForTime": "{state} przez {timeDuration}"
+        }
+    },
+    "Languages": {
+        "menuTitle": "Pomoc językowa",
+        "title": "Obsługa tłumaczeń",
+        "body": "Ta aplikacja jest dostępna w wielu językach. Język zmienisz, klikając wybór języka w menu profilu. Niektóre języki nie mają aktywnych tłumaczy, więc część tłumaczeń może być niepełna. Jeśli chcesz pomóc tłumaczyć aplikację, <a href=\"https://notifiarr.com/discord\" target=\"_blank\">odwiedź nas na Discord</a>. Wejdź na kanał <code>#role-request</code> i wpisz <code>!roleTranslate</code>. Dzięki temu dostaniesz dostęp do kanału <code>#translate</code>. Dołącz tam i napisz, że chcesz pomóc."
+    },
+    "ApiDocs": {
+        "Choose": "Wybierz API do wyświetlenia",
+        "Contrast": "Zgłoś proszę problemy z kontrastem na tej stronie.",
+        "BasePath": "<b>Ścieżka bazowa</b>: <code>{basePath}</code>",
+        "api": {
+            "title": "Prywatne API ({basePath})",
+            "body": "To specyfikacja API strony Notifiarr.com. Strona używa tego API do komunikacji z klientem."
+        },
+        "ui": {
+            "title": "Interfejs WWW ({basePath})",
+            "body": "Ta specyfikacja opisuje metody, których interfejs klienta Notifiarr używa do komunikacji z backendem. Właśnie używasz interfejsu."
+        }
+    },
+    "TestAllInstances": {
+        "title": "Testuj wszystkie instancje",
+        "Instance": "Instancja",
+        "Message": "Komunikat",
+        "Status": "Status",
+        "Updated": "<b>Test zaktualizowano</b>: <code>{timeDuration}</code>",
+        "TestElapsed": "<b>Czas testu</b>: <code>{timeDuration}</code>",
+        "Concurrency": "<b>Współbieżność</b>: <code>{workerCount}</code>",
+        "Tested": "<b>Przetestowane instancje</b>: <code>{testCount}</code>",
+        "clickRefresh": "Kliknij przycisk odświeżania w prawym górnym rogu, aby przetestować ponownie.",
+        "footer": "Użyj tego narzędzia diagnostycznego, aby sprawdzić, czy wszystkie instancje są osiągalne i poprawnie skonfigurowane. Limit czasu jest na sztywno ustawiony na 15 sekund, czyli blisko tego, jak długo strona czeka na odpowiedź."
+    },
+    "FileBrowser": {
+        "tooltip": {
+            "Go": "<code>cd {path}</code><br />Zmień katalog na podaną ścieżkę.",
+            "SelectPath": "Wybierz ścieżkę: <code>{path}</code>",
+            "Up": "<code>cd ..</code><br />Zmień katalog na folder nadrzędny."
+        },
+        "FilterFiles": "Filtruj pliki",
+        "CreateFileIn": "Plik zostanie utworzony w ścieżce: <code>{path}</code>",
+        "CreateFolderIn": "Folder zostanie utworzony w ścieżce: <code>{path}</code>",
+        "Files": "Pliki: {count}",
+        "Folders": "Foldery: {count}",
+        "FilesFiltered": "Pliki: {count}, po filtrze: {filtered}",
+        "FoldersFiltered": "Foldery: {count}, po filtrze: {filtered}",
+        "Selected": "Wybrano: <code>{path}</code>",
+        "Created": "Utworzono: {path}",
+        "Creating": "Tworzenie...",
+        "InvalidPath": "Podano nieprawidłową ścieżkę. Nie dodawaj ukośników (<code>/</code> ani <code>\\</code>).",
+        "FilterFilesDesc": "Użyj filtra plików, aby szybko przeszukać wyświetlaną listę. Przydaje się w folderach z dużą liczbą plików. Przyciskiem <code>Menu</code> utworzysz nowy folder albo plik. Aby wybrać plik, którego nie ma, wpisz go w pasku <code>Ścieżka</code> i kliknij zielony haczyk. Możesz też użyć pozycji menu <code>Utwórz plik</code>, aby go utworzyć."
+    },
+    "Plex": {
+        "URLNotConfigured": "URL Plex nie jest skonfigurowany. <go-to page=\"mediaApps\" subPage=\"plex\">Skonfiguruj to tutaj</go-to>.",
+        "TokenNotConfigured": "Token Plex nie jest skonfigurowany. <go-to page=\"mediaApps\" subPage=\"plex\">Skonfiguruj to tutaj</go-to>.",
+        "Disabled": "Plex jest wyłączony administracyjnie. <go-to page=\"mediaApps\" subPage=\"plex\">Włącz tutaj</go-to>.",
+        "WaitingForWebhooks": "Oczekiwanie na webhooki Plex...",
+        "WebhooksReceived": "Odebrane webhooki: <code>{count}</code>",
+        "NoStatus": "Nie ma zapisanych w pamięci informacji o Plex Media Server. To może oznaczać, że URL albo token Plex jest nieprawidłowy albo limit czasu jest za krótki. Więcej informacji znajdziesz w <go-to page=\"logFiles\">dziennikach aplikacji</go-to>.",
+        "WebhookNote": "<p>Masz już <a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">skonfigurowany webhook Plex</a>?</p><p>Jeśli licznik webhooków nie rośnie, gdy wstrzymujesz i odtwarzasz serial, spróbuj uruchomić ponownie Plex Media Server. Jeśli to nie pomoże, sprawdź <go-to page=\"logFiles\">dzienniki HTTP</go-to> pod kątem nieprawidłowych żądań. Jeśli nic nie widzisz, możesz mieć zły URL webhooka w Plex. Powinien wyglądać tak: <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>, ale to może być niedokładne i zależy od konfiguracji serwera.</p> Niektórzy dostawcy internetu blokują dostęp do URI <code>{urlbase}plex</code>, więc ta aplikacja przyjmuje też webhook Plex pod URI <code>{urlbase}</code> oraz pod <code>{urlbase}api/plex/post</code>. Oferujemy wszechstronność, aby powiadomienia były stabilne.",
+        "WebsiteSettings": "Ustawienia witryny",
+        "AccountMap": "Mapa kont",
+        "ActivityDelay": "Opóźnienie aktywności",
+        "WebhookCoolDown": "Odstęp webhooka",
+        "SessionsInterval": "Interwał sesji",
+        "MoviesFinished": "Ukończone filmy",
+        "SeriesFinished": "Ukończone seriale",
+        "NoActivity": "Brak aktywności"
     }
 }
