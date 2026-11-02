@@ -23,12 +23,12 @@
         "Every6Hours": "Alle 6 Stunden",
         "Every3Hours": "Alle 3 Stunden",
         "ConfirmReloadBody": "Willst du den Client wirklich neu laden?",
-        "ReloadSuccess": "Neuladen erfolgreich! Der Client wurde neu geladen.",
+        "ReloadSuccess": "Erfolgreich neu geladen! Der Client wurde neu geladen.",
         "APIKeyMustBeCountCharactersOrLonger": "API-Schlüssel muss {count} Zeichen oder länger sein.",
         "TokenMustBeCountCharacters": "Token muss {count} Zeichen oder länger sein.",
         "Reloading": "Wird neu geladen...",
-        "FailedToReload": "Neuladen fehlgeschlagen: {error}",
-        "ConfirmReload": "Neuladen bestätigen",
+        "FailedToReload": "Neu laden fehlgeschlagen: {error}",
+        "ConfirmReload": "Neu laden bestätigen",
         "ConfirmShutdown": "Herunterfahren bestätigen",
         "ConfirmShutdownBody": "Willst du den Client wirklich herunterfahren? Du musst ihn dann auf dem Host, auf dem er läuft, neu starten.",
         "ShutdownSuccess": "Herunterfahren erfolgreich! Der Client wurde angehalten.",
@@ -40,7 +40,7 @@
         "LoggedIn": "Angemeldet!",
         "Loading": "Wird geladen...",
         "BackEndUpdated": "Backend vor {timeDuration} aktualisiert.",
-        "ReloadCheckTimedOut": "Die Prüfung des Server-Neuladens hat nach 20 Versuchen das Timeout erreicht",
+        "ReloadCheckTimedOut": "Die Prüfung, ob der Server neu geladen wurde, hat nach 20 Versuchen das Timeout erreicht",
         "URLMustBeginWithHttp": "Die URL muss mit http:// oder https:// beginnen.",
         "NameMustNotBeEmpty": "Der Name darf nicht leer sein.",
         "HostMustNotBeEmpty": "Der Host darf nicht leer sein.",
@@ -1212,7 +1212,7 @@
                 "success": "Synchronisierung von Profil und Format bei Radarr gestartet."
             },
             "TrigStop": {
-                "label": "Neuladen des Clients",
+                "label": "Client wird neu geladen",
                 "button": "Client neu laden"
             },
             "TrigSnapshot": {
