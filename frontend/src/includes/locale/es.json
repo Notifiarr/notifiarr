@@ -1490,7 +1490,7 @@
         "body": {
             "label": "Cuerpo de la solicitud",
             "description": "El cuerpo que se envía a la URL en las solicitudes POST, PUT y PATCH.",
-            "placeholder": "{\"mensaje\": \"¡Hola, mundo!\"}"
+            "placeholder": "{\"message\": \"¡Hola, mundo!\"}"
         }
     },
     "SnapshotApps": {
