@@ -1003,6 +1003,9 @@ export interface Quality {
   quality?: null | BaseQuality;
   items?: null | (null | Quality)[];
   allowed: boolean;
+  minSize?: null | number;
+  maxSize?: null | number;
+  preferredSize?: null | number;
   /**
    * Not sure which app had this....
    */
@@ -1315,9 +1318,11 @@ export interface SonarrQueue {
  */
 export interface SonarrQueueRecord {
   downloadClientHasPostImportCategory: boolean;
+  isFullSeason?: boolean;
   id: number;
   seriesId: number;
   episodeId: number;
+  episodesWithFilesCount?: number;
   language: null | Value;
   quality: null | Quality;
   size: number;
@@ -1335,6 +1340,142 @@ export interface SonarrQueueRecord {
   indexer: string;
   outputPath: string;
   errorMessage: string;
+  episodeIds?: null | number[];
+  seasonNumbers?: null | number[];
+  languages?: null | (null | Value)[];
+  episodes?: null | (null | Episode)[];
+};
+
+/**
+ * Episode is the /api/v3/episode endpoint.
+ * @see golang: <golift.io/starr/sonarr.Episode>
+ */
+export interface Episode {
+  absoluteEpisodeNumber: number;
+  seasonNumber: number;
+  episodeNumber: number;
+  id: number;
+  seriesId: number;
+  tvdbId: number;
+  episodeFileId: number;
+  airDateUtc: Date;
+  airDate: string;
+  title: string;
+  overview: string;
+  unverifiedSceneNumbering: boolean;
+  hasFile: boolean;
+  monitored: boolean;
+  images: null | (null | Image)[];
+  series: null | Series;
+};
+
+/**
+ * Image is used in a few places.
+ * @see golang: <golift.io/starr.Image>
+ */
+export interface Image {
+  coverType: string;
+  url?: string;
+  remoteUrl?: string;
+  extension?: string;
+};
+
+/**
+ * Series is the output of /api/v3/series endpoint.
+ * @see golang: <golift.io/starr/sonarr.Series>
+ */
+export interface Series {
+  ended?: boolean;
+  monitored: boolean;
+  seasonFolder?: boolean;
+  useSceneNumbering?: boolean;
+  runtime?: number;
+  year?: number;
+  id?: number;
+  languageProfileId?: number;
+  qualityProfileId?: number;
+  tvdbId?: number;
+  tvMazeId?: number;
+  tvRageId?: number;
+  airTime?: string;
+  certification?: string;
+  cleanTitle?: string;
+  imdbId?: string;
+  network?: string;
+  overview?: string;
+  path?: string;
+  seriesType?: string;
+  sortTitle?: string;
+  status?: string;
+  title?: string;
+  titleSlug?: string;
+  rootFolderPath?: string;
+  added?: Date;
+  firstAired?: Date;
+  nextAiring?: Date;
+  previousAiring?: Date;
+  ratings?: null | Ratings;
+  statistics?: null | Statistics;
+  tags?: null | number[];
+  genres?: null | string[];
+  alternateTitles?: null | (null | AlternateTitle)[];
+  seasons?: null | (null | Season)[];
+  images?: null | (null | Image)[];
+  seasonType?: string;
+  originalCountry?: string;
+  monitorNewItems?: string;
+  tmdbId?: number;
+  language?: null | Value;
+  originalLanguage?: null | Value;
+  malIds?: null | number[];
+  aniListIds?: null | number[];
+};
+
+/**
+ * Ratings belong to a few types.
+ * @see golang: <golift.io/starr.Ratings>
+ */
+export interface Ratings {
+  votes: number;
+  value: number;
+  popularity?: number;
+  type?: string;
+};
+
+/**
+ * Statistics is part of AddSeriesInput and Queue.
+ * @see golang: <golift.io/starr/sonarr.Statistics>
+ */
+export interface Statistics {
+  seasonCount: number;
+  episodeFileCount: number;
+  episodeCount: number;
+  totalEpisodeCount: number;
+  sizeOnDisk: number;
+  percentOfEpisodes: number;
+  previousAiring: Date;
+  nextAiring: Date;
+  releaseGroups: null | string[];
+};
+
+/**
+ * AlternateTitle is part of a AddSeriesInput.
+ * @see golang: <golift.io/starr/sonarr.AlternateTitle>
+ */
+export interface AlternateTitle {
+  seasonNumber: number;
+  title: string;
+};
+
+/**
+ * Season is part of AddSeriesInput and Queue and used in a few places.
+ * @see golang: <golift.io/starr/sonarr.Season>
+ */
+export interface Season {
+  monitored: boolean;
+  seasonNumber: number;
+  statistics?: null | Statistics;
+  images?: null | (null | Image)[];
 };
 
 /**
