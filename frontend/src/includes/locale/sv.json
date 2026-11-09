@@ -3,517 +3,521 @@
         "Readarr": {
             "apiKey": {
                 "label": "API-nyckel",
-                "description": "",
-                "placeholder": ""
+                "description": "API-nyckel för Readarr-instansen.",
+                "placeholder": "readarr-api-key"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Readarr",
+            "addInstance": "Lägg till Readarr-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på Readarr-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Readarr-instansen.",
+                "placeholder": "http://readarr.server.tv:8787"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Användarnamn",
+                "description": "Användarnamn för Readarr-instansen.",
                 "placeholder": "admin",
-                "tooltip": ""
+                "tooltip": "Du behöver bara användarnamn och lösenord om du vill kontrollera säkerhetskopior av databasen, eftersom de inte kan hämtas via API:et."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för Readarr-instansen.",
+                "placeholder": "lösenord"
             }
         },
         "Radarr": {
             "username": {
-                "description": "",
-                "label": "",
-                "placeholder": "",
-                "tooltip": ""
+                "description": "Användarnamn för Radarr-instansen.",
+                "label": "Användarnamn",
+                "placeholder": "admin",
+                "tooltip": "Du behöver bara användarnamn och lösenord om du vill kontrollera säkerhetskopior av databasen, eftersom de inte kan hämtas via API:et."
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Radarr",
+            "addInstance": "Lägg till Radarr-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på Radarr-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Radarr-instansen.",
+                "placeholder": "http://radarr.server.tv:7878"
             },
             "apiKey": {
-                "description": "",
-                "placeholder": "",
+                "description": "API-nyckel för Radarr-instansen.",
+                "placeholder": "radarr-api-key",
                 "label": "API-nyckel"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för Radarr-instansen.",
+                "placeholder": "lösenord"
             }
         },
         "Sonarr": {
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Sonarr-instansen.",
+                "placeholder": "http://sonarr.server.tv:8989"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Sonarr",
+            "addInstance": "Lägg till Sonarr-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på Sonarr-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "apiKey": {
                 "label": "API-nyckel",
-                "description": "",
-                "placeholder": ""
+                "description": "API-nyckel för Sonarr-instansen.",
+                "placeholder": "sonarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Användarnamn",
+                "description": "Användarnamn för Sonarr-instansen.",
                 "placeholder": "admin",
-                "tooltip": ""
+                "tooltip": "Du behöver bara användarnamn och lösenord om du vill kontrollera säkerhetskopior av databasen, eftersom de inte kan hämtas via API:et."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för Sonarr-instansen.",
+                "placeholder": "lösenord"
             }
         },
         "Prowlarr": {
             "username": {
                 "placeholder": "admin",
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Användarnamn",
+                "description": "Användarnamn för Prowlarr-instansen.",
+                "tooltip": "Du behöver bara användarnamn och lösenord om du vill kontrollera säkerhetskopior av databasen, eftersom de inte kan hämtas via API:et."
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Prowlarr",
+            "addInstance": "Lägg till Prowlarr-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på Prowlarr-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Prowlarr-instansen.",
+                "placeholder": "http://prowlarr.server.tv:9696"
             },
             "apiKey": {
                 "label": "API-nyckel",
-                "description": "",
-                "placeholder": ""
+                "description": "API-nyckel för Prowlarr-instansen.",
+                "placeholder": "prowlarr-api-key"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för Prowlarr-instansen.",
+                "placeholder": "lösenord"
             }
         },
         "Lidarr": {
-            "addInstance": "",
+            "addInstance": "Lägg till Lidarr-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på Lidarr-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Lidarr-instansen.",
+                "placeholder": "http://lidarr.server.tv:8686"
             },
             "apiKey": {
                 "label": "API-nyckel",
-                "description": "",
-                "placeholder": ""
+                "description": "API-nyckel för Lidarr-instansen.",
+                "placeholder": "lidarr-api-key"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Användarnamn",
+                "description": "Användarnamn för Lidarr-instansen.",
                 "placeholder": "admin",
-                "tooltip": ""
+                "tooltip": "Du behöver bara användarnamn och lösenord om du vill kontrollera säkerhetskopior av databasen, eftersom de inte kan hämtas via API:et."
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för Lidarr-instansen.",
+                "placeholder": "lösenord"
             },
-            "title": ""
+            "title": "Lidarr"
         }
     },
     "SnapshotApps": {
         "MySQL": {
             "host": {
-                "description": "",
-                "label": "",
+                "description": "Värd eller IP-adress för MySQL-servern.",
+                "label": "Värd",
                 "placeholder": "127.0.0.1"
             },
-            "title": "",
-            "description": "",
+            "title": "MySQL",
+            "description": "Du kan lägga till MySQL-uppgifter i Notifiarr-klientens konfiguration för att ta en Snapshot av MySQL-tjänstens hälsa. Funktionen tar en Snapshot av data från <code>SHOW PROCESSLIST</code> och <code>SHOW STATUS</code>. Åtkomst till en databas krävs inte. Exempel på GRANT: <code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
             "addInstance": "Lägg till MySQL server",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Servernamn",
+                "description": "Namn på MySQL-servern.",
+                "placeholder": "eget namn för aviseringar"
             },
             "port": {
-                "label": "",
-                "description": "",
+                "label": "Port",
+                "description": "Port för MySQL-servern.",
                 "placeholder": "3306"
             },
             "username": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Användarnamn",
+                "description": "Användarnamn för MySQL-servern.",
+                "placeholder": "root"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för MySQL-servern.",
+                "placeholder": "lösenord"
             }
         },
         "Nvidia": {
-            "title": "",
-            "description": "",
+            "title": "Nvidia",
+            "description": "Den här integrationen visar Nvidia GPU-info i Snapshot-aviseringar. I Docker använder du CUDA-avbildningen (<code>ghcr.io/notifiarr/notifiarr:cuda</code> eller <code>golift/notifiarr:cuda</code>), installerar <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a> på värden och skickar in GPU:n med <code>--gpus all</code> eller Compose <code>gpus: all</code>. En CUDA-verktygsversion på värden krävs inte.",
             "disabled": {
-                "label": "",
-                "description": ""
+                "label": "GPU-Snapshot",
+                "description": "Aktivera eller inaktivera GPU-Snapshot."
             },
             "busIds": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Buss-ID:n",
+                "description": "Kommaseparerad lista med buss-ID:n som ska ingå i Snapshot.",
+                "placeholder": "0000:00:00.0,0000:00:00.1",
+                "tooltip": "Det här är GPU:ns buss-ID. Du hittar det genom att köra <code>nvidia-smi</code> och titta i kolumnen <code>Bus Id</code>. Kort med andra buss-ID:n ignoreras i Snapshot. Lämna oftast fältet tomt. Lägg till flera med radbrytningar."
             },
             "smiPath": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Sökväg till nvidia-smi",
+                "description": "Sökväg till kommandot nvidia-smi.",
+                "placeholder": "/usr/bin/nvidia-smi",
+                "tooltip": "Om nvidia-smi (nvidia-smi.exe i Windows) inte finns i PATH kan du ange en fullständig sökväg till binärfilen här."
             }
         }
     },
     "Downloaders": {
         "Qbittorrent": {
             "name": {
-                "placeholder": "",
-                "label": "",
-                "description": ""
+                "placeholder": "eget namn för aviseringar",
+                "label": "Instansnamn",
+                "description": "Namn på Qbittorrent-instansen."
             },
             "password": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "Lösenord för Qbittorrent-instansen.",
+                "placeholder": "lösenord",
+                "label": "Lösenord"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Qbittorrent",
+            "addInstance": "Lägg till Qbittorrent-instans",
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Qbittorrent-instansen.",
+                "placeholder": "http://qbittorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
+                "label": "Användarnamn",
                 "placeholder": "admin",
-                "description": ""
+                "description": "Användarnamn för Qbittorrent-instansen."
             }
         },
         "Rtorrent": {
-            "title": "",
-            "addInstance": "",
+            "title": "Rtorrent",
+            "addInstance": "Lägg till Rtorrent-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på Rtorrent-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Rtorrent-instansen.",
+                "placeholder": "http://rtorrent.server.tv:8080"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Användarnamn",
+                "description": "Användarnamn för Rtorrent-instansen.",
                 "placeholder": "admin"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för Rtorrent-instansen.",
+                "placeholder": "lösenord"
             }
         },
         "Transmission": {
             "name": {
-                "description": "",
-                "label": "",
-                "placeholder": ""
+                "description": "Namn på Transmission-instansen.",
+                "label": "Instansnamn",
+                "placeholder": "eget namn för aviseringar"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Användarnamn",
+                "description": "Användarnamn för Transmission-instansen.",
                 "placeholder": "admin"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Transmission",
+            "addInstance": "Lägg till Transmission-instans",
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Transmission-instansen. Den <b>måste</b> innehålla suffixet <code>/transmission/rpc</code>.",
+                "placeholder": "http://transmission.server.tv:9091"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för Transmission-instansen.",
+                "placeholder": "lösenord"
             }
         },
         "Deluge": {
             "password": {
-                "placeholder": "",
-                "label": "",
-                "description": ""
+                "placeholder": "lösenord",
+                "label": "Lösenord",
+                "description": "Lösenord för Deluge-instansen."
             },
-            "title": "",
-            "addInstance": "",
+            "title": "Deluge",
+            "addInstance": "Lägg till Deluge-instans",
             "name": {
-                "description": "",
-                "placeholder": "",
-                "label": ""
+                "description": "Namn på Deluge-instansen.",
+                "placeholder": "eget namn för aviseringar",
+                "label": "Instansnamn"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Deluge-instansen.",
+                "placeholder": "http://deluge.server.tv:8112"
             }
         },
         "NZBGet": {
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till NZBGet-instansen.",
+                "placeholder": "http://nzbget.server.tv:6789"
             },
             "password": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Lösenord",
+                "description": "Lösenord för NZBGet-instansen.",
+                "placeholder": "lösenord"
             },
-            "title": "",
-            "addInstance": "",
+            "title": "NZBGet",
+            "addInstance": "Lägg till NZBGet-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på NZBGet-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "username": {
-                "label": "",
-                "description": "",
+                "label": "Användarnamn",
+                "description": "Användarnamn för NZBGet-instansen.",
                 "placeholder": "admin"
             }
         },
         "SabNZB": {
-            "title": "",
-            "addInstance": "",
+            "title": "SabNZB",
+            "addInstance": "Lägg till SabNZB-instans",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Instansnamn",
+                "description": "Namn på SabNZB-instansen.",
+                "placeholder": "eget namn för aviseringar"
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till SabNZB-instansen.",
+                "placeholder": "http://sabnzb.server.tv:8080"
             },
             "apiKey": {
                 "label": "API-nyckel",
-                "description": "",
-                "placeholder": ""
+                "description": "API-nyckel för SabNZB-instansen.",
+                "placeholder": "sabnzb-api-key"
             }
         }
     },
     "SiteTunnel": {
-        "subText": "",
+        "subText": "Klicka på knappen <span class=\"text-success\">Pinga tunnlar</span> och välj tunneln med snabbast svarstid som primär. Välj en annan snabb tunnel som reserv.",
         "phrases": {
-            "PrimaryTunnel": "",
-            "BackupTunnel": "",
-            "Ping": "",
-            "Pinging": "",
-            "ActiveTunnel": "",
-            "TunnelStats": "",
-            "ConnectionPoolSize": "",
-            "Connecting": "",
-            "Idle": "",
-            "Running": "",
-            "LastConnection": "",
-            "LastActiveCheck": "",
-            "SocketURLActive": "",
-            "SocketURLInactive": "",
-            "SelectTunnel": "",
-            "TunnelsSaved": "",
-            "TunnelStatsStale": "",
-            "Disconnects": ""
+            "PrimaryTunnel": "Primär tunnel",
+            "BackupTunnel": "Reservtunnel",
+            "Ping": "Pinga tunnlar",
+            "Pinging": "Pingar ...",
+            "ActiveTunnel": "Aktiv tunnel: {tunnel}",
+            "TunnelStats": "Tunnelstatistik",
+            "ConnectionPoolSize": "Anslutningspoolens storlek",
+            "Connecting": "Ansluter",
+            "Idle": "Inaktiv",
+            "Running": "Körs",
+            "LastConnection": "Senaste anslutning",
+            "LastActiveCheck": "Senaste aktiva kontroll",
+            "SocketURLActive": "Socket-URL (aktiv)",
+            "SocketURLInactive": "Socket-URL (inaktiv)",
+            "SelectTunnel": "Välj en tunnel",
+            "TunnelsSaved": "Tunnlarna sparades för {timeDuration} sedan!",
+            "TunnelStatsStale": "Informationen ovan är alltid inaktuell. Uppdatera den genom att klicka på länken Uppdatera backend i sidhuvudet.",
+            "Disconnects": "Frånkopplingar"
         }
     },
     "system": {
         "StartupParams": {
-            "CustomAssets": "",
-            "UserID": "",
-            "GroupID": "",
-            "IPAddress": "",
-            "title": "",
-            "BinaryPath": "",
-            "ConfigFile": "",
-            "EnvironmentPrefix": "",
-            "ExtraConfigFiles": ""
+            "CustomAssets": "Egna resurser",
+            "UserID": "Användar-ID",
+            "GroupID": "Grupp-ID",
+            "IPAddress": "IP-adress",
+            "title": "Startparametrar",
+            "BinaryPath": "Binärsökväg",
+            "ConfigFile": "Konfigurationsfil",
+            "EnvironmentPrefix": "Miljöprefix",
+            "ExtraConfigFiles": "Extra konfigurationsfiler"
         },
         "UserInformation": {
-            "title": "",
-            "Patron": "",
-            "Subscriber": "",
-            "AbsoluteBadAss": "",
-            "YesYesYouAre": "",
-            "HellaAwesome": "",
-            "YoureSoGifted": "",
-            "DateFormat": ""
+            "title": "Användarinformation",
+            "Patron": "Patron",
+            "Subscriber": "Prenumerant",
+            "AbsoluteBadAss": "Absolut badass",
+            "YesYesYouAre": "Ja, det är du! 💚",
+            "HellaAwesome": "Sjukt grym",
+            "YoureSoGifted": "Du är så begåvad, och vi älskar dig! 💜",
+            "DateFormat": "Datumformat",
+            "InvalidAPIKey": "Inte inloggad på Notifiarr. API-nyckeln avvisades."
         },
         "EnvironmentVariables": {
-            "title": ""
+            "title": "Miljövariabler"
         },
         "BuildInformation": {
-            "BuildUser": "",
-            "BuildDate": "",
-            "title": "",
-            "Branch": "",
-            "GoVersion": "",
-            "Integrity": ""
+            "BuildUser": "Bygganvändare",
+            "BuildDate": "Byggdatum",
+            "title": "Bygginformation",
+            "Branch": "Gren",
+            "GoVersion": "Go-version",
+            "Integrity": "Integritet"
         },
         "StorageData": {
-            "FS": "",
-            "title": "",
-            "Total": "",
-            "Used": "",
-            "Free": "",
-            "ro": ""
+            "FS": "FS",
+            "title": "Lagringsdata",
+            "Total": "Totalt",
+            "Used": "Använt",
+            "Free": "Ledigt",
+            "ro": "ro",
+            "Device": "Enhet",
+            "Mount": "Montering"
         },
         "OperatingSystem": {
-            "title": "",
-            "Hostname": "",
-            "UniqueID": "",
-            "Platform": "",
-            "KernelVersion": "",
-            "VirtualizationSystem": ""
+            "title": "Operativsystem",
+            "Hostname": "Värdnamn",
+            "UniqueID": "Unikt ID",
+            "Platform": "Plattform",
+            "KernelVersion": "Kärnversion",
+            "VirtualizationSystem": "Virtualiseringssystem"
         },
         "ClientInformation": {
-            "title": "",
-            "Application": "",
-            "Version": "",
-            "Started": "",
-            "Uptime": ""
+            "title": "Klientinformation",
+            "Application": "Program",
+            "Version": "Version",
+            "Started": "Startad",
+            "Uptime": "Drifttid"
         },
         "NetworkInformation": {
-            "title": "",
-            "IPAddress": "",
-            "Gateway": "",
-            "Netmask": "",
-            "Interface": ""
+            "title": "Nätverksinformation",
+            "IPAddress": "IP-adress",
+            "Gateway": "Standardgateway",
+            "Netmask": "Nätmask",
+            "Interface": "Gränssnitt"
         }
     },
     "Endpoints": {
         "template": {
-            "placeholder": "",
-            "tooltip": "",
-            "required": "",
-            "label": "",
-            "description": ""
+            "placeholder": "pihole",
+            "tooltip": "Mallen används av webbplatsen för att avgöra hur nyttolasten ska bli en chattavisering. Hitta en lista över tillgängliga mallar eller skapa en egen på <a href=\"https://notifiarr.com/\" target=\"_blank\">webbplatsen</a> under <code>Integrations: Endpoints</code>.",
+            "required": "En mall krävs. Ange 'test' om du är osäker på vad du ska skriva.",
+            "label": "Nyttolastmall",
+            "description": "Tolka nyttolasten med den här mallen."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Tidsgräns för begäran",
+            "description": "Hur länge du ska vänta på att HTTP-begäran slutförs."
         },
         "method": {
-            "label": "",
-            "description": ""
+            "label": "Metod",
+            "description": "HTTP-begäran"
         },
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Relä-URL",
+            "description": "URL till fjärrtjänsten som vidarebefordras till webbplatsen.",
+            "placeholder": "https://pihole.myhome.lan/api/stats"
         },
         "header": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "HTTP-huvuden",
+            "description": "HTTP-begärandehuvuden, 1 per rad.",
+            "placeholder": "Content-Type: application/json",
+            "tooltip": "HTTP-begärandehuvudena skickas till URL:en som de är. Formatet måste vara <code>key: value</code> per rad. Mellanslag och kolon krävs. Ogiltiga värden ignoreras och extra mellanslag trimmas."
         },
         "query": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Frågeparametrar",
+            "description": "Frågeparametrar som läggs till i URL:en, 1 per rad.",
+            "placeholder": "apiKey=1234567890",
+            "tooltip": "Frågeparametrarna läggs till i URL:en. Formatet måste vara <code>key=value</code> per rad. Ogiltiga värden ignoreras och extra mellanslag trimmas. Ta inte med tecknet <code>?</code> eller et-tecken (<code>&</code>) i början av en rad. Nycklar och värden URL-kodas automatiskt."
         },
         "body": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Begäransinnehåll",
+            "description": "Innehållet som skickas till URL:en för POST-, PUT- och PATCH-begäranden.",
+            "placeholder": "{\"message\": \"Hello, world!\"}"
         },
-        "title": "",
-        "addInstance": "",
-        "DeleteEndpoint": "",
+        "title": "Relä-URL:er",
+        "addInstance": "Lägg till relä-URL",
+        "DeleteEndpoint": "Ta bort URL",
         "badge": {
-            "header": "",
-            "query": "",
-            "body": ""
+            "header": "{count, plural, =1 {1 huvud} other {# huvuden}}",
+            "query": "{count, plural, =1 {1 fråga} other {# frågor}}",
+            "body": "{count, plural, =1 {1 tecken} other {# tecken}}"
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Namn",
+            "description": "Namn på relä-URL:en.",
+            "placeholder": "eget namn för aviseringar"
         }
     },
     "MediaApps": {
         "Plex": {
-            "title": "",
-            "description": "",
+            "title": "Plex",
+            "description": "Plex-integrationen är omfattande, och många av inställningarna konfigureras på <a href=\"https://notifiarr.com/\" target=\"_blank\">webbplatsen Notifiarr.com</a>.",
             "name": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "Servernamn",
+                "description": "Namn på Plex-servern.",
+                "placeholder": "Sätts automatiskt av servern",
+                "tooltip": "Namnet på Plex Media Server används i aviseringar, loggar och hälsokontroller. Det sätts automatiskt av Plex-servern."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Plex-servern.",
+                "placeholder": "http://plex.server.tv:32400"
             },
             "token": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": ""
+                "label": "Token",
+                "description": "Token för Plex-servern.",
+                "placeholder": "pl3x-to_Ken",
+                "tooltip": "Du hittar anvisningar för att hitta din Plex-token i <a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">den här Plex-artikeln</a>."
             }
         },
         "Tautulli": {
-            "title": "",
-            "description": "",
+            "title": "Tautulli",
+            "description": "Tautulli har en funktion som låter dig ge dina Plex-användare egna användarnamn. Om du integrerar Notifiarr-klienten med Tautulli visas de egna användarnamnen i aviseringarna på din chatt-server. Om det inte är aktiverat används Plex-användarnamn eller e-postadresser i stället. Det är helt valfritt. Notifiarr-webbplatsen har samma funktion och låter dig mappa Plex-användare till egna namn. Du kan också lägga till en Tautulli-instans här bara för att övervaka den med hälsokontroller.",
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Tautulli-namn",
+                "description": "Namn på Tautulli-tjänsten."
             },
             "url": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "URL",
+                "description": "URL till Tautulli-tjänsten.",
+                "placeholder": "http://tautulli.server.tv:8181"
             },
             "apiKey": {
-                "description": "",
-                "placeholder": "",
+                "description": "API-nyckel för Tautulli-tjänsten.",
+                "placeholder": "tautulli-api-key",
                 "label": "API-nyckel"
             }
         }
@@ -521,977 +525,1346 @@
     "Actions": {
         "triggers": {
             "TrigCollectionGaps": {
-                "success": "",
-                "label": "",
-                "button": ""
+                "success": "Kontroll av luckor i samlingen har startat.",
+                "label": "Luckor i samlingen",
+                "button": "Kontrollera luckor i samlingen"
             },
             "TrigCFSyncLidarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Synk av Lidarr-profil och format",
+                "button": "Synka alla Lidarr-instanser",
+                "success": "Synk av Lidarr-profil och format har startat."
             },
             "TrigCFSyncRadarr": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Synk av Radarr-profil och format",
+                "button": "Synka alla Radarr-instanser",
+                "success": "Synk av Radarr-profil och format har startat."
             },
             "TrigStop": {
-                "label": "",
-                "button": ""
+                "label": "Omladdningar av klienten",
+                "button": "Ladda om klienten"
             },
             "TrigSnapshot": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Snapshot-insamling",
+                "button": "Uppdatera Snapshot",
+                "success": "Snapshot-insamling har startat."
             },
             "TrigProwlarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Skadad Prowlarr-databas",
+                "button": "Kontrollera Prowlarr",
+                "success": "Kontroll av skadad Prowlarr-databas har startat."
             },
             "TrigLidarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Skadad Lidarr-databas",
+                "button": "Kontrollera Lidarr",
+                "success": "Kontroll av skadad Lidarr-databas har startat."
             },
             "TrigRadarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Skadad Radarr-databas",
+                "button": "Kontrollera Radarr",
+                "success": "Kontroll av skadad Radarr-databas har startat."
             },
             "TrigReadarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Skadad Readarr-databas",
+                "button": "Kontrollera Readarr",
+                "success": "Kontroll av skadad Readarr-databas har startat."
             },
             "TrigSonarrCorrupt": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Skadad Sonarr-databas",
+                "button": "Kontrollera Sonarr",
+                "success": "Kontroll av skadad Sonarr-databas har startat."
             },
             "TrigProwlarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Säkerhetskopior av Prowlarr-databasen",
+                "button": "Kontrollera Prowlarr",
+                "success": "Kontroll av säkerhetskopior av Prowlarr-databasen har startat."
             },
             "TrigLidarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Säkerhetskopior av Lidarr-databasen",
+                "button": "Kontrollera Lidarr",
+                "success": "Kontroll av säkerhetskopior av Lidarr-databasen har startat."
             },
             "TrigRadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Säkerhetskopior av Radarr-databasen",
+                "button": "Kontrollera Radarr",
+                "success": "Kontroll av säkerhetskopior av Radarr-databasen har startat."
             },
             "TrigReadarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Säkerhetskopior av Readarr-databasen",
+                "button": "Kontrollera Readarr",
+                "success": "Kontroll av säkerhetskopior av Readarr-databasen har startat."
             },
             "TrigSonarrBackup": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Säkerhetskopior av Sonarr-databasen",
+                "button": "Kontrollera Sonarr",
+                "success": "Kontroll av säkerhetskopior av Sonarr-databasen har startat."
             },
             "TrigUpCheck": {
-                "label": ""
+                "label": "Uppe-kontroll från klient till webbplats"
             },
             "TrigEndpointURL": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Slutpunkts-URL vidarebefordrad till webbplatsen: {name}",
+                "button": "Kör slutpunkt",
+                "success": "Vidarebefordran av slutpunkts-URL har startat."
             },
             "TrigCustomCommand": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Eget kommando: {name}",
+                "button": "Kör kommando",
+                "success": "Eget kommando har startat."
             },
             "TrigAutoUpdate": {
-                "label": ""
+                "label": "Kontroll av automatisk uppdatering"
             },
             "TrigCFSyncLidarrInt": {
-                "label": ""
+                "label": "Synk av anpassat Lidarr-format per instans"
             },
             "TrigCFSyncRadarrInt": {
-                "label": ""
+                "label": "Synk av anpassat Radarr-format per instans"
             },
             "TrigCustomCronTimer": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Webbplatstimer: {name}",
+                "button": "Kör timer nu",
+                "success": "Webbplatstimer har startat."
             },
             "TrigDownloadingItems": {
-                "label": ""
+                "label": "Hämtar / färdiga objekt"
             },
             "TrigLidarrQueue": {
-                "label": ""
+                "label": "Cache för Lidarr-kö"
             },
             "TrigRadarrQueue": {
-                "label": ""
+                "label": "Cache för Radarr-kö"
             },
             "TrigReadarrQueue": {
-                "label": ""
+                "label": "Cache för Readarr-kö"
             },
             "TrigSonarrQueue": {
-                "label": ""
+                "label": "Cache för Sonarr-kö"
             },
             "TrigStuckItems": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Kontroll av fastnade objekt",
+                "button": "Kontrollera fastnade objekt",
+                "success": "Kontroll av fastnade objekt har startat."
             },
             "TrigPollSite": {
-                "label": ""
+                "label": "Webbplatsavfrågare"
             },
             "TrigMDBListSync": {
-                "success": "",
-                "label": "",
-                "button": ""
+                "success": "Synk av MDB-lista har startat.",
+                "label": "Synk av MDB-lista",
+                "button": "Synka MDB-lista"
             },
             "TrigPlexEmptyTrash": {
-                "label": ""
+                "label": "Töm Plex-papperskorgen"
             },
             "TrigUploadFile": {
-                "label": "",
-                "button": "",
-                "success": "",
+                "label": "Loggfil uppladdad till webbplatsen",
+                "button": "Ladda upp logg nu",
+                "success": "Loggfilen har laddats upp till webbplatsen.",
                 "options": {
-                    "choose": "",
-                    "app": "",
-                    "debug": "",
-                    "http": ""
+                    "choose": "Välj en fil att ladda upp.",
+                    "app": "Programmets loggfil.",
+                    "debug": "Felsökningsloggfil.",
+                    "http": "HTTP-loggfil."
                 }
             },
             "TrigPlexSessions": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Samla in Plex-sessioner",
+                "button": "Samla in sessioner nu",
+                "success": "Plex-sessioner insamlade."
             },
             "TrigPlexSessionsCheck": {
-                "label": ""
+                "label": "Kontrollera avslutade Plex-sessioner"
             },
             "TrigDashboard": {
-                "label": "",
-                "button": "",
-                "success": ""
+                "label": "Uppdatering av instrumentpanel",
+                "button": "Uppdatera instrumentpanel",
+                "success": "Uppdatering av instrumentpanelen har startat."
+            },
+            "TrigCFSyncSonarr": {
+                "label": "Synk av Sonarr-profil och format",
+                "button": "Synka alla Sonarr-instanser",
+                "success": "Synk av Sonarr-profil och format har startat."
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "Synk av anpassat Sonarr-format per instans"
             }
         },
         "titles": {
-            "Schedule": "",
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": "",
-            "Counter": "",
-            "Interval": ""
+            "Schedule": "Schema",
+            "Triggers": "Utlösare",
+            "Timers": "Timers",
+            "Schedules": "Scheman",
+            "SiteCrons": "Webbplatstimers",
+            "Counter": "Räknare",
+            "Interval": "Intervall",
+            "Trigger": "Utlösare",
+            "Timer": "Timer",
+            "Type": "Typ",
+            "When": "När",
+            "Action": "Åtgärd",
+            "Never": "Aldrig",
+            "Filter": "Filter"
         },
         "descriptions": {
-            "Triggers": "",
-            "Timers": "",
-            "Schedules": "",
-            "SiteCrons": ""
+            "Triggers": "De här åtgärderna har varken timer eller schema.",
+            "Timers": "De här åtgärderna har en timer.",
+            "Schedules": "De här åtgärderna har ett schema.",
+            "SiteCrons": "De här åtgärderna skapas av webbplatsen för att avlasta timerbevakningen."
         }
     },
     "Commands": {
-        "description": "",
-        "title": "",
-        "addInstance": "",
-        "DeleteCommand": "",
-        "Executions": "",
-        "Failures": "",
-        "LastExecution": "",
-        "neverExecuted": "",
-        "enterCommandArguments": "",
-        "commandRequiresArguments": "",
-        "noOutput": "",
-        "refreshed": "",
-        "regexMismatch": "",
+        "description": "Kommandon körs av klienten (backend). De kan utlösas från det här gränssnittet eller från en chatt-server. Om du ändrar ett kommando måste du spara konfigurationen innan du kan köra det från webbgränssnittet.",
+        "title": "Kommandolista",
+        "addInstance": "Skapa kommando",
+        "DeleteCommand": "Ta bort kommando",
+        "Executions": "Körningar: {count}",
+        "Failures": "Misslyckanden: {count}",
+        "LastExecution": "Senaste körning",
+        "neverExecuted": "aldrig kört",
+        "enterCommandArguments": "Ange kommandoargument",
+        "commandRequiresArguments": "Det här kommandot kräver {count, plural, =1 {ett argument. Ange det nedan.} other {# argument. Ange dem nedan.}}",
+        "noOutput": "Ingen utdata ännu. Prova att köra kommandot och klicka sedan på uppdatera.",
+        "refreshed": "uppdaterades för {timeDuration} sedan",
+        "regexMismatch": "Argumentet matchar inte det reguljära uttrycket.",
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Namn",
+            "description": "Namn på kommandot. Visas i loggen och i aviseringar.",
+            "placeholder": "eget namn för aviseringar"
         },
         "command": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Kommando",
+            "description": "Kommando som ska köras.",
+            "placeholder": "echo 'Hello, world!'",
+            "tooltip": "Det här är kommandot som körs när det utlöses.<br />Klicka på dubbelbock-ikonen för att köra kommandot nu. När det är klart klickar du på uppdatera och på Visa utdata för att se resultatet.<br /><br />Markera rutan för att köra kommandot i ett shell. I Windows körs kommandot med <code>cmd.exe</code> och i andra operativsystem med <code>/bin/bash</code>. Det är praktiskt för kommandon som behöver shell-funktioner som rörledningar och omdirigeringar. Egna positionsargument kan anges i formatet <code>({regex})</code>, alltså ett reguljärt uttryck omslutet av klammerparenteser och parenteser, t.ex. <code>({[a-z]})</code>. Argumenten fylls i av den som kör kommandot, antingen i det här webbgränssnittet eller på din chatt-server. Om ett kommando har ett argument är det obligatoriskt. Om det har flera argument är alla obligatoriska.<br /><br /> <h5>Exempel</h5>Kommando med två argument: <code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />Kommandot ovan låter en användare köra valfri kombination av <code>ls -la</code> mot antingen <code>/tmp</code>, <code>/</code>, <code>/home</code> eller <code>/lib</code>.",
+            "required": "Kommando krävs"
         },
         "notify": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Avisera",
+            "description": "Skicka avisering när kommandot har körts.",
+            "tooltip": "Få en avisering som innehåller kommandots utdata."
         },
         "log": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Logga utdata",
+            "description": "Logga kommandots utdata.",
+            "tooltip": "Logga kommandots utdata i den här klientens programlogg."
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Maximal körtid",
+            "description": "Hur länge kommandot får köra innan det avbryts."
         }
     },
     "monitoring": {
-        "ConfigureServices": "",
-        "EnableOnConfig": "",
-        "StartChecks": "",
-        "ChecksDisabled": "",
-        "ChecksStopped": "",
-        "StopChecks": "",
-        "stopFailed": "",
-        "startFailed": "",
-        "recheckFailed": "",
-        "checkInitiated": "",
-        "nextRefresh": "",
-        "refreshInterval": "",
-        "cardsView": "",
-        "classicView": "",
-        "hideAllOutputs": "",
-        "showAllOutputs": "",
+        "ConfigureServices": "Hälsokontroller för konfigurerade integrationer aktiveras genom att du ger dem ett kontrollintervall på respektive konfigurationssida. Vissa av kontrollerna kommer från sidan <go-to page=\"starrapps\">Starr-appar</go-to>, sidan <go-to page=\"downloaders\">Nedladdningsappar</go-to> eller sidan <go-to page=\"mediaapps\">Medieappar</go-to>. Övriga visade hälsokontroller finns på sidan <go-to page=\"services\">Tjänster</go-to>.",
+        "EnableOnConfig": "Aktivera hälsokontroller på sidan <go-to page=\"services\">Tjänster</go-to>.",
+        "StartChecks": "Återuppta hälsokontroller",
+        "ChecksDisabled": "Hälsokontroller: inaktiverade",
+        "ChecksStopped": "Hälsokontroller: pausade",
+        "StopChecks": "Pausa hälsokontroller",
+        "stopFailed": "Det gick inte att pausa hälsokontrollerna.",
+        "startFailed": "Det gick inte att återuppta hälsokontrollerna.",
+        "recheckFailed": "Det gick inte att köra om hälsokontrollen.",
+        "checkInitiated": "Hälsokontroll startad.",
+        "nextRefresh": "Nästa uppdatering om {timeDuration}.",
+        "refreshInterval": "Uppdateringsintervall",
+        "cardsView": "Kortvy",
+        "classicView": "Klassisk vy",
+        "hideAllOutputs": "Dölj all utdata",
+        "showAllOutputs": "Visa all utdata",
         "check": {
-            "name": "",
+            "name": "Tjänstenamn",
             "state": {
-                "short": "",
-                "title": ""
+                "short": "Tillstånd",
+                "title": "Räknare för tjänstekontroll"
             },
-            "typeExpect": "",
+            "typeExpect": "Typ/förväntat",
             "last": {
-                "short": "",
-                "title": "",
-                "tooltip": "",
-                "description": ""
+                "short": "Senast",
+                "title": "Senaste kontroll: för {timeDuration} sedan",
+                "tooltip": "Hur länge sedan den här tjänsten kontrollerades.",
+                "description": "Tjänsten kontrollerades senast"
             },
             "since": {
-                "tooltip": "",
-                "description": "",
-                "short": "",
-                "title": ""
+                "tooltip": "Hur länge tjänsten har varit i det här tillståndet.",
+                "description": "Tjänsten har varit i det här tillståndet sedan",
+                "short": "Sedan",
+                "title": "Tid i tillståndet: {timeDuration}"
             },
             "interval": {
-                "short": "",
-                "title": "",
-                "tooltip": ""
+                "short": "Intervall",
+                "title": "Kontrollintervall",
+                "tooltip": "Hur ofta den här tjänsten kontrolleras."
             },
-            "output": ""
+            "output": "Utdata från senaste kontroll"
         }
     },
     "ServiceChecks": {
-        "description": "",
-        "title": "",
-        "DeleteCheck": "",
-        "addInstance": "",
-        "processListLink": "",
+        "description": "Använd det här formuläret för att konfigurera hälsokontroller. Lägg inte till starr-, medie-, Snapshot- eller nedladdningsappar här. Ge dem i stället ett kontrollintervall på respektive konfigurationssida. Visa <go-to page=\"ProcessList\">listan över körande processer här</go-to> och använd den som inspiration när du skapar processkontroller.",
+        "title": "Hälsokontroller",
+        "DeleteCheck": "Ta bort hälsokontroll",
+        "addInstance": "Skapa hälsokontroll",
+        "processListLink": "Visa listan över körande processer här.",
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Tidsgräns för kontroll",
+            "description": "Hur länge du ska vänta på att tjänstekontrollen slutförs."
         },
         "interval": {
-            "label": "",
-            "description": ""
+            "label": "Kontrollintervall",
+            "description": "Hur ofta tjänsten ska kontrolleras."
         },
         "name": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Kontrollnamn",
+            "description": "Unikt namn på tjänsten som övervakas.",
+            "placeholder": "eget namn för aviseringar",
+            "tooltip": "Namnet på tjänsten som övervakas. Det används för att identifiera tjänsten i aviseringar. Varje tjänst måste ha ett unikt namn."
         },
         "type": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
+            "label": "Kontrolltyp",
+            "description": "Typ av kontroll som ska utföras.",
+            "tooltip": "Kontrolltypen Processkontroll låter dig övervaka att en process körs. Kontrolltypen HTTP-URL-kontroll låter dig övervaka en URL:s nåbarhet. Kontrolltypen Nåbarhet för TCP-port låter dig övervaka anslutningen till en TCP-port. Båda pingkontrollerna låter dig övervaka nåbarheten för en IP eller värd.",
             "options": {
-                "process": "",
-                "http": "",
-                "tcp": "",
-                "ping": "",
-                "icmp": ""
+                "process": "Processkontroll",
+                "http": "HTTP-URL-kontroll",
+                "tcp": "Nåbarhet för TCP-port",
+                "ping": "UDP-pingkontroll",
+                "icmp": "ICMP-pingkontroll"
             }
         },
         "url": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "URL",
+            "description": "URL till tjänsten som övervakas.",
+            "placeholder": "https://my.site"
         },
         "http": {
             "headers": {
-                "label": "",
-                "description": "",
-                "placeholder": ""
+                "label": "HTTP-huvuden",
+                "description": "HTTP-begärandehuvuden, 1 per rad.",
+                "placeholder": "Content-Type: application/json"
             },
             "codes": {
-                "label": "",
-                "description": "",
-                "required": ""
+                "label": "Godkända svarskoder",
+                "description": "Alla koder här räknas som godkända. Om tjänsten svarar med en annan kod skapas en avisering.",
+                "required": "Minst en förväntad svarskod krävs."
             }
         },
         "tcp": {
             "value": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "required": "",
+                "label": "Värd och port",
+                "description": "Ange värd:port eller värd:ip för att kontrollera anslutningen.",
+                "tooltip": "En IP-adress rekommenderas i allmänhet. Om du också vill testa DNS använder du ett värdnamn. Formatet är <code>host:port</code>. Det ska inte finnas mellanslag eller extra tecken.",
+                "required": "En värd och en port avgränsade med kolon krävs.",
                 "placeholder": "127.0.0.1:22"
             }
         },
         "ping": {
             "value": {
-                "label": "",
-                "description": "",
+                "label": "Värd eller IP",
+                "description": "Ange värd eller IP för att kontrollera nåbarhet.",
                 "placeholder": "127.0.0.1",
-                "tooltip": "",
-                "required": ""
+                "tooltip": "En IP-adress rekommenderas i allmänhet. Om du också vill testa DNS använder du ett värdnamn. Formatet är <code>host</code> eller <code>10.11.12.13</code>. Det ska inte finnas mellanslag eller extra tecken. För att UDP-kontroller ska fungera i Linux måste du aktivera dem med det här kommandot: <code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>. För att ICMP-kontroller ska fungera i Linux måste du ge notifiarr-binärfilen capabilities med det här kommandot: <code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>. Enklast för att båda ska fungera i Docker är att aktivera privilegierat läge, men du kan också sätta capabilities.",
+                "required": "En värd eller IP-adress krävs."
             },
             "count": {
-                "description": "",
-                "label": "",
+                "description": "Antal paket som ska skickas.",
+                "label": "Antal",
                 "placeholder": "10",
-                "required": ""
+                "required": "Ett paketantal större än noll krävs."
             },
             "minimum": {
-                "label": "",
-                "description": "",
+                "label": "Minimum",
+                "description": "Minsta antal paket som måste tas emot.",
                 "placeholder": "10",
-                "required": ""
+                "required": "Ett minsta paketantal större än noll krävs."
             },
             "interval": {
-                "label": "",
-                "description": "",
+                "label": "Intervall",
+                "description": "Intervall i millisekunder mellan paket.",
                 "placeholder": "100"
             }
         },
         "process": {
             "value": {
-                "label": "",
-                "description": "",
-                "placeholder": "",
-                "tooltip": "",
-                "required": ""
+                "label": "Processträff",
+                "description": "Namnet på processen som ska kontrolleras.",
+                "placeholder": "notifiarr",
+                "tooltip": "Namnet på processen som ska kontrolleras. Det är namnet som det visas i processlistan. En jokerteckenmatchning används i båda ändar av värdet, så ju mer specifika argument du anger desto bättre blir träffen.",
+                "required": "Ett processnamn krävs."
             },
             "running": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Körs",
+                "description": "Skicka en varning om processen körs.",
+                "tooltip": "Om du väljer det här utlöses en ohälsosam varning om processen körs. Välj det här om du vill ha en avisering när processen startar."
             },
             "restarts": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Omstarter",
+                "description": "Skicka en varning om processen har startats om.",
+                "tooltip": "Om du väljer det här utlöses en ohälsosam varning om processen har startats om. Välj det här om du vill ha en avisering när PID ändras."
             },
             "minimum": {
-                "label": "",
-                "description": "",
-                "required": "",
-                "tooltip": ""
+                "label": "Minimum",
+                "description": "Minsta antal körande processer som måste matcha värdet.",
+                "required": "Ett minsta antal processer större än noll krävs.",
+                "tooltip": "Om du anger 2 får du en avisering om färre än 2 processer körs. Använd det här för att bli varnad om för få processer körs."
             },
             "maximum": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Maximum",
+                "description": "Högsta antal körande processer som får matcha värdet.",
+                "tooltip": "Om du anger 2 får du en avisering om fler än 2 processer körs. Använd det här för att bli varnad om för många processer körs."
             }
         }
     },
     "FileWatcher": {
-        "title": "",
-        "description": "",
-        "addInstance": "",
-        "DeleteWatcher": "",
+        "title": "Bevakade filer",
+        "description": "Du måste aktivera funktionen Loggbevakare och välja en kanal på Notifiarr-webbplatsen för att det här ska fungera!",
+        "addInstance": "Bevaka en fil till",
+        "DeleteWatcher": "Ta bort bevakare",
         "badges": {
-            "CurrentlyWatching": "",
-            "WatcherStopped": ""
+            "CurrentlyWatching": "Bevakar just nu",
+            "WatcherStopped": "Bevakare stoppad"
         },
         "buttons": {
-            "StopWatcher": "",
-            "StartWatcher": ""
+            "StopWatcher": "Stoppa bevakare",
+            "StartWatcher": "Starta bevakare"
         },
         "titles": {
-            "RegularExpressionTester": "",
-            "Expression": "",
-            "TestString": ""
+            "RegularExpressionTester": "Testare för reguljära uttryck",
+            "Expression": "Uttryck",
+            "TestString": "Teststräng"
         },
         "path": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "required": ""
+            "label": "Filsökväg",
+            "description": "Sökväg till filen som ska bevakas. Absolut sökväg rekommenderas.",
+            "placeholder": "/var/log/nginx/access.log",
+            "required": "Sökväg krävs",
+            "clientLog": "Det går inte att bevaka klientens egen loggfil, det skulle skapa en loop. Klientfel skickas redan som client_error_log."
         },
         "disabled": {
             "label": "Aktiv",
-            "description": ""
+            "description": "Inaktivera den här bevakaren."
         },
         "regex": {
-            "label": "",
-            "description": "",
-            "tooltip": "",
-            "placeholder": "",
-            "required": ""
+            "label": "Reguljärt uttryck",
+            "description": "Regex som ska matchas mot filen.",
+            "tooltip": "Uttryck omsluts automatiskt av en jokerteckenmatchare: <code>.*</code>, så använd inte <code>^</code> eller <code>$</code> i uttrycket. Använd <code>(?i)</code> som prefix för att göra reguljära uttryck skiftlägesokänsliga.",
+            "placeholder": "GET.*some/path",
+            "required": "Regex krävs"
         },
         "skip": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Hoppa över uttryck",
+            "description": "Allt som matchar det här uttrycket ignoreras.",
+            "placeholder": "GET.*some/path"
         },
         "poll": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Filavsökning",
+            "description": "Avsök filen efter ändringar.",
+            "tooltip": "Filsystemshändelser fungerar inte på vissa system. Om inget matchas slår du på det här för att aktivera intervallet för filavsökning."
         },
         "pipe": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "FIFO-pipe",
+            "description": "Sökvägen är en namngiven FIFO-pipe.",
+            "tooltip": "Aktivera det här om filen du bevakar är en namngiven FIFO-pipe. Du behöver det troligen inte."
         },
         "mustExist": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Filen måste finnas",
+            "description": "Hoppa över bevakning om filen saknas.",
+            "tooltip": "Om du aktiverar det här hoppar bevakningen över om filen inte finns när programmet startar. Att bevaka filer som inte finns är fortfarande buggigt och kanske inte fungerar alls."
         },
         "logMatch": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Logga träffar",
+            "description": "Skriv matchade rader till Notifiarr-loggen.",
+            "tooltip": "Om du aktiverar det här skrivs den matchade raden till Notifiarr-loggen. Det är bra vid felsökning, men kan bli rörigt."
         }
     },
     "phrases": {
         "Landing": {
-            "SelectASection": "",
-            "Welcome": ""
+            "SelectASection": "Välj ett avsnitt i navigeringsmenyn för att komma igång.",
+            "Welcome": "Välkommen, {username}!"
         },
-        "Every6Hours": "",
-        "Every3Hours": "",
-        "ERROR": "",
-        "LoggingIn": "",
-        "LoggedIn": "",
-        "UpdateBackend": "",
-        "FailedToReload": "",
-        "ConfirmReload": "",
-        "FailedToShutdown": "",
-        "Changed": "",
-        "New": "",
-        "Invalid": "",
-        "DeleteInstance": "",
-        "DeletedNumber": "",
-        "ItsGone": "",
-        "URLMustBeginWithHttp": "",
-        "NameMustNotBeEmpty": "",
-        "HostMustNotBeEmpty": "",
-        "UsernameMustNotBeEmpty": "",
-        "NameInUseByInstance": "",
-        "APIKeyMustBeCountCharactersOrLonger": "",
-        "TokenMustBeCountCharacters": "",
-        "LeavePage": "",
-        "Loading": "",
-        "BackEndUpdated": "",
-        "UpdatingBackEnd": "",
-        "FailedToUpdateBackEnd": "",
-        "TryRefreshingThePage": "",
-        "ConfigurationSavedReloading": "",
-        "ConfigurationSaved": "",
-        "SavingConfiguration": "",
-        "Version": "",
-        "Every12Hours": "",
-        "Reloading": "",
-        "ConfirmReloadBody": "",
-        "ReloadSuccess": "",
-        "ReloadCheckTimedOut": "",
-        "ConfirmShutdown": "",
-        "ConfirmShutdownBody": "",
-        "ShutdownSuccess": "",
-        "LoginHelp": "",
-        "LoginHelpBody": ""
+        "Every6Hours": "Var 6:e timme",
+        "Every3Hours": "Var 3:e timme",
+        "ERROR": "FEL",
+        "LoggingIn": "Loggar in...",
+        "LoggedIn": "Inloggad!",
+        "UpdateBackend": "Uppdatera backend",
+        "FailedToReload": "Det gick inte att ladda om: {error}",
+        "ConfirmReload": "Bekräfta omladdning",
+        "FailedToShutdown": "Det gick inte att stänga av: {error} - Prova att ladda om sidan.",
+        "Changed": "Ändrad",
+        "New": "Ny",
+        "Invalid": "Ogiltig",
+        "DeleteInstance": "Ta bort instans",
+        "DeletedNumber": "Borttagen {number}",
+        "ItsGone": "Den är borta! Glöm inte att spara.",
+        "URLMustBeginWithHttp": "URL:en måste börja med http:// eller https://",
+        "NameMustNotBeEmpty": "Namnet får inte vara tomt.",
+        "HostMustNotBeEmpty": "Värden får inte vara tom.",
+        "UsernameMustNotBeEmpty": "Användarnamnet får inte vara tomt.",
+        "NameInUseByInstance": "Det här namnet används av instans {number}.",
+        "APIKeyMustBeCountCharactersOrLonger": "API-nyckeln måste vara {count} tecken eller längre.",
+        "TokenMustBeCountCharacters": "Token måste vara {count} tecken eller längre.",
+        "LeavePage": "Vill du verkligen lämna den här sidan?",
+        "Loading": "Laddar...",
+        "BackEndUpdated": "Backend uppdaterades för {timeDuration} sedan.",
+        "UpdatingBackEnd": "Uppdaterar backend...",
+        "FailedToUpdateBackEnd": "Det gick inte att uppdatera backend: {error}",
+        "TryRefreshingThePage": "Prova att uppdatera sidan.",
+        "ConfigurationSavedReloading": "Konfigurationen sparades! Laddar om klienten...",
+        "ConfigurationSaved": "Konfigurationen sparades för {timeDuration} sedan!",
+        "SavingConfiguration": "Sparar konfiguration...",
+        "Version": "Version {version}",
+        "Every12Hours": "Var 12:e timme",
+        "Reloading": "Laddar om...",
+        "ConfirmReloadBody": "Är du säker på att du vill ladda om klienten?",
+        "ReloadSuccess": "Omladdningen lyckades! Klienten har laddats om.",
+        "ReloadCheckTimedOut": "Kontrollen av serverns omladdning nådde tidsgränsen efter 20 försök",
+        "ConfirmShutdown": "Bekräfta avstängning",
+        "ConfirmShutdownBody": "Är du säker på att du vill stänga av klienten? Du måste starta om den från värden den körs på.",
+        "ShutdownSuccess": "Avstängningen lyckades! Klienten har stoppats.",
+        "LoginHelp": "Inloggningshjälp",
+        "LoginHelpBody": "Om det här är första gången du loggar in använder du din e-postadress och ditt lösenord från notifiarr.com. Du kan ange ett lokalt lösenord efter inloggningen. Om du har glömt ditt lokala lösenord, se wikisidan <a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">glömda lösenord</a>.",
+        "ToggleSpoilerVisibility": "Klicka för att visa eller dölja spoilern.",
+        "EnvironmentVariable": "Miljövariabelnamn: <code>{variableName}</code>",
+        "VariableDescription": "<span class=\"text-warning\">Obs:</span> Det här konfigurationsvärdet kommer från en miljövariabel. Om du ändrar värdet här skrivs det nya värdet till konfigurationsfilen, men det träder inte i kraft. Nästa gång du klickar på Spara ersätts det. Ändra värdet här genom att ändra miljövariabelns värde, eller genom att ta bort variabeln från miljön.",
+        "EveryDuration": "Var {timeDuration}",
+        "APIKeyMustBeCountCharacters": "API-nyckeln måste vara {count} tecken.",
+        "InvalidAPIKey": "Ogiltig Notifiarr API-nyckel — uppdatera den under Konfiguration.",
+        "ShowMore": "Visa mer information",
+        "ShowPassword": "Visa lösenord",
+        "HidePassword": "Dölj lösenord",
+        "CheckInstance": "Kontrollera instans",
+        "ValidateSSL": "Validera SSL-certifikat",
+        "RunAsShell": "Kör som shell-kommando",
+        "FollowRedirects": "Följ omdirigeringar",
+        "BrowseFiles": "Bläddra bland filer",
+        "APIKey": {
+            "title": "Ange API-nyckel",
+            "placeholder": "Global API-nyckel från notifiarr.com",
+            "setMsg": "API-nyckeln har angetts!",
+            "Setting": "Anger API-nyckel...",
+            "description": "Notifiarr-klienten behöver en giltig API-nyckel för att fungera. Nyckeln används för att autentisera mot Notifiarr-webbplatsen, ta emot uppdateringar och skicka aviseringar. Klienten fungerar inte utan den, så ange din API-nyckel nedan."
+        }
     },
     "config": {
         "titles": {
-            "System": "",
-            "WatchFile": "",
-            "Configuration": "",
-            "General": "",
-            "Network": "",
-            "Endpoint": "",
-            "Command": "",
-            "SSLConfiguration": "",
-            "Services": "",
-            "Logging": "",
-            "Dark": "",
-            "Light": ""
+            "System": "System",
+            "WatchFile": "Bevakningsfil",
+            "Configuration": "Konfiguration",
+            "General": "Allmänt",
+            "Network": "Nätverk",
+            "Endpoint": "Slutpunkt",
+            "Command": "Kommando",
+            "SSLConfiguration": "SSL-konfiguration",
+            "Services": "Tjänster",
+            "Logging": "Loggning",
+            "Dark": "Mörkt",
+            "Light": "Ljust"
         },
         "quiet": {
-            "description": "",
-            "label": "",
-            "tooltip": ""
+            "description": "Aktivera eller inaktivera tyst loggning.",
+            "label": "Tyst loggning",
+            "tooltip": "Om du aktiverar tyst loggning skriver programmet inget till stdout. Det är praktiskt när en loggfil är aktiverad och du inte vill att loggar ska spruta in i en startdemon också."
         },
         "httpLog": {
-            "description": "",
-            "label": "",
-            "placeholder": "",
-            "tooltip": ""
+            "description": "Sökväg till HTTP-loggfilen eller mappen.",
+            "label": "HTTP-loggfil",
+            "placeholder": "/path/to/http-notifiarr.log",
+            "tooltip": "Om du anger en sökväg till en loggfil här skriver programmet HTTP-loggarna till en egen fil. Filformatet är apache-logg. Starkt rekommenderat. Om du anger en mapp utan filnamn skapar programmet en fil som heter Notifiarr.http.log i mappen."
         },
         "debugLog": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "Felsökningsloggfil",
+            "description": "Sökväg till felsökningsloggfilen eller mappen.",
+            "placeholder": "/path/to/debug-notifiarr.log",
+            "tooltip": "Om du anger en sökväg till en loggfil här skriver programmet felsökningsloggarna till en egen fil. Felsökningsloggar skrivs till programmets loggfil när det här är tomt. Om du anger en mapp utan filnamn skapar programmet en fil som heter Notifiarr.debug.log i mappen."
         },
         "logFiles": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Antal loggfiler",
+            "description": "Antal loggfiler som ska behållas.",
+            "tooltip": "När den här inställningen är 0 eller 1 är loggfilsrotation inaktiverad. Inställningen gäller alla loggfiler och behåller så här många av varje på disk."
         },
         "snapshot": {
             "timeout": {
-                "description": "",
-                "label": ""
+                "description": "Tidsgräns för Snapshot-åtgärder.",
+                "label": "Tidsgräns"
             }
         },
         "ui": {
             "darkMode": {
-                "description": "",
-                "label": ""
+                "description": "Aktivera eller inaktivera mörkt läge.",
+                "label": "Mörkt läge"
             },
             "language": {
-                "label": "",
-                "description": ""
+                "label": "Språk",
+                "description": "Språk i programmets gränssnitt."
             }
         },
         "timeout": {
-            "label": "",
-            "description": ""
+            "label": "Tidsgräns",
+            "description": "Det här är tidsgränsen för API-begäranden till Notifiarr.com."
         },
         "errors": {
-            "InvalidCreds": "",
-            "LoginRequestTimedOut": "",
-            "LoginFailed": "",
-            "ProfileReqTimedOut": "",
+            "InvalidCreds": "Ogiltigt användarnamn eller lösenord.",
+            "LoginRequestTimedOut": "Inloggningsbegäran nådde tidsgränsen",
+            "LoginFailed": "Inloggningen misslyckades: {error}",
+            "ProfileReqTimedOut": "Profilbegäran nådde tidsgränsen",
             "AnUnknownErrorOccurred": "Ett okänt fel har inträffat",
-            "ConfigUpdateFailed": "",
-            "PleaseEnterBothUsernameAndPassword": ""
+            "ConfigUpdateFailed": "Konfigurationsuppdateringen misslyckades: {error}",
+            "PleaseEnterBothUsernameAndPassword": "Ange både användarnamn och lösenord.",
+            "SetAPIKeyFailed": "Det gick inte att ange API-nyckeln: {error}"
         },
         "apiKey": {
             "label": "API-nyckel",
-            "description": "",
-            "tooltip": "",
-            "placeholder": ""
+            "description": "API-nyckel från ditt Notifiarr.com-konto.",
+            "tooltip": "Hitta den genom att logga in på Notifiarr.com, gå till Profil och sedan API-nycklar.",
+            "placeholder": "Ange din API-nyckel här"
         },
         "extraKeys": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Extra nycklar",
+            "description": "Ytterligare API-nycklar för tredjepartsintegrationer. Avgränsa med radbrytningar.",
+            "placeholder": "En per rad..."
         },
         "bindAddr": {
-            "label": "",
-            "description": "",
+            "label": "Bindningsadress",
+            "description": "IP och port som programmet lyssnar på. Använd 0.0.0.0 för att lyssna på alla gränssnitt.",
             "placeholder": "0.0.0.0:5454"
         },
         "sslKeyFile": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "SSL-nyckelfil",
+            "description": "Sökväg till SSL-nyckelfilen.",
+            "placeholder": "/path/to/ssl-key.pem",
+            "tooltip": "Det här programmet kan erbjuda HTTPS. Aktivera det genom att ange sökväg till certifikatfil och nyckelfil."
         },
         "sslCertFile": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "SSL-certifikatfil",
+            "description": "Sökväg till SSL-certifikatfilen.",
+            "placeholder": "/path/to/ssl-cert.pem",
+            "tooltip": "Det här programmet kan erbjuda HTTPS. Aktivera det genom att ange sökväg till certifikatfil och nyckelfil."
         },
         "debug": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Felsökningsloggning",
+            "description": "Aktivera eller inaktivera felsökningsloggning.",
+            "tooltip": "Om du aktiverar felsökningsloggning skrivs mycket mer data till loggen. Använd inställningen Maximal innehållsstorlek för att styra nyttolasternas storlek."
         },
         "logFile": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Programmets loggfil",
+            "description": "Sökväg till programmets loggfil eller mapp.",
+            "placeholder": "/path/to/notifiarr.log",
+            "tooltip": "Om du anger en mapp utan filnamn skapar programmet en fil som heter Notifiarr.log i mappen."
         },
         "maxBody": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Maximal innehållsstorlek",
+            "description": "Maximal innehållsstorlek för HTTP-begäranden.",
+            "tooltip": "När felsökning är aktiverad begränsar den här inställningen hur mycket nyttolastdata som skrivs till loggen, till eller från Notifiarr.com."
         },
         "logFileMb": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Loggfilsstorlek",
+            "description": "Maximal storlek på loggfilen innan rotation.",
+            "tooltip": "När rotation är aktiverad (ställ Antal loggfiler högre än 1) styr den här inställningen hur stor en fil måste vara för att rotation ska ske."
         },
         "noUploads": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Neka uppladdningar",
+            "description": "<b>Inaktiverad</b> låter administratörer på Notifiarr.com få den här klienten att ladda upp loggfiler till webbplatsen. <b>Aktiverad</b> förhindrar uppladdning av loggfiler.",
+            "tooltip": "Den här inställningen styr om webbplatsen Notifiarr.com och Notifiarr-administratörer kan få den här klienten att ladda upp loggfiler till webbplatsen. Ibland behöver vi se loggposter vid felsökning, och den här utlösaren låter oss få klienten att ladda upp program- och felsökningsloggarna."
         },
         "services": {
             "disabled": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Hälsokontroller",
+                "description": "Aktivera eller inaktivera hälsokontroller.",
+                "tooltip": "Inaktivera eller aktivera övervakning av alla hälsokontroller här."
             },
             "interval": {
-                "label": "",
-                "description": "",
-                "tooltip": ""
+                "label": "Uppdateringsintervall",
+                "description": "Uppdateringsintervall för hälsokontroller.",
+                "tooltip": "Det här styr hur ofta samlade resultat från hälsokontroller skickas till Notifiarr.com. Om en hälsokontrolls tillstånd ändras skickas den alltid direkt."
             },
             "logFile": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "placeholder": ""
+                "label": "Loggfil för tjänster",
+                "description": "Sökväg till loggfilen eller mappen för tjänster.",
+                "tooltip": "Loggfilen används för att lagra resultat från hälsokontroller. Om den lämnas tom skrivs hälsokontrollernas utdata till programmets loggfil. Om du anger en mapp utan filnamn skapar programmet en fil som heter Notifiarr.services.log i mappen.",
+                "placeholder": "/path/to/services-notifiarr.log"
             }
         },
         "watchFile": {
             "path": {
-                "label": "",
-                "description": ""
+                "label": "Filsökväg",
+                "description": "Sökväg till filen som ska bevakas."
             }
         },
         "endpoint": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Namn",
+                "description": "Namn på slutpunkten."
             }
         },
         "command": {
             "name": {
-                "description": "",
-                "label": "",
-                "required": ""
+                "description": "Namn på kommandot.",
+                "label": "Namn",
+                "required": "Ett kommando krävs."
             }
         },
         "service": {
             "name": {
-                "label": "",
-                "description": ""
+                "label": "Namn",
+                "description": "Namn på tjänsten."
             }
         },
         "fileMode": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Unix-läge för loggfil",
+            "description": "Det här är unix-filsläget som används när nya loggfiler skrivs.",
+            "tooltip": "Rekommenderade värden från minst till mest öppet: 0600, 0640, 0644"
         },
         "urlbase": {
-            "label": "",
-            "description": "",
-            "placeholder": "",
-            "tooltip": ""
+            "label": "URL-bas",
+            "description": "Det här programmet erbjuder HTTP på / som standard. Du kan ändra det genom att skriva något annat här.",
+            "placeholder": "/notifiarr/",
+            "tooltip": "Exempel: /notifiarr/"
         },
         "hostId": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Värd-ID",
+            "description": "Parametern Värd-ID används för att unikt identifiera den här klientinstallationen.",
+            "tooltip": "Du bör inte ändra det här värdet. Det ska hittas automatiskt. Kopiera inte värdet till en annan installation av Notifiarr-klienten."
         },
         "serial": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Parallella trådar",
+            "description": "Om du inaktiverar den här inställningen använder programmet färre goroutines (trådar) när det hämtar data från konfigurerade program.",
+            "tooltip": "Sprider ut CPU-användningen och minskar minnesåtgången."
         },
         "retries": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Omförsök",
+            "description": "Ibland misslyckas anslutningar till Notifiarr.com. Det här styr hur många gånger varje begäran försöks om vid fel.",
+            "tooltip": "Standard: 4 (värdet 0 använder standardvärdet 4)"
         },
         "apt": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "APT-krok",
+            "description": "Notifiarr-paketen för Debian (och Ubuntu) innehåller en APT-integration.",
+            "tooltip": "Notifiarr-paketen för Debian (och Ubuntu) innehåller en APT-integration. Integrationen körs varje gång ett <b class=\"text-warning\">apt</b>-kommando körs. Aktivera den genom att sätta det här fältet till Aktiverad och sedan <b>aktivera integrationen Pakethanterare på Notifiarr.com.</b> Funktionen kräver inte att klienten körs. Det räcker att klientens deb-paket är installerat. Det fungerar inte på RHEL eller Linux som inte är Debian."
         },
         "autoUpdate": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Automatisk uppdatering",
+            "description": "Så här ofta programmet letar efter uppdateringar. När en hittas installeras den automatiskt.",
+            "tooltip": "Det här fungerar bara i Windows."
         },
         "unstableCh": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Instabil kanal",
+            "description": "Om du aktiverar kanalen för instabila uppdateringar letar programmet efter automatiska uppdateringar på den instabila webbplatsen i stället för på GitHub.",
+            "tooltip": "Bara tillgängligt för användare med utvecklaråtkomst."
+        },
+        "trace": {
+            "label": "Spårningsloggning",
+            "description": "Aktivera eller inaktivera spårningsloggning.",
+            "tooltip": "Om du aktiverar spårningsloggning skrivs ett mycket utförligt körningsflöde till loggen. Använd det för djup felsökning."
         }
     },
     "words": {
         "select-option": {
-            "hours": "",
-            "Off": "",
-            "Enabled": "",
-            "Disabled": "",
-            "minute": "",
-            "minutes": "",
-            "hour": "",
-            "second": "",
-            "seconds": "",
-            "megabytes": "",
-            "bytes": "",
-            "Daily": "",
-            "custom": "",
-            "InstanceDisabled": "",
-            "NoTimeout": "",
-            "ChecksDisabled": ""
+            "hours": "timmar",
+            "Off": "Av",
+            "Enabled": "Aktiverad",
+            "Disabled": "Inaktiverad",
+            "minute": "minut",
+            "minutes": "minuter",
+            "hour": "timme",
+            "second": "sekund",
+            "seconds": "sekunder",
+            "megabytes": "megabyte",
+            "bytes": "byte",
+            "Daily": "Dagligen",
+            "custom": "anpassad",
+            "InstanceDisabled": "Instans inaktiverad",
+            "NoTimeout": "Ingen tidsgräns",
+            "ChecksDisabled": "Kontroller inaktiverade",
+            "Information": "Information"
         },
         "clock": {
             "short": {
-                "ms": "",
-                "s": "",
-                "m": "",
-                "h": "",
-                "d": "",
-                "w": ""
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
+                "m": "{minutes}m",
+                "h": "{hours}h",
+                "d": "{days}d",
+                "w": "{weeks}v"
             },
             "days": {
-                "Sunday": "",
-                "Monday": "",
-                "Tuesday": "",
-                "Wednesday": "",
-                "Thursday": "",
-                "Friday": "",
-                "Saturday": ""
+                "Sunday": "Söndag",
+                "Monday": "Måndag",
+                "Tuesday": "Tisdag",
+                "Wednesday": "Onsdag",
+                "Thursday": "Torsdag",
+                "Friday": "Fredag",
+                "Saturday": "Lördag"
             },
-            "ago": "",
-            "format": ""
+            "ago": "för {timeDuration} sedan",
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}"
         },
         "instance-options": {
             "interval": {
-                "label": "",
-                "description": ""
+                "label": "Hälsokontrollintervall",
+                "description": "Hur ofta instansens nåbarhet ska kontrolleras."
             },
             "timeout": {
-                "label": "",
-                "description": ""
+                "label": "Tidsgräns för begäran",
+                "description": "Hur länge du ska vänta på svar från instansen."
             },
             "validSsl": {
-                "label": "",
-                "description": ""
+                "label": "Validera SSL-certifikat",
+                "description": "Om du markerar rutan kontrolleras att instansen använder ett giltigt SSL-certifikat."
             },
             "deletes": {
-                "label": "",
-                "description": "",
-                "tooltip": "",
-                "countPerHour": ""
+                "label": "Ta bort innehåll",
+                "description": "Det här begränsar hur många borttagningsbegäranden som får skickas till den här instansen per timme.",
+                "tooltip": "Det här styr hur många borttagningsbegäranden som tillåts per timme. Värdet 0 inaktiverar möjligheten att skicka borttagningsbegäranden. Det gäller borttagning av media, men kan även omfatta andra åtgärder. Det är en spärr som hindrar angripare från att radera ditt innehåll.",
+                "countPerHour": "{count} per timme"
             }
         },
         "bytes": {
             "short": {
-                "B": "",
-                "KB": "",
-                "MB": "",
-                "GB": "",
-                "TB": ""
+                "B": "{bytes} B",
+                "KB": "{bytes} KB",
+                "MB": "{bytes} MB",
+                "GB": "{bytes} GB",
+                "TB": "{bytes} TB"
             }
         }
     },
     "metrics": {
-        "CountersReset": "",
-        "ApplicationUptime": "",
+        "CountersReset": "Räknarna på den här sidan nollställs när programmet avslutas. Programmet exponerar räknarna via Prometheus. Du kan skrapa dem och använda <a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">Notifiarr-klientens Grafana-instrumentpanel</a> för att visualisera dem.",
+        "ApplicationUptime": "Programmets drifttid: &nbsp;<b>{timeDuration}</b>",
         "logFiles": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Loggfiler",
+            "description": "Räknare för loggfiler.",
+            "empty": "Inga loggfiler hittades."
         },
         "apiHits": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "API-begäranden",
+            "description": "Räknare för inkommande API-begäranden.",
+            "empty": "Inga API-begäranden ännu."
         },
         "httpRequests": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "HTTP-begäranden",
+            "description": "Statistik för inkommande HTTP-begäranden. Det inkluderar begäranden via websocket-tunneln.",
+            "empty": "Inga HTTP-begäranden ännu."
         },
         "website": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Webbplatsbegäranden",
+            "description": "Begäranden till Notifiarr.com.",
+            "empty": "Inga webbplatsbegäranden ännu."
         },
         "fileWatcher": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Filbevakare",
+            "description": "Statistik för filbevakaren.",
+            "empty": "Inga filbevakare konfigurerade."
         },
         "apps": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Programbegäranden",
+            "description": "Statistik för programbegäranden. Räknarna inkluderar inte hälsokontroller.",
+            "empty": "Inga programbegäranden ännu."
         },
         "timerEvents": {
-            "title": "",
-            "description": "",
-            "empty": ""
+            "title": "Utlösta åtgärder",
+            "description": "Körda utlösare, timers och scheman.",
+            "empty": "Inga utlösta åtgärder ännu."
         }
     },
     "navigation": {
         "titles": {
-            "Metrics": "",
-            "Settings": "",
-            "Insights": "",
-            "Configuration": "",
-            "SiteTunnel": "",
-            "StarrApps": "",
-            "Downloaders": "",
-            "MediaApps": "",
-            "SnapshotApps": "",
-            "FileWatcher": "",
-            "Endpoints": "",
-            "Commands": "",
-            "Services": "",
-            "Integrations": "",
-            "Monitoring": "",
-            "LogFiles": "",
-            "System": "",
-            "TrustProfile": "",
-            "Landing": "",
-            "UnsavedChanges": "",
-            "Actions": ""
+            "Metrics": "Mätvärden",
+            "Settings": "Inställningar",
+            "Insights": "Insikter",
+            "Configuration": "Konfiguration",
+            "SiteTunnel": "Webbplatstunnel",
+            "StarrApps": "Starr-appar",
+            "Downloaders": "Nedladdningsappar",
+            "MediaApps": "Medieappar",
+            "SnapshotApps": "Snapshot-appar",
+            "FileWatcher": "Filbevakare",
+            "Endpoints": "Slutpunkter",
+            "Commands": "Kommandon",
+            "Services": "Tjänster",
+            "Integrations": "Integrationer",
+            "Monitoring": "Övervakning",
+            "LogFiles": "Loggfiler",
+            "System": "System",
+            "TrustProfile": "Förtroendeprofil",
+            "Landing": "Notifiarr-hem",
+            "UnsavedChanges": "Osparade ändringar",
+            "Actions": "Åtgärder",
+            "Plex": "Plex-webhooks",
+            "ApiDocs": "Dokumentation för klient-API"
         },
         "pageDescription": {
-            "Metrics": "",
-            "Configuration": "",
-            "StarrApps": "",
-            "Downloaders": "",
-            "MediaApps": "",
-            "SnapshotApps": "",
-            "FileWatcher": "",
-            "Endpoints": "",
-            "Commands": "",
-            "Services": "",
-            "Integrations": "",
-            "Monitoring": "",
-            "LogFiles": "",
-            "System": "",
-            "TrustProfile": "",
-            "Landing": "",
-            "SiteTunnel": "",
-            "Actions": ""
+            "Metrics": "Visa mätvärdestotaler för klientkonfigurationer.",
+            "Configuration": "Konfigurera inställningarna för Notifiarr-klienten här.",
+            "StarrApps": "Konfigurera Starr-integrationer.",
+            "Downloaders": "Hantera nedladdningsklienter.",
+            "MediaApps": "Hantera mediaspelare och relaterade tjänster.",
+            "SnapshotApps": "De flesta Snapshot-inställningar finns på webbplatsen Notifiarr.com. Nedan finns inställningar för programtillägg till Snapshot-funktionen.",
+            "FileWatcher": "Bevaka filändringar och utlös åtgärder! Den här Notifiarr-klienten kan bevaka (logg)filer efter rader som matchar ett reguljärt uttryck. Det liknar <code>tail -f file | grep string</code> och gör att du kan skicka aviseringar när till exempel en loggfil får en ny rad som matchar ett reguljärt uttryck.",
+            "Endpoints": "Konfigurera URL:er för reläslutpunkter och deras scheman.",
+            "Commands": "Konfigurera och kör egna kommandon och skript.",
+            "Services": "Notifiarr-klienten kan övervaka tjänster med HTTP-kontroller, TCP-portkontroller eller kontroller av om processer körs (och inte körs). <b>Klientens hälsokontroller fungerar tillsammans med nätverksintegrationen på Notifiarr.com.</b>",
+            "Integrations": "Den här sidan visar data som klienten har cachelagrat i minnet för de olika konfigurerade integrationerna.",
+            "Monitoring": "Visa resultat från hälsokontroller av tjänster och nätverk.",
+            "LogFiles": "Visa, följ, hämta och ladda upp klientens loggfiler.",
+            "System": "Visa information om system och klient.",
+            "TrustProfile": "Konfigurera hur du loggar in i den här Notifiarr-klienten.",
+            "Landing": "Det här är den bästa platsen på jorden!",
+            "SiteTunnel": "Den här klienten håller en beständig websocket-anslutning till notifiarr.com via en <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery-tunnel</a>. Tunneln gör att webbplatsen kan skicka begäranden till din klient utan att du behöver öppna en port eller ha en statisk IP. På den här sidan väljer du din primära tunnel och vilken tunnel som ska användas som reserv om den primära blir otillgänglig.",
+            "Actions": "Här hittar du interna åtgärder i Notifiarr-klienten. De körs av timers, scheman och händelser från webbplatsen eller en chatt-server. De är oftast till för felsökning, men du kan utlösa dem manuellt i det här gränssnittet.",
+            "Plex": "Information för felsökning av Plex-webhooks."
         }
     },
     "buttons": {
-        "Login": "",
-        "Confirm": "",
-        "Cancel": "",
-        "Save": "",
-        "Close": "",
-        "SaveChanges": "",
-        "SaveConfiguration": "",
-        "ResetForm": "",
-        "Execute": "",
-        "HideMenu": "",
-        "ShowMenu": "",
-        "ShowOutput": "",
-        "HideOutput": "",
-        "RefreshOutput": "",
-        "NoStayHere": "",
-        "YesDeleteMyChanges": ""
+        "Login": "Logga in",
+        "LoginTitle": "Logga in",
+        "Confirm": "Bekräfta",
+        "Cancel": "Avbryt",
+        "Save": "Spara",
+        "Close": "Stäng",
+        "SaveChanges": "Spara ändringar",
+        "SaveConfiguration": "Spara konfiguration",
+        "ResetForm": "Återställ formulär",
+        "Execute": "Kör",
+        "HideMenu": "Dölj meny",
+        "ShowMenu": "Visa meny",
+        "ShowOutput": "Visa utdata",
+        "HideOutput": "Dölj utdata",
+        "RefreshOutput": "Uppdatera utdata",
+        "NoStayHere": "Nej! Stanna kvar",
+        "YesDeleteMyChanges": "Ja! Ta bort mina ändringar",
+        "Create": "Skapa",
+        "Go": "Gå",
+        "Menu": "Meny",
+        "CreateFolder": "Skapa mapp",
+        "CreateFile": "Skapa fil"
     },
     "profile": {
         "phrase": {
-            "ShowMeMore": "",
-            "ShowMoreDesc": "",
-            "PasswordOnlyUsed": "",
-            "HeaderOnlyUsed": "",
-            "AuthTypeChange": "",
-            "ProfileUpdated": "",
-            "EnterCurrentPassword": "",
-            "ProxyAuthDisabled": "",
-            "Addit": "",
-            "SeeWikiForAuthProxyHelp": "",
-            "ShowMeLess": ""
+            "ShowMeMore": "Visa mer.",
+            "ShowMoreDesc": "Tre autentiseringstyper stöds just nu. Autentiseringsproxy och Inget lösenord är bara tillgängliga om den aktuella begäran kommer från en giltig, konfigurerad uppströms-IP-adress.",
+            "PasswordOnlyUsed": "Användarnamn och lösenord används bara om Autentiseringstyp är satt till Lösenord.",
+            "HeaderOnlyUsed": "Auth-huvudet används bara om Autentiseringstyp är satt till Huvud eller Inget lösenord.",
+            "AuthTypeChange": "Om autentiseringstypen ändras loggar du ut för att slutföra processen.",
+            "ProfileUpdated": "Profilen uppdaterades för {timeDuration} sedan!",
+            "EnterCurrentPassword": "Ange ditt nuvarande lösenord för att göra ändringar.",
+            "ProxyAuthDisabled": "Proxyautentisering är inaktiverad eftersom din uppströms ({upstreamIp}) inte finns i listan över tillåtna uppströms.",
+            "Addit": "Lägg till den.",
+            "SeeWikiForAuthProxyHelp": "Se <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wikin</a> för instruktioner om hur du konfigurerar en autentiseringsproxy.",
+            "ShowMeLess": "Visa mindre."
         },
         "title": {
-            "Authorization": "",
-            "Authentication": ""
+            "Authorization": "Auktorisering",
+            "Authentication": "Autentisering"
         },
         "authType": {
-            "label": "",
-            "description": "",
+            "label": "Autentiseringstyp",
+            "description": "Välj hur du autentiserar dig mot klienten",
             "options": {
-                "password": "",
-                "header": "",
-                "noauth": ""
+                "password": "Lösenord: lokalt användarnamn",
+                "header": "Autentiseringsproxy: huvud",
+                "noauth": "Inget lösenord (farligt)",
+                "website": "Webbplatsuppgifter"
             },
             "option_desc": {
-                "password": "",
-                "header": "",
-                "noauth": ""
+                "password": "Det här är standardtypen för autentisering. Välj alternativet Lösenord för att logga in i programmet med ett konfigurerat användarnamn och lösenord. Bara 1 användarnamn och lösenord stöds. När du väljer det här alternativet måste du fylla i fälten för användarnamn och nytt lösenord. Om det här redan är den aktuella autentiseringstypen måste du också fylla i fältet för nuvarande lösenord för att göra ändringar.",
+                "header": "Välj det här alternativet för att logga in i programmet med ett HTTP-huvud som innehåller ett användarnamn. Det kallas ofta proxyautentisering. Vi har <a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">en wikisida</a> med instruktioner för att konfigurera Nginx för funktionen. När du väljer det här alternativet måste du också välja ett huvud för autentiseringsproxyn. Om inga huvuden visas har uppströmsproxyn inte skickat några giltiga huvuden.",
+                "noauth": "Den här konfigurationen rekommenderas inte. Autentiseringstypen Inget lösenord tillåter alla begäranden från alla konfigurerade <code>uppströms-IP</code>. Den fungerar också med en autentiseringsproxy för att ange användarnamnet. Om inget användarnamn finns i det angivna huvudet används admin som standard.",
+                "website": "Välj det här alternativet för att logga in i programmet med webbplatsuppgifter. Då kan du logga in i klienten med din e-postadress eller ditt användarnamn och lösenord från Notifiarr.com. Ditt lösenord är alltid skyddat och krypteras innan det skickas till klienten."
             }
         },
         "upstreams": {
-            "label": "",
-            "description": "",
+            "label": "Uppströms",
+            "description": "Betrodda proxy-IP-adresser eller CIDR-nät. Avgränsa nät med mellanslag.",
             "placeholder": "127.0.0.1 ::1",
-            "tooltip": ""
+            "tooltip": "Om Notifiarr-klienten ligger bakom en omvänd proxy (swag, nginx och liknande) bör du lägga till proxyns IP här. Du kan också ange hela nät. Det här styr vilken IP som skrivs till webbserverns loggfil, anroparen eller huvudet <span class=\"text-warning\">X-Forwarded-For</span>. Krävs när ett begärandehuvud används för autentisering, eller när autentisering är inaktiverad."
         },
         "header": {
-            "label": "",
-            "description": "",
-            "tooltip": ""
+            "label": "Auth-huvud",
+            "description": "Välj huvudet som innehåller ditt användarnamn",
+            "tooltip": "Här visas huvuden från klienten eller uppströms som kan användas för proxyautentisering. Valet används om Autentiseringstyp är satt till Huvud eller Inget lösenord. Välj huvudet som visar ditt riktiga användarnamn. Med Inget lösenord används huvudet för att ange användarnamnet, men det är inte obligatoriskt."
         },
         "username": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Användarnamn",
+            "description": "Ditt inloggningsanvändarnamn",
+            "placeholder": "Standard: admin"
         },
         "password": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Nuvarande lösenord",
+            "description": "Ange ditt nuvarande lösenord för att göra ändringar",
+            "placeholder": "Ange nuvarande lösenord"
         },
         "newPass": {
-            "label": "",
-            "description": "",
+            "label": "Nytt lösenord",
+            "description": "Ditt nya inloggningslösenord",
             "placeholder": "Minst 9 tecken"
         }
     },
     "RegexTester": {
-        "RegularExpressionTester": "",
+        "RegularExpressionTester": "Testare för reguljära uttryck",
         "testPattern": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Testmönster",
+            "description": "Exempelsträng eller loggrad att testa det reguljära uttrycket mot.",
+            "placeholder": "[INFO] 2025-05-25 16:20:01 - Det här är en testloggrad."
         },
         "testRegex": {
-            "label": "",
-            "description": "",
-            "placeholder": ""
+            "label": "Testuttryck",
+            "description": "Uttryck som ska matchas mot testmönstret.",
+            "placeholder": "GET .*some/path"
         },
-        "TestResult": "",
-        "Test": "",
-        "Expression": "",
-        "Result": "",
-        "NoMatch": ""
+        "TestResult": "Testresultat",
+        "Test": "Testa",
+        "Expression": "Uttryck",
+        "Result": "Resultat",
+        "NoMatch": "Ingen träff"
     },
     "scheduler": {
-        "title": "",
-        "daysOfWeek": "",
-        "daysOfMonth": "",
-        "frequency": "",
-        "selectAFrequency": "",
+        "title": "Schema",
+        "daysOfWeek": "Veckodagar",
+        "daysOfMonth": "Månadsdagar",
+        "frequency": "Frekvens",
+        "selectAFrequency": "Välj en frekvens för att skapa ett schema.",
         "AddATime": "Lägg till tid",
-        "empty": "",
+        "empty": "Om du vill köra varje dag väljer du frekvensen Dagligen.",
         "required": {
-            "daysOfWeek": "",
-            "daysOfMonth": "",
-            "atTimes": ""
+            "daysOfWeek": "Du måste välja minst en veckodag.",
+            "daysOfMonth": "Du måste välja minst en dag i månaden.",
+            "atTimes": "Du måste välja minst en tid då schemat ska köras."
         },
         "ops": {
-            "noSchedule": "",
-            "minutely": "",
-            "hourly": "",
-            "daily": "",
-            "weekly": "",
-            "monthly": ""
+            "noSchedule": "Inget schema",
+            "minutely": "Varje minut",
+            "hourly": "Varje timme",
+            "daily": "Dagligen",
+            "weekly": "Varje vecka",
+            "monthly": "Varje månad"
         },
         "times": {
-            "noneSelected": "",
-            "noDaysSelected": "",
-            "everyMinute": "",
-            "everyHour": "",
-            "everyDay": "",
-            "everyWeek": "",
-            "everyMonth": ""
+            "noneSelected": "(ingen vald)",
+            "noDaysSelected": "(inga dagar valda)",
+            "everyMinute": "{count, plural, =1 {En gång} other {# gånger}} varje minut vid sekunderna {times}",
+            "everyHour": "{count, plural, =1 {En gång} other {# gånger}} varje timme vid minut:sekunder {times}",
+            "everyDay": "{count, plural, =1 {En gång} other {# gånger}} varje dag vid tiderna {times}",
+            "everyWeek": "{count, plural, =1 {En gång} other {# gånger}} varje vecka på {daysOfWeek} vid tiderna {times}",
+            "everyMonth": "{count, plural, =1 {En gång} other {# gånger}} varje månad dagarna {daysOfMonth} vid tiderna {times}"
         }
     },
     "LogFiles": {
         "AddMoreLines": "Lägg till fler rader",
         "button": {
-            "add": "Lägg till"
+            "add": "Lägg till",
+            "download": "Ladda ner",
+            "upload": "Ladda upp",
+            "delete": "Ta bort",
+            "reload": "Ladda om",
+            "tooltip": "Knappen <b>Ladda ner</b> laddar ner filen till din dator. Knappen <b>Ladda upp</b> laddar upp filen till Notifiarr.com-servern. Bara administratörer kan se uppladdade filer. Knappen <b>Ta bort</b> tar bort filen från din hårddisk. Filer som används kan inte tas bort. Används betyder att det här programmet just nu skriver loggposter till den."
         },
         "titles": {
-            "Age": "Ålder"
+            "Age": "Ålder",
+            "Name": "Filnamn",
+            "Bytes": "Byte",
+            "InUse": "Används",
+            "Mode": "Läge",
+            "Owner": "Ägare",
+            "Path": "Sökväg",
+            "Date": "Datum",
+            "FileList": "Fillista",
+            "Details": "Detaljer",
+            "FileContent": "Filinnehåll",
+            "FollowingFile": "Följer fil",
+            "LineCount": "Antal rader",
+            "OpenFile": "Öppna fil {fileName}",
+            "TailFile": "Följ fil {fileName}",
+            "Tailing": "Följer"
+        },
+        "Error": "Fel vid inläsning av loggfil: {error}",
+        "DeleteFile": "Ta bort {filePath}",
+        "deleteConfirm": "Är du säker på att du vill ta bort den här filen? Det går inte att ångra.",
+        "deleteError": "Fel vid borttagning av loggfil: {error}",
+        "deleteSuccess": "Loggfil borttagen: {file}",
+        "uploadError": "Fel vid uppladdning av loggfil: {error}",
+        "uploadSuccess": "Laddar upp loggfil: {file}",
+        "NoFileSelected": "Ingen fil vald.",
+        "SelectFile": "Välj en fil för att se vad som finns i den!",
+        "FilesInDirs": "{fileCount} filer i {dirCount} mappar",
+        "ToggleLinesOrder": "Växla radordning",
+        "ToggleColors": "Växla standardfärger",
+        "Reload": "Ladda om loggfil",
+        "Highlight": "Markera",
+        "ToggleLineWrap": "Växla radbrytning",
+        "FollowTooltip": "Knapparna i den här kolumnen följer aktivt en fil medan den skrivs.",
+        "Tooltip": "<ol><li>Den första orange knappen till vänster växlar ordningen på raderna i filen. Som standard är de i fallande ordning, i den ordning de skrivs. Om du klickar på knappen vänds filen och blir baklänges. Det fungerar bra när du följer en fil som skrivs till.</li><li>Den andra lila knappen växlar de inbyggda färgerna för radmarkering. Den snurrar också när saker händer.</li><li>Sifferfältet anger hur många rader som ska läsas in eller läggas till. När du följer en fil begränsar talet hur många rader som visas.</li><li>Om du klickar på knappen Lägg till läggs antalet rader till överst i filen, med det befintliga radantalet som offset. Knappen Lägg till är inaktiverad för filer som används, eftersom det är omöjligt att veta hur många rader som skrivits sedan senaste uppdateringen. När du följer filer som används ersätts knappen Lägg till av en indikator.</li><li>Om du klickar på knappen Ladda om läses antalet rader in från slutet av filen.</li><li>Använd markeringsfältet för att få viss text att sticka ut.</li><li>Den sista knappen växlar radbrytning.</li></ol>"
+    },
+    "Nodal": {
+        "button": {
+            "refresh": "Uppdatera siddata",
+            "fullscreen": "Växla helskärm",
+            "raw": "Växla rådata"
+        },
+        "noResponse": "Inga svarsdata."
+    },
+    "ProcessList": {
+        "title": "Lista över körande processer",
+        "error": "Fel vid inläsning av processlistan: {error}",
+        "noData": "Ingen processlista returnerades.",
+        "footer": "{count} processer hittades.",
+        "button": {
+            "wrapOn": "Slå på radbrytning",
+            "wrapOff": "Stäng av radbrytning"
         }
+    },
+    "ClientInfo": {
+        "title": "Startnyttolast",
+        "error": "Fel vid inläsning av startnyttolast: {error}",
+        "noData": "Ingen startnyttolast returnerades.",
+        "description": "Det här är nyttolasten som skickades till klienten från Notifiarr.com när den startade. Den innehåller klientens konfiguration och annan information."
+    },
+    "Integrations": {
+        "titles": {
+            "Size": "Storlek",
+            "DashboardAge": "Instrumentpanelens ålder",
+            "CacheAge": "Cacheålder",
+            "StatusAge": "Statusålder",
+            "Version": "Version",
+            "Branch": "Gren",
+            "BuildTime": "Byggtid"
+        },
+        "DriveData": {
+            "title": "Enhetsdata",
+            "driveInformation": {
+                "title": "Enhetsinformation"
+            },
+            "mdStatRaid": {
+                "title": "MDStat Raid"
+            },
+            "titles": {
+                "Drive": "Disk",
+                "Temp": "Temp",
+                "Health": "Hälsa",
+                "Age": "Ålder",
+                "Setting": "Inställning",
+                "Value": "Värde"
+            }
+        },
+        "Snapshot": {
+            "title": "Rå Snapshot-data",
+            "Age": "Snapshot-ålder",
+            "Data": "Snapshot-data",
+            "Latest": "Senaste Snapshot",
+            "System": "System-Snapshot",
+            "titles": {
+                "CPUPercent": "CPU-procent",
+                "MemoryFree": "Ledigt minne",
+                "MemoryUsed": "Använt minne",
+                "MemoryTotal": "Totalt minne",
+                "UserCPUTime": "Användar-CPU-tid",
+                "SystemCPUTime": "System-CPU-tid",
+                "IdleCPUTime": "Inaktiv CPU-tid",
+                "NvidiaGPUs": "Nvidia-GPU:er",
+                "MySQLServers": "MySQL-servrar",
+                "IPMISensors": "IPMI-sensorer",
+                "Synology": "Synology",
+                "RaidConfigs": "Raid-konfigurationer",
+                "ZFSPools": "ZFS-pooler",
+                "Processes": "Processer",
+                "DriveTemps": "Enhetstemperaturer",
+                "DriveHealth": "Enhetshälsa",
+                "DiskUsage": "Diskanvändning",
+                "DiskQuotas": "Diskkvoter",
+                "IOTop": "IO Top",
+                "IOStat": "IO Stat",
+                "IOStat2": "IO Stat 2"
+            }
+        },
+        "starrTitles": {
+            "QueueAge": "Köålder",
+            "QueueSize": "Köstorlek",
+            "Elapsed": "Förfluten",
+            "Shows": "Serier",
+            "Episodes": "Avsnitt",
+            "Movies": "Filmer",
+            "Books": "Böcker",
+            "Editions": "Utgåvor",
+            "Tracks": "Spår",
+            "Artists": "Artister",
+            "OnDisk": "På disk",
+            "Missing": "Saknas"
+        },
+        "downloadTitles": {
+            "Downloads": "Nedladdningar",
+            "Incomplete": "Ofullständiga",
+            "Downloading": "Laddar ner",
+            "Paused": "Pausade",
+            "TotalSize": "Total storlek",
+            "Errors": "Fel",
+            "Downloaded": "Nedladdat",
+            "Uploading": "Laddar upp",
+            "Uploaded": "Uppladdat",
+            "Seeding": "Seedar",
+            "Month": "Månad",
+            "Week": "Vecka",
+            "Day": "Dag"
+        },
+        "lidarrDashboard": {
+            "title": "Rå Lidarr-instrumentpanel"
+        },
+        "radarrDashboard": {
+            "title": "Rå Radarr-instrumentpanel"
+        },
+        "readarrDashboard": {
+            "title": "Rå Readarr-instrumentpanel"
+        },
+        "sonarrDashboard": {
+            "title": "Rå Sonarr-instrumentpanel"
+        },
+        "delugeDashboard": {
+            "title": "Rå Deluge-instrumentpanel"
+        },
+        "nzbgetDashboard": {
+            "title": "Rå NZBGet-instrumentpanel"
+        },
+        "qbitDashboard": {
+            "title": "Rå QBit-instrumentpanel"
+        },
+        "rtorrentDashboard": {
+            "title": "Rå rTorrent-instrumentpanel"
+        },
+        "transmissionDashboard": {
+            "title": "Rå Transmission-instrumentpanel"
+        },
+        "sabnzbdDashboard": {
+            "title": "Rå SabNZBD-instrumentpanel"
+        },
+        "sonarrQueue": {
+            "title": "Rå Sonarr-kö"
+        },
+        "radarrQueue": {
+            "title": "Rå Radarr-kö"
+        },
+        "readarrQueue": {
+            "title": "Rå Readarr-kö"
+        },
+        "lidarrQueue": {
+            "title": "Rå Lidarr-kö"
+        },
+        "prowlarrStatus": {
+            "title": "Rå Prowlarr-information"
+        },
+        "radarrStatus": {
+            "title": "Rå Radarr-information"
+        },
+        "readarrStatus": {
+            "title": "Rå Readarr-information"
+        },
+        "sonarrStatus": {
+            "title": "Rå Sonarr-information"
+        },
+        "lidarrStatus": {
+            "title": "Rå Lidarr-information"
+        },
+        "tautulliStatus": {
+            "title": "Rå Tautulli-information"
+        },
+        "tautulliUsers": {
+            "title": "Tautulli-användare"
+        },
+        "tautulliUsersJson": {
+            "title": "Råa Tautulli-användare"
+        },
+        "plexStatus": {
+            "title": "Information om Plex Media Server"
+        },
+        "plexSessions": {
+            "title": "Aktuella Plex Media Server-sessioner",
+            "footer": "Visar aktuella Plex-sessioner, inte cachade data. Se modalen med rå JSON för cachade data."
+        },
+        "plexSessionsJson": {
+            "title": "Råa Plex Media Server-sessioner"
+        },
+        "mediaTitles": {
+            "Country": "Land",
+            "PushNotifications": "Push-aviseringar",
+            "PlexPass": "Plex Pass",
+            "ServerOwner": "Serverägare",
+            "Sessions": "Sessioner",
+            "SessionsAge": "Sessionernas ålder",
+            "Users": "Användare",
+            "User": "Användare",
+            "PlexUsername": "Plex-användarnamn",
+            "CustomName": "Eget namn",
+            "Email": "E-post",
+            "Session": "Session",
+            "Complete": "Färdig",
+            "Encoding": "Kodning",
+            "Title": "Titel"
+        },
+        "phrases": {
+            "NoCachedSessions": "Inga cachade sessioner.",
+            "NoPlexData": "Ingen Plex-integrationsdata.",
+            "StateForTime": "{state} i {timeDuration}"
+        }
+    },
+    "Languages": {
+        "menuTitle": "Språkhjälp",
+        "title": "Stöd för översättning",
+        "body": "Det här programmet finns på flera språk. Du kan byta språk genom att klicka på språkväljaren i profilmenyn. Vissa språk har inga aktiva översättare, så vissa översättningar kan vara ofullständiga. Om du vill hjälpa till att översätta programmet, <a href=\"https://notifiarr.com/discord\" target=\"_blank\">besök oss på Discord</a>. Gå till kanalen <code>#role-request</code> och skriv <code>!roleTranslate</code>. Då får du åtkomst till kanalen <code>#translate</code>. Gå med där och berätta att du är intresserad."
+    },
+    "ApiDocs": {
+        "Choose": "Välj ett API att visa",
+        "Contrast": "Rapportera gärna kontrastproblem på den här sidan.",
+        "BasePath": "<b>Bassökväg</b>: <code>{basePath}</code>",
+        "api": {
+            "title": "Privat API ({basePath})",
+            "body": "Det här är API-specifikationen för webbplatsen Notifiarr.com. Webbplatsen använder det här API:et för att kommunicera med klienten."
+        },
+        "ui": {
+            "title": "Webbgränssnitt ({basePath})",
+            "body": "Den här specifikationen gäller metoderna som Notifiarr-klientens gränssnitt använder för att kommunicera med backend. Du använder gränssnittet just nu."
+        }
+    },
+    "TestAllInstances": {
+        "title": "Testa alla instanser",
+        "Instance": "Instans",
+        "Message": "Meddelande",
+        "Status": "Status",
+        "Updated": "<b>Test uppdaterat</b>: <code>{timeDuration}</code>",
+        "TestElapsed": "<b>Testtid</b>: <code>{timeDuration}</code>",
+        "Concurrency": "<b>Samtidighet</b>: <code>{workerCount}</code>",
+        "Tested": "<b>Testade instanser</b>: <code>{testCount}</code>",
+        "clickRefresh": "Klicka på uppdateringsknappen uppe till höger för att testa igen.",
+        "footer": "Använd det här felsökningsverktyget för att kontrollera att alla dina instanser är nåbara och rätt konfigurerade. Tidsgränsen är hårdkodad till 15 sekunder, vilket är ungefär så länge webbplatsen väntar på svar."
+    },
+    "FileBrowser": {
+        "tooltip": {
+            "Go": "<code>cd {path}</code><br />Byt katalog till angiven sökväg.",
+            "SelectPath": "Välj sökväg: <code>{path}</code>",
+            "Up": "<code>cd ..</code><br />Byt katalog till överordnad mapp."
+        },
+        "FilterFiles": "Filtrera filer",
+        "CreateFileIn": "Filen skapas i sökvägen: <code>{path}</code>",
+        "CreateFolderIn": "Mappen skapas i sökvägen: <code>{path}</code>",
+        "Files": "Filer: {count}",
+        "Folders": "Mappar: {count}",
+        "FilesFiltered": "Filer: {count}, filtrerade: {filtered}",
+        "FoldersFiltered": "Mappar: {count}, filtrerade: {filtered}",
+        "Selected": "Vald: <code>{path}</code>",
+        "Created": "Skapad: {path}",
+        "Creating": "Skapar...",
+        "InvalidPath": "Ogiltig sökväg angiven. Ta inte med snedstreck (<code>/</code> eller <code>\\</code>).",
+        "FilterFilesDesc": "Använd filfiltret för att snabbt söka i listan över visade filer. Praktiskt i mappar med många filer. Använd knappen <code>Meny</code> för att skapa en ny mapp eller fil. Om du vill välja en fil som inte finns skriver du in den i fältet <code>Sökväg</code> och klickar på den gröna bockknappen. Du kan också använda menyalternativet <code>Skapa fil</code> för att skapa den."
+    },
+    "Plex": {
+        "URLNotConfigured": "Plex-URL:en är inte konfigurerad. <go-to page=\"mediaApps\" subPage=\"plex\">Konfigurera det här</go-to>.",
+        "TokenNotConfigured": "Plex-token är inte konfigurerad. <go-to page=\"mediaApps\" subPage=\"plex\">Konfigurera det här</go-to>.",
+        "Disabled": "Plex är administrativt inaktiverad. <go-to page=\"mediaApps\" subPage=\"plex\">Aktivera den här</go-to>.",
+        "WaitingForWebhooks": "Väntar på Plex-webhooks...",
+        "WebhooksReceived": "Mottagna webhooks: <code>{count}</code>",
+        "NoStatus": "Det finns ingen cachad information om Plex Media Server. Det kan betyda att Plex-URL:en eller token är ogiltig, eller att tidsgränsen är för kort. Se <go-to page=\"logFiles\">programloggarna</go-to> för mer information.",
+        "WebhookNote": "<p>Har du redan <a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">konfigurerat Plex-webhooken</a>?</p><p>Om webhook-räknaren inte ökar när du pausar och spelar upp en serie kan du prova att starta om Plex Media Server. Om det inte hjälper kontrollerar du <go-to page=\"logFiles\">HTTP-loggarna</go-to> efter ogiltiga begäranden. Om du inte ser några kan det betyda att du har fel webhook-URL konfigurerad i Plex. Den bör se ut så här: <spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle> men det kanske inte stämmer och beror på din serverkonfiguration.</p> Vissa webboperatörer blockerar åtkomst till URI:n <code>{urlbase}plex</code>, så det här programmet tar också emot en Plex-webhook på URI:n <code>{urlbase}</code> och på <code>{urlbase}api/plex/post</code>. Vi erbjuder flexibilitet för att säkerställa stabila aviseringar.",
+        "WebsiteSettings": "Webbplatsinställningar",
+        "AccountMap": "Kontomappning",
+        "ActivityDelay": "Aktivitetsfördröjning",
+        "WebhookCoolDown": "Webhook-väntetid",
+        "SessionsInterval": "Sessionsintervall",
+        "MoviesFinished": "Färdiga filmer",
+        "SeriesFinished": "Färdiga serier",
+        "NoActivity": "Ingen aktivitet"
     }
 }

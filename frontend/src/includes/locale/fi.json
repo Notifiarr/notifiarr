@@ -872,6 +872,7 @@
     "buttons": {
         "ResetForm": "",
         "Login": "",
+        "LoginTitle": "Kirjaudu",
         "Confirm": "",
         "Cancel": "",
         "Save": "",

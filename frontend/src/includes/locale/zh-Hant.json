@@ -1,0 +1,1870 @@
+{
+    "system": {
+        "ClientInformation": {
+            "Uptime": "執行時間",
+            "Version": "版本",
+            "Application": "應用程式",
+            "Started": "啟動時間",
+            "title": "用戶端資訊"
+        },
+        "NetworkInformation": {
+            "Gateway": "閘道",
+            "title": "網路資訊",
+            "IPAddress": "IP 位址",
+            "Netmask": "子網路遮罩",
+            "Interface": "介面"
+        },
+        "BuildInformation": {
+            "title": "建置資訊",
+            "Branch": "分支",
+            "BuildUser": "建置使用者",
+            "BuildDate": "建置日期",
+            "GoVersion": "Go 版本",
+            "Integrity": "完整性"
+        },
+        "OperatingSystem": {
+            "title": "作業系統",
+            "Hostname": "主機名稱",
+            "UniqueID": "唯一 ID",
+            "Platform": "平台",
+            "KernelVersion": "核心版本",
+            "VirtualizationSystem": "虛擬化系統"
+        },
+        "StorageData": {
+            "title": "儲存資料",
+            "Total": "總計",
+            "Used": "已使用",
+            "Free": "可用",
+            "FS": "檔案系統",
+            "ro": "唯讀",
+            "Device": "裝置",
+            "Mount": "掛載"
+        },
+        "StartupParams": {
+            "title": "啟動參數",
+            "BinaryPath": "執行檔路徑",
+            "ConfigFile": "設定檔",
+            "EnvironmentPrefix": "環境前綴",
+            "ExtraConfigFiles": "額外設定檔",
+            "CustomAssets": "自訂資產",
+            "UserID": "使用者 ID",
+            "GroupID": "群組 ID",
+            "IPAddress": "IP 位址"
+        },
+        "UserInformation": {
+            "title": "使用者資訊",
+            "Patron": "贊助者",
+            "Subscriber": "訂閱者",
+            "AbsoluteBadAss": "絕對猛人",
+            "YesYesYouAre": "沒錯，你就是！💚",
+            "HellaAwesome": "超讚",
+            "YoureSoGifted": "你這麼有才，我們愛你！💜",
+            "DateFormat": "日期格式",
+            "InvalidAPIKey": "尚未登入 Notifiarr；API 金鑰遭到拒絕。"
+        },
+        "EnvironmentVariables": {
+            "title": "環境變數"
+        }
+    },
+    "Commands": {
+        "description": "命令由用戶端（後端）執行。可以從此介面或聊天伺服器觸發。如果您修改命令，必須先儲存設定，才能從 Web UI 執行。",
+        "title": "命令清單",
+        "addInstance": "建立命令",
+        "DeleteCommand": "刪除命令",
+        "Executions": "執行次數：{count}",
+        "Failures": "失敗次數：{count}",
+        "LastExecution": "上次執行",
+        "neverExecuted": "從未執行",
+        "enterCommandArguments": "輸入命令引數",
+        "commandRequiresArguments": "{count, plural, other {# 個引數。請在下方輸入。}}",
+        "noOutput": "尚無輸出。請嘗試執行命令，然後按一下重新整理。",
+        "refreshed": "已於 {timeDuration} 前重新整理",
+        "regexMismatch": "引數不符合正規表示式。",
+        "name": {
+            "label": "名稱",
+            "description": "命令的名稱。會顯示在記錄與通知中。",
+            "placeholder": "用於通知的自訂名稱"
+        },
+        "command": {
+            "label": "命令",
+            "description": "要執行的命令。",
+            "placeholder": "echo 'Hello, world!'",
+            "tooltip": "這是觸發時會執行的命令。<br />按一下雙勾圖示即可立即執行命令。完成後，按一下重新整理並顯示輸出即可查看結果。<br /><br />勾選方塊可將命令交由 shell 包裝。在 Windows 上會以 <code>cmd.exe</code> 執行命令，在其他作業系統上會以 <code>/bin/bash</code> 執行命令。這對需要管道與重新導向等 shell 功能的命令很有用。自訂位置引數可用此格式定義：<code>({regex})</code>，也就是包在大括號與小括號中的正規表示式，例如 <code>({[a-z]})</code>。這些引數可由執行命令的人填寫，無論是在此 Web UI 或聊天伺服器上。如果命令有引數，該引數為必填；如果有多個引數，則全部必填。<br /><br /> <h5>範例</h5>使用兩個引數的命令：<code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />上述命令可讓使用者執行 <code>ls -la</code> 的任意組合，目標為 <code>/tmp</code>、<code>/</code>、<code>/home</code> 或 <code>/lib</code>。",
+            "required": "必須提供命令"
+        },
+        "notify": {
+            "label": "通知",
+            "description": "命令執行後傳送通知。",
+            "tooltip": "接收包含命令輸出的通知。"
+        },
+        "log": {
+            "label": "記錄輸出",
+            "description": "記錄命令輸出。",
+            "tooltip": "將命令輸出記錄到此用戶端的應用程式記錄。"
+        },
+        "timeout": {
+            "label": "最長執行時間",
+            "description": "命令在被終止前可以執行多久。"
+        }
+    },
+    "monitoring": {
+        "ConfigureServices": "已設定整合的健康狀態檢查，是在各自的設定頁面指定檢查間隔來啟用。其中部分檢查來自<go-to page=\"starrapps\">Starr 應用程式</go-to>頁面、<go-to page=\"downloaders\">下載應用程式</go-to>頁面，或<go-to page=\"mediaapps\">媒體應用程式</go-to>頁面。其餘顯示的健康狀態檢查位於<go-to page=\"services\">服務頁面</go-to>。",
+        "EnableOnConfig": "請在<go-to page=\"services\">服務</go-to>頁面啟用健康狀態檢查。",
+        "ChecksDisabled": "健康狀態檢查：停用",
+        "ChecksStopped": "健康狀態檢查：已暫停",
+        "StartChecks": "繼續健康狀態檢查",
+        "StopChecks": "暫停健康狀態檢查",
+        "stopFailed": "暫停健康狀態檢查失敗。",
+        "startFailed": "繼續健康狀態檢查失敗。",
+        "refreshInterval": "重新整理間隔",
+        "check": {
+            "interval": {
+                "short": "間隔",
+                "title": "檢查間隔",
+                "tooltip": "檢查此服務的頻率。"
+            },
+            "name": "服務名稱",
+            "state": {
+                "short": "狀態",
+                "title": "服務檢查計數器"
+            },
+            "typeExpect": "類型/預期",
+            "last": {
+                "short": "上次",
+                "title": "上次檢查：{timeDuration} 前",
+                "tooltip": "距離上次檢查此服務有多久。",
+                "description": "服務上次檢查於"
+            },
+            "since": {
+                "short": "持續",
+                "title": "處於此狀態的時間：{timeDuration}",
+                "tooltip": "服務處於此狀態有多久。",
+                "description": "服務自此處於此狀態"
+            },
+            "output": "上次檢查輸出"
+        },
+        "recheckFailed": "重新檢查健康狀態檢查失敗。",
+        "checkInitiated": "已開始健康狀態檢查。",
+        "nextRefresh": "下次將於 {timeDuration} 後重新整理。",
+        "cardsView": "卡片檢視",
+        "classicView": "經典檢視",
+        "hideAllOutputs": "隱藏所有輸出",
+        "showAllOutputs": "顯示所有輸出"
+    },
+    "ServiceChecks": {
+        "description": "使用此表單設定健康狀態檢查。請勿在此新增 Starr、媒體、Snapshot 或下載應用程式。請改在各自的設定頁面為它們指定檢查間隔。檢視<go-to page=\"ProcessList\">執行中的程序清單</go-to>，並在建立程序檢查時作為參考。",
+        "type": {
+            "label": "檢查類型",
+            "description": "要執行的檢查類型。",
+            "tooltip": "程序檢查可讓您監控程序是否正在執行。HTTP URL 檢查可讓您監控 URL 是否可連線。TCP 連接埠檢查可讓您監控 TCP 連接埠的連線能力。兩種 Ping 檢查都可監控 IP 或主機是否可連線。",
+            "options": {
+                "process": "程序檢查",
+                "http": "HTTP URL 檢查",
+                "tcp": "TCP 連接埠可連線性",
+                "ping": "UDP Ping 檢查",
+                "icmp": "ICMP Ping 檢查"
+            }
+        },
+        "url": {
+            "label": "URL",
+            "description": "受監控服務的 URL。",
+            "placeholder": "https://my.site"
+        },
+        "title": "健康狀態檢查",
+        "DeleteCheck": "刪除健康狀態檢查",
+        "addInstance": "建立健康狀態檢查",
+        "processListLink": "在此檢視執行中的程序清單。",
+        "timeout": {
+            "label": "檢查逾時",
+            "description": "等待服務檢查完成的時間。"
+        },
+        "interval": {
+            "label": "檢查間隔",
+            "description": "檢查服務的頻率。"
+        },
+        "name": {
+            "label": "檢查名稱",
+            "description": "受監控服務的唯一名稱。",
+            "placeholder": "用於通知的自訂名稱",
+            "tooltip": "受監控服務的名稱。用來在通知中識別服務。每個服務都必須有唯一的名稱。"
+        },
+        "http": {
+            "headers": {
+                "label": "HTTP 標頭",
+                "description": "HTTP 請求標頭，每行 1 個。",
+                "placeholder": "Content-Type: application/json"
+            },
+            "codes": {
+                "label": "可接受的回應碼",
+                "description": "這裡的任何代碼都視為可接受。如果服務以其他代碼回應，就會產生通知。",
+                "required": "至少必須提供一個預期的回應碼。"
+            }
+        },
+        "tcp": {
+            "value": {
+                "label": "主機與連接埠",
+                "description": "輸入 host:port 以檢查連線能力，主機可以是名稱或 IP。",
+                "placeholder": "127.0.0.1:22",
+                "tooltip": "一般建議使用 IP 位址。如果您也想測試 DNS，請使用主機名稱。格式為 <code>host:port</code>。不應有空格或其他字元。",
+                "required": "必須提供以冒號分隔的主機與連接埠。"
+            }
+        },
+        "ping": {
+            "value": {
+                "label": "主機或 IP",
+                "description": "輸入主機或 IP 以檢查是否可連線。",
+                "placeholder": "127.0.0.1",
+                "tooltip": "一般建議使用 IP 位址。如果您也想測試 DNS，請使用主機名稱。格式為 <code>host</code> 或 <code>10.11.12.13</code>。不應有空格或其他字元。若要讓 UDP 檢查在 Linux 上運作，必須用此命令啟用：<code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>。若要在 Linux 中允許 ICMP 檢查，必須用此命令授予 notifiarr 執行檔 capabilities：<code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>。要讓兩者在 Docker 中都能運作，最簡單的方式是啟用特權模式，但您也可以設定 capabilities。",
+                "required": "必須提供主機或 IP 位址。"
+            },
+            "count": {
+                "label": "次數",
+                "description": "要傳送的封包數量。",
+                "placeholder": "10",
+                "required": "封包次數必須大於零。"
+            },
+            "minimum": {
+                "label": "下限",
+                "description": "必須收到的封包數量下限。",
+                "placeholder": "10",
+                "required": "封包數量下限必須大於零。"
+            },
+            "interval": {
+                "label": "間隔",
+                "description": "封包之間的間隔，單位為毫秒。",
+                "placeholder": "100"
+            }
+        },
+        "process": {
+            "value": {
+                "label": "程序比對",
+                "description": "要檢查的程序名稱。",
+                "placeholder": "notifiarr",
+                "tooltip": "要檢查的程序名稱。這是程序在程序清單中顯示的名稱。提供的值兩端都會使用萬用字元比對，所以引數越明確，比對就越準確。",
+                "required": "必須提供程序名稱。"
+            },
+            "running": {
+                "label": "執行中",
+                "description": "如果程序正在執行，就傳送警示。",
+                "tooltip": "選取此項後，如果發現程序正在執行，就會觸發不健康警示。如果您需要在程序啟動時收到通知，請選取此選項。"
+            },
+            "restarts": {
+                "label": "重新啟動",
+                "description": "如果程序已重新啟動，就傳送警示。",
+                "tooltip": "選取此項後，如果發現程序已重新啟動，就會觸發不健康警示。如果您需要在 PID 變更時收到通知，請選取此選項。"
+            },
+            "minimum": {
+                "label": "下限",
+                "description": "必須符合該值的執行中程序數量下限。",
+                "required": "程序數量下限必須大於零。",
+                "tooltip": "如果您輸入 2，當執行中的程序少於 2 個時就會收到通知。用此項在執行中的程序太少時收到警示。"
+            },
+            "maximum": {
+                "label": "上限",
+                "description": "可以符合該值的執行中程序數量上限。",
+                "tooltip": "如果您輸入 2，當執行中的程序多於 2 個時就會收到通知。用此項在執行中的程序太多時收到警示。"
+            }
+        }
+    },
+    "profile": {
+        "authType": {
+            "options": {
+                "password": "密碼：本機使用者名稱",
+                "header": "驗證代理：標頭",
+                "noauth": "無密碼（危險）",
+                "website": "網站認證"
+            },
+            "option_desc": {
+                "password": "這是預設的驗證類型。選擇密碼選項，即可使用已設定的使用者名稱與密碼登入此應用程式。只支援 1 組使用者名稱與密碼。選擇此選項時，必須填寫使用者名稱與新密碼欄位。如果這是目前的驗證類型，還必須填寫目前密碼欄位才能變更。",
+                "header": "選擇此選項可使用包含使用者名稱的 HTTP 標頭登入此應用程式。這通常稱為代理驗證。我們有<a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wiki 頁面</a>說明如何為此功能設定 Nginx。選擇此選項時，還必須為驗證代理選擇標頭。如果沒有顯示任何標頭，表示上游代理未提供有效的標頭。",
+                "noauth": "不建議使用此設定。無密碼驗證類型允許來自任何已設定<code>上游 IP</code>的任何請求。它也可以搭配驗證代理來設定使用者名稱。如果提供的標頭中沒有使用者名稱，則預設為 admin。",
+                "website": "選擇此選項可使用網站認證登入此應用程式。這可讓您使用 Notifiarr.com 的電子郵件地址或使用者名稱與密碼登入用戶端。您的密碼在傳送到用戶端之前一律會加密，以確保安全。"
+            },
+            "description": "選擇向用戶端驗證的方式",
+            "label": "驗證類型"
+        },
+        "upstreams": {
+            "label": "上游",
+            "description": "受信任的代理 IP 或 CIDR 網路。以空格分隔網路。",
+            "placeholder": "127.0.0.1 ::1",
+            "tooltip": "如果 Notifiarr 用戶端位於反向代理（swag、nginx 等）後方，您應在此新增該代理的 IP。您也可以指定完整網路。這會控制寫入網頁伺服器記錄檔的 IP 是請求者，還是 <span class=\"text-warning\">X-Forwarded-For</span> 標頭。使用請求標頭進行驗證，或停用驗證時，必須設定此項。"
+        },
+        "header": {
+            "label": "驗證標頭",
+            "description": "選擇包含您使用者名稱的標頭",
+            "tooltip": "這裡顯示用戶端或上游提供、可用於代理驗證的標頭。如果驗證類型設為標頭或無密碼，就會使用此選擇。請選擇顯示正確使用者名稱的標頭。使用無密碼時，標頭用來設定使用者名稱，但並非必要。"
+        },
+        "username": {
+            "description": "您的登入使用者名稱",
+            "placeholder": "預設：admin",
+            "label": "使用者名稱"
+        },
+        "password": {
+            "label": "目前密碼",
+            "description": "輸入目前的密碼以進行變更",
+            "placeholder": "輸入目前密碼"
+        },
+        "newPass": {
+            "label": "新密碼",
+            "description": "您的新登入密碼",
+            "placeholder": "最少 9 個字元"
+        },
+        "phrase": {
+            "Addit": "新增它。",
+            "ShowMoreDesc": "目前支援三種驗證類型。只有當目前的請求來自有效且已設定的上游 IP 位址時，才能使用驗證代理與無密碼。",
+            "PasswordOnlyUsed": "只有當驗證類型設為密碼時，才會使用使用者名稱與密碼。",
+            "HeaderOnlyUsed": "只有當驗證類型設為標頭或無密碼時，才會使用驗證標頭。",
+            "AuthTypeChange": "如果驗證類型變更，請登出以完成程序。",
+            "ProfileUpdated": "設定檔已於 {timeDuration} 前成功更新！",
+            "EnterCurrentPassword": "輸入目前的密碼以進行變更。",
+            "ProxyAuthDisabled": "由於您的上游（{upstreamIp}）不在允許的上游清單中，代理驗證已停用。",
+            "SeeWikiForAuthProxyHelp": "請參閱<a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wiki</a>以了解設定驗證代理的說明。",
+            "ShowMeMore": "顯示更多。",
+            "ShowMeLess": "顯示較少。"
+        },
+        "title": {
+            "Authentication": "驗證",
+            "Authorization": "授權"
+        }
+    },
+    "config": {
+        "sslKeyFile": {
+            "description": "SSL 金鑰檔的路徑。",
+            "label": "SSL 金鑰檔",
+            "placeholder": "/path/to/ssl-key.pem",
+            "tooltip": "此應用程式可以提供 HTTPS。指定憑證檔路徑與金鑰檔路徑即可啟用。"
+        },
+        "logFiles": {
+            "description": "要保留的記錄檔數量。",
+            "label": "記錄檔數量",
+            "tooltip": "此設定為 0 或 1 時，會停用記錄檔輪替。此設定適用於所有記錄檔，並會在磁碟上各保留此數量。"
+        },
+        "serial": {
+            "label": "平行執行緒",
+            "description": "停用此設定後，應用程式在從已設定的應用程式收集資料時，會使用較少的 goroutine（執行緒）。",
+            "tooltip": "分散 CPU 使用量並降低記憶體占用。"
+        },
+        "logFile": {
+            "placeholder": "/path/to/notifiarr.log",
+            "label": "應用程式記錄檔",
+            "description": "應用程式記錄檔或資料夾的路徑。",
+            "tooltip": "如果您設定的資料夾不含檔案名稱，應用程式會在該資料夾中建立名為 Notifiarr.log 的檔案。"
+        },
+        "debugLog": {
+            "label": "除錯記錄檔",
+            "description": "除錯記錄檔或資料夾的路徑。",
+            "placeholder": "/path/to/debug-notifiarr.log",
+            "tooltip": "在此設定記錄檔路徑後，應用程式會將除錯記錄寫入專用檔案。若未設定，除錯記錄會寫入應用程式記錄檔。如果您設定的資料夾不含檔案名稱，應用程式會在該資料夾中建立名為 Notifiarr.debug.log 的檔案。"
+        },
+        "logFileMb": {
+            "description": "記錄檔輪替前的大小上限。",
+            "label": "記錄檔大小",
+            "tooltip": "啟用輪替時（將記錄檔數量設為大於 1），此設定會控制檔案必須多大才會觸發輪替。"
+        },
+        "command": {
+            "name": {
+                "required": "必須提供命令。",
+                "description": "命令的名稱。",
+                "label": "名稱"
+            }
+        },
+        "snapshot": {
+            "timeout": {
+                "description": "Snapshot 作業的逾時。",
+                "label": "逾時"
+            }
+        },
+        "service": {
+            "name": {
+                "label": "名稱",
+                "description": "服務的名稱。"
+            }
+        },
+        "urlbase": {
+            "label": "URL 基底",
+            "description": "此應用程式預設在 / 提供 HTTP。您可以在此輸入其他內容來變更。",
+            "placeholder": "/notifiarr/",
+            "tooltip": "範例：/notifiarr/"
+        },
+        "errors": {
+            "InvalidCreds": "使用者名稱或密碼無效。",
+            "LoginRequestTimedOut": "登入請求逾時",
+            "LoginFailed": "登入失敗：{error}",
+            "ProfileReqTimedOut": "設定檔請求逾時",
+            "AnUnknownErrorOccurred": "發生未知錯誤",
+            "ConfigUpdateFailed": "設定更新失敗：{error}",
+            "PleaseEnterBothUsernameAndPassword": "請同時輸入使用者名稱和密碼。",
+            "SetAPIKeyFailed": "設定 API 金鑰失敗：{error}"
+        },
+        "titles": {
+            "Configuration": "設定",
+            "General": "一般",
+            "Network": "網路",
+            "System": "系統",
+            "WatchFile": "監看檔案",
+            "Endpoint": "端點",
+            "Command": "命令",
+            "SSLConfiguration": "SSL 設定",
+            "Services": "服務",
+            "Logging": "記錄",
+            "Dark": "深色",
+            "Light": "淺色"
+        },
+        "apiKey": {
+            "label": "API 金鑰",
+            "description": "來自您 Notifiarr.com 帳戶的 API 金鑰。",
+            "tooltip": "登入 Notifiarr.com，前往 Profile，然後前往 API Keys。",
+            "placeholder": "在此輸入 API 金鑰"
+        },
+        "extraKeys": {
+            "label": "額外金鑰",
+            "description": "供第三方整合使用的其他 API 金鑰。請以換行分隔。",
+            "placeholder": "每行一個…"
+        },
+        "bindAddr": {
+            "label": "繫結位址",
+            "description": "應用程式要接聽的 IP 與連接埠。使用 0.0.0.0 可在所有介面上接聽。",
+            "placeholder": "0.0.0.0:5454"
+        },
+        "sslCertFile": {
+            "label": "SSL 憑證檔",
+            "description": "SSL 憑證檔的路徑。",
+            "placeholder": "/path/to/ssl-cert.pem",
+            "tooltip": "此應用程式可以提供 HTTPS。指定憑證檔路徑與金鑰檔路徑即可啟用。"
+        },
+        "debug": {
+            "label": "除錯記錄",
+            "description": "啟用或停用除錯記錄。",
+            "tooltip": "啟用除錯會把更多資料寫入記錄。請使用主體大小上限設定來控制承載大小。"
+        },
+        "quiet": {
+            "label": "安靜記錄",
+            "description": "啟用或停用安靜記錄。",
+            "tooltip": "啟用安靜模式後，應用程式不會向 stdout 輸出任何內容。當已啟用記錄檔，而且您不希望記錄也灌進啟動常駐程式時，這很有用。"
+        },
+        "httpLog": {
+            "placeholder": "/path/to/http-notifiarr.log",
+            "tooltip": "在此設定記錄檔路徑後，應用程式會將 HTTP 記錄寫入專用檔案。檔案格式為 apache 記錄。強烈建議使用。如果您設定的資料夾不含檔案名稱，應用程式會在該資料夾中建立名為 Notifiarr.http.log 的檔案。",
+            "label": "HTTP 記錄檔",
+            "description": "HTTP 記錄檔或資料夾的路徑。"
+        },
+        "maxBody": {
+            "label": "主體大小上限",
+            "description": "HTTP 請求的主體大小上限。",
+            "tooltip": "啟用除錯時，此設定會限制寫入記錄的承載資料量，包含傳向或來自 Notifiarr.com 的資料。"
+        },
+        "noUploads": {
+            "label": "拒絕上傳",
+            "description": "<b>停用</b>允許 Notifiarr.com 管理員讓此用戶端將記錄檔上傳到網站。<b>啟用</b>則禁止上傳記錄檔。",
+            "tooltip": "此設定控制 Notifiarr.com 網站與 Notifiarr 管理員能否觸發此用戶端，將記錄檔上傳到網站。有時我們在診斷問題時需要查看記錄內容，此觸發可讓用戶端上傳應用程式與除錯記錄檔。"
+        },
+        "services": {
+            "disabled": {
+                "label": "健康狀態檢查",
+                "description": "啟用或停用健康狀態檢查。",
+                "tooltip": "在此停用或啟用所有健康狀態檢查的監控。"
+            },
+            "interval": {
+                "label": "更新間隔",
+                "description": "健康狀態檢查的更新間隔。",
+                "tooltip": "這會控制彙總後的健康狀態檢查結果傳送至 Notifiarr.com 的頻率。如果健康狀態檢查的狀態變更，一律會立即傳送。"
+            },
+            "logFile": {
+                "label": "服務記錄檔",
+                "description": "服務記錄檔或資料夾的路徑。",
+                "tooltip": "此記錄檔用來儲存健康狀態檢查結果。若未設定，健康狀態檢查輸出會寫入應用程式記錄檔。如果您設定的資料夾不含檔案名稱，應用程式會在該資料夾中建立名為 Notifiarr.services.log 的檔案。",
+                "placeholder": "/path/to/services-notifiarr.log"
+            }
+        },
+        "ui": {
+            "darkMode": {
+                "label": "深色模式",
+                "description": "啟用或停用深色模式。"
+            },
+            "language": {
+                "label": "語言",
+                "description": "應用程式前端的語言。"
+            }
+        },
+        "watchFile": {
+            "path": {
+                "label": "檔案路徑",
+                "description": "要監看的檔案路徑。"
+            }
+        },
+        "endpoint": {
+            "name": {
+                "label": "名稱",
+                "description": "端點的名稱。"
+            }
+        },
+        "hostId": {
+            "label": "主機 ID",
+            "description": "主機 ID 參數用來唯一識別此用戶端安裝。",
+            "tooltip": "不建議變更此值；它應會自動取得。請勿將此值複製到另一個 Notifiarr 用戶端安裝。"
+        },
+        "retries": {
+            "label": "重試",
+            "description": "與 Notifiarr.com 的連線有時會失敗。這會控制每個請求在失敗時要嘗試的次數。",
+            "tooltip": "預設：4（設為 0 時使用預設值 4）"
+        },
+        "apt": {
+            "label": "APT 掛鉤",
+            "description": "Notifiarr 的 Debian（與 Ubuntu）套件包含 APT 整合。",
+            "tooltip": "Notifiarr 的 Debian（與 Ubuntu）套件包含 APT 整合。每次執行 <b class=\"text-warning\">apt</b> 命令時都會叫用此整合。若要啟用，請將此欄位設為啟用，然後<b>在 Notifiarr.com 啟用套件管理員整合。</b>此功能不需要用戶端正在執行，只需要安裝用戶端 deb 套件。此功能在 RHEL 或非 Debian Linux 上無法使用。"
+        },
+        "timeout": {
+            "label": "逾時",
+            "description": "這是向 Notifiarr.com 發出 API 請求的逾時。"
+        },
+        "fileMode": {
+            "label": "記錄檔 Unix 模式",
+            "description": "這是寫入新記錄檔時使用的 Unix 檔案模式。",
+            "tooltip": "建議值依開放程度排序：0600、0640、0644"
+        },
+        "autoUpdate": {
+            "label": "自動更新",
+            "description": "這是應用程式檢查更新的頻率。找到更新時會自動安裝。",
+            "tooltip": "僅適用於 Windows。"
+        },
+        "unstableCh": {
+            "label": "不穩定頻道",
+            "description": "啟用不穩定更新頻道後，應用程式會改向不穩定版網站檢查自動更新，而不是 GitHub。",
+            "tooltip": "僅限具有開發人員存取權的使用者。"
+        },
+        "trace": {
+            "label": "追蹤記錄",
+            "description": "啟用或停用追蹤記錄。",
+            "tooltip": "啟用追蹤會把非常詳細的執行流程寫入記錄。適合深入除錯。"
+        }
+    },
+    "SiteTunnel": {
+        "phrases": {
+            "Idle": "閒置",
+            "Running": "執行中",
+            "ConnectionPoolSize": "連線集區大小",
+            "Connecting": "連線中",
+            "PrimaryTunnel": "主要通道",
+            "BackupTunnel": "備份通道",
+            "Ping": "Ping 通道",
+            "Pinging": "正在 Ping…",
+            "ActiveTunnel": "作用中通道：{tunnel}",
+            "TunnelStats": "通道統計",
+            "Disconnects": "斷線次數",
+            "LastConnection": "上次連線",
+            "LastActiveCheck": "上次作用中檢查",
+            "SocketURLActive": "Socket URL（作用中）",
+            "SocketURLInactive": "Socket URL（非作用中）",
+            "SelectTunnel": "選擇通道",
+            "TunnelsSaved": "通道已於 {timeDuration} 前儲存！",
+            "TunnelStatsStale": "上方的資料一律是過期的。若要更新，請按一下頁首的更新後端連結。"
+        },
+        "subText": "按一下<span class=\"text-success\">Ping 通道</span>按鈕，並選擇回應時間最快的通道作為主要通道。再選擇另一個快速的通道作為備份。"
+    },
+    "scheduler": {
+        "ops": {
+            "noSchedule": "無排程",
+            "minutely": "每分鐘",
+            "hourly": "每小時",
+            "daily": "每日",
+            "weekly": "每週",
+            "monthly": "每月"
+        },
+        "times": {
+            "noneSelected": "（未選擇）",
+            "noDaysSelected": "（未選擇日期）",
+            "everyMinute": "{count, plural, other {# 次}}，每分鐘在第 {times} 秒",
+            "everyHour": "{count, plural, other {# 次}}，每小時在分:秒 {times}",
+            "everyDay": "{count, plural, other {# 次}}，每天在 {times}",
+            "everyWeek": "{count, plural, other {# 次}}，每週於 {daysOfWeek} 的 {times}",
+            "everyMonth": "{count, plural, other {# 次}}，每月於 {daysOfMonth} 日的 {times}"
+        },
+        "title": "排程",
+        "daysOfWeek": "每週日期",
+        "daysOfMonth": "每月日期",
+        "frequency": "頻率",
+        "selectAFrequency": "選擇頻率以建立排程。",
+        "AddATime": "新增時間",
+        "empty": "如果您想每天執行，請選擇每日頻率。",
+        "required": {
+            "daysOfWeek": "必須至少選擇一週中的一天。",
+            "daysOfMonth": "必須至少選擇一個月中的一天。",
+            "atTimes": "必須至少選擇一個執行排程的時間。"
+        }
+    },
+    "Endpoints": {
+        "title": "轉送 URL",
+        "addInstance": "新增轉送 URL",
+        "DeleteEndpoint": "刪除 URL",
+        "badge": {
+            "header": "{count, plural, other {# 個標頭}}",
+            "query": "{count, plural, other {# 個查詢}}",
+            "body": "{count, plural, other {# 個字元}}"
+        },
+        "name": {
+            "label": "名稱",
+            "description": "轉送 URL 的名稱。",
+            "placeholder": "用於通知的自訂名稱"
+        },
+        "template": {
+            "label": "承載範本",
+            "description": "將承載解析到此範本。",
+            "placeholder": "pihole",
+            "tooltip": "網站使用此範本，判斷如何將承載轉成聊天通知。可用範本清單，或自行建立範本，請見<a href=\"https://notifiarr.com/\" target=\"_blank\">網站</a>的 <code>Integrations: Endpoints</code>。",
+            "required": "必須提供範本。如果不確定要輸入什麼，請輸入 'test'。"
+        },
+        "timeout": {
+            "label": "請求逾時",
+            "description": "等待 HTTP 請求完成的時間。"
+        },
+        "method": {
+            "label": "方法",
+            "description": "HTTP 請求"
+        },
+        "url": {
+            "label": "轉送 URL",
+            "description": "會轉送到網站的遠端服務 URL。",
+            "placeholder": "https://pihole.myhome.lan/api/stats"
+        },
+        "header": {
+            "label": "HTTP 標頭",
+            "description": "HTTP 請求標頭，每行 1 個。",
+            "placeholder": "Content-Type: application/json",
+            "tooltip": "HTTP 請求標頭會依原樣傳送到 URL。格式必須是每行 <code>key: value</code>。空格與冒號都是必要的。無效的值會被忽略，多餘的空格會被去除。"
+        },
+        "query": {
+            "label": "查詢參數",
+            "description": "要加到 URL 的查詢參數，每行 1 個。",
+            "placeholder": "apiKey=1234567890",
+            "tooltip": "查詢參數會附加到 URL。格式必須是每行 <code>key=value</code>。無效的值會被忽略，多餘的空格會被去除。請勿在行首加入 <code>?</code> 字元或 & 符號（<code>&</code>）。鍵與值會自動進行 URL 編碼。"
+        },
+        "body": {
+            "label": "請求主體",
+            "description": "針對 POST、PUT 與 PATCH 請求傳送到 URL 的主體。",
+            "placeholder": "{\"message\": \"Hello, world!\"}"
+        }
+    },
+    "metrics": {
+        "apps": {
+            "title": "應用程式請求",
+            "description": "應用程式請求統計。這些計數器不包含健康狀態檢查。",
+            "empty": "尚無應用程式請求。"
+        },
+        "timerEvents": {
+            "title": "已觸發的動作",
+            "description": "已執行的觸發、計時器與排程。",
+            "empty": "尚無已觸發的動作。"
+        },
+        "CountersReset": "此頁面的計數器會在應用程式結束時重設。應用程式透過 Prometheus 公開這些計數器。您可以抓取它們，並使用 <a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">Notifiarr Client Grafana 儀表板</a>來呈現。",
+        "ApplicationUptime": "應用程式執行時間：&nbsp;<b>{timeDuration}</b>",
+        "logFiles": {
+            "title": "記錄檔",
+            "description": "記錄檔計數器。",
+            "empty": "找不到記錄檔。"
+        },
+        "apiHits": {
+            "title": "API 請求",
+            "description": "傳入的 API 請求計數器。",
+            "empty": "尚無 API 請求。"
+        },
+        "httpRequests": {
+            "title": "HTTP 請求",
+            "description": "傳入的 HTTP 請求統計。這包含 websocket 通道請求。",
+            "empty": "尚無 HTTP 請求。"
+        },
+        "website": {
+            "title": "網站請求",
+            "description": "向 Notifiarr.com 發出的請求。",
+            "empty": "尚無網站請求。"
+        },
+        "fileWatcher": {
+            "title": "檔案監看",
+            "description": "檔案監看統計。",
+            "empty": "尚未設定檔案監看器。"
+        }
+    },
+    "phrases": {
+        "LoginHelpBody": "如果這是您第一次登入，請使用 notifiarr.com 的電子郵件地址與密碼登入。登入後可以設定本機密碼。如果您忘記了本機密碼，請參閱<a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">忘記密碼</a> wiki 頁面。",
+        "LoginHelp": "登入說明",
+        "ERROR": "錯誤",
+        "LoggingIn": "正在登入…",
+        "LoggedIn": "已登入！",
+        "Loading": "載入中…",
+        "UpdateBackend": "更新後端",
+        "BackEndUpdated": "後端已於 {timeDuration} 前更新。",
+        "UpdatingBackEnd": "正在更新後端…",
+        "FailedToUpdateBackEnd": "更新後端失敗：{error}",
+        "TryRefreshingThePage": "請嘗試重新整理頁面。",
+        "ConfigurationSavedReloading": "設定已儲存！正在重新載入用戶端…",
+        "ConfigurationSaved": "設定已於 {timeDuration} 前儲存！",
+        "SavingConfiguration": "正在儲存設定…",
+        "Version": "版本 {version}",
+        "Every12Hours": "每 12 小時",
+        "Every6Hours": "每 6 小時",
+        "Every3Hours": "每 3 小時",
+        "Reloading": "正在重新載入…",
+        "FailedToReload": "重新載入失敗：{error}",
+        "ConfirmReload": "確認重新載入",
+        "ConfirmReloadBody": "確定要重新載入用戶端嗎？",
+        "ReloadSuccess": "重新載入成功！用戶端已重新載入。",
+        "ReloadCheckTimedOut": "伺服器重新載入檢查在 20 次嘗試後逾時",
+        "ConfirmShutdown": "確認關閉",
+        "ConfirmShutdownBody": "確定要關閉用戶端嗎？您必須在執行它的主機上重新啟動。",
+        "ShutdownSuccess": "關閉成功！用戶端已停止。",
+        "FailedToShutdown": "關閉失敗：{error} - 請嘗試重新整理頁面。",
+        "Changed": "已變更",
+        "New": "新",
+        "Invalid": "無效",
+        "DeleteInstance": "刪除執行個體",
+        "DeletedNumber": "已刪除 {number}",
+        "ItsGone": "不見了！別忘了儲存。",
+        "URLMustBeginWithHttp": "URL 必須以 http:// 或 https:// 開頭",
+        "NameMustNotBeEmpty": "名稱不可為空。",
+        "HostMustNotBeEmpty": "主機不可為空。",
+        "UsernameMustNotBeEmpty": "使用者名稱不可為空。",
+        "NameInUseByInstance": "此名稱已被執行個體 {number} 使用。",
+        "APIKeyMustBeCountCharactersOrLonger": "API 金鑰必須為 {count} 個字元或更長。",
+        "TokenMustBeCountCharacters": "Token 必須為 {count} 個字元或更長。",
+        "LeavePage": "確定要離開此頁面嗎？",
+        "Landing": {
+            "SelectASection": "請從導覽選單選擇區段以開始。",
+            "Welcome": "歡迎，{username}！"
+        },
+        "ToggleSpoilerVisibility": "按一下以切換隱藏內容的顯示。",
+        "EnvironmentVariable": "環境變數名稱：<code>{variableName}</code>",
+        "VariableDescription": "<span class=\"text-warning\">注意：</span>此設定值衍生自環境變數。在此變更數值會將新值寫入設定檔，但不會生效。下次按一下儲存時會被取代。若要變更此處的值，請變更環境變數的值，或從環境中移除此變數。",
+        "EveryDuration": "每 {timeDuration}",
+        "APIKeyMustBeCountCharacters": "API 金鑰必須為 {count} 個字元。",
+        "InvalidAPIKey": "Notifiarr API 金鑰無效，請在設定中更新。",
+        "ShowMore": "顯示更多資訊",
+        "ShowPassword": "顯示密碼",
+        "HidePassword": "隱藏密碼",
+        "CheckInstance": "檢查執行個體",
+        "ValidateSSL": "驗證 SSL 憑證",
+        "RunAsShell": "以 shell 命令執行",
+        "FollowRedirects": "跟隨重新導向",
+        "BrowseFiles": "瀏覽檔案",
+        "APIKey": {
+            "title": "提供 API 金鑰",
+            "placeholder": "來自 notifiarr.com 的全域 API 金鑰",
+            "setMsg": "API 金鑰設定成功！",
+            "Setting": "正在設定 API 金鑰…",
+            "description": "Notifiarr 用戶端需要有效的 API 金鑰才能運作。此金鑰用來向 Notifiarr 網站進行驗證，以接收更新並傳送通知。沒有金鑰用戶端就無法運作，請在下方輸入您的 API 金鑰。"
+        }
+    },
+    "navigation": {
+        "titles": {
+            "Actions": "動作",
+            "Settings": "設定",
+            "Insights": "洞察",
+            "Configuration": "設定",
+            "SiteTunnel": "網站通道",
+            "StarrApps": "Starr 應用程式",
+            "Downloaders": "下載應用程式",
+            "MediaApps": "媒體應用程式",
+            "SnapshotApps": "Snapshot 應用程式",
+            "FileWatcher": "檔案監看",
+            "Endpoints": "端點",
+            "Commands": "命令",
+            "Services": "服務",
+            "Integrations": "整合",
+            "Monitoring": "監控",
+            "Metrics": "指標",
+            "LogFiles": "記錄檔",
+            "System": "系統",
+            "TrustProfile": "信任設定檔",
+            "UnsavedChanges": "未儲存的變更",
+            "Landing": "Notifiarr 首頁",
+            "Plex": "Plex Webhook",
+            "ApiDocs": "用戶端 API 文件"
+        },
+        "pageDescription": {
+            "SiteTunnel": "此用戶端使用<a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery 通道</a>與 notifiarr.com 保持持續的 websocket 連線。此通道讓網站無需開放連接埠或擁有固定 IP，即可向您的用戶端發出請求。您可以在此頁面選擇主要通道，以及主要通道無法連線時要用作備份的通道。",
+            "Actions": "在此尋找 Notifiarr 用戶端的內部動作。這些動作由計時器、排程，以及來自網站或聊天伺服器的事件執行。雖然通常保留給疑難排解使用，您仍可在此介面手動觸發。",
+            "Configuration": "在此設定 Notifiarr 用戶端。",
+            "StarrApps": "設定 Starr 整合。",
+            "Downloaders": "管理下載用戶端。",
+            "MediaApps": "管理媒體播放器與相關服務。",
+            "SnapshotApps": "大部分 Snapshot 設定位於 Notifiarr.com 網站。下方是 Snapshot 功能的應用程式「外掛程式」設定。",
+            "FileWatcher": "監看檔案變更並觸發動作！此 Notifiarr 用戶端可以監看記錄檔中符合正規表示式的行。這類似於 <code>tail -f file | grep string</code>，當記錄檔寫入符合正規表示式的新行時即可傳送通知。",
+            "Endpoints": "設定轉送端點 URL 及其排程。",
+            "Commands": "設定並執行自訂命令與指令碼。",
+            "Services": "Notifiarr 用戶端應用程式可透過 HTTP 檢查、TCP 連接埠檢查，或程序正在執行（以及未執行）檢查來監控服務。<b>用戶端健康狀態檢查可搭配 Notifiarr.com 網路整合使用。</b>",
+            "Integrations": "此頁面顯示此用戶端應用程式針對各項已設定整合，快取在記憶體中的資料。",
+            "Monitoring": "檢視服務與網路健康狀態檢查結果。",
+            "Metrics": "檢視用戶端設定的指標總計。",
+            "LogFiles": "檢視、追蹤、下載並上傳用戶端記錄檔。",
+            "System": "檢視系統與用戶端資訊。",
+            "TrustProfile": "設定您登入此 Notifiarr 用戶端應用程式的方式。",
+            "Landing": "這裡是地球上最棒的地方！",
+            "Plex": "用於疑難排解 Plex Webhook 的資訊。"
+        }
+    },
+    "SnapshotApps": {
+        "Nvidia": {
+            "title": "Nvidia",
+            "description": "此整合會在 Snapshot 通知中顯示 Nvidia GPU 資訊。在 Docker 中，請使用 CUDA 映像（<code>ghcr.io/notifiarr/notifiarr:cuda</code> 或 <code>golift/notifiarr:cuda</code>），在主機上安裝 <a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a>，並以 <code>--gpus all</code> 或 Compose <code>gpus: all</code> 傳入 GPU。不需要主機端的 CUDA toolkit 版本。",
+            "disabled": {
+                "label": "GPU Snapshot",
+                "description": "啟用或停用 GPU Snapshot。"
+            },
+            "busIds": {
+                "label": "匯流排 ID",
+                "description": "要納入 Snapshot 的匯流排 ID，以逗號分隔。",
+                "placeholder": "0000:00:00.0,0000:00:00.1",
+                "tooltip": "這是 GPU 的匯流排 ID。執行 <code>nvidia-smi</code> 後查看 <code>Bus Id</code> 欄即可找到。其他匯流排 ID 的顯示卡會在 Snapshot 中被忽略。一般將此留白即可。可用換行新增多筆。"
+            },
+            "smiPath": {
+                "label": "nvidia-smi 路徑",
+                "description": "nvidia-smi 命令的路徑。",
+                "placeholder": "/usr/bin/nvidia-smi",
+                "tooltip": "如果 nvidia-smi（Windows 上為 nvidia-smi.exe）不在 PATH 環境變數中，您可以在此提供執行檔的完整路徑。"
+            }
+        },
+        "MySQL": {
+            "title": "MySQL",
+            "description": "您可以將 MySQL 認證加入 Notifiarr 用戶端設定，以對 MySQL 服務健康狀態建立 Snapshot。此功能會對 <code>SHOW PROCESSLIST</code> 與 <code>SHOW STATUS</code> 資料建立 Snapshot。不需要資料庫存取權。授權範例：<code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
+            "addInstance": "新增 MySQL 伺服器",
+            "name": {
+                "label": "伺服器名稱",
+                "description": "MySQL 伺服器的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "host": {
+                "label": "主機",
+                "description": "MySQL 伺服器的主機或 IP 位址。",
+                "placeholder": "127.0.0.1"
+            },
+            "port": {
+                "label": "連接埠",
+                "description": "MySQL 伺服器的連接埠。",
+                "placeholder": "3306"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "MySQL 伺服器的使用者名稱。",
+                "placeholder": "root"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "MySQL 伺服器的密碼。",
+                "placeholder": "密碼"
+            }
+        }
+    },
+    "FileWatcher": {
+        "logMatch": {
+            "tooltip": "啟用後會將相符的行寫入 notifiarr 記錄。這有助於除錯，但可能產生大量記錄。",
+            "label": "記錄相符項目",
+            "description": "將相符的行寫入 notifiarr 記錄。"
+        },
+        "title": "監看的檔案",
+        "description": "必須在 Notifiarr 網站啟用記錄監看功能並選擇頻道，此功能才會運作！",
+        "addInstance": "監看另一個檔案",
+        "DeleteWatcher": "刪除監看器",
+        "badges": {
+            "CurrentlyWatching": "正在監看",
+            "WatcherStopped": "監看器已停止"
+        },
+        "buttons": {
+            "StopWatcher": "停止監看器",
+            "StartWatcher": "啟動監看器"
+        },
+        "titles": {
+            "RegularExpressionTester": "正規表示式測試工具",
+            "Expression": "表示式",
+            "TestString": "測試字串"
+        },
+        "path": {
+            "label": "檔案路徑",
+            "description": "要監看的檔案路徑。建議使用絕對路徑。",
+            "placeholder": "/var/log/nginx/access.log",
+            "required": "必須提供路徑",
+            "clientLog": "無法監看用戶端自己的記錄檔；那會形成迴圈。用戶端錯誤已會以 client_error_log 傳送。"
+        },
+        "disabled": {
+            "label": "作用中",
+            "description": "停用此監看器。"
+        },
+        "regex": {
+            "label": "正規表示式",
+            "description": "用來比對檔案的正規表示式。",
+            "tooltip": "表示式會自動以萬用字元比對器包起來：<code>.*</code>，所以請勿在表示式中使用 <code>^</code> 或 <code>$</code>。使用 <code>(?i)</code> 作為前綴，可讓正規表示式不區分大小寫。",
+            "placeholder": "GET.*some/path",
+            "required": "必須提供正規表示式"
+        },
+        "skip": {
+            "label": "略過表示式",
+            "description": "符合此表示式的內容都會被忽略。",
+            "placeholder": "GET.*some/path"
+        },
+        "poll": {
+            "label": "檔案輪詢",
+            "description": "輪詢檔案是否有變更。",
+            "tooltip": "檔案系統事件在某些系統上無法運作。如果沒有任何相符項目，請開啟此項以啟用檔案輪詢間隔。"
+        },
+        "pipe": {
+            "label": "FIFO 管道",
+            "description": "路徑是具名 FIFO 管道。",
+            "tooltip": "如果您監看的檔案是具名 FIFO 管道，請啟用此項。您大概不需要它。"
+        },
+        "mustExist": {
+            "label": "檔案必須存在",
+            "description": "如果檔案不存在，就略過監看。",
+            "tooltip": "啟用後，如果應用程式啟動時檔案不存在，就會略過監看。監看不存在的檔案仍然不穩定，可能完全無法運作。"
+        }
+    },
+    "words": {
+        "select-option": {
+            "InstanceDisabled": "執行個體已停用",
+            "Off": "關閉",
+            "Enabled": "啟用",
+            "Disabled": "停用",
+            "minute": "分鐘",
+            "minutes": "分鐘",
+            "hour": "小時",
+            "hours": "小時",
+            "second": "秒",
+            "seconds": "秒",
+            "megabytes": "百萬位元組",
+            "bytes": "位元組",
+            "Daily": "每日",
+            "custom": "自訂",
+            "NoTimeout": "無逾時",
+            "ChecksDisabled": "檢查已停用",
+            "Information": "資訊"
+        },
+        "instance-options": {
+            "interval": {
+                "label": "健康狀態檢查間隔",
+                "description": "檢查執行個體是否可連線的頻率。"
+            },
+            "timeout": {
+                "label": "請求逾時",
+                "description": "等待執行個體回應的時間。"
+            },
+            "validSsl": {
+                "label": "驗證 SSL 憑證",
+                "description": "勾選此方塊可確認執行個體使用有效的 SSL 憑證。"
+            },
+            "deletes": {
+                "label": "刪除內容",
+                "description": "這會限制每小時可傳送給此執行個體的刪除請求數量。",
+                "tooltip": "這會控制每小時允許的刪除請求數量。設定為 0 會停用傳送刪除請求的功能。這是指刪除媒體，但也可能包含其他動作。此節流可防止駭客摧毀您的內容。",
+                "countPerHour": "每小時 {count} 次"
+            }
+        },
+        "clock": {
+            "days": {
+                "Sunday": "星期日",
+                "Monday": "星期一",
+                "Tuesday": "星期二",
+                "Wednesday": "星期三",
+                "Thursday": "星期四",
+                "Friday": "星期五",
+                "Saturday": "星期六"
+            },
+            "short": {
+                "ms": "{milliseconds}ms",
+                "s": "{seconds}s",
+                "m": "{minutes}m",
+                "h": "{hours}h",
+                "d": "{days}d",
+                "w": "{weeks}w"
+            },
+            "ago": "{timeDuration} 前",
+            "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}"
+        },
+        "bytes": {
+            "short": {
+                "B": "{bytes} B",
+                "KB": "{bytes} KB",
+                "MB": "{bytes} MB",
+                "GB": "{bytes} GB",
+                "TB": "{bytes} TB"
+            }
+        }
+    },
+    "StarrApps": {
+        "Prowlarr": {
+            "addInstance": "新增 Prowlarr 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Prowlarr 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Prowlarr 執行個體的 URL。",
+                "placeholder": "http://prowlarr.server.tv:9696"
+            },
+            "apiKey": {
+                "label": "API 金鑰",
+                "description": "Prowlarr 執行個體的 API 金鑰。",
+                "placeholder": "prowlarr-api-key"
+            },
+            "title": "Prowlarr",
+            "username": {
+                "label": "使用者名稱",
+                "description": "Prowlarr 執行個體的使用者名稱。",
+                "placeholder": "admin",
+                "tooltip": "只有在您想檢查資料庫備份時才需要使用者名稱與密碼，因為那些備份無法透過 API 下載。"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Prowlarr 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "Lidarr": {
+            "title": "Lidarr",
+            "addInstance": "新增 Lidarr 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Lidarr 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Lidarr 執行個體的 URL。",
+                "placeholder": "http://lidarr.server.tv:8686"
+            },
+            "apiKey": {
+                "label": "API 金鑰",
+                "description": "Lidarr 執行個體的 API 金鑰。",
+                "placeholder": "lidarr-api-key"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "Lidarr 執行個體的使用者名稱。",
+                "placeholder": "admin",
+                "tooltip": "只有在您想檢查資料庫備份時才需要使用者名稱與密碼，因為那些備份無法透過 API 下載。"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Lidarr 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "Readarr": {
+            "name": {
+                "description": "Readarr 執行個體的名稱。",
+                "label": "執行個體名稱",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "title": "Readarr",
+            "addInstance": "新增 Readarr 執行個體",
+            "url": {
+                "label": "URL",
+                "description": "Readarr 執行個體的 URL。",
+                "placeholder": "http://readarr.server.tv:8787"
+            },
+            "apiKey": {
+                "label": "API 金鑰",
+                "description": "Readarr 執行個體的 API 金鑰。",
+                "placeholder": "readarr-api-key"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "Readarr 執行個體的使用者名稱。",
+                "placeholder": "admin",
+                "tooltip": "只有在您想檢查資料庫備份時才需要使用者名稱與密碼，因為那些備份無法透過 API 下載。"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Readarr 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "Radarr": {
+            "title": "Radarr",
+            "addInstance": "新增 Radarr 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Radarr 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Radarr 執行個體的 URL。",
+                "placeholder": "http://radarr.server.tv:7878"
+            },
+            "apiKey": {
+                "label": "API 金鑰",
+                "description": "Radarr 執行個體的 API 金鑰。",
+                "placeholder": "radarr-api-key"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "Radarr 執行個體的使用者名稱。",
+                "placeholder": "admin",
+                "tooltip": "只有在您想檢查資料庫備份時才需要使用者名稱與密碼，因為那些備份無法透過 API 下載。"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Radarr 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "Sonarr": {
+            "title": "Sonarr",
+            "addInstance": "新增 Sonarr 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Sonarr 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Sonarr 執行個體的 URL。",
+                "placeholder": "http://sonarr.server.tv:8989"
+            },
+            "apiKey": {
+                "label": "API 金鑰",
+                "description": "Sonarr 執行個體的 API 金鑰。",
+                "placeholder": "sonarr-api-key"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "Sonarr 執行個體的使用者名稱。",
+                "placeholder": "admin",
+                "tooltip": "只有在您想檢查資料庫備份時才需要使用者名稱與密碼，因為那些備份無法透過 API 下載。"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Sonarr 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        }
+    },
+    "RegexTester": {
+        "testRegex": {
+            "placeholder": "GET .*some/path",
+            "label": "測試表示式",
+            "description": "用來與測試字串比對的表示式。"
+        },
+        "TestResult": "測試結果",
+        "Test": "測試",
+        "RegularExpressionTester": "正規表示式測試工具",
+        "testPattern": {
+            "label": "測試字串",
+            "description": "用來測試正規表示式的範例字串或記錄行。",
+            "placeholder": "[INFO] 2025-05-25 16:20:01 - 這是測試記錄行。"
+        },
+        "Expression": "表示式",
+        "Result": "結果",
+        "NoMatch": "無相符"
+    },
+    "buttons": {
+        "Login": "登入",
+        "LoginTitle": "登入",
+        "Save": "儲存",
+        "Close": "關閉",
+        "SaveChanges": "儲存變更",
+        "SaveConfiguration": "儲存設定",
+        "ResetForm": "重設表單",
+        "YesDeleteMyChanges": "是！刪除我的變更",
+        "Execute": "執行",
+        "HideMenu": "隱藏選單",
+        "ShowMenu": "顯示選單",
+        "ShowOutput": "顯示輸出",
+        "HideOutput": "隱藏輸出",
+        "RefreshOutput": "重新整理輸出",
+        "NoStayHere": "不要！留在此頁",
+        "Confirm": "確認",
+        "Cancel": "取消",
+        "Create": "建立",
+        "Go": "前往",
+        "Menu": "選單",
+        "CreateFolder": "建立資料夾",
+        "CreateFile": "建立檔案"
+    },
+    "MediaApps": {
+        "Plex": {
+            "title": "Plex",
+            "description": "Plex 整合相當完整，許多設定是在<a href=\"https://notifiarr.com/\" target=\"_blank\">Notifiarr.com 網站</a>上設定的。",
+            "name": {
+                "label": "伺服器名稱",
+                "description": "Plex 伺服器的名稱。",
+                "placeholder": "由伺服器自動設定",
+                "tooltip": "Plex Media Server 的名稱會用於通知、記錄與健康狀態檢查。它會由 Plex 伺服器自動設定。"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Plex 伺服器的 URL。",
+                "placeholder": "http://plex.server.tv:32400"
+            },
+            "token": {
+                "label": "Token",
+                "description": "Plex 伺服器的 Token。",
+                "placeholder": "pl3x-to_Ken",
+                "tooltip": "您可以在<a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">這篇 Plex 文章</a>找到取得 Plex Token 的說明。"
+            }
+        },
+        "Tautulli": {
+            "title": "Tautulli",
+            "description": "Tautulli 提供一項功能，可讓您為 Plex 使用者指定自訂使用者名稱。將 Notifiarr 用戶端與 Tautulli 整合後，這些自訂使用者名稱會顯示在聊天伺服器通知中。若未啟用，則改用 Plex 使用者名稱或電子郵件地址。這完全是選擇性的。Notifiarr 網站也提供相同功能，可讓您將 Plex 使用者對應到自訂名稱。您也可以在此新增 Tautulli 執行個體，只用健康狀態檢查來監控它。",
+            "name": {
+                "label": "Tautulli 名稱",
+                "description": "Tautulli 服務的名稱。"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Tautulli 服務的 URL。",
+                "placeholder": "http://tautulli.server.tv:8181"
+            },
+            "apiKey": {
+                "label": "API 金鑰",
+                "description": "Tautulli 服務的 API 金鑰。",
+                "placeholder": "tautulli-api-key"
+            }
+        }
+    },
+    "Downloaders": {
+        "Qbittorrent": {
+            "title": "Qbittorrent",
+            "addInstance": "新增 Qbittorrent 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Qbittorrent 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Qbittorrent 執行個體的 URL。",
+                "placeholder": "http://qbittorrent.server.tv:8080"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "Qbittorrent 執行個體的使用者名稱。",
+                "placeholder": "admin"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Qbittorrent 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "Deluge": {
+            "url": {
+                "label": "URL",
+                "description": "Deluge 執行個體的 URL。",
+                "placeholder": "http://deluge.server.tv:8112"
+            },
+            "title": "Deluge",
+            "addInstance": "新增 Deluge 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Deluge 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Deluge 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "Rtorrent": {
+            "title": "Rtorrent",
+            "addInstance": "新增 Rtorrent 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Rtorrent 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Rtorrent 執行個體的 URL。",
+                "placeholder": "http://rtorrent.server.tv:8080"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "Rtorrent 執行個體的使用者名稱。",
+                "placeholder": "admin"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Rtorrent 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "Transmission": {
+            "title": "Transmission",
+            "addInstance": "新增 Transmission 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "Transmission 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "Transmission 執行個體的 URL。它<b>必須</b>包含 <code>/transmission/rpc</code> 後綴。",
+                "placeholder": "http://transmission.server.tv:9091"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "Transmission 執行個體的使用者名稱。",
+                "placeholder": "admin"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "Transmission 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        },
+        "SabNZB": {
+            "title": "SabNZB",
+            "addInstance": "新增 SabNZB 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "SabNZB 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "SabNZB 執行個體的 URL。",
+                "placeholder": "http://sabnzb.server.tv:8080"
+            },
+            "apiKey": {
+                "label": "API 金鑰",
+                "description": "SabNZB 執行個體的 API 金鑰。",
+                "placeholder": "sabnzb-api-key"
+            }
+        },
+        "NZBGet": {
+            "title": "NZBGet",
+            "addInstance": "新增 NZBGet 執行個體",
+            "name": {
+                "label": "執行個體名稱",
+                "description": "NZBGet 執行個體的名稱。",
+                "placeholder": "用於通知的自訂名稱"
+            },
+            "url": {
+                "label": "URL",
+                "description": "NZBGet 執行個體的 URL。",
+                "placeholder": "http://nzbget.server.tv:6789"
+            },
+            "username": {
+                "label": "使用者名稱",
+                "description": "NZBGet 執行個體的使用者名稱。",
+                "placeholder": "admin"
+            },
+            "password": {
+                "label": "密碼",
+                "description": "NZBGet 執行個體的密碼。",
+                "placeholder": "密碼"
+            }
+        }
+    },
+    "Actions": {
+        "titles": {
+            "Schedule": "排程",
+            "Triggers": "觸發",
+            "Timers": "計時器",
+            "Schedules": "排程",
+            "SiteCrons": "網站計時器",
+            "Counter": "計數器",
+            "Interval": "間隔",
+            "Trigger": "觸發",
+            "Timer": "計時器",
+            "Type": "類型",
+            "When": "時間",
+            "Action": "動作",
+            "Never": "從不",
+            "Filter": "篩選"
+        },
+        "descriptions": {
+            "Triggers": "這些動作沒有計時器，也沒有排程。",
+            "Timers": "這些動作有計時器。",
+            "Schedules": "這些動作有排程。",
+            "SiteCrons": "這些動作由網站建立，以將計時器追蹤交由用戶端負擔。"
+        },
+        "triggers": {
+            "TrigPlexEmptyTrash": {
+                "label": "清空 Plex 垃圾桶"
+            },
+            "TrigUploadFile": {
+                "label": "記錄檔已上傳到網站",
+                "button": "立即上傳記錄",
+                "success": "記錄檔已上傳到網站。",
+                "options": {
+                    "choose": "選擇要上傳的檔案。",
+                    "app": "應用程式記錄檔。",
+                    "debug": "除錯記錄檔。",
+                    "http": "HTTP 記錄檔。"
+                }
+            },
+            "TrigPlexSessions": {
+                "label": "收集 Plex 工作階段",
+                "button": "立即收集工作階段",
+                "success": "已收集 Plex 工作階段。"
+            },
+            "TrigPlexSessionsCheck": {
+                "label": "檢查已結束的 Plex 工作階段"
+            },
+            "TrigDashboard": {
+                "label": "儀表板更新",
+                "button": "更新儀表板",
+                "success": "已開始更新儀表板。"
+            },
+            "TrigMDBListSync": {
+                "label": "MDB 清單同步",
+                "button": "同步 MDB 清單",
+                "success": "已開始同步 MDB 清單。"
+            },
+            "TrigCollectionGaps": {
+                "label": "收藏缺口",
+                "button": "檢查收藏缺口",
+                "success": "已開始檢查收藏缺口。"
+            },
+            "TrigCFSyncLidarr": {
+                "label": "Lidarr 設定檔與格式同步",
+                "button": "同步所有 Lidarr 執行個體",
+                "success": "已開始同步 Lidarr 設定檔與格式。"
+            },
+            "TrigCFSyncRadarr": {
+                "label": "Radarr 設定檔與格式同步",
+                "button": "同步所有 Radarr 執行個體",
+                "success": "已開始同步 Radarr 設定檔與格式。"
+            },
+            "TrigStop": {
+                "label": "用戶端重新載入",
+                "button": "重新載入用戶端"
+            },
+            "TrigSnapshot": {
+                "label": "收集 Snapshot",
+                "button": "更新 Snapshot",
+                "success": "已開始收集 Snapshot。"
+            },
+            "TrigProwlarrCorrupt": {
+                "label": "Prowlarr 資料庫損毀",
+                "button": "檢查 Prowlarr",
+                "success": "已開始檢查 Prowlarr 資料庫損毀。"
+            },
+            "TrigLidarrCorrupt": {
+                "label": "Lidarr 資料庫損毀",
+                "button": "檢查 Lidarr",
+                "success": "已開始檢查 Lidarr 資料庫損毀。"
+            },
+            "TrigRadarrCorrupt": {
+                "label": "Radarr 資料庫損毀",
+                "button": "檢查 Radarr",
+                "success": "已開始檢查 Radarr 資料庫損毀。"
+            },
+            "TrigReadarrCorrupt": {
+                "label": "Readarr 資料庫損毀",
+                "button": "檢查 Readarr",
+                "success": "已開始檢查 Readarr 資料庫損毀。"
+            },
+            "TrigSonarrCorrupt": {
+                "label": "Sonarr 資料庫損毀",
+                "button": "檢查 Sonarr",
+                "success": "已開始檢查 Sonarr 資料庫損毀。"
+            },
+            "TrigProwlarrBackup": {
+                "label": "Prowlarr 資料庫備份",
+                "button": "檢查 Prowlarr",
+                "success": "已開始檢查 Prowlarr 資料庫備份。"
+            },
+            "TrigLidarrBackup": {
+                "label": "Lidarr 資料庫備份",
+                "button": "檢查 Lidarr",
+                "success": "已開始檢查 Lidarr 資料庫備份。"
+            },
+            "TrigRadarrBackup": {
+                "label": "Radarr 資料庫備份",
+                "button": "檢查 Radarr",
+                "success": "已開始檢查 Radarr 資料庫備份。"
+            },
+            "TrigReadarrBackup": {
+                "label": "Readarr 資料庫備份",
+                "button": "檢查 Readarr",
+                "success": "已開始檢查 Readarr 資料庫備份。"
+            },
+            "TrigSonarrBackup": {
+                "label": "Sonarr 資料庫備份",
+                "button": "檢查 Sonarr",
+                "success": "已開始檢查 Sonarr 資料庫備份。"
+            },
+            "TrigUpCheck": {
+                "label": "用戶端對網站的上線檢查"
+            },
+            "TrigEndpointURL": {
+                "label": "已將端點 URL 轉送到網站：{name}",
+                "button": "執行端點",
+                "success": "已開始轉送端點 URL。"
+            },
+            "TrigCustomCommand": {
+                "label": "自訂命令：{name}",
+                "button": "執行命令",
+                "success": "已開始執行自訂命令。"
+            },
+            "TrigAutoUpdate": {
+                "label": "自動更新檢查"
+            },
+            "TrigCFSyncLidarrInt": {
+                "label": "依執行個體同步 Lidarr 自訂格式"
+            },
+            "TrigCFSyncRadarrInt": {
+                "label": "依執行個體同步 Radarr 自訂格式"
+            },
+            "TrigCustomCronTimer": {
+                "label": "網站計時器：{name}",
+                "button": "立即執行計時器",
+                "success": "已開始執行網站計時器。"
+            },
+            "TrigDownloadingItems": {
+                "label": "下載中 / 已完成的項目"
+            },
+            "TrigLidarrQueue": {
+                "label": "Lidarr 佇列快取"
+            },
+            "TrigRadarrQueue": {
+                "label": "Radarr 佇列快取"
+            },
+            "TrigReadarrQueue": {
+                "label": "Readarr 佇列快取"
+            },
+            "TrigSonarrQueue": {
+                "label": "Sonarr 佇列快取"
+            },
+            "TrigStuckItems": {
+                "label": "卡住的項目檢查",
+                "button": "檢查卡住的項目",
+                "success": "已開始檢查卡住的項目。"
+            },
+            "TrigPollSite": {
+                "label": "網站輪詢"
+            },
+            "TrigCFSyncSonarr": {
+                "label": "Sonarr 設定檔與格式同步",
+                "button": "同步所有 Sonarr 執行個體",
+                "success": "已開始同步 Sonarr 設定檔與格式。"
+            },
+            "TrigCFSyncSonarrInt": {
+                "label": "依執行個體同步 Sonarr 自訂格式"
+            }
+        }
+    },
+    "LogFiles": {
+        "titles": {
+            "Name": "檔案名稱",
+            "Age": "存在時間",
+            "Bytes": "位元組",
+            "InUse": "使用中",
+            "Mode": "模式",
+            "Owner": "擁有者",
+            "Path": "路徑",
+            "Date": "日期",
+            "FileList": "檔案清單",
+            "Details": "詳細資訊",
+            "FileContent": "檔案內容",
+            "FollowingFile": "正在追蹤的檔案",
+            "LineCount": "行數",
+            "OpenFile": "開啟檔案 {fileName}",
+            "TailFile": "追蹤檔案 {fileName}",
+            "Tailing": "正在追蹤"
+        },
+        "button": {
+            "download": "下載",
+            "upload": "上傳",
+            "delete": "刪除",
+            "add": "新增",
+            "reload": "重新載入",
+            "tooltip": "<b>下載</b>按鈕會將檔案下載到您的電腦。<b>上傳</b>按鈕會將檔案上傳到 Notifiarr.com 伺服器。只有管理員能看到已上傳的檔案。<b>刪除</b>按鈕會從硬碟刪除檔案。使用中的檔案無法刪除。使用中表示此應用程式目前正在把記錄寫入該檔案。"
+        },
+        "Error": "載入記錄檔時發生錯誤：{error}",
+        "DeleteFile": "刪除 {filePath}",
+        "deleteConfirm": "確定要刪除這個檔案嗎？此動作無法復原。",
+        "deleteError": "刪除記錄檔時發生錯誤：{error}",
+        "deleteSuccess": "已刪除記錄檔：{file}",
+        "uploadError": "上傳記錄檔時發生錯誤：{error}",
+        "uploadSuccess": "正在上傳記錄檔：{file}",
+        "NoFileSelected": "未選擇檔案。",
+        "SelectFile": "選擇檔案以查看其中的內容！",
+        "FilesInDirs": "{fileCount} 個檔案，位於 {dirCount} 個目錄",
+        "ToggleLinesOrder": "切換行順序",
+        "ToggleColors": "切換預設色彩",
+        "AddMoreLines": "新增更多行",
+        "Reload": "重新載入記錄檔",
+        "Highlight": "強調顯示",
+        "ToggleLineWrap": "切換自動換行",
+        "FollowTooltip": "此欄中的按鈕會在檔案寫入時主動追蹤它。",
+        "Tooltip": "<ol><li>左側第一個橙色按鈕會切換檔案中各行的順序。預設依寫入順序遞減排列。按一下按鈕會反轉檔案，改成由後往前。追蹤正在寫入的檔案時，這樣很有用。</li><li>第二個紫色按鈕會切換內建的行強調色彩。有動作進行時它也會旋轉。</li><li>數字輸入表示要載入或新增多少行。追蹤檔案時，此數字會限制顯示的行數。</li><li>按一下新增按鈕會把該行數加到檔案頂端，並以目前的行數作為偏移。使用中的檔案會停用新增按鈕，因為無法得知上次更新後又寫入了多少行。追蹤使用中的檔案時，新增按鈕會被指示器取代。</li><li>按一下重新載入按鈕會從檔案結尾重新載入該行數。</li><li>使用強調輸入讓特定文字醒目。</li><li>最後一個按鈕會切換自動換行。</li></ol>"
+    },
+    "Nodal": {
+        "button": {
+            "refresh": "重新整理頁面資料",
+            "fullscreen": "切換全螢幕",
+            "raw": "切換原始資料"
+        },
+        "noResponse": "沒有回應資料。"
+    },
+    "ProcessList": {
+        "title": "執行中的程序清單",
+        "error": "載入程序清單時發生錯誤：{error}",
+        "noData": "沒有傳回程序清單。",
+        "footer": "找到 {count} 個程序。",
+        "button": {
+            "wrapOn": "開啟自動換行",
+            "wrapOff": "關閉自動換行"
+        }
+    },
+    "ClientInfo": {
+        "title": "啟動承載",
+        "error": "載入啟動承載時發生錯誤：{error}",
+        "noData": "沒有傳回啟動承載。",
+        "description": "這是啟動時從 Notifiarr.com 傳送到用戶端的承載。其中包含用戶端的設定與其他資訊。"
+    },
+    "Integrations": {
+        "titles": {
+            "Size": "大小",
+            "DashboardAge": "儀表板時間",
+            "CacheAge": "快取時間",
+            "StatusAge": "狀態時間",
+            "Version": "版本",
+            "Branch": "分支",
+            "BuildTime": "建置時間"
+        },
+        "DriveData": {
+            "title": "磁碟資料",
+            "driveInformation": {
+                "title": "磁碟資訊"
+            },
+            "mdStatRaid": {
+                "title": "MDStat RAID"
+            },
+            "titles": {
+                "Drive": "磁碟",
+                "Temp": "溫度",
+                "Health": "健康狀態",
+                "Age": "時間",
+                "Setting": "設定",
+                "Value": "值"
+            }
+        },
+        "Snapshot": {
+            "title": "原始 Snapshot 資料",
+            "Age": "Snapshot 時間",
+            "Data": "Snapshot 資料",
+            "Latest": "最新 Snapshot",
+            "System": "系統 Snapshot",
+            "titles": {
+                "CPUPercent": "CPU 百分比",
+                "MemoryFree": "可用記憶體",
+                "MemoryUsed": "已使用記憶體",
+                "MemoryTotal": "記憶體總計",
+                "UserCPUTime": "使用者 CPU 時間",
+                "SystemCPUTime": "系統 CPU 時間",
+                "IdleCPUTime": "閒置 CPU 時間",
+                "NvidiaGPUs": "Nvidia GPU",
+                "MySQLServers": "MySQL 伺服器",
+                "IPMISensors": "IPMI 感測器",
+                "Synology": "Synology",
+                "RaidConfigs": "RAID 設定",
+                "ZFSPools": "ZFS 集區",
+                "Processes": "程序",
+                "DriveTemps": "磁碟溫度",
+                "DriveHealth": "磁碟健康狀態",
+                "DiskUsage": "磁碟使用量",
+                "DiskQuotas": "磁碟配額",
+                "IOTop": "IO Top",
+                "IOStat": "IO Stat",
+                "IOStat2": "IO Stat 2"
+            }
+        },
+        "starrTitles": {
+            "QueueAge": "佇列時間",
+            "QueueSize": "佇列大小",
+            "Elapsed": "已經過",
+            "Shows": "影集",
+            "Episodes": "集數",
+            "Movies": "電影",
+            "Books": "書籍",
+            "Editions": "版次",
+            "Tracks": "曲目",
+            "Artists": "藝人",
+            "OnDisk": "在磁碟上",
+            "Missing": "缺少"
+        },
+        "downloadTitles": {
+            "Downloads": "下載",
+            "Incomplete": "未完成",
+            "Downloading": "下載中",
+            "Paused": "已暫停",
+            "TotalSize": "總大小",
+            "Errors": "錯誤",
+            "Downloaded": "已下載",
+            "Uploading": "上傳中",
+            "Uploaded": "已上傳",
+            "Seeding": "做種中",
+            "Month": "月",
+            "Week": "週",
+            "Day": "日"
+        },
+        "lidarrDashboard": {
+            "title": "原始 Lidarr 儀表板"
+        },
+        "radarrDashboard": {
+            "title": "原始 Radarr 儀表板"
+        },
+        "readarrDashboard": {
+            "title": "原始 Readarr 儀表板"
+        },
+        "sonarrDashboard": {
+            "title": "原始 Sonarr 儀表板"
+        },
+        "delugeDashboard": {
+            "title": "原始 Deluge 儀表板"
+        },
+        "nzbgetDashboard": {
+            "title": "原始 NZBGet 儀表板"
+        },
+        "qbitDashboard": {
+            "title": "原始 QBit 儀表板"
+        },
+        "rtorrentDashboard": {
+            "title": "原始 rTorrent 儀表板"
+        },
+        "transmissionDashboard": {
+            "title": "原始 Transmission 儀表板"
+        },
+        "sabnzbdDashboard": {
+            "title": "原始 SabNZBD 儀表板"
+        },
+        "sonarrQueue": {
+            "title": "原始 Sonarr 佇列"
+        },
+        "radarrQueue": {
+            "title": "原始 Radarr 佇列"
+        },
+        "readarrQueue": {
+            "title": "原始 Readarr 佇列"
+        },
+        "lidarrQueue": {
+            "title": "原始 Lidarr 佇列"
+        },
+        "prowlarrStatus": {
+            "title": "原始 Prowlarr 資訊"
+        },
+        "radarrStatus": {
+            "title": "原始 Radarr 資訊"
+        },
+        "readarrStatus": {
+            "title": "原始 Readarr 資訊"
+        },
+        "sonarrStatus": {
+            "title": "原始 Sonarr 資訊"
+        },
+        "lidarrStatus": {
+            "title": "原始 Lidarr 資訊"
+        },
+        "tautulliStatus": {
+            "title": "原始 Tautulli 資訊"
+        },
+        "tautulliUsers": {
+            "title": "Tautulli 使用者"
+        },
+        "tautulliUsersJson": {
+            "title": "原始 Tautulli 使用者"
+        },
+        "plexStatus": {
+            "title": "Plex Media Server 資訊"
+        },
+        "plexSessions": {
+            "title": "目前的 Plex Media Server 工作階段",
+            "footer": "顯示的是目前的 Plex 工作階段，不是快取資料。快取資料請查看原始 JSON 視窗。"
+        },
+        "plexSessionsJson": {
+            "title": "原始 Plex Media Server 工作階段"
+        },
+        "mediaTitles": {
+            "Country": "國家",
+            "PushNotifications": "推播通知",
+            "PlexPass": "Plex Pass",
+            "ServerOwner": "伺服器擁有者",
+            "Sessions": "工作階段",
+            "SessionsAge": "工作階段時間",
+            "Users": "使用者",
+            "User": "使用者",
+            "PlexUsername": "Plex 使用者名稱",
+            "CustomName": "自訂名稱",
+            "Email": "電子郵件",
+            "Session": "工作階段",
+            "Complete": "完成",
+            "Encoding": "編碼",
+            "Title": "標題"
+        },
+        "phrases": {
+            "NoCachedSessions": "沒有快取的工作階段。",
+            "NoPlexData": "沒有 Plex 整合資料。",
+            "StateForTime": "{state} 已持續 {timeDuration}"
+        }
+    },
+    "Languages": {
+        "menuTitle": "語言說明",
+        "title": "在地化支援",
+        "body": "此應用程式提供多種語言。您可以按一下設定檔選單中的語言選擇器來變更語言。有些語言沒有活躍的翻譯者，因此部分翻譯可能不完整。如果您有興趣幫忙翻譯此應用程式，請<a href=\"https://notifiarr.com/discord\" target=\"_blank\">到 Discord 找我們</a>。前往 <code>#role-request</code> 頻道並輸入 <code>!roleTranslate</code>。這樣就能進入 <code>#translate</code> 頻道。請加入並表達您的意願。"
+    },
+    "ApiDocs": {
+        "Choose": "選擇要檢視的 API",
+        "Contrast": "請回報此頁面的任何對比問題。",
+        "BasePath": "<b>基底路徑</b>：<code>{basePath}</code>",
+        "api": {
+            "title": "私人 API（{basePath}）",
+            "body": "這是 Notifiarr.com 網站的 API 規格。網站使用此 API 與用戶端互動。"
+        },
+        "ui": {
+            "title": "Web UI（{basePath}）",
+            "body": "此規格說明 Notifiarr 用戶端前端用來與後端互動的方法。您目前正在使用前端。"
+        }
+    },
+    "TestAllInstances": {
+        "title": "測試所有執行個體",
+        "Instance": "執行個體",
+        "Message": "訊息",
+        "Status": "狀態",
+        "Updated": "<b>測試更新</b>：<code>{timeDuration}</code>",
+        "TestElapsed": "<b>測試耗時</b>：<code>{timeDuration}</code>",
+        "Concurrency": "<b>並行數</b>：<code>{workerCount}</code>",
+        "Tested": "<b>已測試執行個體</b>：<code>{testCount}</code>",
+        "clickRefresh": "按一下右上角的重新整理按鈕即可再次測試。",
+        "footer": "使用此疑難排解工具，確認所有執行個體都可連線且設定正確。逾時固定為 15 秒，接近網站等待回應的時間。"
+    },
+    "FileBrowser": {
+        "tooltip": {
+            "Go": "<code>cd {path}</code><br />變更至提供的路徑。",
+            "SelectPath": "選擇路徑：<code>{path}</code>",
+            "Up": "<code>cd ..</code><br />變更至上層資料夾。"
+        },
+        "FilterFiles": "篩選檔案",
+        "CreateFileIn": "檔案將建立在此路徑：<code>{path}</code>",
+        "CreateFolderIn": "資料夾將建立在此路徑：<code>{path}</code>",
+        "Files": "檔案：{count}",
+        "Folders": "資料夾：{count}",
+        "FilesFiltered": "檔案：{count}，篩選後：{filtered}",
+        "FoldersFiltered": "資料夾：{count}，篩選後：{filtered}",
+        "Selected": "已選取：<code>{path}</code>",
+        "Created": "已建立：{path}",
+        "Creating": "正在建立…",
+        "InvalidPath": "提供的路徑無效。請勿包含斜線（<code>/</code> 或 <code>\\</code>）。",
+        "FilterFilesDesc": "使用檔案篩選可快速搜尋顯示的檔案清單。在檔案很多的資料夾中很有用。使用<code>選單</code>按鈕建立新的資料夾或檔案。若要選擇不存在的檔案，請在<code>路徑</code>列輸入，然後按一下綠色勾選按鈕。或者使用<code>建立檔案</code>選單項目來建立它。"
+    },
+    "Plex": {
+        "URLNotConfigured": "尚未設定 Plex URL。<go-to page=\"mediaApps\" subPage=\"plex\">在此設定</go-to>。",
+        "TokenNotConfigured": "尚未設定 Plex Token。<go-to page=\"mediaApps\" subPage=\"plex\">在此設定</go-to>。",
+        "Disabled": "Plex 已被管理者停用。<go-to page=\"mediaApps\" subPage=\"plex\">在此啟用</go-to>。",
+        "WaitingForWebhooks": "正在等待 Plex Webhook…",
+        "WebhooksReceived": "已接收的 Webhook：<code>{count}</code>",
+        "NoStatus": "沒有快取的 Plex Media Server 資訊。這可能表示 Plex URL 或 Token 無效，或逾時太短。請查看<go-to page=\"logFiles\">應用程式記錄</go-to>以取得更多資訊。",
+        "WebhookNote": "<p>您是否已經<a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">設定 Plex Webhook</a>？</p><p>如果在暫停與播放節目時 Webhook 計數器沒有增加，請嘗試重新啟動 Plex Media Server。如果仍然無效，請查看<go-to page=\"logFiles\">HTTP 記錄</go-to>中的無效請求。如果看不到任何請求，可能是在 Plex 中設定了錯誤的 Webhook URL。它應該像這樣：<spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>，但這可能不準確，且取決於您的伺服器設定。</p> 有些網路業者會封鎖對 <code>{urlbase}plex</code> URI 的存取，因此此應用程式也在 <code>{urlbase}</code> URI 以及 <code>{urlbase}api/plex/post</code> 接受 Plex Webhook。我們提供多種方式，以確保通知穩定。",
+        "WebsiteSettings": "網站設定",
+        "AccountMap": "帳戶對應",
+        "ActivityDelay": "活動延遲",
+        "WebhookCoolDown": "Webhook 冷卻",
+        "SessionsInterval": "工作階段間隔",
+        "MoviesFinished": "已完成的電影",
+        "SeriesFinished": "已完成的影集",
+        "NoActivity": "沒有活動"
+    }
+}
