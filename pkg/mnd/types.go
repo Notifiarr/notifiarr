@@ -18,8 +18,9 @@ type Logger interface {
 	Debug(reqID string, v ...any)
 	Debugf(reqID string, msg string, v ...any)
 	DebugEnabled() bool
-	// DebugLogPath is the configured debug log file. Empty when debug logs
-	// are not written to a file. Callers use the directory for crash dumps.
+	// DebugLogPath is the debug log file when debug logging is on, or the app
+	// log file otherwise. Empty only when no file logging is configured.
+	// Callers use the directory for crash dumps.
 	DebugLogPath() string
 	CapturePanic()
 }

@@ -260,8 +260,12 @@ func writeBzip2(dst io.Writer, data []byte) error {
 	return nil
 }
 
+// bzipPanicFile is the single dump kept beside the debug log. Each panic overwrites it.
+const bzipPanicFile = "bzip2-panic.json"
+
 // saveBzipPanicPayload writes the exact bytes passed to the bzip2 writer.
-// The file sits beside the debug log. The returned string is a path or a reason it was not saved.
+// The file sits beside the debug log and replaces the previous dump.
+// The returned string is a path or a reason it was not saved.
 func saveBzipPanicPayload(data []byte) string {
 	dir := os.TempDir()
 
@@ -275,11 +279,40 @@ func saveBzipPanicPayload(data []byte) string {
 		return fmt.Sprintf("not saved: %v", err)
 	}
 
-	name := fmt.Sprintf("bzip2-panic-%s.json", time.Now().UTC().Format("20060102T150405.000000000Z"))
-	path := filepath.Join(dir, name)
+	path := filepath.Join(dir, bzipPanicFile)
 
-	if err := os.WriteFile(path, data, mnd.Mode0600); err != nil {
+	// Write a temp file and rename it so a failed write does not truncate the previous dump.
+	tmp, err := os.CreateTemp(dir, bzipPanicFile+".*")
+	if err != nil {
 		return fmt.Sprintf("not saved: %v", err)
+	}
+
+	tmpName := tmp.Name()
+	defer os.Remove(tmpName) // no-op after a successful rename
+
+	if err = tmp.Chmod(mnd.Mode0600); err != nil {
+		_ = tmp.Close()
+
+		return fmt.Sprintf("not saved: %v", err)
+	}
+
+	if _, err = tmp.Write(data); err != nil {
+		_ = tmp.Close()
+
+		return fmt.Sprintf("not saved: %v", err)
+	}
+
+	if err = tmp.Close(); err != nil {
+		return fmt.Sprintf("not saved: %v", err)
+	}
+
+	if err = os.Rename(tmpName, path); err != nil {
+		// Windows cannot replace an existing file with Rename.
+		_ = os.Remove(path)
+
+		if err = os.Rename(tmpName, path); err != nil {
+			return fmt.Sprintf("not saved: %v", err)
+		}
 	}
 
 	return path
@@ -297,7 +330,8 @@ func (s *server) sendJSON(
 
 	compressed, addHeader, err := s.compressBzip2(bodyBytes)
 	if err != nil {
-		mnd.Log.Errorf(reqID, "Compressing payload: %v", err)
+		// Errorf would enqueue another website post. The sender is this goroutine, so a full queue deadlocks.
+		mnd.Log.ErrorfNoShare(reqID, "Compressing payload: %v", err)
 		compressed = bytes.NewBuffer(bodyBytes)
 	}
 

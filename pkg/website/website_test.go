@@ -119,20 +119,27 @@ func TestCompressBzip2PanicSavesPayloadAndPostsRaw(t *testing.T) {
 	require.Equal(t, payload, posted)
 	require.Equal(t, len(payload), size)
 
-	matches, err := filepath.Glob(filepath.Join(dir, "bzip2-panic-*.json"))
-	require.NoError(t, err)
-	require.Len(t, matches, 1)
-
-	saved, err := os.ReadFile(matches[0])
+	savedPath := filepath.Join(dir, bzipPanicFile)
+	saved, err := os.ReadFile(savedPath)
 	require.NoError(t, err)
 	require.Equal(t, payload, saved)
 
 	// Windows only honors the read-only bit, so the Unix mode is not visible there.
 	if runtime.GOOS != "windows" {
-		info, err := os.Stat(matches[0])
+		info, err := os.Stat(savedPath)
 		require.NoError(t, err)
 		require.Equal(t, os.FileMode(mnd.Mode0600), info.Mode().Perm())
 	}
+
+	next := []byte("second-payload")
+	require.Equal(t, savedPath, saveBzipPanicPayload(next))
+	saved, err = os.ReadFile(savedPath)
+	require.NoError(t, err)
+	require.Equal(t, next, saved)
+
+	matches, err := filepath.Glob(filepath.Join(dir, "bzip2-panic*"))
+	require.NoError(t, err)
+	require.Equal(t, []string{savedPath}, matches)
 }
 
 // pathLog is a website-test logger that points crash dumps at a directory.
