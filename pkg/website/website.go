@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
@@ -201,29 +203,86 @@ func (s *server) sendPayload(ctx context.Context, uri string, payload any, log b
 
 // compressBzip2 compresses a payload using bzip2 if it's larger than 768 bytes.
 // We send the compressed payload to the website, and the website decompresses it.
-func (s *server) compressBzip2(data []byte) (*bytes.Buffer, bool, error) {
+// A panic from the bzip2 library is returned as an error. The uncompressed body is
+// written next to the debug log so the failing input can be replayed. sendJSON
+// posts that body without compression when this returns an error.
+//
+//nolint:nonamedreturns // recover has to assign the named error after the library re-panics.
+func (s *server) compressBzip2(data []byte) (buf *bytes.Buffer, compressed bool, err error) {
 	const compressThreshold = 768
 
 	if len(data) < compressThreshold || s.config.NoCompress {
 		return bytes.NewBuffer(data), false, nil
 	}
 
-	var buf bytes.Buffer
-	zwriter, err := bzip2.NewWriter(&buf, &bzip2.WriterConfig{Level: 8}) //nolint:mnd
+	defer func() {
+		recovered := recover()
+		if recovered == nil {
+			return
+		}
+
+		buf = nil
+		compressed = false
+		err = fmt.Errorf("%w: %v; payload: %s", errBzipPanic, recovered, saveBzipPanicPayload(data))
+	}()
+
+	write := s.bzipWrite
+	if write == nil {
+		write = writeBzip2
+	}
+
+	var out bytes.Buffer
+	if err = write(&out, data); err != nil {
+		return nil, false, err
+	}
+
+	return &out, true, nil
+}
+
+const bzipLevel = 8
+
+func writeBzip2(dst io.Writer, data []byte) error {
+	zwriter, err := bzip2.NewWriter(dst, &bzip2.WriterConfig{Level: bzipLevel})
 	if err != nil {
-		return nil, false, fmt.Errorf("creating bzip2 writer: %w", err)
+		return fmt.Errorf("creating bzip2 writer: %w", err)
 	}
 
-	if _, err := zwriter.Write(data); err != nil {
+	if _, err = zwriter.Write(data); err != nil {
 		_ = zwriter.Close()
-		return nil, false, fmt.Errorf("writing bzip2 data: %w", err)
+
+		return fmt.Errorf("writing bzip2 data: %w", err)
 	}
 
-	if err := zwriter.Close(); err != nil {
-		return nil, false, fmt.Errorf("closing bzip2 writer: %w", err)
+	if err = zwriter.Close(); err != nil {
+		return fmt.Errorf("closing bzip2 writer: %w", err)
 	}
 
-	return &buf, true, nil
+	return nil
+}
+
+// saveBzipPanicPayload writes the exact bytes passed to the bzip2 writer.
+// The file sits beside the debug log. The returned string is a path or a reason it was not saved.
+func saveBzipPanicPayload(data []byte) string {
+	dir := os.TempDir()
+
+	if mnd.Log != nil {
+		if path := mnd.Log.DebugLogPath(); path != "" {
+			dir = filepath.Dir(path)
+		}
+	}
+
+	if err := os.MkdirAll(dir, mnd.Mode0750); err != nil {
+		return fmt.Sprintf("not saved: %v", err)
+	}
+
+	name := fmt.Sprintf("bzip2-panic-%s.json", time.Now().UTC().Format("20060102T150405.000000000Z"))
+	path := filepath.Join(dir, name)
+
+	if err := os.WriteFile(path, data, mnd.Mode0600); err != nil {
+		return fmt.Sprintf("not saved: %v", err)
+	}
+
+	return path
 }
 
 // sendJSON posts a JSON payload to a URL. Returns the response body or an error.

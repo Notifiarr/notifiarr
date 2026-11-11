@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"sync"
 	"time"
@@ -34,6 +35,7 @@ var (
 	ErrInvalidResponse = errors.New("invalid response")
 	ErrNoChannel       = errors.New("the website send-data channel is closed")
 	ErrInvalidAPIKey   = errors.New("configured notifiarr API key is invalid")
+	errBzipPanic       = errors.New("bzip2 panic")
 )
 
 // Config is the input data needed to send payloads to notifiarr.
@@ -52,10 +54,11 @@ type server struct {
 	// Internal cruft.
 	client     *httpClient
 	hostInfo   *host.InfoStat
-	sendData   chan *Request // in (buffered)
-	reconfig   chan *Config  // in+out (unbuffered bidirectional)
-	getConfig  chan struct{} // in (buffered)
-	invalidKey error         // sticky auth failure from a live POST
+	bzipWrite  func(io.Writer, []byte) error // nil uses the bzip2 library. Tests set this.
+	sendData   chan *Request                 // in (buffered)
+	reconfig   chan *Config                  // in+out (unbuffered bidirectional)
+	getConfig  chan struct{}                 // in (buffered)
+	invalidKey error                         // sticky auth failure from a live POST
 	mu         sync.RWMutex
 }
 

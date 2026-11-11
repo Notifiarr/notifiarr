@@ -373,6 +373,19 @@ func (l *Logger) GetLogFiles() map[string]string {
 	}
 }
 
+// DebugLogPath returns the debug log file, or the app log file when debug
+// logging is not configured. The directory is where crash dumps are written.
+func (l *Logger) DebugLogPath() string {
+	l.mu.RLock()
+	defer l.mu.RUnlock()
+
+	if l.LogConfig.DebugLog != "" {
+		return l.LogConfig.DebugLog
+	}
+
+	return l.LogConfig.LogFile
+}
+
 func (l *Logger) DebugEnabled() bool {
 	l.mu.RLock()
 	defer l.mu.RUnlock()
