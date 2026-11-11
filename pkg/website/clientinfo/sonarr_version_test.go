@@ -29,6 +29,7 @@ func (nopLog) ErrorfNoShare(string, string, ...any) {}
 func (nopLog) Debug(string, ...any)                 {}
 func (nopLog) Debugf(string, string, ...any)        {}
 func (nopLog) DebugEnabled() bool                   { return false }
+func (nopLog) DebugLogPath() string                 { return "" }
 func (nopLog) CapturePanic()                        {}
 
 func TestMain(m *testing.M) {
