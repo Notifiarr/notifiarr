@@ -25,3 +25,15 @@ describe('Traditional Chinese locale', () => {
     )
   })
 })
+
+describe('Simplified Chinese locale', () => {
+  it('collapses a zh regional tag to zh-Hans', async () => {
+    await locale.set('zh-CN')
+
+    expect(locale.current).toBe('zh-Hans')
+    expect(get(svelteLocale)).toBe('zh-Hans')
+    expect(get(_)('ProcessList.footer', { values: { count: 42 } })).toBe(
+      '找到 42 个进程。',
+    )
+  })
+})

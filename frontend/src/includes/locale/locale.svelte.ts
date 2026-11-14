@@ -29,10 +29,17 @@ export const Flags: Record<string, string> = {
   'zh-Hans': '🇨🇳',
 }
 
-/** en-US becomes en. zh-Hant stays whole because that catalog includes the script. */
+/** en-US becomes en. zh-Hant and zh-Hans stay whole because those catalogs include the script. */
 const catalog = (input: string) => {
   const tag = input.toLowerCase()
-  if (tag === 'zh-hant' || tag.startsWith('zh-hant-')) return 'zh-Hant'
+  if (
+    tag === 'zh-hant' ||
+    tag.startsWith('zh-hant-') ||
+    tag === 'zh-tw' ||
+    tag.startsWith('zh-tw-')
+  )
+    return 'zh-Hant'
+  if (tag === 'zh-hans' || tag.startsWith('zh-')) return 'zh-Hans'
   return input.split('-')[0]
 }
 
