@@ -25,3 +25,30 @@ describe('Traditional Chinese locale', () => {
     )
   })
 })
+
+describe('Simplified Chinese locale', () => {
+  it('collapses a zh regional tag to zh-Hans', async () => {
+    await locale.set('zh-CN')
+
+    expect(locale.current).toBe('zh-Hans')
+    expect(get(svelteLocale)).toBe('zh-Hans')
+    expect(get(_)('ProcessList.footer', { values: { count: 42 } })).toBe(
+      '找到 42 个进程。',
+    )
+  })
+
+  it('maps a bare zh tag to zh-Hans', async () => {
+    await locale.set('zh')
+
+    expect(locale.current).toBe('zh-Hans')
+    expect(get(svelteLocale)).toBe('zh-Hans')
+  })
+
+  it('keeps Hong Kong and Taiwan tags on zh-Hant', async () => {
+    await locale.set('zh-HK')
+    expect(locale.current).toBe('zh-Hant')
+
+    await locale.set('zh-TW')
+    expect(locale.current).toBe('zh-Hant')
+  })
+})
