@@ -95,6 +95,7 @@
     "CreateFile": "创建文件"
   },
   "RegexTester": {
+    "RegularExpressionTester": "正则表达式测试器",
     "testPattern": {
       "label": "测试模式",
       "description": "用于测试正则表达式的示例字符串或日志行。",
@@ -105,7 +106,6 @@
       "description": "要与测试模式匹配的表达式。",
       "placeholder": "GET .*some/path"
     },
-    "RegularExpressionTester": "正则表达式测试器",
     "TestResult": "测试结果",
     "Test": "测试",
     "Expression": "表达式",
@@ -113,17 +113,6 @@
     "NoMatch": "无匹配"
   },
   "phrases": {
-    "Landing": {
-      "SelectASection": "从导航菜单中选择一个部分开始。",
-      "Welcome": "欢迎，{username}！"
-    },
-    "APIKey": {
-      "title": "提供 API 密钥",
-      "placeholder": "来自 notifiarr.com 的全局 API 密钥",
-      "setMsg": "API 密钥设置成功！",
-      "Setting": "正在设置 API 密钥...",
-      "description": "Notifiarr 客户端需要有效的 API 密钥才能运行。该密钥用于与 Notifiarr 网站进行身份验证，以接收更新和发送通知。没有它客户端将无法工作，请在下方输入你的 API 密钥。"
-    },
     "ToggleSpoilerVisibility": "点击切换剧透内容的可见性。",
     "EnvironmentVariable": "环境变量名：<code>{variableName}</code>",
     "VariableDescription": "<span class=\"text-warning\">注意：</span>此配置值来源于环境变量。在此处修改该值会写入配置文件，但不会生效。下次点击保存时它将被覆盖。要修改此值，请修改环境变量的值，或从环境中移除该变量。",
@@ -172,6 +161,10 @@
     "InvalidAPIKey": "Notifiarr API 密钥无效 — 请在配置中更新。",
     "TokenMustBeCountCharacters": "令牌长度必须至少为 {count} 个字符。",
     "LeavePage": "确定要离开此页面吗？",
+    "Landing": {
+      "SelectASection": "从导航菜单中选择一个部分开始。",
+      "Welcome": "欢迎，{username}！"
+    },
     "ShowMore": "显示更多信息",
     "ShowPassword": "显示密码",
     "HidePassword": "隐藏密码",
@@ -179,7 +172,14 @@
     "ValidateSSL": "验证 SSL 证书",
     "RunAsShell": "作为 shell 命令运行",
     "FollowRedirects": "跟随重定向",
-    "BrowseFiles": "浏览文件"
+    "BrowseFiles": "浏览文件",
+    "APIKey": {
+      "title": "提供 API 密钥",
+      "placeholder": "来自 notifiarr.com 的全局 API 密钥",
+      "setMsg": "API 密钥设置成功！",
+      "Setting": "正在设置 API 密钥...",
+      "description": "Notifiarr 客户端需要有效的 API 密钥才能运行。该密钥用于与 Notifiarr 网站进行身份验证，以接收更新和发送通知。没有它客户端将无法工作，请在下方输入你的 API 密钥。"
+    }
   },
   "navigation": {
     "titles": {
@@ -459,6 +459,8 @@
       "ShowMeLess": "显示更少。"
     },
     "authType": {
+      "label": "身份验证类型",
+      "description": "选择如何对客户端进行身份验证",
       "options": {
         "password": "密码：本地用户名",
         "header": "认证代理：标头",
@@ -470,9 +472,7 @@
         "header": "选择此选项后，通过包含用户名的 HTTP 标头登录此应用。这通常称为代理认证。我们有一个<a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wiki 页面</a>提供为此功能配置 Nginx 的说明。选择此选项时，你还必须为认证代理选择一个标头。如果没有显示任何标头，则上游代理没有提供有效的标头。",
         "website": "选择此选项后，使用网站凭据登录此应用。这样你可以使用 notifiarr.com 的邮箱地址或用户名和密码登录客户端。你的密码在传输到客户端之前始终安全加密。",
         "noauth": "不建议使用此配置。No Password 身份验证类型允许来自任何已配置 <code>upstream IP</code> 的任何请求。它也可以与认证代理配合使用来设置用户名。如果提供的标头中没有用户名，则默认使用 admin。"
-      },
-      "label": "身份验证类型",
-      "description": "选择如何对客户端进行身份验证"
+      }
     },
     "upstreams": {
       "label": "上游",
@@ -570,6 +570,8 @@
   },
   "MediaApps": {
     "Plex": {
+      "title": "Plex",
+      "description": "Plex 集成非常全面，其中许多设置都在<a href=\"https://notifiarr.com/\" target=\"_blank\">Notifiarr.com 网站</a>上配置。",
       "name": {
         "label": "服务器名称",
         "description": "Plex 服务器的名称。",
@@ -586,11 +588,11 @@
         "description": "Plex 服务器的令牌。",
         "placeholder": "pl3x-to_Ken",
         "tooltip": "你可以在这<a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">篇 Plex 文章</a>中找到定位 Plex 令牌的说明。"
-      },
-      "title": "Plex",
-      "description": "Plex 集成非常全面，其中许多设置都在<a href=\"https://notifiarr.com/\" target=\"_blank\">Notifiarr.com 网站</a>上配置。"
+      }
     },
     "Tautulli": {
+      "title": "Tautulli",
+      "description": "Tautulli 提供一项功能，允许你为 Plex 用户设置自定义用户名。通过将 Notifiarr 客户端与 Tautulli 集成，这些自定义用户名会显示在你的聊天服务器通知中。未启用时，则使用 Plex 用户名或邮箱地址。这完全是可选的。Notifiarr 网站也提供相同的功能，允许你将 Plex 用户映射到自定义名称。你也可以在此处添加 Tautulli 实例，仅用于通过健康检查监控它。",
       "name": {
         "label": "Tautulli 名称",
         "description": "Tautulli 服务的名称。"
@@ -604,13 +606,14 @@
         "label": "API 密钥",
         "description": "Tautulli 服务的 API 密钥。",
         "placeholder": "tautulli-api-key"
-      },
-      "title": "Tautulli",
-      "description": "Tautulli 提供一项功能，允许你为 Plex 用户设置自定义用户名。通过将 Notifiarr 客户端与 Tautulli 集成，这些自定义用户名会显示在你的聊天服务器通知中。未启用时，则使用 Plex 用户名或邮箱地址。这完全是可选的。Notifiarr 网站也提供相同的功能，允许你将 Plex 用户映射到自定义名称。你也可以在此处添加 Tautulli 实例，仅用于通过健康检查监控它。"
+      }
     }
   },
   "SnapshotApps": {
     "MySQL": {
+      "title": "MySQL",
+      "description": "你可以在 Notifiarr 客户端配置中添加 MySQL 凭据，以对 MySQL 服务健康状况进行快照。此功能对 <code>SHOW PROCESSLIST</code> 和 <code>SHOW STATUS</code> 数据进行快照。不需要数据库访问权限。授权示例：<code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
+      "addInstance": "添加 MySQL 服务器",
       "name": {
         "label": "服务器名称",
         "description": "MySQL 服务器的名称。",
@@ -635,12 +638,11 @@
         "label": "密码",
         "description": "MySQL 服务器的密码。",
         "placeholder": "password"
-      },
-      "title": "MySQL",
-      "description": "你可以在 Notifiarr 客户端配置中添加 MySQL 凭据，以对 MySQL 服务健康状况进行快照。此功能对 <code>SHOW PROCESSLIST</code> 和 <code>SHOW STATUS</code> 数据进行快照。不需要数据库访问权限。授权示例：<code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
-      "addInstance": "添加 MySQL 服务器"
+      }
     },
     "Nvidia": {
+      "title": "Nvidia",
+      "description": "此集成在快照通知中显示 Nvidia GPU 信息。在 Docker 中，请使用 CUDA 镜像（<code>ghcr.io/notifiarr/notifiarr:cuda</code> 或 <code>golift/notifiarr:cuda</code>），在主机上安装<a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a>，并使用 <code>--gpus all</code> 或 Compose 的 <code>gpus: all</code> 传入 GPU。不需要主机安装 CUDA toolkit。",
       "disabled": {
         "label": "GPU 快照",
         "description": "启用或禁用 GPU 快照。"
@@ -656,13 +658,13 @@
         "description": "nvidia-smi 命令的路径。",
         "placeholder": "/usr/bin/nvidia-smi",
         "tooltip": "如果 nvidia-smi（Windows 上为 nvidia-smi.exe）不在 PATH 环境变量中，你可以在此提供该二进制文件的完整路径。"
-      },
-      "title": "Nvidia",
-      "description": "此集成在快照通知中显示 Nvidia GPU 信息。在 Docker 中，请使用 CUDA 镜像（<code>ghcr.io/notifiarr/notifiarr:cuda</code> 或 <code>golift/notifiarr:cuda</code>），在主机上安装<a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a>，并使用 <code>--gpus all</code> 或 Compose 的 <code>gpus: all</code> 传入 GPU。不需要主机安装 CUDA toolkit。"
+      }
     }
   },
   "StarrApps": {
     "Radarr": {
+      "title": "Radarr",
+      "addInstance": "添加 Radarr 实例",
       "name": {
         "label": "实例名称",
         "description": "Radarr 实例的名称。",
@@ -688,11 +690,11 @@
         "label": "密码",
         "description": "Radarr 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Radarr",
-      "addInstance": "添加 Radarr 实例"
+      }
     },
     "Sonarr": {
+      "title": "Sonarr",
+      "addInstance": "添加 Sonarr 实例",
       "name": {
         "label": "实例名称",
         "description": "Sonarr 实例的名称。",
@@ -718,11 +720,11 @@
         "label": "密码",
         "description": "Sonarr 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Sonarr",
-      "addInstance": "添加 Sonarr 实例"
+      }
     },
     "Readarr": {
+      "title": "Readarr",
+      "addInstance": "添加 Readarr 实例",
       "name": {
         "label": "实例名称",
         "description": "Readarr 实例的名称。",
@@ -748,11 +750,11 @@
         "label": "密码",
         "description": "Readarr 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Readarr",
-      "addInstance": "添加 Readarr 实例"
+      }
     },
     "Lidarr": {
+      "title": "Lidarr",
+      "addInstance": "添加 Lidarr 实例",
       "name": {
         "label": "实例名称",
         "description": "Lidarr 实例的名称。",
@@ -778,11 +780,11 @@
         "label": "密码",
         "description": "Lidarr 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Lidarr",
-      "addInstance": "添加 Lidarr 实例"
+      }
     },
     "Prowlarr": {
+      "title": "Prowlarr",
+      "addInstance": "添加 Prowlarr 实例",
       "name": {
         "label": "实例名称",
         "description": "Prowlarr 实例的名称。",
@@ -808,13 +810,13 @@
         "label": "密码",
         "description": "Prowlarr 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Prowlarr",
-      "addInstance": "添加 Prowlarr 实例"
+      }
     }
   },
   "Downloaders": {
     "Qbittorrent": {
+      "title": "Qbittorrent",
+      "addInstance": "添加 Qbittorrent 实例",
       "name": {
         "label": "实例名称",
         "description": "Qbittorrent 实例的名称。",
@@ -834,11 +836,11 @@
         "label": "密码",
         "description": "Qbittorrent 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Qbittorrent",
-      "addInstance": "添加 Qbittorrent 实例"
+      }
     },
     "Rtorrent": {
+      "title": "Rtorrent",
+      "addInstance": "添加 Rtorrent 实例",
       "name": {
         "label": "实例名称",
         "description": "Rtorrent 实例的名称。",
@@ -858,11 +860,11 @@
         "label": "密码",
         "description": "Rtorrent 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Rtorrent",
-      "addInstance": "添加 Rtorrent 实例"
+      }
     },
     "Transmission": {
+      "title": "Transmission",
+      "addInstance": "添加 Transmission 实例",
       "name": {
         "label": "实例名称",
         "description": "Transmission 实例的名称。",
@@ -882,11 +884,11 @@
         "label": "密码",
         "description": "Transmission 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Transmission",
-      "addInstance": "添加 Transmission 实例"
+      }
     },
     "Deluge": {
+      "title": "Deluge",
+      "addInstance": "添加 Deluge 实例",
       "name": {
         "label": "实例名称",
         "description": "Deluge 实例的名称。",
@@ -901,11 +903,11 @@
         "label": "密码",
         "description": "Deluge 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "Deluge",
-      "addInstance": "添加 Deluge 实例"
+      }
     },
     "SabNZB": {
+      "title": "SabNZB",
+      "addInstance": "添加 SabNZB 实例",
       "name": {
         "label": "实例名称",
         "description": "SabNZB 实例的名称。",
@@ -920,11 +922,11 @@
         "label": "API 密钥",
         "description": "SabNZB 实例的 API 密钥。",
         "placeholder": "sabnzb-api-key"
-      },
-      "title": "SabNZB",
-      "addInstance": "添加 SabNZB 实例"
+      }
     },
     "NZBGet": {
+      "title": "NZBGet",
+      "addInstance": "添加 NZBGet 实例",
       "name": {
         "label": "实例名称",
         "description": "NZBGet 实例的名称。",
@@ -944,12 +946,11 @@
         "label": "密码",
         "description": "NZBGet 实例的密码。",
         "placeholder": "password"
-      },
-      "title": "NZBGet",
-      "addInstance": "添加 NZBGet 实例"
+      }
     }
   },
   "SiteTunnel": {
+    "subText": "点击<span class=\"text-success\">Ping Tunnels</span>按钮，选择响应时间最快的隧道作为主隧道。选择另一个较快的隧道作为备份。",
     "phrases": {
       "PrimaryTunnel": "主隧道",
       "BackupTunnel": "备份隧道",
@@ -969,10 +970,13 @@
       "SelectTunnel": "选择一个隧道",
       "TunnelsSaved": "隧道已于 {timeDuration} 前保存！",
       "TunnelStatsStale": "以上数据总是滞后的。要更新它，请点击页面标题中的更新后端链接。"
-    },
-    "subText": "点击<span class=\"text-success\">Ping Tunnels</span>按钮，选择响应时间最快的隧道作为主隧道。选择另一个较快的隧道作为备份。"
+    }
   },
   "FileWatcher": {
+    "title": "已监视的文件",
+    "description": "你必须启用 Log Watcher（日志监视器）功能并在 Notifiarr 网站上选择一个频道，此功能才能工作！",
+    "addInstance": "监视另一个文件",
+    "DeleteWatcher": "删除监视器",
     "badges": {
       "CurrentlyWatching": "正在监视",
       "WatcherStopped": "监视器已停止"
@@ -1028,13 +1032,22 @@
       "label": "记录匹配项",
       "description": "将匹配的行写入 notifiarr 日志。",
       "tooltip": "启用此项会将匹配的行写入 notifiarr 日志。这有利于调试，但可能很嘈杂。"
-    },
-    "title": "已监视的文件",
-    "description": "你必须启用 Log Watcher（日志监视器）功能并在 Notifiarr 网站上选择一个频道，此功能才能工作！",
-    "addInstance": "监视另一个文件",
-    "DeleteWatcher": "删除监视器"
+    }
   },
   "Commands": {
+    "title": "命令列表",
+    "addInstance": "创建命令",
+    "DeleteCommand": "删除命令",
+    "description": "命令由客户端（后端）执行。它们可以从此界面或聊天服务器触发。如果你修改了命令，必须先保存配置，然后才能从 Web UI 运行它。",
+    "Executions": "执行次数：{count}",
+    "Failures": "失败次数：{count}",
+    "LastExecution": "上次执行",
+    "neverExecuted": "从未执行",
+    "enterCommandArguments": "输入命令参数",
+    "commandRequiresArguments": "{count, plural, =1 {此命令需要一个参数。请在下方输入。} other {此命令需要 # 个参数。请在下方输入。}}",
+    "noOutput": "还没有输出。尝试执行命令，然后点击刷新。",
+    "refreshed": "{timeDuration} 前已刷新",
+    "regexMismatch": "参数与正则表达式不匹配。",
     "name": {
       "label": "名称",
       "description": "命令的名称。会显示在日志和通知中。",
@@ -1060,22 +1073,16 @@
     "timeout": {
       "label": "最长运行时间",
       "description": "命令在被终止前可以运行的时间。"
-    },
-    "title": "命令列表",
-    "addInstance": "创建命令",
-    "DeleteCommand": "删除命令",
-    "description": "命令由客户端（后端）执行。它们可以从此界面或聊天服务器触发。如果你修改了命令，必须先保存配置，然后才能从 Web UI 运行它。",
-    "Executions": "执行次数：{count}",
-    "Failures": "失败次数：{count}",
-    "LastExecution": "上次执行",
-    "neverExecuted": "从未执行",
-    "enterCommandArguments": "输入命令参数",
-    "commandRequiresArguments": "{count, plural, =1 {此命令需要一个参数。请在下方输入。} other {此命令需要 # 个参数。请在下方输入。}}",
-    "noOutput": "还没有输出。尝试执行命令，然后点击刷新。",
-    "refreshed": "{timeDuration} 前已刷新",
-    "regexMismatch": "参数与正则表达式不匹配。"
+    }
   },
   "scheduler": {
+    "title": "计划",
+    "daysOfWeek": "一周中的天数",
+    "daysOfMonth": "一月中的天数",
+    "frequency": "频率",
+    "selectAFrequency": "选择一个频率来创建计划。",
+    "AddATime": "添加时间",
+    "empty": "如果你想每天运行，请选择 Daily（每天）频率。",
     "required": {
       "daysOfWeek": "必须至少选择一周中的一天。",
       "daysOfMonth": "必须至少选择一月中的一天。",
@@ -1097,16 +1104,12 @@
       "everyDay": "{count, plural, =1 {一次} other {# 次}}，每天于 {times} 时刻运行",
       "everyWeek": "{count, plural, =1 {一次} other {# 次}}，每周 {daysOfWeek} 于 {times} 时刻运行",
       "everyMonth": "{count, plural, =1 {一次} other {# 次}}，每月 {daysOfMonth} 日于 {times} 时刻运行"
-    },
-    "title": "计划",
-    "daysOfWeek": "一周中的天数",
-    "daysOfMonth": "一月中的天数",
-    "frequency": "频率",
-    "selectAFrequency": "选择一个频率来创建计划。",
-    "AddATime": "添加时间",
-    "empty": "如果你想每天运行，请选择 Daily（每天）频率。"
+    }
   },
   "Endpoints": {
+    "title": "中继 URL",
+    "addInstance": "添加中继 URL",
+    "DeleteEndpoint": "删除 URL",
     "badge": {
       "header": "{count, plural, =1 {1 个标头} other {# 个标头}}",
       "query": "{count, plural, =1 {1 个查询参数} other {# 个查询参数}}",
@@ -1153,12 +1156,11 @@
       "label": "请求正文",
       "description": "POST、PUT 和 PATCH 请求发送到该 URL 的正文。",
       "placeholder": "{\"message\": \"Hello, world!\"}"
-    },
-    "title": "中继 URL",
-    "addInstance": "添加中继 URL",
-    "DeleteEndpoint": "删除 URL"
+    }
   },
   "metrics": {
+    "CountersReset": "此页面上的计数器会在应用退出时重置。应用通过 Prometheus 公开这些计数器。你可以抓取它们并使用<a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">Notifiarr 客户端 Grafana 仪表板</a>将其可视化。",
+    "ApplicationUptime": "应用运行时间：&nbsp;<b>{timeDuration}</b>",
     "logFiles": {
       "title": "日志文件",
       "description": "日志文件计数器。",
@@ -1193,16 +1195,32 @@
       "title": "已触发操作",
       "description": "已执行的触发器、定时器和计划。",
       "empty": "还没有已触发的操作。"
-    },
-    "CountersReset": "此页面上的计数器会在应用退出时重置。应用通过 Prometheus 公开这些计数器。你可以抓取它们并使用<a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">Notifiarr 客户端 Grafana 仪表板</a>将其可视化。",
-    "ApplicationUptime": "应用运行时间：&nbsp;<b>{timeDuration}</b>"
+    }
   },
   "monitoring": {
+    "ConfigureServices": "通过在各自配置页面上为已配置集成设置检查间隔，即可启用其健康检查。其中一些检查来自<go-to page=\"starrapps\">Starr 应用</go-to>页面、<go-to page=\"downloaders\">下载应用</go-to>页面或<go-to page=\"mediaapps\">媒体应用</go-to>页面。其余显示的健康检查可在<go-to page=\"services\">服务页面</go-to>上找到。",
+    "ChecksDisabled": "健康检查：已禁用",
+    "ChecksStopped": "健康检查：已暂停",
+    "EnableOnConfig": "在<go-to page=\"services\">服务</go-to>页面上启用健康检查。",
+    "StartChecks": "恢复健康检查",
+    "StopChecks": "暂停健康检查",
+    "stopFailed": "暂停健康检查失败。",
+    "startFailed": "恢复健康检查失败。",
+    "recheckFailed": "重新执行健康检查失败。",
+    "checkInitiated": "健康检查已启动。",
+    "nextRefresh": "{timeDuration} 后刷新。",
+    "refreshInterval": "刷新间隔",
+    "cardsView": "卡片视图",
+    "classicView": "经典视图",
+    "hideAllOutputs": "隐藏所有输出",
+    "showAllOutputs": "显示所有输出",
     "check": {
+      "name": "服务名称",
       "state": {
         "short": "状态",
         "title": "服务检查计数器"
       },
+      "typeExpect": "类型/期望",
       "last": {
         "short": "上次",
         "title": "上次检查：{timeDuration} 前",
@@ -1220,28 +1238,15 @@
         "title": "检查间隔",
         "tooltip": "此服务的检查频率。"
       },
-      "name": "服务名称",
-      "typeExpect": "类型/期望",
       "output": "上次检查输出"
-    },
-    "ConfigureServices": "通过在各自配置页面上为已配置集成设置检查间隔，即可启用其健康检查。其中一些检查来自<go-to page=\"starrapps\">Starr 应用</go-to>页面、<go-to page=\"downloaders\">下载应用</go-to>页面或<go-to page=\"mediaapps\">媒体应用</go-to>页面。其余显示的健康检查可在<go-to page=\"services\">服务页面</go-to>上找到。",
-    "ChecksDisabled": "健康检查：已禁用",
-    "ChecksStopped": "健康检查：已暂停",
-    "EnableOnConfig": "在<go-to page=\"services\">服务</go-to>页面上启用健康检查。",
-    "StartChecks": "恢复健康检查",
-    "StopChecks": "暂停健康检查",
-    "stopFailed": "暂停健康检查失败。",
-    "startFailed": "恢复健康检查失败。",
-    "recheckFailed": "重新执行健康检查失败。",
-    "checkInitiated": "健康检查已启动。",
-    "nextRefresh": "{timeDuration} 后刷新。",
-    "refreshInterval": "刷新间隔",
-    "cardsView": "卡片视图",
-    "classicView": "经典视图",
-    "hideAllOutputs": "隐藏所有输出",
-    "showAllOutputs": "显示所有输出"
+    }
   },
   "ServiceChecks": {
+    "title": "健康检查",
+    "DeleteCheck": "删除健康检查",
+    "addInstance": "创建健康检查",
+    "description": "使用此表单配置健康检查。不要在此处添加 starr、媒体、快照或下载器应用。请在它们各自的配置页面上为其设置检查间隔。查看<go-to page=\"ProcessList\">此处的运行进程列表</go-to>，在创建进程检查时可作参考。",
+    "processListLink": "在此查看运行进程列表。",
     "timeout": {
       "label": "检查超时",
       "description": "等待服务检查完成的时间。"
@@ -1257,16 +1262,16 @@
       "tooltip": "被监控服务的名称。用于在通知中标识服务。每个服务必须有唯一的名称。"
     },
     "type": {
+      "label": "检查类型",
+      "description": "要执行的检查类型。",
+      "tooltip": "Process 检查类型允许你监控某个进程是否正在运行。HTTP URL 检查类型允许你监控某个 URL 的可达性。TCP Port 检查类型允许你监控某个 TCP 端口的连通性。两种 Ping 检查类型都允许监控某个 IP 或主机的可达性。",
       "options": {
         "process": "进程检查",
         "http": "HTTP URL 检查",
         "tcp": "TCP 端口可达性",
         "ping": "UDP Ping 检查",
         "icmp": "ICMP Ping 检查"
-      },
-      "label": "检查类型",
-      "description": "要执行的检查类型。",
-      "tooltip": "Process 检查类型允许你监控某个进程是否正在运行。HTTP URL 检查类型允许你监控某个 URL 的可达性。TCP Port 检查类型允许你监控某个 TCP 端口的连通性。两种 Ping 检查类型都允许监控某个 IP 或主机的可达性。"
+      }
     },
     "url": {
       "label": "URL",
@@ -1349,12 +1354,7 @@
         "description": "可以与值匹配的最大运行进程数。",
         "tooltip": "如果你输入 2，那么当运行中的进程超过 2 个时，你将收到通知。用它来在运行进程过多时提醒你。"
       }
-    },
-    "title": "健康检查",
-    "DeleteCheck": "删除健康检查",
-    "addInstance": "创建健康检查",
-    "description": "使用此表单配置健康检查。不要在此处添加 starr、媒体、快照或下载器应用。请在它们各自的配置页面上为其设置检查间隔。查看<go-to page=\"ProcessList\">此处的运行进程列表</go-to>，在创建进程检查时可作参考。",
-    "processListLink": "在此查看运行进程列表。"
+    }
   },
   "Actions": {
     "titles": {
@@ -1384,15 +1384,15 @@
         "label": "清空 Plex 回收站"
       },
       "TrigUploadFile": {
+        "label": "日志文件已上传到网站",
+        "button": "立即上传日志",
+        "success": "日志文件已上传到网站。",
         "options": {
           "choose": "选择要上传的文件。",
           "app": "应用日志文件。",
           "debug": "调试日志文件。",
           "http": "HTTP 日志文件。"
-        },
-        "label": "日志文件已上传到网站",
-        "button": "立即上传日志",
-        "success": "日志文件已上传到网站。"
+        }
       },
       "TrigPlexSessions": {
         "label": "收集 Plex 会话",
@@ -1601,14 +1601,14 @@
     "noResponse": "无响应数据。"
   },
   "ProcessList": {
-    "button": {
-      "wrapOn": "开启自动换行",
-      "wrapOff": "关闭自动换行"
-    },
     "title": "运行进程列表",
     "error": "加载进程列表出错：{error}",
     "noData": "未返回进程列表。",
-    "footer": "找到 {count} 个进程。"
+    "footer": "找到 {count} 个进程。",
+    "button": {
+      "wrapOn": "开启自动换行",
+      "wrapOff": "关闭自动换行"
+    }
   },
   "ClientInfo": {
     "title": "启动负载",
@@ -1627,6 +1627,7 @@
       "BuildTime": "构建时间"
     },
     "DriveData": {
+      "title": "驱动器数据",
       "driveInformation": {
         "title": "驱动器信息"
       },
@@ -1640,10 +1641,14 @@
         "Age": "年龄",
         "Setting": "设置",
         "Value": "值"
-      },
-      "title": "驱动器数据"
+      }
     },
     "Snapshot": {
+      "title": "原始快照数据",
+      "Age": "快照年龄",
+      "Data": "快照数据",
+      "Latest": "最新快照",
+      "System": "系统快照",
       "titles": {
         "CPUPercent": "CPU 百分比",
         "MemoryFree": "可用内存",
@@ -1666,12 +1671,7 @@
         "IOTop": "IO Top",
         "IOStat": "IO Stat",
         "IOStat2": "IO Stat 2"
-      },
-      "title": "原始快照数据",
-      "Age": "快照年龄",
-      "Data": "快照数据",
-      "Latest": "最新快照",
-      "System": "系统快照"
+      }
     },
     "starrTitles": {
       "QueueAge": "队列年龄",
@@ -1807,6 +1807,9 @@
     "body": "此应用提供多种语言。你可以点击个人资料菜单中的语言选择器来更改语言。有些语言没有活跃的翻译人员，因此部分翻译可能不完整。如果你有兴趣帮助翻译此应用，请<a href=\"https://notifiarr.com/discord\" target=\"_blank\">访问我们的 Discord</a>。进入 <code>#role-request</code> 频道并输入 <code>!roleTranslate</code>。这将授予你访问 <code>#translate</code> 频道的权限。请加入并表达你的意愿。"
   },
   "ApiDocs": {
+    "Choose": "选择一个要查看的 API",
+    "Contrast": "如发现此页面有任何对比度问题，请报告。",
+    "BasePath": "<b>基础路径</b>：<code>{basePath}</code>",
     "api": {
       "title": "私有 API（{basePath}）",
       "body": "这是 Notifiarr.com 网站的 API 规范。网站使用此 API 与客户端交互。"
@@ -1814,10 +1817,7 @@
     "ui": {
       "title": "Web UI（{basePath}）",
       "body": "此规范用于 Notifiarr 客户端前端与后端交互的方法。你现在使用的就是前端。"
-    },
-    "Choose": "选择一个要查看的 API",
-    "Contrast": "如发现此页面有任何对比度问题，请报告。",
-    "BasePath": "<b>基础路径</b>：<code>{basePath}</code>"
+    }
   },
   "TestAllInstances": {
     "title": "测试所有实例",

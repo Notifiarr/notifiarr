@@ -36,10 +36,14 @@ const catalog = (input: string) => {
     tag === 'zh-hant' ||
     tag.startsWith('zh-hant-') ||
     tag === 'zh-tw' ||
-    tag.startsWith('zh-tw-')
+    tag.startsWith('zh-tw-') ||
+    tag === 'zh-hk' ||
+    tag.startsWith('zh-hk-') ||
+    tag === 'zh-mo' ||
+    tag.startsWith('zh-mo-')
   )
     return 'zh-Hant'
-  if (tag === 'zh-hans' || tag.startsWith('zh-')) return 'zh-Hans'
+  if (tag === 'zh' || tag === 'zh-hans' || tag.startsWith('zh-')) return 'zh-Hans'
   return input.split('-')[0]
 }
 
