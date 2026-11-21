@@ -1346,10 +1346,14 @@
                             1000000000,
                             60000000000,
                             3600000000000,
+                            -9223372036854775808,
+                            9223372036854775807,
                             1,
                             1000,
                             1000000,
-                            1000000000
+                            1000000000,
+                            60000000000,
+                            3600000000000
                         ],
                         "type": "integer",
                         "x-enum-varnames": [
@@ -1361,10 +1365,14 @@
                             "Second",
                             "Minute",
                             "Hour",
+                            "minDuration",
+                            "maxDuration",
                             "Nanosecond",
                             "Microsecond",
                             "Millisecond",
-                            "Second"
+                            "Second",
+                            "Minute",
+                            "Hour"
                         ]
                     }
                 },
@@ -4836,6 +4844,74 @@
                 },
                 "type": "object"
             },
+            "sonarr.AlternateTitle": {
+                "properties": {
+                    "seasonNumber": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "sonarr.Episode": {
+                "properties": {
+                    "absoluteEpisodeNumber": {
+                        "type": "integer"
+                    },
+                    "airDate": {
+                        "type": "string"
+                    },
+                    "airDateUtc": {
+                        "type": "string"
+                    },
+                    "episodeFileId": {
+                        "type": "integer"
+                    },
+                    "episodeNumber": {
+                        "type": "integer"
+                    },
+                    "hasFile": {
+                        "type": "boolean"
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "images": {
+                        "items": {
+                            "$ref": "#/components/schemas/starr.Image"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "monitored": {
+                        "type": "boolean"
+                    },
+                    "overview": {
+                        "type": "string"
+                    },
+                    "seasonNumber": {
+                        "type": "integer"
+                    },
+                    "series": {
+                        "$ref": "#/components/schemas/sonarr.Series"
+                    },
+                    "seriesId": {
+                        "type": "integer"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "tvdbId": {
+                        "type": "integer"
+                    },
+                    "unverifiedSceneNumbering": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object"
+            },
             "sonarr.Queue": {
                 "properties": {
                     "page": {
@@ -4877,6 +4953,23 @@
                     "episodeId": {
                         "type": "integer"
                     },
+                    "episodeIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "episodes": {
+                        "items": {
+                            "$ref": "#/components/schemas/sonarr.Episode"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "episodesWithFilesCount": {
+                        "type": "integer"
+                    },
                     "errorMessage": {
                         "type": "string"
                     },
@@ -4889,8 +4982,18 @@
                     "indexer": {
                         "type": "string"
                     },
+                    "isFullSeason": {
+                        "type": "boolean"
+                    },
                     "language": {
                         "$ref": "#/components/schemas/starr.Value"
+                    },
+                    "languages": {
+                        "items": {
+                            "$ref": "#/components/schemas/starr.Value"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
                     },
                     "outputPath": {
                         "type": "string"
@@ -4900,6 +5003,13 @@
                     },
                     "quality": {
                         "$ref": "#/components/schemas/starr.Quality"
+                    },
+                    "seasonNumbers": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
                     },
                     "seriesId": {
                         "type": "integer"
@@ -4931,6 +5041,228 @@
                     },
                     "trackedDownloadStatus": {
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "sonarr.Season": {
+                "properties": {
+                    "images": {
+                        "items": {
+                            "$ref": "#/components/schemas/starr.Image"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "monitored": {
+                        "type": "boolean"
+                    },
+                    "seasonNumber": {
+                        "type": "integer"
+                    },
+                    "statistics": {
+                        "$ref": "#/components/schemas/sonarr.Statistics"
+                    }
+                },
+                "type": "object"
+            },
+            "sonarr.Series": {
+                "properties": {
+                    "added": {
+                        "type": "string"
+                    },
+                    "airTime": {
+                        "type": "string"
+                    },
+                    "alternateTitles": {
+                        "items": {
+                            "$ref": "#/components/schemas/sonarr.AlternateTitle"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "aniListIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "certification": {
+                        "type": "string"
+                    },
+                    "cleanTitle": {
+                        "type": "string"
+                    },
+                    "ended": {
+                        "type": "boolean"
+                    },
+                    "firstAired": {
+                        "type": "string"
+                    },
+                    "genres": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "id": {
+                        "type": "integer"
+                    },
+                    "images": {
+                        "items": {
+                            "$ref": "#/components/schemas/starr.Image"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "imdbId": {
+                        "type": "string"
+                    },
+                    "language": {
+                        "$ref": "#/components/schemas/starr.Value"
+                    },
+                    "languageProfileId": {
+                        "type": "integer"
+                    },
+                    "malIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "monitorNewItems": {
+                        "type": "string"
+                    },
+                    "monitored": {
+                        "type": "boolean"
+                    },
+                    "network": {
+                        "type": "string"
+                    },
+                    "nextAiring": {
+                        "type": "string"
+                    },
+                    "originalCountry": {
+                        "type": "string"
+                    },
+                    "originalLanguage": {
+                        "$ref": "#/components/schemas/starr.Value"
+                    },
+                    "overview": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    },
+                    "previousAiring": {
+                        "type": "string"
+                    },
+                    "qualityProfileId": {
+                        "type": "integer"
+                    },
+                    "ratings": {
+                        "$ref": "#/components/schemas/starr.Ratings"
+                    },
+                    "rootFolderPath": {
+                        "type": "string"
+                    },
+                    "runtime": {
+                        "type": "integer"
+                    },
+                    "seasonFolder": {
+                        "type": "boolean"
+                    },
+                    "seasonType": {
+                        "type": "string"
+                    },
+                    "seasons": {
+                        "items": {
+                            "$ref": "#/components/schemas/sonarr.Season"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "seriesType": {
+                        "type": "string"
+                    },
+                    "sortTitle": {
+                        "type": "string"
+                    },
+                    "statistics": {
+                        "$ref": "#/components/schemas/sonarr.Statistics"
+                    },
+                    "status": {
+                        "type": "string"
+                    },
+                    "tags": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "titleSlug": {
+                        "type": "string"
+                    },
+                    "tmdbId": {
+                        "type": "integer"
+                    },
+                    "tvMazeId": {
+                        "type": "integer"
+                    },
+                    "tvRageId": {
+                        "type": "integer"
+                    },
+                    "tvdbId": {
+                        "type": "integer"
+                    },
+                    "useSceneNumbering": {
+                        "type": "boolean"
+                    },
+                    "year": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "sonarr.Statistics": {
+                "properties": {
+                    "episodeCount": {
+                        "type": "integer"
+                    },
+                    "episodeFileCount": {
+                        "type": "integer"
+                    },
+                    "nextAiring": {
+                        "type": "string"
+                    },
+                    "percentOfEpisodes": {
+                        "type": "number"
+                    },
+                    "previousAiring": {
+                        "type": "string"
+                    },
+                    "releaseGroups": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "seasonCount": {
+                        "type": "integer"
+                    },
+                    "sizeOnDisk": {
+                        "type": "integer"
+                    },
+                    "totalEpisodeCount": {
+                        "type": "integer"
                     }
                 },
                 "type": "object"
@@ -5087,6 +5419,23 @@
                 },
                 "type": "object"
             },
+            "starr.Image": {
+                "properties": {
+                    "coverType": {
+                        "type": "string"
+                    },
+                    "extension": {
+                        "type": "string"
+                    },
+                    "remoteUrl": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
             "starr.Protocol": {
                 "enum": [
                     "unknown",
@@ -5115,8 +5464,17 @@
                         "type": "array",
                         "uniqueItems": false
                     },
+                    "maxSize": {
+                        "type": "number"
+                    },
+                    "minSize": {
+                        "type": "number"
+                    },
                     "name": {
                         "type": "string"
+                    },
+                    "preferredSize": {
+                        "type": "number"
                     },
                     "quality": {
                         "$ref": "#/components/schemas/starr.BaseQuality"
@@ -5137,6 +5495,23 @@
                         "type": "integer"
                     },
                     "version": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "starr.Ratings": {
+                "properties": {
+                    "popularity": {
+                        "type": "number"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "value": {
+                        "type": "number"
+                    },
+                    "votes": {
                         "type": "integer"
                     }
                 },
