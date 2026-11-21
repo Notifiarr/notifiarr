@@ -7,6 +7,7 @@ import transmissionLogo from '../../assets/logos/transmission.png'
 import plexLogo from '../../assets/logos/plex.png'
 import tautulliLogo from '../../assets/logos/tautulli.png'
 import sonarrLogo from '../../assets/logos/sonarr.png'
+import sportarrLogo from '../../assets/logos/sportarr.png'
 import radarrLogo from '../../assets/logos/radarr.png'
 import readarrLogo from '../../assets/logos/readarr.png'
 import lidarrLogo from '../../assets/logos/lidarr.png'
@@ -22,6 +23,7 @@ const logos = {
   plex: plexLogo,
   tautulli: tautulliLogo,
   sonarr: sonarrLogo,
+  sportarr: sportarrLogo,
   radarr: radarrLogo,
   readarr: readarrLogo,
   lidarr: lidarrLogo,
@@ -42,6 +44,7 @@ const titles = {
   plex: 'Plex',
   tautulli: 'Tautulli',
   sonarr: 'Sonarr',
+  sportarr: 'Sportarr',
   radarr: 'Radarr',
   readarr: 'Readarr',
   lidarr: 'Lidarr',
@@ -58,6 +61,7 @@ const colors = {
   plex: 'warning',
   tautulli: 'warning-subtle',
   sonarr: 'info',
+  sportarr: 'secondary',
   radarr: 'warning',
   readarr: 'danger',
   lidarr: 'success-subtle',

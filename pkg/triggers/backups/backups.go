@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -26,6 +27,7 @@ func (a *Action) Backup(input *common.ActionInput, app starr.App) error {
 		a.cmd.Exec(input, TrigRadarrBackup)
 		a.cmd.Exec(input, TrigReadarrBackup)
 		a.cmd.Exec(input, TrigSonarrBackup)
+		a.cmd.Exec(input, TrigSportarrBackup)
 	case starr.Lidarr:
 		a.cmd.Exec(input, TrigLidarrBackup)
 	case starr.Prowlarr:
@@ -36,6 +38,8 @@ func (a *Action) Backup(input *common.ActionInput, app starr.App) error {
 		a.cmd.Exec(input, TrigReadarrBackup)
 	case starr.Sonarr:
 		a.cmd.Exec(input, TrigSonarrBackup)
+	case apps.SportarrApp:
+		a.cmd.Exec(input, TrigSportarrBackup)
 	}
 
 	return nil
@@ -128,6 +132,30 @@ func (c *cmd) makeBackupTriggersSonarr(info *clientinfo.ClientInfo) {
 
 	for idx, app := range c.Apps.Sonarr {
 		if app.Enabled() && info.Actions.Apps.Sonarr.Backup(idx+1) != mnd.Disabled {
+			randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
+				time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
+			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
+
+			break
+		}
+	}
+}
+
+func (c *cmd) makeBackupTriggersSportarr(info *clientinfo.ClientInfo) {
+	action := &common.Action{
+		Name: TrigSportarrBackup,
+		Key:  "TrigSportarrBackup",
+		Fn:   c.sendSportarrBackups,
+		C:    make(chan *common.ActionInput, 1),
+	}
+	defer c.Add(action)
+
+	if info == nil {
+		return
+	}
+
+	for idx, app := range c.Apps.Sportarr {
+		if app.Enabled() && info.Actions.Apps.Sportarr.Backup(idx+1) != mnd.Disabled {
 			randomTime := time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Second +
 				time.Duration(c.Config.Rand().Intn(randomMinutes))*time.Minute
 			action.D = cnfg.Duration{Duration: checkInterval + randomTime}
@@ -232,6 +260,22 @@ func (c *cmd) sendSonarrBackups(ctx context.Context, input *common.ActionInput) 
 			c.sendBackups(ctx, &genericInstance{
 				event: input.Type,
 				name:  starr.Sonarr,
+				cName: app.Name,
+				int:   idx + 1,
+				app:   app.Sonarr,
+				skip:  !app.Enabled(),
+			})
+		}
+	}
+}
+
+func (c *cmd) sendSportarrBackups(ctx context.Context, input *common.ActionInput) {
+	for idx, app := range c.Apps.Sportarr {
+		if ci := clientinfo.Get(); input.Type != website.EventCron ||
+			(ci != nil && ci.Actions.Apps.Sportarr.Backup(idx+1) != mnd.Disabled) {
+			c.sendBackups(ctx, &genericInstance{
+				event: input.Type,
+				name:  apps.SportarrApp,
 				cName: app.Name,
 				int:   idx + 1,
 				app:   app.Sonarr,

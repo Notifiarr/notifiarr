@@ -1135,7 +1135,8 @@
                 "description": "Sonarr 執行個體的密碼。",
                 "placeholder": "密碼"
             }
-        }
+        },
+        "Sportarr": { "title": "Sportarr" }
     },
     "RegexTester": {
         "testRegex": {

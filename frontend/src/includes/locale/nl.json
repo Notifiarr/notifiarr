@@ -744,6 +744,7 @@
             },
             "title": "Sonarr"
         },
+        "Sportarr": { "title": "Sportarr" },
         "Prowlarr": {
             "apiKey": {
                 "label": "API-sleutel",

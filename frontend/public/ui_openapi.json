@@ -373,6 +373,13 @@
                         "type": "array",
                         "uniqueItems": false
                     },
+                    "Sportarr": {
+                        "items": {
+                            "$ref": "#/components/schemas/checkapp.TestResult"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
                     "Tautulli": {
                         "items": {
                             "$ref": "#/components/schemas/checkapp.TestResult"
@@ -601,6 +608,39 @@
                         "type": "string"
                     },
                     "sonarr": {
+                        "properties": {
+                            "queue": {
+                                "items": {
+                                    "$ref": "#/components/schemas/sonarr.Queue"
+                                },
+                                "type": "array",
+                                "uniqueItems": false
+                            },
+                            "queueAge": {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array",
+                                "uniqueItems": false
+                            },
+                            "status": {
+                                "items": {
+                                    "$ref": "#/components/schemas/sonarr.SystemStatus"
+                                },
+                                "type": "array",
+                                "uniqueItems": false
+                            },
+                            "statusAge": {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array",
+                                "uniqueItems": false
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "sportarr": {
                         "properties": {
                             "queue": {
                                 "items": {
@@ -1004,6 +1044,13 @@
                         },
                         "type": "array",
                         "uniqueItems": false
+                    },
+                    "sportarr": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
                     }
                 },
                 "type": "object"
@@ -1163,6 +1210,9 @@
                     "sonarr": {
                         "type": "boolean"
                     },
+                    "sportarr": {
+                        "type": "boolean"
+                    },
                     "transmission": {
                         "type": "boolean"
                     }
@@ -1286,6 +1336,22 @@
                         "uniqueItems": false
                     },
                     "sonarrSync": {
+                        "description": "items in sync.",
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "sportarrInstances": {
+                        "description": "which instance IDs we sync",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "sportarrSync": {
                         "description": "items in sync.",
                         "items": {
                             "type": "string"
@@ -1602,6 +1668,13 @@
                         "$ref": "#/components/schemas/snapshot.Config"
                     },
                     "sonarr": {
+                        "items": {
+                            "$ref": "#/components/schemas/apps.StarrConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "sportarr": {
                         "items": {
                             "$ref": "#/components/schemas/apps.StarrConfig"
                         },
@@ -1966,6 +2039,13 @@
                         "uniqueItems": false
                     },
                     "sonarr": {
+                        "items": {
+                            "$ref": "#/components/schemas/dashboard.State"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "sportarr": {
                         "items": {
                             "$ref": "#/components/schemas/dashboard.State"
                         },

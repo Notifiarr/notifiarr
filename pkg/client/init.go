@@ -56,6 +56,7 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 	c.printRadarr(reqID, &clientInfo.Actions.Apps.Radarr)
 	c.printReadarr(reqID, &clientInfo.Actions.Apps.Readarr)
 	c.printSonarr(reqID, &clientInfo.Actions.Apps.Sonarr)
+	c.printSportarr(reqID, &clientInfo.Actions.Apps.Sportarr)
 	c.printDeluge(reqID)
 	c.printTransmission(reqID)
 	c.printNZBGet(reqID)
@@ -242,6 +243,23 @@ func (c *Client) printSonarr(reqID string, app *clientinfo.InstanceConfig) {
 	logs.Log.Print(reqID, " => Sonarr Config:", len(c.Config.Sonarr), s)
 
 	for idx, f := range c.Config.Sonarr {
+		logs.Log.Printf(reqID, starrLogLine,
+			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
+			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled,
+			f.HTTPPass != "" && f.HTTPUser != "", f.Password != "" && f.Username != "")
+	}
+}
+
+// printSportarr is called on startup to print info about each configured server.
+func (c *Client) printSportarr(reqID string, app *clientinfo.InstanceConfig) {
+	s := servers
+	if len(c.Config.Sportarr) == 1 {
+		s = server
+	}
+
+	logs.Log.Print(reqID, " => Sportarr Config:", len(c.Config.Sportarr), s)
+
+	for idx, f := range c.Config.Sportarr {
 		logs.Log.Printf(reqID, starrLogLine,
 			idx+1, f.URL, f.APIKey != "", f.Timeout, f.ValidSSL, app.Stuck(idx+1), app.Finished(idx+1),
 			app.Corrupt(idx+1) != "" && app.Corrupt(idx+1) != mnd.Disabled, app.Backup(idx+1) != mnd.Disabled,

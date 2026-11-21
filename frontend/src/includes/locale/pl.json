@@ -315,6 +315,7 @@
                 "placeholder": "hasło"
             }
         },
+        "Sportarr": { "title": "Sportarr" },
         "Lidarr": {
             "apiKey": {
                 "description": "Klucz API instancji Lidarr.",

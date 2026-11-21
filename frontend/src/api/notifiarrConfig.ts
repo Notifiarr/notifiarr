@@ -105,6 +105,12 @@ export interface Integrations {
     queue: null | (null | SonarrQueue)[];
     queueAge: null | Date[];
   };
+  sportarr: {
+    status: null | (null | SonarrSystemStatus)[];
+    statusAge: null | Date[];
+    queue: null | (null | SonarrQueue)[];
+    queueAge: null | Date[];
+  };
   prowlarr: {
     status: null | (null | ProwlarrSystemStatus)[];
     statusAge: null | Date[];
@@ -754,6 +760,7 @@ export interface States {
   radarr: null | (null | State)[];
   readarr: null | (null | State)[];
   sonarr: null | (null | State)[];
+  sportarr: null | (null | State)[];
   nzbget: null | (null | State)[];
   rtorrent: null | (null | State)[];
   qbit: null | (null | State)[];
@@ -1741,6 +1748,7 @@ export interface LogConfig {
  */
 export interface AppsConfig extends BaseConfig {
   sonarr?: null | StarrConfig[];
+  sportarr?: null | StarrConfig[];
   radarr?: null | StarrConfig[];
   lidarr?: null | StarrConfig[];
   readarr?: null | StarrConfig[];
@@ -2023,6 +2031,7 @@ export interface AllAppConfigs {
   radarr: null | (null | AppConfig)[];
   readarr: null | (null | AppConfig)[];
   sonarr: null | (null | AppConfig)[];
+  sportarr: null | (null | AppConfig)[];
 };
 
 /**
@@ -2054,6 +2063,7 @@ export interface DashConfig {
   radarr: boolean;
   readarr: boolean;
   sonarr: boolean;
+  sportarr: boolean;
   plex: boolean;
   sabnzbd: boolean;
   nzbget: boolean;
@@ -2083,6 +2093,10 @@ export interface SyncConfig {
    */
   sonarrInstances: null | number[];
   /**
+   * which instance IDs we sync
+   */
+  sportarrInstances: null | number[];
+  /**
    * items in sync.
    */
   lidarrSync: null | string[];
@@ -2090,6 +2104,10 @@ export interface SyncConfig {
    * items in sync.
    */
   sonarrSync: null | string[];
+  /**
+   * items in sync.
+   */
+  sportarrSync: null | string[];
   /**
    * items in sync.
    */
@@ -2360,6 +2378,7 @@ export interface APIResponse {
  */
 export interface CheckAllOutput {
   Sonarr: null | TestResult[];
+  Sportarr: null | TestResult[];
   Radarr: null | TestResult[];
   Readarr: null | TestResult[];
   Lidarr: null | TestResult[];

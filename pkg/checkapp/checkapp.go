@@ -96,6 +96,8 @@ func testInstance(ctx context.Context, input *Input) (string, int) {
 		return checkAndRun(ctx, Readarr, input, input.Post.AppsConfig, input.Post.Readarr)
 	case "sonarr":
 		return checkAndRun(ctx, Sonarr, input, input.Post.AppsConfig, input.Post.Sonarr)
+	case "sportarr":
+		return checkAndRun(ctx, Sportarr, input, input.Post.AppsConfig, input.Post.Sportarr)
 	// snapshots.go
 	case "mysql":
 		return checkAndRun(ctx, MySQL, input, input.Post.Snapshot, input.Post.Snapshot.MySQL)

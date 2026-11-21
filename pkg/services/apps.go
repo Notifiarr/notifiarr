@@ -30,6 +30,7 @@ func (s *Services) AddApps(apps *apps.Apps, mysql []snapshot.MySQLConfig) {
 	svcs = collectStarrApps(svcs, apps.Radarr, starrV3StatusURI)
 	svcs = collectStarrApps(svcs, apps.Readarr, starrV1StatusURI)
 	svcs = collectStarrApps(svcs, apps.Sonarr, starrV3StatusURI)
+	svcs = collectStarrApps(svcs, apps.Sportarr, starrV3StatusURI)
 	svcs = collectDelugeApps(svcs, apps.Deluge)
 	svcs = collectNZBGetApps(svcs, apps.NZBGet)
 	svcs = collectQbittorrentApps(svcs, apps.Qbit)

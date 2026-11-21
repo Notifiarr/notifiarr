@@ -85,6 +85,8 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			msg = fmt.Errorf("%v: %w", aID, ErrNoReadarr)
 		case app == starr.Sonarr && (aID >= len(a.Sonarr) || aID < 0):
 			msg = fmt.Errorf("%v: %w", aID, ErrNoSonarr)
+		case app == SportarrApp && (aID >= len(a.Sportarr) || aID < 0):
+			msg = fmt.Errorf("%v: %w", aID, ErrNoSportarr)
 			// Store the application configuration (starr) in a context then pass that into the api() method.
 			// Retrieve the return code and output, and send a response via a.Respond().
 		case app == starr.Lidarr:
@@ -97,6 +99,8 @@ func (a *Apps) handleAPI(app starr.App, api APIHandler) http.HandlerFunc { //nol
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Readarr[aID])))
 		case app == starr.Sonarr:
 			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sonarr[aID])))
+		case app == SportarrApp:
+			code, msg = api(r.WithContext(context.WithValue(ctx, app, a.Sportarr[aID])))
 		case app == "":
 			// no app, just run the handler.
 			code, msg = api(r) // unknown app, just run the handler.

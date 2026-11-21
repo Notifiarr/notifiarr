@@ -57,6 +57,12 @@ type SonarrConTest struct {
 	Status *sonarr.SystemStatus `json:"systemStatus,omitempty"`
 }
 
+// SportarrConTest contains information about connected Sportarrs.
+type SportarrConTest struct {
+	conTest
+	Status *sonarr.SystemStatus `json:"systemStatus,omitempty"`
+}
+
 // ProwlarrConTest contains information about connected Prowlarrs.
 type ProwlarrConTest struct {
 	conTest
@@ -95,6 +101,7 @@ type AppStatuses struct {
 	Radarr   []*RadarrConTest   `json:"radarr,omitempty"`
 	Readarr  []*ReadarrConTest  `json:"readarr,omitempty"`
 	Sonarr   []*SonarrConTest   `json:"sonarr,omitempty"`
+	Sportarr []*SportarrConTest `json:"sportarr,omitempty"`
 	Prowlarr []*ProwlarrConTest `json:"prowlarr,omitempty"`
 	Plex     []*PlexConTest     `json:"plex,omitempty"`
 	Tautulli []*TautulliConTest `json:"tautulli,omitempty"`
@@ -140,7 +147,7 @@ func (c *Config) VersionHandler(r *http.Request) (int, any) {
 //	@Summary		Retrieve client info + 1 app's info.
 //	@Tags			Client
 //	@Produce		json
-//	@Param			app			path		string								true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr, plex, tautulli)
+//	@Param			app			path		string								true	"Application"	Enums(lidarr, prowlarr, radarr, readarr, sonarr, sportarr, plex, tautulli)
 //	@Param			instance	path		int64								true	"Application instance (1-index)."
 //	@Success		200			{object}	apps.APIResponse[clientinfo.AppInfo]	"contains app info included appStatus"
 //	@Failure		404			{object}	string								"bad token or api key"
@@ -165,6 +172,7 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 		rad  = make([]*RadarrConTest, len(c.Radarr))
 		read = make([]*ReadarrConTest, len(c.Readarr))
 		son  = make([]*SonarrConTest, len(c.Sonarr))
+		spo  = make([]*SportarrConTest, len(c.Sportarr))
 		plx  = []*PlexConTest{}
 		wait sync.WaitGroup
 	)
@@ -175,6 +183,7 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 	c.getRadarrVersion(ctx, &wait, c.Radarr, rad)
 	c.getReadarrVersion(ctx, &wait, c.Readarr, read)
 	c.getSonarrVersion(ctx, &wait, c.Sonarr, son)
+	c.getSportarrVersion(ctx, &wait, c.Sportarr, spo)
 	wait.Wait()
 
 	return &AppStatuses{
@@ -182,6 +191,7 @@ func (c *Config) appStatsForVersion(ctx context.Context) *AppStatuses {
 		Radarr:   rad,
 		Readarr:  read,
 		Sonarr:   son,
+		Sportarr: spo,
 		Prowlarr: prl,
 		Plex:     plx,
 	}
@@ -200,6 +210,13 @@ func (c *Config) getConTest(reqID, app string, name string, instance int, err er
 func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, instance int) *AppStatuses { //nolint:cyclop,funlen
 	reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Config.appStatsForVersionInstance", app, instance)
 	defer mnd.Log.Trace(reqID, "end: Config.appStatsForVersionInstance", app, instance)
+
+	// The route accepts instance 0. Starr instances start at 1.
+	// Without this check, instance 0 reads index -1 and panics.
+	// Plex and Tautulli ignore the instance number.
+	if instance < 1 && app != "plex" && app != "tautulli" {
+		return nil
+	}
 
 	switch idx := instance - 1; app {
 	case "lidarr":
@@ -245,6 +262,17 @@ func (c *Config) appStatsForVersionInstance(ctx context.Context, app string, ins
 
 		return &AppStatuses{Sonarr: []*SonarrConTest{{
 			Instance: instance, Up: false, Name: c.Apps.Sonarr[idx].Name, Error: mnd.ErrDisabledInstance.Error(),
+		}}}
+	case "sportarr":
+		if instance <= len(c.Sportarr) && c.Apps.Sportarr[idx].Enabled() {
+			stat, err := c.Apps.Sportarr[idx].GetSystemStatusContext(ctx)
+			data.SaveWithID(app+mnd.Status, idx, stat)
+
+			return &AppStatuses{Sportarr: []*SportarrConTest{{c.getConTest(reqID, app, c.Apps.Sportarr[idx].Name, instance, err), stat}}}
+		}
+
+		return &AppStatuses{Sportarr: []*SportarrConTest{{
+			Instance: instance, Up: false, Name: c.Apps.Sportarr[idx].Name, Error: mnd.ErrDisabledInstance.Error(),
 		}}}
 	case "prowlarr":
 		if instance <= len(c.Prowlarr) && c.Apps.Prowlarr[idx].Enabled() {
@@ -379,6 +407,29 @@ func (c *Config) getSonarrVersion(ctx context.Context, wait *sync.WaitGroup, son
 			data.SaveWithID("sonarrStatus", idx, stat)
 
 			son[idx] = &SonarrConTest{conTest: c.getConTest(reqID, "Sonarr", app.Name, idx+1, err), Status: stat}
+		})
+	}
+}
+
+func (c *Config) getSportarrVersion(
+	ctx context.Context, wait *sync.WaitGroup, sportarrs []apps.Sportarr, spo []*SportarrConTest,
+) {
+	for idx, app := range sportarrs {
+		spo[idx] = &SportarrConTest{Instance: idx + 1, Up: false, Name: app.Name}
+
+		if !app.Enabled() {
+			spo[idx].Error = mnd.ErrDisabledInstance.Error()
+			continue
+		}
+
+		wait.Go(func() {
+			reqID := mnd.Log.Trace(mnd.GetID(ctx), "start: Sportarr.GetSystemStatusContext")
+			defer mnd.Log.Trace(reqID, "end: Sportarr.GetSystemStatusContext")
+
+			stat, err := app.GetSystemStatusContext(ctx)
+			data.SaveWithID("sportarrStatus", idx, stat)
+
+			spo[idx] = &SportarrConTest{conTest: c.getConTest(reqID, "Sportarr", app.Name, idx+1, err), Status: stat}
 		})
 	}
 }

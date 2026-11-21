@@ -461,6 +461,7 @@
             "title": "Sonarr",
             "addInstance": "Sonarr Instanz hinzufügen"
         },
+        "Sportarr": { "title": "Sportarr" },
         "Lidarr": {
             "apiKey": {
                 "label": "API-Schlüssel",
