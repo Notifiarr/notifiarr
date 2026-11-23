@@ -88,12 +88,19 @@ type AppInfoConfig struct {
 
 // AppConfigs contains exported configurations for various integrations.
 type AppConfigs struct {
-	Lidarr   []*AppInfoAppConfig `json:"lidarr"`
-	Prowlarr []*AppInfoAppConfig `json:"prowlarr"`
-	Radarr   []*AppInfoAppConfig `json:"radarr"`
-	Readarr  []*AppInfoAppConfig `json:"readarr"`
-	Sonarr   []*AppInfoAppConfig `json:"sonarr"`
-	Tautulli *AppInfoTautulli    `json:"tautulli"`
+	Lidarr       []*AppInfoAppConfig `json:"lidarr"`
+	Prowlarr     []*AppInfoAppConfig `json:"prowlarr"`
+	Radarr       []*AppInfoAppConfig `json:"radarr"`
+	Readarr      []*AppInfoAppConfig `json:"readarr"`
+	Sonarr       []*AppInfoAppConfig `json:"sonarr"`
+	Deluge       []*AppInfoAppConfig `json:"deluge"`
+	NZBGet       []*AppInfoAppConfig `json:"nzbget"`
+	Qbit         []*AppInfoAppConfig `json:"qbit"`
+	Rtorrent     []*AppInfoAppConfig `json:"rtorrent"`
+	SabNZB       []*AppInfoAppConfig `json:"sabnzbd"`
+	Transmission []*AppInfoAppConfig `json:"transmission"`
+	Plex         *AppInfoAppConfig   `json:"plex,omitempty"`
+	Tautulli     *AppInfoTautulli    `json:"tautulli"`
 }
 
 // AppInfoAppConfig Maps an instance to a name and/or other properties.
@@ -104,10 +111,14 @@ type AppInfoAppConfig struct {
 	Name string `json:"name"`
 }
 
-// AppInfoTautulli contains the Tautulli user map, fetched from Tautulli.
+// AppInfoTautulli contains the configured Tautulli instance and its user map.
 type AppInfoTautulli struct {
-	// Tautulli userID -> email map.
-	Users map[string]string `json:"users"`
+	// Instance is 1 when Tautulli is configured.
+	Instance int `json:"instance,omitempty"`
+	// Name is the instance name configured in the client.
+	Name string `json:"name,omitempty"`
+	// Tautulli userID -> email map. Omitted on startup.
+	Users map[string]string `json:"users,omitempty"`
 }
 
 // Info is used for JSON input for our outgoing app info.
@@ -211,15 +222,65 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 		apps.Sonarr = append(apps.Sonarr, add(i, app.Name))
 	}
 
-	if !startup {
-		if u, err := c.tautulliUsers(ctx); err != nil {
-			mnd.Log.Errorf(mnd.GetID(ctx), "Getting Tautulli Users: %v", err)
-		} else {
-			apps.Tautulli = &AppInfoTautulli{Users: u.MapIDName()}
+	c.addDownloaderConfigs(apps, add)
+
+	if c.Plex.Enabled() {
+		// Server.Name() is the Plex server name, not the configured instance name.
+		apps.Plex = add(0, c.Plex.ExtraConfig.Name)
+	}
+
+	if c.Tautulli.Enabled() {
+		apps.Tautulli = &AppInfoTautulli{
+			Instance: 1,
+			Name:     c.Tautulli.Name,
 		}
 	}
 
+	if !startup {
+		c.addTautulliUsers(ctx, apps)
+	}
+
 	return apps
+}
+
+func (c *Config) addDownloaderConfigs(apps *AppConfigs, add func(int, string) *AppInfoAppConfig) {
+	for i, app := range c.Deluge {
+		apps.Deluge = append(apps.Deluge, add(i, app.Name))
+	}
+
+	for i, app := range c.NZBGet {
+		apps.NZBGet = append(apps.NZBGet, add(i, app.Name))
+	}
+
+	for i, app := range c.Qbit {
+		apps.Qbit = append(apps.Qbit, add(i, app.Name))
+	}
+
+	for i, app := range c.Rtorrent {
+		apps.Rtorrent = append(apps.Rtorrent, add(i, app.Name))
+	}
+
+	for i, app := range c.SabNZB {
+		apps.SabNZB = append(apps.SabNZB, add(i, app.Name))
+	}
+
+	for i, app := range c.Transmission {
+		apps.Transmission = append(apps.Transmission, add(i, app.Name))
+	}
+}
+
+func (c *Config) addTautulliUsers(ctx context.Context, apps *AppConfigs) {
+	users, err := c.tautulliUsers(ctx)
+	if err != nil {
+		mnd.Log.Errorf(mnd.GetID(ctx), "Getting Tautulli Users: %v", err)
+		return
+	}
+
+	if apps.Tautulli == nil {
+		apps.Tautulli = &AppInfoTautulli{}
+	}
+
+	apps.Tautulli.Users = users.MapIDName()
 }
 
 func (c *Config) tautulliUsers(ctx context.Context) (*tautulli.Users, error) {
