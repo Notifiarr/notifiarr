@@ -15,5 +15,6 @@ var langs = []string{
 	"pl",
 	"pt",
 	"sv",
+	"zh-Hans",
 	"zh-Hant",
 }

@@ -1,0 +1,1870 @@
+{
+  "words": {
+    "select-option": {
+      "Off": "关闭",
+      "Enabled": "启用",
+      "Disabled": "禁用",
+      "minute": "分钟",
+      "minutes": "分钟",
+      "hour": "小时",
+      "hours": "小时",
+      "second": "秒",
+      "seconds": "秒",
+      "megabytes": "兆字节",
+      "bytes": "字节",
+      "Daily": "每天",
+      "custom": "自定义",
+      "Information": "信息",
+      "InstanceDisabled": "实例已禁用",
+      "NoTimeout": "无超时",
+      "ChecksDisabled": "检查已禁用"
+    },
+    "instance-options": {
+      "interval": {
+        "label": "健康检查间隔",
+        "description": "检查实例可达性的频率。"
+      },
+      "timeout": {
+        "label": "请求超时",
+        "description": "等待实例响应的时间。"
+      },
+      "validSsl": {
+        "label": "验证 SSL 证书",
+        "description": "勾选此项可确保实例使用的是有效的 SSL 证书。"
+      },
+      "deletes": {
+        "label": "删除内容",
+        "description": "限制一小时内可向此实例发送的删除请求数量。",
+        "tooltip": "控制每小时允许发送的删除请求数量。设置为 0 将禁止发送删除请求。这里指媒体删除，但也可能包含其他操作。这是一种节流措施，用于防止黑客清空你的内容。",
+        "countPerHour": "每小时 {count} 次"
+      }
+    },
+    "clock": {
+      "days": {
+        "Sunday": "星期日",
+        "Monday": "星期一",
+        "Tuesday": "星期二",
+        "Wednesday": "星期三",
+        "Thursday": "星期四",
+        "Friday": "星期五",
+        "Saturday": "星期六"
+      },
+      "short": {
+        "ms": "{milliseconds}毫秒",
+        "s": "{seconds}秒",
+        "m": "{minutes}分钟",
+        "h": "{hours}小时",
+        "d": "{days}天",
+        "w": "{weeks}周"
+      },
+      "format": "{weeks}{days}{hours}{minutes}{seconds}{milliseconds}",
+      "ago": "{timeDuration}前"
+    },
+    "bytes": {
+      "short": {
+        "B": "{bytes} B",
+        "KB": "{bytes} KB",
+        "MB": "{bytes} MB",
+        "GB": "{bytes} GB",
+        "TB": "{bytes} TB"
+      }
+    }
+  },
+  "buttons": {
+    "Login": "登录",
+    "LoginTitle": "登录",
+    "Confirm": "确认",
+    "Cancel": "取消",
+    "Create": "创建",
+    "Save": "保存",
+    "Close": "关闭",
+    "SaveChanges": "保存更改",
+    "SaveConfiguration": "保存配置",
+    "ResetForm": "重置表单",
+    "NoStayHere": "不！留在此处",
+    "YesDeleteMyChanges": "是！删除我的更改",
+    "Execute": "执行",
+    "HideMenu": "隐藏菜单",
+    "ShowMenu": "显示菜单",
+    "ShowOutput": "显示输出",
+    "HideOutput": "隐藏输出",
+    "RefreshOutput": "刷新输出",
+    "Go": "前往",
+    "Menu": "菜单",
+    "CreateFolder": "创建文件夹",
+    "CreateFile": "创建文件"
+  },
+  "RegexTester": {
+    "RegularExpressionTester": "正则表达式测试器",
+    "testPattern": {
+      "label": "测试模式",
+      "description": "用于测试正则表达式的示例字符串或日志行。",
+      "placeholder": "[INFO] 2025-05-25 16:20:01 - 这是一行测试日志。"
+    },
+    "testRegex": {
+      "label": "测试表达式",
+      "description": "要与测试模式匹配的表达式。",
+      "placeholder": "GET .*some/path"
+    },
+    "TestResult": "测试结果",
+    "Test": "测试",
+    "Expression": "表达式",
+    "Result": "结果",
+    "NoMatch": "无匹配"
+  },
+  "phrases": {
+    "ToggleSpoilerVisibility": "点击切换剧透内容的可见性。",
+    "EnvironmentVariable": "环境变量名：<code>{variableName}</code>",
+    "VariableDescription": "<span class=\"text-warning\">注意：</span>此配置值来源于环境变量。在此处修改该值会写入配置文件，但不会生效。下次点击保存时它将被覆盖。要修改此值，请修改环境变量的值，或从环境中移除该变量。",
+    "ERROR": "错误",
+    "LoggingIn": "正在登录...",
+    "LoggedIn": "已登录！",
+    "Loading": "加载中...",
+    "UpdateBackend": "更新后端",
+    "BackEndUpdated": "后端已于 {timeDuration} 前更新。",
+    "UpdatingBackEnd": "正在更新后端...",
+    "FailedToUpdateBackEnd": "更新后端失败：{error}",
+    "TryRefreshingThePage": "请尝试刷新页面。",
+    "ConfigurationSavedReloading": "配置已保存！正在重新加载客户端...",
+    "ConfigurationSaved": "配置已于 {timeDuration} 前保存！",
+    "SavingConfiguration": "正在保存配置...",
+    "Version": "版本 {version}",
+    "Every12Hours": "每 12 小时",
+    "Every6Hours": "每 6 小时",
+    "Every3Hours": "每 3 小时",
+    "EveryDuration": "每 {timeDuration}",
+    "Reloading": "正在重新加载...",
+    "FailedToReload": "重新加载失败：{error}",
+    "ConfirmReload": "确认重新加载",
+    "ConfirmReloadBody": "确定要重新加载客户端吗？",
+    "ReloadSuccess": "重新加载成功！客户端已重新加载。",
+    "ReloadCheckTimedOut": "服务器重新加载检查在 20 次尝试后超时",
+    "ConfirmShutdown": "确认关闭",
+    "ConfirmShutdownBody": "确定要关闭客户端吗？你将需要在其运行的主机上重新启动它。",
+    "ShutdownSuccess": "关闭成功！客户端已停止。",
+    "FailedToShutdown": "关闭失败：{error} - 请尝试刷新页面。",
+    "LoginHelp": "登录帮助",
+    "LoginHelpBody": "如果这是你第一次登录，请使用 notifiarr.com 的邮箱地址和密码登录。登录后可以设置本地密码。如果你忘记了本地密码，请参阅<a href=\"https://notifiarr.wiki/pages/client/troubleshooting/#forgotten-passwords\" target=\"_blank\">忘记密码</a>的 wiki 页面。",
+    "Changed": "已更改",
+    "New": "新建",
+    "Invalid": "无效",
+    "DeleteInstance": "删除实例",
+    "DeletedNumber": "已删除 {number}",
+    "ItsGone": "它已删除！别忘了保存。",
+    "URLMustBeginWithHttp": "URL 必须以 http:// 或 https:// 开头",
+    "NameMustNotBeEmpty": "名称不能为空。",
+    "HostMustNotBeEmpty": "主机不能为空。",
+    "UsernameMustNotBeEmpty": "用户名不能为空。",
+    "NameInUseByInstance": "此名称已被实例 {number} 使用。",
+    "APIKeyMustBeCountCharacters": "API 密钥必须为 {count} 个字符。",
+    "APIKeyMustBeCountCharactersOrLonger": "API 密钥必须至少为 {count} 个字符。",
+    "InvalidAPIKey": "Notifiarr API 密钥无效 — 请在配置中更新。",
+    "TokenMustBeCountCharacters": "令牌长度必须至少为 {count} 个字符。",
+    "LeavePage": "确定要离开此页面吗？",
+    "Landing": {
+      "SelectASection": "从导航菜单中选择一个部分开始。",
+      "Welcome": "欢迎，{username}！"
+    },
+    "ShowMore": "显示更多信息",
+    "ShowPassword": "显示密码",
+    "HidePassword": "隐藏密码",
+    "CheckInstance": "检查实例",
+    "ValidateSSL": "验证 SSL 证书",
+    "RunAsShell": "作为 shell 命令运行",
+    "FollowRedirects": "跟随重定向",
+    "BrowseFiles": "浏览文件",
+    "APIKey": {
+      "title": "提供 API 密钥",
+      "placeholder": "来自 notifiarr.com 的全局 API 密钥",
+      "setMsg": "API 密钥设置成功！",
+      "Setting": "正在设置 API 密钥...",
+      "description": "Notifiarr 客户端需要有效的 API 密钥才能运行。该密钥用于与 Notifiarr 网站进行身份验证，以接收更新和发送通知。没有它客户端将无法工作，请在下方输入你的 API 密钥。"
+    }
+  },
+  "navigation": {
+    "titles": {
+      "Plex": "Plex Webhook",
+      "Settings": "设置",
+      "Insights": "洞察",
+      "Configuration": "配置",
+      "SiteTunnel": "站点隧道",
+      "StarrApps": "Starr 应用",
+      "Downloaders": "下载应用",
+      "MediaApps": "媒体应用",
+      "SnapshotApps": "快照应用",
+      "FileWatcher": "文件监视器",
+      "Endpoints": "端点",
+      "Commands": "命令",
+      "Services": "服务",
+      "Actions": "操作",
+      "Integrations": "集成",
+      "Monitoring": "监控",
+      "Metrics": "指标",
+      "LogFiles": "日志文件",
+      "System": "系统",
+      "TrustProfile": "信任配置文件",
+      "Landing": "Notifiarr 主页",
+      "UnsavedChanges": "未保存的更改",
+      "ApiDocs": "客户端 API 文档"
+    },
+    "pageDescription": {
+      "Plex": "排查 Plex Webhook 问题的信息。",
+      "Configuration": "在此配置你的 Notifiarr 客户端设置。",
+      "SiteTunnel": "此客户端通过 <a href=\"https://github.com/golift/mulery\" target=\"_blank\">Mulery 隧道</a>与 notifiarr.com 保持持久的 websocket 连接。该隧道允许网站向你的客户端发起请求，而无需开放端口或拥有静态 IP。此页面允许你选择主隧道，以及在主隧道不可用时希望用作备份的隧道。",
+      "StarrApps": "设置 Starr 集成。",
+      "Downloaders": "管理下载客户端。",
+      "MediaApps": "管理媒体播放器及相关服务。",
+      "SnapshotApps": "大部分快照配置在 Notifiarr.com 网站上。下面你会找到快照功能的应用程序“插件”设置。",
+      "FileWatcher": "监视文件更改并触发操作！此 Notifiarr 客户端可以监视（日志）文件中与正则表达式匹配的行。这类似于 <code>tail -f file | grep string</code>，例如当日志文件写入一行与正则表达式匹配的新内容时，允许你发送通知。",
+      "Endpoints": "配置中继端点 URL 及其计划。",
+      "Commands": "设置并执行自定义命令和脚本。",
+      "Services": "Notifiarr 客户端应用能够通过 HTTP 检查、TCP 端口检查或进程运行（及未运行）检查来监控服务。<b>客户端健康检查与 Notifiarr.com 网络集成配合使用。</b>",
+      "Actions": "在此查找 Notifiarr 客户端的内部操作。这些操作由网站或聊天服务器的定时器、计划和事件执行。虽然通常用于故障排查，你也可以在此界面中手动触发它们。",
+      "Integrations": "此页面显示此客户端应用为各种已配置集成缓存在内存中的数据。",
+      "Monitoring": "查看服务和网络健康检查结果。",
+      "Metrics": "查看客户端配置的指标汇总。",
+      "LogFiles": "查看、跟踪、下载和上传客户端日志文件。",
+      "System": "查看系统和客户端信息。",
+      "TrustProfile": "配置你如何登录此 Notifiarr 客户端应用。",
+      "Landing": "这是地球上最好的地方！"
+    }
+  },
+  "config": {
+    "errors": {
+      "SetAPIKeyFailed": "设置 API 密钥失败：{error}",
+      "InvalidCreds": "用户名或密码无效。",
+      "LoginRequestTimedOut": "登录请求超时",
+      "LoginFailed": "登录失败：{error}",
+      "ProfileReqTimedOut": "个人资料请求超时",
+      "AnUnknownErrorOccurred": "发生未知错误",
+      "ConfigUpdateFailed": "配置更新失败：{error}",
+      "PleaseEnterBothUsernameAndPassword": "请输入用户名和密码。"
+    },
+    "titles": {
+      "Configuration": "配置",
+      "General": "常规",
+      "Network": "网络",
+      "System": "系统",
+      "WatchFile": "监视文件",
+      "Endpoint": "端点",
+      "Command": "命令",
+      "SSLConfiguration": "SSL 配置",
+      "Services": "服务",
+      "Logging": "日志",
+      "Dark": "深色",
+      "Light": "浅色"
+    },
+    "apiKey": {
+      "label": "API 密钥",
+      "description": "来自你 Notifiarr.com 账户的 API 密钥。",
+      "tooltip": "登录 Notifiarr.com，前往 Profile（个人资料）然后进入 API Keys 即可找到。",
+      "placeholder": "在此输入你的 API 密钥"
+    },
+    "extraKeys": {
+      "label": "额外密钥",
+      "description": "用于第三方集成的附加 API 密钥。用换行分隔。",
+      "placeholder": "每行一个..."
+    },
+    "bindAddr": {
+      "label": "绑定地址",
+      "description": "应用监听的 IP 和端口。使用 0.0.0.0 监听所有网络接口。",
+      "placeholder": "0.0.0.0:5454"
+    },
+    "sslKeyFile": {
+      "label": "SSL 密钥文件",
+      "description": "SSL 密钥文件的路径。",
+      "placeholder": "/path/to/ssl-key.pem",
+      "tooltip": "此应用可以提供 HTTPS 服务。通过指定证书文件路径和密钥文件路径来启用。"
+    },
+    "sslCertFile": {
+      "label": "SSL 证书文件",
+      "description": "SSL 证书文件的路径。",
+      "placeholder": "/path/to/ssl-cert.pem",
+      "tooltip": "此应用可以提供 HTTPS 服务。通过指定证书文件路径和密钥文件路径来启用。"
+    },
+    "debug": {
+      "label": "调试日志",
+      "description": "启用或禁用调试日志。",
+      "tooltip": "启用调试会向日志写入更多数据。使用 Max Body（最大正文）设置来控制负载大小。"
+    },
+    "quiet": {
+      "label": "静默日志",
+      "description": "启用或禁用静默日志。",
+      "tooltip": "启用静默后，应用不会向标准输出打印任何内容。当启用了日志文件，且不希望日志涌进启动守护进程时，这很有用。"
+    },
+    "trace": {
+      "label": "跟踪日志",
+      "description": "启用或禁用跟踪日志。",
+      "tooltip": "启用跟踪会向日志写入非常详细的执行流程。用于深度调试。"
+    },
+    "logFile": {
+      "label": "应用日志文件",
+      "description": "应用日志文件或文件夹的路径。",
+      "placeholder": "/path/to/notifiarr.log",
+      "tooltip": "如果你设置的是不带文件名的文件夹，应用会在该文件夹中创建名为 Notifiarr.log 的文件。"
+    },
+    "httpLog": {
+      "label": "HTTP 日志文件",
+      "description": "HTTP 日志文件或文件夹的路径。",
+      "placeholder": "/path/to/http-notifiarr.log",
+      "tooltip": "在此设置日志文件路径后，应用会将 HTTP 日志写入专用文件。文件格式为 apache 日志格式。强烈推荐。如果你设置的是不带文件名的文件夹，应用会在该文件夹中创建名为 Notifiarr.http.log 的文件。"
+    },
+    "debugLog": {
+      "label": "调试日志文件",
+      "description": "调试日志文件或文件夹的路径。",
+      "placeholder": "/path/to/debug-notifiarr.log",
+      "tooltip": "在此设置日志文件路径后，应用会将调试日志写入专用文件。未设置时，调试日志会写入应用日志文件。如果你设置的是不带文件名的文件夹，应用会在该文件夹中创建名为 Notifiarr.debug.log 的文件。"
+    },
+    "maxBody": {
+      "label": "最大正文大小",
+      "description": "HTTP 请求的最大正文大小。",
+      "tooltip": "启用调试时，此设置限制写入日志的、来自或发往 Notifiarr.com 的负载数据量。"
+    },
+    "logFileMb": {
+      "label": "日志文件大小",
+      "description": "日志文件轮转前的最大大小。",
+      "tooltip": "启用轮转时（Max Log File Count 设置为大于 1），此设置控制文件多大时触发轮转。"
+    },
+    "logFiles": {
+      "label": "日志文件数量",
+      "description": "保留的日志文件数量。",
+      "tooltip": "当此设置为 0 或 1 时，日志文件轮转被禁用。此设置适用于所有日志文件，并在磁盘上每种保留相应数量。"
+    },
+    "noUploads": {
+      "label": "拒绝上传",
+      "description": "<b>禁用</b>时允许 Notifiarr.com 管理员让此客户端向网站上传日志文件。<b>启用</b>时阻止日志文件上传。",
+      "tooltip": "此设置控制 Notifiarr.com 网站及 Notifiarr 管理员触发此客户端向网站上传日志文件的能力。有时我们在诊断问题时需要查看日志条目，此触发器允许我们让客户端上传应用日志和调试日志文件。"
+    },
+    "snapshot": {
+      "timeout": {
+        "label": "超时",
+        "description": "快照操作的超时时间。"
+      }
+    },
+    "services": {
+      "disabled": {
+        "label": "健康检查",
+        "description": "启用或禁用健康检查。",
+        "tooltip": "在此处一键禁用或启用所有健康检查的监控。"
+      },
+      "interval": {
+        "label": "更新间隔",
+        "description": "健康检查的更新间隔。",
+        "tooltip": "控制聚合的健康检查结果发送到 Notifiarr.com 的频率。如果健康检查状态发生变化，则始终立即发送。"
+      },
+      "logFile": {
+        "label": "服务日志文件",
+        "description": "服务日志文件或文件夹的路径。",
+        "tooltip": "日志文件用于存储健康检查结果。如果不设置，健康检查输出会写入应用日志文件。如果你设置的是不带文件名的文件夹，应用会在该文件夹中创建名为 Notifiarr.services.log 的文件。",
+        "placeholder": "/path/to/services-notifiarr.log"
+      }
+    },
+    "ui": {
+      "darkMode": {
+        "label": "深色模式",
+        "description": "启用或禁用深色模式。"
+      },
+      "language": {
+        "label": "语言",
+        "description": "应用前端的语言。"
+      }
+    },
+    "watchFile": {
+      "path": {
+        "label": "文件路径",
+        "description": "要监视的文件的路径。"
+      }
+    },
+    "endpoint": {
+      "name": {
+        "label": "名称",
+        "description": "端点的名称。"
+      }
+    },
+    "command": {
+      "name": {
+        "label": "名称",
+        "description": "命令的名称。",
+        "required": "命令为必填项。"
+      }
+    },
+    "service": {
+      "name": {
+        "label": "名称",
+        "description": "服务的名称。"
+      }
+    },
+    "urlbase": {
+      "label": "URL 基础路径",
+      "description": "此应用默认在 / 上提供 HTTP 服务。你可以在此输入其他内容来更改。",
+      "placeholder": "/notifiarr/",
+      "tooltip": "示例：/notifiarr/"
+    },
+    "hostId": {
+      "label": "主机 ID",
+      "description": "Host ID 参数用于唯一标识此客户端安装。",
+      "tooltip": "不建议更改此值；它应自动获取。请勿将此值复制到另一个 Notifiarr 客户端安装。"
+    },
+    "serial": {
+      "label": "并行线程",
+      "description": "禁用此设置后，应用从已配置应用收集数据时将使用更少的 goroutine（线程）。",
+      "tooltip": "分散 CPU 使用并降低内存占用。"
+    },
+    "retries": {
+      "label": "重试次数",
+      "description": "有时到 Notifiarr.com 的连接会失败。这控制每个请求在失败情况下尝试的次数。",
+      "tooltip": "默认值：4（设置为 0 时使用默认值 4）"
+    },
+    "apt": {
+      "label": "APT 钩子",
+      "description": "Notifiarr 的 Debian（和 Ubuntu）软件包包含 APT 集成。",
+      "tooltip": "Notifiarr 的 Debian（和 Ubuntu）软件包包含 APT 集成。每次执行 <b class=\"text-warning\">apt</b> 命令时都会调用此集成。要启用它，请将此字段设为 Enabled，然后<b>在 Notifiarr.com 上启用 Package Manager 集成。</b>此功能不需要客户端运行；只需要安装客户端的 deb 软件包。这不适用于 RHEL 或非 Debian 的 Linux。"
+    },
+    "timeout": {
+      "label": "超时",
+      "description": "这是向 Notifiarr.com 发出 API 请求的超时时间。"
+    },
+    "fileMode": {
+      "label": "日志文件 Unix 权限",
+      "description": "写入新日志文件时使用的 Unix 文件权限。",
+      "tooltip": "按开放程度排序的推荐值：0600、0640、0644"
+    },
+    "autoUpdate": {
+      "label": "自动更新",
+      "description": "这是应用检查更新的频率。发现更新时它会自动安装。",
+      "tooltip": "此功能仅适用于 Windows。"
+    },
+    "unstableCh": {
+      "label": "不稳定频道",
+      "description": "启用不稳定更新频道后，应用将从 unstable 网站检查自动更新，而不是从 GitHub。",
+      "tooltip": "仅对具有开发者权限的用户可用。"
+    }
+  },
+  "profile": {
+    "title": {
+      "Authentication": "身份验证",
+      "Authorization": "授权"
+    },
+    "phrase": {
+      "ShowMoreDesc": "当前支持三种身份验证类型。仅当当前请求来自有效的、已配置的上游 IP 地址时，Auth Proxy（认证代理）和 No Password（无密码）才可用。",
+      "PasswordOnlyUsed": "仅当 Authentication Type（身份验证类型）设为 Password 时，才会使用用户名和密码。",
+      "HeaderOnlyUsed": "仅当 Authentication Type（身份验证类型）设为 Header 或 No Password 时，才会使用认证标头。",
+      "AuthTypeChange": "如果身份验证类型发生更改，请注销以完成该过程。",
+      "ProfileUpdated": "个人资料已于 {timeDuration} 前更新成功！",
+      "EnterCurrentPassword": "输入你的当前密码以进行更改。",
+      "ProxyAuthDisabled": "代理认证已禁用，因为你的上游（{upstreamIp}）不在允许的上游列表中。",
+      "Addit": "添加它。",
+      "SeeWikiForAuthProxyHelp": "有关设置认证代理的说明，请参阅<a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wiki</a>。",
+      "ShowMeMore": "显示更多。",
+      "ShowMeLess": "显示更少。"
+    },
+    "authType": {
+      "label": "身份验证类型",
+      "description": "选择如何对客户端进行身份验证",
+      "options": {
+        "password": "密码：本地用户名",
+        "header": "认证代理：标头",
+        "website": "网站凭据",
+        "noauth": "无密码（危险）"
+      },
+      "option_desc": {
+        "password": "这是默认的身份验证类型。选择 Password 选项后，使用已配置的用户名和密码登录此应用。仅支持一个用户名和密码。选择此选项时，你必须填写用户名和新密码字段。如果这是当前的身份验证类型，你还必须填写当前密码字段才能进行更改。",
+        "header": "选择此选项后，通过包含用户名的 HTTP 标头登录此应用。这通常称为代理认证。我们有一个<a href=\"https://notifiarr.wiki/pages/client/reverseProxy/\" target=\"_blank\">wiki 页面</a>提供为此功能配置 Nginx 的说明。选择此选项时，你还必须为认证代理选择一个标头。如果没有显示任何标头，则上游代理没有提供有效的标头。",
+        "website": "选择此选项后，使用网站凭据登录此应用。这样你可以使用 notifiarr.com 的邮箱地址或用户名和密码登录客户端。你的密码在传输到客户端之前始终安全加密。",
+        "noauth": "不建议使用此配置。No Password 身份验证类型允许来自任何已配置 <code>upstream IP</code> 的任何请求。它也可以与认证代理配合使用来设置用户名。如果提供的标头中没有用户名，则默认使用 admin。"
+      }
+    },
+    "upstreams": {
+      "label": "上游",
+      "description": "受信任的代理 IP 或 CIDR 网络。用空格分隔网络。",
+      "placeholder": "127.0.0.1 ::1",
+      "tooltip": "如果 Notifiarr 客户端位于反向代理（swag、nginx 等）之后，则应在此处添加该代理的 IP。你还可以指定完整的网络。这控制写入 Web 服务器日志文件的 IP 是请求者还是 <span class=\"text-warning\">X-Forwarded-For</span> 标头。使用请求标头进行身份验证或禁用身份验证时必需。"
+    },
+    "header": {
+      "label": "认证标头",
+      "description": "选择包含你用户名的标头",
+      "tooltip": "此处显示客户端或上游提供的、可用于代理认证的标头。当 Authentication Type 设为 Header 或 No Password 时使用此选择。选择显示你正确用户名的标头。使用 No Password 时，标头用于设置用户名，但不是必需的。"
+    },
+    "username": {
+      "label": "用户名",
+      "description": "你的登录用户名",
+      "placeholder": "默认：admin"
+    },
+    "password": {
+      "label": "当前密码",
+      "description": "输入你的当前密码以进行更改",
+      "placeholder": "输入当前密码"
+    },
+    "newPass": {
+      "label": "新密码",
+      "description": "你的新登录密码",
+      "placeholder": "最少 9 个字符"
+    }
+  },
+  "system": {
+    "BuildInformation": {
+      "title": "构建信息",
+      "Branch": "分支",
+      "BuildUser": "构建用户",
+      "BuildDate": "构建日期",
+      "GoVersion": "Go 版本",
+      "Integrity": "完整性"
+    },
+    "OperatingSystem": {
+      "title": "操作系统",
+      "Hostname": "主机名",
+      "UniqueID": "唯一 ID",
+      "Platform": "平台",
+      "KernelVersion": "内核版本",
+      "VirtualizationSystem": "虚拟化系统"
+    },
+    "ClientInformation": {
+      "title": "客户端信息",
+      "Application": "应用",
+      "Version": "版本",
+      "Started": "启动时间",
+      "Uptime": "运行时间"
+    },
+    "StorageData": {
+      "title": "存储数据",
+      "Device": "设备",
+      "Mount": "挂载点",
+      "Total": "总计",
+      "Used": "已用",
+      "Free": "可用",
+      "FS": "文件系统",
+      "ro": "只读"
+    },
+    "NetworkInformation": {
+      "title": "网络信息",
+      "IPAddress": "IP 地址",
+      "Gateway": "网关",
+      "Netmask": "子网掩码",
+      "Interface": "网络接口"
+    },
+    "StartupParams": {
+      "title": "启动参数",
+      "BinaryPath": "二进制文件路径",
+      "ConfigFile": "配置文件",
+      "EnvironmentPrefix": "环境变量前缀",
+      "ExtraConfigFiles": "额外配置文件",
+      "CustomAssets": "自定义资源",
+      "UserID": "用户 ID",
+      "GroupID": "组 ID",
+      "IPAddress": "IP 地址"
+    },
+    "UserInformation": {
+      "title": "用户信息",
+      "Patron": "赞助者",
+      "Subscriber": "订阅者",
+      "AbsoluteBadAss": "绝对狠角色",
+      "YesYesYouAre": "是的，你确实是！💚",
+      "HellaAwesome": "超级棒",
+      "YoureSoGifted": "你太有才了，我们爱你！💜",
+      "DateFormat": "日期格式",
+      "InvalidAPIKey": "未登录 Notifiarr；API 密钥被拒绝。"
+    },
+    "EnvironmentVariables": {
+      "title": "环境变量"
+    }
+  },
+  "MediaApps": {
+    "Plex": {
+      "title": "Plex",
+      "description": "Plex 集成非常全面，其中许多设置都在<a href=\"https://notifiarr.com/\" target=\"_blank\">Notifiarr.com 网站</a>上配置。",
+      "name": {
+        "label": "服务器名称",
+        "description": "Plex 服务器的名称。",
+        "placeholder": "由服务器自动设置",
+        "tooltip": "Plex Media Server 的名称用于通知、日志和健康检查。它由 Plex 服务器自动设置。"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Plex 服务器的 URL。",
+        "placeholder": "http://plex.server.tv:32400"
+      },
+      "token": {
+        "label": "令牌",
+        "description": "Plex 服务器的令牌。",
+        "placeholder": "pl3x-to_Ken",
+        "tooltip": "你可以在这<a href=\"https://support.plex.tv/articles/204059436-finding-an-authentication-token-x-plex-token/\" target=\"_blank\">篇 Plex 文章</a>中找到定位 Plex 令牌的说明。"
+      }
+    },
+    "Tautulli": {
+      "title": "Tautulli",
+      "description": "Tautulli 提供一项功能，允许你为 Plex 用户设置自定义用户名。通过将 Notifiarr 客户端与 Tautulli 集成，这些自定义用户名会显示在你的聊天服务器通知中。未启用时，则使用 Plex 用户名或邮箱地址。这完全是可选的。Notifiarr 网站也提供相同的功能，允许你将 Plex 用户映射到自定义名称。你也可以在此处添加 Tautulli 实例，仅用于通过健康检查监控它。",
+      "name": {
+        "label": "Tautulli 名称",
+        "description": "Tautulli 服务的名称。"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Tautulli 服务的 URL。",
+        "placeholder": "http://tautulli.server.tv:8181"
+      },
+      "apiKey": {
+        "label": "API 密钥",
+        "description": "Tautulli 服务的 API 密钥。",
+        "placeholder": "tautulli-api-key"
+      }
+    }
+  },
+  "SnapshotApps": {
+    "MySQL": {
+      "title": "MySQL",
+      "description": "你可以在 Notifiarr 客户端配置中添加 MySQL 凭据，以对 MySQL 服务健康状况进行快照。此功能对 <code>SHOW PROCESSLIST</code> 和 <code>SHOW STATUS</code> 数据进行快照。不需要数据库访问权限。授权示例：<code>GRANT PROCESS ON *.* to 'notifiarr'@'localhost'</code>",
+      "addInstance": "添加 MySQL 服务器",
+      "name": {
+        "label": "服务器名称",
+        "description": "MySQL 服务器的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "host": {
+        "label": "主机",
+        "description": "MySQL 服务器的主机名或 IP 地址。",
+        "placeholder": "127.0.0.1"
+      },
+      "port": {
+        "label": "端口",
+        "description": "MySQL 服务器的端口。",
+        "placeholder": "3306"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "MySQL 服务器的用户名。",
+        "placeholder": "root"
+      },
+      "password": {
+        "label": "密码",
+        "description": "MySQL 服务器的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Nvidia": {
+      "title": "Nvidia",
+      "description": "此集成在快照通知中显示 Nvidia GPU 信息。在 Docker 中，请使用 CUDA 镜像（<code>ghcr.io/notifiarr/notifiarr:cuda</code> 或 <code>golift/notifiarr:cuda</code>），在主机上安装<a href=\"https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html\" target=\"_blank\" rel=\"noopener\">NVIDIA Container Toolkit</a>，并使用 <code>--gpus all</code> 或 Compose 的 <code>gpus: all</code> 传入 GPU。不需要主机安装 CUDA toolkit。",
+      "disabled": {
+        "label": "GPU 快照",
+        "description": "启用或禁用 GPU 快照。"
+      },
+      "busIds": {
+        "label": "总线 ID",
+        "description": "要快照的总线 ID 列表，以逗号分隔。",
+        "placeholder": "0000:00:00.0,0000:00:00.1",
+        "tooltip": "这是 GPU 的总线 ID。你可以运行 <code>nvidia-smi</code> 并查看 <code>Bus Id</code> 列找到它。其他总线 ID 的显卡会在快照中被忽略。通常保持空白即可。添加多个时用换行分隔。"
+      },
+      "smiPath": {
+        "label": "nvidia-smi 路径",
+        "description": "nvidia-smi 命令的路径。",
+        "placeholder": "/usr/bin/nvidia-smi",
+        "tooltip": "如果 nvidia-smi（Windows 上为 nvidia-smi.exe）不在 PATH 环境变量中，你可以在此提供该二进制文件的完整路径。"
+      }
+    }
+  },
+  "StarrApps": {
+    "Radarr": {
+      "title": "Radarr",
+      "addInstance": "添加 Radarr 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Radarr 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Radarr 实例的 URL。",
+        "placeholder": "http://radarr.server.tv:7878"
+      },
+      "apiKey": {
+        "label": "API 密钥",
+        "description": "Radarr 实例的 API 密钥。",
+        "placeholder": "radarr-api-key"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Radarr 实例的用户名。",
+        "placeholder": "admin",
+        "tooltip": "仅当你想检查数据库备份时才需要用户名和密码，因为备份无法通过 API 下载。"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Radarr 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Sonarr": {
+      "title": "Sonarr",
+      "addInstance": "添加 Sonarr 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Sonarr 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Sonarr 实例的 URL。",
+        "placeholder": "http://sonarr.server.tv:8989"
+      },
+      "apiKey": {
+        "label": "API 密钥",
+        "description": "Sonarr 实例的 API 密钥。",
+        "placeholder": "sonarr-api-key"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Sonarr 实例的用户名。",
+        "placeholder": "admin",
+        "tooltip": "仅当你想检查数据库备份时才需要用户名和密码，因为备份无法通过 API 下载。"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Sonarr 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Readarr": {
+      "title": "Readarr",
+      "addInstance": "添加 Readarr 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Readarr 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Readarr 实例的 URL。",
+        "placeholder": "http://readarr.server.tv:8787"
+      },
+      "apiKey": {
+        "label": "API 密钥",
+        "description": "Readarr 实例的 API 密钥。",
+        "placeholder": "readarr-api-key"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Readarr 实例的用户名。",
+        "placeholder": "admin",
+        "tooltip": "仅当你想检查数据库备份时才需要用户名和密码，因为备份无法通过 API 下载。"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Readarr 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Lidarr": {
+      "title": "Lidarr",
+      "addInstance": "添加 Lidarr 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Lidarr 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Lidarr 实例的 URL。",
+        "placeholder": "http://lidarr.server.tv:8686"
+      },
+      "apiKey": {
+        "label": "API 密钥",
+        "description": "Lidarr 实例的 API 密钥。",
+        "placeholder": "lidarr-api-key"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Lidarr 实例的用户名。",
+        "placeholder": "admin",
+        "tooltip": "仅当你想检查数据库备份时才需要用户名和密码，因为备份无法通过 API 下载。"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Lidarr 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Prowlarr": {
+      "title": "Prowlarr",
+      "addInstance": "添加 Prowlarr 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Prowlarr 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Prowlarr 实例的 URL。",
+        "placeholder": "http://prowlarr.server.tv:9696"
+      },
+      "apiKey": {
+        "label": "API 密钥",
+        "description": "Prowlarr 实例的 API 密钥。",
+        "placeholder": "prowlarr-api-key"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Prowlarr 实例的用户名。",
+        "placeholder": "admin",
+        "tooltip": "仅当你想检查数据库备份时才需要用户名和密码，因为备份无法通过 API 下载。"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Prowlarr 实例的密码。",
+        "placeholder": "password"
+      }
+    }
+  },
+  "Downloaders": {
+    "Qbittorrent": {
+      "title": "Qbittorrent",
+      "addInstance": "添加 Qbittorrent 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Qbittorrent 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Qbittorrent 实例的 URL。",
+        "placeholder": "http://qbittorrent.server.tv:8080"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Qbittorrent 实例的用户名。",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Qbittorrent 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Rtorrent": {
+      "title": "Rtorrent",
+      "addInstance": "添加 Rtorrent 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Rtorrent 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Rtorrent 实例的 URL。",
+        "placeholder": "http://rtorrent.server.tv:8080"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Rtorrent 实例的用户名。",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Rtorrent 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Transmission": {
+      "title": "Transmission",
+      "addInstance": "添加 Transmission 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Transmission 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Transmission 实例的 URL。它<b>必须</b>包含 <code>/transmission/rpc</code> 后缀。",
+        "placeholder": "http://transmission.server.tv:9091"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "Transmission 实例的用户名。",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Transmission 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "Deluge": {
+      "title": "Deluge",
+      "addInstance": "添加 Deluge 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "Deluge 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "Deluge 实例的 URL。",
+        "placeholder": "http://deluge.server.tv:8112"
+      },
+      "password": {
+        "label": "密码",
+        "description": "Deluge 实例的密码。",
+        "placeholder": "password"
+      }
+    },
+    "SabNZB": {
+      "title": "SabNZB",
+      "addInstance": "添加 SabNZB 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "SabNZB 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "SabNZB 实例的 URL。",
+        "placeholder": "http://sabnzb.server.tv:8080"
+      },
+      "apiKey": {
+        "label": "API 密钥",
+        "description": "SabNZB 实例的 API 密钥。",
+        "placeholder": "sabnzb-api-key"
+      }
+    },
+    "NZBGet": {
+      "title": "NZBGet",
+      "addInstance": "添加 NZBGet 实例",
+      "name": {
+        "label": "实例名称",
+        "description": "NZBGet 实例的名称。",
+        "placeholder": "用于通知的自定义名称"
+      },
+      "url": {
+        "label": "URL",
+        "description": "NZBGet 实例的 URL。",
+        "placeholder": "http://nzbget.server.tv:6789"
+      },
+      "username": {
+        "label": "用户名",
+        "description": "NZBGet 实例的用户名。",
+        "placeholder": "admin"
+      },
+      "password": {
+        "label": "密码",
+        "description": "NZBGet 实例的密码。",
+        "placeholder": "password"
+      }
+    }
+  },
+  "SiteTunnel": {
+    "subText": "点击<span class=\"text-success\">Ping Tunnels</span>按钮，选择响应时间最快的隧道作为主隧道。选择另一个较快的隧道作为备份。",
+    "phrases": {
+      "PrimaryTunnel": "主隧道",
+      "BackupTunnel": "备份隧道",
+      "Ping": "Ping 隧道",
+      "Pinging": "Ping 中 ...",
+      "ActiveTunnel": "活动隧道：{tunnel}",
+      "TunnelStats": "隧道统计",
+      "Disconnects": "断开次数",
+      "ConnectionPoolSize": "连接池大小",
+      "Connecting": "连接中",
+      "Idle": "空闲",
+      "Running": "运行中",
+      "LastConnection": "上次连接",
+      "LastActiveCheck": "上次活动检查",
+      "SocketURLActive": "Socket URL（活动）",
+      "SocketURLInactive": "Socket URL（非活动）",
+      "SelectTunnel": "选择一个隧道",
+      "TunnelsSaved": "隧道已于 {timeDuration} 前保存！",
+      "TunnelStatsStale": "以上数据总是滞后的。要更新它，请点击页面标题中的更新后端链接。"
+    }
+  },
+  "FileWatcher": {
+    "title": "已监视的文件",
+    "description": "你必须启用 Log Watcher（日志监视器）功能并在 Notifiarr 网站上选择一个频道，此功能才能工作！",
+    "addInstance": "监视另一个文件",
+    "DeleteWatcher": "删除监视器",
+    "badges": {
+      "CurrentlyWatching": "正在监视",
+      "WatcherStopped": "监视器已停止"
+    },
+    "buttons": {
+      "StopWatcher": "停止监视器",
+      "StartWatcher": "启动监视器"
+    },
+    "titles": {
+      "RegularExpressionTester": "正则表达式测试器",
+      "Expression": "表达式",
+      "TestString": "测试字符串"
+    },
+    "path": {
+      "label": "文件路径",
+      "description": "要监视的文件的路径。建议使用绝对路径名。",
+      "placeholder": "/var/log/nginx/access.log",
+      "required": "路径为必填项",
+      "clientLog": "不能监视客户端自己的日志文件；那会形成循环。客户端错误已经作为 client_error_log 发送。"
+    },
+    "disabled": {
+      "label": "活动",
+      "description": "禁用此监视器。"
+    },
+    "regex": {
+      "label": "正则表达式",
+      "description": "用于匹配文件的正则表达式。",
+      "tooltip": "表达式会自动用通配符匹配器包装：<code>.*</code>，所以不要在表达式中使用 <code>^</code> 或 <code>$</code>。使用 <code>(?i)</code> 作为前缀可使正则表达式不区分大小写。",
+      "placeholder": "GET.*some/path",
+      "required": "正则表达式为必填项"
+    },
+    "skip": {
+      "label": "跳过表达式",
+      "description": "任何匹配此表达式的内容都会被忽略。",
+      "placeholder": "GET.*some/path"
+    },
+    "poll": {
+      "label": "文件轮询",
+      "description": "轮询文件的更改。",
+      "tooltip": "文件系统事件在某些系统上无法工作。如果没有匹配到任何内容，请开启此项以启用文件轮询间隔。"
+    },
+    "pipe": {
+      "label": "FIFO 管道",
+      "description": "路径是一个命名 FIFO 管道。",
+      "tooltip": "如果你监视的文件是命名 FIFO 管道，请启用此项。你很可能不需要它。"
+    },
+    "mustExist": {
+      "label": "文件必须存在",
+      "description": "文件缺失时跳过监视。",
+      "tooltip": "启用此项后，如果应用启动时文件不存在，将跳过对该文件的监视。监视不存在的文件仍有缺陷，可能完全无法工作。"
+    },
+    "logMatch": {
+      "label": "记录匹配项",
+      "description": "将匹配的行写入 notifiarr 日志。",
+      "tooltip": "启用此项会将匹配的行写入 notifiarr 日志。这有利于调试，但可能很嘈杂。"
+    }
+  },
+  "Commands": {
+    "title": "命令列表",
+    "addInstance": "创建命令",
+    "DeleteCommand": "删除命令",
+    "description": "命令由客户端（后端）执行。它们可以从此界面或聊天服务器触发。如果你修改了命令，必须先保存配置，然后才能从 Web UI 运行它。",
+    "Executions": "执行次数：{count}",
+    "Failures": "失败次数：{count}",
+    "LastExecution": "上次执行",
+    "neverExecuted": "从未执行",
+    "enterCommandArguments": "输入命令参数",
+    "commandRequiresArguments": "{count, plural, =1 {此命令需要一个参数。请在下方输入。} other {此命令需要 # 个参数。请在下方输入。}}",
+    "noOutput": "还没有输出。尝试执行命令，然后点击刷新。",
+    "refreshed": "{timeDuration} 前已刷新",
+    "regexMismatch": "参数与正则表达式不匹配。",
+    "name": {
+      "label": "名称",
+      "description": "命令的名称。会显示在日志和通知中。",
+      "placeholder": "用于通知的自定义名称"
+    },
+    "command": {
+      "label": "命令",
+      "description": "要运行的命令。",
+      "required": "命令为必填项",
+      "placeholder": "echo 'Hello, world!'",
+      "tooltip": "这是触发时将执行的命令。<br />点击双勾图标可立即运行该命令。运行完成后，点击刷新并显示输出来查看结果。<br /><br />勾选该框可将命令包装在 shell 中。在 Windows 上，这将使用 <code>cmd.exe</code> 运行命令；在其他操作系统上，将使用 <code>/bin/bash</code> 运行命令。这对于需要管道和重定向等 shell 功能的命令很有用。可以使用以下格式定义自定义位置参数：<code>({regex})</code> —— 即用大括号和圆括号包裹的正则表达式，例如 <code>({[a-z]})</code>。这些参数可以由运行命令的人填写；既可以在此 Web UI 中，也可以在聊天服务器上。如果命令有一个参数，则必须填写；如果有多个参数，则全部必须填写。<br /><br /> <h5>示例</h5>使用两个参数的命令：<code>/bin/ls ({-la|-l|-a|-al}) ({/tmp|/|/home|/lib})</code><br />上述命令允许用户对 <code>/tmp</code>、<code>/</code>、<code>/home</code> 或 <code>/lib</code> 执行任意组合的 <code>ls -la</code>。"
+    },
+    "notify": {
+      "label": "通知",
+      "description": "命令执行后发送通知。",
+      "tooltip": "接收包含命令输出的通知。"
+    },
+    "log": {
+      "label": "记录输出",
+      "description": "记录命令输出。",
+      "tooltip": "将命令输出记录到此客户端的应用日志。"
+    },
+    "timeout": {
+      "label": "最长运行时间",
+      "description": "命令在被终止前可以运行的时间。"
+    }
+  },
+  "scheduler": {
+    "title": "计划",
+    "daysOfWeek": "一周中的天数",
+    "daysOfMonth": "一月中的天数",
+    "frequency": "频率",
+    "selectAFrequency": "选择一个频率来创建计划。",
+    "AddATime": "添加时间",
+    "empty": "如果你想每天运行，请选择 Daily（每天）频率。",
+    "required": {
+      "daysOfWeek": "必须至少选择一周中的一天。",
+      "daysOfMonth": "必须至少选择一月中的一天。",
+      "atTimes": "必须至少选择一个运行时间。"
+    },
+    "ops": {
+      "noSchedule": "无计划",
+      "minutely": "每分钟",
+      "hourly": "每小时",
+      "daily": "每天",
+      "weekly": "每周",
+      "monthly": "每月"
+    },
+    "times": {
+      "noneSelected": "（未选择）",
+      "noDaysSelected": "（未选择天数）",
+      "everyMinute": "{count, plural, =1 {一次} other {# 次}}，每分钟的第 {times} 秒运行",
+      "everyHour": "{count, plural, =1 {一次} other {# 次}}，每小时的第 {times} 分:秒运行",
+      "everyDay": "{count, plural, =1 {一次} other {# 次}}，每天于 {times} 时刻运行",
+      "everyWeek": "{count, plural, =1 {一次} other {# 次}}，每周 {daysOfWeek} 于 {times} 时刻运行",
+      "everyMonth": "{count, plural, =1 {一次} other {# 次}}，每月 {daysOfMonth} 日于 {times} 时刻运行"
+    }
+  },
+  "Endpoints": {
+    "title": "中继 URL",
+    "addInstance": "添加中继 URL",
+    "DeleteEndpoint": "删除 URL",
+    "badge": {
+      "header": "{count, plural, =1 {1 个标头} other {# 个标头}}",
+      "query": "{count, plural, =1 {1 个查询参数} other {# 个查询参数}}",
+      "body": "{count, plural, =1 {1 个字符} other {# 个字符}}"
+    },
+    "name": {
+      "label": "名称",
+      "description": "中继 URL 的名称。",
+      "placeholder": "用于通知的自定义名称"
+    },
+    "template": {
+      "label": "负载模板",
+      "description": "将负载解析到此模板中。",
+      "placeholder": "pihole",
+      "tooltip": "网站使用该模板来确定如何将负载转换为聊天通知。可以在<a href=\"https://notifiarr.com/\" target=\"_blank\">网站</a>的 <code>Integrations: Endpoints</code> 下找到可用模板列表，或创建你自己的模板。",
+      "required": "模板为必填项。如果不确定输入什么，请输入 'test'。"
+    },
+    "timeout": {
+      "label": "请求超时",
+      "description": "等待 HTTP 请求完成的时间。"
+    },
+    "method": {
+      "label": "方法",
+      "description": "HTTP 请求"
+    },
+    "url": {
+      "label": "中继 URL",
+      "description": "将中继到网站的远程服务的 URL。",
+      "placeholder": "https://pihole.myhome.lan/api/stats"
+    },
+    "header": {
+      "label": "HTTP 标头",
+      "description": "HTTP 请求标头，每行 1 个。",
+      "placeholder": "Content-Type: application/json",
+      "tooltip": "HTTP 请求标头会原样发送到该 URL。格式必须为每行 <code>key: value</code>。空格和冒号是必需的。无效值会被忽略，多余的空格会被修剪。"
+    },
+    "query": {
+      "label": "查询参数",
+      "description": "要添加到 URL 的查询参数，每行 1 个。",
+      "placeholder": "apiKey=1234567890",
+      "tooltip": "查询参数会附加到 URL。格式必须为每行 <code>key=value</code>。无效值会被忽略，多余的空格会被修剪。不要在行首包含 <code>?</code> 字符或与号（<code>&</code>）。键和值会自动进行 URL 编码。"
+    },
+    "body": {
+      "label": "请求正文",
+      "description": "POST、PUT 和 PATCH 请求发送到该 URL 的正文。",
+      "placeholder": "{\"message\": \"Hello, world!\"}"
+    }
+  },
+  "metrics": {
+    "CountersReset": "此页面上的计数器会在应用退出时重置。应用通过 Prometheus 公开这些计数器。你可以抓取它们并使用<a href=\"https://grafana.com/grafana/dashboards/24776-notifiarr-client/\" target=\"_blank\">Notifiarr 客户端 Grafana 仪表板</a>将其可视化。",
+    "ApplicationUptime": "应用运行时间：&nbsp;<b>{timeDuration}</b>",
+    "logFiles": {
+      "title": "日志文件",
+      "description": "日志文件计数器。",
+      "empty": "未找到日志文件。"
+    },
+    "apiHits": {
+      "title": "API 请求",
+      "description": "传入的 API 请求计数器。",
+      "empty": "还没有 API 请求。"
+    },
+    "httpRequests": {
+      "title": "HTTP 请求",
+      "description": "传入的 HTTP 请求统计。这包括 websocket 隧道请求。",
+      "empty": "还没有 HTTP 请求。"
+    },
+    "website": {
+      "title": "网站请求",
+      "description": "发往 Notifiarr.com 的请求。",
+      "empty": "还没有网站请求。"
+    },
+    "fileWatcher": {
+      "title": "文件监视器",
+      "description": "文件监视器统计。",
+      "empty": "未配置文件监视器。"
+    },
+    "apps": {
+      "title": "应用请求",
+      "description": "应用请求统计。这些计数器不包括健康检查。",
+      "empty": "还没有应用请求。"
+    },
+    "timerEvents": {
+      "title": "已触发操作",
+      "description": "已执行的触发器、定时器和计划。",
+      "empty": "还没有已触发的操作。"
+    }
+  },
+  "monitoring": {
+    "ConfigureServices": "通过在各自配置页面上为已配置集成设置检查间隔，即可启用其健康检查。其中一些检查来自<go-to page=\"starrapps\">Starr 应用</go-to>页面、<go-to page=\"downloaders\">下载应用</go-to>页面或<go-to page=\"mediaapps\">媒体应用</go-to>页面。其余显示的健康检查可在<go-to page=\"services\">服务页面</go-to>上找到。",
+    "ChecksDisabled": "健康检查：已禁用",
+    "ChecksStopped": "健康检查：已暂停",
+    "EnableOnConfig": "在<go-to page=\"services\">服务</go-to>页面上启用健康检查。",
+    "StartChecks": "恢复健康检查",
+    "StopChecks": "暂停健康检查",
+    "stopFailed": "暂停健康检查失败。",
+    "startFailed": "恢复健康检查失败。",
+    "recheckFailed": "重新执行健康检查失败。",
+    "checkInitiated": "健康检查已启动。",
+    "nextRefresh": "{timeDuration} 后刷新。",
+    "refreshInterval": "刷新间隔",
+    "cardsView": "卡片视图",
+    "classicView": "经典视图",
+    "hideAllOutputs": "隐藏所有输出",
+    "showAllOutputs": "显示所有输出",
+    "check": {
+      "name": "服务名称",
+      "state": {
+        "short": "状态",
+        "title": "服务检查计数器"
+      },
+      "typeExpect": "类型/期望",
+      "last": {
+        "short": "上次",
+        "title": "上次检查：{timeDuration} 前",
+        "tooltip": "此服务上次被检查是在多久以前。",
+        "description": "服务上次检查时间"
+      },
+      "since": {
+        "short": "自",
+        "title": "状态持续时间：{timeDuration}",
+        "tooltip": "服务处于此状态的时间。",
+        "description": "服务处于此状态的起始时间"
+      },
+      "interval": {
+        "short": "间隔",
+        "title": "检查间隔",
+        "tooltip": "此服务的检查频率。"
+      },
+      "output": "上次检查输出"
+    }
+  },
+  "ServiceChecks": {
+    "title": "健康检查",
+    "DeleteCheck": "删除健康检查",
+    "addInstance": "创建健康检查",
+    "description": "使用此表单配置健康检查。不要在此处添加 starr、媒体、快照或下载器应用。请在它们各自的配置页面上为其设置检查间隔。查看<go-to page=\"ProcessList\">此处的运行进程列表</go-to>，在创建进程检查时可作参考。",
+    "processListLink": "在此查看运行进程列表。",
+    "timeout": {
+      "label": "检查超时",
+      "description": "等待服务检查完成的时间。"
+    },
+    "interval": {
+      "label": "检查间隔",
+      "description": "检查服务的频率。"
+    },
+    "name": {
+      "label": "检查名称",
+      "description": "被监控服务的唯一名称。",
+      "placeholder": "用于通知的自定义名称",
+      "tooltip": "被监控服务的名称。用于在通知中标识服务。每个服务必须有唯一的名称。"
+    },
+    "type": {
+      "label": "检查类型",
+      "description": "要执行的检查类型。",
+      "tooltip": "Process 检查类型允许你监控某个进程是否正在运行。HTTP URL 检查类型允许你监控某个 URL 的可达性。TCP Port 检查类型允许你监控某个 TCP 端口的连通性。两种 Ping 检查类型都允许监控某个 IP 或主机的可达性。",
+      "options": {
+        "process": "进程检查",
+        "http": "HTTP URL 检查",
+        "tcp": "TCP 端口可达性",
+        "ping": "UDP Ping 检查",
+        "icmp": "ICMP Ping 检查"
+      }
+    },
+    "url": {
+      "label": "URL",
+      "description": "被监控服务的 URL。",
+      "placeholder": "https://my.site"
+    },
+    "http": {
+      "headers": {
+        "label": "HTTP 标头",
+        "description": "HTTP 请求标头，每行 1 个。",
+        "placeholder": "Content-Type: application/json"
+      },
+      "codes": {
+        "label": "可接受的响应代码",
+        "description": "此处的任何代码都被视为可接受。如果服务返回其他代码，则会生成通知。",
+        "required": "至少需要一个预期响应代码。"
+      }
+    },
+    "tcp": {
+      "value": {
+        "label": "主机和端口",
+        "description": "输入 host:port 或 host:ip 来检查连通性。",
+        "placeholder": "127.0.0.1:22",
+        "tooltip": "通常建议使用 IP 地址。如果你还想测试 DNS，请使用主机名。格式为 <code>host:port</code>。不应有空格或多余字符。",
+        "required": "需要以冒号分隔的主机和端口。"
+      }
+    },
+    "ping": {
+      "value": {
+        "label": "主机或 IP",
+        "description": "输入主机或 IP 来检查可达性。",
+        "placeholder": "127.0.0.1",
+        "tooltip": "通常建议使用 IP 地址。如果你还想测试 DNS，请使用主机名。格式为 <code>host</code> 或 <code>10.11.12.13</code>。不应有空格或多余字符。要在 Linux 上允许 UDP 检查工作，你必须使用以下命令启用它们：<code>sudo sysctl -w net.ipv4.ping_group_range=\"0 2147483647\"</code>。要在 Linux 中允许 ICMP 检查，你必须使用以下命令为 notifiarr 二进制文件授予权限：<code>sudo setcap cap_net_raw=+ep /usr/bin/notifiarr</code>。在 Docker 中让两者都工作的最简单方法是启用特权模式，但也可以设置 capabilities。",
+        "required": "需要主机或 IP 地址。"
+      },
+      "count": {
+        "label": "数量",
+        "description": "要发送的数据包数量。",
+        "placeholder": "10",
+        "required": "数据包数量必须大于零。"
+      },
+      "minimum": {
+        "label": "最小值",
+        "description": "必须收到的最小数据包数量。",
+        "placeholder": "10",
+        "required": "最小数据包数量必须大于零。"
+      },
+      "interval": {
+        "label": "间隔",
+        "description": "数据包之间的间隔（毫秒）。",
+        "placeholder": "100"
+      }
+    },
+    "process": {
+      "value": {
+        "label": "进程匹配",
+        "description": "要检查的进程名称。",
+        "placeholder": "notifiarr",
+        "tooltip": "要检查的进程名称。这是进程在进程列表中显示的名称。所提供的值两端都会使用通配符字符串匹配，所以你的参数越具体，匹配效果越好。",
+        "required": "需要进程名称。"
+      },
+      "running": {
+        "label": "运行中",
+        "description": "进程正在运行时发送警报。",
+        "tooltip": "勾选此项后，如果发现进程正在运行，将触发不健康警报。如果你需要在进程启动时收到通知，请选择此选项。"
+      },
+      "restarts": {
+        "label": "重启",
+        "description": "进程重启后发送警报。",
+        "tooltip": "勾选此项后，如果发现进程已重启，将触发不健康警报。如果你需要在 PID 变化时收到通知，请选择此选项。"
+      },
+      "minimum": {
+        "label": "最小值",
+        "description": "必须与值匹配的最小运行进程数。",
+        "required": "最小进程数必须大于零。",
+        "tooltip": "如果你输入 2，那么当运行中的进程少于 2 个时，你将收到通知。用它来在运行进程过少时提醒你。"
+      },
+      "maximum": {
+        "label": "最大值",
+        "description": "可以与值匹配的最大运行进程数。",
+        "tooltip": "如果你输入 2，那么当运行中的进程超过 2 个时，你将收到通知。用它来在运行进程过多时提醒你。"
+      }
+    }
+  },
+  "Actions": {
+    "titles": {
+      "Triggers": "触发器",
+      "Timers": "定时器",
+      "Schedules": "计划",
+      "Trigger": "触发器",
+      "Timer": "定时器",
+      "SiteCrons": "网站定时器",
+      "Counter": "计数器",
+      "Interval": "间隔",
+      "Schedule": "计划",
+      "Type": "类型",
+      "When": "时间",
+      "Action": "操作",
+      "Never": "从不",
+      "Filter": "筛选器"
+    },
+    "descriptions": {
+      "Triggers": "这些操作没有定时器也没有计划。",
+      "Timers": "这些操作有定时器。",
+      "Schedules": "这些操作有计划。",
+      "SiteCrons": "这些操作由网站创建，用于卸载定时器跟踪。"
+    },
+    "triggers": {
+      "TrigPlexEmptyTrash": {
+        "label": "清空 Plex 回收站"
+      },
+      "TrigUploadFile": {
+        "label": "日志文件已上传到网站",
+        "button": "立即上传日志",
+        "success": "日志文件已上传到网站。",
+        "options": {
+          "choose": "选择要上传的文件。",
+          "app": "应用日志文件。",
+          "debug": "调试日志文件。",
+          "http": "HTTP 日志文件。"
+        }
+      },
+      "TrigPlexSessions": {
+        "label": "收集 Plex 会话",
+        "button": "立即收集会话",
+        "success": "Plex 会话已收集。"
+      },
+      "TrigPlexSessionsCheck": {
+        "label": "检查已结束的 Plex 会话"
+      },
+      "TrigDashboard": {
+        "label": "仪表板更新",
+        "button": "更新仪表板",
+        "success": "仪表板更新已启动。"
+      },
+      "TrigMDBListSync": {
+        "label": "MDB 列表同步",
+        "button": "同步 MDB 列表",
+        "success": "MDB 列表同步已启动。"
+      },
+      "TrigCollectionGaps": {
+        "label": "收藏缺失检查",
+        "button": "检查收藏缺失",
+        "success": "收藏缺失检查已启动。"
+      },
+      "TrigCFSyncLidarr": {
+        "label": "Lidarr 配置文件和格式同步",
+        "button": "同步所有 Lidarr 实例",
+        "success": "Lidarr 配置文件和格式同步已启动。"
+      },
+      "TrigCFSyncRadarr": {
+        "label": "Radarr 配置文件和格式同步",
+        "button": "同步所有 Radarr 实例",
+        "success": "Radarr 配置文件和格式同步已启动。"
+      },
+      "TrigCFSyncSonarr": {
+        "label": "Sonarr 配置文件和格式同步",
+        "button": "同步所有 Sonarr 实例",
+        "success": "Sonarr 配置文件和格式同步已启动。"
+      },
+      "TrigStop": {
+        "label": "客户端重新加载",
+        "button": "重新加载客户端"
+      },
+      "TrigSnapshot": {
+        "label": "快照收集",
+        "button": "更新快照",
+        "success": "快照收集已启动。"
+      },
+      "TrigProwlarrCorrupt": {
+        "label": "Prowlarr 数据库损坏",
+        "button": "检查 Prowlarr",
+        "success": "Prowlarr 数据库损坏检查已启动。"
+      },
+      "TrigLidarrCorrupt": {
+        "label": "Lidarr 数据库损坏",
+        "button": "检查 Lidarr",
+        "success": "Lidarr 数据库损坏检查已启动。"
+      },
+      "TrigRadarrCorrupt": {
+        "label": "Radarr 数据库损坏",
+        "button": "检查 Radarr",
+        "success": "Radarr 数据库损坏检查已启动。"
+      },
+      "TrigReadarrCorrupt": {
+        "label": "Readarr 数据库损坏",
+        "button": "检查 Readarr",
+        "success": "Readarr 数据库损坏检查已启动。"
+      },
+      "TrigSonarrCorrupt": {
+        "label": "Sonarr 数据库损坏",
+        "button": "检查 Sonarr",
+        "success": "Sonarr 数据库损坏检查已启动。"
+      },
+      "TrigProwlarrBackup": {
+        "label": "Prowlarr 数据库备份",
+        "button": "检查 Prowlarr",
+        "success": "Prowlarr 数据库备份检查已启动。"
+      },
+      "TrigLidarrBackup": {
+        "label": "Lidarr 数据库备份",
+        "button": "检查 Lidarr",
+        "success": "Lidarr 数据库备份检查已启动。"
+      },
+      "TrigRadarrBackup": {
+        "label": "Radarr 数据库备份",
+        "button": "检查 Radarr",
+        "success": "Radarr 数据库备份检查已启动。"
+      },
+      "TrigReadarrBackup": {
+        "label": "Readarr 数据库备份",
+        "button": "检查 Readarr",
+        "success": "Readarr 数据库备份检查已启动。"
+      },
+      "TrigSonarrBackup": {
+        "label": "Sonarr 数据库备份",
+        "button": "检查 Sonarr",
+        "success": "Sonarr 数据库备份检查已启动。"
+      },
+      "TrigUpCheck": {
+        "label": "客户端到网站的在线检查"
+      },
+      "TrigEndpointURL": {
+        "label": "已中继到网站的端点 URL：{name}",
+        "button": "运行端点",
+        "success": "端点 URL 中继已启动。"
+      },
+      "TrigCustomCommand": {
+        "label": "自定义命令：{name}",
+        "button": "运行命令",
+        "success": "自定义命令已启动。"
+      },
+      "TrigAutoUpdate": {
+        "label": "自动更新检查"
+      },
+      "TrigCFSyncLidarrInt": {
+        "label": "Lidarr 每个实例的自定义格式同步"
+      },
+      "TrigCFSyncRadarrInt": {
+        "label": "Radarr 每个实例的自定义格式同步"
+      },
+      "TrigCFSyncSonarrInt": {
+        "label": "Sonarr 每个实例的自定义格式同步"
+      },
+      "TrigCustomCronTimer": {
+        "label": "网站定时器：{name}",
+        "button": "立即运行定时器",
+        "success": "网站定时器已启动。"
+      },
+      "TrigDownloadingItems": {
+        "label": "正在下载 / 已完成的条目"
+      },
+      "TrigLidarrQueue": {
+        "label": "Lidarr 队列缓存器"
+      },
+      "TrigRadarrQueue": {
+        "label": "Radarr 队列缓存器"
+      },
+      "TrigReadarrQueue": {
+        "label": "Readarr 队列缓存器"
+      },
+      "TrigSonarrQueue": {
+        "label": "Sonarr 队列缓存器"
+      },
+      "TrigStuckItems": {
+        "label": "卡住条目检查",
+        "button": "检查卡住的条目",
+        "success": "卡住条目检查已启动。"
+      },
+      "TrigPollSite": {
+        "label": "网站轮询器"
+      }
+    }
+  },
+  "LogFiles": {
+    "titles": {
+      "Name": "文件名",
+      "Age": "年龄",
+      "Bytes": "字节",
+      "InUse": "使用中",
+      "Mode": "权限",
+      "Owner": "所有者",
+      "Path": "路径",
+      "Date": "日期",
+      "FileList": "文件列表",
+      "Details": "详情",
+      "FileContent": "文件内容",
+      "FollowingFile": "正在跟踪文件",
+      "LineCount": "行数",
+      "OpenFile": "打开文件 {fileName}",
+      "TailFile": "跟踪文件 {fileName}",
+      "Tailing": "跟踪中"
+    },
+    "button": {
+      "download": "下载",
+      "upload": "上传",
+      "delete": "删除",
+      "add": "添加",
+      "reload": "重新加载",
+      "tooltip": "<b>下载</b>按钮将文件下载到你的计算机。<b>上传</b>按钮将文件上传到 Notifiarr.com 服务器。只有管理员可以查看上传的文件。<b>删除</b>按钮从你的硬盘删除文件。使用中的文件无法删除。使用中意味着此应用当前正在向其写入日志条目。"
+    },
+    "Error": "加载日志文件出错：{error}",
+    "DeleteFile": "删除 {filePath}",
+    "deleteConfirm": "确定要删除此文件吗？此操作无法撤销。",
+    "deleteError": "删除日志文件出错：{error}",
+    "deleteSuccess": "日志文件已删除：{file}",
+    "uploadError": "上传日志文件出错：{error}",
+    "uploadSuccess": "正在上传日志文件：{file}",
+    "NoFileSelected": "未选择文件。",
+    "SelectFile": "选择一个文件查看其中的内容！",
+    "FilesInDirs": "{dirCount} 个目录中的 {fileCount} 个文件",
+    "ToggleLinesOrder": "切换行顺序",
+    "ToggleColors": "切换默认颜色",
+    "AddMoreLines": "添加更多行",
+    "Reload": "重新加载日志文件",
+    "Highlight": "高亮",
+    "ToggleLineWrap": "切换自动换行",
+    "FollowTooltip": "此列中的按钮会在文件写入时主动跟踪该文件。",
+    "Tooltip": "<ol><li>左侧第一个橙色按钮切换文件中行的顺序。默认按写入顺序降序排列。点击该按钮会反转文件，使其变为倒序。在跟踪正在写入的文件时这很有效。</li><li>第二个紫色按钮切换内置的行高亮颜色。有事情发生时它还会旋转。</li><li>数字输入框表示要加载或添加的行数。跟踪文件时，该数字限制显示的行数。</li><li>点击添加按钮会以现有行数作为偏移量，将相应行数添加到文件顶部。使用中的文件上添加按钮会被禁用，因为无法知道自上次更新以来写入了多少行。跟踪使用中的文件时，添加按钮会被指示器替代。</li><li>点击重新加载按钮会从文件末尾重新加载相应行数。</li><li>使用高亮输入框让特定文本突出显示。</li><li>最后一个按钮切换自动换行。</li></ol>"
+  },
+  "Nodal": {
+    "button": {
+      "refresh": "刷新页面数据",
+      "fullscreen": "切换全屏",
+      "raw": "切换原始数据"
+    },
+    "noResponse": "无响应数据。"
+  },
+  "ProcessList": {
+    "title": "运行进程列表",
+    "error": "加载进程列表出错：{error}",
+    "noData": "未返回进程列表。",
+    "footer": "找到 {count} 个进程。",
+    "button": {
+      "wrapOn": "开启自动换行",
+      "wrapOff": "关闭自动换行"
+    }
+  },
+  "ClientInfo": {
+    "title": "启动负载",
+    "error": "加载启动负载出错：{error}",
+    "noData": "未返回启动负载。",
+    "description": "这是客户端启动时从 Notifiarr.com 发送给它的负载。它包含客户端的配置和其他信息。"
+  },
+  "Integrations": {
+    "titles": {
+      "Size": "大小",
+      "DashboardAge": "仪表板年龄",
+      "CacheAge": "缓存年龄",
+      "StatusAge": "状态年龄",
+      "Version": "版本",
+      "Branch": "分支",
+      "BuildTime": "构建时间"
+    },
+    "DriveData": {
+      "title": "驱动器数据",
+      "driveInformation": {
+        "title": "驱动器信息"
+      },
+      "mdStatRaid": {
+        "title": "MDStat RAID"
+      },
+      "titles": {
+        "Drive": "驱动器",
+        "Temp": "温度",
+        "Health": "健康",
+        "Age": "年龄",
+        "Setting": "设置",
+        "Value": "值"
+      }
+    },
+    "Snapshot": {
+      "title": "原始快照数据",
+      "Age": "快照年龄",
+      "Data": "快照数据",
+      "Latest": "最新快照",
+      "System": "系统快照",
+      "titles": {
+        "CPUPercent": "CPU 百分比",
+        "MemoryFree": "可用内存",
+        "MemoryUsed": "已用内存",
+        "MemoryTotal": "总内存",
+        "UserCPUTime": "用户 CPU 时间",
+        "SystemCPUTime": "系统 CPU 时间",
+        "IdleCPUTime": "空闲 CPU 时间",
+        "NvidiaGPUs": "Nvidia GPU",
+        "MySQLServers": "MySQL 服务器",
+        "IPMISensors": "IPMI 传感器",
+        "Synology": "Synology",
+        "RaidConfigs": "RAID 配置",
+        "ZFSPools": "ZFS 池",
+        "Processes": "进程",
+        "DriveTemps": "驱动器温度",
+        "DriveHealth": "驱动器健康",
+        "DiskUsage": "磁盘使用",
+        "DiskQuotas": "磁盘配额",
+        "IOTop": "IO Top",
+        "IOStat": "IO Stat",
+        "IOStat2": "IO Stat 2"
+      }
+    },
+    "starrTitles": {
+      "QueueAge": "队列年龄",
+      "QueueSize": "队列大小",
+      "Elapsed": "已耗时",
+      "Shows": "剧集",
+      "Episodes": "单集",
+      "Movies": "电影",
+      "Books": "图书",
+      "Editions": "版本",
+      "Tracks": "音轨",
+      "Artists": "艺术家",
+      "OnDisk": "磁盘上",
+      "Missing": "缺失"
+    },
+    "downloadTitles": {
+      "Downloads": "下载",
+      "Incomplete": "未完成",
+      "Downloading": "下载中",
+      "Paused": "已暂停",
+      "TotalSize": "总大小",
+      "Errors": "错误",
+      "Downloaded": "已下载",
+      "Uploading": "上传中",
+      "Uploaded": "已上传",
+      "Seeding": "做种中",
+      "Month": "月",
+      "Week": "周",
+      "Day": "日"
+    },
+    "lidarrDashboard": {
+      "title": "原始 Lidarr 仪表板"
+    },
+    "radarrDashboard": {
+      "title": "原始 Radarr 仪表板"
+    },
+    "readarrDashboard": {
+      "title": "原始 Readarr 仪表板"
+    },
+    "sonarrDashboard": {
+      "title": "原始 Sonarr 仪表板"
+    },
+    "delugeDashboard": {
+      "title": "原始 Deluge 仪表板"
+    },
+    "nzbgetDashboard": {
+      "title": "原始 NZBGet 仪表板"
+    },
+    "qbitDashboard": {
+      "title": "原始 QBit 仪表板"
+    },
+    "rtorrentDashboard": {
+      "title": "原始 rTorrent 仪表板"
+    },
+    "transmissionDashboard": {
+      "title": "原始 Transmission 仪表板"
+    },
+    "sabnzbdDashboard": {
+      "title": "原始 SabNZBD 仪表板"
+    },
+    "sonarrQueue": {
+      "title": "原始 Sonarr 队列"
+    },
+    "radarrQueue": {
+      "title": "原始 Radarr 队列"
+    },
+    "readarrQueue": {
+      "title": "原始 Readarr 队列"
+    },
+    "lidarrQueue": {
+      "title": "原始 Lidarr 队列"
+    },
+    "prowlarrStatus": {
+      "title": "原始 Prowlarr 信息"
+    },
+    "radarrStatus": {
+      "title": "原始 Radarr 信息"
+    },
+    "readarrStatus": {
+      "title": "原始 Readarr 信息"
+    },
+    "sonarrStatus": {
+      "title": "原始 Sonarr 信息"
+    },
+    "lidarrStatus": {
+      "title": "原始 Lidarr 信息"
+    },
+    "tautulliStatus": {
+      "title": "原始 Tautulli 信息"
+    },
+    "tautulliUsers": {
+      "title": "Tautulli 用户"
+    },
+    "tautulliUsersJson": {
+      "title": "原始 Tautulli 用户"
+    },
+    "plexStatus": {
+      "title": "Plex Media Server 信息"
+    },
+    "plexSessions": {
+      "title": "当前 Plex Media Server 会话",
+      "footer": "显示当前 Plex 会话，而非缓存数据。缓存数据请查看原始 JSON 模态框。"
+    },
+    "plexSessionsJson": {
+      "title": "原始 Plex Media Server 会话"
+    },
+    "mediaTitles": {
+      "Country": "国家",
+      "PushNotifications": "推送通知",
+      "PlexPass": "Plex Pass",
+      "ServerOwner": "服务器所有者",
+      "Sessions": "会话",
+      "SessionsAge": "会话年龄",
+      "Users": "用户",
+      "User": "用户",
+      "PlexUsername": "Plex 用户名",
+      "CustomName": "自定义名称",
+      "Email": "邮箱",
+      "Session": "会话",
+      "Complete": "完成",
+      "Encoding": "编码",
+      "Title": "标题"
+    },
+    "phrases": {
+      "NoCachedSessions": "没有缓存的会话。",
+      "NoPlexData": "没有 Plex 集成数据。",
+      "StateForTime": "{state}，已持续 {timeDuration}"
+    }
+  },
+  "Languages": {
+    "menuTitle": "语言帮助",
+    "title": "本地化支持",
+    "body": "此应用提供多种语言。你可以点击个人资料菜单中的语言选择器来更改语言。有些语言没有活跃的翻译人员，因此部分翻译可能不完整。如果你有兴趣帮助翻译此应用，请<a href=\"https://notifiarr.com/discord\" target=\"_blank\">访问我们的 Discord</a>。进入 <code>#role-request</code> 频道并输入 <code>!roleTranslate</code>。这将授予你访问 <code>#translate</code> 频道的权限。请加入并表达你的意愿。"
+  },
+  "ApiDocs": {
+    "Choose": "选择一个要查看的 API",
+    "Contrast": "如发现此页面有任何对比度问题，请报告。",
+    "BasePath": "<b>基础路径</b>：<code>{basePath}</code>",
+    "api": {
+      "title": "私有 API（{basePath}）",
+      "body": "这是 Notifiarr.com 网站的 API 规范。网站使用此 API 与客户端交互。"
+    },
+    "ui": {
+      "title": "Web UI（{basePath}）",
+      "body": "此规范用于 Notifiarr 客户端前端与后端交互的方法。你现在使用的就是前端。"
+    }
+  },
+  "TestAllInstances": {
+    "title": "测试所有实例",
+    "Instance": "实例",
+    "Message": "消息",
+    "Status": "状态",
+    "Updated": "<b>测试更新时间</b>：<code>{timeDuration}</code>",
+    "TestElapsed": "<b>测试耗时</b>：<code>{timeDuration}</code>",
+    "Concurrency": "<b>并发数</b>：<code>{workerCount}</code>",
+    "Tested": "<b>已测试实例</b>：<code>{testCount}</code>",
+    "clickRefresh": "点击右上角的刷新按钮可再次测试。",
+    "footer": "使用此故障排查工具验证所有实例是否可达且配置正确。超时硬编码为 15 秒，接近网站等待响应的时间。"
+  },
+  "FileBrowser": {
+    "tooltip": {
+      "Go": "<code>cd {path}</code><br />切换到所提供的路径。",
+      "SelectPath": "选择路径：<code>{path}</code>",
+      "Up": "<code>cd ..</code><br />切换到父文件夹。"
+    },
+    "FilterFiles": "筛选文件",
+    "CreateFileIn": "文件将创建于路径：<code>{path}</code>",
+    "CreateFolderIn": "文件夹将创建于路径：<code>{path}</code>",
+    "Files": "文件：{count}",
+    "Folders": "文件夹：{count}",
+    "FilesFiltered": "文件：{count}，筛选后：{filtered}",
+    "FoldersFiltered": "文件夹：{count}，筛选后：{filtered}",
+    "Selected": "已选择：<code>{path}</code>",
+    "Created": "已创建：{path}",
+    "Creating": "创建中...",
+    "InvalidPath": "提供的路径无效。请勿包含斜杠（<code>/</code> 或 <code>\\</code>）。",
+    "FilterFilesDesc": "使用文件筛选器快速搜索显示的文件列表。在文件很多的文件夹中很有用。使用 <code>Menu</code> 按钮创建新文件夹或文件。要选择不存在的文件，请在 <code>Path</code> 栏中输入它并点击绿色勾选按钮。或者，使用 <code>Create File</code> 菜单项创建它。"
+  },
+  "Plex": {
+    "URLNotConfigured": "未配置 Plex URL。<go-to page=\"mediaApps\" subPage=\"plex\">请在此处配置</go-to>。",
+    "TokenNotConfigured": "未配置 Plex 令牌。<go-to page=\"mediaApps\" subPage=\"plex\">请在此处配置</go-to>。",
+    "Disabled": "Plex 已被管理性禁用。<go-to page=\"mediaApps\" subPage=\"plex\">请在此处启用</go-to>。",
+    "WaitingForWebhooks": "正在等待 Plex Webhook...",
+    "WebhooksReceived": "收到的 Webhook：<code>{count}</code>",
+    "NoStatus": "没有缓存的 Plex Media Server 信息。这可能意味着 Plex URL 或令牌无效，或超时时间太短。请查看<go-to page=\"logFiles\">应用日志</go-to>了解更多信息。",
+    "WebhookNote": "<p>你是否已经<a href=\"https://notifiarr.wiki/pages/client/afterInstall/#plex-webhook\" target=\"_blank\">配置了 Plex Webhook</a>？</p><p>如果你暂停和播放节目时 Webhook 计数器没有增加，请尝试重启 Plex Media Server。如果仍无效，请检查<go-to page=\"logFiles\">HTTP 日志</go-to>中的无效请求。如果你看不到任何内容，可能意味着你在 Plex 中配置的 Webhook URL 有误。它应该类似这样：<spoiler-toggle><code>{webhookUrl}</code></spoiler-toggle>，但这可能不准确，取决于你的服务器配置。</p> 有些网络提供商会阻止对 <code>{urlbase}plex</code> URI 的访问，因此此应用也接受 <code>{urlbase}</code> URI 和 <code>{urlbase}api/plex/post</code> 上的 Plex Webhook。我们提供多种方式以确保通知稳定。",
+    "WebsiteSettings": "网站设置",
+    "AccountMap": "账户映射",
+    "ActivityDelay": "活动延迟",
+    "WebhookCoolDown": "Webhook 冷却",
+    "SessionsInterval": "会话间隔",
+    "MoviesFinished": "电影已完成",
+    "SeriesFinished": "剧集已完成",
+    "NoActivity": "无活动"
+  }
+}
