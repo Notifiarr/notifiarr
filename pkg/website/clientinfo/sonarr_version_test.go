@@ -5,37 +5,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
-	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/stretchr/testify/require"
 	"golift.io/cnfg"
 	"golift.io/starr"
 	"golift.io/starr/sonarr"
 )
-
-type nopLog struct{}
-
-func (nopLog) Trace(string, ...any) string          { return "id" }
-func (nopLog) Print(string, ...any)                 {}
-func (nopLog) Printf(string, string, ...any)        {}
-func (nopLog) Error(string, ...any)                 {}
-func (nopLog) Errorf(string, string, ...any)        {}
-func (nopLog) ErrorfNoShare(string, string, ...any) {}
-func (nopLog) Debug(string, ...any)                 {}
-func (nopLog) Debugf(string, string, ...any)        {}
-func (nopLog) DebugEnabled() bool                   { return false }
-func (nopLog) DebugLogPath() string                 { return "" }
-func (nopLog) CapturePanic()                        {}
-
-func TestMain(m *testing.M) {
-	mnd.Log = nopLog{}
-	os.Exit(m.Run())
-}
 
 func TestSonarrVersionOnCheckIn(t *testing.T) {
 	t.Parallel()
