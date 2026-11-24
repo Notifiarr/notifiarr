@@ -1452,6 +1452,7 @@ export interface Profile {
  */
 export interface Config extends LogConfig, AppsConfig {
   hostId: string;
+  clientName: string;
   uiPassword: string;
   bindAddr: string;
   noCompress: boolean;

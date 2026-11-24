@@ -66,7 +66,7 @@ func (s *server) createFileUpload(file *UploadFile) (*bytes.Buffer, string, erro
 	if host := s.hostInfoNoError(); host != nil {
 		// Since we can't send the normal hostInfo json payload,
 		// we have to shove some things into the form fields.
-		if err := writer.WriteField("hostname", host.Hostname); err != nil {
+		if err := writer.WriteField("hostname", s.clientHostname(host.Hostname)); err != nil {
 			return nil, "", fmt.Errorf("adding variable to form buffer: %w", err)
 		}
 

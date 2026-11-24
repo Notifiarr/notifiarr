@@ -50,6 +50,7 @@ const (
 // Config represents the data in our config file.
 type Config struct {
 	HostID     string                   `json:"hostId"      toml:"host_id"       xml:"host_id"       yaml:"hostId"`
+	ClientName string                   `json:"clientName"  toml:"client_name"   xml:"client_name"   yaml:"clientName"`
 	UIPassword CryptPass                `json:"uiPassword"  toml:"ui_password"   xml:"ui_password"   yaml:"uiPassword"`
 	BindAddr   string                   `json:"bindAddr"    toml:"bind_addr"     xml:"bind_addr"     yaml:"bindAddr"`
 	NoCompress bool                     `json:"noCompress"  toml:"no_compress"   xml:"no_compress"   yaml:"noCompress"`
@@ -189,6 +190,7 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 		Timeout:    c.Timeout,
 		Retries:    c.Retries,
 		HostID:     c.HostID,
+		ClientName: c.ClientName,
 		BindAddr:   c.BindAddr,
 		NoCompress: c.NoCompress,
 	})
@@ -199,6 +201,8 @@ func (c *Config) Setup(ctx context.Context, flag *Flags) (*SetupResult, error) {
 }
 
 func (c *Config) fixConfig() {
+	c.ClientName = strings.TrimSpace(c.ClientName)
+
 	if c.Retries < 0 {
 		c.Retries = 0
 	} else if c.Retries == 0 {
@@ -333,6 +337,8 @@ func (c *Config) Write(ctx context.Context, file string, encode bool) (string, e
 		c.HostID, _ = host.HostIDWithContext(ctx)
 	}
 
+	c.setDefaultClientName(ctx)
+
 	var writer io.Writer = newFile
 
 	if encode && os.Getenv("DN_ENCODE_CONFIG_FILE") != mnd.False {
@@ -352,4 +358,23 @@ func (c *Config) Write(ctx context.Context, file string, encode bool) (string, e
 	}
 
 	return file, nil
+}
+
+// setDefaultClientName stores the system hostname when the client name is unset.
+// Example config generation leaves it empty so the template keeps the commented sample.
+func (c *Config) setDefaultClientName(ctx context.Context) {
+	c.ClientName = strings.TrimSpace(c.ClientName)
+	if c.ClientName != "" || ForceAllTmpl {
+		return
+	}
+
+	info, err := host.InfoWithContext(ctx)
+	if err == nil {
+		if name := website.CleanHostname(info); name != "" {
+			c.ClientName = name
+			return
+		}
+	}
+
+	c.ClientName, _ = os.Hostname()
 }

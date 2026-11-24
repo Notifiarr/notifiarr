@@ -44,6 +44,7 @@ type Config struct {
 	Retries    int
 	Timeout    cnfg.Duration
 	HostID     string
+	ClientName string
 	BindAddr   string
 	NoCompress bool
 }

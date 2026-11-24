@@ -1459,6 +1459,9 @@
                     "bindAddr": {
                         "type": "string"
                     },
+                    "clientName": {
+                        "type": "string"
+                    },
                     "commands": {
                         "items": {
                             "$ref": "#/components/schemas/commands.Command"
