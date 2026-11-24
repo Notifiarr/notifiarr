@@ -164,10 +164,7 @@ func (s *server) sendPayload(ctx context.Context, uri string, payload any, log b
 	if err == nil {
 		var torn map[string]any
 		if err := json.Unmarshal(data, &torn); err == nil {
-			if torn["host"], err = GetHostInfo(ctx); err != nil {
-				mnd.Log.Errorf(mnd.GetID(ctx), "Host Info Unknown: %v", err)
-			}
-
+			torn["host"] = s.payloadHost(ctx)
 			torn["private"] = private.Info()
 			torn["requestId"] = mnd.GetID(ctx)
 			payload = torn

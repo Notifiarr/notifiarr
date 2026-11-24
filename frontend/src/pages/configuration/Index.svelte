@@ -84,6 +84,11 @@
     envVar="HOST_ID"
     bind:value={config.hostId}
     original={$profile.config.hostId} />
+  <Input
+    id="config.clientName"
+    envVar="CLIENT_NAME"
+    bind:value={config.clientName}
+    original={$profile.config.clientName} />
 
   <!-- Network Section -->
   <Network bind:config original={$profile.config} />
