@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-  import { CardBody } from '@sveltestrap/sveltestrap'
+  import { CardBody, Col, Row } from '@sveltestrap/sveltestrap'
   import { profile } from '../../api/profile.svelte'
   import Input from '../../includes/Input.svelte'
   import { _ } from '../../includes/Translate.svelte'
@@ -79,16 +79,22 @@
     bind:value={extraKeys}
     {rows}
     original={$profile.config.extraKeys?.join('\n') ?? ''} />
-  <Input
-    id="config.hostId"
-    envVar="HOST_ID"
-    bind:value={config.hostId}
-    original={$profile.config.hostId} />
-  <Input
-    id="config.clientName"
-    envVar="CLIENT_NAME"
-    bind:value={config.clientName}
-    original={$profile.config.clientName} />
+  <Row>
+    <Col md={6}>
+      <Input
+        id="config.hostId"
+        envVar="HOST_ID"
+        bind:value={config.hostId}
+        original={$profile.config.hostId} />
+    </Col>
+    <Col md={6}>
+      <Input
+        id="config.clientName"
+        envVar="CLIENT_NAME"
+        bind:value={config.clientName}
+        original={$profile.config.clientName} />
+    </Col>
+  </Row>
 
   <!-- Network Section -->
   <Network bind:config original={$profile.config} />

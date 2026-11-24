@@ -388,7 +388,7 @@
     },
     "clientName": {
       "label": "Client Name",
-      "description": "Name sent to Notifiarr.com instead of the system hostname. An empty value uses the system hostname and is saved the next time the config file is written.",
+      "description": "Name sent to Notifiarr.com instead of the system hostname. Changing this value renames the client on the website.",
       "tooltip": "Saving a client name keeps the same name when the system hostname changes, such as when a Docker container is recreated."
     },
     "serial": {
