@@ -19,7 +19,6 @@
   import type { ChildProps } from '../../includes/Instances.svelte'
   import Input from '../../includes/Input.svelte'
   import CheckedInput from '../../includes/CheckedInput.svelte'
-  import { onMount } from 'svelte'
 
   let {
     form = $bindable(),
@@ -41,25 +40,12 @@
   let pingCheck = $state(setData(form?.expect ?? ''))
   export const reset = () => (pingCheck = setData(form?.expect ?? ''))
 
-  const updateExpect = (id: string, value: any) => {
-    validate?.(app.id + '.ping.count', pingCheck.count)
-    validate?.(app.id + '.ping.minimum', pingCheck.minimum)
-    validate?.(app.id + '.ping.interval', pingCheck.interval)
-    form.expect = `${pingCheck.count || 1}:${pingCheck.minimum || 1}:${pingCheck.interval || 10}`
-
-    return id ? (validate?.(id, value) ?? '') : ''
-  }
-
-  const resetValidators = () => {
-    validate?.(app.id + '.value', 'this.is.valid')
-    validate?.(app.id + '.ping.count', 1)
-    validate?.(app.id + '.ping.minimum', 1)
-    validate?.(app.id + '.ping.interval', 10)
-  }
-
-  onMount(() => {
-    updateExpect('', '')
-    return () => resetValidators()
+  // Input calls validate from `$derived`. Writing form.expect there throws
+  // state_unsafe_mutation, so persist the packet string from an effect.
+  $effect(() => {
+    if (!form) return
+    const next = `${pingCheck.count || 1}:${pingCheck.minimum || 1}:${pingCheck.interval || 10}`
+    if (form.expect !== next) form.expect = next
   })
 </script>
 
@@ -86,7 +72,7 @@
     id={app.id + '.ping.count'}
     bind:value={pingCheck.count}
     original={originalPing.count}
-    validate={updateExpect} />
+    {validate} />
 </Col>
 
 <Col md={4}>
@@ -97,7 +83,7 @@
     id={app.id + '.ping.minimum'}
     bind:value={pingCheck.minimum}
     original={originalPing.minimum}
-    validate={updateExpect} />
+    {validate} />
 </Col>
 
 <Col md={4}>
@@ -111,5 +97,5 @@
       name: $_('words.clock.short.ms', { values: { milliseconds: ms } }),
       value: ms,
     }))}
-    validate={updateExpect} />
+    {validate} />
 </Col>

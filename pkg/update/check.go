@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"runtime"
 	"strings"
@@ -25,14 +26,37 @@ var OSsuffixMap = map[string]string{ //nolint:gochecknoglobals
 
 // Custom errors.
 var (
-	ErrNoFile = errors.New("no downloadable file found in release")
+	ErrNoFile       = errors.New("no downloadable file found in release")
+	ErrBadStatus    = errors.New("unexpected http status")
+	ErrBodyTooLarge = errors.New("response body too large")
 )
 
 // LatestGH is where we find the latest release.
 const LatestGH = "https://api.github.com/repos/%s/releases/latest"
 
-// GitHub API and JSON unmarshal timeout.
-const timeout = 10 * time.Second
+const (
+	// timeout is the per-attempt budget for a GitHub/unstable version check.
+	timeout = 10 * time.Second
+	// versionCheckAttempts is 1 try plus retries for Cloudflare 5xx blips.
+	versionCheckAttempts = 3
+)
+
+// versionCheckRetry is the pause between version-check attempts.
+var versionCheckRetry = time.Second
+
+// httpStatusError is an HTTP status that was not 200.
+type httpStatusError struct {
+	URI    string
+	Status int
+}
+
+func (e *httpStatusError) Error() string {
+	return fmt.Sprintf("%s: %s: %d", ErrBadStatus, e.URI, e.Status)
+}
+
+func (e *httpStatusError) Unwrap() error {
+	return ErrBadStatus
+}
 
 // Update contains running Version, Current version and Download URL for Current version.
 // Outdate is true if the running version is older than the current version.
@@ -57,26 +81,138 @@ func CheckGitHub(ctx context.Context, userRepo string, version string) (*Update,
 
 // GetRelease returns a GitHub release. See Check for an example on how to use it.
 func GetRelease(ctx context.Context, uri string) (*GitHubReleasesLatest, error) {
+	var release GitHubReleasesLatest
+	if err := doVersionCheck(ctx, uri, &release, githubJSONLimit, nil); err != nil {
+		return nil, err
+	}
+
+	return &release, nil
+}
+
+const (
+	unstableJSONLimit = 1024
+	githubJSONLimit   = 1024 * 1024
+	maxLogBody        = 4 * 1024
+)
+
+func decodeJSONBody(ctx context.Context, resp *http.Response, uri string, dest any, maxBody int) error {
+	readLimit := max(maxBody, maxLogBody)
+
+	body, err := io.ReadAll(io.LimitReader(resp.Body, int64(readLimit)+1))
+	if err != nil {
+		return fmt.Errorf("reading %s response: %w", uri, err)
+	}
+
+	// Cloudflare error pages are several KB; the sidecar cap only applies to 200 JSON.
+	if resp.StatusCode != http.StatusOK {
+		logUpdateBody(ctx, resp, uri, body, nil)
+		return &httpStatusError{URI: uri, Status: resp.StatusCode}
+	}
+
+	if len(body) > maxBody {
+		logUpdateBody(ctx, resp, uri, body, ErrBodyTooLarge)
+		return fmt.Errorf("%w: %s (%d bytes)", ErrBodyTooLarge, uri, len(body))
+	}
+
+	if err = json.Unmarshal(body, dest); err != nil {
+		logUpdateBody(ctx, resp, uri, body, err)
+		return fmt.Errorf("decoding %s response: %w", uri, err)
+	}
+
+	return nil
+}
+
+func logUpdateBody(ctx context.Context, resp *http.Response, uri string, body []byte, decodeErr error) {
+	if mnd.Log == nil {
+		return
+	}
+
+	logged := body
+	if len(logged) > maxLogBody {
+		logged = logged[:maxLogBody]
+	}
+
+	if decodeErr != nil {
+		mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] decoding %s: status %d type %q body %q: %v",
+			uri, resp.StatusCode, resp.Header.Get("Content-Type"), logged, decodeErr)
+		return
+	}
+
+	mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] %s: status %d type %q body %q",
+		uri, resp.StatusCode, resp.Header.Get("Content-Type"), logged)
+}
+
+func doVersionCheck(ctx context.Context, uri string, dest any, maxBody int, after func(*http.Response)) error {
+	var lastErr error
+
+	for attempt := 1; attempt <= versionCheckAttempts; attempt++ {
+		err := doVersionCheckOnce(ctx, uri, dest, maxBody, after)
+		if err == nil {
+			return nil
+		}
+
+		lastErr = err
+		if attempt == versionCheckAttempts || !retryableVersionCheck(err) {
+			return err
+		}
+
+		if mnd.Log != nil {
+			mnd.Log.Errorf(mnd.GetID(ctx), "[UPDATE] [%d/%d] version check failed, retrying in %s: %v",
+				attempt, versionCheckAttempts, versionCheckRetry, err)
+		}
+
+		timer := time.NewTimer(versionCheckRetry)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return fmt.Errorf("version check: %w", ctx.Err())
+		case <-timer.C:
+		}
+	}
+
+	return lastErr
+}
+
+func doVersionCheckOnce(ctx context.Context, uri string, dest any, maxBody int, after func(*http.Response)) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, uri, nil)
 	if err != nil {
-		return nil, fmt.Errorf("requesting github: %w", err)
+		return fmt.Errorf("requesting %s: %w", uri, err)
 	}
 
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("querying github: %w", err)
+		return fmt.Errorf("querying %s: %w", uri, err)
 	}
 	defer resp.Body.Close()
 
-	var release GitHubReleasesLatest
-	if err = json.NewDecoder(resp.Body).Decode(&release); err != nil {
-		return nil, fmt.Errorf("decoding github response: %w", err)
+	if err = decodeJSONBody(ctx, resp, uri, dest, maxBody); err != nil {
+		return err
 	}
 
-	return &release, nil
+	if after != nil {
+		after(resp)
+	}
+
+	return nil
+}
+
+func retryableVersionCheck(err error) bool {
+	switch {
+	case err == nil, errors.Is(err, context.Canceled), errors.Is(err, ErrBodyTooLarge):
+		return false
+	}
+
+	if statusErr, ok := errors.AsType[*httpStatusError](err); ok {
+		return statusErr.Status >= http.StatusInternalServerError ||
+			statusErr.Status == http.StatusTooManyRequests ||
+			statusErr.Status == http.StatusRequestTimeout
+	}
+
+	// Transport errors, per-attempt timeouts, and Cloudflare 200 error pages.
+	return true
 }
 
 // FillUpdate compares a current version with the latest GitHub release.

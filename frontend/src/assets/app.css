@@ -232,6 +232,8 @@ input[type='checkbox'] {
   --list-background: var(--bs-secondary-bg);
   --list-border: var(--bs-border-width) solid var(--bs-border-color);
   --list-border-radius: var(--bs-border-radius);
+  /* Above Bootstrap .input-group .btn (z-index 2, 5 when focused). */
+  --list-z-index: 6;
   --border-focused: 3px solid #3cd2a5;
   --border-hover: var(--bs-border-width) solid var(--bs-border-color);
   --list-shadow: 0 0 5px #2fa582;

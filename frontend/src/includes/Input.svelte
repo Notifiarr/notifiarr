@@ -160,10 +160,7 @@
         { value: '10m0s', name: '10 ' + $_('words.select-option.minutes') },
       ]
       if (!noDisable) {
-        opts.unshift({
-          value: '-1s',
-          name: $_('words.select-option.InstanceDisabled'),
-        })
+        opts.unshift({ value: '-1s', name: $_('words.select-option.InstanceDisabled') })
       }
       return opts
     }

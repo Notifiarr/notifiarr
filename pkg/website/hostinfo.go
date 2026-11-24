@@ -34,7 +34,7 @@ func (s *server) hostInfoNoError() *host.InfoStat {
 }
 
 // GetHostInfo attempts to make a unique machine identifier...
-func GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
+func GetHostInfo(ctx context.Context) (*host.InfoStat, error) {
 	if site.hostInfo != nil {
 		return site.hostInfoNoError(), nil
 	}
@@ -59,16 +59,8 @@ func GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
 		hostInfo.PlatformFamily = "Docker"
 	}
 
-	const (
-		trueNasJunkLen   = 17
-		trueNasJunkParts = 2
-	)
 	// TrueNAS adds junk to the hostname.
-	if mnd.IsDocker && strings.HasSuffix(hostInfo.KernelVersion, "truenas") && len(hostInfo.Hostname) > trueNasJunkLen {
-		if splitHost := strings.Split(hostInfo.Hostname, "-"); len(splitHost) > trueNasJunkParts {
-			hostInfo.Hostname = strings.Join(splitHost[:len(splitHost)-trueNasJunkParts], "-")
-		}
-	}
+	hostInfo.Hostname = CleanHostname(hostInfo)
 
 	if hid := site.config.HostID; hid != "" {
 		hostInfo.HostID = hid
@@ -78,4 +70,54 @@ func GetHostInfo(ctx context.Context) (*host.InfoStat, error) { //nolint:cyclop
 	site.hostInfo = hostInfo
 
 	return site.hostInfoNoError(), nil // return a copy.
+}
+
+const (
+	trueNasJunkLen   = 17
+	trueNasJunkParts = 2
+)
+
+// CleanHostname returns the system hostname reported when no client name is configured.
+// TrueNAS Docker hosts append a random suffix; that suffix is removed.
+func CleanHostname(info *host.InfoStat) string {
+	if info == nil {
+		return ""
+	}
+
+	hostname := info.Hostname
+	if mnd.IsDocker && strings.HasSuffix(info.KernelVersion, "truenas") && len(hostname) > trueNasJunkLen {
+		if splitHost := strings.Split(hostname, "-"); len(splitHost) > trueNasJunkParts {
+			return strings.Join(splitHost[:len(splitHost)-trueNasJunkParts], "-")
+		}
+	}
+
+	return hostname
+}
+
+// payloadHost is the host object included in payloads sent to Notifiarr.com.
+// ClientName replaces the system hostname so a container recreate does not rename the client.
+func (s *server) payloadHost(ctx context.Context) *host.InfoStat {
+	info, err := GetHostInfo(ctx)
+	if err != nil {
+		mnd.Log.Errorf(mnd.GetID(ctx), "Host Info Unknown: %v", err)
+		return info
+	}
+
+	if info != nil {
+		info.Hostname = s.clientHostname(info.Hostname)
+	}
+
+	return info
+}
+
+func (s *server) clientHostname(system string) string {
+	if s == nil || s.config == nil {
+		return system
+	}
+
+	if name := strings.TrimSpace(s.config.ClientName); name != "" {
+		return name
+	}
+
+	return system
 }

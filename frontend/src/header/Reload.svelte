@@ -51,7 +51,13 @@
 </script>
 
 <a href="#reload" onclick={e => (e.preventDefault(), (isOpen = true))} title="reload">
-  <Fa i={ArrowClockwise} weight="bold" c1="#33A000" d1="#3cd2a5" class="me-2" spin={isOpen} />
+  <Fa
+    i={ArrowClockwise}
+    weight="bold"
+    c1="#33A000"
+    d1="#3cd2a5"
+    class="me-2"
+    spin={isOpen} />
 </a>
 
 <Nodal bind:isOpen title="phrases.ConfirmReload" follow={reset} disabled={reloading} esc>

@@ -4,10 +4,7 @@
   import { profile } from '../../api/profile.svelte'
   import T from '../../includes/Translate.svelte'
 
-  export const page = {
-    type: 'modal' as const,
-    id: 'ClientInfo',
-  }
+  export const page = { type: 'modal' as const, id: 'ClientInfo' }
 </script>
 
 <script lang="ts">

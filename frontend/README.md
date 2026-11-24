@@ -1,3 +1,1 @@
- # Notifiarr Client Frontend
-
- 
+# Notifiarr Client Frontend

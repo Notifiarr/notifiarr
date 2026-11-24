@@ -4,6 +4,7 @@
   import { theme as thm } from '../../includes/theme.svelte'
   import T from '../../includes/Translate.svelte'
   import type { TriggerInfo } from '../../api/notifiarrConfig'
+  import { present } from '../../includes/util'
 
   type Props = { row: TriggerInfo }
   const { row }: Props = $props()
@@ -14,7 +15,8 @@
 <Popover target={id + 'label'} trigger="hover" theme={$thm}>
   <code>{row.key}</code><br />
   {#if row.key == 'TrigCustomCronTimer'}
-    {$profile.siteCrons?.find(c => row.name.endsWith("'" + c.name + "'"))?.description}
+    {present($profile.siteCrons).find(c => row.name.endsWith("'" + c.name + "'"))
+      ?.description}
   {:else}
     {row.name}
   {/if}

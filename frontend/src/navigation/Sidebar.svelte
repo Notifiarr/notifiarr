@@ -16,7 +16,11 @@
   )
 </script>
 
-<div class="sidebar-card-wrapper" class:mobile={isMobile} transition:slyde={slide} {style}>
+<div
+  class="sidebar-card-wrapper"
+  class:mobile={isMobile}
+  transition:slyde={slide}
+  {style}>
   <Card body class="sidebar-card pb-2" theme={$theme}>
     <div class="sidebar-scroll">
       <Section title="Settings" pages={settings} />
@@ -110,5 +114,4 @@
     border-radius: 8px;
     color: ivory !important;
   }
-
 </style>

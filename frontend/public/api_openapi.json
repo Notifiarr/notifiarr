@@ -1156,6 +1156,13 @@
             },
             "clientinfo.AppConfigs": {
                 "properties": {
+                    "deluge": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
                     "lidarr": {
                         "items": {
                             "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
@@ -1163,7 +1170,24 @@
                         "type": "array",
                         "uniqueItems": false
                     },
+                    "nzbget": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "plex": {
+                        "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                    },
                     "prowlarr": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "qbit": {
                         "items": {
                             "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
                         },
@@ -1184,6 +1208,20 @@
                         "type": "array",
                         "uniqueItems": false
                     },
+                    "rtorrent": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "sabnzbd": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
                     "sonarr": {
                         "items": {
                             "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
@@ -1193,6 +1231,13 @@
                     },
                     "tautulli": {
                         "$ref": "#/components/schemas/clientinfo.AppInfoTautulli"
+                    },
+                    "transmission": {
+                        "items": {
+                            "$ref": "#/components/schemas/clientinfo.AppInfoAppConfig"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
                     }
                 },
                 "type": "object"
@@ -1330,11 +1375,19 @@
             },
             "clientinfo.AppInfoTautulli": {
                 "properties": {
+                    "instance": {
+                        "description": "Instance is 1 when Tautulli is configured.",
+                        "type": "integer"
+                    },
+                    "name": {
+                        "description": "Name is the instance name configured in the client.",
+                        "type": "string"
+                    },
                     "users": {
                         "additionalProperties": {
                             "type": "string"
                         },
-                        "description": "Tautulli userID -\u003e email map.",
+                        "description": "Tautulli userID -\u003e email map. Omitted on startup.",
                         "type": "object"
                     }
                 },
@@ -1645,8 +1698,6 @@
                             1000000000,
                             60000000000,
                             3600000000000,
-                            -9223372036854775808,
-                            9223372036854775807,
                             1,
                             1000,
                             1000000,
@@ -1664,8 +1715,6 @@
                             "Second",
                             "Minute",
                             "Hour",
-                            "minDuration",
-                            "maxDuration",
                             "Nanosecond",
                             "Microsecond",
                             "Millisecond",

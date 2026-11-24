@@ -34,7 +34,7 @@ We [maintain](https://github.com/Notifiarr/mkdocs-wiki) a wiki with the install 
 
 The data that was once in this section is no longer super relevant, but can also be found in the wiki.
 
-- https://notifiarr.wiki/pages/client/configuration/
+- https://notifiarr.wiki/pages/client/afterInstall/
 
 ## Troubleshooting
 
@@ -44,7 +44,7 @@ We have a client troubleshooting section in the wiki too.
 
 ## Contributing
 
-[Join us on Discord](https://notifiarr.com/discord) where we can discuss your proposal.
+[Join us on Discord](https://notifiarr.com/discord) where we can discuss your proposal. See [CONTRIBUTING.md](CONTRIBUTING.md) for the development setup and pull-request process.
 
 ## License
 

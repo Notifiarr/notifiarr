@@ -35,7 +35,9 @@ export const validate = (
   } else if (key == 'host' && value === '') {
     return get(_)('phrases.HostMustNotBeEmpty')
   } else if (key == 'apiKey' && (value?.length ?? 0) < 32) {
-    return get(_)('phrases.APIKeyMustBeCountCharactersOrLonger', { values: { count: 32 } })
+    return get(_)('phrases.APIKeyMustBeCountCharactersOrLonger', {
+      values: { count: 32 },
+    })
   } else if (key == 'token' && (value?.length ?? 0) < 8) {
     return get(_)('phrases.TokenMustBeCountCharacters', { values: { count: 8 } })
   }

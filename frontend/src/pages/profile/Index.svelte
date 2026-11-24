@@ -12,6 +12,7 @@
   import { onMount } from 'svelte'
   import Header from './Header.svelte'
   import { nav } from '../../navigation/nav.svelte'
+  import { present } from '../../includes/util'
 
   // Form state, this is what we're sending to the backend.
   const form = $state({
@@ -66,7 +67,9 @@
     ([Auth.password, Auth.website].includes($profile?.upstreamType) &&
       (!form.password || form.password.length < 5)) ||
       // New local password must be at least 9 characters when provided.
-      (authType === Auth.password && form.newPass.length > 0 && form.newPass.length < 9) ||
+      (authType === Auth.password &&
+        form.newPass.length > 0 &&
+        form.newPass.length < 9) ||
       // Switching to password requires a new password and a usable username.
       (authType === Auth.password &&
         $profile?.upstreamType !== Auth.password &&
@@ -127,7 +130,7 @@
             bind:value={form.header}
             original={$profile?.upstreamHeader || ''}>
             {#each Object.entries($profile?.headers || {}) as [key, value]}
-              {#each value! as val}
+              {#each present(value) as val}
                 <option value={key}>
                   {key} ({val})
                 </option>

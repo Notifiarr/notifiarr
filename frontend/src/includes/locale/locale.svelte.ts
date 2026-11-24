@@ -25,8 +25,26 @@ export const Flags: Record<string, string> = {
   pl: '🇵🇱',
   pt: '🇵🇹',
   sv: '🇸🇪',
-  zh_Hant: '🇹🇼',
-  zh_Hans: '🇨🇳',
+  'zh-Hant': '🇹🇼',
+  'zh-Hans': '🇨🇳',
+}
+
+/** en-US becomes en. zh-Hant and zh-Hans stay whole because those catalogs include the script. */
+const catalog = (input: string) => {
+  const tag = input.toLowerCase()
+  if (
+    tag === 'zh-hant' ||
+    tag.startsWith('zh-hant-') ||
+    tag === 'zh-tw' ||
+    tag.startsWith('zh-tw-') ||
+    tag === 'zh-hk' ||
+    tag.startsWith('zh-hk-') ||
+    tag === 'zh-mo' ||
+    tag.startsWith('zh-mo-')
+  )
+    return 'zh-Hant'
+  if (tag === 'zh' || tag === 'zh-hans' || tag.startsWith('zh-')) return 'zh-Hans'
+  return input.split('-')[0]
 }
 
 class Locale {
@@ -38,9 +56,10 @@ class Locale {
   public readonly current = $derived(this.curr)
 
   constructor() {
-    // We only support language codes, not country codes. Maybe one day.
-    const init = nav.getQuery('lang') || getLocaleFromNavigator() || this.fallbackLocale
-    this.init(init?.split('-')[0], this.fallbackLocale)
+    // Regional tags collapse to the language. zh-Hant is kept whole.
+    const requested =
+      nav.getQuery('lang') || getLocaleFromNavigator() || this.fallbackLocale
+    this.init(catalog(requested), this.fallbackLocale)
   }
 
   /** Use this to change the UI locale (translated language). */
@@ -48,7 +67,7 @@ class Locale {
     if (!newLocale) return
 
     try {
-      newLocale = newLocale.split('-')[0]
+      newLocale = catalog(newLocale)
       await register(newLocale, async () => await import(`../locale/${newLocale}.json`))
       await lang.set(newLocale)
       await nav.setQuery('lang', (this.curr = newLocale))

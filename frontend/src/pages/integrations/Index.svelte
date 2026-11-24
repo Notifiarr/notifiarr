@@ -10,6 +10,7 @@
   import { onMount } from 'svelte'
   import Plex from './Plex.svelte'
   import { type Config, type Integrations } from '../../api/notifiarrConfig'
+  import { present } from '../../includes/util'
   import Starr from './Starr.svelte'
   import { profile } from '../../api/profile.svelte'
   import Downloader from './Downloader.svelte'
@@ -35,8 +36,9 @@
   app: 'sonarr' | 'radarr' | 'readarr' | 'lidarr' | 'prowlarr',
 )}
   {#each config[app] ?? [] as status, index}
-    {#if config[app]}
-      {@const queue = app == 'prowlarr' ? undefined : resp?.[app]?.queue?.[index]}
+    {#if config[app]?.[index]}
+      {@const queue =
+        app == 'prowlarr' ? undefined : (resp?.[app]?.queue?.[index] ?? undefined)}
       {@const queueAge = app == 'prowlarr' ? undefined : resp?.[app]?.queueAge?.[index]}
       <!-- make a slider in the ui control these values -->
       <Col class="mb-2" sm={12} md={6} xxl={4}>
@@ -46,9 +48,9 @@
           {queue}
           {queueAge}
           config={config[app][index]}
-          status={resp?.[app]?.status?.[index]}
+          status={resp?.[app]?.status?.[index] ?? undefined}
           statusAge={resp?.[app]?.statusAge?.[index]}
-          dashboard={app == 'prowlarr' ? undefined : resp?.dashboard?.[app]}
+          dashboard={app == 'prowlarr' ? undefined : present(resp?.dashboard?.[app])}
           dashboardAge={resp?.dashboardAge} />
       </Col>
     {/if}
@@ -61,13 +63,13 @@
   app: 'deluge' | 'nzbget' | 'qbit' | 'rtorrent' | 'sabnzbd' | 'transmission',
 )}
   {#each config[app] ?? [] as status, index}
-    {#if config[app]}
+    {#if config[app]?.[index]}
       <Col class="mb-2" sm={12} md={6} xxl={4}>
         <Downloader
           {app}
           {index}
           config={config[app][index]}
-          dashboard={resp?.dashboard?.[app]}
+          dashboard={present(resp?.dashboard?.[app])}
           dashboardAge={resp?.dashboardAge} />
       </Col>
     {/if}
@@ -79,8 +81,8 @@
   <Row>
     <Col class="mb-2" sm={12} md={config.tautulli ? 6 : 12}>
       <Plex
-        status={resp.plex}
-        sessions={resp.sessions}
+        status={resp.plex ?? undefined}
+        sessions={resp.sessions ?? undefined}
         plexAge={resp.plexAge}
         sessionsAge={resp.sessionsAge} />
     </Col>
@@ -89,7 +91,7 @@
       <Col class="mb-2" sm={12} md={6}>
         <Tautulli
           config={config.tautulli}
-          status={resp.tautulli}
+          status={resp.tautulli ?? undefined}
           users={resp.tautulliUsers?.response.data ?? []}
           statusAge={resp.tautulliAge}
           usersAge={resp.tautulliUsersAge} />

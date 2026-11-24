@@ -73,7 +73,13 @@
       <span class="text-nowrap">
         {#if $profile?.loggedIn}
           <a href="#reload" onclick={updateBackend} class="text-decoration-none">
-            <Fa i={ArrowsClockwise} weight="bold" c1="#3cd2a5" d1="green" class="me-1" {spin} />
+            <Fa
+              i={ArrowsClockwise}
+              weight="bold"
+              c1="#3cd2a5"
+              d1="green"
+              class="me-1"
+              {spin} />
           </a>
           {#if notification}
             {@html notification}

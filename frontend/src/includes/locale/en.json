@@ -72,6 +72,7 @@
   },
   "buttons": {
     "Login": "Login",
+    "LoginTitle": "Login",
     "Confirm": "Confirm",
     "Cancel": "Cancel",
     "Create": "Create",
@@ -384,6 +385,11 @@
       "label": "Host ID",
       "description": "The Host ID parameter is used to uniquely identify this client installation.",
       "tooltip": "Changing this value is discouraged; it should be found automatically. Do not copy this value to another Notifiarr client installation."
+    },
+    "clientName": {
+      "label": "Client Name",
+      "description": "Name sent to Notifiarr.com instead of the system hostname. Changing this value renames the client on the website.",
+      "tooltip": "Saving a client name keeps the same name when the system hostname changes, such as when a Docker container is recreated."
     },
     "serial": {
       "label": "Parallel Threads",

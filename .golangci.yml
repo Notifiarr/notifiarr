@@ -20,6 +20,9 @@ linters:
     - noinlineerr
     - embeddedstructfieldcheck
   exclusions:
+    # flatted (an ESLint dependency) publishes a Go port with no go.mod.
+    paths:
+      - node_modules
     presets:
       - comments
       - std-error-handling

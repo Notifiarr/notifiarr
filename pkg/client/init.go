@@ -37,7 +37,8 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 		clientInfo = &clientinfo.ClientInfo{}
 	}
 
-	switch host, err := website.GetHostInfo(ctx); {
+	host, err := website.GetHostInfo(ctx)
+	switch {
 	case err != nil:
 		logs.Log.Errorf(reqID, "=> Unknown Host Info (this is bad): %v", err)
 	case c.Config.HostID == "":
@@ -45,6 +46,10 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 		logs.Log.Printf(reqID, "==> {UNSAVED} Unique Host ID: %s (%s)", c.Config.HostID, host.Hostname)
 	default:
 		logs.Log.Printf(reqID, "==> Unique Host ID: %s (%s)", host.HostID, host.Hostname)
+	}
+
+	if err == nil {
+		c.logClientName(reqID, host.Hostname)
 	}
 
 	hostname, _ := os.Hostname()
@@ -82,6 +87,17 @@ func (c *Client) PrintStartupInfo(ctx context.Context, clientInfo *clientinfo.Cl
 	}
 
 	c.printLogFileInfo(reqID)
+}
+
+func (c *Client) logClientName(reqID, hostname string) {
+	if c.Config.ClientName == "" {
+		c.Config.ClientName = hostname
+		logs.Log.Printf(reqID, "==> {UNSAVED} Client Name: %s", c.Config.ClientName)
+
+		return
+	}
+
+	logs.Log.Printf(reqID, "==> Client Name: %s", c.Config.ClientName)
 }
 
 func (c *Client) printVersionChangeInfo(reqID string) {

@@ -23,14 +23,16 @@
   let { index, active, form }: Props = $props()
 
   let output = $state<Stats | null>()
+  /** null = auto (show output after a failure); otherwise the user's last toggle. */
+  let pinned: boolean | null = $state(null)
   /** Whether the output is visible. */
-  let showOutput = $state(false)
+  let showOutput = $derived(pinned ?? Boolean(output?.output?.startsWith('error:')))
   /** The last time the output data was refreshed. */
   let lastRefreshed = $state(Date.now())
   /** How long ago the output data was refreshed. Dynamically updated. */
   let timeDuration = $state('')
   /** Toggle the output visibility. */
-  const toggleOutput = (e?: Event) => (e?.preventDefault(), (showOutput = !showOutput))
+  const toggleOutput = (e?: Event) => (e?.preventDefault(), (pinned = !showOutput))
 
   /** Retrieve the command output and update the last refreshed time. */
   export const getStats = async (e?: Event) => {

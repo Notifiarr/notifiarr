@@ -17,7 +17,6 @@
   import type { ChildProps } from '../../includes/Instances.svelte'
   import Input from '../../includes/Input.svelte'
   import CheckedInput from '../../includes/CheckedInput.svelte'
-  import { onMount } from 'svelte'
 
   let {
     form = $bindable(),
@@ -40,37 +39,24 @@
   let procCheck = $state(setData(form?.expect ?? ''))
   export const reset = () => (procCheck = setData(form?.expect ?? ''))
 
-  const updateExpect = (id: string, value: any) => {
+  // Input calls validate from `$derived`. Writing form.expect there throws
+  // state_unsafe_mutation, so persist the count string from an effect.
+  $effect(() => {
+    if (!form) return
     if (procCheck.running) {
-      form.expect = 'running'
+      // Assign without reading these fields so the effect does not depend on them.
       procCheck.restarts = false
       procCheck.minimum = 1
       procCheck.maximum = 0
-      resetValidators()
-    } else {
-      const os = original?.expect?.split(':').length ?? 0
-      form.expect =
-        `count:${procCheck.minimum}` +
-        (procCheck.maximum > 0 || os > 2 ? `:${procCheck.maximum}` : '') +
-        (procCheck.restarts ? ',restart' : '')
-      validate?.(app.id + '.process.restarts', procCheck.restarts)
-      validate?.(app.id + '.process.minimum', procCheck.minimum)
-      validate?.(app.id + '.process.maximum', procCheck.maximum)
+      if (form.expect !== 'running') form.expect = 'running'
+      return
     }
-
-    return id ? (validate?.(id, value) ?? '') : ''
-  }
-
-  const resetValidators = () => {
-    validate?.(app.id + '.value', 'this.is.valid')
-    validate?.(app.id + '.process.restarts', 'false')
-    validate?.(app.id + '.process.minimum', 1)
-    validate?.(app.id + '.process.maximum', 0)
-  }
-
-  onMount(() => {
-    updateExpect('', '')
-    return () => resetValidators()
+    const os = original?.expect?.split(':').length ?? 0
+    const next =
+      `count:${procCheck.minimum}` +
+      (procCheck.maximum > 0 || os > 2 ? `:${procCheck.maximum}` : '') +
+      (procCheck.restarts ? ',restart' : '')
+    if (form.expect !== next) form.expect = next
   })
 </script>
 
@@ -96,7 +82,7 @@
     envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.running}
     original={originalProc.running}
-    validate={updateExpect} />
+    {validate} />
 </Col>
 
 <Col md={6}>
@@ -107,7 +93,7 @@
     envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.restarts}
     original={originalProc.restarts}
-    validate={updateExpect} />
+    {validate} />
 </Col>
 
 <Col md={6}>
@@ -119,7 +105,7 @@
     envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.minimum}
     original={originalProc.minimum}
-    validate={updateExpect} />
+    {validate} />
 </Col>
 
 <Col md={6}>
@@ -130,5 +116,5 @@
     envVar={`${app.envPrefix}_${index}_EXPECT`}
     bind:value={procCheck.maximum}
     original={originalProc.maximum}
-    validate={updateExpect} />
+    {validate} />
 </Col>

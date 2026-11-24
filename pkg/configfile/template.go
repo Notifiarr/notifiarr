@@ -95,6 +95,10 @@ max_body = {{.MaxBody}} # maximum body size for debug logs. 0 = no limit.
 ## Do not copy this value to another server, every client must be unique.
 host_id = "{{.HostID}}"{{end}}
 
+## ClientName is sent to Notifiarr.com as this client's hostname.
+## An empty value uses the system hostname and is saved the next time this file is written.
+{{if .ClientName}}client_name = '''{{toml .ClientName}}'''{{else}}#client_name = "my-client"{{end}}
+
 ## All API paths start with /api. This does not affect incoming /plex webhooks.
 ## Change it to /somethingelse/api by setting urlbase to "/somethingelse"
 ##

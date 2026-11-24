@@ -12,13 +12,7 @@
   let fs = $derived($_('system.StorageData.FS'))
 </script>
 
-<Header
-  id="StorageData"
-  i={Disc}
-  c1="darkblue"
-  c2="lightblue"
-  d1="cyan"
-  d2="lightcyan" />
+<Header id="StorageData" i={Disc} c1="darkblue" c2="lightblue" d1="cyan" d2="lightcyan" />
 
 <Table>
   <thead>

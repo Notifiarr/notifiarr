@@ -11,10 +11,7 @@
   import SvelteTable from 'svelte-table'
   import NameCell, { type Result } from './NameCell.svelte'
 
-  export const page = {
-    type: 'modal' as const,
-    id: 'TestAllInstances',
-  }
+  export const page = { type: 'modal' as const, id: 'TestAllInstances' }
 </script>
 
 <script lang="ts">
