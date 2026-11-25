@@ -258,6 +258,10 @@ func (a *AppsConfig) setupQbit() ([]Qbit, error) {
 }
 
 func (q *QbitConfig) Setup(maxBody int) (*qbit.Qbit, error) {
+	if q.Timeout.Duration == 0 {
+		q.Timeout.Duration = time.Minute
+	}
+
 	if mnd.Log.DebugEnabled() {
 		q.Client = starr.ClientWithDebug(q.Timeout.Duration, q.ValidSSL, debuglog.Config{
 			MaxBody: maxBody,

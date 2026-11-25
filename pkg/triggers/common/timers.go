@@ -205,6 +205,14 @@ func (c *Config) stopTimerLoop(ctx context.Context, actions []*Action) {
 
 	c.sharedCtx = make(chan context.Context, 1)
 	mnd.Log.Printf(mnd.GetID(ctx), "!!> Stopping main Notifiarr loop. All timers and triggers are now disabled.")
+	c.closeTriggers(actions)
+}
+
+// closeTriggers stops tickers and closes trigger channels.
+// Callers of TryExec hold enqueueMu across the send, so this cannot close a channel mid-send.
+func (c *Config) closeTriggers(actions []*Action) {
+	c.enqueueMu.Lock()
+	defer c.enqueueMu.Unlock()
 
 	for _, action := range actions {
 		if action.t != nil {
@@ -212,9 +220,10 @@ func (c *Config) stopTimerLoop(ctx context.Context, actions []*Action) {
 			action.t = nil
 		}
 
-		if action.C != nil && action.C != c.stop.C { // do not close stop channel here.
-			close(action.C)
+		if action.C != nil && c.stop != nil && action.C != c.stop.C { // do not close stop channel here.
+			ch := action.C
 			action.C = nil
+			close(ch)
 		}
 	}
 }

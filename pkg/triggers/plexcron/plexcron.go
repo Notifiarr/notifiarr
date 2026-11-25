@@ -27,8 +27,9 @@ type Action struct {
 
 type cmd struct {
 	*common.Config
-	Plex *apps.Plex
-	sent map[string]struct{} // Tracks Finished sessions already sent.
+	Plex           *apps.Plex
+	sent           map[string]struct{} // Tracks Finished sessions already sent.
+	sessionUpdated func()
 	sync.Mutex
 }
 
@@ -152,6 +153,13 @@ func (c *cmd) sendWebhook(hook *plex.IncomingWebhook) {
 // GetSessions returns the plex sessions up to 1 minute old. This uses a channel so concurrent requests are avoided.
 func (a *Action) GetSessions(ctx context.Context) (*plex.Sessions, error) {
 	return a.cmd.getSessions(ctx, time.Minute)
+}
+
+// SetSessionUpdated registers a callback after Plex sessions are saved.
+func (a *Action) SetSessionUpdated(fn func()) {
+	if a != nil && a.cmd != nil {
+		a.cmd.sessionUpdated = fn
+	}
 }
 
 // GetMetaSnap grabs some basic system info: cpu, memory, username. Gets added to Plex sessions and webhook payloads.

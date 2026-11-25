@@ -15,6 +15,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/qbitlimit"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -173,6 +174,8 @@ func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigg
 		return a.emptyplextrash(input, content)
 	case "mdblist", "TrigMDBListSync":
 		return a.mdblist(input)
+	case "qbitspeed", "TrigQbitSpeed":
+		return a.qbitspeedMode(input, content)
 	case "uploadlog", "TrigUploadFile":
 		return a.uploadlog(input, content)
 	case "reconfig", "TrigReconfig":
@@ -528,6 +531,61 @@ func (a *Actions) emptyplextrash(input *common.ActionInput, content string) (int
 func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 	a.MDbList.Send(input)
 	return http.StatusOK, "MDBList library update started."
+}
+
+// @Description	Reconcile qBittorrent alternative (turtle) speed limits.
+// @Summary		Reconcile qBittorrent speed limits
+// @Tags			Triggers
+// @Produce		json
+// @Success		200	{object}	apps.APIResponse[string]	"success"
+// @Failure		501	{object}	apps.APIResponse[string]	"not enabled"
+// @Failure		503	{object}	apps.APIResponse[string]	"shutting down"
+// @Failure		404	{object}	string								"bad token or api key"
+// @Router			/trigger/qbitspeed [get]
+// @Security		ApiKeyAuth
+func (a *Actions) qbitspeed(input *common.ActionInput, content string) (int, string) {
+	switch content {
+	case "", "enable", "disable":
+	default:
+		return http.StatusBadRequest, "qBittorrent speed limit mode must be enable, disable, or empty."
+	}
+
+	if content != "" {
+		input.Args = []string{content}
+	}
+
+	switch a.QbitLimit.Send(input) {
+	case qbitlimit.SendStopping:
+		return http.StatusServiceUnavailable, "qBittorrent speed limit is shutting down."
+	case qbitlimit.SendDisabled:
+		return http.StatusNotImplemented, "qBittorrent speed limit is not enabled."
+	case qbitlimit.SendQueued:
+	}
+
+	switch content {
+	case "enable":
+		return http.StatusOK, "qBittorrent alternative speed limits enable requested."
+	case "disable":
+		return http.StatusOK, "qBittorrent alternative speed limits disable requested."
+	default:
+		return http.StatusOK, "qBittorrent alternative speed limits reconcile requested."
+	}
+}
+
+// @Description	Enable or disable qBittorrent alternative (turtle) speed limits.
+// @Summary		Set qBittorrent speed limits
+// @Tags			Triggers
+// @Produce		json
+// @Param			mode	path		string								true	"enable or disable"
+// @Success		200		{object}	apps.APIResponse[string]	"success"
+// @Failure		400		{object}	apps.APIResponse[string]	"invalid mode"
+// @Failure		501		{object}	apps.APIResponse[string]	"not enabled"
+// @Failure		503		{object}	apps.APIResponse[string]	"shutting down"
+// @Failure		404		{object}	string								"bad token or api key"
+// @Router			/trigger/qbitspeed/{mode} [get]
+// @Security		ApiKeyAuth
+func (a *Actions) qbitspeedMode(input *common.ActionInput, mode string) (int, string) {
+	return a.qbitspeed(input, mode)
 }
 
 // @Description	Uploads a log file to Notifiarr.com.

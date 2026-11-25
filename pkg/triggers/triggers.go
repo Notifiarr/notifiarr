@@ -27,6 +27,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/triggers/gaps"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/mdblist"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/plexcron"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/qbitlimit"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/snapcron"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/starrqueue"
 	"github.com/Notifiarr/notifiarr/pkg/website"
@@ -66,6 +67,7 @@ type Actions struct {
 	MDbList    *mdblist.Action
 	Endpoints  *endpoints.Action
 	PlexCron   *plexcron.Action
+	QbitLimit  *qbitlimit.Action
 	SnapCron   *snapcron.Action
 	StarrQueue *starrqueue.Action
 	inCh       chan inChData
@@ -82,6 +84,8 @@ func New(ctx context.Context, config *Config) *Actions {
 	}
 	common.Scheduler, _ = gocron.NewScheduler()
 	plex := plexcron.New(common, &config.Apps.Plex)
+	qbitLimit := qbitlimit.New(common, plex)
+	plex.SetSessionUpdated(qbitLimit.Kick)
 
 	actions := &Actions{
 		AutoUpdate: autoupdate.New(common, config.AutoUpdate, config.ConfigFile, config.UnstableCh),
@@ -98,6 +102,7 @@ func New(ctx context.Context, config *Config) *Actions {
 		MDbList:    mdblist.New(common),
 		Endpoints:  endpoints.New(common, config.Endpoints),
 		PlexCron:   plex,
+		QbitLimit:  qbitLimit,
 		SnapCron:   snapcron.New(common),
 		StarrQueue: starrqueue.New(common),
 		inCh:       make(chan inChData),
