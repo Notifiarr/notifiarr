@@ -4,9 +4,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Notifiarr/notifiarr/pkg/apps"
 	"github.com/Notifiarr/notifiarr/pkg/apps/apppkg/plex"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golift.io/cnfg"
+	"golift.io/qbit"
 )
 
 func TestWanSession(t *testing.T) {
@@ -132,6 +136,73 @@ func TestCooldown(t *testing.T) {
 
 	assert.Equal(t, defaultCool, cooldown(cnfg.Duration{}))
 	assert.Equal(t, time.Minute, cooldown(cnfg.Duration{Duration: time.Minute}))
+}
+
+func TestIdleState(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	cool := 10 * time.Second
+
+	since, restore := idleState(true, now.Add(-time.Hour), now, cool)
+	assert.True(t, since.IsZero())
+	assert.False(t, restore)
+
+	since, restore = idleState(false, time.Time{}, now, cool)
+	assert.Equal(t, now, since)
+	assert.False(t, restore)
+
+	since, restore = idleState(false, now, now.Add(9*time.Second), cool)
+	assert.Equal(t, now, since)
+	assert.False(t, restore)
+
+	since, restore = idleState(false, now, now.Add(cool), cool)
+	assert.Equal(t, now, since)
+	assert.True(t, restore)
+}
+
+func TestEnqueueCoalesces(t *testing.T) {
+	t.Parallel()
+
+	cmd := &cmd{accepting: true, kick: make(chan *common.ActionInput, 1)}
+	require.True(t, cmd.enqueue(&common.ActionInput{ReqID: "poll"}))
+	require.True(t, cmd.enqueue(&common.ActionInput{ReqID: "poll-2"}))
+	require.True(t, cmd.enqueue(&common.ActionInput{ReqID: "mode", Args: []string{"disable"}}))
+
+	got := <-cmd.kick
+	assert.Equal(t, []string{"disable"}, got.Args)
+
+	cmd.accepting = false
+	assert.False(t, cmd.enqueue(&common.ActionInput{Args: []string{"enable"}}))
+}
+
+func TestSeedOwnedURL(t *testing.T) { //nolint:paralleltest // mutates the package ownership map
+	ownedMu.Lock()
+	ownedByURL = map[string]bool{}
+	ownedMu.Unlock()
+
+	t.Cleanup(func() {
+		ownedMu.Lock()
+		ownedByURL = map[string]bool{}
+		ownedMu.Unlock()
+	})
+
+	setOwnedURL("http://qbit.example", true)
+	setOwnedURL("", true)
+
+	// Keyed so ExtraConfig stays zero; modernize wants an unkeyed embed that does not compile.
+	app := apps.Qbit{QbitConfig: apps.QbitConfig{Config: qbit.Config{URL: "http://qbit.example"}}} //nolint:modernize
+	cmd := &cmd{
+		weEnabled: map[int]bool{},
+		Config:    &common.Config{Apps: &apps.Apps{Qbit: []apps.Qbit{app}}},
+	}
+	cmd.seedOwned()
+	assert.True(t, cmd.weEnabled[1])
+
+	setOwnedURL("http://qbit.example", false)
+	cmd.weEnabled = map[int]bool{}
+	cmd.seedOwned()
+	assert.False(t, cmd.weEnabled[1])
 }
 
 func TestFreshSessions(t *testing.T) {

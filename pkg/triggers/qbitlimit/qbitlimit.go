@@ -31,6 +31,18 @@ const (
 	lanLocation      = "lan"
 )
 
+// SendStatus is the result of queueing a speed-limit reconcile.
+type SendStatus uint8
+
+const (
+	// SendDisabled means the feature or qBittorrent is off.
+	SendDisabled SendStatus = iota
+	// SendQueued means a worker will reconcile this request.
+	SendQueued
+	// SendStopping means the worker is shut down and did not accept the request.
+	SendStopping
+)
+
 // Action contains the exported methods for this package.
 type Action struct {
 	cmd *cmd
@@ -40,11 +52,23 @@ type cmd struct {
 	*common.Config
 	plex        *plexcron.Action
 	mu          sync.Mutex
+	kickMu      sync.Mutex
 	weEnabled   map[int]bool
 	leftAlone   map[int]bool
 	remoteUntil time.Time
-	lastDesired time.Time
+	idleSince   time.Time
+	kick        chan *common.ActionInput
+	cancel      context.CancelFunc
+	done        chan struct{}
+	accepting   bool
 }
+
+// ownedByURL survives a full configuration reload, which builds a new Action and
+// would otherwise treat turtles this process enabled as user-owned.
+var (
+	ownedMu    sync.Mutex
+	ownedByURL = map[string]bool{}
+)
 
 // New configures the library.
 func New(config *common.Config, plexCron *plexcron.Action) *Action {
@@ -53,7 +77,27 @@ func New(config *common.Config, plexCron *plexcron.Action) *Action {
 		plex:      plexCron,
 		weEnabled: make(map[int]bool),
 		leftAlone: make(map[int]bool),
+		kick:      make(chan *common.ActionInput, 1),
+		accepting: true,
 	}}
+}
+
+// Run starts the reconcile worker. The shared timer loop only kicks this worker.
+func (a *Action) Run(ctx context.Context) {
+	if a == nil || a.cmd == nil {
+		return
+	}
+
+	a.cmd.startWorker(ctx)
+}
+
+// Stop cancels the reconcile worker and waits for it to leave qBittorrent alone.
+func (a *Action) Stop() {
+	if a == nil || a.cmd == nil {
+		return
+	}
+
+	a.cmd.stopWorker()
 }
 
 // Create initializes the library.
@@ -63,12 +107,17 @@ func (a *Action) Create() {
 }
 
 func (c *cmd) create(reqID string) {
+	c.kickMu.Lock()
+	c.accepting = true
+	c.kickMu.Unlock()
+
 	var dur time.Duration
 
 	info := clientinfo.Get()
 	enabled := info != nil && info.Actions.QbitThrottle.Enabled && c.hasQbit()
 
 	c.mu.Lock()
+	c.seedOwned()
 	c.dropGone()
 	owned := c.hasOwned()
 	c.mu.Unlock()
@@ -86,14 +135,14 @@ func (c *cmd) create(reqID string) {
 	c.Add(&common.Action{
 		Key:  "TrigQbitSpeed",
 		Name: TrigQbitSpeed,
-		Hide: true, // 15s poll would spam Event Triggered.
-		Fn:   c.reconcile,
+		Hide: true,   // 15s poll would spam Event Triggered.
+		Fn:   c.poke, // must return immediately; reconcile runs on the worker.
 		C:    make(chan *common.ActionInput, 1),
 		D:    cnfg.Duration{Duration: dur},
 	})
 
 	if !enabled && owned {
-		c.queue(&common.ActionInput{Type: website.EventUser, ReqID: reqID})
+		_ = c.enqueue(&common.ActionInput{Type: website.EventUser, ReqID: reqID})
 	}
 }
 
@@ -152,12 +201,16 @@ func (c *cmd) ready() bool {
 }
 
 // Send queues a reconcile. Optional args: "enable" or "disable" (website remote playback).
-func (a *Action) Send(input *common.ActionInput) bool {
+func (a *Action) Send(input *common.ActionInput) SendStatus {
 	if a == nil || a.cmd == nil || !a.cmd.ready() {
-		return false
+		return SendDisabled
 	}
 
-	return a.cmd.Exec(input, TrigQbitSpeed)
+	if !a.cmd.enqueue(input) {
+		return SendStopping
+	}
+
+	return SendQueued
 }
 
 // Kick queues a non-blocking reconcile so Plex session updates cannot deadlock.
@@ -167,12 +220,100 @@ func (a *Action) Kick() {
 		return
 	}
 
-	a.cmd.queue(&common.ActionInput{Type: website.EventHook, ReqID: mnd.ReqID()})
+	_ = a.cmd.enqueue(&common.ActionInput{Type: website.EventHook, ReqID: mnd.ReqID()})
 }
 
-func (c *cmd) queue(input *common.ActionInput) {
-	// TryExec shares a lock with trigger shutdown. A plain send panics if reload closes the channel.
-	_ = c.TryExec(input, TrigQbitSpeed)
+// poke is the timer-loop callback. It must not call qBittorrent; one stalled server
+// would block every other trigger and shutdown.
+func (c *cmd) poke(_ context.Context, input *common.ActionInput) {
+	_ = c.enqueue(input)
+}
+
+func (c *cmd) startWorker(parent context.Context) {
+	c.kickMu.Lock()
+	defer c.kickMu.Unlock()
+
+	if c.cancel != nil {
+		return
+	}
+
+	ctx, cancel := context.WithCancel(parent)
+	c.cancel = cancel
+	c.accepting = true
+	c.done = make(chan struct{})
+
+	go c.loop(ctx, c.done)
+}
+
+func (c *cmd) stopWorker() {
+	c.kickMu.Lock()
+	cancel := c.cancel
+	done := c.done
+	c.cancel = nil
+	c.accepting = false
+	c.kickMu.Unlock()
+
+	if cancel != nil {
+		cancel()
+	}
+
+	if done != nil {
+		<-done
+	}
+}
+
+func (c *cmd) loop(ctx context.Context, done chan struct{}) {
+	defer close(done)
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case input := <-c.kick:
+			if input == nil {
+				continue
+			}
+
+			c.reconcile(ctx, input)
+		}
+	}
+}
+
+// enqueue coalesces empty polls and keeps the latest enable/disable.
+// It returns false when the worker is stopping, and it does not send on a closed channel.
+func (c *cmd) enqueue(input *common.ActionInput) bool {
+	if input == nil {
+		return false
+	}
+
+	c.kickMu.Lock()
+	defer c.kickMu.Unlock()
+
+	if !c.accepting {
+		return false
+	}
+
+	select {
+	case c.kick <- input:
+		return true
+	default:
+	}
+
+	if len(input.Args) == 0 {
+		return true
+	}
+
+	select {
+	case <-c.kick:
+	default:
+	}
+
+	select {
+	case c.kick <- input:
+		return true
+	default:
+		return false
+	}
 }
 
 func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
@@ -203,14 +344,17 @@ func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
 	c.applyRemoteArg(input, now)
 
 	desired := c.desired(ctx, cfg, now)
+	since, restore := idleState(desired, c.idleSince, now, cooldown(cfg.Cooldown))
+	c.idleSince = since
+
 	if desired {
-		c.lastDesired = now
 		c.apply(ctx, input, cfg, true)
 
 		return
 	}
 
-	if c.lastDesired.IsZero() || now.Sub(c.lastDesired) < cooldown(cfg.Cooldown) {
+	// Cooldown starts when playback goes idle, not from the last active poll.
+	if !restore || !c.hasOwned() {
 		return
 	}
 
@@ -334,10 +478,57 @@ func (c *cmd) syncInstance(
 	}
 
 	c.weEnabled[instance] = weOwn
+	setOwnedURL(app.URL, weOwn)
 	delete(c.leftAlone, instance)
 
 	mnd.Log.Printf(input.ReqID, "[%s requested] qBittorrent alternative speed limits (%d:%s) => %v",
 		input.Type, instance, app.URL, turtle)
+}
+
+// idleState starts the cooldown at the transition to idle.
+// The restore flag is false until a full cooldown has elapsed since that transition.
+func idleState(desired bool, idleSince, now time.Time, cool time.Duration) (time.Time, bool) {
+	if desired {
+		return time.Time{}, false
+	}
+
+	if idleSince.IsZero() {
+		idleSince = now
+	}
+
+	return idleSince, now.Sub(idleSince) >= cool
+}
+
+func (c *cmd) seedOwned() {
+	if c.Apps == nil {
+		return
+	}
+
+	ownedMu.Lock()
+	defer ownedMu.Unlock()
+
+	for idx := range c.Apps.Qbit {
+		if ownedByURL[c.Apps.Qbit[idx].URL] {
+			c.weEnabled[idx+1] = true
+		}
+	}
+}
+
+func setOwnedURL(url string, owned bool) {
+	if url == "" {
+		return
+	}
+
+	ownedMu.Lock()
+	defer ownedMu.Unlock()
+
+	if owned {
+		ownedByURL[url] = true
+
+		return
+	}
+
+	delete(ownedByURL, url)
 }
 
 func cooldown(dur cnfg.Duration) time.Duration {
@@ -411,3 +602,8 @@ func planTurtle(current, desired, weEnabled bool) (bool, bool, bool) {
 
 	return false, false, false
 }
+
+var (
+	_ common.Create = (*Action)(nil)
+	_ common.Run    = (*Action)(nil)
+)

@@ -18611,6 +18611,16 @@
                             }
                         },
                         "description": "not enabled"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "shutting down"
                     }
                 },
                 "security": [
@@ -18678,6 +18688,16 @@
                             }
                         },
                         "description": "not enabled"
+                    },
+                    "503": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/apps.APIResponse-string"
+                                }
+                            }
+                        },
+                        "description": "shutting down"
                     }
                 },
                 "security": [

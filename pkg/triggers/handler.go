@@ -15,6 +15,7 @@ import (
 	"github.com/Notifiarr/notifiarr/pkg/logs/share"
 	"github.com/Notifiarr/notifiarr/pkg/mnd"
 	"github.com/Notifiarr/notifiarr/pkg/triggers/common"
+	"github.com/Notifiarr/notifiarr/pkg/triggers/qbitlimit"
 	"github.com/Notifiarr/notifiarr/pkg/ui"
 	"github.com/Notifiarr/notifiarr/pkg/website"
 	"github.com/Notifiarr/notifiarr/pkg/website/clientinfo"
@@ -538,6 +539,7 @@ func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 // @Produce		json
 // @Success		200	{object}	apps.APIResponse[string]	"success"
 // @Failure		501	{object}	apps.APIResponse[string]	"not enabled"
+// @Failure		503	{object}	apps.APIResponse[string]	"shutting down"
 // @Failure		404	{object}	string								"bad token or api key"
 // @Router			/trigger/qbitspeed [get]
 // @Security		ApiKeyAuth
@@ -552,8 +554,12 @@ func (a *Actions) qbitspeed(input *common.ActionInput, content string) (int, str
 		input.Args = []string{content}
 	}
 
-	if !a.QbitLimit.Send(input) {
+	switch a.QbitLimit.Send(input) {
+	case qbitlimit.SendStopping:
+		return http.StatusServiceUnavailable, "qBittorrent speed limit is shutting down."
+	case qbitlimit.SendDisabled:
 		return http.StatusNotImplemented, "qBittorrent speed limit is not enabled."
+	case qbitlimit.SendQueued:
 	}
 
 	switch content {
@@ -574,6 +580,7 @@ func (a *Actions) qbitspeed(input *common.ActionInput, content string) (int, str
 // @Success		200		{object}	apps.APIResponse[string]	"success"
 // @Failure		400		{object}	apps.APIResponse[string]	"invalid mode"
 // @Failure		501		{object}	apps.APIResponse[string]	"not enabled"
+// @Failure		503		{object}	apps.APIResponse[string]	"shutting down"
 // @Failure		404		{object}	string								"bad token or api key"
 // @Router			/trigger/qbitspeed/{mode} [get]
 // @Security		ApiKeyAuth
