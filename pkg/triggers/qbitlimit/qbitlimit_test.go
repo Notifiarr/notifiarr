@@ -179,11 +179,13 @@ func TestEnqueueCoalesces(t *testing.T) {
 func TestSeedOwnedURL(t *testing.T) { //nolint:paralleltest // mutates the package ownership map
 	ownedMu.Lock()
 	ownedByURL = map[string]bool{}
+	remoteDeadline = time.Time{}
 	ownedMu.Unlock()
 
 	t.Cleanup(func() {
 		ownedMu.Lock()
 		ownedByURL = map[string]bool{}
+		remoteDeadline = time.Time{}
 		ownedMu.Unlock()
 	})
 
@@ -203,6 +205,17 @@ func TestSeedOwnedURL(t *testing.T) { //nolint:paralleltest // mutates the packa
 	cmd.weEnabled = map[int]bool{}
 	cmd.seedOwned()
 	assert.False(t, cmd.weEnabled[1])
+
+	deadline := time.Now().Add(time.Hour)
+	setRemoteDeadline(deadline)
+	cmd.remoteUntil = time.Time{}
+	cmd.seedOwned()
+	assert.Equal(t, deadline, cmd.remoteUntil)
+
+	setRemoteDeadline(time.Now().Add(-time.Minute))
+	cmd.remoteUntil = time.Time{}
+	cmd.seedOwned()
+	assert.True(t, cmd.remoteUntil.IsZero())
 }
 
 func TestFreshSessions(t *testing.T) {

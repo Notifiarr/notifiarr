@@ -63,11 +63,13 @@ type cmd struct {
 	accepting   bool
 }
 
-// ownedByURL survives a full configuration reload, which builds a new Action and
-// would otherwise treat turtles this process enabled as user-owned.
+// ownedByURL and remoteDeadline survive a full configuration reload, which builds a
+// new Action. Without them, turtles this process enabled look user-owned, and a
+// Jellyfin or Emby enable is forgotten so turtle turns off while playback continues.
 var (
-	ownedMu    sync.Mutex
-	ownedByURL = map[string]bool{}
+	ownedMu        sync.Mutex
+	ownedByURL     = map[string]bool{}
+	remoteDeadline time.Time
 )
 
 // New configures the library.
@@ -369,10 +371,12 @@ func (c *cmd) applyRemoteArg(input *common.ActionInput, now time.Time) {
 	switch input.Args[0] {
 	case "enable":
 		c.remoteUntil = now.Add(remoteTTL)
+		setRemoteDeadline(c.remoteUntil)
 		mnd.Log.Printf(input.ReqID, "[%s requested] Remote playback active; qBittorrent alternative speed limits wanted",
 			input.Type)
 	case "disable":
 		c.remoteUntil = time.Time{}
+		setRemoteDeadline(time.Time{})
 		mnd.Log.Printf(input.ReqID,
 			"[%s requested] Remote playback ended; qBittorrent alternative speed limits will restore after cooldown",
 			input.Type)
@@ -500,12 +504,16 @@ func idleState(desired bool, idleSince, now time.Time, cool time.Duration) (time
 }
 
 func (c *cmd) seedOwned() {
+	ownedMu.Lock()
+	defer ownedMu.Unlock()
+
+	if !remoteDeadline.IsZero() && time.Now().Before(remoteDeadline) {
+		c.remoteUntil = remoteDeadline
+	}
+
 	if c.Apps == nil {
 		return
 	}
-
-	ownedMu.Lock()
-	defer ownedMu.Unlock()
 
 	for idx := range c.Apps.Qbit {
 		if ownedByURL[c.Apps.Qbit[idx].URL] {
@@ -529,6 +537,12 @@ func setOwnedURL(url string, owned bool) {
 	}
 
 	delete(ownedByURL, url)
+}
+
+func setRemoteDeadline(until time.Time) {
+	ownedMu.Lock()
+	remoteDeadline = until
+	ownedMu.Unlock()
 }
 
 func cooldown(dur cnfg.Duration) time.Duration {
