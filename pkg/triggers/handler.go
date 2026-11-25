@@ -174,7 +174,7 @@ func (a *Actions) runTrigger(req *http.Request, input *common.ActionInput, trigg
 	case "mdblist", "TrigMDBListSync":
 		return a.mdblist(input)
 	case "qbitspeed", "TrigQbitSpeed":
-		return a.qbitspeed(input, content)
+		return a.qbitspeedMode(input, content)
 	case "uploadlog", "TrigUploadFile":
 		return a.uploadlog(input, content)
 	case "reconfig", "TrigReconfig":
@@ -532,17 +532,14 @@ func (a *Actions) mdblist(input *common.ActionInput) (int, string) {
 	return http.StatusOK, "MDBList library update started."
 }
 
-// @Description	Enable, disable, or reconcile qBittorrent alternative (turtle) speed limits.
-// @Summary		qBittorrent speed limits
+// @Description	Reconcile qBittorrent alternative (turtle) speed limits.
+// @Summary		Reconcile qBittorrent speed limits
 // @Tags			Triggers
 // @Produce		json
-// @Param			mode	path		string								false	"enable, disable, or empty to reconcile"
-// @Success		200		{object}	apps.APIResponse[string]	"success"
-// @Failure		400		{object}	apps.APIResponse[string]	"invalid mode"
-// @Failure		501		{object}	apps.APIResponse[string]	"not enabled"
-// @Failure		404		{object}	string								"bad token or api key"
+// @Success		200	{object}	apps.APIResponse[string]	"success"
+// @Failure		501	{object}	apps.APIResponse[string]	"not enabled"
+// @Failure		404	{object}	string								"bad token or api key"
 // @Router			/trigger/qbitspeed [get]
-// @Router			/trigger/qbitspeed/{mode} [get]
 // @Security		ApiKeyAuth
 func (a *Actions) qbitspeed(input *common.ActionInput, content string) (int, string) {
 	switch content {
@@ -567,6 +564,21 @@ func (a *Actions) qbitspeed(input *common.ActionInput, content string) (int, str
 	default:
 		return http.StatusOK, "qBittorrent alternative speed limits reconcile requested."
 	}
+}
+
+// @Description	Enable or disable qBittorrent alternative (turtle) speed limits.
+// @Summary		Set qBittorrent speed limits
+// @Tags			Triggers
+// @Produce		json
+// @Param			mode	path		string								true	"enable or disable"
+// @Success		200		{object}	apps.APIResponse[string]	"success"
+// @Failure		400		{object}	apps.APIResponse[string]	"invalid mode"
+// @Failure		501		{object}	apps.APIResponse[string]	"not enabled"
+// @Failure		404		{object}	string								"bad token or api key"
+// @Router			/trigger/qbitspeed/{mode} [get]
+// @Security		ApiKeyAuth
+func (a *Actions) qbitspeedMode(input *common.ActionInput, mode string) (int, string) {
+	return a.qbitspeed(input, mode)
 }
 
 // @Description	Uploads a log file to Notifiarr.com.

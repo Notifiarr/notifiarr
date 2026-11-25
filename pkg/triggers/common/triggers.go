@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/Notifiarr/notifiarr/pkg/apps"
@@ -35,6 +36,7 @@ type Config struct {
 	stop      *Action // Triggered by calling Stop()
 	sharedCtx chan context.Context
 	list      []*Action      // List of action triggers
+	enqueueMu sync.Mutex     // serializes TryExec with closeTriggers
 	Services                 // for running service checks.
 	reloadCh  chan os.Signal // so triggers can reload the app.
 	stopCh    chan os.Signal // so triggers can stop the app.
@@ -124,6 +126,30 @@ func (c *Config) Exec(input *ActionInput, name TriggerName) bool {
 	trig.C <- input
 
 	return true
+}
+
+// TryExec queues input without blocking. It returns false when the trigger is
+// missing, its buffer is full, or triggers are shutting down. The send shares
+// enqueueMu with closeTriggers, so a closed trigger channel cannot panic the caller.
+func (c *Config) TryExec(input *ActionInput, name TriggerName) bool {
+	if c == nil {
+		return false
+	}
+
+	c.enqueueMu.Lock()
+	defer c.enqueueMu.Unlock()
+
+	trig := c.Get(name)
+	if trig == nil || trig.C == nil {
+		return false
+	}
+
+	select {
+	case trig.C <- input:
+		return true
+	default:
+		return false
+	}
 }
 
 // Get a trigger by unique name. May return nil, and that could cause a panic.

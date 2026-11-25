@@ -18580,17 +18580,7 @@
         },
         "/trigger/qbitspeed": {
             "get": {
-                "description": "Enable, disable, or reconcile qBittorrent alternative (turtle) speed limits.",
-                "parameters": [
-                    {
-                        "description": "enable, disable, or empty to reconcile",
-                        "in": "path",
-                        "name": "mode",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
+                "description": "Reconcile qBittorrent alternative (turtle) speed limits.",
                 "responses": {
                     "200": {
                         "content": {
@@ -18601,16 +18591,6 @@
                             }
                         },
                         "description": "success"
-                    },
-                    "400": {
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/apps.APIResponse-string"
-                                }
-                            }
-                        },
-                        "description": "invalid mode"
                     },
                     "404": {
                         "content": {
@@ -18638,7 +18618,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "summary": "qBittorrent speed limits",
+                "summary": "Reconcile qBittorrent speed limits",
                 "tags": [
                     "Triggers"
                 ]
@@ -18646,12 +18626,13 @@
         },
         "/trigger/qbitspeed/{mode}": {
             "get": {
-                "description": "Enable, disable, or reconcile qBittorrent alternative (turtle) speed limits.",
+                "description": "Enable or disable qBittorrent alternative (turtle) speed limits.",
                 "parameters": [
                     {
-                        "description": "enable, disable, or empty to reconcile",
+                        "description": "enable or disable",
                         "in": "path",
                         "name": "mode",
+                        "required": true,
                         "schema": {
                             "type": "string"
                         }
@@ -18704,7 +18685,7 @@
                         "ApiKeyAuth": []
                     }
                 ],
-                "summary": "qBittorrent speed limits",
+                "summary": "Set qBittorrent speed limits",
                 "tags": [
                     "Triggers"
                 ]

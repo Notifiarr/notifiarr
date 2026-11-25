@@ -134,6 +134,21 @@ func TestCooldown(t *testing.T) {
 	assert.Equal(t, time.Minute, cooldown(cnfg.Duration{Duration: time.Minute}))
 }
 
+func TestFreshSessions(t *testing.T) {
+	t.Parallel()
+
+	now := time.Now()
+	session := &plex.Session{Type: movieType, Player: plex.Player{State: playing}}
+	session.Session.Location = "wan"
+	list := &plex.Sessions{Sessions: []*plex.Session{session}}
+
+	assert.True(t, hasWANSession(freshSessions(now, list, now)))
+	assert.Nil(t, freshSessions(now.Add(-sessionCacheAge), list, now))
+	assert.Nil(t, freshSessions(time.Time{}, list, now))
+	assert.Nil(t, freshSessions(now, "nope", now))
+	assert.Nil(t, freshSessions(now, nil, now))
+}
+
 func TestDropMissing(t *testing.T) {
 	t.Parallel()
 

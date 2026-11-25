@@ -23,6 +23,7 @@ const (
 	remoteTTL        = 4 * time.Hour
 	defaultCool      = 30 * time.Second
 	reconcileTimeout = time.Minute
+	sessionCacheAge  = time.Minute // same window as plexcron.GetSessions
 	playing          = "playing"
 	paused           = "paused"
 	movieType        = "movie"
@@ -170,23 +171,13 @@ func (a *Action) Kick() {
 }
 
 func (c *cmd) queue(input *common.ActionInput) {
-	trig := c.Get(TrigQbitSpeed)
-	if trig == nil || trig.C == nil {
-		return
-	}
-
-	select {
-	case trig.C <- input:
-	default:
-	}
+	// TryExec shares a lock with trigger shutdown. A plain send panics if reload closes the channel.
+	_ = c.TryExec(input, TrigQbitSpeed)
 }
 
 func (c *cmd) reconcile(ctx context.Context, input *common.ActionInput) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-
-	ctx, cancel := context.WithTimeout(ctx, reconcileTimeout)
-	defer cancel()
 
 	info := clientinfo.Get()
 	if info == nil {
@@ -257,6 +248,9 @@ func (c *cmd) desired(ctx context.Context, cfg clientinfo.QbitThrottleConfig, no
 }
 
 func (c *cmd) plexSessions(ctx context.Context, reqID string) *plex.Sessions {
+	ctx, cancel := context.WithTimeout(ctx, reconcileTimeout)
+	defer cancel()
+
 	sessions, err := c.plex.GetSessions(ctx)
 	if err == nil {
 		return sessions
@@ -264,56 +258,86 @@ func (c *cmd) plexSessions(ctx context.Context, reqID string) *plex.Sessions {
 
 	mnd.Log.Errorf(reqID, "Getting Plex sessions for qBittorrent speed limit: %v", err)
 
-	if item := data.Get("plexCurrentSessions"); item != nil && item.Data != nil {
-		cached, _ := item.Data.(*plex.Sessions)
-
-		return cached
+	// item.Time is the save time. Get refreshes last access, which would keep a dead
+	// WAN session looking fresh for as long as Plex stays down.
+	if item := data.Get("plexCurrentSessions"); item != nil {
+		if fresh := freshSessions(item.Time, item.Data, time.Now()); fresh != nil {
+			return fresh
+		}
 	}
+
+	return sessions
+}
+
+// freshSessions returns a cached Plex session list only while it is still inside sessionCacheAge.
+func freshSessions(saved time.Time, item any, now time.Time) *plex.Sessions {
+	if item == nil || saved.IsZero() || now.Sub(saved) >= sessionCacheAge {
+		return nil
+	}
+
+	sessions, _ := item.(*plex.Sessions)
 
 	return sessions
 }
 
 func (c *cmd) apply(ctx context.Context, input *common.ActionInput, cfg clientinfo.QbitThrottleConfig, desired bool) {
 	for idx := range c.Apps.Qbit {
-		instance := idx + 1
-		app := &c.Apps.Qbit[idx]
-		owned := c.weEnabled[instance]
-		// Empty Instances means every qBit instance; the website has no picker in v1.
-		selected := len(cfg.Instances) == 0 || cfg.Instances.Has(instance)
-		want, skipInst := instanceDesired(desired, selected, owned)
-
-		if !app.Enabled() || skipInst {
-			continue
-		}
-
-		current, err := app.SpeedLimitsModeContext(ctx)
-		if err != nil {
-			mnd.Log.Errorf(input.ReqID, "[%s requested] qBittorrent speed limits mode (%d:%s) failed: %v",
-				input.Type, instance, app.URL, err)
-			continue
-		}
-
-		turtle, weOwn, skip := planTurtle(current, want, owned)
-		if skip {
-			if current && !owned {
-				c.logUnowned(input.ReqID, instance, app.URL)
-			}
-
-			continue
-		}
-
-		if err := app.SetSpeedLimitsModeContext(ctx, turtle); err != nil {
-			mnd.Log.Errorf(input.ReqID, "[%s requested] Setting qBittorrent alternative speed limits (%d:%s) to %v failed: %v",
-				input.Type, instance, app.URL, turtle, err)
-			continue
-		}
-
-		c.weEnabled[instance] = weOwn
-		delete(c.leftAlone, instance)
-
-		mnd.Log.Printf(input.ReqID, "[%s requested] qBittorrent alternative speed limits (%d:%s) => %v",
-			input.Type, instance, app.URL, turtle)
+		c.syncInstance(ctx, input, cfg, desired, idx)
 	}
+}
+
+// syncInstance gives this qBit its own deadline so a stalled server cannot consume the
+// budget of every instance after it. Each poll starts at index zero.
+func (c *cmd) syncInstance(
+	ctx context.Context,
+	input *common.ActionInput,
+	cfg clientinfo.QbitThrottleConfig,
+	desired bool,
+	idx int,
+) {
+	ctx, cancel := context.WithTimeout(ctx, reconcileTimeout)
+	defer cancel()
+
+	instance := idx + 1
+	app := &c.Apps.Qbit[idx]
+	owned := c.weEnabled[instance]
+	// Empty Instances means every qBit instance; the website has no picker in v1.
+	selected := len(cfg.Instances) == 0 || cfg.Instances.Has(instance)
+	want, skipInst := instanceDesired(desired, selected, owned)
+
+	if !app.Enabled() || skipInst {
+		return
+	}
+
+	current, err := app.SpeedLimitsModeContext(ctx)
+	if err != nil {
+		mnd.Log.Errorf(input.ReqID, "[%s requested] qBittorrent speed limits mode (%d:%s) failed: %v",
+			input.Type, instance, app.URL, err)
+
+		return
+	}
+
+	turtle, weOwn, skip := planTurtle(current, want, owned)
+	if skip {
+		if current && !owned {
+			c.logUnowned(input.ReqID, instance, app.URL)
+		}
+
+		return
+	}
+
+	if err := app.SetSpeedLimitsModeContext(ctx, turtle); err != nil {
+		mnd.Log.Errorf(input.ReqID, "[%s requested] Setting qBittorrent alternative speed limits (%d:%s) to %v failed: %v",
+			input.Type, instance, app.URL, turtle, err)
+
+		return
+	}
+
+	c.weEnabled[instance] = weOwn
+	delete(c.leftAlone, instance)
+
+	mnd.Log.Printf(input.ReqID, "[%s requested] qBittorrent alternative speed limits (%d:%s) => %v",
+		input.Type, instance, app.URL, turtle)
 }
 
 func cooldown(dur cnfg.Duration) time.Duration {
