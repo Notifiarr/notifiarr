@@ -1296,6 +1296,10 @@
                     "name": {
                         "description": "Instance name as configured in the client.",
                         "type": "string"
+                    },
+                    "version": {
+                        "description": "Version is the Sonarr server version from the last /version poll. Empty until that poll, and empty for other apps.",
+                        "type": "string"
                     }
                 },
                 "type": "object"
@@ -4072,24 +4076,6 @@
                     "ColonReplaceWithSpaceDashSpace"
                 ]
             },
-            "radarr.Collection": {
-                "properties": {
-                    "images": {
-                        "items": {
-                            "$ref": "#/components/schemas/starr.Image"
-                        },
-                        "type": "array",
-                        "uniqueItems": false
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "tmdbId": {
-                        "type": "integer"
-                    }
-                },
-                "type": "object"
-            },
             "radarr.CustomFormatInput": {
                 "properties": {
                     "id": {
@@ -4406,7 +4392,7 @@
                         "type": "string"
                     },
                     "collection": {
-                        "$ref": "#/components/schemas/radarr.Collection"
+                        "$ref": "#/components/schemas/radarr.MovieCollection"
                     },
                     "digitalRelease": {
                         "type": "string"
@@ -4521,6 +4507,24 @@
                     },
                     "youTubeTrailerId": {
                         "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "radarr.MovieCollection": {
+                "properties": {
+                    "images": {
+                        "items": {
+                            "$ref": "#/components/schemas/starr.Image"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "tmdbId": {
+                        "type": "integer"
                     }
                 },
                 "type": "object"
@@ -4682,9 +4686,6 @@
             },
             "radarr.NotificationOutput": {
                 "properties": {
-                    "SupportsOnMovieDelete": {
-                        "type": "boolean"
-                    },
                     "configContract": {
                         "type": "string"
                     },
@@ -4756,6 +4757,9 @@
                         "type": "boolean"
                     },
                     "supportsOnMovieAdded": {
+                        "type": "boolean"
+                    },
+                    "supportsOnMovieDelete": {
                         "type": "boolean"
                     },
                     "supportsOnMovieFileDelete": {
@@ -5926,6 +5930,13 @@
                     "addOptions": {
                         "$ref": "#/components/schemas/sonarr.AddSeriesOptions"
                     },
+                    "aniListIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
                     "id": {
                         "type": "integer"
                     },
@@ -5939,11 +5950,30 @@
                     "imdbId": {
                         "type": "string"
                     },
+                    "language": {
+                        "$ref": "#/components/schemas/starr.Value"
+                    },
                     "languageProfileId": {
                         "type": "integer"
                     },
+                    "malIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "monitorNewItems": {
+                        "type": "string"
+                    },
                     "monitored": {
                         "type": "boolean"
+                    },
+                    "originalCountry": {
+                        "type": "string"
+                    },
+                    "originalLanguage": {
+                        "$ref": "#/components/schemas/starr.Value"
                     },
                     "path": {
                         "type": "string"
@@ -5956,6 +5986,9 @@
                     },
                     "seasonFolder": {
                         "type": "boolean"
+                    },
+                    "seasonType": {
+                        "type": "string"
                     },
                     "seasons": {
                         "items": {
@@ -5979,6 +6012,9 @@
                     },
                     "titleSlug": {
                         "type": "string"
+                    },
+                    "tmdbId": {
+                        "type": "integer"
                     },
                     "tvMazeId": {
                         "type": "integer"
@@ -6173,6 +6209,12 @@
                     "implementation": {
                         "type": "string"
                     },
+                    "implementationName": {
+                        "type": "string"
+                    },
+                    "infoLink": {
+                        "type": "string"
+                    },
                     "name": {
                         "type": "string"
                     },
@@ -6323,6 +6365,9 @@
                     "infoLink": {
                         "type": "string"
                     },
+                    "language": {
+                        "$ref": "#/components/schemas/starr.Value"
+                    },
                     "listOrder": {
                         "type": "integer"
                     },
@@ -6330,6 +6375,9 @@
                         "type": "string"
                     },
                     "minRefreshInterval": {
+                        "type": "string"
+                    },
+                    "monitorNewItems": {
                         "type": "string"
                     },
                     "name": {
@@ -6341,6 +6389,9 @@
                     "rootFolderPath": {
                         "type": "string"
                     },
+                    "searchForMissingEpisodes": {
+                        "type": "boolean"
+                    },
                     "seasonFolder": {
                         "type": "boolean"
                     },
@@ -6348,6 +6399,9 @@
                         "type": "string"
                     },
                     "shouldMonitor": {
+                        "type": "string"
+                    },
+                    "tagExisting": {
                         "type": "string"
                     },
                     "tags": {
@@ -6388,6 +6442,9 @@
                     "infoLink": {
                         "type": "string"
                     },
+                    "language": {
+                        "$ref": "#/components/schemas/starr.Value"
+                    },
                     "listOrder": {
                         "type": "integer"
                     },
@@ -6395,6 +6452,9 @@
                         "type": "string"
                     },
                     "minRefreshInterval": {
+                        "type": "string"
+                    },
+                    "monitorNewItems": {
                         "type": "string"
                     },
                     "name": {
@@ -6406,6 +6466,9 @@
                     "rootFolderPath": {
                         "type": "string"
                     },
+                    "searchForMissingEpisodes": {
+                        "type": "boolean"
+                    },
                     "seasonFolder": {
                         "type": "boolean"
                     },
@@ -6413,6 +6476,9 @@
                         "type": "string"
                     },
                     "shouldMonitor": {
+                        "type": "string"
+                    },
+                    "tagExisting": {
                         "type": "string"
                     },
                     "tags": {
@@ -6757,8 +6823,24 @@
             },
             "sonarr.ReleaseProfile": {
                 "properties": {
+                    "airDateGracePeriod": {
+                        "type": "integer"
+                    },
+                    "airDateRestriction": {
+                        "type": "boolean"
+                    },
+                    "allowSeasonPackWithoutAllEpisodesAired": {
+                        "type": "boolean"
+                    },
                     "enabled": {
                         "type": "boolean"
+                    },
+                    "excludedTags": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
                     },
                     "id": {
                         "type": "integer"
@@ -6771,17 +6853,24 @@
                         "uniqueItems": false
                     },
                     "includePreferredWhenRenaming": {
-                        "description": "V3 only, removed from v4.",
+                        "description": "v3 only.",
                         "type": "boolean"
                     },
                     "indexerId": {
                         "type": "integer"
                     },
+                    "indexerIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
                     "name": {
                         "type": "string"
                     },
                     "preferred": {
-                        "description": "V3 only, removed from v4.",
+                        "description": "v3 only.",
                         "items": {
                             "$ref": "#/components/schemas/starr.KeyValue"
                         },
@@ -6857,6 +6946,13 @@
                         "type": "array",
                         "uniqueItems": false
                     },
+                    "aniListIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
                     "certification": {
                         "type": "string"
                     },
@@ -6889,8 +6985,21 @@
                     "imdbId": {
                         "type": "string"
                     },
+                    "language": {
+                        "$ref": "#/components/schemas/starr.Value"
+                    },
                     "languageProfileId": {
                         "type": "integer"
+                    },
+                    "malIds": {
+                        "items": {
+                            "type": "integer"
+                        },
+                        "type": "array",
+                        "uniqueItems": false
+                    },
+                    "monitorNewItems": {
+                        "type": "string"
                     },
                     "monitored": {
                         "type": "boolean"
@@ -6900,6 +7009,12 @@
                     },
                     "nextAiring": {
                         "type": "string"
+                    },
+                    "originalCountry": {
+                        "type": "string"
+                    },
+                    "originalLanguage": {
+                        "$ref": "#/components/schemas/starr.Value"
                     },
                     "overview": {
                         "type": "string"
@@ -6924,6 +7039,9 @@
                     },
                     "seasonFolder": {
                         "type": "boolean"
+                    },
+                    "seasonType": {
+                        "type": "string"
                     },
                     "seasons": {
                         "items": {
@@ -6956,6 +7074,9 @@
                     },
                     "titleSlug": {
                         "type": "string"
+                    },
+                    "tmdbId": {
+                        "type": "integer"
                     },
                     "tvMazeId": {
                         "type": "integer"
@@ -7254,8 +7375,17 @@
                         "type": "array",
                         "uniqueItems": false
                     },
+                    "maxSize": {
+                        "type": "number"
+                    },
+                    "minSize": {
+                        "type": "number"
+                    },
                     "name": {
                         "type": "string"
+                    },
+                    "preferredSize": {
+                        "type": "number"
                     },
                     "quality": {
                         "$ref": "#/components/schemas/starr.BaseQuality"

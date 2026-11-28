@@ -109,6 +109,8 @@ type AppInfoAppConfig struct {
 	Instance int `json:"instance"`
 	// Instance name as configured in the client.
 	Name string `json:"name"`
+	// Version is the Sonarr server version from the last /version poll. Empty until that poll, and empty for other apps.
+	Version string `json:"version,omitempty"`
 }
 
 // AppInfoTautulli contains the configured Tautulli instance and its user map.
@@ -219,7 +221,9 @@ func (c *Config) getAppConfigs(ctx context.Context, startup bool) *AppConfigs {
 	}
 
 	for i, app := range c.Sonarr {
-		apps.Sonarr = append(apps.Sonarr, add(i, app.Name))
+		item := add(i, app.Name)
+		item.Version = app.Version()
+		apps.Sonarr = append(apps.Sonarr, item)
 	}
 
 	c.addDownloaderConfigs(apps, add)
